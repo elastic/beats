@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -34,29 +35,24 @@ import (
 )
 
 var (
-	debugf    = logp.MakeDebug("sip")
-	detailedf = logp.MakeDebug("sipdetailed")
-)
-
-// SIP application level protocol analyser plugin.
-type plugin struct {
-	// config
-	ports              []int
-	parseAuthorization bool
-	parseBody          bool
-	keepOriginal       bool
-
-	results protos.Reporter
-	watcher procs.ProcessesWatcher
-}
-
-var (
+	debugf     = logp.MakeDebug("sip")
+	detailedf  = logp.MakeDebug("sipdetailed")
 	isDebug    = false
 	isDetailed = false
+
+	_ protos.UDPPlugin = &plugin{}
+	_ protos.TCPPlugin = &plugin{}
 )
 
 func init() {
 	protos.Register("sip", New)
+}
+
+// SIP application level protocol analyser UDP and TCP plugin.
+type plugin struct {
+	cfg     *config
+	results protos.Reporter
+	watcher procs.ProcessesWatcher
 }
 
 func New(
@@ -67,7 +63,9 @@ func New(
 ) (protos.Plugin, error) {
 	cfgwarn.Beta("packetbeat SIP protocol is used")
 
-	p := &plugin{}
+	isDebug = logp.IsDebug("sip")
+	isDetailed = logp.IsDebug("sipdetailed")
+
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -75,40 +73,71 @@ func New(
 		}
 	}
 
-	if err := p.init(results, watcher, &config); err != nil {
-		return nil, err
+	tp := strings.ToLower(config.TransportProto)
+	switch tp {
+	case "tcp", "udp":
+		p := &plugin{}
+		p.init(results, watcher, &config)
+		return p, nil
 	}
-	return p, nil
+
+	return nil, fmt.Errorf("unsupported transport_protocol: %s", tp)
 }
 
 // Init initializes the HTTP protocol analyser.
-func (p *plugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *config) error {
-	p.setFromConfig(config)
-
-	isDebug = logp.IsDebug("sip")
-	isDetailed = logp.IsDebug("sipdetailed")
+func (p *plugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *config) {
 	p.results = results
 	p.watcher = watcher
-	return nil
-}
-
-func (p *plugin) setFromConfig(config *config) {
-	p.ports = config.Ports
-	p.keepOriginal = config.KeepOriginal
-	p.parseAuthorization = config.ParseAuthorization
-	p.parseBody = config.ParseBody
+	p.cfg = config
 }
 
 func (p *plugin) GetPorts() []int {
-	return p.ports
+	return p.cfg.Ports
 }
 
 func (p *plugin) ParseUDP(pkt *protos.Packet) {
 	defer logp.Recover("SIP ParseUDP exception")
 
 	if err := p.doParse(pkt); err != nil {
-		debugf("error: %s", err)
+		logp.Error(err)
 	}
+}
+
+// Parse function is used to process TCP payloads.
+func (p *plugin) Parse(
+	pkt *protos.Packet,
+	tcptuple *common.TCPTuple,
+	dir uint8,
+	private protos.ProtocolData,
+) protos.ProtocolData {
+	defer logp.Recover("SIP Parse exception")
+	// return p.doParse(ensureConnection(private), pkt, tcptuple, dir)
+	if err := p.doParse(pkt); err != nil {
+		logp.Error(err)
+	}
+	return private
+}
+
+// ReceivedFin will be called when TCP transaction is terminating.
+func (p *plugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
+	private protos.ProtocolData,
+) protos.ProtocolData {
+	debugf("Received FIN")
+	return private
+}
+
+// GapInStream is called when a gap of nbytes bytes is found in the stream (due
+// to packet loss).
+func (p *plugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+) {
+	defer logp.Recover("GapInStream(sip) exception")
+	return private, false
+}
+
+// ConnectionTimeout returns the configured HTTP transaction timeout.
+func (p *plugin) ConnectionTimeout() time.Duration {
+	return p.cfg.TransactionTimeout
 }
 
 func (p *plugin) doParse(pkt *protos.Packet) error {
@@ -116,15 +145,13 @@ func (p *plugin) doParse(pkt *protos.Packet) error {
 		detailedf("Payload received: [%s]", pkt.Payload)
 	}
 
-	parser := newParser(p.watcher)
-
 	pi := newParsingInfo(pkt)
-	m, err := parser.parse(pi)
+	m, err := parse(pi)
 	if err != nil {
 		return err
 	}
 
-	evt, err := p.buildEvent(m, pkt)
+	evt, err := p.buildEvent(p.cfg, pi, m)
 	if err != nil {
 		return err
 	}
@@ -140,15 +167,7 @@ func (p *plugin) publish(evt beat.Event) {
 	}
 }
 
-func newParsingInfo(pkt *protos.Packet) *parsingInfo {
-	return &parsingInfo{
-		tuple: &pkt.Tuple,
-		data:  pkt.Payload,
-		pkt:   pkt,
-	}
-}
-
-func (p *plugin) buildEvent(m *message, _ *protos.Packet) (*beat.Event, error) {
+func (p *plugin) buildEvent(cfg *config, pi *parsingInfo, m *message) (*beat.Event, error) {
 	status := common.OK_STATUS
 	if m.statusCode >= 400 {
 		status = common.ERROR_STATUS
@@ -166,30 +185,37 @@ func (p *plugin) buildEvent(m *message, _ *protos.Packet) (*beat.Event, error) {
 		populateResponseFields(m, &sipFields)
 	}
 
-	p.populateHeadersFields(m, evt, pbf, &sipFields)
+	populateHeadersFields(cfg, m, evt, pbf, &sipFields)
 
-	if p.parseBody {
+	if cfg.ParseBody {
 		populateBodyFields(m, pbf, &sipFields)
 	}
 
 	pbf.Network.IANANumber = "17"
 	pbf.Network.Application = "sip"
 	pbf.Network.Protocol = "sip"
-	pbf.Network.Transport = "udp"
+	pbf.Network.Transport = cfg.TransportProto
 
-	src, dst := m.getEndpoints()
+	cmdlineTuple := p.watcher.FindProcessesTupleTCP(&pi.pkt.Tuple)
+	src, dst := getEndpoints(pi.pkt.Tuple.BaseTuple, cmdlineTuple)
 	pbf.SetSource(src)
 	pbf.AddIP(src.IP)
 	pbf.SetDestination(dst)
 	pbf.AddIP(dst.IP)
 
-	p.populateEventFields(m, pbf, sipFields)
+	populateEventFields(cfg, m, pbf, sipFields)
 
 	if err := pb.MarshalStruct(evt.Fields, "sip", sipFields); err != nil {
 		return nil, err
 	}
 
 	return &evt, nil
+}
+
+func getEndpoints(tuple common.BaseTuple, cmdTuple *common.ProcessTuple) (src *common.Endpoint, dst *common.Endpoint) {
+	source, destination := common.MakeEndpointPair(tuple, cmdTuple)
+	src, dst = &source, &destination
+	return src, dst
 }
 
 func populateRequestFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
@@ -215,7 +241,7 @@ func populateResponseFields(m *message, fields *ProtocolFields) {
 	fields.Version = m.version.String()
 }
 
-func (p *plugin) populateHeadersFields(m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields) {
+func populateHeadersFields(cfg *config, m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields) {
 	fields.Allow = m.allow
 	fields.CallID = m.callID
 	fields.ContentLength = m.contentLength
@@ -255,7 +281,7 @@ func (p *plugin) populateHeadersFields(m *message, evt beat.Event, pbf *pb.Field
 
 	populateContactFields(m, pbf, fields)
 
-	if p.parseAuthorization {
+	if cfg.ParseAuthorization {
 		populateAuthFields(m, evt, pbf, fields)
 	}
 }
@@ -317,7 +343,7 @@ func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	}
 }
 
-func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, fields ProtocolFields) {
+func populateEventFields(cfg *config, m *message, pbf *pb.Fields, fields ProtocolFields) {
 	pbf.Event.Kind = "event"
 	pbf.Event.Type = []string{"info", "protocol"}
 	pbf.Event.Dataset = "sip"
@@ -328,7 +354,7 @@ func (p *plugin) populateEventFields(m *message, pbf *pb.Fields, fields Protocol
 	pbf.Event.End = m.ts
 	//
 
-	if p.keepOriginal {
+	if cfg.KeepOriginal {
 		pbf.Event.Original = string(m.rawData)
 	}
 

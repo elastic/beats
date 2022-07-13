@@ -26,19 +26,16 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
-// Http Message
+// sip Message
 type message struct {
 	ts               time.Time
 	hasContentLength bool
 	headerOffset     int
 
-	isRequest    bool
-	ipPortTuple  common.IPPortTuple
-	cmdlineTuple *common.ProcessTuple
+	isRequest bool
 
 	// Info
 	requestURI   common.NetString
@@ -56,6 +53,7 @@ type message struct {
 	cseq          common.NetString
 	callID        common.NetString
 	maxForwards   int
+	viaDedup      map[string]struct{}
 	via           []common.NetString
 	allow         []string
 	supported     []string
@@ -86,13 +84,7 @@ const (
 	stateBody
 )
 
-type parser struct {
-	watcher procs.ProcessesWatcher
-}
-
 type parsingInfo struct {
-	tuple *common.IPPortTuple
-
 	data []byte
 
 	parseOffset  int
@@ -100,6 +92,13 @@ type parsingInfo struct {
 	bodyReceived int
 
 	pkt *protos.Packet
+}
+
+func newParsingInfo(pkt *protos.Packet) *parsingInfo {
+	return &parsingInfo{
+		data: pkt.Payload,
+		pkt:  pkt,
+	}
 }
 
 var (
@@ -118,37 +117,29 @@ var (
 	nameVia           = []byte("via")
 )
 
-func newParser(watcher procs.ProcessesWatcher) *parser {
-	return &parser{
-		watcher: watcher,
-	}
-}
-
-func (parser *parser) parse(pi *parsingInfo) (*message, error) {
+func parse(pi *parsingInfo) (*message, error) {
 	m := &message{
-		ts:           pi.pkt.Ts,
-		ipPortTuple:  pi.pkt.Tuple,
-		cmdlineTuple: parser.watcher.FindProcessesTupleTCP(&pi.pkt.Tuple),
-		rawData:      pi.data,
+		ts:      pi.pkt.Ts,
+		rawData: pi.data,
 	}
 	for pi.parseOffset < len(pi.data) {
 		switch pi.state {
 		case stateStart:
-			if err := parser.parseSIPLine(pi, m); err != nil {
+			if err := parseSIPLine(pi, m); err != nil {
 				return m, err
 			}
 		case stateHeaders:
-			if err := parser.parseHeaders(pi, m); err != nil {
+			if err := parseHeaders(pi, m); err != nil {
 				return m, err
 			}
 		case stateBody:
-			parser.parseBody(pi, m)
+			parseBody(pi, m)
 		}
 	}
 	return m, nil
 }
 
-func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
+func parseSIPLine(pi *parsingInfo, m *message) error {
 	// ignore any CRLF appearing before the start-line (RFC3261 7.5)
 	pi.data = bytes.TrimLeft(pi.data[pi.parseOffset:], string(constCRLF))
 
@@ -267,10 +258,10 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 	return uint8(major), uint8(minor), nil
 }
 
-func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
+func parseHeaders(pi *parsingInfo, m *message) error {
 	// check if it isn't headers end yet with /r/n/r/n
 	if len(pi.data)-pi.parseOffset < 2 || !bytes.Equal(pi.data[pi.parseOffset:pi.parseOffset+2], constCRLF) {
-		offset, err := parser.parseHeader(m, pi.data[pi.parseOffset:])
+		offset, err := parseHeader(pi, m)
 		if err != nil {
 			return err
 		}
@@ -301,10 +292,12 @@ func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
 	return nil
 }
 
-func (parser *parser) parseHeader(m *message, data []byte) (int, error) {
+func parseHeader(pi *parsingInfo, m *message) (int, error) {
 	if m.headers == nil {
 		m.headers = make(map[string][]common.NetString)
 	}
+
+	data := pi.data[pi.parseOffset:]
 
 	i := bytes.Index(data, []byte(":"))
 	if i == -1 {
@@ -368,7 +361,13 @@ func (parser *parser) parseHeader(m *message, data []byte) (int, error) {
 		case bytes.Equal(headerName, nameSupported):
 			m.supported = parseCommaSeparatedList(headerVal)
 		case bytes.Equal(headerName, nameVia):
-			m.via = append(m.via, headerVal)
+			if m.viaDedup == nil {
+				m.viaDedup = map[string]struct{}{}
+			}
+			if _, found := m.viaDedup[string(headerVal)]; !found {
+				m.via = append(m.via, headerVal)
+				m.viaDedup[string(headerVal)] = struct{}{}
+			}
 		}
 
 		m.headers[string(headerName)] = append(
@@ -391,7 +390,7 @@ func parseCommaSeparatedList(s common.NetString) (list []string) {
 	return list
 }
 
-func (*parser) parseBody(pi *parsingInfo, m *message) {
+func parseBody(pi *parsingInfo, m *message) {
 	nbytes := len(pi.data)
 	if nbytes >= m.contentLength-pi.bodyReceived {
 		wanted := m.contentLength - pi.bodyReceived
@@ -408,12 +407,6 @@ func (*parser) parseBody(pi *parsingInfo, m *message) {
 			debugf("bodyReceived: %d", pi.bodyReceived)
 		}
 	}
-}
-
-func (m *message) getEndpoints() (src *common.Endpoint, dst *common.Endpoint) {
-	source, destination := common.MakeEndpointPair(m.ipPortTuple.BaseTuple, m.cmdlineTuple)
-	src, dst = &source, &destination
-	return src, dst
 }
 
 func parseInt(line []byte) (int, error) {
