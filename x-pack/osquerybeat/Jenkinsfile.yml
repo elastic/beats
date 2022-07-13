@@ -66,7 +66,7 @@ stages:
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-8"
+            - "windows-8-latest"
         stage: extended_win
     packaging-linux:
         packaging-linux: "mage package"
