@@ -111,6 +111,7 @@ pipeline {
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
+            expression { return false }
           }
           expression { return params.runAllStages }         // If UI forced
         }
@@ -130,6 +131,7 @@ pipeline {
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
+            expression { return false }
           }
           expression { return params.runAllStages }         // If UI forced
         }
