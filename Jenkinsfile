@@ -142,17 +142,6 @@ pipeline {
     }
     stage('ExtendedWin') {
       options { skipDefaultCheckout() }
-      when {
-        // On a branches/tags, skip if changes are only related to docs.
-        // Always when forcing the input parameter
-        anyOf {
-          allOf {                                           // If no PR and no docs changes
-            expression { return env.ONLY_DOCS == "false" }
-            not { changeRequest() }
-          }
-          expression { return params.runAllStages }         // If UI forced
-        }
-      }
       steps {
         runBuildAndTest(filterStage: 'extended_win')
       }
@@ -166,6 +155,7 @@ pipeline {
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
+            expression { return false }
           }
           expression { return params.runAllStages }         // If UI forced
         }
@@ -183,6 +173,7 @@ pipeline {
             expression { return env.GO_MOD_CHANGES == "true" }
             expression { return env.PACKAGING_CHANGES == "true" }
           }
+          expression { return false }
           changeRequest()
         }
       }
