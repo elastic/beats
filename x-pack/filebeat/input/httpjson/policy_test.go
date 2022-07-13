@@ -34,7 +34,7 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 	defer statusCompletedResponse.Body.Close()
 	statusInitiatedResponse := getTestResponse(statusInitiated, 200)
 	defer statusInitiatedResponse.Body.Close()
-	internalServerErrorResponse := getTestResponse(statusCompleted, 200)
+	internalServerErrorResponse := getTestResponse(statusCompleted, 500)
 	defer internalServerErrorResponse.Body.Close()
 
 	type fields struct {

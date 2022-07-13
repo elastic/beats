@@ -103,6 +103,12 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 			return retry, fmt.Errorf("failed to read http response body : %w", err)
 		}
 
+		err = resp.Body.Close()
+		if err != nil {
+			return retry, fmt.Errorf("error closing response body : %w", err)
+		}
+		resp.Body = io.NopCloser(bytes.NewBuffer(body))
+
 		result, err := p.fn(p.expression, body, p.log)
 		if err != nil {
 			return retry, err
@@ -111,7 +117,6 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 		if !result {
 			retry = true
 		}
-		resp.Body = io.NopCloser(bytes.NewBuffer(body))
 
 		return retry, nil
 	}

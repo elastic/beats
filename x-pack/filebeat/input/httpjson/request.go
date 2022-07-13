@@ -102,7 +102,7 @@ type requestFactory struct {
 	encoder         encoderFunc
 	replace         string
 	isChain         bool
-	till            *valueTpl
+	until           *valueTpl
 	chainHTTPClient *httpClient
 }
 
@@ -151,7 +151,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 			}
 		} else if ch.While != nil {
 			ts, _ := newBasicTransformsFromConfig(ch.While.Request.Transforms, requestNamespace, log)
-			policy := newHTTPPolicy(evaluateResponse, ch.While.Till, log)
+			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, log)
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
 			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, &ch.While.Request, log, policy)
 			if err != nil {
@@ -169,7 +169,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				log:             log,
 				encoder:         registeredEncoders[config.Request.EncodeAs],
 				replace:         ch.While.Replace,
-				till:            ch.While.Till,
+				until:           ch.While.Until,
 				isChain:         true,
 				chainHTTPClient: httpClient,
 			}

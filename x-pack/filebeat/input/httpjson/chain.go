@@ -76,9 +76,9 @@ type stepConfig struct {
 }
 
 // whileConfig will contain basic properties like auth parameters, request parameters,
-// response parameters , a replace parameter and an expression parameter called till.
-// While is similar to stepConfig with the addition of till. Till holds an expression
-// and with the combination of "request.retry.max_attempts" retries a request till the
+// response parameters , a replace parameter and an expression parameter called 'until'.
+// While is similar to stepConfig with the addition of 'until'. 'until' holds an expression
+// and with the combination of "request.retry.max_attempts" retries a request 'until' the
 // expression is evaluated to "true" or request.retry.max_attempts is exhausted. If
 // request.retry.max_attempts is not specified , the max_attempts is always 1.
 type whileConfig struct {
@@ -86,7 +86,7 @@ type whileConfig struct {
 	Request  requestConfig       `config:"request" validate:"required"`
 	Response responseChainConfig `config:"response,omitempty"`
 	Replace  string              `config:"replace,omitempty"`
-	Till     *valueTpl           `config:"till" validate:"required"`
+	Until    *valueTpl           `config:"until" validate:"required"`
 }
 
 type responseChainConfig struct {
