@@ -191,16 +191,16 @@ func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMet
 	}
 
 	var formattedStats []Stats
-	for id, containerStats := range taskStatsOutput {
+	for id, taskStats := range taskStatsOutput {
 		if c, ok := containersInfo[id]; ok {
 			statsPerContainer := Stats{
-				Time:         common.Time(containerStats.Stats.Read),
+				Time:         common.Time(taskStats.Stats.Read),
 				taskInfo:     &taskInfo,
 				Container:    getContainerMetadata(&c),
-				cpuStats:     getCPUStats(containerStats),
-				memoryStats:  getMemoryStats(containerStats),
-				networkStats: getNetworkStats(containerStats),
-				blkioStats:   getBlkioStats(containerStats.BlkioStats),
+				cpuStats:     getCPUStats(taskStats),
+				memoryStats:  getMemoryStats(taskStats),
+				networkStats: getNetworkStats(taskStats),
+				blkioStats:   getBlkioStats(taskStats.BlkioStats),
 			}
 
 			formattedStats = append(formattedStats, statsPerContainer)
