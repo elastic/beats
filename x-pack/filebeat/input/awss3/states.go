@@ -154,7 +154,7 @@ func (s *states) Update(newState state, listingID string) {
 	s.Lock()
 	defer s.Unlock()
 
-	id := newState.Bucket + newState.Key
+	id := newState.ID
 	index := s.findPrevious(id)
 
 	if index >= 0 {
@@ -204,7 +204,7 @@ func (s *states) Update(newState state, listingID string) {
 func (s *states) FindPrevious(newState state) state {
 	s.RLock()
 	defer s.RUnlock()
-	id := newState.Bucket + newState.Key
+	id := newState.ID
 	i := s.findPrevious(id)
 	if i < 0 {
 		return state{}
@@ -227,7 +227,7 @@ func (s *states) FindPreviousByID(id string) state {
 func (s *states) IsNew(state state) bool {
 	s.RLock()
 	defer s.RUnlock()
-	id := state.Bucket + state.Key
+	id := state.ID
 	i := s.findPrevious(id)
 
 	if i < 0 {
