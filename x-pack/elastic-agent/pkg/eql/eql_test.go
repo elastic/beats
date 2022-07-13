@@ -308,10 +308,10 @@ func TestEql(t *testing.T) {
 
 	store := &testVarStore{
 		vars: map[string]interface{}{
-			"env.HOSTNAME": "my-hostname",
-			"host.name":    "host-name",
-			"data.array":   []interface{}{"array1", "array2", "array3"},
-			"with-dash":    "dash-value",
+			"env.HOSTNAME":   "my-hostname",
+			"host.name":      "host-name",
+			"data.array":     []interface{}{"array1", "array2", "array3"},
+			"data.with-dash": "dash-value",
 			"data.dict": map[string]interface{}{
 				"key1": "dict1",
 				"key2": "dict2",
