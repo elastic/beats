@@ -36444,15 +36444,6 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.push_request_latencies.value`*::
-+
---
-Distribution of push request latencies (in microseconds), grouped by result.
-
-type: long
-
---
-
 *`gcp.pubsub.subscription.retained_acked.bytes`*::
 +
 --
