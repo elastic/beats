@@ -42,9 +42,19 @@ func createEvent(stats *Stats) mb.Event {
 		e.MetricSetFields.Put("cluster_name", clusterName)
 	}
 
-	taskName := stats.Container.Labels[taskLabel]
+	taskName := stats.taskInfo.Family
 	if taskName != "" {
 		e.MetricSetFields.Put("task_name", taskName)
+	}
+
+	taskDesiredStatus := stats.taskInfo.TaskDesiredStatus
+	if taskDesiredStatus != "" {
+		e.MetricSetFields.Put("task_desired_status", taskDesiredStatus)
+	}
+
+	taskKnownStatus := stats.taskInfo.TaskKnownStatus
+	if taskKnownStatus != "" {
+		e.MetricSetFields.Put("task_known_status", taskKnownStatus)
 	}
 
 	e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
