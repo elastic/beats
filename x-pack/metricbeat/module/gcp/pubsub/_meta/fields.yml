@@ -124,7 +124,8 @@
     type: long
     description: Cumulative count of configuration changes, grouped by operation type and result.
   - name: topic.message_sizes.bytes
-    type: long
+    type: object
+    object_type: histogram
     description: Distribution of publish message sizes (in bytes)
   - name: topic.oldest_retained_acked_message_age_by_region.value
     type: long
@@ -147,3 +148,11 @@
   - name: topic.unacked_bytes_by_region.bytes
     type: long
     description: Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
+  - name: subscription.ack_latencies.value
+    type: object
+    object_type: histogram
+    description: Distribution of ack latencies in milliseconds. The ack latency is the time between when Cloud Pub/Sub sends a message to a subscriber client and when Cloud Pub/Sub receives an Acknowledge request for that message.
+  - name: subscription.push_request_latencies.value
+    type: object
+    object_type: histogram
+    description: Distribution of push request latencies (in microseconds), grouped by result.
