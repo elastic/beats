@@ -318,4 +318,4 @@ remove this section and set `:has-dashboards: false` at the top of this file.
 For a description of each field in the module, see the
 <<exported-fields-salesforce,exported fields>> section.
 
-edit_url!:
+:edit_url!:
