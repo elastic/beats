@@ -16,7 +16,6 @@ import (
 
 var (
 	clusterLabel = "com_amazonaws_ecs_cluster"
-	taskLabel    = "com_amazonaws_ecs_task-definition-family"
 )
 
 func eventsMapping(r mb.ReporterV2, statsList []Stats) {
