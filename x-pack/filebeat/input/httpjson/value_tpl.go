@@ -71,6 +71,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"parseTimestamp":      parseTimestamp,
 			"parseTimestampMilli": parseTimestampMilli,
 			"parseTimestampNano":  parseTimestampNano,
+			"replaceAll":          replaceAll,
 			"sprintf":             fmt.Sprintf,
 			"toInt":               toInt,
 			"urlEncode":           urlEncode,
@@ -425,4 +426,16 @@ func urlEncode(value string) string {
 		return ""
 	}
 	return url.QueryEscape(value)
+}
+
+// replaceAll returns a copy of the string s with all non-overlapping instances
+// of old replaced by new.
+//
+// Note that the order of the arguments differs from Go's [strings.ReplaceAll] to
+// make pipelining more ergonomic. This allows s to be piped in because it is
+// the final argument. For example,
+//
+//   [[ "some value" | replaceAll "some" "my" ]]  // == "my value"
+func replaceAll(old, new, s string) string {
+	return strings.ReplaceAll(s, old, new)
 }

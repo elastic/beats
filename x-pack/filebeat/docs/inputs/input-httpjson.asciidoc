@@ -221,6 +221,7 @@ Some built-in helper functions are provided to work with the input state inside 
 - `parseTimestampMilli`: parses a timestamp in milliseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 - `parseTimestampNano`: parses a timestamp in nanoseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000000000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 - `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
+- `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some value" "some" "my" ]]` returns `my value`.
 - `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
 - `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 - `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
