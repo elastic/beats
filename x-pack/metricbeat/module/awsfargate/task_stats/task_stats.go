@@ -5,6 +5,7 @@
 package task_stats
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -60,7 +61,7 @@ type TaskInfo struct {
 // Stats is a struct that represents information regarding a container
 type Stats struct {
 	Time         common.Time
-	taskInfo     *TaskInfo
+	taskInfo     TaskInfo
 	Container    *container
 	cpuStats     cpu.CPUStats
 	memoryStats  memoryStats
@@ -117,8 +118,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
-	// Get response from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
-	taskStatsResp, err := http.Get(m.taskStatsEndpoint)
+	// Collect information from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, m.taskStatsEndpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("http.NewRequestWithContext: %w", err)
+	}
+	taskStatsResp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
@@ -128,7 +133,11 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	}
 
 	// Collect container metadata information from ${ECS_CONTAINER_METADATA_URI_V4}/task
-	taskResp, err := http.Get(m.taskEndpoint)
+	req, err = http.NewRequestWithContext(context.Background(), http.MethodGet, m.taskStatsEndpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("http.NewRequestWithContext: %w", err)
+	}
+	taskResp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
@@ -195,7 +204,7 @@ func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMet
 		if c, ok := containersInfo[id]; ok {
 			statsPerContainer := Stats{
 				Time:         common.Time(taskStats.Stats.Read),
-				taskInfo:     &taskInfo,
+				taskInfo:     taskInfo,
 				Container:    getContainerMetadata(&c),
 				cpuStats:     getCPUStats(taskStats),
 				memoryStats:  getMemoryStats(taskStats),

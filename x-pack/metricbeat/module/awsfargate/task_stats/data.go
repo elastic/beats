@@ -5,6 +5,7 @@
 package task_stats
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -19,8 +20,8 @@ var (
 )
 
 func eventsMapping(r mb.ReporterV2, statsList []Stats) {
-	for _, stats := range statsList {
-		r.Event(createEvent(&stats))
+	for i := range statsList {
+		r.Event(createEvent(&statsList[i]))
 	}
 }
 
@@ -38,25 +39,40 @@ func createEvent(stats *Stats) mb.Event {
 	regionName, clusterName := getRegionAndClusterName(stats.Container.Labels)
 	e.RootFields = createRootFields(stats, regionName)
 	if clusterName != "" {
-		e.MetricSetFields.Put("cluster_name", clusterName)
+		_, err := e.MetricSetFields.Put("cluster_name", clusterName)
+		if err != nil {
+			_ = fmt.Errorf("error putting metric set field 'cluster_name': %w", err)
+		}
 	}
 
 	taskName := stats.taskInfo.Family
 	if taskName != "" {
-		e.MetricSetFields.Put("task_name", taskName)
+		_, err := e.MetricSetFields.Put("task_name", taskName)
+		if err != nil {
+			_ = fmt.Errorf("error putting metric set field 'task_name': %w", err)
+		}
 	}
 
 	taskDesiredStatus := stats.taskInfo.TaskDesiredStatus
 	if taskDesiredStatus != "" {
-		e.MetricSetFields.Put("task_desired_status", taskDesiredStatus)
+		_, err := e.MetricSetFields.Put("task_desired_status", taskDesiredStatus)
+		if err != nil {
+			_ = fmt.Errorf("error putting metric set field 'task_desired_status': %w", err)
+		}
 	}
 
 	taskKnownStatus := stats.taskInfo.TaskKnownStatus
 	if taskKnownStatus != "" {
-		e.MetricSetFields.Put("task_known_status", taskKnownStatus)
+		_, err := e.MetricSetFields.Put("task_known_status", taskKnownStatus)
+		if err != nil {
+			_ = fmt.Errorf("error putting metric set field 'task_known_status': %w", err)
+		}
 	}
 
-	e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
+	_, err := e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
+	if err != nil {
+		_ = fmt.Errorf("error putting metric set field 'identifier': %w", err)
+	}
 	return e
 }
 
@@ -75,9 +91,8 @@ func getRegionAndClusterName(labels map[string]string) (regionName string, clust
 		if err == nil {
 			regionName = arnParsed.Region
 		}
-		return
 	}
-	return
+	return regionName, clusterName
 }
 
 func createRootFields(stats *Stats, regionName string) mapstr.M {
@@ -97,7 +112,10 @@ func createRootFields(stats *Stats, regionName string) mapstr.M {
 		cloud := mapstr.M{
 			"region": regionName,
 		}
-		rootFields.Put("cloud", cloud)
+		_, err := rootFields.Put("cloud", cloud)
+		if err != nil {
+			_ = fmt.Errorf("error putting root field 'cloud': %w", err)
+		}
 	}
 	return rootFields
 }
@@ -172,7 +190,7 @@ func createMemoryFields(stats *Stats) mapstr.M {
 func createNetworkFields(stats *Stats) mapstr.M {
 	networkFields := mapstr.M{}
 	for _, n := range stats.networkStats {
-		networkFields.Put(n.NameInterface,
+		_, err := networkFields.Put(n.NameInterface,
 			mapstr.M{"inbound": mapstr.M{
 				"bytes":   n.Total.RxBytes,
 				"dropped": n.Total.RxDropped,
@@ -185,6 +203,9 @@ func createNetworkFields(stats *Stats) mapstr.M {
 					"errors":  n.Total.TxErrors,
 					"packets": n.Total.TxPackets,
 				}})
+		if err != nil {
+			_ = fmt.Errorf("error while putting network fields: %w", err)
+		}
 	}
 	return networkFields
 }
