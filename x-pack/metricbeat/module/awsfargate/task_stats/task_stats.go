@@ -119,7 +119,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	// Collect information from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, m.taskStatsEndpoint, nil)
+	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, m.taskStatsEndpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("http.NewRequestWithContext: %w", err)
 	}
@@ -133,7 +133,7 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	}
 
 	// Collect container metadata information from ${ECS_CONTAINER_METADATA_URI_V4}/task
-	req, err = http.NewRequestWithContext(context.Background(), http.MethodGet, m.taskStatsEndpoint, nil)
+	req, err = http.NewRequestWithContext(context.TODO(), http.MethodGet, m.taskEndpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("http.NewRequestWithContext: %w", err)
 	}
