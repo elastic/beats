@@ -36,6 +36,10 @@ SIP is a text-based protocol like HTTP. But SIP has various unique features like
 
   # Preserve original contents in event.original
   keep_original: true
+
+  # You can monitor tcp SIP traffic by setting the transport_protocol option
+  # to tcp, it defaults to udp.
+  #transport_protocol: tcp
 ```
 
 ### Sample Full JSON Output
