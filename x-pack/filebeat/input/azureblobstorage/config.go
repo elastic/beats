@@ -36,11 +36,11 @@ func (c config) Validate() error {
 
 func defaultConfig() config {
 	return config{
-		AccountName: "beatsblobstorage1",
-		AccountKey:  "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+		AccountName: "some_account",
+		AccountKey:  "some_key",
 		Containers: []container{
-			{Name: "beatscontainer", MaxWorkers: 1, Poll: true, PollInterval: time.Duration(time.Second * 5)},
-			{Name: "blobcontainer", MaxWorkers: 3, Poll: true, PollInterval: time.Duration(time.Second * 5)},
+			{Name: "container1", MaxWorkers: 1, Poll: true, PollInterval: time.Duration(time.Second * 5)},
+			{Name: "container2", MaxWorkers: 3, Poll: true, PollInterval: time.Duration(time.Second * 5)},
 		},
 	}
 }

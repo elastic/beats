@@ -37,7 +37,7 @@ type azureInputJob struct {
 	publisher cursor.Publisher
 }
 
-func newAzureInputJobV2(client *azblob.BlockBlobClient, blob *azblob.BlobItemInternal,
+func newAzureInputJob(client *azblob.BlockBlobClient, blob *azblob.BlobItemInternal,
 	marker *string, state *state.State, src *source, publisher cursor.Publisher) Job {
 
 	return &azureInputJob{
@@ -49,56 +49,6 @@ func newAzureInputJobV2(client *azblob.BlockBlobClient, blob *azblob.BlobItemInt
 		publisher: publisher,
 	}
 }
-
-func newAzureInputJob(client *azblob.BlockBlobClient, blob *azblob.BlobItemInternal, state *state.State, src *source, publisher cursor.Publisher) Job {
-
-	return &azureInputJob{
-		client:    client,
-		blob:      blob,
-		state:     state,
-		src:       src,
-		publisher: publisher,
-	}
-}
-
-// func (aij *azureInputJob) Do(ctx context.Context, jobID string, marker *string, wg *sync.WaitGroup, errChan chan<- error) {
-// 	defer aij.wg.Done()
-
-// 	select {
-// 	case <-aij.ctx.Done():
-// 		aij.errChan <- aij.ctx.Err()
-// 		return
-// 	default:
-// 		var event beat.Event
-// 		msg := mapstr.M{}
-// 		if allowedContentTypes[*aij.blob.Properties.ContentType] {
-// 			data, err := aij.extractData(ctx)
-// 			if err != nil {
-// 				errChan <- fmt.Errorf("Job with jobID %s encountered an error : %v", aij.id, err)
-// 				return
-// 			}
-// 			msg.Put("message.containerName", aij.src.containerName)
-// 			msg.Put("message.blobName", aij.blob.Name)
-// 			msg.Put("message.content_type", aij.blob.Properties.ContentType)
-// 			msg.Put("message.data", data.String())
-// 			msg.Put("event.kind", "publish_data")
-
-// 		} else {
-// 			err := fmt.Errorf("Job with jobID %s encountered an error : content-type %s not supported", aij.id, *aij.blob.Properties.ContentType)
-// 			msg.Put("message.error", err)
-// 			msg.Put("event.kind", "publish_error")
-// 		}
-
-// 		event = beat.Event{
-// 			Timestamp: time.Now(),
-// 			Fields:    msg,
-// 		}
-// 		aij.state.Save(*aij.blob.Name, aij.marker, aij.blob.Properties.LastModified)
-// 		aij.publisher.Publish(event, aij.state.Checkpoint())
-
-// 	}
-
-// }
 
 func (aij *azureInputJob) Do(ctx context.Context, id string) error {
 

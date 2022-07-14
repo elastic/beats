@@ -122,7 +122,7 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 			return nil, err
 		}
 
-		job := newAzureInputJobV2(blobClient, v, pageMarker, ais.state, ais.src, ais.publisher)
+		job := newAzureInputJob(blobClient, v, pageMarker, ais.state, ais.src, ais.publisher)
 		jobs = append(jobs, job)
 	}
 
