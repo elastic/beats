@@ -255,7 +255,7 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 	major := s[0] - '0'
 	minor := s[2] - '0'
 
-	return uint8(major), uint8(minor), nil
+	return major, minor, nil
 }
 
 func parseHeaders(pi *parsingInfo, m *message) error {
