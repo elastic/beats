@@ -61,7 +61,7 @@ require (
 	github.com/elastic/go-seccomp-bpf v1.2.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.8.1
-	github.com/elastic/go-ucfg v0.8.5
+	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -160,9 +160,9 @@ require (
 
 require (
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/elastic-agent-autodiscover v0.1.1
-	github.com/elastic/elastic-agent-libs v0.2.4
-	github.com/elastic/elastic-agent-system-metrics v0.4.2
+	github.com/elastic/elastic-agent-autodiscover v0.2.1
+	github.com/elastic/elastic-agent-libs v0.2.9
+	github.com/elastic/elastic-agent-system-metrics v0.4.3
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
@@ -195,7 +195,7 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
-	github.com/containerd/containerd v1.5.7 // indirect
+	github.com/containerd/containerd v1.5.13 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
@@ -291,7 +291,7 @@ require (
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
 	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect

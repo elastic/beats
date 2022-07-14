@@ -5837,11 +5837,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-autodiscover
-Version: v0.1.1
+Version: v0.2.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-autodiscover@v0.1.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-autodiscover@v0.2.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -6281,11 +6281,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.2.4
+Version: v0.2.9
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.2.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.2.9/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -6492,11 +6492,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-l
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-system-metrics
-Version: v0.4.2
+Version: v0.4.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.4.2/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.4.3/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -8244,11 +8244,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.8
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-ucfg
-Version: v0.8.5
+Version: v0.8.6
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-ucfg@v0.8.5/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-ucfg@v0.8.6/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -23704,11 +23704,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/containerd/containerd
-Version: v1.5.7
+Version: v1.5.13
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.7/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.13/LICENSE:
 
 
                                  Apache License
@@ -37107,11 +37107,11 @@ Contents of probable licence file $GOMODCACHE/go.opencensus.io@v0.23.0/LICENSE:
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/goleak
-Version: v1.1.11
+Version: v1.1.12
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/goleak@v1.1.11/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.uber.org/goleak@v1.1.12/LICENSE:
 
 The MIT License (MIT)
 
@@ -38342,11 +38342,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : gopkg.in/yaml.v3
-Version: v3.0.0-20210107192922-496545a6307b
+Version: v3.0.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/gopkg.in/yaml.v3@v3.0.0-20210107192922-496545a6307b/LICENSE:
+Contents of probable licence file $GOMODCACHE/gopkg.in/yaml.v3@v3.0.1/LICENSE:
 
 
 This project is covered by two different licenses: MIT and Apache.
