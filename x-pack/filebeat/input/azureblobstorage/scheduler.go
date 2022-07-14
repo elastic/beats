@@ -56,9 +56,11 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 	var availableWorkers int32
 
 	workerPool := NewWorkerPool(ctx, ais.src.maxWorkers, ais.log)
-	availableWorkers = workerPool.AvailableWorkers()
+	workerPool.Start()
+	defer workerPool.Stop()
 
 	if !ais.src.poll {
+		availableWorkers = workerPool.AvailableWorkers()
 		pager = ais.fetchBlobPager(availableWorkers)
 		return ais.scheduleOnce(ctx, pager, workerPool)
 	}
@@ -66,6 +68,7 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 	for {
 
 		availableWorkers = workerPool.AvailableWorkers()
+		fmt.Println(ais.src.containerName+"-HERE-1", availableWorkers)
 		if availableWorkers == 0 {
 			continue
 		}
@@ -85,9 +88,11 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 }
 
 func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager, workerPool Pool) error {
-
+	counter := 0
 	for pager.NextPage(ctx) {
 		jobs, err := ais.createJobs(pager)
+		fmt.Printf("pager - iteration for container :%s :%d and job len: %d\n", ais.src.containerName, counter, len(jobs))
+		counter++
 		if err != nil {
 			ais.log.Errorf("Job creation failed for container %s with error %v", ais.src.containerName, err)
 			return err

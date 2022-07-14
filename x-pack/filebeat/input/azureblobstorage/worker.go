@@ -49,7 +49,7 @@ func (w *worker) Process(work Job) {
 			const size = 64 << 10
 			buf := make([]byte, size)
 			buf = buf[:runtime.Stack(buf, false)]
-			w.errChan <- fmt.Errorf("worker %d panicked, but recovered, in running process: %v\n%s\n", w.id, r, buf)
+			w.errChan <- fmt.Errorf("worker %d panicked, but recovered, in running process: %v\n%s", w.id, r, buf)
 		}
 	}()
 

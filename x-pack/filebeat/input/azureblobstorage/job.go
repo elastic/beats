@@ -147,7 +147,7 @@ func (aij *azureInputJob) extractData(ctx context.Context) (*bytes.Buffer, error
 
 	get, err := aij.client.Download(ctx, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to download data from blob with error : %v", err)
+		return nil, fmt.Errorf("failed to download data from blob with error : %w", err)
 	}
 
 	downloadedData := &bytes.Buffer{}
@@ -155,13 +155,13 @@ func (aij *azureInputJob) extractData(ctx context.Context) (*bytes.Buffer, error
 	defer func() {
 		err = reader.Close()
 		if err != nil {
-			err = fmt.Errorf("failed to close blob reader with error : %v", err)
+			err = fmt.Errorf("failed to close blob reader with error : %w", err)
 		}
 	}()
 
 	_, err = downloadedData.ReadFrom(reader)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read data from blob with error : %v", err)
+		return nil, fmt.Errorf("failed to read data from blob with error : %w", err)
 	}
 
 	return downloadedData, err

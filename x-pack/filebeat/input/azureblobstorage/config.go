@@ -39,8 +39,8 @@ func defaultConfig() config {
 		AccountName: "beatsblobstorage1",
 		AccountKey:  "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
 		Containers: []container{
-			{Name: "beatscontainer", MaxWorkers: 10, Poll: true, PollInterval: time.Duration(time.Second * 5)},
-			{Name: "blobcontainer", MaxWorkers: 10, Poll: true, PollInterval: time.Duration(time.Second * 5)},
+			{Name: "beatscontainer", MaxWorkers: 1, Poll: true, PollInterval: time.Duration(time.Second * 5)},
+			{Name: "blobcontainer", MaxWorkers: 3, Poll: true, PollInterval: time.Duration(time.Second * 5)},
 		},
 	}
 }

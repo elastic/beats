@@ -91,7 +91,7 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 	currentSource := src.(*source)
 
 	log := inputCtx.Logger.With("account_name", currentSource.accountName).With("container", currentSource.containerName)
-	log.Info("Running azure blob storage for account %s", input.config.AccountName)
+	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 
 	if !cursor.IsNew() {
 		cursor.Unpack(&cp)
