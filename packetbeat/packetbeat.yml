@@ -39,33 +39,33 @@ packetbeat.flows:
 # =========================== Transaction protocols ============================
 
 packetbeat.protocols:
-- type: icmp
+#- type: icmp
   # Enable ICMPv4 and ICMPv6 monitoring. The default is true.
-  enabled: true
+#  enabled: true
 
-- type: amqp
-  # Configure the ports where to listen for AMQP traffic. You can disable
-  # the AMQP protocol by commenting out the list of ports.
-  ports: [5672]
+# - type: amqp
+#   # Configure the ports where to listen for AMQP traffic. You can disable
+#   # the AMQP protocol by commenting out the list of ports.
+#   ports: [5672]
 
-- type: cassandra
-  # Configure the ports where to listen for Cassandra traffic. You can disable
-  # the Cassandra protocol by commenting out the list of ports.
-  ports: [9042]
+# - type: cassandra
+#   # Configure the ports where to listen for Cassandra traffic. You can disable
+#   # the Cassandra protocol by commenting out the list of ports.
+#   ports: [9042]
 
-- type: dhcpv4
-  # Configure the DHCP for IPv4 ports.
-  ports: [67, 68]
+# - type: dhcpv4
+#   # Configure the DHCP for IPv4 ports.
+#   ports: [67, 68]
 
-- type: dns
-  # Configure the ports where to listen for DNS traffic. You can disable
-  # the DNS protocol by commenting out the list of ports.
-  ports: [53]
+# - type: dns
+#   # Configure the ports where to listen for DNS traffic. You can disable
+#   # the DNS protocol by commenting out the list of ports.
+#   ports: [53]
 
-- type: http
-  # Configure the ports where to listen for HTTP traffic. You can disable
-  # the HTTP protocol by commenting out the list of ports.
-  ports: [80, 8080, 8000, 5000, 8002]
+# - type: http
+#   # Configure the ports where to listen for HTTP traffic. You can disable
+#   # the HTTP protocol by commenting out the list of ports.
+#   ports: [80, 8080, 8000, 5000, 8002]
 
 - type: memcache
   # Configure the ports where to listen for memcache traffic. You can disable
@@ -87,37 +87,37 @@ packetbeat.protocols:
   # the Redis protocol by commenting out the list of ports.
   ports: [6379]
 
-- type: thrift
-  # Configure the ports where to listen for Thrift-RPC traffic. You can disable
-  # the Thrift-RPC protocol by commenting out the list of ports.
-  ports: [9090]
+# - type: thrift
+#   # Configure the ports where to listen for Thrift-RPC traffic. You can disable
+#   # the Thrift-RPC protocol by commenting out the list of ports.
+#   ports: [9090]
 
 - type: mongodb
   # Configure the ports where to listen for MongoDB traffic. You can disable
   # the MongoDB protocol by commenting out the list of ports.
   ports: [27017]
 
-- type: nfs
-  # Configure the ports where to listen for NFS traffic. You can disable
-  # the NFS protocol by commenting out the list of ports.
-  ports: [2049]
+# - type: nfs
+#   # Configure the ports where to listen for NFS traffic. You can disable
+#   # the NFS protocol by commenting out the list of ports.
+#   ports: [2049]
 
-- type: tls
-  # Configure the ports where to listen for TLS traffic. You can disable
-  # the TLS protocol by commenting out the list of ports.
-  ports:
-    - 443   # HTTPS
-    - 993   # IMAPS
-    - 995   # POP3S
-    - 5223  # XMPP over SSL
-    - 8443
-    - 8883  # Secure MQTT
-    - 9243  # Elasticsearch
+# - type: tls
+#   # Configure the ports where to listen for TLS traffic. You can disable
+#   # the TLS protocol by commenting out the list of ports.
+#   ports:
+#     - 443   # HTTPS
+#     - 993   # IMAPS
+#     - 995   # POP3S
+#     - 5223  # XMPP over SSL
+#     - 8443
+#     - 8883  # Secure MQTT
+#     - 9243  # Elasticsearch
 
-- type: sip
-  # Configure the ports where to listen for SIP traffic. You can disable
-  # the SIP protocol by commenting out the list of ports.
-  ports: [5060]
+# - type: sip
+#   # Configure the ports where to listen for SIP traffic. You can disable
+#   # the SIP protocol by commenting out the list of ports.
+#   ports: [5060]
 
 # ======================= Elasticsearch template setting =======================
 
@@ -192,8 +192,8 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
-  username: "elastic"
-  password: "123456"
+  username: ""
+  password: ""
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"

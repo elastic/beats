@@ -1,0 +1,7 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/go/src/github.com/elastic/beats/packetbeat'
+ 
+go build -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=2022-07-12T06:39:50Z -X github.com/elastic/beats/libbeat/version.commit=df53489c296cb700a2730456dfadcfaf8d7f3b5f"
+ 
+make: Leaving directory '/home/go/src/github.com/elastic/beats/packetbeat'
+ 
