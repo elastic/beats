@@ -111,7 +111,6 @@ func (p *plugin) Parse(
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 	defer logp.Recover("SIP Parse exception")
-	// return p.doParse(ensureConnection(private), pkt, tcptuple, dir)
 	if err := p.doParse(pkt); err != nil {
 		logp.Error(err)
 	}
