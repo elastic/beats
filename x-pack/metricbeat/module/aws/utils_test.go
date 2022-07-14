@@ -405,6 +405,7 @@ func TestFindTimestamp(t *testing.T) {
 	}
 }
 
+//fixme: add test case.....
 func TestFindIdentifierFromARN(t *testing.T) {
 	cases := []struct {
 		resourceARN             string
@@ -435,6 +436,11 @@ func TestFindIdentifierFromARN(t *testing.T) {
 			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
 			"net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
 			"loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+		},
+		{
+			"arn:aws:apigateway:us-east-1::/apis/lqyipneb7c",
+			"lqyipneb7c",
+			"/apis/lqyipneb7c",
 		},
 	}
 
