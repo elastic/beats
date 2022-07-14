@@ -50,7 +50,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
-- Reduced memory usage and possibly resolved extremely slow memory leak under rare situations for browser monitors. {pull}32317[32317]
+- Reduced memory usage slightly for browser monitors. {pull}32317[32317]
 
 *Metricbeat*
 
