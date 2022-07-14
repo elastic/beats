@@ -84,6 +84,9 @@ pipeline {
       environment {
         GOFLAGS = '-mod=readonly'
       }
+      when {
+        expression { return false }
+      }
       steps {
         withGithubNotify(context: "Checks") {
           stageStatusCache(id: 'Checks'){
@@ -554,6 +557,7 @@ def e2e_with_entrypoint(Map args = [:]) {
 * This method runs in a node
 */
 def target(Map args = [:]) {
+  echo "NODE with labels '${args.label}'"
   withNode(labels: args.label, forceWorkspace: true){
     targetWithoutNode(args)
   }
