@@ -46,7 +46,7 @@ type produceState struct {
 	cb        ackHandler
 	dropCB    func(beat.Event)
 	cancelled bool
-	lastACK   uint64
+	lastACK   queue.EntryID
 }
 
 type ackHandler func(count int)
@@ -81,27 +81,29 @@ func (p *forgetfulProducer) Cancel() int {
 }
 
 func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
-	return 0, p.updSeq(p.openState.publish(p.makeRequest(event)))
+	resp := make(chan queue.EntryID, 1)
+	if p.openState.publish(pushRequest{
+		event: event,
+		state: &p.state,
+		resp:  resp,
+	}) {
+		id := <-resp
+		return id, true
+	}
+	return 0, false
 }
 
 func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
-	return 0, p.updSeq(p.openState.tryPublish(p.makeRequest(event)))
-}
-
-func (p *ackProducer) updSeq(ok bool) bool {
-	if ok {
-		p.seq++
-	}
-	return ok
-}
-
-func (p *ackProducer) makeRequest(event interface{}) pushRequest {
-	req := pushRequest{
+	resp := make(chan queue.EntryID, 1)
+	if p.openState.tryPublish(pushRequest{
 		event: event,
-		seq:   p.seq,
 		state: &p.state,
+		resp:  resp,
+	}) {
+		id := <-resp
+		return id, true
 	}
-	return req
+	return 0, false
 }
 
 func (p *ackProducer) Cancel() int {
@@ -143,7 +145,7 @@ func (st *openState) tryPublish(req pushRequest) bool {
 		st.events = nil
 		return false
 	default:
-		st.log.Debugf("Dropping event, queue is blocked (seq=%v) ", req.seq)
+		st.log.Debugf("Dropping event, queue is blocked")
 		return false
 	}
 }

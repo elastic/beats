@@ -98,6 +98,7 @@ type Settings struct {
 type queueEntry struct {
 	event  interface{}
 	client clientState
+	id     queue.EntryID
 }
 
 type batch struct {

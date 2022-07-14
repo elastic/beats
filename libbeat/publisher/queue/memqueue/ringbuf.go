@@ -53,7 +53,7 @@ type region struct {
 }
 
 type clientState struct {
-	seq   uint64        // event sequence number
+	//seq   queue.EntryID // event sequence number
 	state *produceState // the producer it's state used to compute and signal the ACK count
 }
 

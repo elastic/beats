@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -35,6 +36,8 @@ type directEventLoop struct {
 	// pendingACKs aggregates a list of ACK channels for batches that have been sent
 	// to consumers, which is then sent to the broker's scheduledACKs channel.
 	pendingACKs chanList
+
+	nextEntryID queue.EntryID
 }
 
 // bufferingEventLoop implements the broker main event loop.
@@ -63,6 +66,8 @@ type bufferingEventLoop struct {
 	// buffer flush timer state
 	timer *time.Timer
 	idleC <-chan time.Time
+
+	nextEntryID queue.EntryID
 }
 
 type flushList struct {
@@ -144,15 +149,17 @@ func (l *directEventLoop) insert(req *pushRequest) {
 	log := l.broker.logger
 
 	st := req.state
-	if st == nil {
-		l.buf.insert(req.event, clientState{})
-	} else if st.cancelled {
+	if st.cancelled {
 		reportCancelledState(log, req)
 	} else {
+		if req.resp != nil {
+			req.resp <- l.nextEntryID
+		}
 		l.buf.insert(req.event, clientState{
-			seq:   req.seq,
+			seq:   l.nextEntryID,
 			state: st,
 		})
+		l.nextEntryID++
 	}
 }
 
@@ -213,6 +220,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 		}
 
 		client := &entries[idx].client
+		seq := entries[idx].id
 		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, client.seq)
 
 		idx--
@@ -327,7 +335,12 @@ func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
 }
 
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
-	if l.insert(req) {
+	if l.insert(req, l.nextEntryID) {
+		if req.resp != nil {
+			// If there is a response channel, send back the new event id.
+			req.resp <- l.nextEntryID
+		}
+		l.nextEntryID++
 		l.eventCount++
 
 		L := l.buf.length()
@@ -347,7 +360,7 @@ func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 	}
 }
 
-func (l *bufferingEventLoop) insert(req *pushRequest) bool {
+func (l *bufferingEventLoop) insert(req *pushRequest, seq queue.EntryID) bool {
 	if req.state == nil {
 		l.buf.add(req.event, clientState{})
 		return true
@@ -360,7 +373,7 @@ func (l *bufferingEventLoop) insert(req *pushRequest) bool {
 	}
 
 	l.buf.add(req.event, clientState{
-		seq:   req.seq,
+		seq:   seq,
 		state: st,
 	})
 	return true
@@ -542,7 +555,7 @@ func (l *flushList) add(b *batchBuffer) {
 }
 
 func reportCancelledState(log *logp.Logger, req *pushRequest) {
-	log.Debugf("cancelled producer - ignore event: %v\t%v\t%p", req.event, req.seq, req.state)
+	log.Debugf("cancelled producer - ignore event: %v\t%v\t%p", req.event, req.state)
 
 	// do not add waiting events if producer did send cancel signal
 
