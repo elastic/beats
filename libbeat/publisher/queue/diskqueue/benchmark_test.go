@@ -105,7 +105,7 @@ func cleanup(q *diskQueue) {
 
 func publishEvents(p queue.Producer, num int) {
 	for i := 0; i < num; i++ {
-		ok := p.Publish(makeEvent())
+		_, ok := p.Publish(makeEvent())
 		if !ok {
 			panic("didn't publish")
 		}

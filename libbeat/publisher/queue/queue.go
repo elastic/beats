@@ -109,21 +109,21 @@ type ProducerConfig struct {
 	DropOnCancel bool
 }
 
-type EntryId uint64
+type EntryID uint64
 
 // Producer is an interface to be used by the pipelines client to forward
 // events to a queue.
 type Producer interface {
 	// Publish adds an event to the queue, blocking if necessary, and returns
-	// true on success.
-	Publish(event interface{}) bool
+	// the new entry's id and true on success.
+	Publish(event interface{}) (EntryID, bool)
 
 	// TryPublish adds an event to the queue if doing so will not block the
 	// caller, otherwise it immediately returns. The reasons a publish attempt
 	// might block are defined by the specific queue implementation and its
-	// configuration. Returns true if the event was successfully added, false
-	// otherwise.
-	TryPublish(event interface{}) bool
+	// configuration. If the event was successfully added, returns true with
+	// the event's assigned ID, and false otherwise.
+	TryPublish(event interface{}) (EntryID, bool)
 
 	// Cancel closes this Producer endpoint. If the producer is configured to
 	// drop its events on Cancel, the number of dropped events is returned.
@@ -138,6 +138,6 @@ type Producer interface {
 type Batch interface {
 	Count() int
 	Entry(i int) interface{}
-	Id(i int) EntryId
+	ID(i int) EntryID
 	Done()
 }

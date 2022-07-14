@@ -389,8 +389,8 @@ func (b *batch) Entry(i int) interface{} {
 	return b.entries[i].event
 }
 
-func (b *batch) Id(i int) queue.EntryId {
-	return queue.EntryId(b.entries[i].client.seq)
+func (b *batch) ID(i int) queue.EntryID {
+	return queue.EntryID(b.entries[i].client.seq)
 }
 
 func (b *batch) Done() {
