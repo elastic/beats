@@ -238,6 +238,12 @@ metadata for the configured topics. The default is false.
 
 *`retry.backoff`*:: Waiting time between retries during leader elections. Default is 250ms.
 
+===== `workers`
+
+The number of workers per configured host publishing events to Kafka. This is best used with 
+load balancing mode enabled. Example: If you have 2 hosts and 3 workers, in total 
+6 workers are started (3 for each host).
+
 ===== `max_retries`
 
 ifdef::ignores_max_retries[]
