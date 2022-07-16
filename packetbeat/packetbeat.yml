@@ -164,7 +164,7 @@ setup.kibana:
   # Scheme and port can be left out and will be set to the default (http and 5601)
   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-  #host: "localhost:5601"
+  host: "localhost:5601"
 
   # Kibana Space ID
   # ID of the Kibana Space into which the dashboards should be loaded. By default,
@@ -194,6 +194,8 @@ output.elasticsearch:
   hosts: ["localhost:9200"]
   username: ""
   password: ""
+  #index: "mysqlaudit-%{+yyyy.MM.dd}"
+  #name:1.1.1.1
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
