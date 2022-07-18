@@ -17,7 +17,7 @@
 
 // Usage:
 //
-// go test -bench=1M -benchtime 1x -count 10 -timeout 600m -benchmem > results.txt
+// go test -bench=100k -benchtime 1x -count 10 -timeout 10m -benchmem > results.txt
 //
 // then
 //
@@ -202,74 +202,74 @@ func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool,
 func BenchmarkAsync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, false, false, true, false, b)
 }
-func BenchmarkAsync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, false, false, true, false, b)
+func BenchmarkAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, false, true, false, b)
 }
 func BenchmarkEncryptAsync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, true, false, true, false, b)
 }
-func BenchmarkEncryptAsync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, true, false, true, false, b)
+func BenchmarkEncryptAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, false, true, false, b)
 }
 func BenchmarkCompressAsync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, false, true, true, false, b)
 }
-func BenchmarkCompressAsync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, false, true, true, false, b)
+func BenchmarkCompressAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, true, true, false, b)
 }
 func BenchmarkEncryptCompressAsync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, true, true, true, false, b)
 }
-func BenchmarkEncryptCompressAsync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, true, true, true, false, b)
+func BenchmarkEncryptCompressAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, true, true, false, b)
 }
 func BenchmarkProtoAsync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, false, false, true, true, b)
 }
-func BenchmarkProtoAsync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, false, false, true, true, b)
+func BenchmarkProtoAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, false, true, true, b)
 }
 func BenchmarkEncCompProtoAsync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, true, true, true, true, b)
 }
-func BenchmarkEncCompProtoAsync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, true, true, true, true, b)
+func BenchmarkEncCompProtoAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, true, true, true, b)
 }
 
 // Sync Benchmarks
 func BenchmarkSync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, false, false, false, false, b)
 }
-func BenchmarkSync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, false, false, false, false, b)
+func BenchmarkSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, false, false, false, b)
 }
 func BenchmarkEncryptSync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, true, false, false, false, b)
 }
-func BenchmarkEncryptSync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, true, false, false, false, b)
+func BenchmarkEncryptSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, false, false, false, b)
 }
 func BenchmarkCompressSync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, false, true, false, false, b)
 }
-func BenchmarkCompressSync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, false, true, false, false, b)
+func BenchmarkCompressSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, true, false, false, b)
 }
 func BenchmarkEncryptCompressSync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, true, true, false, false, b)
 }
-func BenchmarkEncryptCompressSync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, true, true, false, false, b)
+func BenchmarkEncryptCompressSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, true, false, false, b)
 }
 func BenchmarkProtoSync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, false, false, false, true, b)
 }
-func BenchmarkProtoSync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, false, false, false, true, b)
+func BenchmarkProtoSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, false, false, true, b)
 }
 func BenchmarkEncCompProtoSync1k(b *testing.B) {
 	benchmarkQueue(1000, 10, true, true, false, true, b)
 }
-func BenchmarkEncCompProtoSync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, true, true, false, true, b)
+func BenchmarkEncCompProtoSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, true, false, true, b)
 }
