@@ -231,11 +231,9 @@ func runCmd(
 		err = cmd.Start()
 
 		cmdStarted <- err
-		close(cmdStarted)
 
 		err := cmd.Wait()
 		cmdDone <- err
-		close(cmdDone)
 	}()
 
 	err = <-cmdStarted
