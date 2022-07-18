@@ -100,7 +100,7 @@ func TestSerialize(t *testing.T) {
 		switch test.format {
 		case SerializationCBOR:
 			event, ok := decoded.(publisher.Event)
-			assert.True(t, ok)
+			require.True(t, ok)
 			decodedValue, err := event.Content.Fields.GetValue("test_field")
 			if err != nil {
 				t.Fatalf("[%v] Couldn't get field 'test_field': %v", test.name, err)
