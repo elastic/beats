@@ -95,12 +95,12 @@ func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
 	switch v := evt.(type) {
 	case publisher.Event:
 		if e.serializationFormat != SerializationCBOR {
-			return nil, fmt.Errorf("incompatible serialization for type %T", v)
+			return nil, fmt.Errorf("incompatible serialization for type %T. Only CBOR is supported", v)
 		}
 		return e.encode_publisher_event(v)
 	case *messages.Event:
 		if e.serializationFormat != SerializationProtobuf {
-			return nil, fmt.Errorf("incompatible serialization for type %T", v)
+			return nil, fmt.Errorf("incompatible serialization for type %T. Only Protobuf is supported", v)
 		}
 		return proto.Marshal(v)
 	default:
