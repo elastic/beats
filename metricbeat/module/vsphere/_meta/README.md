@@ -15,7 +15,7 @@ export GOPATH=/directory/code
 
 2. Install Govcsim
 ```
-go get -u github.com/vmware/vic/cmd/vcsim
+go get -u github.com/vmware/govmomi/vcsim
 ```
 
 3. Run Govcsim
