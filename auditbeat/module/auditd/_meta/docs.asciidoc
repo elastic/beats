@@ -157,8 +157,9 @@ newer and no rules have been defined. Otherwise `unicast` will be used.
 This option can only be used with the `socket_type: unicast` since {beatname_uc}
 needs to manage the rules to be able to set it.
 +
-It is important to note that with this setting set, if {beatname_uc} is stopped
-for any reason, a system restart is required before restarting it successfully.
+It is important to note that with this setting set, {beatname_uc} should never
+be stopped, as it won't be able to resume processing `auditd` events until the
+system is restarted.
 
 *`resolve_ids`*:: This boolean setting enables the resolution of UIDs and
 GIDs to their associated names. The default value is true.
