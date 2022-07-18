@@ -124,7 +124,7 @@ func (c *Config) loadRules() error {
 	for _, pattern := range c.RuleFiles {
 		absPattern, err := filepath.Abs(pattern)
 		if err != nil {
-			return fmt.Errorf("unable to get the absolute path for %s: %v", pattern, err)
+			return fmt.Errorf("unable to get the absolute path for %s: %w", pattern, err)
 		}
 		files, err := filepath.Glob(absPattern)
 		if err != nil {
@@ -145,7 +145,7 @@ func (c *Config) loadRules() error {
 	for _, filename := range paths {
 		fHandle, err := os.Open(filename)
 		if err != nil {
-			return fmt.Errorf("unable to open rule file '%s': %v", filename, err)
+			return fmt.Errorf("unable to open rule file '%s': %w", filename, err)
 		}
 		rules, err = readRules(fHandle, filename, knownRules)
 		if err != nil {

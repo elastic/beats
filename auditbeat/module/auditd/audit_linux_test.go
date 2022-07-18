@@ -73,7 +73,7 @@ var (
 )
 
 func TestImmutable(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -107,7 +107,7 @@ func TestImmutable(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -139,7 +139,7 @@ func TestData(t *testing.T) {
 }
 
 func TestLoginType(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -257,7 +257,7 @@ func TestUnicastClient(t *testing.T) {
 		t.Skip("-audit was not specified")
 	}
 
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -270,7 +270,7 @@ func TestUnicastClient(t *testing.T) {
 
 	// Any commands executed by this process will generate events due to the
 	// PPID filter we applied to the rule.
-	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
+	time.AfterFunc(time.Second, func() { _, _ = exec.Command("cat", "/proc/self/status").Output() })
 
 	ms := mbtest.NewPushMetricSetV2(t, c)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
@@ -287,7 +287,7 @@ func TestMulticastClient(t *testing.T) {
 		t.Skip("no multicast support")
 	}
 
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -300,7 +300,7 @@ func TestMulticastClient(t *testing.T) {
 
 	// Any commands executed by this process will generate events due to the
 	// PPID filter we applied to the rule.
-	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
+	time.AfterFunc(time.Second, func() { _, _ = exec.Command("cat", "/proc/self/status").Output() })
 
 	ms := mbtest.NewPushMetricSetV2(t, c)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
