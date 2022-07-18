@@ -108,7 +108,7 @@ func TestSerialize(t *testing.T) {
 			assert.Equal(t, test.value, decodedValue)
 		case SerializationProtobuf:
 			event, ok := decoded.(*messages.Event)
-			assert.True(t, ok)
+			require.True(t, ok)
 			d := event.GetFields().GetData()
 			decodedValue := d["test_field"].GetStringValue()
 			assert.Equal(t, test.value, decodedValue)
