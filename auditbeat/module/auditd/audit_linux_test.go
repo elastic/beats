@@ -72,6 +72,40 @@ var (
 	}
 )
 
+func TestImmutable(t *testing.T) {
+	logp.TestingSetup()
+
+	// Create a mock netlink client that provides the expected responses.
+	mock := NewMock().
+		// Get Status response for initClient
+		returnACK().returnStatus().
+		// Send expected ACKs for initialization
+		// With one extra for SetImmutable
+		returnACK().returnACK().returnACK().returnACK().returnACK().returnACK().
+		// Send one auditd message.
+		returnMessage(userLoginFailMsg)
+
+	// Replace the default AuditClient with a mock.
+	config := getConfig()
+	config["immutable"] = true
+
+	ms := mbtest.NewPushMetricSetV2(t, config)
+	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet.client.Close()
+	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
+
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
+	if len(events) != 1 {
+		t.Fatalf("expected 1 events, but received %d", len(events))
+	}
+	assertNoErrors(t, events)
+
+	assertFieldsAreDocumented(t, events)
+
+	beatEvent := mbtest.StandardizeEvent(ms, events[0], core.AddDatasetToEvent)
+	mbtest.WriteEventToDataJSON(t, beatEvent, "")
+}
+
 func TestData(t *testing.T) {
 	logp.TestingSetup()
 
