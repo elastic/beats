@@ -155,6 +155,7 @@ func (d *eventDecoder) Buffer(n int) []byte {
 	}
 	return d.buf
 }
+
 func (d *eventDecoder) Decode() (interface{}, error) {
 	switch d.serializationFormat {
 	case SerializationJSON, SerializationCBOR:
