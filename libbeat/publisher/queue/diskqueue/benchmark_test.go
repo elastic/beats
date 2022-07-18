@@ -61,7 +61,7 @@ var (
 	}
 )
 
-//makePublisherEvent creates a sample publisher.Event, using a random message from msg above
+//makePublisherEvent creates a sample publisher.Event, using a random message from msgs list
 func makePublisherEvent() publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{
