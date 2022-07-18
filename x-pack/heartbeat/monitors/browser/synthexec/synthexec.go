@@ -219,6 +219,7 @@ func runCmd(
 		wg.Done()
 	}()
 
+	// This use of channels for results is awkward, but required for the thread locking below
 	cmdStarted := make(chan error)
 	cmdDone := make(chan error)
 	go func() {
