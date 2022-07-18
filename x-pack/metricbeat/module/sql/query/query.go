@@ -49,7 +49,8 @@ type config struct {
 	ResponseFormat string `config:"sql_response_format"`
 	Query          string `config:"sql_query" `
 
-	Queries []query `config:"sql_queries" `
+	Queries      []query `config:"sql_queries" `
+	MergeQueries bool    `config:"request_merge"`
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -124,6 +125,8 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		queries = append(queries, one_query)
 	}
 
+	merged := mapstr.M{}
+
 	for _, q := range queries {
 		if q.ResponseFormat == tableResponseFormat {
 			// Table format
@@ -133,7 +136,23 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 
 			for _, ms := range mss {
-				m.reportEvent(ms, reporter, q.Query)
+				if m.Config.MergeQueries {
+					if len(mss) > 1 {
+						return fmt.Errorf("can not merge query resulting with more than one rows: %s", q)
+					} else {
+						for k, v := range ms {
+							//fmt.Println("Adding1", k, v)
+							_, ok := merged[k]
+							if ok {
+								m.Logger().Warn("overwriting duplicate metrics: ", k)
+							}
+							merged[k] = v
+						}
+					}
+				} else {
+					// Report immediately for non-merged cases.
+					m.reportEvent(ms, reporter, q.Query)
+				}
 			}
 		} else {
 			// Variable format
@@ -142,8 +161,24 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				return fmt.Errorf("fetch variable mode failed: %w", err)
 			}
 
-			m.reportEvent(ms, reporter, q.Query)
+			if m.Config.MergeQueries {
+				for k, v := range ms {
+					//fmt.Println("Adding2", k, v)
+					_, ok := merged[k]
+					if ok {
+						m.Logger().Warn("overwriting duplicate metrics: ", k)
+					}
+					merged[k] = v
+				}
+			} else {
+				// Report immediately for non-merged cases.
+				m.reportEvent(ms, reporter, q.Query)
+			}
 		}
+	}
+	if m.Config.MergeQueries {
+		// Report here for merged case.
+		m.reportEvent(merged, reporter, "MULTIPLE")
 	}
 
 	return nil
