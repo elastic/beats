@@ -73,7 +73,7 @@ func makePublisherEvent() publisher.Event {
 	}
 }
 
-//makeMessagesEvent creates a sample *messages.Event, using a random message from msg above
+//makeMessagesEvent creates a sample *messages.Event, using a random message from msgs list
 func makeMessagesEvent() *messages.Event {
 	return &messages.Event{
 		Timestamp: timestamppb.New(eventTime),
