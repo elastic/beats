@@ -15,8 +15,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
@@ -25,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"golang.org/x/sys/unix"
 )
 
 const debugSelector = "synthexec"
@@ -112,6 +115,10 @@ func runCmd(
 	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Pdeathsig: unix.SIGKILL,
+	}
+
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
@@ -207,7 +214,26 @@ func runCmd(
 
 		wg.Done()
 	}()
-	err = cmd.Start()
+
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err = cmd.Start()
+
+		cmdStarted <- err
+		close(cmdStarted)
+
+		err := cmd.Wait()
+		cmdDone <- err
+		close(cmdDone)
+	}()
+
+	err = <-cmdStarted
 	if err != nil {
 		logp.Warn("Could not start command %s: %s", cmd, err)
 		return nil, err
@@ -224,7 +250,7 @@ func runCmd(
 
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
-		err := cmd.Wait()
+		err := <-cmdDone
 		jsonWriter.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 
