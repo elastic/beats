@@ -101,7 +101,11 @@ func (c *Config) Validate() error {
 
 	c.SocketType = strings.ToLower(c.SocketType)
 	switch c.SocketType {
-	case "", "unicast", "multicast":
+	case "multicast":
+		if c.Immutable {
+			errs = append(errs, fmt.Errorf("immutable can't be used with socket_type: multicast"))
+		}
+	case "", "unicast":
 	default:
 		errs = append(errs, fmt.Errorf("invalid socket_type "+
 			"'%v' (use unicast, multicast, or don't set a value)", c.SocketType))
