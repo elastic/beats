@@ -2,7 +2,7 @@
   enabled: true
   metricsets: ["datastore", "host", "virtualmachine"]
   period: 10s
-  hosts: ["https://localhost/sdk"]
+  hosts: ["https://localhost:8989/sdk"]
 
   username: "user"
   password: "password"
