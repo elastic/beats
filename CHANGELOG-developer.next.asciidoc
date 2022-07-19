@@ -63,6 +63,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Remove `common.MapStr` and use `mapstr.M` from `github.com/elastic/elastic-agent-libs` instead. {pull}31420[31420]
 - Remove `queue.Consumer`. Queues can now be read via a `Get` call directly on the queue object. {pull}31502[31502]
 - The `queue.Batch` API now provides access to individual events instead of an array. {pull}31699[31699]
+- Rename `queue.Batch.ACK()` to `queue.Batch.Done()`. {pull}31903[31903]
 
 ==== Bugfixes
 
@@ -74,6 +75,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
 - Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
 - Allow to use metricbeat for named mssql instances. {issue}24076[24076] {pull}30859[30859]
+- Setting DEV=true when running `mage build` now correctly generates binaries without optimisations and with debug symbols {pull}31955[31955]
 
 ==== Added
 
@@ -141,6 +143,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add Github action for linting
 - Add regex support for drop_fields processor.
 - Improve compatibility and reduce flakyness of Python tests {pull}31588[31588]
+- Added `.python-version` file {pull}32323[32323]
 
 ==== Deprecated
 

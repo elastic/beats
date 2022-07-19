@@ -194,7 +194,7 @@
         "title": "Persistent Volume Claims Informations [Metricbeat Kubernetes]",
         "visualizationType": "lnsDatatable"
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "kubernetes-f1d25db0-bcb9-11ec-b64f-7dd6e8e82013",
     "migrationVersion": {
         "lens": "8.3.0"
@@ -217,6 +217,6 @@
         }
     ],
     "type": "lens",
-    "updated_at": "2022-05-23T08:46:50.843Z",
-    "version": "WzcyNywxXQ=="
+    "updated_at": "2022-06-28T06:47:07.287Z",
+    "version": "WzU3NzEsM10="
 }

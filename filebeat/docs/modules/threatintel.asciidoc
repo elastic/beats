@@ -12,6 +12,14 @@ This file is generated! See scripts/docs_collector.py
 
 == Threat Intel module
 
+//temporarily override modulename to create working link
+:modulename: ti_abusech
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: threatintel
+
 This module ingests data from a collection of different threat intelligence
 sources. The ingested data is meant to be used with
 https://www.elastic.co/guide/en/security/current/rules-ui-create.html#create-indicator-rule[Indicator
@@ -678,4 +686,4 @@ Overview of the information provided by the ThreatQuotient feed.
 For a description of each field in the module, see the
 <<exported-fields-threatintel,exported fields>> section.
 
-edit_url!:
+:edit_url!:
