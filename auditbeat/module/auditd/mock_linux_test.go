@@ -47,6 +47,7 @@ func (n *MockNetlinkSendReceiver) returnACK() *MockNetlinkSendReceiver {
 	return n
 }
 
+//nolint:unused // it still might be useful for tests in the future
 func (n *MockNetlinkSendReceiver) returnDone() *MockNetlinkSendReceiver {
 	n.messages = append(n.messages, syscall.NetlinkMessage{
 		Header: syscall.NlMsghdr{
