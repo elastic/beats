@@ -343,11 +343,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			}
 
 			if config.ResourceType != "" {
-				if _, ok := resourceTypesWithTags[config.ResourceType]; ok {
-					resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
-				} else {
-					resourceTypesWithTags[config.ResourceType] = append(resourceTypesWithTags[config.ResourceType], m.MetricSet.TagsFilter...)
-				}
+				resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
 			}
 			continue
 		}
