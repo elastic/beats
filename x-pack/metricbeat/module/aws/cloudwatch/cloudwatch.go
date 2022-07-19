@@ -357,11 +357,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			dimensions:         cloudwatchDimensions,
 		}
 
-		if _, ok := namespaceDetailTotal[config.Namespace]; ok {
-			namespaceDetailTotal[config.Namespace] = append(namespaceDetailTotal[config.Namespace], configPerNamespace)
-		} else {
-			namespaceDetailTotal[config.Namespace] = []namespaceDetail{configPerNamespace}
-		}
+		namespaceDetailTotal[config.Namespace] = append(namespaceDetailTotal[config.Namespace], configPerNamespace)
 	}
 
 	listMetricDetailTotal.resourceTypeFilters = resourceTypesWithTags
@@ -644,7 +640,7 @@ func insertTags(events map[string]mb.Event, identifier string, resourceTagMap ma
 			// By default, replace dot "." using underscore "_" for tag keys.
 			// Note: tag values are not dedotted.
 			for _, tag := range tags {
-				events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
+				_, _ = events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
 			}
 			continue
 		}
