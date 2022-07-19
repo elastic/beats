@@ -39,40 +39,25 @@ func createEvent(stats *Stats) mb.Event {
 	regionName, clusterName := getRegionAndClusterName(stats.Container.Labels)
 	e.RootFields = createRootFields(stats, regionName)
 	if clusterName != "" {
-		_, err := e.MetricSetFields.Put("cluster_name", clusterName)
-		if err != nil {
-			_ = fmt.Errorf("error putting metric set field 'cluster_name': %w", err)
-		}
+		_, _ = e.MetricSetFields.Put("cluster_name", clusterName)
 	}
 
 	taskName := stats.taskInfo.Family
 	if taskName != "" {
-		_, err := e.MetricSetFields.Put("task_name", taskName)
-		if err != nil {
-			_ = fmt.Errorf("error putting metric set field 'task_name': %w", err)
-		}
+		_, _ = e.MetricSetFields.Put("task_name", taskName)
 	}
 
 	taskDesiredStatus := stats.taskInfo.TaskDesiredStatus
 	if taskDesiredStatus != "" {
-		_, err := e.MetricSetFields.Put("task_desired_status", taskDesiredStatus)
-		if err != nil {
-			_ = fmt.Errorf("error putting metric set field 'task_desired_status': %w", err)
-		}
+		_, _ = e.MetricSetFields.Put("task_desired_status", taskDesiredStatus)
 	}
 
 	taskKnownStatus := stats.taskInfo.TaskKnownStatus
 	if taskKnownStatus != "" {
-		_, err := e.MetricSetFields.Put("task_known_status", taskKnownStatus)
-		if err != nil {
-			_ = fmt.Errorf("error putting metric set field 'task_known_status': %w", err)
-		}
+		_, _ = e.MetricSetFields.Put("task_known_status", taskKnownStatus)
 	}
 
-	_, err := e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
-	if err != nil {
-		_ = fmt.Errorf("error putting metric set field 'identifier': %w", err)
-	}
+	_, _ = e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
 	return e
 }
 

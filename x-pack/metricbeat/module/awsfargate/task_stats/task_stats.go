@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/docker/docker/api/types"
 
@@ -22,9 +23,10 @@ import (
 )
 
 var (
-	metricsetName = "task_stats"
-	taskStatsPath = "task/stats"
-	taskPath      = "task"
+	metricsetName                    = "task_stats"
+	taskStatsPath                    = "task/stats"
+	taskPath                         = "task"
+	queryTaskMetadataEndpointTimeout = 60 * time.Second
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -118,8 +120,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
+	context, cancel := context.WithTimeout(context.Background(), queryTaskMetadataEndpointTimeout)
+	defer cancel()
 	// Collect information from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
-	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, m.taskStatsEndpoint, nil)
+	req, err := http.NewRequestWithContext(context, http.MethodGet, m.taskStatsEndpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("http.NewRequestWithContext: %w", err)
 	}
@@ -133,7 +137,7 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	}
 
 	// Collect container metadata information from ${ECS_CONTAINER_METADATA_URI_V4}/task
-	req, err = http.NewRequestWithContext(context.TODO(), http.MethodGet, m.taskEndpoint, nil)
+	req, err = http.NewRequestWithContext(context, http.MethodGet, m.taskEndpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("http.NewRequestWithContext: %w", err)
 	}
