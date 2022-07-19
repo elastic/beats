@@ -146,14 +146,12 @@ func getIronbankContextName() string {
 
 func prepareIronbankBuild() error {
 	fmt.Println(">> prepareIronbankBuild: prepare the IronBank container context.")
-	ironbank := getIronbankContextName()
-
+	buildDir := filepath.Join("build", getIronbankContextName())
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		return fmt.Errorf("could not get the base dir: %w", err)
 	}
 
-	// TODO: get the name of the project
 	templatesDir := filepath.Join(beatsDir, "dev-tools", "packaging", "templates", "ironbank", BeatName)
 
 	data := map[string]interface{}{
@@ -163,7 +161,7 @@ func prepareIronbankBuild() error {
 	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
 		if !info.IsDir() {
 			target := strings.TrimSuffix(
-				filepath.Join(ironbank, filepath.Base(path)),
+				filepath.Join(buildDir, filepath.Base(path)),
 				".tmpl",
 			)
 
@@ -181,7 +179,7 @@ func prepareIronbankBuild() error {
 
 	// copy license
 	sourceLicense := filepath.Join(beatsDir, "dev-tools", "packaging", "files", "ironbank", "LICENSE")
-	targetLicense := filepath.Join(ironbank, "LICENSE")
+	targetLicense := filepath.Join(buildDir, "LICENSE")
 	if err := CopyFile(sourceLicense, targetLicense); err != nil {
 		return fmt.Errorf("cannot copy LICENSE file for the IronBank: %w", err)
 	}
@@ -189,7 +187,7 @@ func prepareIronbankBuild() error {
 	// copy specific files for the given beat
 	sourceBeatPath := filepath.Join(beatsDir, "dev-tools", "packaging", "files", "ironbank", BeatName)
 	if _, err := os.Stat(sourceBeatPath); !os.IsNotExist(err) {
-		if err := Copy(sourceBeatPath, ironbank); err != nil {
+		if err := Copy(sourceBeatPath, buildDir); err != nil {
 			return fmt.Errorf("cannot create files for the IronBank: %w", err)
 		}
 	}
@@ -201,9 +199,9 @@ func saveIronbank() error {
 	fmt.Println(">> saveIronbank: save the IronBank container context.")
 
 	ironbank := getIronbankContextName()
-	buildDir := filepath.Join(ironbank)
+	buildDir := filepath.Join("build", ironbank)
 	if _, err := os.Stat(buildDir); os.IsNotExist(err) {
-		return fmt.Errorf("cannot find the folder with the ironbank context")
+		return fmt.Errorf("cannot find the folder with the ironbank context: %+v", err)
 	}
 
 	distributionsDir := "build/distributions"
@@ -216,9 +214,9 @@ func saveIronbank() error {
 	tarGzFile := filepath.Join(distributionsDir, ironbank+".tar.gz")
 
 	// Save the build context as tar.gz artifact
-	err := Tar(buildDir, tarGzFile)
+	err := TarWithOptions(buildDir, tarGzFile, true)
 	if err != nil {
-		return fmt.Errorf("cannot compress the tar.gz file")
+		return fmt.Errorf("cannot compress the tar.gz file: %+v", err)
 	}
 
 	return errors.Wrap(CreateSHA512File(tarGzFile), "failed to create .sha512 file")
