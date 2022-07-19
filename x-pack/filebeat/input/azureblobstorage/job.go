@@ -30,14 +30,14 @@ type Job interface {
 
 type azureInputJob struct {
 	marker    *string
-	client    *azblob.BlockBlobClient
+	client    *azblob.BlobClient
 	blob      *azblob.BlobItemInternal
 	state     *state.State
 	src       *source
 	publisher cursor.Publisher
 }
 
-func newAzureInputJob(client *azblob.BlockBlobClient, blob *azblob.BlobItemInternal,
+func newAzureInputJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal,
 	marker *string, state *state.State, src *source, publisher cursor.Publisher) Job {
 
 	return &azureInputJob{

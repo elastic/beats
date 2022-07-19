@@ -8,15 +8,26 @@
 package azureblobstorage
 
 import (
+	"fmt"
+
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func fetchServiceClientAndCreds(config config, url string, log *logp.Logger) (*azblob.ServiceClient, *azblob.SharedKeyCredential, error) {
+func fetchServiceClientAndCreds(cfg config, url string, log *logp.Logger) (*azblob.ServiceClient, *serviceCredentials, error) {
+	if cfg.Auth.SharedCredentials != nil {
+		return fetchServiceClientWithSharedKeyCreds(url, cfg.AccountName, cfg.Auth.SharedCredentials, log)
+	} else if cfg.Auth.ConnectionString != nil {
+		return fetchServiceClientWithConnectionString(cfg.Auth.ConnectionString, log)
+	}
 
-	// Create a default request pipeline using your storage account name and account key.
-	credential, err := azblob.NewSharedKeyCredential(config.AccountName, config.AccountKey)
+	return nil, nil, fmt.Errorf("no valid auth specified")
+}
+
+func fetchServiceClientWithSharedKeyCreds(url string, accountName string, sharedKeycfg *sharedKeyConfig, log *logp.Logger) (*azblob.ServiceClient, *serviceCredentials, error) {
+	// Creates a default request pipeline using your storage account name and account key.
+	credential, err := azblob.NewSharedKeyCredential(accountName, sharedKeycfg.AccountKey)
 	if err != nil {
 		log.Errorf("Invalid credentials with error: %v", err)
 		return nil, nil, err
@@ -27,13 +38,49 @@ func fetchServiceClientAndCreds(config config, url string, log *logp.Logger) (*a
 		log.Errorf("Invalid credentials with error: %v", err)
 		return nil, nil, err
 	}
-	return serviceClient, credential, nil
+	return serviceClient, &serviceCredentials{sharedKeyCreds: credential, cType: sharedKeyCredential}, nil
 }
 
-func fetchBlobClients(url string, credential *azblob.SharedKeyCredential, log *logp.Logger) (*azblob.BlockBlobClient, error) {
-	blobClient, err := azblob.NewBlockBlobClientWithSharedKey(url, credential, nil)
+func fetchServiceClientWithConnectionString(connectionString *connectionStringConfig, log *logp.Logger) (*azblob.ServiceClient, *serviceCredentials, error) {
+	// Creates a default request pipeline using your connection string.
+	serviceClient, err := azblob.NewServiceClientFromConnectionString(connectionString.URI, nil)
+	if err != nil {
+		log.Errorf("Invalid credentials with error: %v", err)
+		return nil, nil, err
+	}
+
+	return serviceClient, &serviceCredentials{connectionStrCreds: connectionString.URI, cType: connectionStringCredential}, nil
+}
+
+func fetchBlobClient(url string, credential *blobCredentials, log *logp.Logger) (*azblob.BlobClient, error) {
+	if credential == nil {
+		return nil, fmt.Errorf("no valid blob credentials found")
+	}
+
+	switch credential.serviceCreds.cType {
+	case sharedKeyCredential:
+		return fetchBlobClientWithSharedKey(url, credential.serviceCreds.sharedKeyCreds, log)
+	case connectionStringCredential:
+		return fetchBlobClientWithConnectionString(credential.serviceCreds.connectionStrCreds, credential.containerName, credential.blobName, log)
+	default:
+		return nil, fmt.Errorf("no valid service credential 'type' found")
+	}
+}
+
+func fetchBlobClientWithSharedKey(url string, credential *azblob.SharedKeyCredential, log *logp.Logger) (*azblob.BlobClient, error) {
+	blobClient, err := azblob.NewBlobClientWithSharedKey(url, credential, nil)
 	if err != nil {
 		log.Errorf("Error fetching blob client for url : %s, error : %v", url, err)
+		return nil, err
+	}
+
+	return blobClient, nil
+}
+
+func fetchBlobClientWithConnectionString(connectionString string, containerName string, blobName string, log *logp.Logger) (*azblob.BlobClient, error) {
+	blobClient, err := azblob.NewBlobClientFromConnectionString(connectionString, containerName, blobName, nil)
+	if err != nil {
+		log.Errorf("Error fetching blob client for connectionString : %s, error : %v", connectionString, err)
 		return nil, err
 	}
 

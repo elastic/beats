@@ -27,7 +27,7 @@ type scheduler interface {
 type azureInputScheduler struct {
 	publisher  cursor.Publisher
 	client     *azblob.ContainerClient
-	credential *azblob.SharedKeyCredential
+	credential *serviceCredentials
 	src        *source
 	cfg        *config
 	state      *state.State
@@ -36,7 +36,7 @@ type azureInputScheduler struct {
 }
 
 func newAzureInputScheduler(publisher cursor.Publisher, client *azblob.ContainerClient,
-	credential *azblob.SharedKeyCredential, src *source, cfg *config,
+	credential *serviceCredentials, src *source, cfg *config,
 	state *state.State, serviceURL string, log *logp.Logger) scheduler {
 
 	return &azureInputScheduler{
@@ -68,7 +68,6 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 	for {
 
 		availableWorkers = workerPool.AvailableWorkers()
-		fmt.Println(ais.src.containerName+"-HERE-1", availableWorkers)
 		if availableWorkers == 0 {
 			continue
 		}
@@ -88,11 +87,9 @@ func (ais *azureInputScheduler) schedule(ctx context.Context) error {
 }
 
 func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager, workerPool Pool) error {
-	counter := 0
 	for pager.NextPage(ctx) {
 		jobs, err := ais.createJobs(pager)
-		fmt.Printf("pager - iteration for container :%s :%d and job len: %d\n", ais.src.containerName, counter, len(jobs))
-		counter++
+
 		if err != nil {
 			ais.log.Errorf("Job creation failed for container %s with error %v", ais.src.containerName, err)
 			return err
@@ -117,7 +114,13 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 
 	for _, v := range pager.PageResponse().Segment.BlobItems {
 		blobURL := fmt.Sprintf("%s%s/%s", ais.serviceURL, ais.src.containerName, *v.Name)
-		blobClient, err := fetchBlobClients(blobURL, ais.credential, ais.log)
+		blobCreds := &blobCredentials{
+			serviceCreds:  ais.credential,
+			blobName:      *v.Name,
+			containerName: ais.src.containerName,
+		}
+
+		blobClient, err := fetchBlobClient(blobURL, blobCreds, ais.log)
 		if err != nil {
 			return nil, err
 		}
@@ -129,13 +132,21 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 	return jobs, nil
 }
 
+// fetchBlobPager fetches the current blob page object given a batch size & a page marker.
+// The page marker has been disabled since it was found that it operates on the basis of
+// lexicographical order , and not on the basis of the latest file uploaded, meaning if a blob with a name
+// of lesser lexicographic value is uploaded after a blob with a name of higer value , the latest
+// marker stored in the checkpoint will not retrieve that new blob , this distorts the polling logic
+// hence disabling it for now , until more feedback is given. Disabling this how ever makes the sheduler loop
+// through all the blobs on every poll action to arrive at the latest checkpoint.
+// [NOTE] : There are no api's / sdk functions that list blobs via timestamp/latest entry , it's always lexicographical order
 func (ais *azureInputScheduler) fetchBlobPager(batchSize int32) *azblob.ContainerListBlobFlatPager {
 	pager := ais.client.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{
 		Include: []azblob.ListBlobsIncludeItem{
 			azblob.ListBlobsIncludeItemMetadata,
 			azblob.ListBlobsIncludeItemTags,
 		},
-		Marker:     ais.state.Checkpoint().Marker,
+		// Marker:     ais.state.Checkpoint().Marker,
 		MaxResults: &batchSize,
 	})
 
@@ -143,11 +154,12 @@ func (ais *azureInputScheduler) fetchBlobPager(batchSize int32) *azblob.Containe
 }
 
 func (ais *azureInputScheduler) moveToLastSeenJob(jobs []Job) []Job {
-	// Jobs are stored in alphabedical order always , hence the latest position can be found on the basis of job name
+	// Jobs are stored in lexicographical order always , hence the latest position can be found on the basis of job name
 	var latestJobs []Job
-	var jobsToReturn []Job
+	jobsToReturn := make([]Job, 0)
 	counter := 0
 	flag := false
+	ignore := false
 
 	for _, job := range jobs {
 		if job.Timestamp().After(*ais.state.Checkpoint().LatestEntryTime) {
@@ -155,21 +167,28 @@ func (ais *azureInputScheduler) moveToLastSeenJob(jobs []Job) []Job {
 		} else if job.Name() == ais.state.Checkpoint().BlobName {
 			flag = true
 			break
+		} else if job.Name() > ais.state.Checkpoint().BlobName {
+			flag = true
+			counter--
+			break
+		} else if job.Name() <= ais.state.Checkpoint().BlobName && !ignore {
+			ignore = true
 		}
 		counter++
 	}
 
-	if flag {
-		if counter < len(jobs)-1 {
-			jobsToReturn = jobs[counter+1:]
-		} else {
-			jobsToReturn = make([]Job, 0)
-		}
-	} else {
+	if flag && (counter < len(jobs)-1) {
+		jobsToReturn = jobs[counter+1:]
+	} else if !flag && !ignore {
 		jobsToReturn = jobs
 	}
 
-	latestJobs = append(latestJobs, jobsToReturn...)
+	// in a senario where there are some jobs which have a later time stamp
+	// but lesser alphanumeric order and some jobs have greater alphanumeric order
+	// than the current checkpoint
+	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
+		jobsToReturn = append(latestJobs, jobsToReturn...)
+	}
 
-	return latestJobs
+	return jobsToReturn
 }

@@ -48,7 +48,7 @@ func NewWorkerPool(ctx context.Context, maxWorkers int, log *logp.Logger) Pool {
 
 	// creates workers
 	for i := 0; i < maxWorkers; i++ {
-		workers[i] = NewWorker(ctx, i+1, readyPool, &workersWg, errChan)
+		workers[i] = NewWorker(ctx, i+1, readyPool, &workersWg, errChan, log)
 	}
 
 	return &pool{

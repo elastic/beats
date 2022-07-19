@@ -14,8 +14,8 @@ import (
 
 type config struct {
 	AccountName string      `config:"account_name"`
-	AccountKey  string      `config:"account_key"`
-	Containers  []container `config:"containers"`
+	Auth        authConfig  `config:"auth" validate:"required"`
+	Containers  []container `config:"containers" validate:"required"`
 }
 
 type container struct {
@@ -23,6 +23,18 @@ type container struct {
 	MaxWorkers   int           `config:"max_workers"`
 	Poll         bool          `config:"poll"`
 	PollInterval time.Duration `config:"poll_interval"`
+}
+
+type authConfig struct {
+	SharedCredentials *sharedKeyConfig        `config:"shared_credentials,omitempty"`
+	ConnectionString  *connectionStringConfig `config:"connection_string,omitempty"`
+}
+
+type connectionStringConfig struct {
+	URI string `config:"uri,omitempty"`
+}
+type sharedKeyConfig struct {
+	AccountKey string `config:"account_key"`
 }
 
 func (c config) Validate() error {
@@ -37,7 +49,11 @@ func (c config) Validate() error {
 func defaultConfig() config {
 	return config{
 		AccountName: "some_account",
-		AccountKey:  "some_key",
+		Auth: authConfig{
+			SharedCredentials: &sharedKeyConfig{
+				AccountKey: "some_key",
+			},
+		},
 		Containers: []container{
 			{Name: "container1", MaxWorkers: 1, Poll: true, PollInterval: time.Duration(time.Second * 5)},
 			{Name: "container2", MaxWorkers: 3, Poll: true, PollInterval: time.Duration(time.Second * 5)},

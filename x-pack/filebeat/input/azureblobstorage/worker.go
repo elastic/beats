@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type Worker interface {
@@ -28,9 +30,10 @@ type worker struct {
 	job       chan Job
 	readyPool chan chan Job
 	quit      chan bool
+	log       *logp.Logger
 }
 
-func NewWorker(ctx context.Context, id int, readyPool chan chan Job, wg *sync.WaitGroup, errChan chan<- error) Worker {
+func NewWorker(ctx context.Context, id int, readyPool chan chan Job, wg *sync.WaitGroup, errChan chan<- error, log *logp.Logger) Worker {
 	return &worker{
 		id:        id,
 		ctx:       ctx,
@@ -39,6 +42,7 @@ func NewWorker(ctx context.Context, id int, readyPool chan chan Job, wg *sync.Wa
 		readyPool: readyPool,
 		job:       make(chan Job),
 		quit:      make(chan bool),
+		log:       log,
 	}
 }
 
@@ -54,7 +58,7 @@ func (w *worker) Process(work Job) {
 	}()
 
 	jobID := fetchJobID(w.id, work.Source().containerName, work.Name())
-	fmt.Printf("JOB WITH ID %v and timeStamp %v EXECUTED\n", jobID, work.Timestamp().String())
+	w.log.Infof("job with id %s and timeStamp %s executed\n", jobID, work.Timestamp().String())
 	err := work.Do(w.ctx, jobID)
 	if err != nil {
 		w.errChan <- fmt.Errorf("worker %d encountered an error : %w", w.id, err)
