@@ -48,19 +48,31 @@ func TestPreProcessors(t *testing.T) {
 		wantProc           bool
 		wantErr            bool
 	}{
-		"no settings should yield no processor": {
+		"no settings should yield no processor for lightweight monitor": {
 			publishSettings{},
 			"",
 			nil,
-			"browser",
+			"http",
 			false,
+			false,
+		},
+		"no settings should yield a data stream processor for browsers": {
+			publishSettings{},
+			"synthetics-browser-default",
+			&add_data_stream.DataStream{
+				Namespace: "default",
+				Dataset:   "browser",
+				Type:      "synthetics",
+			},
+			"browser",
+			true,
 			false,
 		},
 		"exact index should be used exactly": {
 			publishSettings{Index: *fmtstr.MustCompileEvent("test")},
 			"test",
 			nil,
-			"browser",
+			"http",
 			true,
 			false,
 		},

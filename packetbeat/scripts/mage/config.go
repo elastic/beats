@@ -23,18 +23,11 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-var defaultDevice = map[string]string{
-	"darwin":  "en0",
-	"linux":   "any",
-	"windows": "0",
-}
-
 func device(goos string) string {
-	dev, found := defaultDevice[goos]
-	if found {
-		return dev
+	if goos == "linux" {
+		return "any"
 	}
-	return "any"
+	return "default_route"
 }
 
 // ConfigFileParams returns the default ConfigFileParams for generating

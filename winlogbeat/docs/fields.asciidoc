@@ -16313,6 +16313,42 @@ required: True
 
 --
 
+*`winlog.computerObject.domain`*::
++
+--
+The domain of the account that was added, modified or deleted in the event.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`winlog.computerObject.id`*::
++
+--
+A globally unique identifier that identifies the target device.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`winlog.computerObject.name`*::
++
+--
+The account name that was added, modified or deleted in the event.
+
+
+type: keyword
+
+required: False
+
+--
+
 *`winlog.event_data`*::
 +
 --
@@ -17236,6 +17272,44 @@ The event creation time.
 
 
 type: date
+
+required: False
+
+--
+
+*`winlog.trustAttribute`*::
++
+--
+The decimal value of attributes for new trust created to a domain.
+
+
+type: keyword
+
+required: False
+
+--
+
+*`winlog.trustDirection`*::
++
+--
+The direction of new trust created to a domain.
+Possible values are `TRUST_DIRECTION_DISABLED`, `TRUST_DIRECTION_INBOUND`, `TRUST_DIRECTION_OUTBOUND` and `TRUST_DIRECTION_BIDIRECTIONAL`
+
+
+type: keyword
+
+required: False
+
+--
+
+*`winlog.trustType`*::
++
+--
+The account name that was added, modified or deleted in the event.
+Possible values are `TRUST_TYPE_DOWNLEVEL`, `TRUST_TYPE_UPLEVEL`, `TRUST_TYPE_MIT` and `TRUST_TYPE_DCE`
+
+
+type: keyword
 
 required: False
 

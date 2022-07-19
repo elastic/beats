@@ -109,7 +109,8 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 		if err != nil {
 			return err
 		}
-		return module.UploadPipelines(b.Info, esClient, overwritePipelines)
+		_, err = module.UploadPipelines(b.Info, esClient, overwritePipelines)
+		return err
 	}
 	return nil
 }
@@ -137,7 +138,8 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	if b.Config.Output.Name() == "elasticsearch" {
 		callback := func(esClient *eslegclient.Connection) error {
-			return module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
+			_, err := module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
+			return err
 		}
 		_, err := elasticsearch.RegisterConnectCallback(callback)
 		if err != nil {

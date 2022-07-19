@@ -39,9 +39,6 @@ processors:
       if: ctx?.winlog?.time_created != null
 
   - set:
-      field: event.ingested
-      value: '{{_ingest.timestamp}}'
-  - set:
       field: event.module
       value: powershell
   - set:
@@ -235,7 +232,7 @@ processors:
         field: param3
       source: |-
         def parseRawDetail(String raw) {
-            Pattern detailRegex = /^(.+)\((.+)\)\:\s*(.+)?$/;
+            Pattern detailRegex = /^([^:(]+)\((.+)\)\:\s*(.+)?$/;
             Pattern parameterBindingRegex = /name\=(.+);\s*value\=(.+)$/;
 
             def matcher = detailRegex.matcher(raw);

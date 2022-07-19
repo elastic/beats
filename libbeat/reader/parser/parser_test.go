@@ -337,7 +337,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 		config          map[string]interface{}
 		expectedMessage reader.Message
 	}{
-		"no postprocesser, no processing": {
+		"no postprocessor, no processing": {
 			message: reader.Message{
 				Content: []byte("line 1"),
 			},
@@ -346,7 +346,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte("line 1"),
 			},
 		},
-		"JSON post processer with keys_under_root": {
+		"JSON post processor with keys_under_root": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\"}"),
 				Fields:  mapstr.M{},
@@ -367,7 +367,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 		},
-		"JSON post processer with document ID": {
+		"JSON post processor with document ID": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),
 				Fields:  mapstr.M{},
@@ -392,7 +392,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 		},
-		"JSON post processer with overwrite keys and under root": {
+		"JSON post processor with overwrite keys and under root": {
 			message: reader.Message{
 				Content: []byte("{\"key\": \"value\"}"),
 				Fields: mapstr.M{
@@ -415,6 +415,135 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Fields: mapstr.M{
 					"key":       "value",
 					"other-key": "other-value",
+				},
+			},
+		},
+		"JSON post processor with type in message": {
+			message: reader.Message{
+				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": "test"}`),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target":         "",
+							"overwrite_keys": true,
+							"add_error_key":  true,
+							"message_key":    "msg",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte("FetchActiveSessionToken process ended"),
+				Fields: mapstr.M{
+					"appInfo": mapstr.M{
+						"appname": "SessionManager",
+						"appid":   "Pooler",
+						"host":    "demohost.mydomain.com",
+						"ip":      "192.168.128.113",
+						"pid":     int64(13982),
+					},
+					"level":  "INFO",
+					"logger": "iapi.logger",
+					"userFields": mapstr.M{
+						"ApplicationId":     "PROFAPP_001",
+						"RequestTrackingId": "RetrieveTBProfileToken-6066477",
+					},
+					"msg":       "FetchActiveSessionToken process ended",
+					"source":    "DataAccess/FetchActiveSessionToken.process",
+					"thread":    "JobCourier4",
+					"type":      "test",
+					"timestamp": "2016-04-05T18:47:18.444Z",
+				},
+			},
+		},
+		"JSON post processor on invalid type in message": {
+			message: reader.Message{
+				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": 5}`),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target":         "",
+							"overwrite_keys": true,
+							"add_error_key":  true,
+							"message_key":    "msg",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte("FetchActiveSessionToken process ended"),
+				Fields: mapstr.M{
+					"appInfo": mapstr.M{
+						"appname": "SessionManager",
+						"appid":   "Pooler",
+						"host":    "demohost.mydomain.com",
+						"ip":      "192.168.128.113",
+						"pid":     int64(13982),
+					},
+					"level":  "INFO",
+					"logger": "iapi.logger",
+					"userFields": mapstr.M{
+						"ApplicationId":     "PROFAPP_001",
+						"RequestTrackingId": "RetrieveTBProfileToken-6066477",
+					},
+					"msg":       "FetchActiveSessionToken process ended",
+					"source":    "DataAccess/FetchActiveSessionToken.process",
+					"thread":    "JobCourier4",
+					"timestamp": "2016-04-05T18:47:18.444Z",
+					"error": mapstr.M{
+						"message": "type not overwritten (not string)",
+						"type":    "json",
+					},
+				},
+			},
+		},
+		"JSON post processor on invalid struct under type in message": {
+			message: reader.Message{
+				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": {"hello": "shouldn't work"}}`),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target":         "",
+							"overwrite_keys": true,
+							"add_error_key":  true,
+							"message_key":    "msg",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte("FetchActiveSessionToken process ended"),
+				Fields: mapstr.M{
+					"appInfo": mapstr.M{
+						"appname": "SessionManager",
+						"appid":   "Pooler",
+						"host":    "demohost.mydomain.com",
+						"ip":      "192.168.128.113",
+						"pid":     int64(13982),
+					},
+					"level":  "INFO",
+					"logger": "iapi.logger",
+					"userFields": mapstr.M{
+						"ApplicationId":     "PROFAPP_001",
+						"RequestTrackingId": "RetrieveTBProfileToken-6066477",
+					},
+					"msg":       "FetchActiveSessionToken process ended",
+					"source":    "DataAccess/FetchActiveSessionToken.process",
+					"thread":    "JobCourier4",
+					"timestamp": "2016-04-05T18:47:18.444Z",
+					"error": mapstr.M{
+						"message": "type not overwritten (not string)",
+						"type":    "json",
+					},
 				},
 			},
 		},

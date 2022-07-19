@@ -20,7 +20,6 @@ package diskqueue
 import (
 	"bytes"
 	"encoding/binary"
-	"os"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -89,7 +88,7 @@ type writerLoop struct {
 
 	// The file handle corresponding to currentSegment. When currentSegment
 	// changes, this handle is closed and a new one is created.
-	outputFile *os.File
+	outputFile *segmentWriter
 
 	currentRetryInterval time.Duration
 
@@ -118,7 +117,7 @@ func (wl *writerLoop) run() {
 			// The request channel is closed, we are done. If there is an active
 			// segment file, finalize its frame count and close it.
 			if wl.outputFile != nil {
-				_ = writeSegmentHeader(wl.outputFile, wl.currentSegment.frameCount)
+				_ = wl.outputFile.UpdateCount(wl.currentSegment.frameCount)
 				_ = wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
@@ -162,8 +161,7 @@ outerLoop:
 			if wl.outputFile != nil {
 				// Update the header with the frame count (including the ones we
 				// just wrote), try to sync to disk, then close the file.
-				_ = writeSegmentHeader(wl.outputFile,
-					wl.currentSegment.frameCount+curSegmentResponse.framesWritten)
+				_ = wl.outputFile.UpdateCount(wl.currentSegment.frameCount + curSegmentResponse.framesWritten)
 				_ = wl.outputFile.Sync()
 				wl.outputFile.Close()
 				wl.outputFile = nil
