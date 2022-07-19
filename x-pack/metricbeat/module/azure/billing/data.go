@@ -19,7 +19,7 @@ import (
 
 // EventsMapping maps the usage details to a slice of metricbeat events.
 func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) ([]mb.Event, error) {
-	var events []mb.Event
+	events := make([]mb.Event, 0, len(results.UsageDetails))
 	if len(results.UsageDetails) > 0 {
 		for _, ud := range results.UsageDetails {
 			event := mb.Event{Timestamp: time.Now().UTC()}
