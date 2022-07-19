@@ -40,12 +40,16 @@ var (
 	isDebug    = false
 	isDetailed = false
 
-	_ protos.UDPPlugin = &plugin{}
-	_ protos.TCPPlugin = &plugin{}
+	_ protos.UDPPlugin                = &plugin{}
+	_ protos.ExpirationAwareTCPPlugin = &plugin{}
 )
 
 func init() {
 	protos.Register("sip", New)
+}
+
+type connectionData struct {
+	streams [2]*parsingInfo
 }
 
 // SIP application level protocol analyser UDP and TCP plugin.
@@ -97,8 +101,8 @@ func (p *plugin) GetPorts() []int {
 
 func (p *plugin) ParseUDP(pkt *protos.Packet) {
 	defer logp.Recover("SIP ParseUDP exception")
-
-	if err := p.doParse(pkt); err != nil {
+	pi := newParsingInfo(pkt, pkt.Tuple.BaseTuple)
+	if _, err := p.doParse(pi); err != nil {
 		logp.Error(err)
 	}
 }
@@ -111,27 +115,158 @@ func (p *plugin) Parse(
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 	defer logp.Recover("SIP Parse exception")
-	if err := p.doParse(pkt); err != nil {
+
+	conn := ensureConnection(private)
+	st := conn.streams[dir]
+	if st == nil {
+		st = newParsingInfo(pkt, tcptuple.BaseTuple)
+		conn.streams[dir] = st
+	} else {
+		st.data = append(st.data, pkt.Payload...)
+		st.message.rawData = append(st.message.rawData, pkt.Payload...)
+	}
+
+	ok, err := p.doParse(st)
+	if err != nil {
 		logp.Error(err)
 	}
+
+	if !ok {
+		// drop this tcp stream. Will retry parsing with the next
+		// segment in it
+		conn.streams[dir] = nil
+	}
+
 	return private
 }
 
+func ensureConnection(private protos.ProtocolData) *connectionData {
+	conn := getConnection(private)
+	if conn == nil {
+		conn = &connectionData{}
+	}
+	return conn
+}
+
+func getConnection(private protos.ProtocolData) *connectionData {
+	if private == nil {
+		return nil
+	}
+
+	priv, ok := private.(*connectionData)
+	if !ok {
+		logp.Warn("connection data type error")
+		return nil
+	}
+	if priv == nil {
+		logp.Warn("Unexpected: connection data not set")
+		return nil
+	}
+
+	return priv
+}
+
 // ReceivedFin will be called when TCP transaction is terminating.
-func (p *plugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
+func (p *plugin) ReceivedFin(
+	tcptuple *common.TCPTuple,
+	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
 	debugf("Received FIN")
-	return private
+	conn := getConnection(private)
+	if conn == nil {
+		return private
+	}
+
+	pi := conn.streams[dir]
+	if pi == nil {
+		return conn
+	}
+
+	if pi.message != nil {
+		evt, err := p.buildEvent(p.cfg, pi)
+		if err != nil {
+			return conn
+		}
+
+		p.publish(*evt)
+
+		// and reset stream for next message
+		pi.prepareForNewMessage()
+	}
+
+	return conn
 }
 
 // GapInStream is called when a gap of nbytes bytes is found in the stream (due
 // to packet loss).
-func (p *plugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+func (p *plugin) GapInStream(
+	tcptuple *common.TCPTuple,
+	dir uint8,
+	nbytes int,
+	private protos.ProtocolData,
+) (priv protos.ProtocolData, drop bool,
 ) {
 	defer logp.Recover("GapInStream(sip) exception")
+
+	conn := getConnection(private)
+	if conn == nil {
+		return private, false
+	}
+
+	st := conn.streams[dir]
+	if st == nil || st.message == nil {
+		// nothing to do
+		return private, false
+	}
+
+	ok, complete := p.messageGap(st, nbytes)
+	if isDetailed {
+		detailedf("messageGap returned ok=%v complete=%v", ok, complete)
+	}
+	if !ok {
+		// on errors, drop stream
+		conn.streams[dir] = nil
+		return conn, true
+	}
+
+	if complete {
+		// Current message is complete, we need to publish from here
+		evt, err := p.buildEvent(p.cfg, st)
+		if err != nil {
+			return conn, true
+		}
+
+		p.publish(*evt)
+
+		// and reset stream for next message
+		st.prepareForNewMessage()
+	}
+
+	// don't drop the stream, we can ignore the gap
 	return private, false
+}
+
+func (p *plugin) messageGap(pi *parsingInfo, nbytes int) (ok bool, complete bool) {
+	m := pi.message
+	switch pi.state {
+	case stateStart, stateHeaders:
+		// we know we cannot recover from these
+		return false, false
+	case stateBody:
+		if isDebug {
+			debugf("gap in body: %d", nbytes)
+		}
+		if len(pi.data)+nbytes >= m.contentLength-pi.bodyReceived {
+			// we're done, but the last portion of the data is gone
+			return true, true
+		} else {
+			pi.bodyReceived += nbytes
+			return true, false
+		}
+	}
+	// assume we cannot recover
+	return false, false
 }
 
 // ConnectionTimeout returns the configured HTTP transaction timeout.
@@ -139,25 +274,66 @@ func (p *plugin) ConnectionTimeout() time.Duration {
 	return p.cfg.TransactionTimeout
 }
 
-func (p *plugin) doParse(pkt *protos.Packet) error {
+func (p *plugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
+	conn := getConnection(private)
+	if conn == nil {
+		return
+	}
+	if isDebug {
+		debugf("expired connection %s", tuple)
+	}
+	// terminate streams
+	for _, st := range conn.streams {
+		// Do not send incomplete or empty messages
+		if st != nil && st.message != nil && st.message.headerOffset > 0 {
+			if isDebug {
+				debugf("got message %+v", st.message)
+			}
+			// Current message is complete, we need to publish from here
+			evt, err := p.buildEvent(p.cfg, st)
+			if err != nil {
+				return
+			}
+
+			p.publish(*evt)
+
+			// and reset stream for next message
+			st.prepareForNewMessage()
+		}
+	}
+}
+
+func (p *plugin) doParse(pi *parsingInfo) (bool, error) {
 	if isDetailed {
-		detailedf("Payload received: [%s]", pkt.Payload)
+		detailedf("Payload received: [%s]", pi.pkt.Payload)
 	}
 
-	pi := newParsingInfo(pkt)
-	m, err := parse(pi)
-	if err != nil {
-		return err
+	for len(pi.data) > 0 {
+		if pi.message == nil {
+			pi.message = &message{ts: pi.pkt.Ts, rawData: append([]byte{}, pi.data...)}
+		}
+		ok, complete := parse(pi)
+		if !ok {
+			return false, nil
+		}
+
+		if !complete {
+			// wait for more data
+			break
+		}
+
+		evt, err := p.buildEvent(p.cfg, pi)
+		if err != nil {
+			return true, err
+		}
+
+		p.publish(*evt)
+
+		// and reset stream for next message
+		pi.prepareForNewMessage()
 	}
 
-	evt, err := p.buildEvent(p.cfg, pi, m)
-	if err != nil {
-		return err
-	}
-
-	p.publish(*evt)
-
-	return nil
+	return true, nil
 }
 
 func (p *plugin) publish(evt beat.Event) {
@@ -166,7 +342,8 @@ func (p *plugin) publish(evt beat.Event) {
 	}
 }
 
-func (p *plugin) buildEvent(cfg *config, pi *parsingInfo, m *message) (*beat.Event, error) {
+func (p *plugin) buildEvent(cfg *config, pi *parsingInfo) (*beat.Event, error) {
+	m := pi.message
 	status := common.OK_STATUS
 	if m.statusCode >= 400 {
 		status = common.ERROR_STATUS
@@ -202,7 +379,7 @@ func (p *plugin) buildEvent(cfg *config, pi *parsingInfo, m *message) (*beat.Eve
 	pbf.SetDestination(dst)
 	pbf.AddIP(dst.IP)
 
-	populateEventFields(cfg, m, pbf, sipFields)
+	populateEventFields(cfg, pi, pbf, sipFields)
 
 	if err := pb.MarshalStruct(evt.Fields, "sip", sipFields); err != nil {
 		return nil, err
@@ -342,7 +519,8 @@ func populateContactFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	}
 }
 
-func populateEventFields(cfg *config, m *message, pbf *pb.Fields, fields ProtocolFields) {
+func populateEventFields(cfg *config, pi *parsingInfo, pbf *pb.Fields, fields ProtocolFields) {
+	m := pi.message
 	pbf.Event.Kind = "event"
 	pbf.Event.Type = []string{"info", "protocol"}
 	pbf.Event.Dataset = "sip"
