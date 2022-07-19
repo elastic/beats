@@ -14,7 +14,7 @@ def metricbeat(
     flags = ""
     if mode == "debug":
         flags = '-gcflags "-N -l"'
-    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build {} -o build/metricbeat .".format(flags)
+    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build {} -o build/metricbeat ../../metricbeat".format(flags)
     print("Build cmd: {}".format(build_cmd))
 
     local_resource(
@@ -31,7 +31,7 @@ def metricbeat(
     docker_image = 'metricbeat-{}-image'.format(mode)
     print("Docker image: {}".format(docker_image))
 
-    docker_file = 'k8s-dev-tools/Dockerfile.{}'.format(mode)
+    docker_file = 'Dockerfile.{}'.format(mode)
     print("Docker file: {}".format(docker_file))
 
     if mode == "run":
@@ -69,7 +69,7 @@ def metricbeat(
     )
 
     ## Deploy to k8s
-    k8s_manifest = 'k8s-dev-tools/manifest.{}.yaml'.format(mode)
+    k8s_manifest = 'manifest.{}.yaml'.format(mode)
     print("K8s manifest: {}".format(k8s_manifest))
 
     k8s_yaml(k8s_manifest)

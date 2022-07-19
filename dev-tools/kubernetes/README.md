@@ -1,6 +1,6 @@
 # Readme
 
-K8s dev tools are a combination of Dockerfile, k8s manifest and Tiltfile.
+Kubernetes dev tools are a combination of Dockerfile, k8s manifest and Tiltfile.
 
 [Tilt](https://tilt.dev/) is a dev toolkit for microservices.
 
@@ -9,12 +9,12 @@ K8s dev tools are a combination of Dockerfile, k8s manifest and Tiltfile.
 You can install Tilt by using the script
 
 ```shell
-./metricbeat/k8s-dev-tools/get_tilt.sh
+./dev-tools/kubernetes/get_tilt.sh
 ```
 
 
 ## How to run
-The Tiltfile that orchestrates everything is located at `./metricbeat/Tiltfile` under the metricbeat folder of this repo. All the following commands need to be run from `./metricbeat`, in the same folder where the Tiltfile is located.
+The Tiltfile that orchestrates everything is located at `./dev-tools/kubernetes/Tiltfile`. All the following commands need to be run from `./dev-tools/kubernetes`, in the same folder where the Tiltfile is located.
 
 How to run Tilt
 
