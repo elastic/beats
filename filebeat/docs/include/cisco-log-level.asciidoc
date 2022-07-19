@@ -1,4 +1,4 @@
-An integer between 1 and 7 that allows to filter messages based on the
+An integer between 1 and 7 that allows filtering messages based on the
 severity level. The different severity levels supported by the Cisco ASA are:
 
 [width="30%",cols="^1,2",options="header"]
@@ -19,6 +19,6 @@ example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
 and 3 (Error). All other messages will be dropped.
 
 NOTE: The filtering is done in the ingest pipeline, if this setting is
-changed, the ingest pipeline need to be reloaded manyally. To reload
+changed, the ingest pipeline need to be reloaded manually. To reload
 the ingest pipeline, set `filebeat.overwrite_pipelines: true` and
-maually <<load-ingest-pipelines>>.
+manually <<load-ingest-pipelines>>.
