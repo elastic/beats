@@ -126,7 +126,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add new Kubernetes module dashboards {pull}31591[31591]
 - system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
 - Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
-- Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}TBD[TBD]
+- Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}32394[32394]
 
 *Packetbeat*
 
