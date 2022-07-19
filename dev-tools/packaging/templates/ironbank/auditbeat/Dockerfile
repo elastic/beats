@@ -26,7 +26,7 @@ COPY config/auditbeat.yml /usr/share/${ELASTIC_PRODUCT}
 # REF: https://docs.okd.io/latest/openshift_images/create-images.html
 RUN chmod -R g=u /usr/share/${ELASTIC_PRODUCT}
 
-# Create auxiliar folders and assing default permissions.
+# Create auxiliary folders and assigning default permissions.
 RUN mkdir /usr/share/${ELASTIC_PRODUCT}/data /usr/share/${ELASTIC_PRODUCT}/logs && \
     chown -R root:root /usr/share/${ELASTIC_PRODUCT} && \
     find /usr/share/${ELASTIC_PRODUCT} -type d -exec chmod 0750 {} \; && \
