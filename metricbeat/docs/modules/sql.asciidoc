@@ -484,6 +484,63 @@ The example generates this event: By disabling the flag `raw_data.enabled`, whic
 }
 ----
 
+[float]
+=== Example: Merge multiple queries to single event.
+
+Multiple queries will create multiple events, one for each query.  It may be preferrable to create a single event by combining the metrics together in a single event.
+
+This feature can be enabled using the `request_merge` config.
+
+However, such a merge is possible only if the table queries being merged, each produce a single row.
+
+For example:
+
+[source,yaml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["postgres://postgres:postgres@localhost?sslmode=disable"]
+  driver: "postgres"
+  raw_data.enabled: true
+  request_merge: true
+  sql_queries:
+    - query: "SELECT blks_hit FROM pg_stat_database limit 1;"
+      response_format: table
+    - query: "SELECT blks_read FROM pg_stat_database limit 1;"
+      response_format: table
+----
+
+This creates a combined event as below, where `blks_hit` and `blks_read` are part of same event.
+
+[source,json]
+----
+{
+  "@timestamp": "2022-07-18T14:03:30.049Z",
+  "service": {
+    "address": "localhost",
+    "type": "sql"
+  },
+  "sql": {
+    "query": "MULTIPLE",
+      "metrics": {
+        "blks_hit": 9883,
+        "blks_read": 21
+      },
+      "driver": "postgres"
+  },
+  "event": {
+    "dataset": "sql.query",
+    "module": "sql",
+    "duration": 19461958
+  },
+  "metricset": {
+    "name": "query",
+    "period": 10000
+  }
+}
+----
 
 :edit_url:
 
