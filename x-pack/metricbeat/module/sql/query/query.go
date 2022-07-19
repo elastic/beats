@@ -141,7 +141,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 						return fmt.Errorf("can not merge query resulting with more than one rows: %s", q)
 					} else {
 						for k, v := range ms {
-							//fmt.Println("Adding1", k, v)
 							_, ok := merged[k]
 							if ok {
 								m.Logger().Warn("overwriting duplicate metrics: ", k)
@@ -163,7 +162,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 			if m.Config.MergeQueries {
 				for k, v := range ms {
-					//fmt.Println("Adding2", k, v)
 					_, ok := merged[k]
 					if ok {
 						m.Logger().Warn("overwriting duplicate metrics: ", k)
