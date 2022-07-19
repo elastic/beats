@@ -81,9 +81,13 @@ func newResponseProcessor(config config, pagination *pagination, log *logp.Logge
 			log:        log,
 		}
 		// chain calls responseProcessor object
-		split, _ := newSplitResponse(ch.Step.Response.Split, log)
-
-		rp.split = split
+		if ch.Step != nil {
+			split, _ := newSplitResponse(ch.Step.Response.Split, log)
+			rp.split = split
+		} else if ch.While != nil {
+			split, _ := newSplitResponse(ch.While.Response.Split, log)
+			rp.split = split
+		}
 
 		rps = append(rps, rp)
 	}

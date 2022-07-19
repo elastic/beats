@@ -3,6 +3,8 @@
 
 == Elasticsearch module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is the elasticsearch module.
 
 include::../include/what-happens.asciidoc[]

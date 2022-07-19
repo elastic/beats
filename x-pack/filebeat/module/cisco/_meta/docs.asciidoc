@@ -5,7 +5,13 @@
 
 == Cisco module
 
+//temporarily override modulename to create working link
+:modulename: cisco_asa
+
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: cisco
 
 This is a module for Cisco network device's logs and Cisco Umbrella. It includes the following
 filesets for receiving logs over syslog or read from a file:

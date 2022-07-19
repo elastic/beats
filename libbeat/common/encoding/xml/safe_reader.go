@@ -53,12 +53,22 @@ func (r *SafeReader) Read(d []byte) (n int, err error) {
 		return output(n)
 	}
 	if len(r.buf) == 0 {
-		n, _ = r.inner.Read(r.backing[:])
+		n, _ := r.inner.Read(r.backing[:])
 		r.buf = r.backing[:n]
 	}
 	for i := 0; i < len(r.buf); {
+		if !utf8.FullRune(r.buf[i:]) {
+			n = copy(d, r.buf[:i])
+			rn := copy(r.backing[:], r.buf[i:])
+			nn, err := r.inner.Read(r.backing[rn:])
+			if err != nil && err != io.EOF {
+				return 0, err
+			}
+			r.buf = r.backing[:rn+nn]
+			return output(n)
+		}
 		code, size := utf8.DecodeRune(r.buf[i:])
-		if !unicode.IsSpace(code) && unicode.IsControl(code) {
+		if code == utf8.RuneError || (!unicode.IsSpace(code) && unicode.IsControl(code)) {
 			n = copy(d, r.buf[:i])
 			r.buf = r.buf[n+1:]
 			r.code = []byte(fmt.Sprintf("\\u%04x", code))
