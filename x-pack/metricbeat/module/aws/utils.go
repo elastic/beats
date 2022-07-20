@@ -214,7 +214,7 @@ func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	return strings.Join(resourceARNSplit[1:], "/"), nil
 }
 
-// FindWholeIdentifierFromARN funtion extracts whole resource filed of ARN
+// FindWholeIdentifierFromARN function extracts whole resource filed of ARN
 func FindWholeIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
