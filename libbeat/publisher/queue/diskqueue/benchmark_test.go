@@ -17,7 +17,7 @@
 
 // Usage:
 //
-// go test -bench=100k -benchtime 1x -count 10 -timeout 10m -benchmem > results.txt
+// go test -bench=100k -benchtime 1x -count 10 -timeout 10m -benchmem | tee results.txt && benchstat results.txt
 //
 // then
 //
