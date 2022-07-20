@@ -18,9 +18,8 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
-
-	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -119,9 +118,9 @@ func runCmd(
 	// we are passing in a unix.SysProcAttr object
 	// this is equivalent, but the unix package is not considered deprecated
 	// as the syscall package is
-	cmd.SysProcAttr = &unix.SysProcAttr{
+	cmd.SysProcAttr = &syscall.SysProcAttr.SysProcAttr{
 		// Ensure node subprocesses are killed if this process dies (linux only)
-		Pdeathsig: unix.SIGKILL,
+		Pdeathsig: syscall.SIGKILL,
 	}
 
 	mpx = NewExecMultiplexer()
