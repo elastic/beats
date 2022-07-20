@@ -87,6 +87,8 @@ def beat(
     else:
         k8s_resource(beat, port_forwards=56268)
 
+    allow_k8s_contexts(k8s_context())
+
 
 # beat(mode="run")
 beat(beat="filebeat", mode="run")
