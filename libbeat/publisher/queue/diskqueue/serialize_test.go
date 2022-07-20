@@ -94,7 +94,7 @@ func TestSerialize(t *testing.T) {
 			event, ok := decoded.(publisher.Event)
 			require.True(t, ok)
 			decodedValue, err := event.Content.Fields.GetValue("test_field")
-			assert.NoErrorf(t, err, "%s: Couldn't get 'test_field': error: %v", name, err)
+			assert.NoErrorf(t, err, "%s: Couldn't get 'test_field'", name)
 			assert.Equal(t, tc.value, decodedValue)
 		case SerializationProtobuf:
 			event, ok := decoded.(*messages.Event)
