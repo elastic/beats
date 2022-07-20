@@ -118,8 +118,6 @@ func Package() error {
 	return nil
 }
 
-<<<<<<< HEAD
-=======
 // Package packages the Beat for IronBank distribution.
 //
 // Use SNAPSHOT=true to build snapshots.
@@ -226,23 +224,8 @@ func saveIronbank() error {
 	return errors.Wrap(CreateSHA512File(tarGzFile), "failed to create .sha512 file")
 }
 
-// updateWithDarwinUniversal checks if darwin/amd64 and darwin/arm64, are listed
-// if so, the universal binary was built, then we need to package it as well.
-func updateWithDarwinUniversal(platforms BuildPlatformList) BuildPlatformList {
-	if IsDarwinUniversal() {
-		platforms = append(platforms,
-			BuildPlatform{
-				Name:  "darwin/universal",
-				Flags: CGOSupported | CrossBuildSupported | Default,
-			})
-	}
-
-	return platforms
-}
-
 // isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
 // pkgType is present on SelectedPackageTypes. It returns false otherwise.
->>>>>>> e41dc18a54 (automate the ironbank docker context generation  (#32251))
 func isPackageTypeSelected(pkgType PackageType) bool {
 	if SelectedPackageTypes != nil {
 		selected := false
