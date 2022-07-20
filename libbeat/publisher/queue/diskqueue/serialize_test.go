@@ -87,7 +87,7 @@ func TestSerialize(t *testing.T) {
 		buf := decoder.Buffer(len(serialized))
 		copy(buf, serialized)
 		decoded, err := decoder.Decode()
-		assert.NoErrorf(t, err, "%s: Couldn't decode event, error: %v", name, err)
+		require.NoErrorf(t, err, "%s: Couldn't decode event", name)
 
 		switch tc.format {
 		case SerializationCBOR:
