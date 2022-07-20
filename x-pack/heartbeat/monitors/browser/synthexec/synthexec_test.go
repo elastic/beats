@@ -153,7 +153,7 @@ func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string) []*SynthEvent {
 	_, filename, _, _ := runtime.Caller(0)
 	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
 
-	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
+	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{}, 15*time.Minute)
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent
