@@ -66,10 +66,7 @@ func (s *server) Close() error {
 }
 
 func (s *server) Run() error {
-	return s.processBatches()
-}
-
-func (s *server) processBatches() error {
+	// Process batches until the input is stopped.
 	for batch := range s.ljSvr.ReceiveChan() {
 		s.metrics.batchesReceivedTotal.Inc()
 
