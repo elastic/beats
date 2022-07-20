@@ -51,6 +51,7 @@ func TestServer(t *testing.T) {
 
 		c := makeTestConfig()
 		c.TLS = serverConf
+		// Disable mTLS requirements in the server.
 		c.TLS.ClientAuth = 0 // tls.NoClientCert
 		c.TLS.VerificationMode = tlscommon.VerifyNone
 
