@@ -118,7 +118,7 @@ func runCmd(
 	// we are passing in a unix.SysProcAttr object
 	// this is equivalent, but the unix package is not considered deprecated
 	// as the syscall package is
-	cmd.SysProcAttr = &syscall.SysProcAttr.SysProcAttr{
+	cmd.SysProcAttr = &syscall.SysProcAttr{
 		// Ensure node subprocesses are killed if this process dies (linux only)
 		Pdeathsig: syscall.SIGKILL,
 	}
