@@ -8,6 +8,7 @@
 package cloudwatch
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -17,7 +18,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -427,6 +427,52 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		resourceTypeFilters: resourceTypeFiltersEC2,
 	}
 
+	expectedListMetricWithDetailEC2sRDSWithTag := listMetricWithDetail{
+		metricsWithStats: []metricsWithStatistics{
+			{
+				cloudwatch.Metric{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("InstanceId"),
+						Value: awssdk.String("i-1"),
+					}},
+					MetricName: awssdk.String("CPUUtilization"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+				[]string{"Average"},
+				nil,
+			},
+			{
+				cloudwatch.Metric{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("InstanceId"),
+						Value: awssdk.String("i-2"),
+					}},
+					MetricName: awssdk.String("DiskReadBytes"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+				[]string{"Sum"},
+				nil,
+			},
+			{
+				cloudwatch.Metric{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("DBClusterIdentifier"),
+						Value: awssdk.String("test1-cluster"),
+					},
+						{
+							Name:  awssdk.String("Role"),
+							Value: awssdk.String("READER"),
+						}},
+					MetricName: awssdk.String("CommitThroughput"),
+					Namespace:  awssdk.String("AWS/RDS"),
+				},
+				[]string{"Average"},
+				nil,
+			},
+		},
+		resourceTypeFilters: resourceTypeFiltersEC2RDSWithTag,
+	}
+
 	cases := []struct {
 		title                         string
 		cloudwatchMetricsConfig       []Config
@@ -706,6 +752,59 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 			nil,
 			expectedListMetricsEC2WithDim,
+			map[string][]namespaceDetail{},
+		},
+		{
+			"Test with same namespace and tag filters but different metric names",
+			[]Config{
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: []string{"CPUUtilization"},
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: "i-1",
+						},
+					},
+					Statistic:    []string{"Average"},
+					ResourceType: "ec2:instance",
+				},
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: []string{"DiskReadBytes"},
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: "i-2",
+						},
+					},
+					Statistic:    []string{"Sum"},
+					ResourceType: "ec2:instance",
+				},
+				{
+					Namespace:  "AWS/RDS",
+					MetricName: []string{"CommitThroughput"},
+					Dimensions: []Dimension{
+						{
+							Name:  "DBClusterIdentifier",
+							Value: "test1-cluster",
+						},
+						{
+							Name:  "Role",
+							Value: "READER",
+						},
+					},
+					Statistic:    []string{"Average"},
+					ResourceType: "rds",
+				},
+			},
+			[]aws.Tag{
+				{
+					Key:   "name",
+					Value: "test",
+				},
+			},
+			expectedListMetricWithDetailEC2sRDSWithTag,
 			map[string][]namespaceDetail{},
 		},
 	}
