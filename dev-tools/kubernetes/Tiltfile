@@ -35,13 +35,17 @@ def beat(
     docker_file = '{}/Dockerfile.{}'.format(beat, mode)
     print("Docker file: {}".format(docker_file))
 
+    extra_args = ""
+    if beat == "metricbeat":
+        extra_args = "-system.hostfs=/hostfs"
+
     if mode == "run":
         docker_entrypoint = [
                 '/usr/share/{}/{}'.format(beat, beat),
                 "-c",
                 "/etc/{}.yml".format(beat),
                 "-e",
-                "-system.hostfs=/hostfs",
+                extra_args
             ]
     else:
         docker_entrypoint = [
@@ -56,7 +60,7 @@ def beat(
             "-c",
             "/etc/{}.yml".format(beat),
             "-e",
-            "-system.hostfs=/hostfs",
+            extra_args
         ]
     print("Docker entrypoint: {}".format(docker_entrypoint))
 
@@ -84,8 +88,9 @@ def beat(
         k8s_resource(beat, port_forwards=56268)
 
 
-beat(mode="run")
-# metricbeat(mode="debug")
+# beat(mode="run")
+beat(beat="filebeat", mode="run")
+# beat(beat="metricbeat", mode="debug")
 
 
 
