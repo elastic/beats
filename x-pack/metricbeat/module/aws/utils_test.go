@@ -238,7 +238,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 	reqGetMetricData := mockSvc.GetMetricDataRequest(getMetricDataInput)
 	getMetricDataOutput, err := reqGetMetricData.Send(context.TODO())
 	if err != nil {
-		fmt.Println("failed getMetricDataPerRegion: ", err)
+		_ = fmt.Errorf("failed getMetricDataPerRegion: %w", err)
 		t.FailNow()
 	}
 
@@ -278,7 +278,7 @@ func TestGetMetricDataResults(t *testing.T) {
 	}
 	getMetricDataResults, err := GetMetricDataResults(metricDataQueries, mockSvc, startTime, endTime)
 	if err != nil {
-		fmt.Println("failed getMetricDataPerRegion: ", err)
+		_ = fmt.Errorf("failed getMetricDataPerRegion: %w", err)
 		t.FailNow()
 	}
 
