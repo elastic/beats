@@ -49,7 +49,7 @@ func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputM
 
 	return &server{
 		config:      c,
-		log:         log.With("listen_address", bindAddress),
+		log:         log,
 		publish:     pub,
 		metrics:     metrics,
 		ljSvr:       ljSvr,
