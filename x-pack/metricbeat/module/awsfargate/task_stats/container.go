@@ -17,16 +17,7 @@ type container struct {
 	Labels   map[string]string
 }
 
-// ContainerMetadata is an struct represents container metadata
-type ContainerMetadata struct {
-	Cluster   string
-	TaskARN   string
-	Family    string
-	Revision  string
-	Container *container
-}
-
-func getContainerStats(c *container) *container {
+func getContainerMetadata(c *container) *container {
 	return &container{
 		DockerId: c.DockerId,
 		Image:    c.Image,
