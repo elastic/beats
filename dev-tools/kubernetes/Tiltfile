@@ -30,10 +30,21 @@ def beat(
 
 
     ## Docker Build
-    if k8s_env == "prod": # use https://ttl.sh/
-        docker_image = 'ttl.sh/{}-{}-image:5m'.format(beat, mode)
-    else:
-        docker_image = '{}-{}-image'.format(beat, mode)
+    docker_image = '{}-{}-image'.format(beat, mode)
+    if k8s_env == "prod":
+        # More info at https://ttl.sh/
+        # docker_registry = 'ttl.sh/{}'.format(docker_image)
+
+        # In order to push to GCR you need
+        #   gcloud auth login
+        #   gcloud auth configure-docker
+        #
+        # More info at https://cloud.google.com/container-registry/docs/advanced-authentication#gcloud-helper
+        docker_registry = "us.gcr.io/elastic-observability".format(docker_image)
+
+        default_registry(docker_registry)
+        print("Docker registry: {}".format(docker_registry))
+
     print("Docker image: {}".format(docker_image))
 
     docker_file = '{}/Dockerfile.{}'.format(beat, mode)
@@ -96,10 +107,14 @@ def beat(
 
 # beat(mode="run")
 # beat(beat="filebeat", mode="run")
+# beat(beat="metricbeat", mode="debug")
+
 beat(beat="filebeat",
     mode="run",
     k8s_env="prod")  # use ttl.sh as docker registry
-# beat(beat="metricbeat", mode="debug")
+# beat(beat="metricbeat",
+#     mode="run",
+#     k8s_env="prod")  # use ttl.sh as docker registry
 
 
 

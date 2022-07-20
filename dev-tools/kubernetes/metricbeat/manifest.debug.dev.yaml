@@ -157,7 +157,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: metricbeat-debug-image:latest
+        image: metricbeat-debug-image
         imagePullPolicy: Never
         args: [
           "-c", "/etc/metricbeat.yml",

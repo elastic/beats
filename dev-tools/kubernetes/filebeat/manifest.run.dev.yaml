@@ -65,7 +65,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
-        image: filebeat-run-image:latest
+        image: filebeat-run-image
         imagePullPolicy: Never
         args: [
           "-c", "/etc/filebeat.yml",
