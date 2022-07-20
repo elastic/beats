@@ -118,6 +118,9 @@ packetbeat.protocols:
   # Configure the ports where to listen for SIP traffic. You can disable
   # the SIP protocol by commenting out the list of ports.
   ports: [5060]
+  # You can monitor tcp SIP traffic by setting the transport_protocol option
+  # to tcp, it defaults to udp.
+  #transport_protocol: tcp
 
 {{header "Elasticsearch template setting"}}
 
