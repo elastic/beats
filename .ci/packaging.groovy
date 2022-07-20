@@ -352,7 +352,12 @@ def release(){
     ]) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
+<<<<<<< HEAD
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+=======
+        sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+        sh(label: "mage ironbank ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage ironbank')
+>>>>>>> e41dc18a54 (automate the ironbank docker context generation  (#32251))
         def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
