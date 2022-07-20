@@ -12,28 +12,23 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/state"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/types"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-type source struct {
-	containerName string
-	accountName   string
-	maxWorkers    int
-	poll          bool
-	pollInterval  time.Duration
-}
 
 type azurebsInput struct {
 	config     config
 	serviceURL string
 }
+
+const (
+	inputName string = "azureblobstorage"
+)
 
 func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	return v2.Plugin{
@@ -54,17 +49,18 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, nil, errors.Wrap(err, "reading config")
+		return nil, nil, err
 	}
 
 	var sources []cursor.Source
 	for _, c := range config.Containers {
-		sources = append(sources, &source{
-			accountName:   config.AccountName,
-			containerName: c.Name,
-			maxWorkers:    c.MaxWorkers,
-			poll:          c.Poll,
-			pollInterval:  c.PollInterval,
+		container := tryOverrideOrDefault(config, c)
+		sources = append(sources, &types.Source{
+			AccountName:   config.AccountName,
+			ContainerName: c.Name,
+			MaxWorkers:    *container.MaxWorkers,
+			Poll:          *container.Poll,
+			PollInterval:  *container.PollInterval,
 		})
 	}
 
@@ -72,8 +68,33 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	return sources, &azurebsInput{config: config, serviceURL: url}, nil
 }
 
-func (s *source) Name() string {
-	return s.accountName + "::" + s.containerName
+// tryOverrideOrDefault , overrides global values with local
+// container level values present. If both global & local values
+// are absent , assigns default values
+func tryOverrideOrDefault(cfg config, c container) container {
+
+	if c.MaxWorkers == nil && cfg.MaxWorkers != nil {
+		c.MaxWorkers = cfg.MaxWorkers
+	} else if c.MaxWorkers == nil && cfg.MaxWorkers == nil {
+		workers := 1
+		c.MaxWorkers = &workers
+	}
+
+	if c.Poll == nil && cfg.Poll != nil {
+		c.Poll = cfg.Poll
+	} else if c.Poll == nil && cfg.Poll == nil {
+		poll := false
+		c.Poll = &poll
+	}
+
+	if c.PollInterval == nil && cfg.PollInterval != nil {
+		c.PollInterval = cfg.PollInterval
+	} else if c.PollInterval == nil && cfg.PollInterval == nil {
+		interval := time.Second * 1
+		c.PollInterval = &interval
+	}
+
+	return c
 }
 
 func (input *azurebsInput) Name() string {
@@ -85,16 +106,18 @@ func (input *azurebsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor.Cursor, publisher cursor.Publisher) error {
-	var err error
 	var cp *state.Checkpoint
 	st := state.NewState()
-	currentSource := src.(*source)
+	currentSource := src.(*types.Source)
 
-	log := inputCtx.Logger.With("account_name", currentSource.accountName).With("container", currentSource.containerName)
+	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 
 	if !cursor.IsNew() {
-		cursor.Unpack(&cp)
+		if err := cursor.Unpack(&cp); err != nil {
+			return err
+		}
+
 		st.SetCheckpoint(cp)
 	}
 
@@ -112,13 +135,13 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 	if err != nil {
 		return err
 	}
-	containerClient, err := fetchContainerClient(serviceClient, currentSource.containerName, log)
+	containerClient, err := fetchContainerClient(serviceClient, currentSource.ContainerName, log)
 	if err != nil {
 		return err
 	}
 
-	scheduler := newAzureInputScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
-	err = scheduler.schedule(ctx)
+	scheduler := NewAzureInputScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
+	err = scheduler.Schedule(ctx)
 	if err != nil {
 		return err
 	}

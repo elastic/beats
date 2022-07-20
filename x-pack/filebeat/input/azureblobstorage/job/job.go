@@ -5,7 +5,7 @@
 //go:build !aix
 // +build !aix
 
-package azureblobstorage
+package job
 
 import (
 	"bytes"
@@ -18,6 +18,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/state"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/types"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -25,22 +26,22 @@ type Job interface {
 	Do(ctx context.Context, id string) error
 	Name() string
 	Timestamp() *time.Time
-	Source() *source
+	Source() *types.Source
 }
 
-type azureInputJob struct {
+type AzureInputJob struct {
 	marker    *string
 	client    *azblob.BlobClient
 	blob      *azblob.BlobItemInternal
 	state     *state.State
-	src       *source
+	src       *types.Source
 	publisher cursor.Publisher
 }
 
-func newAzureInputJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal,
-	marker *string, state *state.State, src *source, publisher cursor.Publisher) Job {
+func NewAzureInputJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal,
+	marker *string, state *state.State, src *types.Source, publisher cursor.Publisher) Job {
 
-	return &azureInputJob{
+	return &AzureInputJob{
 		marker:    marker,
 		client:    client,
 		blob:      blob,
@@ -50,25 +51,40 @@ func newAzureInputJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal,
 	}
 }
 
-func (aij *azureInputJob) Do(ctx context.Context, id string) error {
+func (aij *AzureInputJob) Do(ctx context.Context, id string) error {
 
 	var event beat.Event
 	msg := mapstr.M{}
-	if allowedContentTypes[*aij.blob.Properties.ContentType] {
+	if types.AllowedContentTypes[*aij.blob.Properties.ContentType] {
 		data, err := aij.extractData(ctx)
 		if err != nil {
-			return fmt.Errorf("Job with jobID %s encountered an error : %w", id, err)
+			return fmt.Errorf("job with jobId %s encountered an error : %w", id, err)
 		}
-		msg.Put("message.containerName", aij.src.containerName)
-		msg.Put("message.blobName", aij.blob.Name)
-		msg.Put("message.content_type", aij.blob.Properties.ContentType)
-		msg.Put("message.data", data.String())
-		msg.Put("event.kind", "publish_data")
+
+		if _, err := msg.Put("message.containerName", aij.src.ContainerName); err != nil {
+			return err
+		}
+		if _, err := msg.Put("message.blobName", aij.blob.Name); err != nil {
+			return err
+		}
+		if _, err := msg.Put("message.content_type", aij.blob.Properties.ContentType); err != nil {
+			return err
+		}
+		if _, err := msg.Put("message.data", data.String()); err != nil {
+			return err
+		}
+		if _, err := msg.Put("event.kind", "publish_data"); err != nil {
+			return err
+		}
 
 	} else {
-		err := fmt.Errorf("Job with jobID %s encountered an error : content-type %s not supported", id, *aij.blob.Properties.ContentType)
-		msg.Put("message.error", err)
-		msg.Put("event.kind", "publish_error")
+		err := fmt.Errorf("job with jobId %s encountered an error : content-type %s not supported", id, *aij.blob.Properties.ContentType)
+		if _, err := msg.Put("message.error", err); err != nil {
+			return err
+		}
+		if _, err := msg.Put("event.kind", "publish_error"); err != nil {
+			return err
+		}
 	}
 
 	event = beat.Event{
@@ -76,23 +92,25 @@ func (aij *azureInputJob) Do(ctx context.Context, id string) error {
 		Fields:    msg,
 	}
 	aij.state.Save(*aij.blob.Name, aij.marker, aij.blob.Properties.LastModified)
-	aij.publisher.Publish(event, aij.state.Checkpoint())
+	if err := aij.publisher.Publish(event, aij.state.Checkpoint()); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (aij *azureInputJob) Name() string {
+func (aij *AzureInputJob) Name() string {
 	return *aij.blob.Name
 }
 
-func (aij *azureInputJob) Source() *source {
+func (aij *AzureInputJob) Source() *types.Source {
 	return aij.src
 }
-func (aij *azureInputJob) Timestamp() *time.Time {
+func (aij *AzureInputJob) Timestamp() *time.Time {
 	return aij.blob.Properties.LastModified
 }
 
-func (aij *azureInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
+func (aij *AzureInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
 	var err error
 
 	get, err := aij.client.Download(ctx, nil)

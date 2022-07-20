@@ -14,29 +14,33 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/job"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/pool"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/state"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
 
 type scheduler interface {
-	createJobs(pager *azblob.ContainerListBlobFlatPager) ([]Job, error)
-	schedule(ctx context.Context) error
+	createJobs(pager *azblob.ContainerListBlobFlatPager) ([]job.Job, error)
+	Schedule(ctx context.Context) error
 }
 
 type azureInputScheduler struct {
 	publisher  cursor.Publisher
 	client     *azblob.ContainerClient
-	credential *serviceCredentials
-	src        *source
+	credential *types.ServiceCredentials
+	src        *types.Source
 	cfg        *config
 	state      *state.State
 	log        *logp.Logger
 	serviceURL string
 }
 
-func newAzureInputScheduler(publisher cursor.Publisher, client *azblob.ContainerClient,
-	credential *serviceCredentials, src *source, cfg *config,
+// NewAzureInputScheduler , returns a new scheduler instance
+func NewAzureInputScheduler(publisher cursor.Publisher, client *azblob.ContainerClient,
+	credential *types.ServiceCredentials, src *types.Source, cfg *config,
 	state *state.State, serviceURL string, log *logp.Logger) scheduler {
 
 	return &azureInputScheduler{
@@ -51,47 +55,47 @@ func newAzureInputScheduler(publisher cursor.Publisher, client *azblob.Container
 	}
 }
 
-func (ais *azureInputScheduler) schedule(ctx context.Context) error {
+func (ais *azureInputScheduler) Schedule(ctx context.Context) error {
 	var pager *azblob.ContainerListBlobFlatPager
 	var availableWorkers int32
 
-	workerPool := NewWorkerPool(ctx, ais.src.maxWorkers, ais.log)
+	workerPool := pool.NewWorkerPool(ctx, ais.src.MaxWorkers, ais.log)
 	workerPool.Start()
-	defer workerPool.Stop()
 
-	if !ais.src.poll {
+	if !ais.src.Poll {
 		availableWorkers = workerPool.AvailableWorkers()
 		pager = ais.fetchBlobPager(availableWorkers)
 		return ais.scheduleOnce(ctx, pager, workerPool)
 	}
 
 	for {
-
 		availableWorkers = workerPool.AvailableWorkers()
 		if availableWorkers == 0 {
 			continue
 		}
+
+		// availableWorkers is used as the batch size for a blob page so that
+		// work distribution remains efficient
 		pager = ais.fetchBlobPager(availableWorkers)
 		err := ais.scheduleOnce(ctx, pager, workerPool)
 		if err != nil {
 			return err
 		}
 
-		err = timed.Wait(ctx, ais.src.pollInterval)
+		err = timed.Wait(ctx, ais.src.PollInterval)
 		if err != nil {
 			return err
 		}
-
 	}
 
 }
 
-func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager, workerPool Pool) error {
+func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager, workerPool pool.Pool) error {
 	for pager.NextPage(ctx) {
 		jobs, err := ais.createJobs(pager)
 
 		if err != nil {
-			ais.log.Errorf("Job creation failed for container %s with error %v", ais.src.containerName, err)
+			ais.log.Errorf("Job creation failed for container %s with error %v", ais.src.ContainerName, err)
 			return err
 		}
 
@@ -108,16 +112,16 @@ func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.
 	return nil
 }
 
-func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]Job, error) {
-	var jobs []Job
+func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]job.Job, error) {
+	var jobs []job.Job
 	pageMarker := pager.PageResponse().Marker
 
 	for _, v := range pager.PageResponse().Segment.BlobItems {
-		blobURL := fmt.Sprintf("%s%s/%s", ais.serviceURL, ais.src.containerName, *v.Name)
-		blobCreds := &blobCredentials{
-			serviceCreds:  ais.credential,
-			blobName:      *v.Name,
-			containerName: ais.src.containerName,
+		blobURL := fmt.Sprintf("%s%s/%s", ais.serviceURL, ais.src.ContainerName, *v.Name)
+		blobCreds := &types.BlobCredentials{
+			ServiceCreds:  ais.credential,
+			BlobName:      *v.Name,
+			ContainerName: ais.src.ContainerName,
 		}
 
 		blobClient, err := fetchBlobClient(blobURL, blobCreds, ais.log)
@@ -125,7 +129,7 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 			return nil, err
 		}
 
-		job := newAzureInputJob(blobClient, v, pageMarker, ais.state, ais.src, ais.publisher)
+		job := job.NewAzureInputJob(blobClient, v, pageMarker, ais.state, ais.src, ais.publisher)
 		jobs = append(jobs, job)
 	}
 
@@ -135,7 +139,7 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 // fetchBlobPager fetches the current blob page object given a batch size & a page marker.
 // The page marker has been disabled since it was found that it operates on the basis of
 // lexicographical order , and not on the basis of the latest file uploaded, meaning if a blob with a name
-// of lesser lexicographic value is uploaded after a blob with a name of higer value , the latest
+// of lesser lexicographic value is uploaded after a blob with a name of higher value , the latest
 // marker stored in the checkpoint will not retrieve that new blob , this distorts the polling logic
 // hence disabling it for now , until more feedback is given. Disabling this how ever makes the sheduler loop
 // through all the blobs on every poll action to arrive at the latest checkpoint.
@@ -153,10 +157,11 @@ func (ais *azureInputScheduler) fetchBlobPager(batchSize int32) *azblob.Containe
 	return pager
 }
 
-func (ais *azureInputScheduler) moveToLastSeenJob(jobs []Job) []Job {
-	// Jobs are stored in lexicographical order always , hence the latest position can be found on the basis of job name
-	var latestJobs []Job
-	jobsToReturn := make([]Job, 0)
+// moveToLastSeenJob , moves to the latest job position past the last seen job
+// Jobs are stored in lexicographical order always , hence the latest position can be found either on the basis of job name or timestamp
+func (ais *azureInputScheduler) moveToLastSeenJob(jobs []job.Job) []job.Job {
+	var latestJobs []job.Job
+	jobsToReturn := make([]job.Job, 0)
 	counter := 0
 	flag := false
 	ignore := false

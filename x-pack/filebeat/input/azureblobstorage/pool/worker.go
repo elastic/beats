@@ -5,19 +5,21 @@
 //go:build !aix
 // +build !aix
 
-package azureblobstorage
+package pool
 
 import (
 	"context"
 	"fmt"
 	"runtime"
+	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/job"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type Worker interface {
-	Process(work Job)
+	Process(work job.Job)
 	Start()
 	Stop()
 }
@@ -27,26 +29,26 @@ type worker struct {
 	ctx       context.Context
 	wg        *sync.WaitGroup
 	errChan   chan<- error
-	job       chan Job
-	readyPool chan chan Job
+	job       chan job.Job
+	readyPool chan chan job.Job
 	quit      chan bool
 	log       *logp.Logger
 }
 
-func NewWorker(ctx context.Context, id int, readyPool chan chan Job, wg *sync.WaitGroup, errChan chan<- error, log *logp.Logger) Worker {
+func NewWorker(ctx context.Context, id int, readyPool chan chan job.Job, wg *sync.WaitGroup, errChan chan<- error, log *logp.Logger) Worker {
 	return &worker{
 		id:        id,
 		ctx:       ctx,
 		wg:        wg,
 		errChan:   errChan,
 		readyPool: readyPool,
-		job:       make(chan Job),
+		job:       make(chan job.Job),
 		quit:      make(chan bool),
 		log:       log,
 	}
 }
 
-func (w *worker) Process(work Job) {
+func (w *worker) Process(work job.Job) {
 	// do the work
 	defer func() {
 		if r := recover(); r != nil {
@@ -57,7 +59,7 @@ func (w *worker) Process(work Job) {
 		}
 	}()
 
-	jobID := fetchJobID(w.id, work.Source().containerName, work.Name())
+	jobID := fetchJobID(w.id, work.Source().ContainerName, work.Name())
 	w.log.Infof("job with id %s and timeStamp %s executed\n", jobID, work.Timestamp().String())
 	err := work.Do(w.ctx, jobID)
 	if err != nil {
@@ -84,4 +86,10 @@ func (w *worker) Start() {
 func (w *worker) Stop() {
 	// tells worker to stop
 	w.quit <- true
+}
+
+func fetchJobID(jobCounter int, containerName string, blobName string) string {
+	jobID := fmt.Sprintf("%s-%s-%d", strings.ToUpper(containerName), strings.ToUpper(blobName), jobCounter)
+
+	return jobID
 }

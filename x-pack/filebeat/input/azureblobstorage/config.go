@@ -8,21 +8,27 @@
 package azureblobstorage
 
 import (
-	"fmt"
 	"time"
 )
 
+// MaxWorkers, Poll & PollInterval can be configured at a global level,
+// which applies to all containers , as well as at the container level.
+// Container level configurations will always override global level values.
 type config struct {
-	AccountName string      `config:"account_name"`
-	Auth        authConfig  `config:"auth" validate:"required"`
-	Containers  []container `config:"containers" validate:"required"`
+	AccountName  string         `config:"account_name" validate:"required"`
+	Auth         authConfig     `config:"auth" validate:"required"`
+	MaxWorkers   *int           `config:"max_workers,omitempty" validate:"max=5000"`
+	Poll         *bool          `config:"poll,omitempty"`
+	PollInterval *time.Duration `config:"poll_interval,omitempty"`
+	Containers   []container    `config:"containers" validate:"required"`
 }
 
+// container contains the config for each specific blob storage container in the root account
 type container struct {
-	Name         string        `config:"name" validate:"required"`
-	MaxWorkers   int           `config:"max_workers"`
-	Poll         bool          `config:"poll"`
-	PollInterval time.Duration `config:"poll_interval"`
+	Name         string         `config:"name" validate:"required"`
+	MaxWorkers   *int           `config:"max_workers,omitempty" validate:"max=5000"`
+	Poll         *bool          `config:"poll,omitempty"`
+	PollInterval *time.Duration `config:"poll_interval,omitempty"`
 }
 
 type authConfig struct {
@@ -37,15 +43,6 @@ type sharedKeyConfig struct {
 	AccountKey string `config:"account_key"`
 }
 
-func (c config) Validate() error {
-	for _, v := range c.Containers {
-		if v.MaxWorkers > 10000 {
-			return fmt.Errorf("batch size should be less than 10000")
-		}
-	}
-	return nil
-}
-
 func defaultConfig() config {
 	return config{
 		AccountName: "some_account",
@@ -53,10 +50,6 @@ func defaultConfig() config {
 			SharedCredentials: &sharedKeyConfig{
 				AccountKey: "some_key",
 			},
-		},
-		Containers: []container{
-			{Name: "container1", MaxWorkers: 1, Poll: true, PollInterval: time.Duration(time.Second * 5)},
-			{Name: "container2", MaxWorkers: 3, Poll: true, PollInterval: time.Duration(time.Second * 5)},
 		},
 	}
 }

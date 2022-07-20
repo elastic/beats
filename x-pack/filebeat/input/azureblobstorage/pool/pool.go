@@ -5,27 +5,28 @@
 //go:build !aix
 // +build !aix
 
-package azureblobstorage
+package pool
 
 import (
 	"context"
 	"sync"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/job"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type Pool interface {
 	Start()
 	Stop()
-	Submit(job Job)
+	Submit(job job.Job)
 	AvailableWorkers() int32
 }
 
 type pool struct {
 	ctx           context.Context
 	workerErrChan chan error
-	jobQueue      chan Job
-	readyPool     chan chan Job
+	jobQueue      chan job.Job
+	readyPool     chan chan job.Job
 	workers       []Worker
 	dispatcherWg  sync.WaitGroup
 	workersWg     *sync.WaitGroup
@@ -42,7 +43,7 @@ func NewWorkerPool(ctx context.Context, maxWorkers int, log *logp.Logger) Pool {
 
 	workersWg := sync.WaitGroup{}
 
-	readyPool := make(chan chan Job, maxWorkers)
+	readyPool := make(chan chan job.Job, maxWorkers)
 	workers := make([]Worker, maxWorkers)
 	errChan := make(chan error)
 
@@ -54,7 +55,7 @@ func NewWorkerPool(ctx context.Context, maxWorkers int, log *logp.Logger) Pool {
 	return &pool{
 		ctx:           ctx,
 		workerErrChan: errChan,
-		jobQueue:      make(chan Job),
+		jobQueue:      make(chan job.Job),
 		readyPool:     readyPool,
 		workers:       workers,
 		dispatcherWg:  sync.WaitGroup{},
@@ -64,6 +65,7 @@ func NewWorkerPool(ctx context.Context, maxWorkers int, log *logp.Logger) Pool {
 	}
 }
 
+// Start, starts the worker pool and initializes the workers
 func (q *pool) Start() {
 	// puts workers in ready state
 	for i := 0; i < len(q.workers); i++ {
@@ -74,8 +76,9 @@ func (q *pool) Start() {
 	go q.dispatch()
 }
 
+// Submit , submits the job to the job queue
 // This is a blocking if all workers are busy
-func (q *pool) Submit(job Job) {
+func (q *pool) Submit(job job.Job) {
 	q.jobQueue <- job
 }
 
@@ -84,6 +87,7 @@ func (q *pool) AvailableWorkers() int32 {
 	return int32(len(q.readyPool))
 }
 
+// Stop , gracefully stops the workers & frees the worker pool
 func (q *pool) Stop() {
 	q.quit <- true
 	q.dispatcherWg.Wait()
@@ -107,7 +111,7 @@ func (q *pool) dispatch() {
 			workerXChannel <- job           // assigns job to worker 'x'
 
 		case <-q.quit:
-			// frees all workers & gracefully close worker pool
+			// frees all workers & gracefully closes the worker pool
 			for i := 0; i < len(q.workers); i++ {
 				q.workers[i].Stop()
 			}

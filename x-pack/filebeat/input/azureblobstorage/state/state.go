@@ -22,7 +22,7 @@ type State struct {
 
 // Azure sdks do not return results based on timestamps , but only based on alphabetical order
 // This forces us to maintain 2 different vars in addition to the page marker to calculate the
-// exact checkpoint based on various senarios
+// exact checkpoint based on various scenarios
 type Checkpoint struct {
 	// marker contains the last known position in the blob pager which was fetched
 	Marker *string
@@ -38,7 +38,7 @@ func NewState() *State {
 	}
 }
 
-// save functions , saves/updates the current state
+// Save , saves/updates the current state for cursor checkpoint
 func (s *State) Save(name string, marker *string, lastModifiedOn *time.Time) {
 	s.mu.Lock()
 	if len(s.cp.BlobName) == 0 {
@@ -55,10 +55,12 @@ func (s *State) Save(name string, marker *string, lastModifiedOn *time.Time) {
 	s.mu.Unlock()
 }
 
+// SetCheckpoint , sets checkpoint from source to current state instance
 func (s *State) SetCheckpoint(chkpt *Checkpoint) {
 	s.cp = chkpt
 }
 
+// Checkpoint , returns the current state checkpoint
 func (s *State) Checkpoint() *Checkpoint {
 	return s.cp
 }
