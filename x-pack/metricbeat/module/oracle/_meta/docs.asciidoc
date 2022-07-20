@@ -25,7 +25,6 @@ For example: Let’s consider Oracle Database 21c installation using RPM manuall
     `ORACLE_SID=ORCLCDB`
     `ORACLE_BASE=/opt/oracle/oradata`
     `ORACLE_HOME=/opt/oracle/product/21c/dbhome_1`
-
 Also, add `ORACLE_HOME/bin` to the `PATH` environment variable.
 
 *Oracle Instant Client*
