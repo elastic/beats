@@ -12,6 +12,10 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 This module periodically fetches metrics from CockroachDB.
 
 [float]

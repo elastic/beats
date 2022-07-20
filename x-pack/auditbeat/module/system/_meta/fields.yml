@@ -85,15 +85,6 @@
         type: keyword
         description: XX64 hash of the executable.
 
-  - name: socket
-    type: group
-    fields:
-    - name: entity_id
-      type: keyword
-      description: >
-        ID uniquely identifying the socket. It is computed as a SHA-256 hash of the
-        host ID, socket inode, local IP, local port, remote IP, and remote port.
-
   - name: system.audit
     type: group
     description: >
