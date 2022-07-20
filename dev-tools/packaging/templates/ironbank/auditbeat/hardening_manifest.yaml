@@ -9,7 +9,6 @@ name: "elastic/beats/auditbeat"
 # on ironbank.dsop.io
 tags:
   - "{{ beat_version }}"
-  - "latest"
 
 # Build args passed to Dockerfile ARGs
 args:
