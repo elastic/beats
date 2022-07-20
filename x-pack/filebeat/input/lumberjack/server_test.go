@@ -122,7 +122,6 @@ func sendData(ctx context.Context, t testing.TB, bindAddress string, numberOfEve
 	defer c.Close()
 	go func() {
 		<-ctx.Done()
-		time.Sleep(time.Second)
 		c.Close()
 	}()
 	t.Log("Lumberjack client connected.")
