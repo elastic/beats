@@ -6,7 +6,6 @@ package aws
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -237,10 +236,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 
 	reqGetMetricData := mockSvc.GetMetricDataRequest(getMetricDataInput)
 	getMetricDataOutput, err := reqGetMetricData.Send(context.TODO())
-	if err != nil {
-		_ = fmt.Errorf("failed getMetricDataPerRegion: %w", err)
-		t.FailNow()
-	}
+	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
 	assert.Equal(t, id1, *getMetricDataOutput.MetricDataResults[0].Id)
@@ -277,10 +273,7 @@ func TestGetMetricDataResults(t *testing.T) {
 		},
 	}
 	getMetricDataResults, err := GetMetricDataResults(metricDataQueries, mockSvc, startTime, endTime)
-	if err != nil {
-		_ = fmt.Errorf("failed getMetricDataPerRegion: %w", err)
-		t.FailNow()
-	}
+	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(getMetricDataResults))
 	assert.Equal(t, id1, *getMetricDataResults[0].Id)
@@ -405,7 +398,6 @@ func TestFindTimestamp(t *testing.T) {
 	}
 }
 
-//fixme: add test case.....
 func TestFindIdentifierFromARN(t *testing.T) {
 	cases := []struct {
 		resourceARN             string
