@@ -179,10 +179,10 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 		if err != nil {
 			return nil, err
 		}
-		return &httpClient{client: authClient, limiter: limiter}, nil
+		return &httpClient{client: authClient, limiter: limiter, tracer: newTracer(config.Request.Tracer)}, nil
 	}
 
-	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
+	return &httpClient{client: client.StandardClient(), limiter: limiter, tracer: newTracer(config.Request.Tracer)}, nil
 }
 
 func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {

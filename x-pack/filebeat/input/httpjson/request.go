@@ -10,11 +10,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/PaesslerAG/jsonpath"
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -32,6 +36,7 @@ func registerRequestTransforms() {
 type httpClient struct {
 	client  *http.Client
 	limiter *rateLimiter
+	tracer  *tracer
 }
 
 func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Response, error) {
@@ -42,6 +47,7 @@ func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Respon
 		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
 	defer resp.Body.Close()
+	c.tracer.trace(req, resp)
 
 	// Read the whole resp.Body so we can release the connection.
 	// This implementation is inspired by httputil.DumpResponse
@@ -55,6 +61,44 @@ func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Respon
 		return nil, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, string(body))
 	}
 	return resp, nil
+}
+
+// tracer is a lightweight transaction tracer for debugging httpjson configurations.
+// It is not intended to be used for machine ingestion, but rather as a human aid.
+type tracer struct {
+	sess int64 // sess is the unix time of the start of a session.
+	txn  int   // txn is a session-unique transaction id.
+	log  *log.Logger
+}
+
+func newTracer(logger *lumberjack.Logger) *tracer {
+	if logger == nil {
+		return nil
+	}
+	return &tracer{sess: time.Now().UnixMilli(), log: log.New(logger, "", log.LstdFlags)}
+}
+
+func (t *tracer) trace(req *http.Request, resp *http.Response) {
+	if t == nil {
+		return
+	}
+	t.txn++
+	b, err := httputil.DumpRequestOut(req, true)
+	if err != nil {
+		t.log.Print(err)
+	} else {
+		t.log.Printf("request %d.%d:\n\t%s", t.sess, t.txn, bytes.ReplaceAll(b, []byte{'\n'}, []byte("\n\t")))
+	}
+	if resp == nil {
+		t.log.Printf("no response %d.%d", t.sess, t.txn)
+		return
+	}
+	b, err = httputil.DumpResponse(resp, true)
+	if err != nil {
+		t.log.Printf("response %d.%d: %v", t.sess, t.txn, err)
+	} else {
+		t.log.Printf("response %d.%d:\n\t%s", t.sess, t.txn, bytes.ReplaceAll(b, []byte{'\n'}, []byte("\n\t")))
+	}
 }
 
 func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, error) {
