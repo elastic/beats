@@ -93,6 +93,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
 
 *Packetbeat*
 
