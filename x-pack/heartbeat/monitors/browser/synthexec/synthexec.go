@@ -18,7 +18,6 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
@@ -35,6 +34,12 @@ type FilterJourneyConfig struct {
 	Tags  []string `config:"tags"`
 	Match string   `config:"match"`
 }
+
+// platformCmdMutate is the hook for OS specific mutation of cmds
+// This is practically just used by synthexec_unix.go to add Sysprocattrs
+// It's still nice for devs to be able to test browser monitors on OSX
+// where these are unsupported
+var platformCmdMutate func(*exec.Cmd) = func(*exec.Cmd) {}
 
 // ProjectJob will run a single journey by name from the given project.
 func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
@@ -114,14 +119,8 @@ func runCmd(
 	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
-	// Note that while cmd.SysProcAtr takes a syscall.SysProcAttr object
-	// we are passing in a unix.SysProcAttr object
-	// this is equivalent, but the unix package is not considered deprecated
-	// as the syscall package is
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		// Ensure node subprocesses are killed if this process dies (linux only)
-		Pdeathsig: syscall.SIGKILL,
-	}
+	// Attach sysproc attrs to ensure subprocesses are properly killed
+	platformCmdMutate(cmd)
 
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
