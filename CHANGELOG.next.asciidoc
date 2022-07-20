@@ -72,6 +72,30 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
+
+*Auditbeat*
+
+- Add `immutable` option to the auditd module. {issue}8352[8352] {pull}32381[32381]
+
+
+*Filebeat*
+
+- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
+- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
+- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
+- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
+- Add support for parsers on journald input {pull}29070[29070]
+- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
+- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
+- Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
+- Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
+- Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
+- Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
+- Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
+- Add references for CRI-O configuration in input-container and in our kubernetes manifests {issue}32149[32149] {pull}32151[32151]
+- httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
+- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
 
 *Auditbeat*
 
