@@ -83,7 +83,7 @@ require (
 	github.com/elastic/go-seccomp-bpf v1.2.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.8.1
-	github.com/elastic/go-ucfg v0.8.5
+	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -204,7 +204,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.2.1
 	github.com/elastic/elastic-agent-libs v0.2.9
 	github.com/elastic/elastic-agent-shipper-client v0.2.0
-	github.com/elastic/elastic-agent-system-metrics v0.4.2
+	github.com/elastic/elastic-agent-system-metrics v0.4.3
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/pierrec/lz4/v4 v4.1.15
 	github.com/shirou/gopsutil/v3 v3.21.12
