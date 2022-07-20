@@ -1,8 +1,9 @@
 
 load('ext://restart_process', 'docker_build_with_restart')
 
-def metricbeat(
+def beat(
         mode="run",  # or debug
+        beat="metricbeat",
         **kwargs):
 
     if mode not in ["run", "debug"]:
@@ -14,11 +15,11 @@ def metricbeat(
     flags = ""
     if mode == "debug":
         flags = '-gcflags "-N -l"'
-    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build {} -o build/metricbeat ../../metricbeat".format(flags)
+    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build {} -o build/{} ../../{}".format(flags, beat, beat)
     print("Build cmd: {}".format(build_cmd))
 
     local_resource(
-        'metricbeat-compile',
+        '{}-compile'.format(beat),
         build_cmd,
         deps=['.'],
         ignore=[
@@ -28,16 +29,17 @@ def metricbeat(
 
 
     ## Docker Build
-    docker_image = 'metricbeat-{}-image'.format(mode)
+    docker_image = '{}-{}-image'.format(beat, mode)
     print("Docker image: {}".format(docker_image))
 
-    docker_file = 'Dockerfile.{}'.format(mode)
+    docker_file = '{}/Dockerfile.{}'.format(beat, mode)
     print("Docker file: {}".format(docker_file))
 
     if mode == "run":
         docker_entrypoint = [
-                '/usr/share/metricbeat/metricbeat',
-                "-c", "/etc/metricbeat.yml",
+                '/usr/share/{}/{}'.format(beat, beat),
+                "-c",
+                "/etc/{}.yml".format(beat),
                 "-e",
                 "-system.hostfs=/hostfs",
             ]
@@ -49,9 +51,10 @@ def metricbeat(
             "--api-version=2",
             "--log",
             "exec",
-            "/usr/share/metricbeat/metricbeat",
+            "/usr/share/{}/{}".format(beat, beat),
             "--",
-            "-c", "/etc/metricbeat.yml",
+            "-c",
+            "/etc/{}.yml".format(beat),
             "-e",
             "-system.hostfs=/hostfs",
         ]
@@ -64,24 +67,24 @@ def metricbeat(
         dockerfile=docker_file,
         only=["build"],
         live_update=[
-            sync('./build', '/usr/share/metricbeat'),
+            sync('./build', '/usr/share/{}'.format(beat)),
         ],
     )
 
     ## Deploy to k8s
-    k8s_manifest = 'manifest.{}.yaml'.format(mode)
+    k8s_manifest = '{}/manifest.{}.yaml'.format(beat, mode)
     print("K8s manifest: {}".format(k8s_manifest))
 
     k8s_yaml(k8s_manifest)
 
     ## Expose resource
     if mode == "run":
-        k8s_resource('metricbeat')
+        k8s_resource(beat)
     else:
-        k8s_resource('metricbeat', port_forwards=56268)
+        k8s_resource(beat, port_forwards=56268)
 
 
-metricbeat(mode="run")
+beat(mode="run")
 # metricbeat(mode="debug")
 
 
