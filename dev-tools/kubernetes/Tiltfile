@@ -4,6 +4,7 @@ load('ext://restart_process', 'docker_build_with_restart')
 def beat(
         mode="run",  # or debug
         beat="metricbeat",
+        k8s_env="dev",
         **kwargs):
 
     if mode not in ["run", "debug"]:
@@ -29,7 +30,10 @@ def beat(
 
 
     ## Docker Build
-    docker_image = '{}-{}-image'.format(beat, mode)
+    if k8s_env == "prod": # use https://ttl.sh/
+        docker_image = 'ttl.sh/{}-{}-image:5m'.format(beat, mode)
+    else:
+        docker_image = '{}-{}-image'.format(beat, mode)
     print("Docker image: {}".format(docker_image))
 
     docker_file = '{}/Dockerfile.{}'.format(beat, mode)
@@ -76,7 +80,7 @@ def beat(
     )
 
     ## Deploy to k8s
-    k8s_manifest = '{}/manifest.{}.yaml'.format(beat, mode)
+    k8s_manifest = '{}/manifest.{}.{}.yaml'.format(beat, mode, k8s_env)
     print("K8s manifest: {}".format(k8s_manifest))
 
     k8s_yaml(k8s_manifest)
@@ -91,7 +95,10 @@ def beat(
 
 
 # beat(mode="run")
-beat(beat="filebeat", mode="run")
+# beat(beat="filebeat", mode="run")
+beat(beat="filebeat",
+    mode="run",
+    k8s_env="prod")  # use ttl.sh as docker registry
 # beat(beat="metricbeat", mode="debug")
 
 
