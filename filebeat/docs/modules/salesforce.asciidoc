@@ -300,12 +300,13 @@ The URL of the Saleforce instance.
 [float]
 === Example dashboard
 
-This module comes with a sample dashboard. For example:
+This Salesforce module comes with several predefined dashboards, including Login, Logout, Apex, and Setup Audit Trails Dashboards. For example:
 
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
+image::./images/filebeat-salesforce-login-dashboard.png[]
 
-:has-dashboards!:
+image::./images/filebeat-salesforce-logout-dashboard.png[]
+
+:has-dashboards!: 
 
 :fileset_ex!:
 
@@ -318,4 +319,4 @@ remove this section and set `:has-dashboards: false` at the top of this file.
 For a description of each field in the module, see the
 <<exported-fields-salesforce,exported fields>> section.
 
-edit_url!:
+:edit_url!:

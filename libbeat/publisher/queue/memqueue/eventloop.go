@@ -185,7 +185,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 
 	ackCH := newBatchACKState(start, count, l.buf.entries)
 
-	req.responseChan <- getResponse{ackCH.ackChan, buf}
+	req.responseChan <- getResponse{ackCH.doneChan, buf}
 	l.pendingACKs.append(ackCH)
 }
 
@@ -422,7 +422,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	entries := buf.entries[:count]
 	acker := newBatchACKState(0, count, entries)
 
-	req.responseChan <- getResponse{acker.ackChan, entries}
+	req.responseChan <- getResponse{acker.doneChan, entries}
 	l.pendingACKs.append(acker)
 
 	l.unackedEventCount += len(entries)

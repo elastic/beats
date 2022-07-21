@@ -103,7 +103,7 @@
         "title": "Memory Usage per Namespace [Metricbeat Kubernetes]",
         "visualizationType": "lnsPie"
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "1c23c960-db40-11ec-a23d-5dd6249f86b6",
     "migrationVersion": {
         "lens": "8.3.0"
@@ -116,6 +116,6 @@
         }
     ],
     "type": "lens",
-    "updated_at": "2022-05-24T09:01:33.818Z",
-    "version": "WzEwMDExLDFd"
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3ODcsM10="
 }

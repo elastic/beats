@@ -24,8 +24,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	sc "github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
+	sc "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -33,12 +35,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -48,6 +48,7 @@ type shipper struct {
 	conn     *grpc.ClientConn
 	client   sc.ProducerClient
 	timeout  time.Duration
+	config   Config
 }
 
 func init() {
@@ -67,13 +68,25 @@ func makeShipper(
 		return outputs.Fail(err)
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	s := outputs.WithBackoff(&shipper{
+		log:      logp.NewLogger("shipper"),
+		observer: observer,
+		config:   config,
+		timeout:  config.Timeout,
+	}, config.Backoff.Init, config.Backoff.Max)
+
+	return outputs.Success(config.BulkMaxSize, config.MaxRetries, s)
+}
+
+// Connect establishes connection to the shipper server and implements `outputs.Connectable`.
+func (c *shipper) Connect() error {
+	tls, err := tlscommon.LoadTLSConfig(c.config.TLS)
 	if err != nil {
-		return outputs.Fail(fmt.Errorf("invalid shipper TLS configuration: %w", err))
+		return fmt.Errorf("invalid shipper TLS configuration: %w", err)
 	}
 
 	var creds credentials.TransportCredentials
-	if config.TLS != nil && config.TLS.Enabled != nil && *config.TLS.Enabled {
+	if c.config.TLS != nil && c.config.TLS.Enabled != nil && *c.config.TLS.Enabled {
 		creds = credentials.NewTLS(tls.ToConfig())
 	} else {
 		creds = insecure.NewCredentials()
@@ -81,79 +94,55 @@ func makeShipper(
 
 	opts := []grpc.DialOption{
 		grpc.WithConnectParams(grpc.ConnectParams{
-			Backoff:           backoff.DefaultConfig,
-			MinConnectTimeout: config.Timeout,
+			MinConnectTimeout: c.config.Timeout,
 		}),
+		grpc.WithBlock(),
 		grpc.WithTransportCredentials(creds),
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
+
+	ctx, cancel := context.WithTimeout(context.Background(), c.config.Timeout)
 	defer cancel()
 
-	log := logp.NewLogger("shipper")
-	log.Debugf("trying to connect to %s...", config.Server)
+	c.log.Debugf("trying to connect to %s...", c.config.Server)
 
-	conn, err := grpc.DialContext(ctx, config.Server, opts...)
+	conn, err := grpc.DialContext(ctx, c.config.Server, opts...)
 	if err != nil {
-		return outputs.Fail(fmt.Errorf("shipper connection failed with: %w", err))
+		return fmt.Errorf("shipper connection failed with: %w", err)
 	}
-	log.Debugf("connect to %s established.", config.Server)
+	c.log.Debugf("connect to %s established.", c.config.Server)
 
-	s := &shipper{
-		log:      log,
-		observer: observer,
-		conn:     conn,
-		client:   sc.NewProducerClient(conn),
-		timeout:  config.Timeout,
-	}
+	c.conn = conn
+	c.client = sc.NewProducerClient(conn)
 
-	return outputs.Success(config.BulkMaxSize, config.MaxRetries, s)
+	return nil
 }
 
-//nolint: godox // this implementation is not finished
+// Publish converts and sends a batch of events to the shipper server.
+// Also, implements `outputs.Client`
 func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
+	if c.client == nil {
+		return fmt.Errorf("connection is not established")
+	}
+
 	st := c.observer
 	events := batch.Events()
 	st.NewBatch(len(events))
 
 	nonDroppedEvents := make([]publisher.Event, 0, len(events))
-	convertedEvents := make([]*sc.Event, 0, len(events))
+	convertedEvents := make([]*messages.Event, 0, len(events))
 
 	c.log.Debugf("converting %d events to protobuf...", len(events))
 
 	for i, e := range events {
 
-		meta, err := convertMapStr(e.Content.Meta)
+		converted, err := toShipperEvent(e)
 		if err != nil {
 			// conversion errors are not recoverable, so we have to drop the event completely
-			c.log.Errorf("%d/%d failed to convert event metadata to protobuf, dropped: %w", i+1, len(events), err)
+			c.log.Errorf("%d/%d: %q, dropped", i+1, len(events), err)
 			continue
 		}
 
-		fields, err := convertMapStr(e.Content.Fields)
-		if err != nil {
-			c.log.Errorf("%d/%d failed to convert event fields to protobuf, dropped: %w", i+1, len(events), err)
-			continue
-		}
-
-		convertedEvents = append(convertedEvents, &sc.Event{
-			Timestamp: timestamppb.New(e.Content.Timestamp),
-			Metadata:  meta.GetStructValue(),
-			Fields:    fields.GetStructValue(),
-			// TODO this contains temporary values, since they are required and not available from the event at the moment
-			Input: &sc.Input{
-				Id:   "beats",
-				Name: "beats",
-				Type: "beats",
-			},
-			// TODO this contains temporary values, since they are required and not propagated at the moment
-			DataStream: &sc.DataStream{
-				// Id:        "none", // not generated at the moment
-				Type:      "shipper.output",
-				Dataset:   "generic",
-				Namespace: "default",
-			},
-		})
-
+		convertedEvents = append(convertedEvents, converted)
 		nonDroppedEvents = append(nonDroppedEvents, e)
 	}
 
@@ -164,68 +153,77 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
-	resp, err := c.client.PublishEvents(ctx, &sc.PublishRequest{
+	resp, err := c.client.PublishEvents(ctx, &messages.PublishRequest{
 		Events: convertedEvents,
 	})
 
 	if status.Code(err) != codes.OK || resp == nil {
 		batch.Cancelled()         // does not decrease the TTL
 		st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
-		c.log.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
-		return nil
+		return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
 	}
 
 	// with a correct server implementation should never happen, this error is not recoverable
-	if len(resp.Results) > len(nonDroppedEvents) {
+	if int(resp.AcceptedCount) > len(nonDroppedEvents) {
 		return fmt.Errorf(
-			"server returned unexpected results, expected maximum %d items, got %d",
+			"server returned unexpected results, expected maximum accepted items %d, got %d",
 			len(nonDroppedEvents),
-			len(resp.Results),
+			resp.AcceptedCount,
 		)
 	}
 
 	// the server is supposed to retain the order of the initial events in the response
 	// judging by the size of the result list we can determine what part of the initial
 	// list was accepted and we can send the rest of the list for a retry
-	retries := nonDroppedEvents[len(resp.Results):]
+	retries := nonDroppedEvents[resp.AcceptedCount:]
 	if len(retries) == 0 {
 		batch.ACK()
 		st.Acked(len(nonDroppedEvents))
-		c.log.Debugf("%d events have been acknowledged, %d dropped", len(nonDroppedEvents), droppedCount)
+		c.log.Debugf("%d events have been accepted, %d dropped", len(nonDroppedEvents), droppedCount)
 	} else {
 		batch.RetryEvents(retries) // decreases TTL unless guaranteed delivery
 		st.Failed(len(retries))
-		c.log.Debugf("%d events have been acknowledged, %d sent for retry, %d dropped", len(resp.Results), len(retries), droppedCount)
+		c.log.Debugf("%d events have been accepted, %d sent for retry, %d dropped", resp.AcceptedCount, len(retries), droppedCount)
 	}
 
 	return nil
 }
 
+// Close closes the connection to the shipper server.
+// Also, implements `outputs.Client`
 func (c *shipper) Close() error {
-	return c.conn.Close()
+	if c.client == nil {
+		return fmt.Errorf("connection is not established")
+	}
+	err := c.conn.Close()
+	c.conn = nil
+	c.client = nil
+
+	return err
 }
 
+// String implements `outputs.Client`
 func (c *shipper) String() string {
 	return "shipper"
 }
 
-func convertMapStr(m mapstr.M) (*structpb.Value, error) {
+func convertMapStr(m mapstr.M) (*messages.Value, error) {
 	if m == nil {
-		return structpb.NewNullValue(), nil
+		return helpers.NewNullValue(), nil
 	}
 
-	fields := make(map[string]*structpb.Value, len(m))
+	fields := make(map[string]*messages.Value, len(m))
 
 	for key, value := range m {
 		var (
-			protoValue *structpb.Value
+			protoValue *messages.Value
 			err        error
 		)
 		switch v := value.(type) {
 		case mapstr.M:
 			protoValue, err = convertMapStr(v)
 		default:
-			protoValue, err = structpb.NewValue(v)
+			protoValue, err = helpers.NewValue(v)
 		}
 		if err != nil {
 			return nil, err
@@ -233,9 +231,55 @@ func convertMapStr(m mapstr.M) (*structpb.Value, error) {
 		fields[key] = protoValue
 	}
 
-	s := &structpb.Struct{
-		Fields: fields,
+	s := &messages.Struct{
+		Data: fields,
 	}
 
-	return structpb.NewStructValue(s), nil
+	return helpers.NewStructValue(s), nil
+}
+
+func toShipperEvent(e publisher.Event) (*messages.Event, error) {
+	meta, err := convertMapStr(e.Content.Meta)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert event metadata to protobuf: %w", err)
+	}
+
+	fields, err := convertMapStr(e.Content.Fields)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert event fields to protobuf: %w", err)
+	}
+
+	source := &messages.Source{}
+	ds := &messages.DataStream{}
+
+	inputIDVal, err := e.Content.Meta.GetValue("input_id")
+	if err == nil {
+		source.InputId, _ = inputIDVal.(string)
+	}
+
+	streamIDVal, err := e.Content.Meta.GetValue("stream_id")
+	if err == nil {
+		source.StreamId, _ = streamIDVal.(string)
+	}
+
+	dsType, err := e.Content.Fields.GetValue("data_stream.type")
+	if err == nil {
+		ds.Type, _ = dsType.(string)
+	}
+	dsNamespace, err := e.Content.Fields.GetValue("data_stream.namespace")
+	if err == nil {
+		ds.Namespace, _ = dsNamespace.(string)
+	}
+	dsDataset, err := e.Content.Fields.GetValue("data_stream.dataset")
+	if err == nil {
+		ds.Dataset, _ = dsDataset.(string)
+	}
+
+	return &messages.Event{
+		Timestamp:  timestamppb.New(e.Content.Timestamp),
+		Metadata:   meta.GetStructValue(),
+		Fields:     fields.GetStructValue(),
+		Source:     source,
+		DataStream: ds,
+	}, nil
 }
