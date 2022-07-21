@@ -49,7 +49,7 @@ Example configuration:
 ----
 
 WARNING: Each filestream input must have a unique ID. Omitting or changing the filestream ID may cause
-data duplication. Without a unique ID filestream is unable to correctly track the state of files.
+data duplication. Without a unique ID, filestream is unable to correctly track the state of files.
 
 You can apply additional
 <<{beatname_lc}-input-{type}-options,configuration settings>> (such as `fields`,
