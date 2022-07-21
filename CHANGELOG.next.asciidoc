@@ -46,6 +46,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- auditd module: Fix parsing of audit rules where arguments are quoted (like file paths containing spaces). {pull}32421[32421]
+- auditd module: Fix minimum AuditStatus length so that library can support kernels from 2.6.32. {pull}32421[32421]
+
 
 *Filebeat*
 
@@ -53,6 +56,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
 - cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
 - Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
+- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
 
 *Heartbeat*
 
@@ -62,6 +66,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 - update kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard {pull}31973[31973]
+- Check for nil metadata in GCP. {pull}32281[32281]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 - update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
 
@@ -106,6 +111,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
 - Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
 - Add references for CRI-O configuration in input-container and in our kubernetes manifests {issue}32149[32149] {pull}32151[32151]
+- httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
+- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
 
 *Auditbeat*
 
@@ -126,11 +133,13 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 - Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
 * Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
+- AWS Fargate: Added support for DesiredStatus and KnownStatus {issue}32077[32077] {pull}32342[#32342]
 - Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}32394[32394]
 
 *Packetbeat*
 
 - Add support for specifying default route interface sniffing. {issue}31905[31905] {pull}31950[31950]
+- Add support for TCP transport to the SIP protocol. {issue}28166[28166] {pull}32346[32346]
 
 *Functionbeat*
 

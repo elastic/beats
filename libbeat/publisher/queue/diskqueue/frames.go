@@ -17,8 +17,6 @@
 
 package diskqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher"
-
 // Every data frame read from the queue is assigned a unique sequential
 // integer, which is used to keep track of which frames have been
 // acknowledged.
@@ -54,7 +52,7 @@ type readFrame struct {
 	id frameID
 
 	// The event decoded from the data frame.
-	event publisher.Event
+	event interface{}
 
 	// How much space this frame occupied on disk (before deserialization),
 	// including the frame header / footer.
