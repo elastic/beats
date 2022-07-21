@@ -330,9 +330,9 @@ func Package() {
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
-	// This will be implemented in a follow up.
-	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
-	return nil
+	start := time.Now()
+	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
+	return devtools.Ironbank()
 }
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
