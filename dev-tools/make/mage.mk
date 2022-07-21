@@ -38,7 +38,7 @@ help:
 
 .PHONY: release
 release: mage
-	mage package
+	mage package ironbank
 
 stop-environment:
 
