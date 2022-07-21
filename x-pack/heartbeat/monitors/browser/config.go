@@ -17,7 +17,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		Sandbox:     false,
 		Screenshots: "on",
-		Timeout:     14 * time.Minute,
+		Timeout:     15 * time.Minute,
 	}
 }
 
