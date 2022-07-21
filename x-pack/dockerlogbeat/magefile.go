@@ -382,6 +382,14 @@ func Package() {
 	mg.SerialDeps(Build, Export)
 }
 
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
+}
+
 func isSupportedPlatform() bool {
 	_, isAMD64Selected := devtools.Platforms.Get("linux/amd64")
 	_, isARM64Selected := devtools.Platforms.Get("linux/arm64")
