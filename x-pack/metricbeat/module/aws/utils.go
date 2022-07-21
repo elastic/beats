@@ -62,7 +62,6 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 
 		metricsTotal = append(metricsTotal, page.Metrics...)
 	}
-
 	return metricsTotal, nil
 }
 
@@ -206,9 +205,9 @@ func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 
 	resourceARNSplit := []string{arnParsed.Resource}
 	if strings.Contains(arnParsed.Resource, ":") {
-		resourceARNSplit = strings.Split(arnParsed.Resource, ":")
+		resourceARNSplit = strings.Split(strings.Trim(arnParsed.Resource, ":"), ":")
 	} else if strings.Contains(arnParsed.Resource, "/") {
-		resourceARNSplit = strings.Split(arnParsed.Resource, "/")
+		resourceARNSplit = strings.Split(strings.Trim(arnParsed.Resource, "/"), "/")
 	}
 
 	if len(resourceARNSplit) <= 1 {

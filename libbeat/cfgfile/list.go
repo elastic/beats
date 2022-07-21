@@ -87,11 +87,11 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		wg.Add(1)
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
-		go func() {
+		go func(runner Runner) {
 			defer wg.Done()
 			runner.Stop()
 			r.logger.Debugf("Runner: '%s' has stopped", runner)
-		}()
+		}(runner)
 		moduleStops.Add(1)
 	}
 

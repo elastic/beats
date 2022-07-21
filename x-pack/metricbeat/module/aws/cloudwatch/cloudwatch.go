@@ -75,7 +75,6 @@ type Config struct {
 type metricsWithStatistics struct {
 	cloudwatchMetric types.Metric
 	statistic        []string
-	tags             []aws.Tag
 }
 
 type listMetricWithDetail struct {
@@ -251,7 +250,6 @@ func filterListMetricsOutput(listMetricsOutput []types.Metric, namespaceDetails 
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
 						statistic:        configPerNamespace.statistics,
-						tags:             configPerNamespace.tags,
 					})
 
 			} else if configPerNamespace.names == nil && configPerNamespace.dimensions != nil {
@@ -264,7 +262,6 @@ func filterListMetricsOutput(listMetricsOutput []types.Metric, namespaceDetails 
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
 						statistic:        configPerNamespace.statistics,
-						tags:             configPerNamespace.tags,
 					})
 			} else if configPerNamespace.names != nil && configPerNamespace.dimensions != nil {
 				if exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names); !exists {
@@ -277,7 +274,6 @@ func filterListMetricsOutput(listMetricsOutput []types.Metric, namespaceDetails 
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
 						statistic:        configPerNamespace.statistics,
-						tags:             configPerNamespace.tags,
 					})
 			} else {
 				// if no metric name and no dimensions given, then keep all listMetricsOutput
@@ -285,7 +281,6 @@ func filterListMetricsOutput(listMetricsOutput []types.Metric, namespaceDetails 
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
 						statistic:        configPerNamespace.statistics,
-						tags:             configPerNamespace.tags,
 					})
 			}
 		}

@@ -173,9 +173,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 	}
 
 	getMetricDataOutput, err := mockSvc.GetMetricData(context.TODO(), getMetricDataInput)
-	if err != nil {
-		t.Fatalf("failed getMetricDataPerRegion: %s", err)
-	}
+	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
 	assert.Equal(t, id1, *getMetricDataOutput.MetricDataResults[0].Id)
@@ -212,9 +210,7 @@ func TestGetMetricDataResults(t *testing.T) {
 		},
 	}
 	getMetricDataResults, err := GetMetricDataResults(metricDataQueries, mockSvc, startTime, endTime)
-	if err != nil {
-		t.Fatalf("failed getMetricDataPerRegion: %s", err)
-	}
+	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(getMetricDataResults))
 	assert.Equal(t, id1, *getMetricDataResults[0].Id)
@@ -369,6 +365,11 @@ func TestFindIdentifierFromARN(t *testing.T) {
 			"arn:aws:elasticloadbalancing:eu-central-1:627959692251:loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
 			"net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
 			"loadbalancer/net/ece-es-clusters-nlb/0c5bdb3b96cf1552",
+		},
+		{
+			"arn:aws:apigateway:us-east-1::/apis/lqyipneb7c",
+			"lqyipneb7c",
+			"/apis/lqyipneb7c",
 		},
 	}
 
