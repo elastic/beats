@@ -211,16 +211,12 @@ VERSION=${env.VERSION}-SNAPSHOT""")
   }
 }
 
-<<<<<<< HEAD
-def runLinting() {
-=======
 // When to create a GiHub issue
 def isGitHubIssueEnabled() {
   return isBranch() && currentBuild.currentResult != "SUCCESS" && currentBuild.currentResult != "ABORTED"
 }
 
-def runChecks() {
->>>>>>> f7002f850d (ci: avoid creating github issues when aborted (#32441))
+def runLinting() {
   def mapParallelTasks = [:]
   def content = readYaml(file: 'Jenkinsfile.yml')
   content['projects'].each { projectName ->
