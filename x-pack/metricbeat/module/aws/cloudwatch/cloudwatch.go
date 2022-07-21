@@ -89,7 +89,6 @@ func (c Config) Validate() error {
 type metricsWithStatistics struct {
 	cloudwatchMetric cloudwatch.Metric
 	statistic        []string
-	tags             []aws.Tag
 }
 
 type listMetricWithDetail struct {
@@ -243,7 +242,6 @@ func filterListMetricsOutput(listMetricsOutput []cloudwatch.Metric, namespaceDet
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
 						statistic:        configPerNamespace.statistics,
-						tags:             configPerNamespace.tags,
 					})
 
 			} else if configPerNamespace.names == nil && configPerNamespace.dimensions != nil {
@@ -256,7 +254,6 @@ func filterListMetricsOutput(listMetricsOutput []cloudwatch.Metric, namespaceDet
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
 						statistic:        configPerNamespace.statistics,
-						tags:             configPerNamespace.tags,
 					})
 			} else if configPerNamespace.names != nil && configPerNamespace.dimensions != nil {
 				if exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names); !exists {
@@ -269,7 +266,6 @@ func filterListMetricsOutput(listMetricsOutput []cloudwatch.Metric, namespaceDet
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
 						statistic:        configPerNamespace.statistics,
-						tags:             configPerNamespace.tags,
 					})
 			} else {
 				// if no metric name and no dimensions given, then keep all listMetricsOutput
@@ -277,7 +273,6 @@ func filterListMetricsOutput(listMetricsOutput []cloudwatch.Metric, namespaceDet
 					metricsWithStatistics{
 						cloudwatchMetric: listMetric,
 						statistic:        configPerNamespace.statistics,
-						tags:             configPerNamespace.tags,
 					})
 			}
 		}

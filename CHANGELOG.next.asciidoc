@@ -53,6 +53,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- update kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard {pull}31973[31973]
+- Check for nil metadata in GCP. {pull}32281[32281]
+- update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
+- update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
+- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
 
 *Packetbeat*
 
