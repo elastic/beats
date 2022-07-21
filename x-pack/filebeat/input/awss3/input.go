@@ -214,7 +214,16 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if err != nil {
 		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
 	}
+
+	originalAwsConfigRegion := in.awsConfig.Region
+
 	in.awsConfig.Region = regionName
+
+	if regionName != originalAwsConfigRegion {
+		s3Client = s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig), func(o *s3.Options) {
+			o.UsePathStyle = in.config.PathStyle
+		})
+	}
 
 	s3API := &awsS3API{
 		client: s3Client,
@@ -274,6 +283,11 @@ func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName str
 
 	if err != nil {
 		return "", err
+	}
+
+	// Region us-east-1 have a LocationConstraint of null.
+	if len(getBucketLocationOutput.LocationConstraint) == 0 {
+		return "us-east-1", nil
 	}
 
 	return string(getBucketLocationOutput.LocationConstraint), nil

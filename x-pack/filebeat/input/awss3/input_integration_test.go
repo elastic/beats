@@ -391,6 +391,7 @@ func TestGetRegionForBucketARN(t *testing.T) {
 	s3Client := s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
 
 	regionName, err := getRegionForBucket(context.Background(), s3Client, getBucketNameFromARN(tfConfig.BucketName))
+	assert.NoError(t, err)
 	assert.Equal(t, tfConfig.AWSRegion, regionName)
 }
 

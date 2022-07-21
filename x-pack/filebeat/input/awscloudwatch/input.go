@@ -16,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -31,18 +30,17 @@ const (
 	inputName = "aws-cloudwatch"
 )
 
-func Plugin(store beater.StateStore) v2.Plugin {
+func Plugin() v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from cloudwatch",
-		Manager:    &cloudwatchInputManager{store: store},
+		Manager:    &cloudwatchInputManager{},
 	}
 }
 
 type cloudwatchInputManager struct {
-	store beater.StateStore
 }
 
 func (im *cloudwatchInputManager) Init(grp unison.Group, mode v2.Mode) error {
@@ -55,17 +53,16 @@ func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newInput(config, im.store)
+	return newInput(config)
 }
 
 // cloudwatchInput is an input for reading logs from CloudWatch periodically.
 type cloudwatchInput struct {
 	config    config
 	awsConfig awssdk.Config
-	store     beater.StateStore
 }
 
-func newInput(config config, store beater.StateStore) (*cloudwatchInput, error) {
+func newInput(config config) (*cloudwatchInput, error) {
 	cfgwarn.Beta("aws-cloudwatch input type is used")
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
@@ -89,7 +86,6 @@ func newInput(config config, store beater.StateStore) (*cloudwatchInput, error) 
 	return &cloudwatchInput{
 		config:    config,
 		awsConfig: awsConfig,
-		store:     store,
 	}, nil
 }
 
@@ -101,13 +97,6 @@ func (in *cloudwatchInput) Test(ctx v2.TestContext) error {
 
 func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	var err error
-
-	persistentStore, err := in.store.Access()
-	if err != nil {
-		return fmt.Errorf("can not access persistent store: %w", err)
-	}
-
-	defer persistentStore.Close()
 
 	// Wrap input Context's cancellation Done channel a context.Context. This
 	// goroutine stops with the parent closes the Done channel.
@@ -146,7 +135,6 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	cwPoller := newCloudwatchPoller(
 		log.Named("cloudwatch_poller"),
 		metrics,
-		persistentStore,
 		in.awsConfig.Region,
 		in.config.APISleep,
 		in.config.NumberOfWorkers,

@@ -14,7 +14,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -31,13 +30,11 @@ type cloudwatchPoller struct {
 	workerSem            *awscommon.Sem
 	log                  *logp.Logger
 	metrics              *inputMetrics
-	store                *statestore.Store
 	workersListingMap    *sync.Map
 	workersProcessingMap *sync.Map
 }
 
 func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
-	store *statestore.Store,
 	awsRegion string, apiSleep time.Duration,
 	numberOfWorkers int, logStreams []*string, logStreamPrefix string) *cloudwatchPoller {
 	if metrics == nil {
@@ -55,7 +52,6 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 		workerSem:            awscommon.NewSem(numberOfWorkers),
 		log:                  log,
 		metrics:              metrics,
-		store:                store,
 		workersListingMap:    new(sync.Map),
 		workersProcessingMap: new(sync.Map),
 	}
