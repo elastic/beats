@@ -29,3 +29,12 @@ jobs:
       run: cd ${{ env.BEAT_MODULE }} && mage build
     - name: Run test
       run: cd ${{ env.BEAT_MODULE }} && echo "See https://github.com/elastic/beats/issues/29038"
+    - uses: v1v/otel-upload-test-artifact-action@v2
+      if: always()
+      continue-on-error: true
+      with:
+        jobName: "macos"
+        stepName: "Run test"
+        path: "${{ env.BEAT_MODULE }}/build/TEST*.xml"
+        type: "junit"
+        githubToken: ${{ secrets.GITHUB_TOKEN }}
