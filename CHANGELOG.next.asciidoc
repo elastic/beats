@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 - update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
+- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
 
 *Packetbeat*
 
