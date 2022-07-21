@@ -388,7 +388,3 @@ func getNpmRootIn(path, origPath string) (string, error) {
 	}
 	return getNpmRootIn(parent, origPath)
 }
-
-func killProcessOnTimeout() {
-
-}
