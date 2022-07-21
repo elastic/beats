@@ -55,6 +55,7 @@ func NewAzureInputScheduler(publisher cursor.Publisher, client *azblob.Container
 	}
 }
 
+// Schedule , is responsible for fetching & scheduling jobs using the workerpool model
 func (ais *azureInputScheduler) Schedule(ctx context.Context) error {
 	var pager *azblob.ContainerListBlobFlatPager
 	var availableWorkers int32

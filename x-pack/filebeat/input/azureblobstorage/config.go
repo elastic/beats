@@ -46,10 +46,5 @@ type sharedKeyConfig struct {
 func defaultConfig() config {
 	return config{
 		AccountName: "some_account",
-		Auth: authConfig{
-			SharedCredentials: &sharedKeyConfig{
-				AccountKey: "some_key",
-			},
-		},
 	}
 }

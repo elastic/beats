@@ -90,7 +90,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if c.PollInterval == nil && cfg.PollInterval != nil {
 		c.PollInterval = cfg.PollInterval
 	} else if c.PollInterval == nil && cfg.PollInterval == nil {
-		interval := time.Second * 1
+		interval := time.Second * 120
 		c.PollInterval = &interval
 	}
 

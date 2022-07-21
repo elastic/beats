@@ -38,6 +38,7 @@ type AzureInputJob struct {
 	publisher cursor.Publisher
 }
 
+// NewAzureInputJob, returns an instance of a job , which is a unit of work that can be assigned to a go routine
 func NewAzureInputJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal,
 	marker *string, state *state.State, src *types.Source, publisher cursor.Publisher) Job {
 
