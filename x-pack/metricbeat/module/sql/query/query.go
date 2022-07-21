@@ -187,20 +187,32 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string) {
 	if m.Config.RawData.Enabled {
 
-		reporter.Event(mb.Event{
-			// New usage.
-			// Only driver & query field mapped.
-			// metrics to be mapped by end user.
-			ModuleFields: mapstr.M{
-				"metrics": ms, // Individual metric
-				"driver":  m.Config.Driver,
-				"query":   qry,
-			},
-		})
+		// New usage.
+		// Only driver & query field mapped.
+		// metrics to be mapped by end user.
+		if len(qry) > 0 {
+			// set query.
+			reporter.Event(mb.Event{
+				ModuleFields: mapstr.M{
+					"metrics": ms, // Individual metric
+					"driver":  m.Config.Driver,
+					"query":   qry,
+				},
+			})
+		} else {
+			reporter.Event(mb.Event{
+				// Do not set query.
+				ModuleFields: mapstr.M{
+					"metrics": ms, // Individual metric
+					"driver":  m.Config.Driver,
+				},
+			})
+
+		}
 	} else {
+		// Previous usage. Backword compartibility.
+		// Supports field mapping.
 		reporter.Event(mb.Event{
-			// Previous usage. Backword compartibility.
-			// Supports field mapping.
 			ModuleFields: mapstr.M{
 				"driver":  m.Config.Driver,
 				"query":   qry,

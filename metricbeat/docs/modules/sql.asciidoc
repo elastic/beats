@@ -535,7 +535,6 @@ This creates a combined event as below, where `blks_hit`, `blks_read`, `checkpoi
     "address": "localhost"
   },
   "sql": {
-    "query": "",
     "metrics": {
       "blks_read": 21,
       "checkpoints_req": 1,
