@@ -204,14 +204,23 @@ VERSION=${env.VERSION}-SNAPSHOT""")
         notifyBuildResult(prComment: true,
                           slackComment: true,
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
-                          githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS",
+                          githubIssue: isGitHubIssueEnabled(),
                           githubLabels: 'Team:Elastic-Agent-Data-Plane')
       }
     }
   }
 }
 
+<<<<<<< HEAD
 def runLinting() {
+=======
+// When to create a GiHub issue
+def isGitHubIssueEnabled() {
+  return isBranch() && currentBuild.currentResult != "SUCCESS" && currentBuild.currentResult != "ABORTED"
+}
+
+def runChecks() {
+>>>>>>> f7002f850d (ci: avoid creating github issues when aborted (#32441))
   def mapParallelTasks = [:]
   def content = readYaml(file: 'Jenkinsfile.yml')
   content['projects'].each { projectName ->
