@@ -65,6 +65,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
 - Reduced memory usage slightly for browser monitors. {pull}32317[32317]
 - Automatically kill zombie-ish node processes. {pull}32393[32393]
+- Added timeout for browser monitors. {pull}32434[32434]
 
 *Metricbeat*
 
