@@ -113,6 +113,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add references for CRI-O configuration in input-container and in our kubernetes manifests {issue}32149[32149] {pull}32151[32151]
 - httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
 - Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
+- httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
+- Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
 
 *Auditbeat*
 
