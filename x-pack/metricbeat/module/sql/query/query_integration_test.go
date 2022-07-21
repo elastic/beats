@@ -162,7 +162,6 @@ func TestPostgreSQL(t *testing.T) {
 				},
 			}
 
-			// Need to add this.
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
@@ -187,7 +186,6 @@ func TestPostgreSQL(t *testing.T) {
 				},
 			}
 
-			// Need to add this.
 			t.Run("fetch with URL", func(t *testing.T) {
 				testFetch(t, cfg)
 			})
@@ -197,13 +195,16 @@ func TestPostgreSQL(t *testing.T) {
 		t.Run("merged mode", func(t *testing.T) {
 			cfg = testFetchConfig{
 				config: config{
-					Driver:         "postgres",
-					Queries:        []query{query{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"}, query{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"}},
+					Driver: "postgres",
+					Queries: []query{
+						query{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						query{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+					},
 					ResponseFormat: tableResponseFormat,
 					RawData: rawData{
 						Enabled: true,
 					},
-					MergeQueries: true,
+					MergeResults: true,
 				},
 				Host: fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
 				Assertion: func(t *testing.T, event beat.Event) {
@@ -253,7 +254,7 @@ func getConfig(cfg testFetchConfig) map[string]interface{} {
 		"sql_query":        cfg.config.Query,
 		"sql_queries":      cfg.config.Queries,
 		"raw_data.enabled": cfg.config.RawData.Enabled,
-		"request_merge":    cfg.config.MergeQueries,
+		"merge_results":    cfg.config.MergeResults,
 	}
 
 	if cfg.config.ResponseFormat != "" {

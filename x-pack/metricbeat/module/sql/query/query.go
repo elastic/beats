@@ -50,7 +50,7 @@ type config struct {
 	Query          string `config:"sql_query" `
 
 	Queries      []query `config:"sql_queries" `
-	MergeQueries bool    `config:"request_merge"`
+	MergeResults bool    `config:"merge_results"`
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -136,7 +136,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 
 			for _, ms := range mss {
-				if m.Config.MergeQueries {
+				if m.Config.MergeResults {
 					if len(mss) > 1 {
 						return fmt.Errorf("can not merge query resulting with more than one rows: %s", q)
 					} else {
@@ -160,7 +160,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				return fmt.Errorf("fetch variable mode failed: %w", err)
 			}
 
-			if m.Config.MergeQueries {
+			if m.Config.MergeResults {
 				for k, v := range ms {
 					_, ok := merged[k]
 					if ok {
@@ -174,9 +174,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 		}
 	}
-	if m.Config.MergeQueries {
+	if m.Config.MergeResults {
 		// Report here for merged case.
-		m.reportEvent(merged, reporter, "MULTIPLE")
+		m.reportEvent(merged, reporter, "")
 	}
 
 	return nil
