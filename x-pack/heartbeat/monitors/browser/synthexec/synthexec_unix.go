@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package synthexec
 
 import (
@@ -14,7 +18,7 @@ func init() {
 		// as the syscall package is
 		cmd.SysProcAttr = &unix.SysProcAttr{
 			// Ensure node subprocesses are killed if this process dies (linux only)
-			Pdeathsig: unix.SIGKILL,
+			Pdeathsig: unix.SIGTERM,
 		}
 	}
 }
