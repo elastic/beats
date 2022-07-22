@@ -96,7 +96,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Auditbeat*
 
 - Add `immutable` option to the auditd module. {issue}8352[8352] {pull}32381[32381]
-
+- system: Reduce memory usage of the `socket` dataset. {issue}32191[32191] {pull}32192[32192]
 
 *Filebeat*
 
