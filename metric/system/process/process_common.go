@@ -34,20 +34,19 @@ import (
 	sysinfo "github.com/elastic/go-sysinfo"
 )
 
-//ProcsMap is aconvinence wrapper type
+//ProcsMap is a convinence wrapper for the oft-used ideom of map[int]ProcState
 type ProcsMap map[int]ProcState
 
-// ProcsTrack is a map where the keys are the names of processes and the value is the Process with that name
-//type ProcsTrack map[int]ProcState
+// ProcsTrack is a thread-safe wrapper for a process Stat object's internal map of processes.
 type ProcsTrack struct {
 	pids ProcsMap
-	mut  *sync.Mutex
+	mut  sync.Mutex
 }
 
 func NewProcsMap() *ProcsTrack {
 	return &ProcsTrack{
 		pids: make(ProcsMap, 0),
-		mut:  &sync.Mutex{},
+		mut:  sync.Mutex{},
 	}
 }
 
