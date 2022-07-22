@@ -31,8 +31,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"golang.org/x/sys/windows"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -51,7 +49,6 @@ type Reader struct {
 	log      *logp.Logger //
 	config   Config       // Metricset configuration
 	counters []PerfCounter
-	event    windows.Handle
 }
 
 type PerfCounter struct {
@@ -71,18 +68,13 @@ func NewReader(config Config) (*Reader, error) {
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
-	event, err := windows.CreateEvent(nil, 0, 0, nil)
-	if err != nil {
-		return nil, err
-	}
 	r := &Reader{
 		query:  query,
 		log:    logp.NewLogger("perfmon"),
 		config: config,
-		event:  event,
 	}
 	r.mapCounters(config)
-	_, err = r.getCounterPaths()
+	_, err := r.getCounterPaths()
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +145,6 @@ func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 
 // Close will close the PDH query for now.
 func (re *Reader) Close() error {
-	defer windows.CloseHandle(re.event)
 	return re.query.Close()
 }
 
