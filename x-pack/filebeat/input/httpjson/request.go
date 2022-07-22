@@ -40,14 +40,15 @@ type httpClient struct {
 }
 
 func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Response, error) {
+	c.tracer.txnStart(req)
 	resp, err := c.limiter.execute(stdCtx, func() (*http.Response, error) {
 		return c.client.Do(req)
 	})
+	c.tracer.txnDone(resp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
 	defer resp.Body.Close()
-	c.tracer.trace(req, resp)
 
 	// Read the whole resp.Body so we can release the connection.
 	// This implementation is inspired by httputil.DumpResponse
@@ -66,9 +67,10 @@ func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Respon
 // tracer is a lightweight transaction tracer for debugging httpjson configurations.
 // It is not intended to be used for machine ingestion, but rather as a human aid.
 type tracer struct {
-	sess int64 // sess is the unix time of the start of a session.
-	txn  int   // txn is a session-unique transaction id.
-	log  *log.Logger
+	sess  int64 // sess is the unix time of the start of a session.
+	txn   int   // txn is a session-unique transaction id.
+	inTxn bool
+	log   *log.Logger
 }
 
 func newTracer(logger *lumberjack.Logger) *tracer {
@@ -78,22 +80,36 @@ func newTracer(logger *lumberjack.Logger) *tracer {
 	return &tracer{sess: time.Now().UnixMilli(), log: log.New(logger, "", log.LstdFlags)}
 }
 
-func (t *tracer) trace(req *http.Request, resp *http.Response) {
+func (t *tracer) txnStart(req *http.Request) {
 	if t == nil {
 		return
 	}
+	if t.inTxn {
+		t.log.Printf("no response %d.%d", t.sess, t.txn)
+	}
 	t.txn++
+	t.inTxn = true
 	b, err := httputil.DumpRequestOut(req, true)
 	if err != nil {
 		t.log.Print(err)
 	} else {
 		t.log.Printf("request %d.%d:\n\t%s", t.sess, t.txn, bytes.ReplaceAll(b, []byte{'\n'}, []byte("\n\t")))
 	}
+}
+
+func (t *tracer) txnDone(resp *http.Response) {
+	if t == nil {
+		return
+	}
+	if !t.inTxn {
+		t.log.Printf("missing request %d.%d", t.sess, t.txn)
+	}
+	t.inTxn = false
 	if resp == nil {
 		t.log.Printf("no response %d.%d", t.sess, t.txn)
 		return
 	}
-	b, err = httputil.DumpResponse(resp, true)
+	b, err := httputil.DumpResponse(resp, true)
 	if err != nil {
 		t.log.Printf("response %d.%d: %v", t.sess, t.txn, err)
 	} else {
