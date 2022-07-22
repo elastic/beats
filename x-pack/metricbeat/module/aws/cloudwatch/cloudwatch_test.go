@@ -8,16 +8,18 @@
 package cloudwatch
 
 import (
+	"context"
 	"errors"
-	"net/http"
 	"testing"
 	"time"
 
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
+	"github.com/aws/smithy-go/middleware"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
-	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -51,8 +53,8 @@ var (
 	metricName3     = "StatusCheckFailed_System"
 	metricName4     = "StatusCheckFailed_Instance"
 	resourceTypeEC2 = "ec2:instance"
-	listMetric1     = cloudwatch.Metric{
-		Dimensions: []cloudwatch.Dimension{{
+	listMetric1     = cloudwatchtypes.Metric{
+		Dimensions: []cloudwatchtypes.Dimension{{
 			Name:  &dimName,
 			Value: &instanceID1,
 		}},
@@ -60,8 +62,8 @@ var (
 		Namespace:  &namespace,
 	}
 
-	listMetric2 = cloudwatch.Metric{
-		Dimensions: []cloudwatch.Dimension{{
+	listMetric2 = cloudwatchtypes.Metric{
+		Dimensions: []cloudwatchtypes.Dimension{{
 			Name:  &dimName,
 			Value: &instanceID1,
 		}},
@@ -69,8 +71,8 @@ var (
 		Namespace:  &namespace,
 	}
 
-	listMetric3 = cloudwatch.Metric{
-		Dimensions: []cloudwatch.Dimension{{
+	listMetric3 = cloudwatchtypes.Metric{
+		Dimensions: []cloudwatchtypes.Dimension{{
 			Name:  &dimName,
 			Value: &instanceID2,
 		}},
@@ -78,8 +80,8 @@ var (
 		Namespace:  &namespace,
 	}
 
-	listMetric4 = cloudwatch.Metric{
-		Dimensions: []cloudwatch.Dimension{{
+	listMetric4 = cloudwatchtypes.Metric{
+		Dimensions: []cloudwatchtypes.Dimension{{
 			Name:  &dimName,
 			Value: &instanceID2,
 		}},
@@ -87,14 +89,14 @@ var (
 		Namespace:  &namespace,
 	}
 
-	listMetric5 = cloudwatch.Metric{
+	listMetric5 = cloudwatchtypes.Metric{
 		MetricName: &metricName1,
 		Namespace:  &namespace,
 	}
 
 	namespaceMSK = "AWS/Kafka"
 	metricName6  = "MemoryUsed"
-	listMetric8  = cloudwatch.Metric{
+	listMetric8  = cloudwatchtypes.Metric{
 		MetricName: &metricName6,
 		Namespace:  &namespaceMSK,
 	}
@@ -102,7 +104,7 @@ var (
 
 func TestConstructLabel(t *testing.T) {
 	cases := []struct {
-		listMetricDetail cloudwatch.Metric
+		listMetricDetail cloudwatchtypes.Metric
 		statistic        string
 		expectedLabel    string
 	}{
@@ -153,8 +155,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedListMetricWithDetailEC2 := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-1"),
 					}},
@@ -181,8 +183,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedListMetricWithDetailEC2RDS := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-1"),
 					}},
@@ -192,8 +194,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				[]string{"Average"},
 			},
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("DBClusterIdentifier"),
 						Value: awssdk.String("test1-cluster"),
 					},
@@ -226,8 +228,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedListMetricWithDetailEC2RDSWithTag := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-1"),
 					}},
@@ -237,8 +239,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				[]string{"Average"},
 			},
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("DBClusterIdentifier"),
 						Value: awssdk.String("test1-cluster"),
 					},
@@ -383,7 +385,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		{
 			resourceTypeFilter: "ec2:instance",
 			statistics:         []string{"Average"},
-			dimensions: []cloudwatch.Dimension{
+			dimensions: []cloudwatchtypes.Dimension{
 				{
 					Name:  awssdk.String("InstanceId"),
 					Value: awssdk.String("i-1"),
@@ -395,8 +397,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedListMetricsEC2WithDim := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-1"),
 					}},
@@ -406,8 +408,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				[]string{"Average"},
 			},
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-1"),
 					}},
@@ -423,8 +425,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedListMetricWithDetailEC2sRDSWithTag := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-1"),
 					}},
@@ -434,8 +436,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				[]string{"Average"},
 			},
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-2"),
 					}},
@@ -445,8 +447,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				[]string{"Sum"},
 			},
 			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
+				cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("DBClusterIdentifier"),
 						Value: awssdk.String("test1-cluster"),
 					},
@@ -878,17 +880,17 @@ func TestGenerateFieldName(t *testing.T) {
 func TestCompareAWSDimensions(t *testing.T) {
 	cases := []struct {
 		title          string
-		dim1           []cloudwatch.Dimension
-		dim2           []cloudwatch.Dimension
+		dim1           []cloudwatchtypes.Dimension
+		dim2           []cloudwatchtypes.Dimension
 		expectedResult bool
 	}{
 		{
 			"same dimensions with length 2 but different order",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
 			},
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
 				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
 			},
@@ -896,60 +898,60 @@ func TestCompareAWSDimensions(t *testing.T) {
 		},
 		{
 			"different dimensions with different length",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
 			},
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
 			},
 			false,
 		},
 		{
 			"different dimensions with same length",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
 			},
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
 			},
 			false,
 		},
 		{
 			"compare with an empty dimension",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
 			},
-			[]cloudwatch.Dimension{},
+			[]cloudwatchtypes.Dimension{},
 			false,
 		},
 		{
 			"compare with wildcard dimension value, one same name dimension",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
 			},
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID1"), Value: awssdk.String(dimensionValueWildcard)},
 			},
 			true,
 		},
 		{
 			"compare with wildcard dimension value, one different name dimension",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("IDx"), Value: awssdk.String("111")},
 			},
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID1"), Value: awssdk.String(dimensionValueWildcard)},
 			},
 			false,
 		},
 		{
 			"compare with wildcard dimension value, two same name dimensions",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
 				{Name: awssdk.String("ID2"), Value: awssdk.String("222")},
 			},
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
 				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
 			},
@@ -957,21 +959,21 @@ func TestCompareAWSDimensions(t *testing.T) {
 		},
 		{
 			"compare with wildcard dimension value, different length, case1",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
 				{Name: awssdk.String("ID2"), Value: awssdk.String("222")},
 			},
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
 			},
 			false,
 		},
 		{
 			"compare with wildcard dimension value, different length, case2",
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
 			},
-			[]cloudwatch.Dimension{
+			[]cloudwatchtypes.Dimension{
 				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
 				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
 			},
@@ -1028,7 +1030,7 @@ func TestConstructTagsFilters(t *testing.T) {
 				{
 					resourceTypeFilter: "ec2:instance",
 					statistics:         []string{"Average"},
-					dimensions: []cloudwatch.Dimension{
+					dimensions: []cloudwatchtypes.Dimension{
 						{
 							Name:  awssdk.String("InstanceId"),
 							Value: awssdk.String("i-1"),
@@ -1107,15 +1109,15 @@ func TestConstructTagsFilters(t *testing.T) {
 func TestFilterListMetricsOutput(t *testing.T) {
 	cases := []struct {
 		title                        string
-		listMetricsOutput            []cloudwatch.Metric
+		listMetricsOutput            []cloudwatchtypes.Metric
 		namespaceDetails             []namespaceDetail
 		filteredMetricWithStatsTotal []metricsWithStatistics
 	}{
 		{
 			"test filter cloudwatch metrics with dimension",
-			[]cloudwatch.Metric{
+			[]cloudwatchtypes.Metric{
 				{
-					Dimensions: []cloudwatch.Dimension{
+					Dimensions: []cloudwatchtypes.Dimension{
 						{
 							Name:  awssdk.String("DBClusterIdentifier"),
 							Value: awssdk.String("test1-cluster"),
@@ -1128,7 +1130,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 					Namespace:  awssdk.String("AWS/RDS"),
 				},
 				{
-					Dimensions: []cloudwatch.Dimension{{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-1"),
 					}},
@@ -1140,7 +1142,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 				{
 					resourceTypeFilter: "ec2:instance",
 					statistics:         []string{"Average"},
-					dimensions: []cloudwatch.Dimension{
+					dimensions: []cloudwatchtypes.Dimension{
 						{
 							Name:  awssdk.String("InstanceId"),
 							Value: awssdk.String("i-1"),
@@ -1150,8 +1152,8 @@ func TestFilterListMetricsOutput(t *testing.T) {
 			},
 			[]metricsWithStatistics{
 				{
-					cloudwatch.Metric{
-						Dimensions: []cloudwatch.Dimension{{
+					cloudwatchtypes.Metric{
+						Dimensions: []cloudwatchtypes.Dimension{{
 							Name:  awssdk.String("InstanceId"),
 							Value: awssdk.String("i-1"),
 						}},
@@ -1164,9 +1166,9 @@ func TestFilterListMetricsOutput(t *testing.T) {
 		},
 		{
 			"test filter cloudwatch metrics with name",
-			[]cloudwatch.Metric{
+			[]cloudwatchtypes.Metric{
 				{
-					Dimensions: []cloudwatch.Dimension{
+					Dimensions: []cloudwatchtypes.Dimension{
 						{
 							Name:  awssdk.String("DBClusterIdentifier"),
 							Value: awssdk.String("test1-cluster"),
@@ -1179,7 +1181,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 					Namespace:  awssdk.String("AWS/RDS"),
 				},
 				{
-					Dimensions: []cloudwatch.Dimension{{
+					Dimensions: []cloudwatchtypes.Dimension{{
 						Name:  awssdk.String("InstanceId"),
 						Value: awssdk.String("i-1"),
 					}},
@@ -1196,8 +1198,8 @@ func TestFilterListMetricsOutput(t *testing.T) {
 			},
 			[]metricsWithStatistics{
 				{
-					cloudwatch.Metric{
-						Dimensions: []cloudwatch.Dimension{{
+					cloudwatchtypes.Metric{
+						Dimensions: []cloudwatchtypes.Dimension{{
 							Name:  awssdk.String("InstanceId"),
 							Value: awssdk.String("i-1"),
 						}},
@@ -1289,157 +1291,79 @@ func TestCheckStatistics(t *testing.T) {
 }
 
 // MockCloudWatchClient struct is used for unit tests.
-type MockCloudWatchClient struct {
-	cloudwatchiface.ClientAPI
+type MockCloudWatchClient struct{}
+
+// GetMetricData implements cloudwatch.GetMetricDataAPIClient interface
+func (m *MockCloudWatchClient) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
+	emptyString := ""
+	return &cloudwatch.GetMetricDataOutput{
+		Messages: nil,
+		MetricDataResults: []cloudwatchtypes.MetricDataResult{
+			{
+				Id:         &id1,
+				Label:      &label1,
+				Values:     []float64{value1},
+				Timestamps: []time.Time{timestamp},
+			},
+			{
+				Id:         &id2,
+				Label:      &label2,
+				Values:     []float64{value2},
+				Timestamps: []time.Time{timestamp},
+			},
+		},
+		NextToken:      &emptyString,
+		ResultMetadata: middleware.Metadata{},
+	}, nil
 }
 
 // MockCloudWatchClientWithoutDim struct is used for unit tests.
-type MockCloudWatchClientWithoutDim struct {
-	cloudwatchiface.ClientAPI
+type MockCloudWatchClientWithoutDim struct{}
+
+// GetMetricData implements cloudwatch.GetMetricDataAPIClient.
+func (m *MockCloudWatchClientWithoutDim) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
+	emptyString := ""
+	return &cloudwatch.GetMetricDataOutput{
+		Messages: nil,
+		MetricDataResults: []cloudwatchtypes.MetricDataResult{
+			{
+				Id:         &id1,
+				Label:      &label3,
+				Values:     []float64{value1},
+				Timestamps: []time.Time{timestamp},
+			},
+			{
+				Id:         &id2,
+				Label:      &label4,
+				Values:     []float64{value2},
+				Timestamps: []time.Time{timestamp},
+			},
+		},
+		NextToken:      &emptyString,
+		ResultMetadata: middleware.Metadata{},
+	}, nil
 }
 
 // MockResourceGroupsTaggingClient is used for unit tests.
-type MockResourceGroupsTaggingClient struct {
-	resourcegroupstaggingapiiface.ClientAPI
-}
+type MockResourceGroupsTaggingClient struct{}
 
-func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsInput) cloudwatch.ListMetricsRequest {
-	dim := cloudwatch.Dimension{
-		Name:  &dimName,
-		Value: &instanceID1,
-	}
-	httpReq, _ := http.NewRequest("", "", nil)
-	return cloudwatch.ListMetricsRequest{
-		Request: &awssdk.Request{
-			Data: &cloudwatch.ListMetricsOutput{
-				Metrics: []cloudwatch.Metric{
+// GetResources implements resourcegroupstaggingapi.GetResourcesAPIClient.
+func (m *MockResourceGroupsTaggingClient) GetResources(context.Context, *resourcegroupstaggingapi.GetResourcesInput, ...func(*resourcegroupstaggingapi.Options)) (*resourcegroupstaggingapi.GetResourcesOutput, error) {
+	return &resourcegroupstaggingapi.GetResourcesOutput{
+		PaginationToken: awssdk.String(""),
+		ResourceTagMappingList: []resourcegroupstaggingapitypes.ResourceTagMapping{
+			{
+				ResourceARN: awssdk.String("arn:aws:ec2:us-west-1:123456789012:instance:i-1"),
+				Tags: []resourcegroupstaggingapitypes.Tag{
 					{
-						MetricName: &metricName1,
-						Namespace:  &namespace,
-						Dimensions: []cloudwatch.Dimension{dim},
+						Key:   awssdk.String("name"),
+						Value: awssdk.String("test-ec2"),
 					},
 				},
 			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
 		},
-	}
-}
-
-func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-
-	return cloudwatch.GetMetricDataRequest{
-		Input: input,
-		Copy:  m.GetMetricDataRequest,
-		Request: &awssdk.Request{
-			Operation: &awssdk.Operation{
-				Name:      "GetMetricData",
-				Paginator: nil,
-			},
-			Data: &cloudwatch.GetMetricDataOutput{
-				MetricDataResults: []cloudwatch.MetricDataResult{
-					{
-						Id:         &id1,
-						Label:      &label1,
-						Values:     []float64{value1},
-						Timestamps: []time.Time{timestamp},
-					},
-					{
-						Id:         &id2,
-						Label:      &label2,
-						Values:     []float64{value2},
-						Timestamps: []time.Time{timestamp},
-					},
-				},
-			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
-		},
-	}
-}
-
-func (m *MockCloudWatchClientWithoutDim) ListMetricsRequest(input *cloudwatch.ListMetricsInput) cloudwatch.ListMetricsRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-	return cloudwatch.ListMetricsRequest{
-		Request: &awssdk.Request{
-			Data: &cloudwatch.ListMetricsOutput{
-				Metrics: []cloudwatch.Metric{
-					{
-						MetricName: &metricName1,
-						Namespace:  &namespace,
-					},
-				},
-			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
-		},
-	}
-}
-
-func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-
-	return cloudwatch.GetMetricDataRequest{
-		Input: input,
-		Copy:  m.GetMetricDataRequest,
-		Request: &awssdk.Request{
-			Operation: &awssdk.Operation{
-				Name:      "GetMetricData",
-				Paginator: nil,
-			},
-			Data: &cloudwatch.GetMetricDataOutput{
-				MetricDataResults: []cloudwatch.MetricDataResult{
-					{
-						Id:         &id1,
-						Label:      &label3,
-						Values:     []float64{value1},
-						Timestamps: []time.Time{timestamp},
-					},
-					{
-						Id:         &id2,
-						Label:      &label4,
-						Values:     []float64{value2},
-						Timestamps: []time.Time{timestamp},
-					},
-				},
-			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
-		},
-	}
-}
-
-func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-	return resourcegroupstaggingapi.GetResourcesRequest{
-		Input: input,
-		Copy:  m.GetResourcesRequest,
-		Request: &awssdk.Request{
-			Operation: &awssdk.Operation{
-				Name:       "GetResources",
-				HTTPMethod: "POST",
-				HTTPPath:   "/",
-				Paginator:  nil,
-			},
-			Data: &resourcegroupstaggingapi.GetResourcesOutput{
-				PaginationToken: awssdk.String(""),
-				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
-					{
-						ResourceARN: awssdk.String("arn:aws:ec2:us-west-1:123456789012:instance:i-1"),
-						Tags: []resourcegroupstaggingapi.Tag{
-							{
-								Key:   awssdk.String("name"),
-								Value: awssdk.String("test-ec2"),
-							},
-						},
-					},
-				},
-			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
-		},
-	}
+		ResultMetadata: middleware.Metadata{},
+	}, nil
 }
 
 func TestCreateEventsWithIdentifier(t *testing.T) {
@@ -1451,8 +1375,8 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClient{}
 	listMetricWithStatsTotal := []metricsWithStatistics{{
-		cloudwatch.Metric{
-			Dimensions: []cloudwatch.Dimension{{
+		cloudwatchtypes.Metric{
+			Dimensions: []cloudwatchtypes.Dimension{{
 				Name:  awssdk.String("InstanceId"),
 				Value: awssdk.String("i-1"),
 			}},
@@ -1492,14 +1416,14 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	mockCloudwatchSvc := &MockCloudWatchClientWithoutDim{}
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
-			cloudwatch.Metric{
+			cloudwatchtypes.Metric{
 				MetricName: awssdk.String("CPUUtilization"),
 				Namespace:  awssdk.String("AWS/EC2"),
 			},
 			[]string{"Average"},
 		},
 		{
-			cloudwatch.Metric{
+			cloudwatchtypes.Metric{
 				MetricName: awssdk.String("DiskReadOps"),
 				Namespace:  awssdk.String("AWS/EC2"),
 			},
@@ -1533,8 +1457,8 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	mockCloudwatchSvc := &MockCloudWatchClient{}
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
-			cloudwatch.Metric{
-				Dimensions: []cloudwatch.Dimension{{
+			cloudwatchtypes.Metric{
+				Dimensions: []cloudwatchtypes.Dimension{{
 					Name:  awssdk.String("InstanceId"),
 					Value: awssdk.String("i-1"),
 				}},
@@ -1588,20 +1512,20 @@ func TestInsertTags(t *testing.T) {
 	events[identifier2] = aws.InitEvent(regionName, accountName, accountID, timestamp)
 	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID, timestamp)
 
-	resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
-	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapi.Tag{
+	resourceTagMap := map[string][]resourcegroupstaggingapitypes.Tag{}
+	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapitypes.Tag{
 		{
 			Key:   awssdk.String(tagKey1),
 			Value: awssdk.String(tagValue1),
 		},
 	}
-	resourceTagMap["test-s3-2"] = []resourcegroupstaggingapi.Tag{
+	resourceTagMap["test-s3-2"] = []resourcegroupstaggingapitypes.Tag{
 		{
 			Key:   awssdk.String(tagKey2),
 			Value: awssdk.String(tagValue2),
 		},
 	}
-	resourceTagMap["eipalloc-0123456789abcdef"] = []resourcegroupstaggingapi.Tag{
+	resourceTagMap["eipalloc-0123456789abcdef"] = []resourcegroupstaggingapitypes.Tag{
 		{
 			Key:   awssdk.String(tagKey3),
 			Value: awssdk.String(tagValue3),
@@ -1697,7 +1621,7 @@ func TestCreateEventsTimestamp(t *testing.T) {
 
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
-			cloudwatch.Metric{
+			cloudwatchtypes.Metric{
 				MetricName: awssdk.String("CPUUtilization"),
 				Namespace:  awssdk.String("AWS/EC2"),
 			},
@@ -1708,7 +1632,9 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
-	events, err := m.createEvents(&MockCloudWatchClientWithoutDim{}, &MockResourceGroupsTaggingClient{}, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	cloudwatchMock := &MockCloudWatchClientWithoutDim{}
+	resGroupTaggingClientMock := &MockResourceGroupsTaggingClient{}
+	events, err := m.createEvents(cloudwatchMock, resGroupTaggingClientMock, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, timestamp, events[regionName+accountID+namespace].Timestamp)
 }

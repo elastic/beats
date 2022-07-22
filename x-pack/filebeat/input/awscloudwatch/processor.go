@@ -8,7 +8,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -36,7 +36,7 @@ func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Cli
 	}
 }
 
-func (p *logProcessor) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) {
+func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logGroup string, regionName string) {
 	for _, logEvent := range logEvents {
 		event := createEvent(logEvent, logGroup, regionName)
 		p.publish(p.ack, &event)
@@ -50,7 +50,7 @@ func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event
 	p.publisher.Publish(*event)
 }
 
-func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) beat.Event {
+func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName string) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
 		Fields: mapstr.M{
