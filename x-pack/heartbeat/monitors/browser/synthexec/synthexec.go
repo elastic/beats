@@ -374,8 +374,10 @@ func getNpmRootIn(path, origPath string) (string, error) {
 }
 
 func NewSynthexecCtx(timeout time.Duration) (context.Context, context.CancelFunc) {
-	synthexecCtx := context.WithValue(context.TODO(), SynthexecTimeout, timeout)
-	ctx, cancel := context.WithTimeout(synthexecCtx, timeout)
+	cmdTimeout := timeout + 30*time.Second
+
+	synthexecCtx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
+	ctx, cancel := context.WithTimeout(synthexecCtx, cmdTimeout)
 
 	return ctx, cancel
 }
