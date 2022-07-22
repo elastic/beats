@@ -18,7 +18,7 @@ func init() {
 		// as the syscall package is
 		cmd.SysProcAttr = &unix.SysProcAttr{
 			// Ensure node subprocesses are killed if this process dies (linux only)
-			Pdeathsig: unix.SIGTERM,
+			Pdeathsig: unix.SIGKILL,
 		}
 	}
 }
