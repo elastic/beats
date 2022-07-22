@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -125,7 +126,8 @@ func (p *Project) extraArgs() []string {
 func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
 	isScript := p.projectCfg.Source.Inline != nil
-	ctx, _ := synthexec.NewSynthexecCtx(p.projectCfg.Timeout)
+	ctx := context.WithValue(context.TODO(), synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
+
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
 		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), p.StdFields(), p.extraArgs()...)

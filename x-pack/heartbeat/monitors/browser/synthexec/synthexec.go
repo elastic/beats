@@ -243,6 +243,9 @@ func runCmd(
 		return nil, err
 	}
 
+	// Get timeout from parent ctx
+	timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	go func() {
 		<-ctx.Done()
 
@@ -265,7 +268,8 @@ func runCmd(
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(ctx.Value(SynthexecTimeout).(time.Duration), loggableCmd.String()))
+				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, loggableCmd.String()))
 			} else {
 				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
 			}
@@ -279,6 +283,7 @@ func runCmd(
 
 		wg.Wait()
 		mpx.Close()
+		cancel()
 	}()
 
 	return mpx, nil
@@ -373,13 +378,4 @@ func getNpmRootIn(path, origPath string) (string, error) {
 		return "", fmt.Errorf("no package.json found in '%s'", origPath)
 	}
 	return getNpmRootIn(parent, origPath)
-}
-
-func NewSynthexecCtx(timeout time.Duration) (context.Context, context.CancelFunc) {
-	cmdTimeout := timeout + 30*time.Second
-
-	synthexecCtx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
-	ctx, cancel := context.WithTimeout(synthexecCtx, cmdTimeout)
-
-	return ctx, cancel
 }

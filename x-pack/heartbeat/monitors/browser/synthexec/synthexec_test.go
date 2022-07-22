@@ -166,8 +166,7 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {
 	_, filename, _, _ := runtime.Caller(0)
 	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
-	synthexecCtx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
-	ctx, _ := context.WithTimeout(synthexecCtx, cmdTimeout)
+	ctx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
 
 	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
