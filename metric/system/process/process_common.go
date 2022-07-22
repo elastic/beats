@@ -23,6 +23,7 @@ package process
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/match"
@@ -33,8 +34,42 @@ import (
 	sysinfo "github.com/elastic/go-sysinfo"
 )
 
-// ProcsMap is a map where the keys are the names of processes and the value is the Process with that name
+//ProcsMap is aconvinence wrapper type
 type ProcsMap map[int]ProcState
+
+// ProcsTrack is a map where the keys are the names of processes and the value is the Process with that name
+//type ProcsTrack map[int]ProcState
+type ProcsTrack struct {
+	pids ProcsMap
+	mut  *sync.Mutex
+}
+
+func NewProcsMap() *ProcsTrack {
+	return &ProcsTrack{
+		pids: make(ProcsMap, 0),
+		mut:  &sync.Mutex{},
+	}
+}
+
+func (pm *ProcsTrack) GetPid(pid int) (ProcState, bool) {
+	pm.mut.Lock()
+	defer pm.mut.Unlock()
+	proc, ok := pm.pids[pid]
+	return proc, ok
+}
+
+func (pm *ProcsTrack) SetPid(pid int, ps ProcState) {
+	pm.mut.Lock()
+	defer pm.mut.Unlock()
+	pm.pids[pid] = ps
+}
+
+func (pm *ProcsTrack) SetMap(pids map[int]ProcState) {
+	pm.mut.Lock()
+	defer pm.mut.Unlock()
+	pm.pids = pids
+
+}
 
 // ProcCallback is a function that FetchPid* methods can call at various points to do OS-agnostic processing
 type ProcCallback func(in ProcState) (ProcState, error)
@@ -53,7 +88,7 @@ type CgroupPctStats struct {
 type Stats struct {
 	Hostfs        resolve.Resolver
 	Procs         []string
-	ProcsMap      ProcsMap
+	ProcsMap      *ProcsTrack
 	CPUTicks      bool
 	EnvWhitelist  []string
 	CacheCmdLine  bool
@@ -128,7 +163,7 @@ func (procStats *Stats) Init() error {
 		procStats.Hostfs = resolve.NewTestResolver("/")
 	}
 
-	procStats.ProcsMap = make(ProcsMap)
+	procStats.ProcsMap = NewProcsMap()
 
 	if len(procStats.Procs) == 0 {
 		return nil
