@@ -584,12 +584,8 @@ func wait(t *testing.T, test func() bool) {
 	}
 }
 
-<<<<<<< HEAD
 func check(t *testing.T, runners []*mockRunner, expected *common.Config, started, stopped bool) {
-=======
-func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopped bool) {
 	t.Helper()
->>>>>>> 2777272039 (Fix race condition when reloading configuration (#32433))
 	for _, r := range runners {
 		if reflect.DeepEqual(expected, r.config) {
 			ok1 := assert.Equal(t, started, r.started)
