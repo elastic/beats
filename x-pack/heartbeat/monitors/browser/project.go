@@ -125,16 +125,17 @@ func (p *Project) extraArgs() []string {
 func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
 	isScript := p.projectCfg.Source.Inline != nil
+	ctx, _ := synthexec.NewSynthexecCtx(p.projectCfg.Timeout)
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.StdFields(), p.projectCfg.Timeout, p.extraArgs()...)
+		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), p.StdFields(), p.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.projectCfg.Timeout, p.extraArgs()...)
+			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}

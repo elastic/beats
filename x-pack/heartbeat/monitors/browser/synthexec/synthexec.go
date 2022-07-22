@@ -41,8 +41,10 @@ type FilterJourneyConfig struct {
 // where these are unsupported
 var platformCmdMutate func(*exec.Cmd) = func(*exec.Cmd) {}
 
+var SynthexecTimeout struct{}
+
 // ProjectJob will run a single journey by name from the given project.
-func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, timeout time.Duration, extraArgs ...string) (jobs.Job, error) {
+func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given projectPath, use '.' as the first arg since the command runs
 	// in the correct dir
 	cmdFactory, err := projectCommandFactory(projectPath, extraArgs...)
@@ -50,7 +52,7 @@ func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filter
 		return nil, err
 	}
 
-	return startCmdJob(ctx, cmdFactory, nil, params, filterJourneys, fields, timeout), nil
+	return startCmdJob(ctx, cmdFactory, nil, params, filterJourneys, fields), nil
 }
 
 func projectCommandFactory(projectPath string, args ...string) (func() *exec.Cmd, error) {
@@ -74,20 +76,20 @@ func projectCommandFactory(projectPath string, args ...string) (func() *exec.Cmd
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields stdfields.StdMonitorFields, timeout time.Duration, extraArgs ...string) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
 		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...) //nolint:gosec // we are safely building a command here, users can add args at their own risk
 	}
 
-	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields, timeout)
+	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
 }
 
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields, timeout time.Duration) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys, timeout)
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +120,6 @@ func runCmd(
 	stdinStr *string,
 	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
-	timeout time.Duration,
 ) (mpx *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
@@ -242,26 +243,13 @@ func runCmd(
 		return nil, err
 	}
 
-	cmdKilled := make(chan *SynthError, 1)
 	go func() {
-		toTimer := time.NewTimer(timeout)
-		defer toTimer.Stop()
-
-		var cmdError *SynthError = nil
-		select {
-		case <-toTimer.C:
-			// Kill the process if timeout expired
-			cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, loggableCmd.String()))
-		case <-ctx.Done():
-			// Kill the process if the context ends
-		}
+		<-ctx.Done()
 
 		err := cmd.Process.Kill()
 		if err != nil {
 			logp.Warn("could not kill synthetics process: %s", err)
 		}
-
-		cmdKilled <- cmdError
 	}()
 
 	// Close mpx after the process is done and all events have been sent / consumed
@@ -272,17 +260,13 @@ func runCmd(
 
 		var cmdError *SynthError = nil
 		if err != nil {
-			cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
-		}
 
-		// If there's a kill reason, override cmd.Wait() err
-		select {
-		case killErr := <-cmdKilled:
-			if killErr != nil {
-				cmdError = killErr
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(ctx.Value(SynthexecTimeout).(time.Duration), loggableCmd.String()))
+			} else {
+				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
 			}
-		default:
 		}
 
 		mpx.writeSynthEvent(&SynthEvent{
@@ -387,4 +371,11 @@ func getNpmRootIn(path, origPath string) (string, error) {
 		return "", fmt.Errorf("no package.json found in '%s'", origPath)
 	}
 	return getNpmRootIn(parent, origPath)
+}
+
+func NewSynthexecCtx(timeout time.Duration) (context.Context, context.CancelFunc) {
+	synthexecCtx := context.WithValue(context.TODO(), SynthexecTimeout, timeout)
+	ctx, cancel := context.WithTimeout(synthexecCtx, timeout)
+
+	return ctx, cancel
 }
