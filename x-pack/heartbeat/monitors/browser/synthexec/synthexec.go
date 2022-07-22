@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -33,6 +34,12 @@ type FilterJourneyConfig struct {
 	Tags  []string `config:"tags"`
 	Match string   `config:"match"`
 }
+
+// platformCmdMutate is the hook for OS specific mutation of cmds
+// This is practically just used by synthexec_unix.go to add Sysprocattrs
+// It's still nice for devs to be able to test browser monitors on OSX
+// where these are unsupported
+var platformCmdMutate func(*exec.Cmd) = func(*exec.Cmd) {}
 
 // ProjectJob will run a single journey by name from the given project.
 func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
@@ -112,6 +119,9 @@ func runCmd(
 	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
+	// Attach sysproc attrs to ensure subprocesses are properly killed
+	platformCmdMutate(cmd)
+
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
@@ -207,7 +217,25 @@ func runCmd(
 
 		wg.Done()
 	}()
-	err = cmd.Start()
+
+	// This use of channels for results is awkward, but required for the thread locking below
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err = cmd.Start()
+
+		cmdStarted <- err
+
+		err := cmd.Wait()
+		cmdDone <- err
+	}()
+
+	err = <-cmdStarted
 	if err != nil {
 		logp.Warn("Could not start command %s: %s", cmd, err)
 		return nil, err
@@ -224,7 +252,7 @@ func runCmd(
 
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
-		err := cmd.Wait()
+		err := <-cmdDone
 		jsonWriter.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 
