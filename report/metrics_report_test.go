@@ -37,17 +37,12 @@ func TestSystemMetricsReport(t *testing.T) {
 	var gotCPU, gotMem, gotInfo bool
 	testFunc := func(key string, val interface{}) {
 		if key == "info.uptime.ms" {
-			uptime, ok := val.(int64)
-			assert.True(t, ok, "info.uptime.ms not an int64")
-			assert.NotZero(t, uptime, "error fetching info.uptime.ms")
 			gotInfo = true
 		}
 		if key == "cpu.total.ticks" {
-			assert.NotNil(t, val)
 			gotCPU = true
 		}
 		if key == "memstats.rss" {
-			assert.NotNil(t, val)
 			gotMem = true
 		}
 	}
