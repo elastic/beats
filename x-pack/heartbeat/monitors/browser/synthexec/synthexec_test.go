@@ -5,7 +5,6 @@
 package synthexec
 
 import (
-	"context"
 	"fmt"
 	"os/exec"
 	"path"
@@ -153,7 +152,7 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 	cmd := exec.Command("go", "run", "./main.go")
 	synthEvents := runAndCollect(t, cmd, "", 0*time.Second)
 
-	// go run outputs "exit status 123" to stderr so we have two messages
+	// go run should not produce any additional stderr output in this case
 	require.Len(t, synthEvents, 1)
 
 	t.Run("has a cmd status event", func(t *testing.T) {
@@ -166,8 +165,9 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {
 	_, filename, _, _ := runtime.Caller(0)
 	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
+	ctx, _ := NewSynthexecCtx(cmdTimeout)
 
-	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{}, cmdTimeout)
+	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent
