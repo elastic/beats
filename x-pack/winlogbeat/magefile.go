@@ -88,3 +88,11 @@ func PythonVirtualEnv() error {
 	fmt.Println(venv)
 	return nil
 }
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
+}
