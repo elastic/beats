@@ -137,6 +137,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
 * Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
 - AWS Fargate: Added support for DesiredStatus and KnownStatus {issue}32077[32077] {pull}32342[#32342]
+- Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}32394[32394]
 
 *Packetbeat*
 
