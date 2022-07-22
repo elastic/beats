@@ -574,6 +574,17 @@ func TestValueTpl(t *testing.T) {
 			paramTr:     transformable{},
 			expectedVal: "my value",
 		},
+		{
+			name:  "func toJSON",
+			value: "[[ toJSON .last_response.body.paginationParams ]]",
+			paramCtx: &transformContext{
+				firstEvent:   &mapstr.M{},
+				lastEvent:    &mapstr.M{},
+				lastResponse: newTestResponse(mapstr.M{"paginationParams": mapstr.M{"id": 1234}}, nil, ""),
+			},
+			paramTr:     transformable{},
+			expectedVal: `{"id":1234}`,
+		},
 	}
 
 	for _, tc := range cases {
