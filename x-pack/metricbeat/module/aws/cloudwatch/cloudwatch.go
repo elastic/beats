@@ -582,7 +582,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 func reportEvents(eventsWithIdentifier map[string]mb.Event, report mb.ReporterV2) error {
 	for _, event := range eventsWithIdentifier {
 		if reported := report.Event(event); !reported {
-			return nil
+			return errors.New("report event failed")
 		}
 	}
 	return nil
