@@ -260,6 +260,8 @@ func runCmd(
 
 		var cmdError *SynthError = nil
 		if err != nil {
+			// err could be generic or it could have been killed by context timeout, log and check context
+			// to decide which error to stream
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {

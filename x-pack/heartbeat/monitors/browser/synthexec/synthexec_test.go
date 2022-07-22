@@ -5,6 +5,7 @@
 package synthexec
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"path"
@@ -165,7 +166,8 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {
 	_, filename, _, _ := runtime.Caller(0)
 	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
-	ctx, _ := NewSynthexecCtx(cmdTimeout)
+	synthexecCtx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
+	ctx, _ := context.WithTimeout(synthexecCtx, cmdTimeout)
 
 	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
