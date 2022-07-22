@@ -15,7 +15,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -59,7 +61,8 @@ type terraformOutputData struct {
 func getTerraformOutputs(t *testing.T) terraformOutputData {
 	t.Helper()
 
-	ymlData, err := ioutil.ReadFile(terraformOutputYML)
+	_, filename, _, _ := runtime.Caller(0)
+	ymlData, err := ioutil.ReadFile(path.Join(path.Dir(filename), terraformOutputYML))
 	if os.IsNotExist(err) {
 		t.Skipf("Run 'terraform apply' in %v to setup S3 and SQS for the test.", filepath.Dir(terraformOutputYML))
 	}
@@ -317,8 +320,10 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 	s3Client := s3.NewFromConfig(cfg)
 	uploader := s3manager.NewUploader(s3Client)
 
+	_, basefile, _, _ := runtime.Caller(0)
+	basedir := path.Dir(basefile)
 	for _, filename := range filenames {
-		data, err := ioutil.ReadFile(filename)
+		data, err := ioutil.ReadFile(path.Join(basedir, filename))
 		if err != nil {
 			t.Fatalf("Failed to open file %q, %v", filename, err)
 		}

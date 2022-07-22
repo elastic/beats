@@ -15,7 +15,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -57,7 +59,8 @@ type terraformOutputData struct {
 func getTerraformOutputs(t *testing.T) terraformOutputData {
 	t.Helper()
 
-	ymlData, err := ioutil.ReadFile(terraformOutputYML)
+	_, filename, _, _ := runtime.Caller(0)
+	ymlData, err := ioutil.ReadFile(path.Join(path.Dir(filename), terraformOutputYML))
 	if os.IsNotExist(err) {
 		t.Skipf("Run 'terraform apply' in %v to setup CloudWatch log groups and log streams for the test.", filepath.Dir(terraformOutputYML))
 	}
