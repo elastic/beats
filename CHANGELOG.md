@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## [Unreleased]
 
 ### Added
@@ -16,6 +17,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fix thread safety in process code #43
 
+## [0.4.4]
+
+### Fixed
+
+- Fix thread safety in process code #43
 ## [0.4.3]
 
 ## Fixed
