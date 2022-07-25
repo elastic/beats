@@ -40,6 +40,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
 - Fix race condition when reloading runners {pull}32309[32309]
+- Fix race condition when stopping runners {pull}32433[32433]
 
 *Auditbeat*
 

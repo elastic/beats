@@ -8,6 +8,7 @@
 package cloudwatch
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -17,7 +18,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -420,8 +420,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		resourceTypeFilters: resourceTypeFiltersEC2,
 	}
 
-<<<<<<< HEAD
-=======
 	expectedListMetricWithDetailEC2sRDSWithTag := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
@@ -465,7 +463,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		resourceTypeFilters: resourceTypeFiltersEC2RDSWithTag,
 	}
 
->>>>>>> e3c609ce35 ([metricbeat] fix ARN parsing in cloudwatch collector for API Gateway metrics (#32358))
 	cases := []struct {
 		title                         string
 		cloudwatchMetricsConfig       []Config
@@ -745,6 +742,59 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 			nil,
 			expectedListMetricsEC2WithDim,
+			map[string][]namespaceDetail{},
+		},
+		{
+			"Test with same namespace and tag filters but different metric names",
+			[]Config{
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: []string{"CPUUtilization"},
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: "i-1",
+						},
+					},
+					Statistic:    []string{"Average"},
+					ResourceType: "ec2:instance",
+				},
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: []string{"DiskReadBytes"},
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: "i-2",
+						},
+					},
+					Statistic:    []string{"Sum"},
+					ResourceType: "ec2:instance",
+				},
+				{
+					Namespace:  "AWS/RDS",
+					MetricName: []string{"CommitThroughput"},
+					Dimensions: []Dimension{
+						{
+							Name:  "DBClusterIdentifier",
+							Value: "test1-cluster",
+						},
+						{
+							Name:  "Role",
+							Value: "READER",
+						},
+					},
+					Statistic:    []string{"Average"},
+					ResourceType: "rds",
+				},
+			},
+			[]aws.Tag{
+				{
+					Key:   "name",
+					Value: "test",
+				},
+			},
+			expectedListMetricWithDetailEC2sRDSWithTag,
 			map[string][]namespaceDetail{},
 		},
 	}

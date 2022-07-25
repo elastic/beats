@@ -204,11 +204,16 @@ VERSION=${env.VERSION}-SNAPSHOT""")
         notifyBuildResult(prComment: true,
                           slackComment: true,
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
-                          githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS",
+                          githubIssue: isGitHubIssueEnabled(),
                           githubLabels: 'Team:Elastic-Agent-Data-Plane')
       }
     }
   }
+}
+
+// When to create a GiHub issue
+def isGitHubIssueEnabled() {
+  return isBranch() && currentBuild.currentResult != "SUCCESS" && currentBuild.currentResult != "ABORTED"
 }
 
 def runChecks() {
