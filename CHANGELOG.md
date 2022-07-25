@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Add option to `file.NewFileRotator` to allow setting file extension. #68
+
 ### Changed
 
 ### Deprecated
@@ -13,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 
 ### Fixed
+
+- Fix filename logging in `file.NewFileRotator`. #68
 
 ## [0.2.9]
 

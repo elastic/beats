@@ -18,6 +18,7 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -25,8 +26,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
-	"errors"
 )
 
 const (
@@ -55,6 +54,7 @@ type Rotator struct {
 	triggers []trigger
 
 	filename        string
+	extension       string
 	maxSizeBytes    uint
 	maxBackups      uint
 	interval        time.Duration
@@ -81,6 +81,14 @@ type RotatorOption func(r *Rotator)
 func MaxSizeBytes(n uint) RotatorOption {
 	return func(r *Rotator) {
 		r.maxSizeBytes = n
+	}
+}
+
+// Extension configures the file extension to use for the log file.
+// The default is "ndjson".
+func Extension(ext string) RotatorOption {
+	return func(r *Rotator) {
+		r.extension = ext
 	}
 }
 
@@ -142,6 +150,8 @@ func WithClock(clock clock) RotatorOption {
 // NewFileRotator returns a new Rotator.
 func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error) {
 	r := &Rotator{
+		filename:        filename,
+		extension:       "ndjson",
 		maxSizeBytes:    10 * 1024 * 1024, // 10 MiB
 		maxBackups:      7,
 		permissions:     0600,
@@ -168,7 +178,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		return nil, errors.New("the minimum time interval for log rotation is 1 second")
 	}
 
-	r.rot = newDateRotater(r.log, filename, r.clock)
+	r.rot = newDateRotater(r.log, filename, r.extension, r.clock)
 
 	shouldRotateOnStart := r.rotateOnStartup
 	if _, err := os.Stat(r.rot.ActiveFile()); os.IsNotExist(err) {
@@ -180,6 +190,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 	if r.log != nil {
 		r.log.Debugw("Initialized file rotator",
 			"filename", r.filename,
+			"extension", r.extension,
 			"max_size_bytes", r.maxSizeBytes,
 			"max_backups", r.maxBackups,
 			"permissions", r.permissions,
@@ -408,12 +419,12 @@ type dateRotator struct {
 	logOrderCache map[string]logOrder
 }
 
-func newDateRotater(log Logger, filename string, clock clock) rotater {
+func newDateRotater(log Logger, filename, extension string, clock clock) rotater {
 	d := &dateRotator{
 		log:            log,
 		clock:          clock,
 		filenamePrefix: filename + "-",
-		extension:      ".ndjson",
+		extension:      "." + extension,
 		format:         DateFormat,
 		logOrderCache:  make(map[string]logOrder),
 	}

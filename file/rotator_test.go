@@ -254,6 +254,44 @@ func TestRotate(t *testing.T) {
 	AssertDirContents(t, dir, secondFile, thirdFile)
 }
 
+func TestRotateExtension(t *testing.T) {
+	dir := t.TempDir()
+
+	const (
+		logname   = "beatname"
+		extension = "log"
+	)
+	filename := filepath.Join(dir, logname)
+
+	c := &testClock{time.Date(2021, 11, 11, 0, 0, 0, 0, time.Local)}
+	r, err := file.NewFileRotator(filename, file.Extension(extension), file.MaxBackups(1), file.WithClock(c))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+
+	WriteMsg(t, r)
+
+	firstFile := fmt.Sprintf("%s-%s."+extension, logname, c.Now().Format(file.DateFormat))
+	AssertDirContents(t, dir, firstFile)
+
+	c.time = time.Date(2021, 11, 13, 0, 0, 0, 0, time.Local)
+	secondFile := fmt.Sprintf("%s-%s."+extension, logname, c.Now().Format(file.DateFormat))
+
+	Rotate(t, r)
+	WriteMsg(t, r)
+
+	AssertDirContents(t, dir, firstFile, secondFile)
+
+	c.time = time.Date(2021, 11, 15, 0, 0, 0, 0, time.Local)
+	thirdFile := fmt.Sprintf("%s-%s."+extension, logname, c.Now().Format(file.DateFormat))
+
+	Rotate(t, r)
+	WriteMsg(t, r)
+
+	AssertDirContents(t, dir, secondFile, thirdFile)
+}
+
 func CreateFile(t *testing.T, filename string) {
 	t.Helper()
 	f, err := os.Create(filename)
