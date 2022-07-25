@@ -34,8 +34,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
 - Fix race condition when reloading runners {pull}32309[32309]
+- Fix race condition when stopping runners {pull}32433[32433]
 
 *Auditbeat*
+
+- auditd module: Fix parsing of audit rules where arguments are quoted (like file paths containing spaces). {pull}32421[32421]
+- auditd module: Fix minimum AuditStatus length so that library can support kernels from 2.6.32. {pull}32421[32421]
 
 
 *Filebeat*
@@ -53,6 +57,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32445[32445]
 
 *Packetbeat*
 
