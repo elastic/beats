@@ -23,7 +23,7 @@ import (
 	"net/http/httptest"
 	"path/filepath"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
@@ -32,18 +32,20 @@ import (
 
 func TestEventMapping(t *testing.T) {
 	content, err := ioutil.ReadFile("../_meta/test/selfstats.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	event := eventMapping(content)
 
-	assert.Equal(t, event["id"], string("8e9e05c52164694d"))
+	require.Equal(t, event["id"], string("8e9e05c52164694d"))
 }
 
 func TestFetchEventContent(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/test/")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	response, err := ioutil.ReadFile(absPath + "/selfstats.json")
+	require.NoError(t, err)
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
@@ -61,7 +63,7 @@ func TestFetchEventContent(t *testing.T) {
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-	assert.NotEmpty(t, events)
+	require.NotEmpty(t, events)
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
