@@ -432,7 +432,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 			{
 				cloudwatch.Metric{
@@ -444,7 +443,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 				[]string{"Sum"},
-				nil,
 			},
 			{
 				cloudwatch.Metric{
@@ -460,7 +458,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/RDS"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 		},
 		resourceTypeFilters: resourceTypeFiltersEC2RDSWithTag,
