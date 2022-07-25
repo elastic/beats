@@ -14,6 +14,14 @@
       type: keyword
       description: >
         Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
+    - name: task_desired_status
+      type: keyword
+      description: >
+        The desired status for the task from Amazon ECS.
+    - name: task_known_status
+      type: keyword
+      description: >
+        The known status for the task from Amazon ECS.
     - name: cpu
       type: group
       description: Runtime CPU metrics.

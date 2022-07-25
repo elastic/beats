@@ -243,6 +243,34 @@ processors:
       field: event.category
       value: intrusion_detection
       if: "['Detect', 'Prevent'].contains(ctx.checkpoint?.rule_action)"
+  - set:
+      field: event.outcome
+      value: success
+      if: ctx.checkpoint?.action == 'Log In'
+  - set:
+      field: event.outcome
+      value: failure
+      if: ctx.checkpoint?.action == 'Failed Log In'
+  - append:
+      field: event.category
+      value: authentication
+      if: "['Log In', 'Failed Log In'].contains(ctx.checkpoint?.action)"
+  - append:
+      field: event.type
+      value: allowed
+      if: ctx.checkpoint?.action == 'Log In'
+  - set:
+      field: checkpoint.action
+      value: logged-in
+      if: ctx.checkpoint?.action == 'Log In'
+  - append:
+      field: event.type
+      value: denied
+      if: ctx.checkpoint?.action == 'Failed Log In'
+  - set:
+      field: checkpoint.action
+      value: logon-failed
+      if: ctx.checkpoint?.action == 'Failed Log In'
   - append:
       field: related.ip
       value: "{{source.ip}}"
@@ -480,6 +508,18 @@ processors:
   - rename:
       field: checkpoint.origin
       target_field: observer.name
+      ignore_missing: true
+  - rename:
+      field: checkpoint.mac_address
+      target_field: observer.mac
+      ignore_missing: true
+  - gsub:
+      field: observer.mac
+      ignore_missing: true
+      pattern: '[:]'
+      replacement: '-'
+  - uppercase:
+      field: observer.mac
       ignore_missing: true
   - rename:
       field: checkpoint.origin_ip

@@ -32,7 +32,7 @@ func newOpUploadToBucket(
 ) *opUploadToBucket {
 	return &opUploadToBucket{
 		log:        log,
-		svc:        s3.New(config),
+		svc:        s3.NewFromConfig(config),
 		bucketName: bucketName,
 		path:       path,
 		raw:        raw,
@@ -47,8 +47,7 @@ func (o *opUploadToBucket) Execute(_ executor.Context) error {
 		Body:   bytes.NewReader(o.raw),
 		Key:    aws.String(o.path),
 	}
-	req := o.svc.PutObjectRequest(input)
-	resp, err := req.Send(context.TODO())
+	resp, err := o.svc.PutObject(context.TODO(), input)
 
 	if err != nil {
 		o.log.Debugf("Could not upload object to S3, resp: %v", resp)

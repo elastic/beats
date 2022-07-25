@@ -43,8 +43,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
 - Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
 - Fix race condition when reloading runners {pull}32309[32309]
+- Fix race condition when stopping runners {pull}32433[32433]
 
 *Auditbeat*
+
+- auditd module: Fix parsing of audit rules where arguments are quoted (like file paths containing spaces). {pull}32421[32421]
+- auditd module: Fix minimum AuditStatus length so that library can support kernels from 2.6.32. {pull}32421[32421]
 
 
 *Filebeat*
@@ -59,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
 - Reduced memory usage slightly for browser monitors. {pull}32317[32317]
+- Automatically kill zombie-ish node processes. {pull}32393[32393]
 
 *Metricbeat*
 
@@ -66,6 +71,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Check for nil metadata in GCP. {pull}32281[32281]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 - update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
+- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
 
 *Packetbeat*
 
@@ -109,6 +115,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
 - Add references for CRI-O configuration in input-container and in our kubernetes manifests {issue}32149[32149] {pull}32151[32151]
 - httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
+- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
+- Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
+- add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
 
 *Auditbeat*
 
@@ -129,10 +138,13 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
 - Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
 * Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
+- AWS Fargate: Added support for DesiredStatus and KnownStatus {issue}32077[32077] {pull}32342[#32342]
+- Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}32394[32394]
 
 *Packetbeat*
 
 - Add support for specifying default route interface sniffing. {issue}31905[31905] {pull}31950[31950]
+- Add support for TCP transport to the SIP protocol. {issue}28166[28166] {pull}32346[32346]
 
 *Functionbeat*
 
