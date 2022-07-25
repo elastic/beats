@@ -21,6 +21,11 @@
 package process_summary
 
 import (
+	"fmt"
+	"io/ioutil"
+	"strconv"
+	"strings"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
@@ -89,4 +94,28 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	})
 
 	return nil
+}
+
+func threadStats(sys resolve.Resolver) (mapstr.M, error) {
+	statPath := sys.ResolveHostFS("/proc/stat")
+	procData, err := ioutil.ReadFile(statPath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading procfs file %s: %w", statPath, err)
+	}
+
+	threadData := mapstr.M{}
+	for _, line := range strings.Split(string(procData), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+		if strings.Contains(fields[0], "procs_") {
+			procsInt, err := strconv.ParseInt(fields[1], 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("Error parsing value %s from %s: %w", fields[0], statPath, err)
+			}
+			threadData[fields[0]] = procsInt
+		}
+	}
+	return threadData, nil
 }

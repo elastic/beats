@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestData(t *testing.T) {
@@ -95,6 +96,13 @@ func TestStateNames(t *testing.T) {
 	}
 	assert.Equal(t, total, sum)
 
+}
+
+func TestThreads(t *testing.T) {
+	root := resolve.NewTestResolver("/")
+	stats, err := threadStats(root)
+	require.NoError(t, err)
+	t.Logf("metrics: %#v", stats)
 }
 
 func getConfig() map[string]interface{} {
