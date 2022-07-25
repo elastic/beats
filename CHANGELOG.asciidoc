@@ -12,7 +12,7 @@ https://github.com/elastic/beats/compare/v8.3.2\...v8.3.3[View commits]
 *Affecting all Beats*
 
 - Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
-- Fix race condition when reloading running inputs {pull}32309[32309]
+- Fix race condition when reloading running inputs. {pull}32309[32309]
 
 *Filebeat*
 
