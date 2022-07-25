@@ -9,13 +9,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/helpers/transpiler"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	ucfg "github.com/elastic/go-ucfg"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
 // BeatInput represents the "root" of a single input config
@@ -223,7 +222,7 @@ func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 			unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
 		}
 		unit.UpdateState(client.UnitStateHealthy, "reloaded component", nil)
-	} else if unitType == client.UnitTypeOutput {
+	} else if unitType == client.UnitTypeInput {
 
 		// Find the V2 inputs we need to reload
 		// I'm not 100% sure that we'll "get" a unit that is specific to the beat we're currently running,
@@ -236,14 +235,14 @@ func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 			unit.UpdateState(client.UnitStateFailed, "failed to find beat reloadable type 'input'", nil)
 			return
 		}
-		conv := ucfg.Config(*reloadConfig.Config)
-		_, err := transpiler.NewASTFromConfig(&conv)
+		var unitCfg UnitsConfig
+		_, unitRaw := unit.Expected()
+		err := yaml.Unmarshal([]byte(unitRaw), &unitCfg)
 		if err != nil {
-			errString := fmt.Errorf("Failed to create AST from config: %w", err)
+			errString := fmt.Errorf("Failed to create Unit config: %w", err)
 			unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
 		}
-
-		// Here: take the incoming config, use the same AST logic the agent was using to transform it
+		beatCfg, err := generateBeatConfig(unitCfg)
 
 	}
 }
@@ -257,7 +256,7 @@ func (cm *BeatV2Manager) handleUnitUpdated(unit *client.Unit) {
 // createConfigForReloader is a little helper that takes the raw config from the unit
 // and converts it to the weird config type used by the reloaders
 func createConfigForReloader(unit *client.Unit) (*reload.ConfigWithMeta, error) {
-	_, unitRaw := unit.Expected()
+
 	uconfig, err := conf.NewConfigFrom(unitRaw)
 	if err != nil {
 		return nil, err
