@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"runtime"
-	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/job"
@@ -88,8 +87,9 @@ func (w *worker) Stop() {
 	w.quit <- true
 }
 
-func fetchJobID(jobCounter int, containerName string, blobName string) string {
-	jobID := fmt.Sprintf("%s-%s-%d", strings.ToUpper(containerName), strings.ToUpper(blobName), jobCounter)
+// fetchJobID returns a job id which is a combination of worker id, container name and blob name
+func fetchJobID(workerId int, containerName string, blobName string) string {
+	jobID := fmt.Sprintf("%s-%s-worker-%d", containerName, blobName, workerId)
 
 	return jobID
 }

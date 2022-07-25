@@ -16,7 +16,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// fetchServiceClientAndCreds , generic function that returns a ServiceClient instance and a ServiceCredentials instance
 func fetchServiceClientAndCreds(cfg config, url string, log *logp.Logger) (*azblob.ServiceClient, *types.ServiceCredentials, error) {
 	if cfg.Auth.SharedCredentials != nil {
 		return fetchServiceClientWithSharedKeyCreds(url, cfg.AccountName, cfg.Auth.SharedCredentials, log)
@@ -27,20 +26,20 @@ func fetchServiceClientAndCreds(cfg config, url string, log *logp.Logger) (*azbl
 	return nil, nil, fmt.Errorf("no valid auth specified")
 }
 
-func fetchServiceClientWithSharedKeyCreds(url string, accountName string, sharedKeycfg *sharedKeyConfig, log *logp.Logger) (*azblob.ServiceClient, *types.ServiceCredentials, error) {
+func fetchServiceClientWithSharedKeyCreds(url string, accountName string, cfg *sharedKeyConfig, log *logp.Logger) (*azblob.ServiceClient, *types.ServiceCredentials, error) {
 	// Creates a default request pipeline using your storage account name and account key.
-	credential, err := azblob.NewSharedKeyCredential(accountName, sharedKeycfg.AccountKey)
+	credential, err := azblob.NewSharedKeyCredential(accountName, cfg.AccountKey)
 	if err != nil {
 		log.Errorf("Invalid credentials with error: %v", err)
 		return nil, nil, err
 	}
 
-	serviceClient, err := azblob.NewServiceClientWithSharedKey(url, credential, nil)
+	client, err := azblob.NewServiceClientWithSharedKey(url, credential, nil)
 	if err != nil {
 		log.Errorf("Invalid credentials with error: %v", err)
 		return nil, nil, err
 	}
-	return serviceClient, &types.ServiceCredentials{SharedKeyCreds: credential, Ctype: types.SharedKeyType}, nil
+	return client, &types.ServiceCredentials{SharedKeyCreds: credential, Ctype: types.SharedKeyType}, nil
 }
 
 func fetchServiceClientWithConnectionString(connectionString *connectionStringConfig, log *logp.Logger) (*azblob.ServiceClient, *types.ServiceCredentials, error) {
@@ -91,7 +90,6 @@ func fetchBlobClientWithConnectionString(connectionString string, containerName 
 }
 
 func fetchContainerClient(serviceClient *azblob.ServiceClient, containerName string, log *logp.Logger) (*azblob.ContainerClient, error) {
-
 	containerClient, err := serviceClient.NewContainerClient(containerName)
 	if err != nil {
 		log.Errorf("Error fetching container client for container : %s, error : %v", containerName, err)

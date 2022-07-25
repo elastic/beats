@@ -9,7 +9,6 @@ package azureblobstorage
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
@@ -41,8 +40,8 @@ type azureInputScheduler struct {
 // NewAzureInputScheduler , returns a new scheduler instance
 func NewAzureInputScheduler(publisher cursor.Publisher, client *azblob.ContainerClient,
 	credential *types.ServiceCredentials, src *types.Source, cfg *config,
-	state *state.State, serviceURL string, log *logp.Logger) scheduler {
-
+	state *state.State, serviceURL string, log *logp.Logger,
+) scheduler {
 	return &azureInputScheduler{
 		publisher:  publisher,
 		client:     client,
@@ -88,13 +87,11 @@ func (ais *azureInputScheduler) Schedule(ctx context.Context) error {
 			return err
 		}
 	}
-
 }
 
 func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager, workerPool pool.Pool) error {
 	for pager.NextPage(ctx) {
 		jobs, err := ais.createJobs(pager)
-
 		if err != nil {
 			ais.log.Errorf("Job creation failed for container %s with error %v", ais.src.ContainerName, err)
 			return err
@@ -118,7 +115,7 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 	pageMarker := pager.PageResponse().Marker
 
 	for _, v := range pager.PageResponse().Segment.BlobItems {
-		blobURL := fmt.Sprintf("%s%s/%s", ais.serviceURL, ais.src.ContainerName, *v.Name)
+		blobURL := ais.serviceURL + ais.src.ContainerName + "/" + *v.Name
 		blobCreds := &types.BlobCredentials{
 			ServiceCreds:  ais.credential,
 			BlobName:      *v.Name,
@@ -130,7 +127,7 @@ func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPa
 			return nil, err
 		}
 
-		job := job.NewAzureInputJob(blobClient, v, pageMarker, ais.state, ais.src, ais.publisher)
+		job := job.NewAzureInputJob(blobClient, v, blobURL, pageMarker, ais.state, ais.src, ais.publisher)
 		jobs = append(jobs, job)
 	}
 

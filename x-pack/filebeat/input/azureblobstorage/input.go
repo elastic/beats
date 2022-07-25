@@ -10,6 +10,7 @@ package azureblobstorage
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -27,7 +28,7 @@ type azurebsInput struct {
 }
 
 const (
-	inputName string = "azureblobstorage"
+	inputName string = "azure-blob-storage"
 )
 
 func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
@@ -64,15 +65,22 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		})
 	}
 
-	url := fmt.Sprintf("https://%s.blob.core.windows.net/", config.AccountName)
-	return sources, &azurebsInput{config: config, serviceURL: url}, nil
+	var urL string
+	if len(config.StorageURL) != 0 {
+		if _, err := url.ParseRequestURI(config.StorageURL); err != nil {
+			return nil, nil, fmt.Errorf("error parsing url : %w", err)
+		}
+		urL = config.StorageURL
+	} else {
+		urL = "https://" + config.AccountName + ".blob.core.windows.net/"
+	}
+	return sources, &azurebsInput{config: config, serviceURL: urL}, nil
 }
 
 // tryOverrideOrDefault , overrides global values with local
 // container level values present. If both global & local values
 // are absent , assigns default values
 func tryOverrideOrDefault(cfg config, c container) container {
-
 	if c.MaxWorkers == nil && cfg.MaxWorkers != nil {
 		c.MaxWorkers = cfg.MaxWorkers
 	} else if c.MaxWorkers == nil && cfg.MaxWorkers == nil {
@@ -129,7 +137,6 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 		case <-ctx.Done():
 		}
 	}()
-	defer cancelInputCtx()
 
 	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
 	if err != nil {

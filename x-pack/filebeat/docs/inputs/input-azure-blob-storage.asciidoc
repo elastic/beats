@@ -36,7 +36,7 @@ NOTE: Currently only `JSON` is supported with respect to blob/file formats. As f
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
-- type: azureblobstorage
+- type: azure-blob-storage
   id: my-azureblobstorage-id
   enabled: true
   account_name: some_account
@@ -77,23 +77,69 @@ processing a certain number of files , decided by the `maximum available workers
 ["source","json"]
 ----
  {
-  "message": {
-    "blobName": "ata.json",
-    "content_type": "application/json",
-    "containerName": "container_1",
-    "data": "{\n\"id\": 1,\n\"title\": \"iPhone 9\",\n\"description\": \"An apple mobile which is nothing like apple\",\n\"price\": 549,\n\"discountPercentage\": 12.96,\n\"rating\": 4.69,\n\"stock\": 94,\n\"brand\": \"Apple\",\n\"category\": \"smartphones\",\n\"thumbnail\": \"https://dummyjson.com/image/i/products/1/thumbnail.jpg\",\n\"images\": [\n\"https://dummyjson.com/image/i/products/1/1.jpg\",\n\"https://dummyjson.com/image/i/products/1/2.jpg\",\n\"https://dummyjson.com/image/i/products/1/3.jpg\",\n\"https://dummyjson.com/image/i/products/1/4.jpg\",\n\"https://dummyjson.com/image/i/products/1/thumbnail.jpg\"\n]\n}\n"
-  }
+    "@timestamp": "2022-07-25T07:00:18.544Z",
+    "@metadata": {
+        "beat": "filebeat",
+        "type": "_doc",
+        "version": "8.4.0",
+        "_id": "beatscontainer-data_3.json-worker-1"
+    },
+    "message": "{\n    \"id\": 3,\n    \"title\": \"Samsung Universe 9\",\n    \"description\": \"Samsung's new variant which goes beyond Galaxy to the Universe\",\n    \"price\": 1249,\n    \"discountPercentage\": 15.46,\n    \"rating\": 4.09,\n    \"stock\": 36,\n    \"brand\": \"Samsung\",\n    \"category\": \"smartphones\",\n    \"thumbnail\": \"https://dummyjson.com/image/i/products/3/thumbnail.jpg\",\n    \"images\": [\n        \"https://dummyjson.com/image/i/products/3/1.jpg\"\n    ]\n}",
+    "cloud": {
+        "provider": "azure"
+    },
+    "input": {
+        "type": "azure-blob-storage"
+    },
+    "log": {
+        "file": {
+            "path": "https://beatsblobstorage1.blob.core.windows.net/beatscontainer/data_3.json"
+        }
+    },
+    "azure": {
+        "blob": {
+            "container": {
+                "name": "beatscontainer"
+            },
+            "object": {
+                "content_type": "application/json",
+                "data": [
+                    {
+                        "description": "Samsung's new variant which goes beyond Galaxy to the Universe",
+                        "price": 1249,
+                        "thumbnail": "https://dummyjson.com/image/i/products/3/thumbnail.jpg",
+                        "discountPercentage": 15.46,
+                        "brand": "Samsung",
+                        "title": "Samsung Universe 9",
+                        "id": 3,
+                        "images": [
+                            "https://dummyjson.com/image/i/products/3/1.jpg"
+                        ],
+                        "stock": 36,
+                        "category": "smartphones",
+                        "rating": 4.09
+                    }
+                ],
+                "name": "data_3.json"
+            }
+        }
+    },
+    "event": {
+        "kind": "publish_data"
+    }
 }
 ----
 
-As we can see from the response above, the `message` field contains information regarding the contents of the file/blob that has been read. 
+As we can see from the response above, the `message` field contains the original stringified data while the `azure.blob.object.data` contains the objectified data. 
     
-*It has the following properties :-* 
+*Some of the key attributes are as follows :-* 
 
-    1. *blobName* : Name of the file/blob which has been read.
-    2. *content_type* : Content type of the file/blob. You can find the supported content types <<supported-types,here>> .
-    3. *containerName* : Name of the container from which the file has been read.
-    4. *data* : Stringified `JSON` data , representing the contents of the file.
+    1. *message* : Original stringified blob data.
+    2. *log.file.path* : Path of the blob in azure cloud.
+    3. *azure.blob.container.name* : Name of the container from which the file has been read.
+    4. *azure.blob.object.name* : Name of the file/blob which has been read.
+    5. *azure.blob.object.content_type* : Content type of the file/blob. You can find the supported content types <<supported-types,here>> .
+    6. *azure.blob.object.data* :  Objectified blob data , representing the contents of the file.
 
 Now let's explore the configuration attributes a bit more elaborately.
 
@@ -103,11 +149,12 @@ Now let's explore the configuration attributes a bit more elaborately.
     1. <<attrib-account-name,account_name>>
     2. <<attrib-auth-shared-account-key,auth.shared_credentials.account_key>>
     3. <<attrib-auth-connection-string,auth.connection_string.uri>>
-    4. <<attrib-containers,containers>>
-    5. <<attrib-container-name,name>>
-    6. <<attrib-max_workers,max_workers>>
-    7. <<attrib-poll,poll>>
-    8. <<attrib-poll_interval,poll_interval>>
+    4. <<attrib-storage-url,storage_url>>
+    5. <<attrib-containers,containers>>
+    6. <<attrib-container-name,name>>
+    7. <<attrib-max_workers,max_workers>>
+    8. <<attrib-poll,poll>>
+    9. <<attrib-poll_interval,poll_interval>>
 
 
 [id="attrib-account-name"]
@@ -134,6 +181,14 @@ can contain multiple containers , and they will all use this common connection s
 NOTE: We require only either of `auth.shared_credentials.account_key` or `auth.connection_string.uri` to be specified for authentication purposes. If both attributes are
 specified, then the one that occurs first in the configuration will be used.
 
+[id="attrib-storage-url"]
+[float]
+==== `storage_url`
+
+Use this attribute to specify a custom storage URL if required. By default it points to azure cloud storage. Only use this if there is a specific need to connect to a 
+different environment where blob storage is available. 
+
+*URL format :* `{{protocol}}://{{account_name}}.{{storage_uri}}`. This attribute resides at the root level of the config and not inside any container block.
 
 [id="attrib-containers"]
 [float]
@@ -187,7 +242,7 @@ Here `container_1` is using root level attributes while `container_2` overrides 
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
-- type: azureblobstorage
+- type: azure-blob-storage
   id: my-azureblobstorage-id
   enabled: true
   account_name: some_account
@@ -215,7 +270,7 @@ Here both `container_1` and `container_2` overrides the root values :
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
-  - type: azureblobstorage
+  - type: azure-blob-storage
     id: my-azureblobstorage-id
     enabled: true
     account_name: some_account

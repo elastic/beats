@@ -34,13 +34,10 @@ type pool struct {
 	log           *logp.Logger
 }
 
-var (
-	poolError string = "worker pool error : %w"
-)
+var poolError string = "worker pool error : %w"
 
 // NewWorkerPool returns an instance of a worker pool with 'maxWorkers' ready to accept work
 func NewWorkerPool(ctx context.Context, maxWorkers int, log *logp.Logger) Pool {
-
 	workersWg := sync.WaitGroup{}
 
 	readyPool := make(chan chan job.Job, maxWorkers)

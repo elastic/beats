@@ -16,6 +16,7 @@ import (
 // Container level configurations will always override global level values.
 type config struct {
 	AccountName  string         `config:"account_name" validate:"required"`
+	StorageURL   string         `config:"storage_url,omitempty"`
 	Auth         authConfig     `config:"auth" validate:"required"`
 	MaxWorkers   *int           `config:"max_workers,omitempty" validate:"max=5000"`
 	Poll         *bool          `config:"poll,omitempty"`
