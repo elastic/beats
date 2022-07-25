@@ -82,6 +82,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"schedule": "@every 5s",
 				"type":     "icmp",
+				"hosts":    []interface{}{},
 			},
 		},
 		{
