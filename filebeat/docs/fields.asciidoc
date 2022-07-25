@@ -16863,6 +16863,16 @@ type: integer
 
 --
 
+*`checkpoint.identity_src`*::
++
+--
+The source for authentication identity information.
+
+
+type: keyword
+
+--
+
 *`checkpoint.information`*::
 +
 --
@@ -17437,6 +17447,16 @@ type: keyword
 +
 --
 Risk level we got from the engine.
+
+
+type: keyword
+
+--
+
+*`checkpoint.roles`*::
++
+--
+The role of identity.
 
 
 type: keyword
@@ -19883,6 +19903,16 @@ type: keyword
 
 --
 
+*`checkpoint.snid`*::
++
+--
+The Check Point session ID.
+
+
+type: keyword
+
+--
+
 *`checkpoint.source_object`*::
 +
 --
@@ -20407,6 +20437,16 @@ type: keyword
 +
 --
 Password authentication protocol used (PAP or EAP).
+
+
+type: keyword
+
+--
+
+*`checkpoint.auth_status`*::
++
+--
+The authentication status for an event.
 
 
 type: keyword

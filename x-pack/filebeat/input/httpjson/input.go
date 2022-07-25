@@ -112,7 +112,11 @@ func run(
 		return err
 	}
 
-	requestFactory := newRequestFactory(config, log)
+	requestFactory, err := newRequestFactory(stdCtx, config, log)
+	if err != nil {
+		log.Errorf("Error while creating requestFactory: %v", err)
+		return err
+	}
 	pagination := newPagination(config, httpClient, log)
 	responseProcessor := newResponseProcessor(config, pagination, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)

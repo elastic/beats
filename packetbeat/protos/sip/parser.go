@@ -26,19 +26,16 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
-// Http Message
+// sip Message
 type message struct {
 	ts               time.Time
 	hasContentLength bool
 	headerOffset     int
 
-	isRequest    bool
-	ipPortTuple  common.IPPortTuple
-	cmdlineTuple *common.ProcessTuple
+	isRequest bool
 
 	// Info
 	requestURI   common.NetString
@@ -56,6 +53,7 @@ type message struct {
 	cseq          common.NetString
 	callID        common.NetString
 	maxForwards   int
+	viaDedup      map[string]struct{}
 	via           []common.NetString
 	allow         []string
 	supported     []string
@@ -86,12 +84,8 @@ const (
 	stateBody
 )
 
-type parser struct {
-	watcher procs.ProcessesWatcher
-}
-
 type parsingInfo struct {
-	tuple *common.IPPortTuple
+	pkt *protos.Packet
 
 	data []byte
 
@@ -99,7 +93,21 @@ type parsingInfo struct {
 	state        parserState
 	bodyReceived int
 
-	pkt *protos.Packet
+	message *message
+}
+
+func (pi *parsingInfo) prepareForNewMessage() {
+	pi.state = stateStart
+	pi.parseOffset = 0
+	pi.bodyReceived = 0
+	pi.message = nil
+}
+
+func newParsingInfo(pkt *protos.Packet, tuple common.BaseTuple) *parsingInfo {
+	return &parsingInfo{
+		pkt:  pkt,
+		data: pkt.Payload,
+	}
 }
 
 var (
@@ -118,43 +126,32 @@ var (
 	nameVia           = []byte("via")
 )
 
-func newParser(watcher procs.ProcessesWatcher) *parser {
-	return &parser{
-		watcher: watcher,
-	}
-}
-
-func (parser *parser) parse(pi *parsingInfo) (*message, error) {
-	m := &message{
-		ts:           pi.pkt.Ts,
-		ipPortTuple:  pi.pkt.Tuple,
-		cmdlineTuple: parser.watcher.FindProcessesTupleTCP(&pi.pkt.Tuple),
-		rawData:      pi.data,
-	}
+func parse(pi *parsingInfo) (ok, complete bool) {
+	m := pi.message
 	for pi.parseOffset < len(pi.data) {
 		switch pi.state {
 		case stateStart:
-			if err := parser.parseSIPLine(pi, m); err != nil {
-				return m, err
+			if ok, cont, complete := parseSIPLine(pi, m); !cont {
+				return ok, complete
 			}
 		case stateHeaders:
-			if err := parser.parseHeaders(pi, m); err != nil {
-				return m, err
+			if ok, cont, complete := parseHeaders(pi, m); !cont {
+				return ok, complete
 			}
 		case stateBody:
-			parser.parseBody(pi, m)
+			return parseBody(pi, m)
 		}
 	}
-	return m, nil
+	return true, false
 }
 
-func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
+func parseSIPLine(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 	// ignore any CRLF appearing before the start-line (RFC3261 7.5)
 	pi.data = bytes.TrimLeft(pi.data[pi.parseOffset:], string(constCRLF))
 
 	i := bytes.Index(pi.data[pi.parseOffset:], constCRLF)
 	if i == -1 {
-		return errors.New("not found expected CRLF")
+		return true, false, false
 	}
 
 	// Very basic tests on the first line. Just to check that
@@ -170,7 +167,7 @@ func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
 		if isDebug {
 			debugf("First line too small")
 		}
-		return errors.New("first line too small")
+		return false, false, false
 	}
 
 	m.firstLine = fline
@@ -184,7 +181,7 @@ func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
 			if isDebug {
 				debugf("Failed to understand SIP response status: %s", fline[8:])
 			}
-			return errors.New("failed to parse response status")
+			return false, false, false
 		}
 
 		if isDebug {
@@ -200,7 +197,7 @@ func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
 			if isDebug {
 				debugf("Couldn't understand SIP request: %s", fline)
 			}
-			return errors.New("failed to parse SIP request")
+			return false, false, false
 		}
 
 		m.method = common.NetString(fline[:afterMethodIdx])
@@ -214,7 +211,7 @@ func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
 			if isDebug {
 				debugf("Couldn't understand SIP version: %s", fline)
 			}
-			return errors.New("failed to parse SIP version")
+			return false, false, false
 		}
 	}
 
@@ -223,7 +220,7 @@ func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
 		if isDebug {
 			debugf(err.Error(), version)
 		}
-		return err
+		return false, false, false
 	}
 	if isDebug {
 		debugf("SIP version %d.%d", m.version.major, m.version.minor)
@@ -234,7 +231,7 @@ func (*parser) parseSIPLine(pi *parsingInfo, m *message) error {
 	m.headerOffset = pi.parseOffset
 	pi.state = stateHeaders
 
-	return nil
+	return true, true, true
 }
 
 func parseResponseStatus(s []byte) (uint16, []byte, error) {
@@ -264,20 +261,24 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 	major := s[0] - '0'
 	minor := s[2] - '0'
 
-	return uint8(major), uint8(minor), nil
+	return major, minor, nil
 }
 
-func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
+func parseHeaders(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 	// check if it isn't headers end yet with /r/n/r/n
 	if len(pi.data)-pi.parseOffset < 2 || !bytes.Equal(pi.data[pi.parseOffset:pi.parseOffset+2], constCRLF) {
-		offset, err := parser.parseHeader(m, pi.data[pi.parseOffset:])
-		if err != nil {
-			return err
+		ok, hcomplete, offset := parseHeader(pi, m)
+		if !ok {
+			return false, false, false
+		}
+
+		if !hcomplete {
+			return true, false, false
 		}
 
 		pi.parseOffset += offset
 
-		return nil
+		return true, true, true
 	}
 
 	m.size = uint64(pi.parseOffset + 2)
@@ -289,7 +290,7 @@ func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
 		if isDebug {
 			debugf("Empty content length, ignore body")
 		}
-		return nil
+		return true, false, true
 	}
 
 	if isDebug {
@@ -298,21 +299,20 @@ func (parser *parser) parseHeaders(pi *parsingInfo, m *message) error {
 
 	pi.state = stateBody
 
-	return nil
+	return true, true, true
 }
 
-func (parser *parser) parseHeader(m *message, data []byte) (int, error) {
+func parseHeader(pi *parsingInfo, m *message) (ok, complete bool, offset int) {
 	if m.headers == nil {
 		m.headers = make(map[string][]common.NetString)
 	}
 
+	data := pi.data[pi.parseOffset:]
+
 	i := bytes.Index(data, []byte(":"))
 	if i == -1 {
 		// Expected \":\" in headers. Assuming incomplete
-		if isDebug {
-			debugf("ignoring incomplete header %s", data)
-		}
-		return len(data), nil
+		return true, false, 0
 	}
 
 	// enabled if required. Allocs for parameters slow down parser big times
@@ -325,10 +325,8 @@ func (parser *parser) parseHeader(m *message, data []byte) (int, error) {
 	for p := i + 1; p < len(data); {
 		q := bytes.Index(data[p:], constCRLF)
 		if q == -1 {
-			if isDebug {
-				debugf("ignoring incomplete header %s", data)
-			}
-			return len(data), nil
+			// assuming incomplete
+			return true, false, 0
 		}
 
 		p += q
@@ -368,7 +366,13 @@ func (parser *parser) parseHeader(m *message, data []byte) (int, error) {
 		case bytes.Equal(headerName, nameSupported):
 			m.supported = parseCommaSeparatedList(headerVal)
 		case bytes.Equal(headerName, nameVia):
-			m.via = append(m.via, headerVal)
+			if m.viaDedup == nil {
+				m.viaDedup = map[string]struct{}{}
+			}
+			if _, found := m.viaDedup[string(headerVal)]; !found {
+				m.via = append(m.via, headerVal)
+				m.viaDedup[string(headerVal)] = struct{}{}
+			}
 		}
 
 		m.headers[string(headerName)] = append(
@@ -376,10 +380,10 @@ func (parser *parser) parseHeader(m *message, data []byte) (int, error) {
 			headerVal,
 		)
 
-		return p + 2, nil
+		return true, true, p + 2
 	}
 
-	return len(data), nil
+	return true, false, len(data)
 }
 
 func parseCommaSeparatedList(s common.NetString) (list []string) {
@@ -391,7 +395,7 @@ func parseCommaSeparatedList(s common.NetString) (list []string) {
 	return list
 }
 
-func (*parser) parseBody(pi *parsingInfo, m *message) {
+func parseBody(pi *parsingInfo, m *message) (ok, complete bool) {
 	nbytes := len(pi.data)
 	if nbytes >= m.contentLength-pi.bodyReceived {
 		wanted := m.contentLength - pi.bodyReceived
@@ -399,21 +403,16 @@ func (*parser) parseBody(pi *parsingInfo, m *message) {
 		pi.bodyReceived = m.contentLength
 		m.size += uint64(wanted)
 		pi.data = pi.data[wanted:]
-	} else {
-		m.body = append(m.body, pi.data...)
-		pi.data = nil
-		pi.bodyReceived += nbytes
-		m.size += uint64(nbytes)
-		if isDebug {
-			debugf("bodyReceived: %d", pi.bodyReceived)
-		}
+		return true, true
 	}
-}
-
-func (m *message) getEndpoints() (src *common.Endpoint, dst *common.Endpoint) {
-	source, destination := common.MakeEndpointPair(m.ipPortTuple.BaseTuple, m.cmdlineTuple)
-	src, dst = &source, &destination
-	return src, dst
+	m.body = append(m.body, pi.data...)
+	pi.data = nil
+	pi.bodyReceived += nbytes
+	m.size += uint64(nbytes)
+	if isDebug {
+		debugf("bodyReceived: %d", pi.bodyReceived)
+	}
+	return true, false
 }
 
 func parseInt(line []byte) (int, error) {

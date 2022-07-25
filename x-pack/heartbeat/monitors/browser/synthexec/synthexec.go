@@ -8,12 +8,14 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -32,6 +34,12 @@ type FilterJourneyConfig struct {
 	Tags  []string `config:"tags"`
 	Match string   `config:"match"`
 }
+
+// platformCmdMutate is the hook for OS specific mutation of cmds
+// This is practically just used by synthexec_unix.go to add Sysprocattrs
+// It's still nice for devs to be able to test browser monitors on OSX
+// where these are unsupported
+var platformCmdMutate func(*exec.Cmd) = func(*exec.Cmd) {}
 
 // ProjectJob will run a single journey by name from the given project.
 func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
@@ -111,6 +119,9 @@ func runCmd(
 	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
+	// Attach sysproc attrs to ensure subprocesses are properly killed
+	platformCmdMutate(cmd)
+
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
@@ -165,6 +176,7 @@ func runCmd(
 		if err != nil {
 			logp.Warn("could not scan stdout events from synthetics: %s", err)
 		}
+
 		wg.Done()
 	}()
 
@@ -184,13 +196,46 @@ func runCmd(
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		err := scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
-		if err != nil {
-			logp.Warn("could not scan JSON events from synthetics: %s", err)
+		defer jsonReader.Close()
+
+		// We don't use scanToSynthEvents here because all lines here will be JSON
+		// It's more efficient to let the json decoder handle the ndjson than
+		// using the scanner
+		decoder := json.NewDecoder(jsonReader)
+		for {
+			var se SynthEvent
+			err := decoder.Decode(&se)
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if err != nil {
+				logp.L().Warn("error decoding json for test json results: %w", err)
+			}
+
+			mpx.writeSynthEvent(&se)
 		}
+
 		wg.Done()
 	}()
-	err = cmd.Start()
+
+	// This use of channels for results is awkward, but required for the thread locking below
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err = cmd.Start()
+
+		cmdStarted <- err
+
+		err := cmd.Wait()
+		cmdDone <- err
+	}()
+
+	err = <-cmdStarted
 	if err != nil {
 		logp.Warn("Could not start command %s: %s", cmd, err)
 		return nil, err
@@ -207,9 +252,8 @@ func runCmd(
 
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
-		err := cmd.Wait()
+		err := <-cmdDone
 		jsonWriter.Close()
-		jsonReader.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 
 		var cmdError *SynthError = nil
@@ -234,9 +278,10 @@ func runCmd(
 // scanToSynthEvents takes a reader, a transform function, and a callback, and processes
 // each scanned line via the reader before invoking it with the callback.
 func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) (*SynthEvent, error), cb func(*SynthEvent)) error {
+	defer rdr.Close()
 	scanner := bufio.NewScanner(rdr)
-	buf := make([]byte, 1024*1024*2)  // 2MiB initial buffer (images can be big!)
-	scanner.Buffer(buf, 1024*1024*40) // Max 50MiB Buffer
+	buf := make([]byte, 1024*10)      // 10KiB initial buffer
+	scanner.Buffer(buf, 1024*1024*10) // Max 10MiB Buffer
 
 	for scanner.Scan() {
 		se, err := transform(scanner.Bytes(), scanner.Text())

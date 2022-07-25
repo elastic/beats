@@ -19,7 +19,6 @@ x-pack/functionbeat/pkg
 *.generated.yml
 coverage.out
 docker.env
-.python-version
 beat.db
 *.keystore
 go_env.properties
