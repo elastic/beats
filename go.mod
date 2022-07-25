@@ -204,7 +204,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.2.1
 	github.com/elastic/elastic-agent-libs v0.2.9
 	github.com/elastic/elastic-agent-shipper-client v0.2.0
-	github.com/elastic/elastic-agent-system-metrics v0.4.4 // do not upgrade until https://github.com/elastic/beats/issues/32467 is fixed
+	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/pierrec/lz4/v4 v4.1.15
 	github.com/shirou/gopsutil/v3 v3.21.12
