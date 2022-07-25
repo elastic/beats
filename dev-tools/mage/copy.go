@@ -33,6 +33,16 @@ func Copy(src, dest string) error {
 	return copy.Execute()
 }
 
+// Copy copies a file and preserves the permissions.
+func CopyFile(src, dest string) error {
+	copy := &CopyTask{Source: src, Dest: dest}
+	info, err := os.Stat(src)
+	if err != nil {
+		return errors.Wrapf(err, "copy failed: cannot stat source file %v", src)
+	}
+	return copy.fileCopy(src, dest, info)
+}
+
 // CopyTask copies a file or directory (recursively) and preserves the permissions.
 type CopyTask struct {
 	Source   string           // Source directory or file.
