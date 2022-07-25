@@ -358,15 +358,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			}
 
 			if config.ResourceType != "" {
-<<<<<<< HEAD
-				if _, ok := resourceTypesWithTags[config.ResourceType]; ok {
-					resourceTypesWithTags[config.ResourceType] = tagsFilter
-				} else {
-					resourceTypesWithTags[config.ResourceType] = append(resourceTypesWithTags[config.ResourceType], tagsFilter...)
-				}
-=======
 				resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
->>>>>>> 50f968d706 ([AWS] Fix CloudWatch readCloudwatchConfig function (#32408))
 			}
 			continue
 		}
