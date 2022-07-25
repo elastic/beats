@@ -40,19 +40,18 @@ type ProcsMap map[int]ProcState
 // ProcsTrack is a thread-safe wrapper for a process Stat object's internal map of processes.
 type ProcsTrack struct {
 	pids ProcsMap
-	mut  sync.Mutex
+	mut  sync.RWMutex
 }
 
-func NewProcsMap() *ProcsTrack {
+func NewProcsTrack() *ProcsTrack {
 	return &ProcsTrack{
 		pids: make(ProcsMap, 0),
-		mut:  sync.Mutex{},
 	}
 }
 
 func (pm *ProcsTrack) GetPid(pid int) (ProcState, bool) {
-	pm.mut.Lock()
-	defer pm.mut.Unlock()
+	pm.mut.RLock()
+	defer pm.mut.RUnlock()
 	proc, ok := pm.pids[pid]
 	return proc, ok
 }
@@ -162,7 +161,7 @@ func (procStats *Stats) Init() error {
 		procStats.Hostfs = resolve.NewTestResolver("/")
 	}
 
-	procStats.ProcsMap = NewProcsMap()
+	procStats.ProcsMap = NewProcsTrack()
 
 	if len(procStats.Procs) == 0 {
 		return nil

@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Fix thread safety in process code #43
+
 ## [0.4.3]
 
 ## Fixed

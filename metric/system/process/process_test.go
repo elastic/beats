@@ -206,7 +206,7 @@ func TestProcMemPercentage(t *testing.T) {
 		},
 	}
 
-	procStats.ProcsMap = NewProcsMap()
+	procStats.ProcsMap = NewProcsTrack()
 	procStats.ProcsMap.SetPid(p.Pid.ValueOr(0), p)
 
 	rssPercent := GetProcMemPercentage(p, 10000)

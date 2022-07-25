@@ -50,15 +50,18 @@ func TestSystemMetricsReport(t *testing.T) {
 	//iterate over the processes a few times,
 	// with the concurrency (hopefully) emulating what might
 	// happen if this was an HTTP endpoint getting multiple GET requests
-	iter := 5
+	iter := 100
 	var wait sync.WaitGroup
 	wait.Add(iter)
+	ch := make(chan struct{})
 	for i := 0; i < iter; i++ {
 		go func() {
+			<-ch
 			processMetrics.Do(monitoring.Full, testFunc)
 			wait.Done()
 		}()
 	}
+	close(ch)
 
 	wait.Wait()
 	assert.True(t, gotCPU, "Didn't find cpu.total.ticks")
