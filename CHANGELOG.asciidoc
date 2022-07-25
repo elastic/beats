@@ -7,12 +7,6 @@
 === Beats version 8.3.3
 https://github.com/elastic/beats/compare/v8.3.2\...v8.3.3[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-- Fix namespacing on self-monitoring {pull}32336[32336]
-
 ==== Bugfixes
 
 *Affecting all Beats*
