@@ -47,7 +47,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "orka && darwin && poc"
+          - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test filebeat for macos"
@@ -72,6 +72,11 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
         stage: mandatory
+    windows-11:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-11"
+        stage: extended_win
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

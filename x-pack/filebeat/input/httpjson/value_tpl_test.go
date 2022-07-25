@@ -567,6 +567,13 @@ func TestValueTpl(t *testing.T) {
 			paramTr:     transformable{},
 			expectedVal: "2022-02-17T04%3A37%3A10.406%2B0000",
 		},
+		{
+			name:        "func replaceAll",
+			value:       `[[ "some value" | replaceAll "some" "my" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "my value",
+		},
 	}
 
 	for _, tc := range cases {

@@ -6,9 +6,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "0903692971093938986",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CHAT_SETTINGS\",\"name\":\"MEET_INTEROP_CREATE_GATEWAY\",\"parameters\":[{\"name\":\"GATEWAY_NAME\",\"value\":\"gateway\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"0903692971093938986\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CHAT_SETTINGS\",\"name\":\"MEET_INTEROP_CREATE_GATEWAY\",\"parameters\":[{\"name\":\"GATEWAY_NAME\",\"value\":\"gateway\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -54,9 +54,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-4415897279372825467",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CHAT_SETTINGS\",\"name\":\"MEET_INTEROP_DELETE_GATEWAY\",\"parameters\":[{\"name\":\"GATEWAY_NAME\",\"value\":\"gateway\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-4415897279372825467\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CHAT_SETTINGS\",\"name\":\"MEET_INTEROP_DELETE_GATEWAY\",\"parameters\":[{\"name\":\"GATEWAY_NAME\",\"value\":\"gateway\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion"
@@ -68,7 +68,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 383,
+        "log.offset": 403,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -103,9 +103,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "5726055978625010725",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CHAT_SETTINGS\",\"name\":\"MEET_INTEROP_MODIFY_GATEWAY\",\"parameters\":[{\"name\":\"GATEWAY_NAME\",\"value\":\"gateway\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5726055978625010725\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CHAT_SETTINGS\",\"name\":\"MEET_INTEROP_MODIFY_GATEWAY\",\"parameters\":[{\"name\":\"GATEWAY_NAME\",\"value\":\"gateway\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -117,7 +117,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 766,
+        "log.offset": 807,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -152,9 +152,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "0679253479986750928",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CHAT_SETTINGS\",\"name\":\"CHANGE_CHAT_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"0679253479986750928\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CHAT_SETTINGS\",\"name\":\"CHANGE_CHAT_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -173,7 +173,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 1149,
+        "log.offset": 1210,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

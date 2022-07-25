@@ -11,6 +11,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,7 +22,9 @@ import (
 )
 
 func TestS3Poller(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
+
 	const bucket = "bucket"
 	const numberOfWorkers = 5
 	const pollInterval = 2 * time.Second
@@ -54,18 +57,18 @@ func TestS3Poller(t *testing.T) {
 
 		// Initial Poll
 		mockPager.EXPECT().
-			Next(gomock.Any()).
+			HasMorePages().
 			Times(1).
-			DoAndReturn(func(_ context.Context) bool {
+			DoAndReturn(func() bool {
 				return true
 			})
 
 		mockPager.EXPECT().
-			CurrentPage().
+			NextPage(gomock.Any()).
 			Times(1).
-			DoAndReturn(func() *s3.ListObjectsOutput {
-				return &s3.ListObjectsOutput{
-					Contents: []s3.Object{
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
 						{
 							ETag:         aws.String("etag1"),
 							Key:          aws.String("key1"),
@@ -92,21 +95,14 @@ func TestS3Poller(t *testing.T) {
 							LastModified: aws.Time(time.Now()),
 						},
 					},
-				}
+				}, nil
 			})
 
 		mockPager.EXPECT().
-			Next(gomock.Any()).
+			HasMorePages().
 			Times(1).
-			DoAndReturn(func(_ context.Context) bool {
+			DoAndReturn(func() bool {
 				return false
-			})
-
-		mockPager.EXPECT().
-			Err().
-			Times(1).
-			DoAndReturn(func() error {
-				return nil
 			})
 
 		mockAPI.EXPECT().
@@ -171,31 +167,31 @@ func TestS3Poller(t *testing.T) {
 
 		// Initial Next gets an error.
 		mockPagerFirst.EXPECT().
-			Next(gomock.Any()).
-			Times(1).
-			DoAndReturn(func(_ context.Context) bool {
-				return false
+			HasMorePages().
+			Times(10).
+			DoAndReturn(func() bool {
+				return true
 			})
 		mockPagerFirst.EXPECT().
-			Err().
-			Times(1).
-			DoAndReturn(func() error {
-				return errFakeConnectivityFailure
+			NextPage(gomock.Any()).
+			Times(5).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return nil, errFakeConnectivityFailure
 			})
 
 		// After waiting for pollInterval, it retries.
 		mockPagerSecond.EXPECT().
-			Next(gomock.Any()).
+			HasMorePages().
 			Times(1).
-			DoAndReturn(func(_ context.Context) bool {
+			DoAndReturn(func() bool {
 				return true
 			})
 		mockPagerSecond.EXPECT().
-			CurrentPage().
+			NextPage(gomock.Any()).
 			Times(1).
-			DoAndReturn(func() *s3.ListObjectsOutput {
-				return &s3.ListObjectsOutput{
-					Contents: []s3.Object{
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
 						{
 							ETag:         aws.String("etag1"),
 							Key:          aws.String("key1"),
@@ -222,21 +218,14 @@ func TestS3Poller(t *testing.T) {
 							LastModified: aws.Time(time.Now()),
 						},
 					},
-				}
+				}, nil
 			})
 
 		mockPagerSecond.EXPECT().
-			Next(gomock.Any()).
+			HasMorePages().
 			Times(1).
-			DoAndReturn(func(_ context.Context) bool {
+			DoAndReturn(func() bool {
 				return false
-			})
-
-		mockPagerSecond.EXPECT().
-			Err().
-			Times(1).
-			DoAndReturn(func() error {
-				return nil
 			})
 
 		mockAPI.EXPECT().

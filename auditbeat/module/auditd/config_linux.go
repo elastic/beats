@@ -45,6 +45,7 @@ type Config struct {
 	RulesBlob    string   `config:"audit_rules"`         // Audit rules. One rule per line.
 	RuleFiles    []string `config:"audit_rule_files"`    // List of rule files.
 	SocketType   string   `config:"socket_type"`         // Socket type to use with the kernel (unicast or multicast).
+	Immutable    bool     `config:"immutable"`           // Sets kernel audit config immutable.
 
 	// Tuning options (advanced, use with care)
 	ReassemblerMaxInFlight uint32        `config:"reassembler.max_in_flight"`
@@ -78,6 +79,7 @@ var defaultConfig = Config{
 	BacklogLimit:           8192,
 	RateLimit:              0,
 	RawMessage:             false,
+	Immutable:              false,
 	Warnings:               false,
 	ReassemblerMaxInFlight: 50,
 	ReassemblerTimeout:     2 * time.Second,
@@ -99,7 +101,11 @@ func (c *Config) Validate() error {
 
 	c.SocketType = strings.ToLower(c.SocketType)
 	switch c.SocketType {
-	case "", "unicast", "multicast":
+	case "multicast":
+		if c.Immutable {
+			errs = append(errs, fmt.Errorf("immutable can't be used with socket_type: multicast"))
+		}
+	case "", "unicast":
 	default:
 		errs = append(errs, fmt.Errorf("invalid socket_type "+
 			"'%v' (use unicast, multicast, or don't set a value)", c.SocketType))
@@ -118,7 +124,7 @@ func (c *Config) loadRules() error {
 	for _, pattern := range c.RuleFiles {
 		absPattern, err := filepath.Abs(pattern)
 		if err != nil {
-			return fmt.Errorf("unable to get the absolute path for %s: %v", pattern, err)
+			return fmt.Errorf("unable to get the absolute path for %s: %w", pattern, err)
 		}
 		files, err := filepath.Glob(absPattern)
 		if err != nil {
@@ -139,7 +145,7 @@ func (c *Config) loadRules() error {
 	for _, filename := range paths {
 		fHandle, err := os.Open(filename)
 		if err != nil {
-			return fmt.Errorf("unable to open rule file '%s': %v", filename, err)
+			return fmt.Errorf("unable to open rule file '%s': %w", filename, err)
 		}
 		rules, err = readRules(fHandle, filename, knownRules)
 		if err != nil {

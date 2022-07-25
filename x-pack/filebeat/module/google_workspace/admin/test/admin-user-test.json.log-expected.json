@@ -6,9 +6,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "5640965697263813496",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_2SV_SCRATCH_CODES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5640965697263813496\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_2SV_SCRATCH_CODES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion",
@@ -59,9 +59,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2954521252745950476",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"GENERATE_2SV_SCRATCH_CODES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2954521252745950476\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"GENERATE_2SV_SCRATCH_CODES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation",
@@ -74,7 +74,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 387,
+        "log.offset": 407,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -112,9 +112,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3012888532746615766",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_3LO_DEVICE_TOKENS\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3012888532746615766\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_3LO_DEVICE_TOKENS\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -129,7 +129,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 776,
+        "log.offset": 816,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -167,9 +167,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-6347540646818736011",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_3LO_TOKEN\",\"parameters\":[{\"name\":\"APP_ID\",\"value\":\"id\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-6347540646818736011\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_3LO_TOKEN\",\"parameters\":[{\"name\":\"APP_ID\",\"value\":\"id\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -183,7 +183,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1235,
+        "log.offset": 1295,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -221,9 +221,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "5072903074032700822",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ADD_RECOVERY_EMAIL\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5072903074032700822\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ADD_RECOVERY_EMAIL\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -236,7 +236,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1645,
+        "log.offset": 1726,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -274,9 +274,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-5552738880643201901",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ADD_RECOVERY_PHONE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-5552738880643201901\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ADD_RECOVERY_PHONE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -289,7 +289,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2026,
+        "log.offset": 2127,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -327,9 +327,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "4427185918513842232",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"GRANT_ADMIN_PRIVILEGE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"4427185918513842232\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"GRANT_ADMIN_PRIVILEGE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -342,7 +342,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2407,
+        "log.offset": 2529,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -380,9 +380,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-5195762311244420217",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_ADMIN_PRIVILEGE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-5195762311244420217\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_ADMIN_PRIVILEGE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -395,7 +395,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2791,
+        "log.offset": 2933,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -433,9 +433,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6034187430904303414",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_ASP\",\"parameters\":[{\"name\":\"ASP_ID\",\"value\":\"id\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6034187430904303414\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_ASP\",\"parameters\":[{\"name\":\"ASP_ID\",\"value\":\"id\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -449,7 +449,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3176,
+        "log.offset": 3339,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -487,9 +487,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-5196872844611496223",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"TOGGLE_AUTOMATIC_CONTACT_SHARING\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-5196872844611496223\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"TOGGLE_AUTOMATIC_CONTACT_SHARING\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -503,7 +503,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3580,
+        "log.offset": 3763,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -541,9 +541,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "5267513112865908085",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"BULK_UPLOAD\",\"parameters\":[{\"name\":\"BULK_UPLOAD_FAIL_USERS_NUMBER\",\"value\":\"1\"},{\"name\":\"BULK_UPLOAD_TOTAL_USERS_NUMBER\",\"value\":\"10\"},{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5267513112865908085\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"BULK_UPLOAD\",\"parameters\":[{\"name\":\"BULK_UPLOAD_FAIL_USERS_NUMBER\",\"value\":\"1\"},{\"name\":\"BULK_UPLOAD_TOTAL_USERS_NUMBER\",\"value\":\"10\"},{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -557,7 +557,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4010,
+        "log.offset": 4214,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -591,9 +591,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "8651941366730241290",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"BULK_UPLOAD_NOTIFICATION_SENT\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"8651941366730241290\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"BULK_UPLOAD_NOTIFICATION_SENT\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info",
@@ -607,7 +607,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4488,
+        "log.offset": 4712,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -645,9 +645,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-0012877037217102447",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CANCEL_USER_INVITE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-0012877037217102447\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CANCEL_USER_INVITE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -661,7 +661,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4925,
+        "log.offset": 5169,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -699,9 +699,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "7748233813756918202",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_CUSTOM_FIELD\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"USER_CUSTOM_FIELD\",\"value\":\"custom\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7748233813756918202\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_CUSTOM_FIELD\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"USER_CUSTOM_FIELD\",\"value\":\"custom\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -717,7 +717,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5351,
+        "log.offset": 5616,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -755,9 +755,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9739179869818838498",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_EXTERNAL_ID\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9739179869818838498\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_EXTERNAL_ID\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -772,7 +772,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5854,
+        "log.offset": 6139,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -810,9 +810,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "8199459556951943605",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_GENDER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"8199459556951943605\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_GENDER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -827,7 +827,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 6310,
+        "log.offset": 6615,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -865,9 +865,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3476197935604542765",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_IM\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3476197935604542765\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_IM\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -882,7 +882,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 6761,
+        "log.offset": 7086,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -920,9 +920,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "7112302766503230034",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ENABLE_USER_IP_WHITELIST\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7112302766503230034\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ENABLE_USER_IP_WHITELIST\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -937,7 +937,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 7208,
+        "log.offset": 7553,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -975,9 +975,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "0645833087145983255",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_KEYWORD\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"0645833087145983255\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_KEYWORD\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -992,7 +992,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 7665,
+        "log.offset": 8030,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1030,9 +1030,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "1686732242492715294",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_LANGUAGE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"1686732242492715294\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_LANGUAGE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1047,7 +1047,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 8117,
+        "log.offset": 8502,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1085,9 +1085,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3087791213934751334",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_LOCATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3087791213934751334\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_LOCATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1102,7 +1102,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 8570,
+        "log.offset": 8975,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1140,9 +1140,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3658386628009838969",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_ORGANIZATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3658386628009838969\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_ORGANIZATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1157,7 +1157,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 9023,
+        "log.offset": 9448,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1195,9 +1195,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9055795312185092858",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_PHONE_NUMBER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9055795312185092858\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_PHONE_NUMBER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1212,7 +1212,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 9480,
+        "log.offset": 9925,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1250,9 +1250,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-4470461810124366457",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_RECOVERY_EMAIL\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-4470461810124366457\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_RECOVERY_EMAIL\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1265,7 +1265,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 9937,
+        "log.offset": 10402,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1303,9 +1303,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2376902061143910968",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_RECOVERY_PHONE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2376902061143910968\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_RECOVERY_PHONE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1318,7 +1318,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 10321,
+        "log.offset": 10807,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1356,9 +1356,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-2420228130276931471",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_RELATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-2420228130276931471\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_RELATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1373,7 +1373,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 10705,
+        "log.offset": 11211,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1411,9 +1411,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2756131283077836358",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_ADDRESS\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2756131283077836358\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_USER_ADDRESS\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1428,7 +1428,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 11158,
+        "log.offset": 11685,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1468,9 +1468,9 @@
         "event.dataset": "google_workspace.admin",
         "event.duration": 3600000000000,
         "event.end": "2002-10-02T16:00:00.000Z",
-        "event.id": "1",
+        "event.id": "5868500264469702306",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CREATE_EMAIL_MONITOR\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"EMAIL_MONITOR_DEST_EMAIL\",\"value\":\"dest@example.com\"},{\"name\":\"EMAIL_MONITOR_LEVEL_CHAT\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_DRAFT_EMAIL\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_INCOMING_EMAIL\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_OUTGOING_EMAIL\",\"value\":\"info\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T16:00:00Z\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5868500264469702306\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CREATE_EMAIL_MONITOR\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"EMAIL_MONITOR_DEST_EMAIL\",\"value\":\"dest@example.com\"},{\"name\":\"EMAIL_MONITOR_LEVEL_CHAT\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_DRAFT_EMAIL\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_INCOMING_EMAIL\",\"value\":\"info\"},{\"name\":\"EMAIL_MONITOR_LEVEL_OUTGOING_EMAIL\",\"value\":\"info\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T16:00:00Z\"}]}}",
         "event.provider": "admin",
         "event.start": "2002-10-02T15:00:00.000Z",
         "event.type": [
@@ -1489,7 +1489,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 11610,
+        "log.offset": 12157,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1527,9 +1527,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2107236121466327145",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CREATE_DATA_TRANSFER_REQUEST\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"DESTINATION_USER_EMAIL\",\"value\":\"dest@example.com\"},{\"name\":\"APPLICATION_NAME\",\"value\":\"a,b,c\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2107236121466327145\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CREATE_DATA_TRANSFER_REQUEST\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"DESTINATION_USER_EMAIL\",\"value\":\"dest@example.com\"},{\"name\":\"APPLICATION_NAME\",\"value\":\"a,b,c\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation",
@@ -1544,7 +1544,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 12401,
+        "log.offset": 12968,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1582,9 +1582,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-1459421272902776361",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"GRANT_DELEGATED_ADMIN_PRIVILEGES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-1459421272902776361\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"GRANT_DELEGATED_ADMIN_PRIVILEGES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1598,7 +1598,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 12897,
+        "log.offset": 13484,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1636,9 +1636,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6525767281201843120",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_ACCOUNT_INFO_DUMP\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"REQUEST_ID\",\"value\":\"id\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6525767281201843120\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_ACCOUNT_INFO_DUMP\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"REQUEST_ID\",\"value\":\"id\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion",
@@ -1652,7 +1652,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 13327,
+        "log.offset": 13935,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1690,9 +1690,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-4718993790847506013",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_EMAIL_MONITOR\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"EMAIL_MONITOR_DEST_EMAIL\",\"value\":\"dest@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-4718993790847506013\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_EMAIL_MONITOR\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"EMAIL_MONITOR_DEST_EMAIL\",\"value\":\"dest@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion",
@@ -1706,7 +1706,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 13749,
+        "log.offset": 14377,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1744,9 +1744,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-2360527973019801951",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_MAILBOX_DUMP\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"REQUEST_ID\",\"value\":\"id\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-2360527973019801951\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_MAILBOX_DUMP\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"REQUEST_ID\",\"value\":\"id\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion",
@@ -1760,7 +1760,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 14195,
+        "log.offset": 14844,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1798,9 +1798,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-5355263986144853917",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_FIRST_NAME\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-5355263986144853917\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_FIRST_NAME\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1815,7 +1815,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 14612,
+        "log.offset": 15282,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1853,9 +1853,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-9640878300192003943",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"GMAIL_RESET_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"GMAIL_RESET_REASON\",\"value\":\"reason\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-9640878300192003943\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"GMAIL_RESET_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"GMAIL_RESET_REASON\",\"value\":\"reason\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1868,7 +1868,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 15062,
+        "log.offset": 15753,
         "message": "reason",
         "organization.id": "1",
         "related.ip": [
@@ -1907,9 +1907,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6273256452844463059",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_LAST_NAME\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6273256452844463059\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_LAST_NAME\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1924,7 +1924,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 15488,
+        "log.offset": 16200,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -1962,9 +1962,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "5576735333780489602",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"MAIL_ROUTING_DESTINATION_ADDED\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5576735333780489602\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"MAIL_ROUTING_DESTINATION_ADDED\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1978,7 +1978,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 15937,
+        "log.offset": 16669,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2016,9 +2016,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-8477868339112437547",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"MAIL_ROUTING_DESTINATION_REMOVED\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-8477868339112437547\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"MAIL_ROUTING_DESTINATION_REMOVED\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2032,7 +2032,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 16365,
+        "log.offset": 17117,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2070,9 +2070,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-6997130251179043817",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ADD_NICKNAME\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"USER_NICKNAME\",\"value\":\"nick\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-6997130251179043817\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ADD_NICKNAME\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"USER_NICKNAME\",\"value\":\"nick\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2086,7 +2086,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 16795,
+        "log.offset": 17568,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2124,9 +2124,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-0841047205639102013",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REMOVE_NICKNAME\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"USER_NICKNAME\",\"value\":\"nick\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-0841047205639102013\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REMOVE_NICKNAME\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"USER_NICKNAME\",\"value\":\"nick\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2140,7 +2140,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 17210,
+        "log.offset": 18004,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2178,9 +2178,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "7668763943331897972",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_PASSWORD\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7668763943331897972\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_PASSWORD\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2193,7 +2193,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 17628,
+        "log.offset": 18443,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2231,9 +2231,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "8031604764350460335",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_PASSWORD_ON_NEXT_LOGIN\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"8031604764350460335\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CHANGE_PASSWORD_ON_NEXT_LOGIN\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2248,7 +2248,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 18006,
+        "log.offset": 18841,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2286,9 +2286,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "1723550138347025559",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DOWNLOAD_PENDING_INVITES_LIST\"}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"1723550138347025559\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DOWNLOAD_PENDING_INVITES_LIST\"}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -2299,7 +2299,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 18468,
+        "log.offset": 19323,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2333,9 +2333,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3619287750726326756",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REMOVE_RECOVERY_EMAIL\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3619287750726326756\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REMOVE_RECOVERY_EMAIL\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2348,7 +2348,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 18796,
+        "log.offset": 19671,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2386,9 +2386,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "0928200910389674179",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REMOVE_RECOVERY_PHONE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"0928200910389674179\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REMOVE_RECOVERY_PHONE\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2401,7 +2401,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 19180,
+        "log.offset": 20075,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2439,9 +2439,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-9620988396235082547",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REQUEST_ACCOUNT_INFO\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-9620988396235082547\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REQUEST_ACCOUNT_INFO\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info",
@@ -2454,7 +2454,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 19564,
+        "log.offset": 20479,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2494,9 +2494,9 @@
         "event.dataset": "google_workspace.admin",
         "event.duration": 3600000000000,
         "event.end": "2002-10-02T16:00:00.000Z",
-        "event.id": "1",
+        "event.id": "-5118234252997993607",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REQUEST_MAILBOX_DUMP\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"EMAIL_EXPORT_INCLUDE_DELETED\",\"value\":\"true\"},{\"name\":\"EMAIL_EXPORT_PACKAGE_CONTENT\",\"value\":\"contents\"},{\"name\":\"SEARCH_QUERY_FOR_DUMP\",\"value\":\"foo bar\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T16:00:00Z\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-5118234252997993607\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REQUEST_MAILBOX_DUMP\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"EMAIL_EXPORT_INCLUDE_DELETED\",\"value\":\"true\"},{\"name\":\"EMAIL_EXPORT_PACKAGE_CONTENT\",\"value\":\"contents\"},{\"name\":\"SEARCH_QUERY_FOR_DUMP\",\"value\":\"foo bar\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T16:00:00Z\"}]}}",
         "event.provider": "admin",
         "event.start": "2002-10-02T15:00:00.000Z",
         "event.type": [
@@ -2513,7 +2513,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 19947,
+        "log.offset": 20883,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2551,9 +2551,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-9500964328957419557",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"RESEND_USER_INVITE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-9500964328957419557\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"RESEND_USER_INVITE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info",
@@ -2567,7 +2567,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 20609,
+        "log.offset": 21566,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2605,9 +2605,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-7243144654732157951",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"RESET_SIGNIN_COOKIES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-7243144654732157951\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"RESET_SIGNIN_COOKIES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2620,7 +2620,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 21035,
+        "log.offset": 22013,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2658,9 +2658,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6475480878497925346",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"SECURITY_KEY_REGISTERED_FOR_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6475480878497925346\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"SECURITY_KEY_REGISTERED_FOR_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2673,7 +2673,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 21418,
+        "log.offset": 22417,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2711,9 +2711,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-4195228917199645267",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_SECURITY_KEY\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-4195228917199645267\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"REVOKE_SECURITY_KEY\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2726,7 +2726,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 21813,
+        "log.offset": 22832,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2764,9 +2764,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6627790845499351649",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USER_INVITE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6627790845499351649\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USER_INVITE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info",
@@ -2780,7 +2780,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 22195,
+        "log.offset": 23235,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2818,9 +2818,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6506709000563079328",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"VIEW_TEMP_PASSWORD\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6506709000563079328\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"VIEW_TEMP_PASSWORD\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info",
@@ -2834,7 +2834,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 22614,
+        "log.offset": 23674,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2872,9 +2872,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2261051367420730730",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"TURN_OFF_2_STEP_VERIFICATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2261051367420730730\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"TURN_OFF_2_STEP_VERIFICATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2887,7 +2887,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 23040,
+        "log.offset": 24120,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2925,9 +2925,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "8022978902123861342",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNBLOCK_USER_SESSION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"8022978902123861342\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNBLOCK_USER_SESSION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2940,7 +2940,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 23431,
+        "log.offset": 24531,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -2978,9 +2978,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "8360881840568008462",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNENROLL_USER_FROM_TITANIUM\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"8360881840568008462\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNENROLL_USER_FROM_TITANIUM\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -2993,7 +2993,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 23814,
+        "log.offset": 24934,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3031,9 +3031,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-2547951854555172697",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ARCHIVE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-2547951854555172697\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"ARCHIVE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3046,7 +3046,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 24204,
+        "log.offset": 25344,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3084,9 +3084,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3010728760012393946",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UPDATE_BIRTHDATE\",\"parameters\":[{\"name\":\"BIRTHDATE\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3010728760012393946\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UPDATE_BIRTHDATE\",\"parameters\":[{\"name\":\"BIRTHDATE\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3100,7 +3100,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 24579,
+        "log.offset": 25740,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3138,9 +3138,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2265992803668411805",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CREATE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2265992803668411805\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"CREATE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation",
@@ -3153,7 +3153,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 25010,
+        "log.offset": 26191,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3191,9 +3191,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2362001198017419924",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2362001198017419924\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DELETE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion",
@@ -3206,7 +3206,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 25384,
+        "log.offset": 26585,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3244,9 +3244,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-6273439543329942861",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DOWNGRADE_USER_FROM_GPLUS\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-6273439543329942861\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DOWNGRADE_USER_FROM_GPLUS\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3259,7 +3259,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 25758,
+        "log.offset": 26979,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3297,9 +3297,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3855515369538334425",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USER_ENROLLED_IN_TWO_STEP_VERIFICATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3855515369538334425\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USER_ENROLLED_IN_TWO_STEP_VERIFICATION\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3312,7 +3312,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 26146,
+        "log.offset": 27388,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3350,9 +3350,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "7234284212790144880",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DOWNLOAD_USERLIST_CSV\"}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7234284212790144880\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"DOWNLOAD_USERLIST_CSV\"}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -3363,7 +3363,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 26547,
+        "log.offset": 27809,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3397,9 +3397,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6542755340490618818",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"MOVE_USER_TO_ORG_UNIT\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6542755340490618818\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"MOVE_USER_TO_ORG_UNIT\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3414,7 +3414,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 26867,
+        "log.offset": 28149,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3452,9 +3452,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3855253439874836072",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USER_PUT_IN_TWO_STEP_VERIFICATION_GRACE_PERIOD\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3855253439874836072\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USER_PUT_IN_TWO_STEP_VERIFICATION_GRACE_PERIOD\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3468,7 +3468,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 27325,
+        "log.offset": 28627,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3506,9 +3506,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "5471934155402640672",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"RENAME_USER\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5471934155402640672\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"RENAME_USER\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3522,7 +3522,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 27769,
+        "log.offset": 29091,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3560,9 +3560,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9267328131083610420",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNENROLL_USER_FROM_STRONG_AUTH\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9267328131083610420\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNENROLL_USER_FROM_STRONG_AUTH\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3575,7 +3575,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 28178,
+        "log.offset": 29520,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3613,9 +3613,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3174654065957292794",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"SUSPEND_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3174654065957292794\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"SUSPEND_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3628,7 +3628,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 28571,
+        "log.offset": 29933,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3666,9 +3666,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9805603920991774738",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNARCHIVE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9805603920991774738\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNARCHIVE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3681,7 +3681,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 28946,
+        "log.offset": 30328,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3719,9 +3719,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "7034768673952413309",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNDELETE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7034768673952413309\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNDELETE_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation",
@@ -3734,7 +3734,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 29323,
+        "log.offset": 30725,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3772,9 +3772,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "8809170053490543206",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNSUSPEND_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"8809170053490543206\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UNSUSPEND_USER\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3787,7 +3787,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 29699,
+        "log.offset": 31121,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3825,9 +3825,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2499928017130994906",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UPGRADE_USER_TO_GPLUS\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2499928017130994906\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"UPGRADE_USER_TO_GPLUS\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -3840,7 +3840,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 30076,
+        "log.offset": 31518,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3878,9 +3878,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-4926943474063726197",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USERS_BULK_UPLOAD\",\"parameters\":[{\"name\":\"BULK_UPLOAD_FAIL_USERS_NUMBER\",\"value\":\"0\"},{\"name\":\"BULK_UPLOAD_TOTAL_USERS_NUMBER\",\"value\":\"10\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-4926943474063726197\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USERS_BULK_UPLOAD\",\"parameters\":[{\"name\":\"BULK_UPLOAD_FAIL_USERS_NUMBER\",\"value\":\"0\"},{\"name\":\"BULK_UPLOAD_TOTAL_USERS_NUMBER\",\"value\":\"10\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -3893,7 +3893,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 30460,
+        "log.offset": 31922,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -3927,9 +3927,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "5861726786624219052",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USERS_BULK_UPLOAD_NOTIFICATION_SENT\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5861726786624219052\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"USER_SETTINGS\",\"name\":\"USERS_BULK_UPLOAD_NOTIFICATION_SENT\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info",
@@ -3942,7 +3942,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 30899,
+        "log.offset": 32382,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

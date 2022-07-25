@@ -22,16 +22,157 @@
                     "enhancements": {}
                 },
                 "gridData": {
+                    "h": 4,
+                    "i": "2a787123-bd63-49c2-a7a2-a5c28ff75374",
+                    "w": 47,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2a787123-bd63-49c2-a7a2-a5c28ff75374",
+                "panelRefName": "panel_2a787123-bd63-49c2-a7a2-a5c28ff75374",
+                "type": "visualization",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
                     "h": 5,
                     "i": "ba968df2-1d4c-4edb-a9fd-1a40803778b4",
                     "w": 47,
                     "x": 0,
-                    "y": 3
+                    "y": 4
                 },
                 "panelIndex": "ba968df2-1d4c-4edb-a9fd-1a40803778b4",
                 "panelRefName": "panel_ba968df2-1d4c-4edb-a9fd-1a40803778b4",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": true,
+                                            "useCurrentFilters": true
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Pods Detailed Dashboard"
+                                    },
+                                    "eventId": "6a2acda4-6f9d-4996-95fe-31a15bfb5f3b",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "0a223c6a-1f9a-44c9-9153-571a1b7d2102",
+                    "w": 11,
+                    "x": 0,
+                    "y": 9
+                },
+                "panelIndex": "0a223c6a-1f9a-44c9-9153-571a1b7d2102",
+                "panelRefName": "panel_0a223c6a-1f9a-44c9-9153-571a1b7d2102",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {
+                        "dynamicActions": {
+                            "events": [
+                                {
+                                    "action": {
+                                        "config": {
+                                            "openInNewTab": false,
+                                            "useCurrentDateRange": true,
+                                            "useCurrentFilters": true
+                                        },
+                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
+                                        "name": "Go to Pods Detailed Dashboard"
+                                    },
+                                    "eventId": "6a2acda4-6f9d-4996-95fe-31a15bfb5f3b",
+                                    "triggers": [
+                                        "FILTER_TRIGGER"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "f1bdd155-db4a-41da-9129-4470e99c2685",
+                    "w": 11,
+                    "x": 11,
+                    "y": 9
+                },
+                "panelIndex": "f1bdd155-db4a-41da-9129-4470e99c2685",
+                "panelRefName": "panel_f1bdd155-db4a-41da-9129-4470e99c2685",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "64289359-e57f-4997-9045-a55f11ef52fb",
+                    "w": 25,
+                    "x": 22,
+                    "y": 9
+                },
+                "panelIndex": "64289359-e57f-4997-9045-a55f11ef52fb",
+                "panelRefName": "panel_64289359-e57f-4997-9045-a55f11ef52fb",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5eb87528-4a1b-4c72-9134-59bca517c6aa",
+                    "w": 22,
+                    "x": 0,
+                    "y": 23
+                },
+                "panelIndex": "5eb87528-4a1b-4c72-9134-59bca517c6aa",
+                "panelRefName": "panel_5eb87528-4a1b-4c72-9134-59bca517c6aa",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "d742e656-4d29-41be-a5fa-20ab22a48c6f",
+                    "w": 25,
+                    "x": 22,
+                    "y": 23
+                },
+                "panelIndex": "d742e656-4d29-41be-a5fa-20ab22a48c6f",
+                "panelRefName": "panel_d742e656-4d29-41be-a5fa-20ab22a48c6f",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -63,12 +204,12 @@
                     "i": "fde29758-f1f1-4899-becc-7e39d9e9e1b8",
                     "w": 11,
                     "x": 0,
-                    "y": 37
+                    "y": 38
                 },
                 "panelIndex": "fde29758-f1f1-4899-becc-7e39d9e9e1b8",
                 "panelRefName": "panel_fde29758-f1f1-4899-becc-7e39d9e9e1b8",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -100,12 +241,12 @@
                     "i": "cb735401-c01b-4633-aeff-30f7c49821f2",
                     "w": 11,
                     "x": 11,
-                    "y": 37
+                    "y": 38
                 },
                 "panelIndex": "cb735401-c01b-4633-aeff-30f7c49821f2",
                 "panelRefName": "panel_cb735401-c01b-4633-aeff-30f7c49821f2",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -137,12 +278,12 @@
                     "i": "e6cab9d7-093e-4cef-9d78-4ff90a999dcb",
                     "w": 11,
                     "x": 22,
-                    "y": 37
+                    "y": 38
                 },
                 "panelIndex": "e6cab9d7-093e-4cef-9d78-4ff90a999dcb",
                 "panelRefName": "panel_e6cab9d7-093e-4cef-9d78-4ff90a999dcb",
                 "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -153,12 +294,12 @@
                     "i": "79761ec0-48c7-40a0-aa1a-e5a902864b94",
                     "w": 14,
                     "x": 33,
-                    "y": 37
+                    "y": 38
                 },
                 "panelIndex": "79761ec0-48c7-40a0-aa1a-e5a902864b94",
                 "panelRefName": "panel_79761ec0-48c7-40a0-aa1a-e5a902864b94",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -169,12 +310,12 @@
                     "i": "be4176ad-2a17-4731-a988-ceedee49e775",
                     "w": 7,
                     "x": 33,
-                    "y": 40
+                    "y": 41
                 },
                 "panelIndex": "be4176ad-2a17-4731-a988-ceedee49e775",
                 "panelRefName": "panel_be4176ad-2a17-4731-a988-ceedee49e775",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -328,12 +469,12 @@
                     "i": "0ef47305-ecb8-413c-ba38-f08a34885b82",
                     "w": 7,
                     "x": 40,
-                    "y": 40
+                    "y": 41
                 },
                 "panelIndex": "0ef47305-ecb8-413c-ba38-f08a34885b82",
                 "title": "Cores Used [Metricbeat Kubernetes]",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -475,12 +616,12 @@
                     "i": "f05ed38e-333c-4a45-a441-da0be70b097c",
                     "w": 7,
                     "x": 33,
-                    "y": 44
+                    "y": 45
                 },
                 "panelIndex": "f05ed38e-333c-4a45-a441-da0be70b097c",
                 "title": "Memory Reserved [Metricbeat Kubernetes]",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -491,12 +632,12 @@
                     "i": "c02fc878-cc8a-4b42-b84b-68480327e535",
                     "w": 7,
                     "x": 40,
-                    "y": 44
+                    "y": 45
                 },
                 "panelIndex": "c02fc878-cc8a-4b42-b84b-68480327e535",
                 "panelRefName": "panel_c02fc878-cc8a-4b42-b84b-68480327e535",
                 "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -507,169 +648,68 @@
                     "i": "4a66eae8-63ab-40c9-85c4-69c6165a1c72",
                     "w": 47,
                     "x": 0,
-                    "y": 49
+                    "y": 50
                 },
                 "panelIndex": "4a66eae8-63ab-40c9-85c4-69c6165a1c72",
                 "panelRefName": "panel_4a66eae8-63ab-40c9-85c4-69c6165a1c72",
                 "type": "search",
-                "version": "8.3.0-SNAPSHOT"
-            },
-            {
-                "embeddableConfig": {
-                    "enhancements": {}
-                },
-                "gridData": {
-                    "h": 3,
-                    "i": "2a787123-bd63-49c2-a7a2-a5c28ff75374",
-                    "w": 47,
-                    "x": 0,
-                    "y": 0
-                },
-                "panelIndex": "2a787123-bd63-49c2-a7a2-a5c28ff75374",
-                "panelRefName": "panel_2a787123-bd63-49c2-a7a2-a5c28ff75374",
-                "type": "visualization",
-                "version": "8.3.0-SNAPSHOT"
-            },
-            {
-                "embeddableConfig": {
-                    "enhancements": {
-                        "dynamicActions": {
-                            "events": [
-                                {
-                                    "action": {
-                                        "config": {
-                                            "openInNewTab": false,
-                                            "useCurrentDateRange": true,
-                                            "useCurrentFilters": true
-                                        },
-                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
-                                        "name": "Go to Pods Detailed Dashboard"
-                                    },
-                                    "eventId": "6a2acda4-6f9d-4996-95fe-31a15bfb5f3b",
-                                    "triggers": [
-                                        "FILTER_TRIGGER"
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 14,
-                    "i": "0a223c6a-1f9a-44c9-9153-571a1b7d2102",
-                    "w": 11,
-                    "x": 0,
-                    "y": 8
-                },
-                "panelIndex": "0a223c6a-1f9a-44c9-9153-571a1b7d2102",
-                "panelRefName": "panel_0a223c6a-1f9a-44c9-9153-571a1b7d2102",
-                "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
-            },
-            {
-                "embeddableConfig": {
-                    "enhancements": {
-                        "dynamicActions": {
-                            "events": [
-                                {
-                                    "action": {
-                                        "config": {
-                                            "openInNewTab": false,
-                                            "useCurrentDateRange": true,
-                                            "useCurrentFilters": true
-                                        },
-                                        "factoryId": "DASHBOARD_TO_DASHBOARD_DRILLDOWN",
-                                        "name": "Go to Pods Detailed Dashboard"
-                                    },
-                                    "eventId": "6a2acda4-6f9d-4996-95fe-31a15bfb5f3b",
-                                    "triggers": [
-                                        "FILTER_TRIGGER"
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 14,
-                    "i": "f1bdd155-db4a-41da-9129-4470e99c2685",
-                    "w": 11,
-                    "x": 11,
-                    "y": 8
-                },
-                "panelIndex": "f1bdd155-db4a-41da-9129-4470e99c2685",
-                "panelRefName": "panel_f1bdd155-db4a-41da-9129-4470e99c2685",
-                "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
-            },
-            {
-                "embeddableConfig": {
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 14,
-                    "i": "64289359-e57f-4997-9045-a55f11ef52fb",
-                    "w": 25,
-                    "x": 22,
-                    "y": 8
-                },
-                "panelIndex": "64289359-e57f-4997-9045-a55f11ef52fb",
-                "panelRefName": "panel_64289359-e57f-4997-9045-a55f11ef52fb",
-                "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
-            },
-            {
-                "embeddableConfig": {
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 15,
-                    "i": "5eb87528-4a1b-4c72-9134-59bca517c6aa",
-                    "w": 22,
-                    "x": 0,
-                    "y": 22
-                },
-                "panelIndex": "5eb87528-4a1b-4c72-9134-59bca517c6aa",
-                "panelRefName": "panel_5eb87528-4a1b-4c72-9134-59bca517c6aa",
-                "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
-            },
-            {
-                "embeddableConfig": {
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 15,
-                    "i": "d742e656-4d29-41be-a5fa-20ab22a48c6f",
-                    "w": 25,
-                    "x": 22,
-                    "y": 22
-                },
-                "panelIndex": "d742e656-4d29-41be-a5fa-20ab22a48c6f",
-                "panelRefName": "panel_d742e656-4d29-41be-a5fa-20ab22a48c6f",
-                "type": "lens",
-                "version": "8.3.0-SNAPSHOT"
+                "version": "8.4.0-SNAPSHOT"
             }
         ],
         "timeRestore": false,
         "title": "[Metricbeat Kubernetes] Overview",
         "version": 1
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "kubernetes-e0195ce0-bcaf-11ec-b64f-7dd6e8e82013",
     "migrationVersion": {
         "dashboard": "8.3.0"
     },
     "references": [
         {
+            "id": "0797edf0-db40-11ec-a23d-5dd6249f86b6",
+            "name": "2a787123-bd63-49c2-a7a2-a5c28ff75374:panel_2a787123-bd63-49c2-a7a2-a5c28ff75374",
+            "type": "visualization"
+        },
+        {
             "id": "kubernetes-a3929d80-bcb5-11ec-b64f-7dd6e8e82013",
             "name": "ba968df2-1d4c-4edb-a9fd-1a40803778b4:panel_ba968df2-1d4c-4edb-a9fd-1a40803778b4",
             "type": "visualization"
+        },
+        {
+            "id": "0c48f2e0-db40-11ec-a23d-5dd6249f86b6",
+            "name": "0a223c6a-1f9a-44c9-9153-571a1b7d2102:panel_0a223c6a-1f9a-44c9-9153-571a1b7d2102",
+            "type": "lens"
+        },
+        {
+            "id": "kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "0a223c6a-1f9a-44c9-9153-571a1b7d2102:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:6a2acda4-6f9d-4996-95fe-31a15bfb5f3b:dashboardId",
+            "type": "dashboard"
+        },
+        {
+            "id": "0f534cb0-db40-11ec-a23d-5dd6249f86b6",
+            "name": "f1bdd155-db4a-41da-9129-4470e99c2685:panel_f1bdd155-db4a-41da-9129-4470e99c2685",
+            "type": "lens"
+        },
+        {
+            "id": "kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013",
+            "name": "f1bdd155-db4a-41da-9129-4470e99c2685:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:6a2acda4-6f9d-4996-95fe-31a15bfb5f3b:dashboardId",
+            "type": "dashboard"
+        },
+        {
+            "id": "133df460-db40-11ec-a23d-5dd6249f86b6",
+            "name": "64289359-e57f-4997-9045-a55f11ef52fb:panel_64289359-e57f-4997-9045-a55f11ef52fb",
+            "type": "lens"
+        },
+        {
+            "id": "18248840-db40-11ec-a23d-5dd6249f86b6",
+            "name": "5eb87528-4a1b-4c72-9134-59bca517c6aa:panel_5eb87528-4a1b-4c72-9134-59bca517c6aa",
+            "type": "lens"
+        },
+        {
+            "id": "1c23c960-db40-11ec-a23d-5dd6249f86b6",
+            "name": "d742e656-4d29-41be-a5fa-20ab22a48c6f:panel_d742e656-4d29-41be-a5fa-20ab22a48c6f",
+            "type": "lens"
         },
         {
             "id": "kubernetes-ca83a3d0-bcb5-11ec-b64f-7dd6e8e82013",
@@ -730,49 +770,9 @@
             "id": "adc7d0c0-d1fc-11ec-8c69-8bbb7ca8f9ee",
             "name": "4a66eae8-63ab-40c9-85c4-69c6165a1c72:panel_4a66eae8-63ab-40c9-85c4-69c6165a1c72",
             "type": "search"
-        },
-        {
-            "id": "0797edf0-db40-11ec-a23d-5dd6249f86b6",
-            "name": "2a787123-bd63-49c2-a7a2-a5c28ff75374:panel_2a787123-bd63-49c2-a7a2-a5c28ff75374",
-            "type": "visualization"
-        },
-        {
-            "id": "0c48f2e0-db40-11ec-a23d-5dd6249f86b6",
-            "name": "0a223c6a-1f9a-44c9-9153-571a1b7d2102:panel_0a223c6a-1f9a-44c9-9153-571a1b7d2102",
-            "type": "lens"
-        },
-        {
-            "id": "kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013",
-            "name": "0a223c6a-1f9a-44c9-9153-571a1b7d2102:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:6a2acda4-6f9d-4996-95fe-31a15bfb5f3b:dashboardId",
-            "type": "dashboard"
-        },
-        {
-            "id": "0f534cb0-db40-11ec-a23d-5dd6249f86b6",
-            "name": "f1bdd155-db4a-41da-9129-4470e99c2685:panel_f1bdd155-db4a-41da-9129-4470e99c2685",
-            "type": "lens"
-        },
-        {
-            "id": "kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013",
-            "name": "f1bdd155-db4a-41da-9129-4470e99c2685:drilldown:DASHBOARD_TO_DASHBOARD_DRILLDOWN:6a2acda4-6f9d-4996-95fe-31a15bfb5f3b:dashboardId",
-            "type": "dashboard"
-        },
-        {
-            "id": "133df460-db40-11ec-a23d-5dd6249f86b6",
-            "name": "64289359-e57f-4997-9045-a55f11ef52fb:panel_64289359-e57f-4997-9045-a55f11ef52fb",
-            "type": "lens"
-        },
-        {
-            "id": "18248840-db40-11ec-a23d-5dd6249f86b6",
-            "name": "5eb87528-4a1b-4c72-9134-59bca517c6aa:panel_5eb87528-4a1b-4c72-9134-59bca517c6aa",
-            "type": "lens"
-        },
-        {
-            "id": "1c23c960-db40-11ec-a23d-5dd6249f86b6",
-            "name": "d742e656-4d29-41be-a5fa-20ab22a48c6f:panel_d742e656-4d29-41be-a5fa-20ab22a48c6f",
-            "type": "lens"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-05-24T09:01:43.141Z",
-    "version": "WzEwMDI1LDFd"
+    "updated_at": "2022-06-28T07:02:09.164Z",
+    "version": "WzY2MzksM10="
 }

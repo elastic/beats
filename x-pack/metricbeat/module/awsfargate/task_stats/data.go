@@ -5,6 +5,7 @@
 package task_stats
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -16,12 +17,11 @@ import (
 
 var (
 	clusterLabel = "com_amazonaws_ecs_cluster"
-	taskLabel    = "com_amazonaws_ecs_task-definition-family"
 )
 
 func eventsMapping(r mb.ReporterV2, statsList []Stats) {
-	for _, stats := range statsList {
-		r.Event(createEvent(&stats))
+	for i := range statsList {
+		r.Event(createEvent(&statsList[i]))
 	}
 }
 
@@ -39,15 +39,25 @@ func createEvent(stats *Stats) mb.Event {
 	regionName, clusterName := getRegionAndClusterName(stats.Container.Labels)
 	e.RootFields = createRootFields(stats, regionName)
 	if clusterName != "" {
-		e.MetricSetFields.Put("cluster_name", clusterName)
+		_, _ = e.MetricSetFields.Put("cluster_name", clusterName)
 	}
 
-	taskName := stats.Container.Labels[taskLabel]
+	taskName := stats.taskInfo.Family
 	if taskName != "" {
-		e.MetricSetFields.Put("task_name", taskName)
+		_, _ = e.MetricSetFields.Put("task_name", taskName)
 	}
 
-	e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
+	taskDesiredStatus := stats.taskInfo.TaskDesiredStatus
+	if taskDesiredStatus != "" {
+		_, _ = e.MetricSetFields.Put("task_desired_status", taskDesiredStatus)
+	}
+
+	taskKnownStatus := stats.taskInfo.TaskKnownStatus
+	if taskKnownStatus != "" {
+		_, _ = e.MetricSetFields.Put("task_known_status", taskKnownStatus)
+	}
+
+	_, _ = e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
 	return e
 }
 
@@ -66,9 +76,8 @@ func getRegionAndClusterName(labels map[string]string) (regionName string, clust
 		if err == nil {
 			regionName = arnParsed.Region
 		}
-		return
 	}
-	return
+	return regionName, clusterName
 }
 
 func createRootFields(stats *Stats, regionName string) mapstr.M {
@@ -88,7 +97,10 @@ func createRootFields(stats *Stats, regionName string) mapstr.M {
 		cloud := mapstr.M{
 			"region": regionName,
 		}
-		rootFields.Put("cloud", cloud)
+		_, err := rootFields.Put("cloud", cloud)
+		if err != nil {
+			_ = fmt.Errorf("error putting root field 'cloud': %w", err)
+		}
 	}
 	return rootFields
 }
@@ -163,7 +175,7 @@ func createMemoryFields(stats *Stats) mapstr.M {
 func createNetworkFields(stats *Stats) mapstr.M {
 	networkFields := mapstr.M{}
 	for _, n := range stats.networkStats {
-		networkFields.Put(n.NameInterface,
+		_, err := networkFields.Put(n.NameInterface,
 			mapstr.M{"inbound": mapstr.M{
 				"bytes":   n.Total.RxBytes,
 				"dropped": n.Total.RxDropped,
@@ -176,6 +188,9 @@ func createNetworkFields(stats *Stats) mapstr.M {
 					"errors":  n.Total.TxErrors,
 					"packets": n.Total.TxPackets,
 				}})
+		if err != nil {
+			_ = fmt.Errorf("error while putting network fields: %w", err)
+		}
 	}
 	return networkFields
 }
