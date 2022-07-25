@@ -359,6 +359,14 @@ func BeatQualifiedVersion() (string, error) {
 	return version + "-" + versionQualifier, nil
 }
 
+func BeatMajorMinorVersion() string {
+	if v, _ := BeatQualifiedVersion(); v != "" {
+		parts := strings.SplitN(v, ".", 3)
+		return parts[0] + "." + parts[1]
+	}
+	return ""
+}
+
 // BeatVersion returns the Beat's version. The value can be overridden by
 // setting BEAT_VERSION in the environment.
 func beatVersion() (string, error) {

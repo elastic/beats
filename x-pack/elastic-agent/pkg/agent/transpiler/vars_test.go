@@ -17,8 +17,9 @@ import (
 func TestVars_Replace(t *testing.T) {
 	vars := mustMakeVars(map[string]interface{}{
 		"un-der_score": map[string]interface{}{
-			"key1": "data1",
-			"key2": "data2",
+			"key1":      "data1",
+			"key2":      "data2",
+			"with-dash": "dash-value",
 			"list": []string{
 				"array1",
 				"array2",
@@ -41,6 +42,12 @@ func TestVars_Replace(t *testing.T) {
 		{
 			"${un-der_score.key1}",
 			NewStrVal("data1"),
+			false,
+			false,
+		},
+		{
+			"${un-der_score.with-dash}",
+			NewStrVal("dash-value"),
 			false,
 			false,
 		},
