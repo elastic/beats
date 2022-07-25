@@ -206,8 +206,8 @@ func TestProcMemPercentage(t *testing.T) {
 		},
 	}
 
-	procStats.ProcsMap = make(ProcsMap)
-	procStats.ProcsMap[p.Pid.ValueOr(0)] = p
+	procStats.ProcsMap = NewProcsTrack()
+	procStats.ProcsMap.SetPid(p.Pid.ValueOr(0), p)
 
 	rssPercent := GetProcMemPercentage(p, 10000)
 	assert.Equal(t, rssPercent.ValueOr(0), 0.1416)

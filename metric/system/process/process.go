@@ -70,7 +70,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 		return nil, nil, fmt.Errorf("error gathering PIDs: %w", err)
 	}
 	// We use this to track processes over time.
-	procStats.ProcsMap = pidMap
+	procStats.ProcsMap.SetMap(pidMap)
 
 	// filter the process list that will be passed down to users
 	plist = procStats.includeTopProcesses(plist)
@@ -119,9 +119,8 @@ func (procStats *Stats) GetOne(pid int) (mapstr.M, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error fetching PID %d: %w", pid, err)
 	}
-	newMap := make(ProcsMap)
-	newMap[pid] = pidStat
-	procStats.ProcsMap = newMap
+
+	procStats.ProcsMap.SetPid(pid, pidStat)
 
 	return procStats.getProcessEvent(&pidStat)
 }
@@ -134,13 +133,14 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 	if err != nil {
 		return ProcState{}, fmt.Errorf("error fetching PID %d: %w", self, err)
 	}
-	procStats.ProcsMap[self] = pidStat
+
+	procStats.ProcsMap.SetPid(self, pidStat)
 	return pidStat, nil
 }
 
 // pidIter wraps a few lines of generic code that all OS-specific FetchPids() functions must call.
 // this also handles the process of adding to the maps/lists in order to limit the code duplication in all the OS implementations
-func (procStats *Stats) pidIter(pid int, procMap map[int]ProcState, proclist []ProcState) (map[int]ProcState, []ProcState) {
+func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState) (ProcsMap, []ProcState) {
 	status, saved, err := procStats.pidFill(pid, true)
 	if err != nil {
 		procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
@@ -190,7 +190,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	}
 
 	//postprocess with cgroups and percentages
-	last, ok := procStats.ProcsMap[status.Pid.ValueOr(0)]
+	last, ok := procStats.ProcsMap.GetPid(status.Pid.ValueOr(0))
 	status.SampleTime = time.Now()
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(status.Pid.ValueOr(0))
@@ -215,7 +215,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 
 // cacheCmdLine fills out Env and arg metrics from any stored previous metrics for the pid
 func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
-	if previousProc, ok := procStats.ProcsMap[in.Pid.ValueOr(0)]; ok {
+	if previousProc, ok := procStats.ProcsMap.GetPid(in.Pid.ValueOr(0)); ok {
 		if procStats.CacheCmdLine {
 			in.Args = previousProc.Args
 			in.Cmdline = previousProc.Cmdline
