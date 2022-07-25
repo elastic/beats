@@ -420,52 +420,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		resourceTypeFilters: resourceTypeFiltersEC2,
 	}
 
-<<<<<<< HEAD
-=======
-	expectedListMetricWithDetailEC2sRDSWithTag := listMetricWithDetail{
-		metricsWithStats: []metricsWithStatistics{
-			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
-						Name:  awssdk.String("InstanceId"),
-						Value: awssdk.String("i-1"),
-					}},
-					MetricName: awssdk.String("CPUUtilization"),
-					Namespace:  awssdk.String("AWS/EC2"),
-				},
-				[]string{"Average"},
-			},
-			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
-						Name:  awssdk.String("InstanceId"),
-						Value: awssdk.String("i-2"),
-					}},
-					MetricName: awssdk.String("DiskReadBytes"),
-					Namespace:  awssdk.String("AWS/EC2"),
-				},
-				[]string{"Sum"},
-			},
-			{
-				cloudwatch.Metric{
-					Dimensions: []cloudwatch.Dimension{{
-						Name:  awssdk.String("DBClusterIdentifier"),
-						Value: awssdk.String("test1-cluster"),
-					},
-						{
-							Name:  awssdk.String("Role"),
-							Value: awssdk.String("READER"),
-						}},
-					MetricName: awssdk.String("CommitThroughput"),
-					Namespace:  awssdk.String("AWS/RDS"),
-				},
-				[]string{"Average"},
-			},
-		},
-		resourceTypeFilters: resourceTypeFiltersEC2RDSWithTag,
-	}
-
->>>>>>> e3c609ce35 ([metricbeat] fix ARN parsing in cloudwatch collector for API Gateway metrics (#32358))
 	cases := []struct {
 		title                         string
 		cloudwatchMetricsConfig       []Config
