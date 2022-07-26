@@ -249,6 +249,11 @@ func runCmd(
 	go func() {
 		<-ctx.Done()
 
+		// ProcessState can be null if it hasn't reported back yet
+		if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
+			return
+		}
+
 		err := cmd.Process.Kill()
 		if err != nil {
 			logp.Warn("could not kill synthetics process: %s", err)
