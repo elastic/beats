@@ -1,0 +1,10 @@
+# Rocky-Devel.repo
+#
+
+[devel]
+name=Rocky Linux $releasever - Devel WARNING! FOR BUILDROOT AND KOJI USE
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=Devel-$releasever
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/Devel/$basearch/os/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial

@@ -1,0 +1,58 @@
+# Rocky-Sources.repo
+
+[baseos-source]
+name=Rocky Linux $releasever - BaseOS - Source
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=BaseOS-$releasever-source
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/BaseOS/source/tree/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+[appstream-source]
+name=Rocky Linux $releasever - AppStream - Source
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=AppStream-$releasever-source
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/AppStream/source/tree/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+#[extras-source]
+#name=Rocky Linux $releasever - Extras - Source
+#mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=extras-$releasever-source
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/extras/source/tree/
+#gpgcheck=1
+#enabled=0
+#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+#[plus-source]
+#name=Rocky Linux $releasever - Plus - Source
+#mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=plus-$releasever-source
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/Plus/source/tree/
+#gpgcheck=1
+#enabled=0
+#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+[ha-source]
+name=Rocky Linux $releasever - High Availability - Source
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=HighAvailability-$releasever-source
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/HighAvailability/source/tree/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+[powertools-source]
+name=Rocky Linux $releasever - PowerTools - Source
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=PowerTools-$releasever-source
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/PowerTools/source/tree/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+[resilient-storage-source]
+name=Rocky Linux $releasever - Resilient Storage - Source
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=source&repo=ResilientStorage-$releasever-source
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/ResilientStorage/source/tree/
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+

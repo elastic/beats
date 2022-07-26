@@ -1,0 +1,22 @@
+# Rocky-Media.repo
+#
+# You can use this repo to install items directly off the installation media.
+# Verify your mount point matches one of the below file:// paths.
+
+[media-baseos]
+name=Rocky Linux $releasever - Media - BaseOS
+baseurl=file:///media/Rocky/BaseOS
+        file:///media/cdrom/BaseOS
+        file:///media/cdrecorder/BaseOS
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+[media-appstream]
+name=Rocky Linux $releasever - Media - AppStream
+baseurl=file:///media/Rocky/AppStream
+        file:///media/cdrom/AppStream
+        file:///media/cdrecorder/AppStream
+gpgcheck=1
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial

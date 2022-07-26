@@ -1,0 +1,87 @@
+version: "2.4"
+services:
+  beat:
+    image: dcar-heartbeat:${STACK_VERSION}
+    build:
+      context: src
+      network: host
+      args:
+        - BASE_REGISTRY=${BASE_REGISTRY}
+        - BASE_IMAGE=${BASE_IMAGE}
+        - BASE_TAG=${BASE_TAG}
+        - STACK_VERSION=${STACK_VERSION}
+    pid: "host"
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+    command:
+      - "-E"
+      - "setup.kibana.host=kibana:5601"
+      - "-E"
+      - 'output.elasticsearch.hosts=["https://elasticsearch:9200"]'
+      - "-E"
+      - "output.elasticsearch.elasticsearch.ssl.verification_mode=none"
+      - "-environment"
+      - "container"
+    volumes:
+      - "./stack_config/monitors.yml:/usr/share/heartbeat/monitors.d/demo-monitors.yml"
+
+  elasticsearch:
+    environment:
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "cluster.routing.allocation.disk.threshold_enabled=false"
+      - "discovery.type=single-node"
+      - "xpack.security.authc.anonymous.roles=remote_monitoring_collector"
+      - "xpack.security.authc.realms.file.file1.order=0"
+      - "xpack.security.authc.realms.native.native1.order=1"
+      - "xpack.security.enabled=true"
+      - "xpack.license.self_generated.type=trial"
+      - "xpack.security.authc.token.enabled=true"
+      - "xpack.security.authc.api_key.enabled=true"
+      - "logger.org.elasticsearch=${ES_LOG_LEVEL:-error}"
+      - "action.destructive_requires_name=false"
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    ports:
+      - "9200:9200"
+    healthcheck:
+      interval: 20s
+      retries: 10
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=500ms",
+        ]
+    volumes:
+      - "./elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml"
+      - "./elasticsearch/users:/usr/share/elasticsearch/config/users"
+      - "./elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles"
+      - "./elasticsearch/service_tokens:/usr/share/elasticsearch/config/service_tokens"
+
+  kibana:
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: "${KIBANA_ES_USER:-kibana_system_user}"
+      ELASTICSEARCH_PASSWORD: "${KIBANA_ES_PASS:-changeme}"
+      STATUS_ALLOWANONYMOUS: "true"
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    ports:
+      - "5601:5601"
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s http://localhost:5601/api/status | grep -q 'All services are available'",
+        ]
+
+  wait:
+    image: busybox
+    depends_on:
+      beat: { condition: service_healthy }
