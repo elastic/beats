@@ -10498,6 +10498,7 @@ Contents of probable licence file $GOMODCACHE/github.com/gomodule/redigo@v1.8.3/
 
 
 --------------------------------------------------------------------------------
+<<<<<<< HEAD
 Dependency : github.com/google/flatbuffers
 Version: v1.12.1
 Licence type (autodetected): Apache-2.0
@@ -10505,6 +10506,14 @@ Licence type (autodetected): Apache-2.0
 
 Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v1.12.1/LICENSE.txt:
 
+=======
+Dependency : github.com/elastic/elastic-agent-system-metrics
+Version: v0.4.4
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.4.4/LICENSE.txt:
+>>>>>>> e8a0da132f (update elastic-agent-system-metrics to v.0.4.4 to fix concurrent map writes (#32491))
 
                                  Apache License
                            Version 2.0, January 2004
