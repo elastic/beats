@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix namespacing on self-monitoring {pull}32336[32336]
 
 
 *Auditbeat*
@@ -73,6 +72,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 - update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
+- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32446[32446]
 
 *Packetbeat*
 
@@ -178,6 +178,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
