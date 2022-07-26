@@ -106,7 +106,8 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 
 		// NOTE: `Period * 2` is an arbitrary value to make the cache NEVER to expire before the next scraping run
 		// if different metricsets have different periods, we will effectively set (timeout = max(Period) * 2)
-		minCacheExpirationTime := base.Config().Period * 2
+		// minCacheExpirationTime := base.Config().Period * 2
+		minCacheExpirationTime, _ := time.ParseDuration("1000h")
 		if perfMetrics.GetTimeout() < minCacheExpirationTime {
 			perfMetrics.SetOrUpdateTimeout(minCacheExpirationTime)
 		}
