@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
 - Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
 - Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
+- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 
 *Heartbeat*
 
