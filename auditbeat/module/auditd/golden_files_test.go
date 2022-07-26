@@ -196,7 +196,8 @@ func TestGoldenFiles(t *testing.T) {
 				// Get Status response for initClient
 				returnACK().returnStatus().
 				// Send expected ACKs for initialization
-				returnACK().returnACK().returnACK().returnACK().returnACK().
+				returnACK().returnStatus().returnACK().returnACK().
+				returnACK().returnACK().returnACK().
 				// Send audit messages
 				returnMessage(lines...).
 				// Send stream terminator
