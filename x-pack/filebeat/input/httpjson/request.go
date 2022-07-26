@@ -40,11 +40,12 @@ type httpClient struct {
 }
 
 func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Response, error) {
-	c.tracer.txnStart(req)
 	resp, err := c.limiter.execute(stdCtx, func() (*http.Response, error) {
-		return c.client.Do(req)
+		c.tracer.txnStart(req)
+		resp, err := c.client.Do(req)
+		c.tracer.txnDone(resp)
+		return resp, err
 	})
-	c.tracer.txnDone(resp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
