@@ -25,12 +25,14 @@ import (
 func init() {
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
-			"process_cpu_seconds_total":                   prometheus.Metric("process.cpu.sec"),
-			"process_resident_memory_bytes":               prometheus.Metric("process.memory.resident.bytes"),
-			"process_virtual_memory_bytes":                prometheus.Metric("process.memory.virtual.bytes"),
-			"process_open_fds":                            prometheus.Metric("process.fds.open.count"),
-			"process_max_fds":                             prometheus.Metric("process.fds.max.count"),
-			"process_start_time_seconds":                  prometheus.Metric("process.started.sec"),
+			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
+			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
+			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
+			"process_open_fds":              prometheus.Metric("process.fds.open.count"),
+			"process_max_fds":               prometheus.Metric("process.fds.max.count"),
+			"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
+			// rest_client_request_duration_seconds buckets declared in
+			// https://github.com/kubernetes/component-base/blob/3b9b201c27aa896b98da61b94545efe442ae597e/metrics/prometheus/restclient/metrics.go#L39
 			"rest_client_request_duration_seconds":        prometheus.Metric("client.request.duration.us", prometheus.OpMultiplyBuckets(1000000)),
 			"rest_client_requests_total":                  prometheus.Metric("client.request.count"),
 			"workqueue_longest_running_processor_seconds": prometheus.Metric("workqueue.longestrunning.sec"),
