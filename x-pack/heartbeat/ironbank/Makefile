@@ -9,13 +9,11 @@ SYNTHETICS_VERSION = 1.0.0-beta.17
 SYNTHETIC_URL = https://storage.googleapis.com/obs-ci-cache/beats/elastic-synthetics-$(SYNTHETICS_VERSION).tgz
 SYNTHETIC_SHA256 = $(shell sha256sum $(BUILD)/elastic-synthetics.tar.gz|cut -d " " -f 1)
 
-.PHONY: prepare
-prepare: ## Download container dependencies defined in the download.json file.
+.PHONY: generate-custom
+generate-custom: ## Generate the custom hardening_manifest.
 	rm -rf $(BUILD) || true
 	mkdir -p $(BUILD)
-	curl -sSfL -o $(BUILD)/node.tar.gz $(NODE_URL)
-	curl -sSfL -o $(BUILD)/elastic-synthetics.tar.gz $(SYNTHETIC_URL)
-	@for i in $(shell cat rpm-deps.txt);\
+	@for i in $(shell make dependencies);\
 	do \
 		echo "Downloading $${i}"; \
 		BASENAME=$$(basename "$${i}"); \
@@ -26,3 +24,8 @@ prepare: ## Download container dependencies defined in the download.json file.
 		echo "      type: sha256" >> $(BUILD)/hardening_manifest.yml.add; \
 		echo "      value: $$( sha256sum $(BUILD)/$${BASENAME}|cut -d " " -f 1)" >> $(BUILD)/hardening_manifest.yml.add; \
 	done
+
+dependencies: ## List the dependencies to be downloaded
+	@echo $(NODE_URL)
+	@echo $(SYNTHETIC_URL)
+	@cat rpm-deps.txt

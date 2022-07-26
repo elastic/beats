@@ -84,7 +84,7 @@ func Ironbank() error {
 
 func customiseIronbank() error {
 	fmt.Println(">>> customiseIronbank (I'm downloading all the required dependencies...)")
-	makeIronbankPrepare := sh.OutCmd("make", "-C", "ironbank", "prepare")
+	makeIronbankPrepare := sh.OutCmd("make", "-C", "ironbank", "generate-custom")
 	if out, err := makeIronbankPrepare(); err != nil {
 		fmt.Println(out)
 		return err
