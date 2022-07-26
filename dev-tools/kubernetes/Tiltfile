@@ -4,6 +4,7 @@ load('ext://restart_process', 'docker_build_with_restart')
 def beat(
         mode="run",  # or debug
         beat="metricbeat",
+        arch="arm64",
         k8s_env="dev",
         **kwargs):
 
@@ -16,7 +17,7 @@ def beat(
     flags = ""
     if mode == "debug":
         flags = '-gcflags "-N -l"'
-    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build {} -o build/{} ../../{}".format(flags, beat, beat)
+    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH={} go build {} -o build/{} ../../{}".format(arch, flags, beat, beat)
     print("Build cmd: {}".format(build_cmd))
 
     local_resource(
@@ -50,17 +51,12 @@ def beat(
     docker_file = '{}/Dockerfile.{}'.format(beat, mode)
     print("Docker file: {}".format(docker_file))
 
-    extra_args = ""
-    if beat == "metricbeat":
-        extra_args = "-system.hostfs=/hostfs"
-
     if mode == "run":
         docker_entrypoint = [
                 '/usr/share/{}/{}'.format(beat, beat),
                 "-c",
                 "/etc/{}.yml".format(beat),
-                "-e",
-                extra_args
+                "-e"
             ]
     else:
         docker_entrypoint = [
@@ -71,11 +67,7 @@ def beat(
             "--log",
             "exec",
             "/usr/share/{}/{}".format(beat, beat),
-            "--",
-            "-c",
-            "/etc/{}.yml".format(beat),
-            "-e",
-            extra_args
+            "--"
         ]
     print("Docker entrypoint: {}".format(docker_entrypoint))
 
@@ -110,7 +102,8 @@ def beat(
 # beat(beat="metricbeat", mode="debug")
 
 beat(beat="metricbeat",
-    mode="run",
+    mode="debug",
+    arch="arm64", # change if on different laptop architecture
     k8s_env="dev")  # use ttl.sh as docker registry
 # beat(beat="metricbeat",
 #     mode="run",
