@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"context"
+	"github.com/elastic/beats/v7/heartbeat/ftestutils"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -95,7 +96,7 @@ func Test_runPublishJob(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			client := &MockBeatClient{}
+			client := &ftestutils.MockBeatClient{}
 			queue := runPublishJob(tc.job, &WrappedClient{
 				Publish: client.Publish,
 				Close:   client.Close,
@@ -112,8 +113,8 @@ func Test_runPublishJob(t *testing.T) {
 			}
 			client.Close()
 
-			require.Len(t, client.publishes, len(tc.validators))
-			for idx, event := range client.publishes {
+			require.Len(t, client.PublishedEvents(), len(tc.validators))
+			for idx, event := range client.PublishedEvents() {
 				testslike.Test(t, tc.validators[idx], event.Fields)
 			}
 		})

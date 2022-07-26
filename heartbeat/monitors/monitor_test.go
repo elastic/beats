@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/ftestutils"
 	"testing"
 	"time"
 
@@ -38,8 +39,8 @@ import (
 func TestMonitorBasic(t *testing.T) {
 	testMonitorConfig(
 		t,
-		mockPluginConf(t, "myId", "myName", "@every 1ms", "http://example.net"),
-		mockEventMonitorValidator("myId", "myName"),
+		ftestutils.MockPluginConf(t, "myId", "myName", "@every 1ms", "http://example.net"),
+		ftestutils.MockEventMonitorValidator("myId", "myName"),
 	)
 }
 
@@ -48,9 +49,9 @@ func TestMonitorBasic(t *testing.T) {
 func TestMonitorCfgError(t *testing.T) {
 	testMonitorConfig(
 		t,
-		mockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
+		ftestutils.MockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
 		lookslike.Compose(
-			baseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
+			ftestutils.BaseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
 			lookslike.MustCompile(mapstr.M{
 				"error": mapstr.M{
 					"message": isdef.IsStringContaining("missing required field"),
@@ -62,8 +63,8 @@ func TestMonitorCfgError(t *testing.T) {
 }
 
 func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Validator) {
-	reg, built, closed := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
+	reg, built, closed := ftestutils.MockPluginsReg()
+	pipelineConnector := &ftestutils.MockPipelineConnector{}
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
@@ -73,20 +74,20 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 
 	mon.Start()
 
-	require.Equal(t, 1, len(pipelineConnector.clients))
-	pcClient := pipelineConnector.clients[0]
+	require.Equal(t, 1, len(pipelineConnector.Clients))
+	pcClient := pipelineConnector.Clients[0]
 
 	timeout := time.Second
 	start := time.Now()
 	success := false
 	for time.Since(start) < timeout && !success {
-		count := len(pcClient.Publishes())
+		count := len(pcClient.PublishedEvents())
 		if count >= 1 {
 			success = true
 
 			pcClient.Close()
 
-			for _, event := range pcClient.Publishes() {
+			for _, event := range pcClient.PublishedEvents() {
 				testslike.Test(t, eventValidator, event.Fields)
 			}
 		} else {
@@ -104,13 +105,13 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 	mon.Stop()
 
 	assert.Equal(t, 1, closed.Load())
-	assert.Equal(t, true, pcClient.closed)
+	assert.Equal(t, true, pcClient.IsClosed())
 }
 
 func TestCheckInvalidConfig(t *testing.T) {
-	serverMonConf := mockInvalidPluginConf(t)
-	reg, built, closed := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
+	serverMonConf := ftestutils.MockInvalidPluginConf(t)
+	reg, built, closed := ftestutils.MockPluginsReg()
+	pipelineConnector := &ftestutils.MockPipelineConnector{}
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()

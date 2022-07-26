@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/ftestutils"
 	"regexp"
 	"testing"
 	"time"
@@ -161,10 +162,10 @@ func TestPreProcessors(t *testing.T) {
 }
 
 func TestDuplicateMonitorIDs(t *testing.T) {
-	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
-	badConf := mockBadPluginConf(t, "custom")
-	reg, built, closed := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
+	serverMonConf := ftestutils.MockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
+	badConf := ftestutils.MockBadPluginConf(t, "custom")
+	reg, built, closed := ftestutils.MockPluginsReg()
+	pipelineConnector := &ftestutils.MockPipelineConnector{}
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
