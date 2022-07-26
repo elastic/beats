@@ -40,8 +40,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
-- Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
-- Fix race condition when reloading runners {pull}32309[32309]
 - Fix race condition when stopping runners {pull}32433[32433]
 
 *Auditbeat*
@@ -52,10 +50,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
-- Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
-- cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
-- Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
 - Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
 - Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 
@@ -70,7 +64,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - update kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard {pull}31973[31973]
 - Check for nil metadata in GCP. {pull}32281[32281]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
-- update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32446[32446]
 
@@ -136,7 +129,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
 - Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
 - Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
-- Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
 * Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
 - AWS Fargate: Added support for DesiredStatus and KnownStatus {issue}32077[32077] {pull}32342[#32342]
 - Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}32394[32394]
