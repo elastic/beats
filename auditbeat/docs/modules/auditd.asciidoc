@@ -164,7 +164,7 @@ newer and no rules have been defined. Otherwise `unicast` will be used.
 This option can only be used with the `socket_type: unicast` since {beatname_uc}
 needs to manage the rules to be able to set it.
 +
-It is important to note that with this setting set, if {beatname_uc} is
+It is important to note that with this setting enabled, if {beatname_uc} is
 stopped and resumed events will continue to be processed but the
 configuration won't be updated until the system is restarted entirely.
 
