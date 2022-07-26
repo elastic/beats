@@ -109,9 +109,9 @@ def beat(
 # beat(beat="filebeat", mode="run")
 # beat(beat="metricbeat", mode="debug")
 
-beat(beat="filebeat",
+beat(beat="metricbeat",
     mode="run",
-    k8s_env="prod")  # use ttl.sh as docker registry
+    k8s_env="dev")  # use ttl.sh as docker registry
 # beat(beat="metricbeat",
 #     mode="run",
 #     k8s_env="prod")  # use ttl.sh as docker registry
