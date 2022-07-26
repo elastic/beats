@@ -58,7 +58,17 @@ func Package() {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
-// Package packages the Beat for IronBank distribution.
+// ValidateIronbank validates the existing dependencies needed
+// for the Ironbank have not changed and if so, then fail the build.
+//
+func ValidateIronbank() error {
+	start := time.Now()
+	defer func() { fmt.Println("validateIronbank ran for", time.Since(start)) }()
+	// TODO: generate dependencies file (rpm-deps.txt) and compare with
+	return nil
+}
+
+// Ironbank packages the Beat for IronBank distribution.
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
