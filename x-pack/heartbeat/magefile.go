@@ -65,7 +65,7 @@ func Package() {
 func ValidateIronbank() error {
 	start := time.Now()
 	defer func() { fmt.Println("validateIronbank ran for", time.Since(start)) }()
-	Ironbank()
+	return Ironbank()
 }
 
 // Ironbank packages the Beat for IronBank distribution.
