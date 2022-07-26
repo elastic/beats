@@ -1037,7 +1037,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 			}
 			return multicast, nil
 		}
-		if isLocked {
+		if isLocked && !c.Immutable {
 			log.Errorf("Cannot continue: audit configuration is locked " +
 				"in the kernel (enabled=2) which prevents using unicast " +
 				"sockets. Multicast audit subscriptions are not available " +
