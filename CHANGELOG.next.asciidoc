@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
 - Fix race condition when stopping runners {pull}32433[32433]
 
@@ -65,7 +66,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Check for nil metadata in GCP. {pull}32281[32281]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
-- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32446[32446]
 
 *Packetbeat*
 
