@@ -108,11 +108,11 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *lo
 			kubernetes2.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
-		if coresLimit > nodeCores {
+		if nodeCores > 0 && coresLimit > nodeCores {
 			coresLimit = nodeCores
 		}
 
-		if memLimit > nodeMem {
+		if nodeMem > 0 && memLimit > nodeMem {
 			memLimit = nodeMem
 		}
 
