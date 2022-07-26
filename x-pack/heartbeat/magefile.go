@@ -65,8 +65,7 @@ func Package() {
 func ValidateIronbank() error {
 	start := time.Now()
 	defer func() { fmt.Println("validateIronbank ran for", time.Since(start)) }()
-	// TODO: generate dependencies file (rpm-deps.txt) and compare with
-	return customiseIronbank()
+	Ironbank()
 }
 
 // Ironbank packages the Beat for IronBank distribution.

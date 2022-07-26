@@ -27,8 +27,8 @@ stages:
     goIntegTest:
         mage: "mage goIntegTest"
         stage: mandatory
-    validateIronbank:
-        mage: "mage validateIronbank"
+    ironbank:
+        mage: "mage ironbank"
         stage: mandatory
     macos:
         mage: "mage build unitTest"
@@ -72,7 +72,9 @@ stages:
 #            - "windows-8"
 #        stage: extended_win
     packaging-linux:
-        packaging-linux: "mage package"
+        packaging-linux: |
+          mage package;
+          mage validateIronbank;
         e2e:
             enabled: false
         stage: packaging
