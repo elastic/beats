@@ -126,7 +126,7 @@ func (p *Project) extraArgs() []string {
 func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
 	isScript := p.projectCfg.Source.Inline != nil
-	ctx := context.WithValue(context.TODO(), synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
+	ctx := context.WithValue(context.Background(), synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
 
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
