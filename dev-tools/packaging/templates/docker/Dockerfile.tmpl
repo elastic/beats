@@ -160,7 +160,7 @@ USER root
 # Install additional fonts as well
 RUN for iter in {1..10}; do \
     apt-get update -y && \
-    $NODE_PATH/node/lib/node_modules/@elastic/synthetics/node_modules/.bin/playwright install-deps && \
+    $NODE_PATH/node/lib/node_modules/@elastic/synthetics/node_modules/.bin/playwright install-deps chromium && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes \
     fonts-noto \
     fonts-noto-cjk && \
