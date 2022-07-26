@@ -98,7 +98,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.12"
+    go: "1.18.4"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -118,17 +118,17 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.12"
+    go: "1.18.4"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.12"
+    go: "1.18.4"
     checks: ["all"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.12"
+    go: "1.18.4"
 
   gosec:
     excludes:
