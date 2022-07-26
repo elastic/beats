@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
 - Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
 - Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
+- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 
 *Heartbeat*
 
