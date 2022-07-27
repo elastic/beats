@@ -41,6 +41,8 @@ type FilterJourneyConfig struct {
 // where these are unsupported
 var platformCmdMutate func(*exec.Cmd) = func(*exec.Cmd) {}
 
+var SynthexecTimeout struct{}
+
 // ProjectJob will run a single journey by name from the given project.
 func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given projectPath, use '.' as the first arg since the command runs
@@ -241,9 +243,17 @@ func runCmd(
 		return nil, err
 	}
 
-	// Kill the process if the context ends
+	// Get timeout from parent ctx
+	timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	go func() {
 		<-ctx.Done()
+
+		// ProcessState can be null if it hasn't reported back yet
+		if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
+			return
+		}
+
 		err := cmd.Process.Kill()
 		if err != nil {
 			logp.Warn("could not kill synthetics process: %s", err)
@@ -258,8 +268,16 @@ func runCmd(
 
 		var cmdError *SynthError = nil
 		if err != nil {
-			cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
+			// err could be generic or it could have been killed by context timeout, log and check context
+			// to decide which error to stream
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
+
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, loggableCmd.String()))
+			} else {
+				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
+			}
 		}
 
 		mpx.writeSynthEvent(&SynthEvent{
@@ -270,6 +288,7 @@ func runCmd(
 
 		wg.Wait()
 		mpx.Close()
+		cancel()
 	}()
 
 	return mpx, nil

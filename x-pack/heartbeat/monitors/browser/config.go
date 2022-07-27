@@ -6,6 +6,7 @@ package browser
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
@@ -16,6 +17,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		Sandbox:     false,
 		Screenshots: "on",
+		Timeout:     15 * time.Minute,
 	}
 }
 
@@ -35,6 +37,7 @@ type Config struct {
 	PlaywrightOpts    map[string]interface{}        `config:"playwright_options"`
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
 	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
+	Timeout           time.Duration                 `config:"timeout"`
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")

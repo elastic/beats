@@ -99,7 +99,7 @@ func TestRunCmd(t *testing.T) {
 	cmd := exec.Command("go", "run", "./main.go")
 
 	stdinStr := "MY_STDIN"
-	synthEvents := runAndCollect(t, cmd, stdinStr)
+	synthEvents := runAndCollect(t, cmd, stdinStr, 15*time.Minute)
 
 	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
 		stdoutEvents := eventsWithType(Stdout, synthEvents)
@@ -133,7 +133,7 @@ func TestRunCmd(t *testing.T) {
 
 func TestRunBadExitCodeCmd(t *testing.T) {
 	cmd := exec.Command("go", "run", "./main.go", "exit")
-	synthEvents := runAndCollect(t, cmd, "")
+	synthEvents := runAndCollect(t, cmd, "", 15*time.Minute)
 
 	// go run outputs "exit status 123" to stderr so we have two messages
 	require.Len(t, synthEvents, 2)
@@ -149,11 +149,26 @@ func TestRunBadExitCodeCmd(t *testing.T) {
 	})
 }
 
-func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string) []*SynthEvent {
+func TestRunTimeoutExitCodeCmd(t *testing.T) {
+	cmd := exec.Command("go", "run", "./main.go")
+	synthEvents := runAndCollect(t, cmd, "", 0*time.Second)
+
+	// go run should not produce any additional stderr output in this case
+	require.Len(t, synthEvents, 1)
+
+	t.Run("has a cmd status event", func(t *testing.T) {
+		stdoutEvents := eventsWithType(CmdStatus, synthEvents)
+		require.Len(t, stdoutEvents, 1)
+		require.Equal(t, synthEvents[0].Error.Code, "CMD_TIMEOUT")
+	})
+}
+
+func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {
 	_, filename, _, _ := runtime.Caller(0)
 	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
+	ctx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
 
-	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
+	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent
