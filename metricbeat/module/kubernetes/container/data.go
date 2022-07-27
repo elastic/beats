@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *logp.Logger) ([]mapstr.M, error) {
+func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, containerMetrics *util.MetricsStorage, logger *logp.Logger) ([]mapstr.M, error) {
 	events := []mapstr.M{}
 	var summary kubernetes.Summary
 
@@ -130,6 +130,11 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *lo
 			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
 			coresLimit := perfMetrics.ContainerCoresLimit.GetWithDefault(cuid, nodeCores)
 			memLimit := perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
+
+			coresLimitMetric, err := containerMetrics.Get(cuid, util.CONTAINER_CORES_LIMIT)
+			if err == nil {
+				coresLimit = coresLimitMetric.Get()
+			}
 
 			if coresLimit > 0 {
 				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit, logger)
