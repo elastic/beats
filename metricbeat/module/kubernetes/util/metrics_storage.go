@@ -32,11 +32,11 @@ type Metrics struct {
 	// NodeCoresAllocatable *Float64Metric
 	// ContainerMemLimit *Float64Metric
 	// ContainerCoresLimit *Float64Metric
-	entries map[string]*Float64Metric
+	entries map[int]*Float64Metric
 }
 
 func NewMetrics() *Metrics {
-	entries := make(map[string]*Float64Metric)
+	entries := make(map[int]*Float64Metric)
 
 	ans := &Metrics{
 		entries: entries,
@@ -63,9 +63,16 @@ func (s *MetricsStorage) Clear() {
 	}
 }
 
-const CONTAINER_CORES_LIMIT = "ContainerCoresLimit"
+const CONTAINER_CORES_LIMIT = 1
+const CONTAINER_MEMORY_LIMIT = 2
+const NODE_CORES_ALLOCATABLE = 3
+const NODE_MEMORY_ALLOCATABLE = 4
 
-func (s *MetricsStorage) Set(id, metricName string, metricValue float64) error {
+func (s *MetricsStorage) Delete(id string) {
+	// delete(s.metrics, id) // TODO: lock on metrics by id
+}
+
+func (s *MetricsStorage) Set(id string, metricName int, metricValue float64) error {
 	metrics, exists := s.metrics[id]
 	if !exists {
 		s.metrics[id] = NewMetrics()
@@ -79,7 +86,7 @@ func (s *MetricsStorage) Set(id, metricName string, metricValue float64) error {
 		metrics.entries[metricName] = metric.NewFloat64Metric()
 		metric, exists = metrics.entries[metricName]
 		if !exists {
-			return fmt.Errorf("Cannot create metric for id: %s, name: %s", id, metricName)
+			return fmt.Errorf("Cannot create metric for id: %s, name: %v", id, metricName)
 		}
 	}
 
@@ -88,7 +95,7 @@ func (s *MetricsStorage) Set(id, metricName string, metricValue float64) error {
 	return nil
 }
 
-func (s *MetricsStorage) Get(id, metricName string) (*Float64Metric, error) {
+func (s *MetricsStorage) Get(id string, metricName int) (*Float64Metric, error) {
 	metrics, exists := s.metrics[id]
 	if !exists {
 		return nil, fmt.Errorf("Metrics not found for id: %s", id)
@@ -96,8 +103,16 @@ func (s *MetricsStorage) Get(id, metricName string) (*Float64Metric, error) {
 
 	metric, exists := metrics.entries[metricName]
 	if !exists {
-		return nil, fmt.Errorf("Metric not found for id: %s, name: %s", id, metricName)
+		return nil, fmt.Errorf("Metric not found for id: %s, name: %v", id, metricName)
 	}
 
 	return metric, nil
+}
+
+func (s *MetricsStorage) GetWithDefault(id string, metricName int, defaultValue float64) (float64) {
+	metricValue, err := s.Get(id, metricName)
+	if err != nil {
+		return defaultValue
+	}
+	return metricValue.Get()
 }

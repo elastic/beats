@@ -42,8 +42,7 @@ type Module interface {
 	mb.Module
 	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
 	GetKubeletStats(http *helper.HTTP) ([]byte, error)
-	GetPerfMetricsCache() *util.PerfMetricsCache
-	GetContainerMetrics() *util.MetricsStorage
+	GetMetricsStorage() *util.MetricsStorage
 }
 
 type familiesCache struct {
@@ -87,8 +86,7 @@ type module struct {
 
 	kubeStateMetricsCache *kubeStateMetricsCache
 	kubeletStatsCache     *kubeletStatsCache
-	perfMetrics           *util.PerfMetricsCache
-	containerMetrics      *util.MetricsStorage
+	metricsStorage        *util.MetricsStorage
 	cacheHash             uint64
 }
 
@@ -99,28 +97,18 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	kubeletStatsCache := &kubeletStatsCache{
 		cacheMap: make(map[uint64]*statsCache),
 	}
-	perfMetrics := util.NewPerfMetricsCache(0)
-	containerMetrics := util.NewMetricsStorage()
+	metricsStorage := util.NewMetricsStorage()
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
 			return nil, fmt.Errorf("error generating cache hash for kubeStateMetricsCache: %w", err)
 		}
 
-		// NOTE: `Period * 2` is an arbitrary value to make the cache NEVER to expire before the next scraping run
-		// if different metricsets have different periods, we will effectively set (timeout = max(Period) * 2)
-		// minCacheExpirationTime := base.Config().Period * 2
-		minCacheExpirationTime, _ := time.ParseDuration("48h")
-		if perfMetrics.GetTimeout() < minCacheExpirationTime {
-			perfMetrics.SetOrUpdateTimeout(minCacheExpirationTime)
-		}
-
 		m := module{
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
 			kubeletStatsCache:     kubeletStatsCache,
-			perfMetrics:           perfMetrics,
-			containerMetrics:      containerMetrics,
+			metricsStorage:        metricsStorage,
 			cacheHash:             hash,
 		}
 		return &m, nil
@@ -172,10 +160,6 @@ func generateCacheHash(host []string) (uint64, error) {
 	return id, nil
 }
 
-func (m *module) GetPerfMetricsCache() *util.PerfMetricsCache {
-	return m.perfMetrics
-}
-
-func (m *module) GetContainerMetrics() *util.MetricsStorage {
-	return m.containerMetrics
+func (m *module) GetMetricsStorage() *util.MetricsStorage {
+	return m.metricsStorage
 }
