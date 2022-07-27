@@ -21,6 +21,7 @@ import (
 )
 
 func TestValidLocal(t *testing.T) {
+	timeout := 30
 	_, filename, _, _ := runtime.Caller(0)
 	path := path.Join(filepath.Dir(filename), "source/fixtures/todos")
 	testParams := map[string]interface{}{
@@ -40,6 +41,7 @@ func TestValidLocal(t *testing.T) {
 				"path": path,
 			},
 		},
+		"timeout": timeout,
 	})
 	s, e := NewProject(cfg)
 	require.NoError(t, e)
@@ -57,6 +59,7 @@ func TestValidLocal(t *testing.T) {
 }
 
 func TestValidInline(t *testing.T) {
+	timeout := 30
 	script := "a script"
 	testParams := map[string]interface{}{
 		"key1": "value1",
@@ -71,6 +74,7 @@ func TestValidInline(t *testing.T) {
 				"script": script,
 			},
 		},
+		"timeout": timeout,
 	})
 	s, e := NewProject(cfg)
 	require.NoError(t, e)
@@ -210,4 +214,22 @@ func TestExtraArgs(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestEmptyTimeout(t *testing.T) {
+	defaults := DefaultConfig()
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"name": "My Name",
+		"id":   "myId",
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "script",
+			},
+		},
+	})
+	s, e := NewProject(cfg)
+
+	require.NoError(t, e)
+	require.NotNil(t, s)
+	require.Equal(t, s.projectCfg.Timeout, defaults.Timeout)
 }
