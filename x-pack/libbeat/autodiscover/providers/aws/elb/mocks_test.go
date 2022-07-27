@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elasticloadbalancingv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 )
 
 // mockFetcher is a fetcher that returns a customizable list of results, useful for testing.
@@ -53,28 +53,28 @@ func fakeLbl() *lbListener {
 	strVal := "strVal"
 	lbARN := "lb_arn"
 	listenerARN := "listen_arn"
-	state := elasticloadbalancingv2.LoadBalancerState{Reason: &strVal, Code: elasticloadbalancingv2.LoadBalancerStateEnumActive}
+	state := elasticloadbalancingv2types.LoadBalancerState{Reason: &strVal, Code: elasticloadbalancingv2types.LoadBalancerStateEnumActive}
 	now := time.Now()
 
-	lb := &elasticloadbalancingv2.LoadBalancer{
+	lb := &elasticloadbalancingv2types.LoadBalancer{
 		LoadBalancerArn:   &lbARN,
 		DNSName:           &dnsName,
-		Type:              elasticloadbalancingv2.LoadBalancerTypeEnumApplication,
-		Scheme:            elasticloadbalancingv2.LoadBalancerSchemeEnumInternetFacing,
-		AvailabilityZones: []elasticloadbalancingv2.AvailabilityZone{{ZoneName: &strVal}},
+		Type:              elasticloadbalancingv2types.LoadBalancerTypeEnumApplication,
+		Scheme:            elasticloadbalancingv2types.LoadBalancerSchemeEnumInternetFacing,
+		AvailabilityZones: []elasticloadbalancingv2types.AvailabilityZone{{ZoneName: &strVal}},
 		CreatedTime:       &now,
 		State:             &state,
-		IpAddressType:     elasticloadbalancingv2.IpAddressTypeDualstack,
+		IpAddressType:     elasticloadbalancingv2types.IpAddressTypeDualstack,
 		SecurityGroups:    []string{"foo-security-group"},
 		VpcId:             &strVal,
 	}
 
-	var port int64 = 1234
-	listener := &elasticloadbalancingv2.Listener{
+	var port int32 = 1234
+	listener := &elasticloadbalancingv2types.Listener{
 		ListenerArn:     &listenerARN,
 		LoadBalancerArn: lb.LoadBalancerArn,
 		Port:            &port,
-		Protocol:        elasticloadbalancingv2.ProtocolEnumHttps,
+		Protocol:        elasticloadbalancingv2types.ProtocolEnumHttps,
 		SslPolicy:       &strVal,
 	}
 

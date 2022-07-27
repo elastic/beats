@@ -143,6 +143,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add Github action for linting
 - Add regex support for drop_fields processor.
 - Improve compatibility and reduce flakyness of Python tests {pull}31588[31588]
+- Added `.python-version` file {pull}32323[32323]
 
 ==== Deprecated
 

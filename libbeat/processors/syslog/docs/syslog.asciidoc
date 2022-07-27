@@ -121,6 +121,14 @@ The RFC 5424 format accepts the following forms of timestamps:
 
 Formats with an asterisk (*) are a non-standard allowance.
 
+[float]
+==== Structured Data
+
+For RFC 5424-formatted logs, if the structured data cannot be parsed according
+to RFC standards, the original structured data text will be prepended to the message
+field, separated by a space.
+
+
 ifndef::serverless[]
 
 [float]

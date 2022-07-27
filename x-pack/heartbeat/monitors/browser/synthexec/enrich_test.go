@@ -97,7 +97,8 @@ func TestJourneyEnricher(t *testing.T) {
 		} else {
 			u, _ := url.Parse(url1)
 			// journey end gets a summary
-			v = append(v, lookslike.MustCompile(mapstr.M{
+			v = append(v, lookslike.MustCompile(map[string]interface{}{
+				"event.type":          "heartbeat/summary",
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
@@ -138,7 +139,8 @@ func TestJourneyEnricher(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
-			je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: sFields}}
+
+			je := makeTestJourneyEnricher(sFields)
 			for _, se := range synthEvents {
 				check(t, se, je)
 			}
@@ -157,7 +159,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			"stderr",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type: "stderr",
+				Type: Stderr,
 				Payload: mapstr.M{
 					"message": "Error from synthetics",
 				},
@@ -169,7 +171,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 						"payload": mapstr.M{
 							"message": "Error from synthetics",
 						},
-						"type":            "stderr",
+						"type":            Stderr,
 						"package_version": "1.0.0",
 						"index":           0,
 					},
@@ -181,7 +183,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 			"stdout",
 			&journeyEnricher{},
 			&SynthEvent{
-				Type: "stdout",
+				Type: Stdout,
 				Payload: mapstr.M{
 					"message": "debug output",
 				},
@@ -193,7 +195,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 						"payload": mapstr.M{
 							"message": "debug output",
 						},
-						"type":            "stdout",
+						"type":            Stdout,
 						"package_version": "1.0.0",
 						"index":           0,
 					},
@@ -374,7 +376,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 	}
 
 	stdFields := stdfields.StdMonitorFields{}
-	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
+	je := makeTestJourneyEnricher(stdFields)
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
 
@@ -436,7 +438,7 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 	hasCmdStatus := false
 
 	stdFields := stdfields.StdMonitorFields{}
-	je := &journeyEnricher{streamEnricher: &streamEnricher{sFields: stdFields}}
+	je := makeTestJourneyEnricher(stdFields)
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
@@ -500,7 +502,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			end:             baseTime.Add(10 * time.Microsecond),
 			journeyComplete: true,
 			errorCount:      1,
-			firstError:      fmt.Errorf("journey errored"),
+			error:           fmt.Errorf("journey errored"),
 		},
 		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
@@ -569,4 +571,8 @@ func TestCreateSummaryEvent(t *testing.T) {
 			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
 		})
 	}
+}
+
+func makeTestJourneyEnricher(sFields stdfields.StdMonitorFields) *journeyEnricher {
+	return &journeyEnricher{streamEnricher: newStreamEnricher(sFields)}
 }

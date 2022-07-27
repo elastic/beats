@@ -5,24 +5,20 @@
 package ec2
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/pkg/errors"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
-	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type ec2Instance struct {
-	ec2Instance ec2.Instance
+	ec2Instance ec2types.Instance
 }
 
 // toMap converts this ec2Instance into the form consumed as metadata in the autodiscovery process.
 func (i *ec2Instance) toMap() mapstr.M {
-	architecture, err := i.ec2Instance.Architecture.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for architecture: "))
-	}
+	architecture := string(i.ec2Instance.Architecture)
 
 	m := mapstr.M{
 		"image":            i.toImage(),
@@ -38,7 +34,7 @@ func (i *ec2Instance) toMap() mapstr.M {
 	}
 
 	for _, tag := range i.ec2Instance.Tags {
-		m.Put("tags."+awsauto.SafeString(tag.Key), awsauto.SafeString(tag.Value))
+		_, _ = m.Put("tags."+awsauto.SafeString(tag.Key), awsauto.SafeString(tag.Value))
 	}
 	return m
 }
@@ -54,10 +50,7 @@ func (i *ec2Instance) toImage() mapstr.M {
 }
 
 func (i *ec2Instance) toMonitoringState() mapstr.M {
-	monitoringState, err := i.ec2Instance.Monitoring.State.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for monitoring state: "))
-	}
+	monitoringState := i.ec2Instance.Monitoring.State
 
 	m := mapstr.M{}
 	m["state"] = monitoringState
@@ -109,10 +102,7 @@ func (i *ec2Instance) toCloudMap() mapstr.M {
 	instance["id"] = i.instanceID()
 	m["instance"] = instance
 
-	instanceType, err := i.ec2Instance.InstanceType.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for instance type: "))
-	}
+	instanceType := string(i.ec2Instance.InstanceType)
 	machine := mapstr.M{}
 	machine["type"] = instanceType
 	m["machine"] = machine
@@ -123,10 +113,7 @@ func (i *ec2Instance) toCloudMap() mapstr.M {
 func (i *ec2Instance) stateMap() (stateMap mapstr.M) {
 	state := i.ec2Instance.State
 	stateMap = mapstr.M{}
-	nameString, err := state.Name.MarshalValue()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "MarshalValue failed for instance state name: "))
-	}
+	nameString := string(state.Name)
 
 	stateMap["name"] = nameString
 	stateMap["code"] = state.Code

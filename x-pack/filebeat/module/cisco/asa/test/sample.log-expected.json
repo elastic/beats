@@ -3933,7 +3933,7 @@
             "89.160.20.156"
         ],
         "related.user": [
-            "user@domain.tld"
+            "user"
         ],
         "service.type": "cisco",
         "source.address": "1.128.3.4",
@@ -3944,7 +3944,7 @@
         "source.nat.port": "34534",
         "source.port": 12312,
         "source.user.domain": "domain.tld",
-        "source.user.name": "user@domain.tld",
+        "source.user.name": "user",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -4028,7 +4028,7 @@
         "destination.as.organization.name": "Telstra Pty Ltd",
         "destination.ip": "1.128.3.4",
         "destination.user.domain": "domain.tld",
-        "destination.user.name": "user@domain.tld",
+        "destination.user.name": "user",
         "event.action": "flow-expiration",
         "event.category": [
             "network"
@@ -4062,7 +4062,7 @@
             "89.160.20.156"
         ],
         "related.user": [
-            "user@domain.tld"
+            "user"
         ],
         "service.type": "cisco",
         "source.address": "89.160.20.156",
@@ -4078,12 +4078,12 @@
         "source.geo.region_name": "\u00d6sterg\u00f6tland County",
         "source.ip": "89.160.20.156",
         "source.user.domain": "domain.tld",
-        "source.user.name": "user@domain.tld",
+        "source.user.name": "user",
         "tags": [
             "cisco-asa",
             "forwarded"
         ],
-        "user.name": "user@domain.tld"
+        "user.name": "user"
     },
     {
         "@timestamp": "2021-01-13T19:12:37.000-02:00",
@@ -4756,6 +4756,9 @@
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 13909,
+        "log.syslog.facility.code": 1,
+        "log.syslog.priority": 13,
+        "log.syslog.severity.code": 5,
         "network.protocol": "tcp",
         "observer.egress.interface.name": "Inside",
         "observer.ingress.interface.name": "outside",
@@ -4770,7 +4773,6 @@
         "source.address": "54.239.28.85",
         "source.ip": "54.239.28.85",
         "source.port": 443,
-        "syslog.facility": 13,
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -4797,6 +4799,9 @@
         "log.file.path": "sample.log",
         "log.level": "warning",
         "log.offset": 14071,
+        "log.syslog.facility.code": 1,
+        "log.syslog.priority": 13,
+        "log.syslog.severity.code": 5,
         "network.protocol": "tcp",
         "observer.egress.interface.name": "Inside",
         "observer.ingress.interface.name": "outside",
@@ -4811,7 +4816,6 @@
         "source.address": "54.239.28.85",
         "source.ip": "54.239.28.85",
         "source.port": 443,
-        "syslog.facility": 13,
         "tags": [
             "cisco-asa",
             "forwarded"

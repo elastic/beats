@@ -10,6 +10,8 @@ var:
       # ssh logs to files
       - /var/log/secure.log*
     os.windows: []
+  - name: tags
+    default: []
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/auth.yml

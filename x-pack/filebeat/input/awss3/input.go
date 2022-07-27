@@ -159,7 +159,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	sqsServiceName := awscommon.CreateServiceName("sqs", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
 
 	sqsAPI := &awsSQSAPI{
-		client:            sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, sqsServiceName, in.awsConfig.Region, in.awsConfig)),
+		client:            sqs.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, sqsServiceName, in.awsConfig.Region, in.awsConfig)),
 		queueURL:          in.config.QueueURL,
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
@@ -167,7 +167,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	}
 
 	s3API := &awsS3API{
-		client: s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig)),
+		client: s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig)),
 	}
 
 	log := ctx.Logger.With("queue_url", in.config.QueueURL)
@@ -206,14 +206,24 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 		bucketName = getBucketNameFromARN(in.config.BucketARN)
 		bucketID = in.config.BucketARN
 	}
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
+
+	s3Client := s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig), func(o *s3.Options) {
+		o.UsePathStyle = in.config.PathStyle
+	})
 	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
 	}
+
+	originalAwsConfigRegion := in.awsConfig.Region
+
 	in.awsConfig.Region = regionName
-	s3Client = s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
-	s3Client.ForcePathStyle = in.config.PathStyle
+
+	if regionName != originalAwsConfigRegion {
+		s3Client = s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig), func(o *s3.Options) {
+			o.UsePathStyle = in.config.PathStyle
+		})
+	}
 
 	s3API := &awsS3API{
 		client: s3Client,
@@ -267,16 +277,20 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 }
 
 func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {
-	req := s3Client.GetBucketLocationRequest(&s3.GetBucketLocationInput{
+	getBucketLocationOutput, err := s3Client.GetBucketLocation(ctx, &s3.GetBucketLocationInput{
 		Bucket: awssdk.String(bucketName),
 	})
 
-	resp, err := req.Send(ctx)
 	if err != nil {
 		return "", err
 	}
 
-	return string(s3.NormalizeBucketLocation(resp.LocationConstraint)), nil
+	// Region us-east-1 have a LocationConstraint of null.
+	if len(getBucketLocationOutput.LocationConstraint) == 0 {
+		return "us-east-1", nil
+	}
+
+	return string(getBucketLocationOutput.LocationConstraint), nil
 }
 
 func getBucketNameFromARN(bucketARN string) string {
