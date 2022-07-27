@@ -185,6 +185,7 @@ func NewResourceMetadataEnricher(
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
 	perfMetrics *PerfMetricsCache,
+	containerMetrics *MetricsStorage,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
@@ -231,6 +232,7 @@ func NewContainerMetadataEnricher(
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
 						perfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+						containerMetrics.Set(cuid, CONTAINER_CORES_LIMIT, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
