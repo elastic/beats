@@ -87,9 +87,13 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	// Get a buffer from the pool and adjust its length.
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
+	// The documentation for EventFormatMessage specifies that the buffer is
+	// requested "in characters", and the buffer itself is LPWSTR, meaning the
+	// characters are WCHAR so double the value.
+	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
 	bb.Reserve(int(bufferUsed * 2))
 
-	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(bb.Len()), bb.PtrAt(0), &bufferUsed)
+	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, bufferUsed, bb.PtrAt(0), &bufferUsed)
 	switch err { //nolint:errorlint // This is an errno or nil.
 	case nil: // OK
 
