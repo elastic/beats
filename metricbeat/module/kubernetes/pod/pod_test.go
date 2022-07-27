@@ -24,7 +24,6 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -44,12 +43,12 @@ func TestEventMapping(t *testing.T) {
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	cache := util.NewPerfMetricsCache(120 * time.Second)
-	cache.NodeCoresAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 2)
-	cache.NodeMemAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 146227200)
-	cache.ContainerMemLimit.Set(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), 14622720)
+	metricsStorage := util.NewMetricsStorage()
+	metricsStorage.Set("gke-beats-default-pool-a5b33e2e-hdww", util.NODE_CORES_ALLOCATABLE, 2)
+	metricsStorage.Set("gke-beats-default-pool-a5b33e2e-hdww",  util.NODE_MEMORY_ALLOCATABLE, 146227200)
+	metricsStorage.Set(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), util.CONTAINER_MEMORY_LIMIT, 14622720)
 
-	events, err := eventMapping(body, cache, logger)
+	events, err := eventMapping(body, metricsStorage, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
