@@ -10319,10 +10319,29 @@ type: float
 [[exported-fields-cockroachdb]]
 == CockroachDB fields
 
-CockroachDB module
+CockroachDB module scrape metrics using Prometheus endpoint.
 
 
 
+
+*`prometheus.labels.*`*::
++
+--
+Prometheus metric labels
+
+
+type: object
+
+--
+
+*`prometheus.metrics.*`*::
++
+--
+
+
+type: object
+
+--
 
 [[exported-fields-common]]
 == Common fields

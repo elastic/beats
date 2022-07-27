@@ -19,5 +19,5 @@ func init() {
 // AssetCockroachdb returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/cockroachdb.
 func AssetCockroachdb() string {
-	return "eJxczjsOwjAQhOHepxi5SUMusAUFcAtE4dhLYsWxLe+myO0RLykw5Uif9PeYeSP44udWnJ/CYACNmpjQnb/v5dQZoHFiJ0wYWJ0BAotvsWosmXA0ALATWEpYExtAWDXmUQhXK5LsAXZSrfZmgHvkFIReuEd2C//HPKdbZcLYylo/z9697W/dIwAA//+zakEu"
+	return "eJyUkr1Ow0AQhHs/xcgUkaIkD+CCAuihRyg6323sI/en3bWivD1KbEcOICG2nNmf70a3xZHODWy2R87G9q6tAPUaqMHqeVZfnlYVwBTICDXoTAU4Esu+qM+pwWMFAIt+xOyGQBDLphAiKXsrGMSnDm+cI2lPg4CSK9kn3VWAkKpPnTR4r0VCvUHdq5b6owIOnoKT5npmi2QiNSi3NVcZ0HO50HEeyqQsxy71gFd2xPACH0tmNUnRE9MGwbQUBCcfAqJR2+PgWXQD7QlMojBMcHloA932zSjj8G59M2aY3H6S1YU8CvvRPdL5lNkt7F9SnWuR2hjndPUHzBT2v2m+ve3O3UdTik/d1Fqv67+ht3c/5isAAP//YgO4RQ=="
 }
