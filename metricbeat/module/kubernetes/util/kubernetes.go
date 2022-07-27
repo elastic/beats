@@ -124,12 +124,12 @@ func NewResourceMetadataEnricher(
 				nodeName := r.GetObjectMeta().GetName()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						metricsStorage.Set(nodeName, NODE_CORES_ALLOCATABLE, float64(q.MilliValue())/1000)
+						metricsStorage.SetNodeMetric(nodeName, NODE_CORES_ALLOCATABLE, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						metricsStorage.Set(nodeName, NODE_MEMORY_ALLOCATABLE, float64(q.Value()))
+						metricsStorage.SetNodeMetric(nodeName, NODE_MEMORY_ALLOCATABLE, float64(q.Value()))
 					}
 				}
 
@@ -236,12 +236,12 @@ func NewContainerMetadataEnricher(
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						metricsStorage.Set(cuid, CONTAINER_CORES_LIMIT, float64(q.MilliValue())/1000)
+						metricsStorage.SetContainerMetric(cuid, CONTAINER_CORES_LIMIT, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						metricsStorage.Set(cuid, CONTAINER_MEMORY_LIMIT, float64(q.Value()))
+						metricsStorage.SetContainerMetric(cuid, CONTAINER_MEMORY_LIMIT, float64(q.Value()))
 					}
 				}
 
@@ -268,8 +268,8 @@ func NewContainerMetadataEnricher(
 				base.Logger().Debugf("Error while casting event: %s", ok)
 			}
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-				metricsStorage.Delete(cuid)
+				// cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
+				// metricsStorage.Delete(cuid) // fixme
 
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
