@@ -20,7 +20,6 @@ package queue
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -102,7 +101,7 @@ type ProducerConfig struct {
 	// with close happening early might result in the event being dropped. The callback
 	// gives a queue user a chance to keep track of total number of events
 	// being buffered by the queue.
-	OnDrop func(beat.Event)
+	OnDrop func(interface{})
 
 	// DropOnCancel is a hint to the queue to drop events if the producer disconnects
 	// via Cancel.

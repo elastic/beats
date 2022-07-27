@@ -102,11 +102,11 @@ func (b *ringBuffer) insert(entry queueEntry) {
 
 // cancel removes all buffered events matching `st`, not yet reserved by
 // any consumer
-func (b *ringBuffer) cancel(st *produceState) int {
-	cancelledB := b.cancelRegion(st, b.regB)
+func (b *ringBuffer) cancel(producer *ackProducer) int {
+	cancelledB := b.cancelRegion(producer, b.regB)
 	b.regB.size -= cancelledB
 
-	cancelledA := b.cancelRegion(st, region{
+	cancelledA := b.cancelRegion(producer, region{
 		index: b.regA.index + b.reserved,
 		size:  b.regA.size - b.reserved,
 	})
@@ -118,7 +118,7 @@ func (b *ringBuffer) cancel(st *produceState) int {
 // cancelRegion removes the events in the specified range having
 // the specified produceState. It returns the number of events
 // removed.
-func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
+func (b *ringBuffer) cancelRegion(producer *ackProducer, reg region) int {
 	start := reg.index
 	end := start + reg.size
 	entries := b.entries[start:end]
@@ -127,7 +127,7 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 
 	// filter loop
 	for i := 0; i < reg.size; i++ {
-		if entries[i].client.state == st {
+		if entries[i].producer == producer {
 			continue // remove
 		}
 		toEntries = append(toEntries, entries[i])

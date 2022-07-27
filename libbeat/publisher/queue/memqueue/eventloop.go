@@ -18,11 +18,8 @@
 package memqueue
 
 import (
-	"fmt"
-	"math"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -145,20 +142,20 @@ func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
 }
 
 // Returns true if the queue is full after handling the insertion request.
-func (l *directEventLoop) insert(req *pushRequest, id queue.EntryID) {
+func (l *directEventLoop) insert(req *pushRequest) {
 	log := l.broker.logger
 
-	st := req.state
-	if st.cancelled {
+	if req.producer != nil && req.producer.state.cancelled {
 		reportCancelledState(log, req)
 	} else {
 		if req.resp != nil {
 			req.resp <- l.nextEntryID
 		}
-		l.buf.insert(req.event, producerEventState{
-			seq:   l.nextEntryID,
-			state: st,
-		})
+		l.buf.insert(queueEntry{
+			event:         req.event,
+			id:            l.nextEntryID,
+			producer:      req.producer,
+			producerIndex: req.producerIndex})
 		l.nextEntryID++
 	}
 }
@@ -169,9 +166,9 @@ func (l *directEventLoop) handleCancel(req *producerCancelRequest) {
 
 	var removed int
 
-	if st := req.state; st != nil {
-		st.cancelled = true
-		removed = l.buf.cancel(st)
+	if producer := req.producer; producer != nil {
+		producer.state.cancelled = true
+		removed = l.buf.cancel(producer)
 	}
 
 	// signal cancel request being finished
@@ -210,50 +207,29 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 	entries := l.buf.entries
 
 	firstIndex := lst.front().start
-	// Position the index at the end of the block of ACKed events
-	idx := (firstIndex + N - 1) % len(entries)
-
-	total := 0
+	// We traverse the block of events newest to oldest so we encounter the
+	// highest produer IDs first and can skip subsequent callbacks to the
+	// same producer.
 	for i := N - 1; i >= 0; i-- {
-		if idx < 0 {
-			idx = len(entries) - 1
-		}
+		idx := (firstIndex + i) % len(entries)
+		entry := &entries[idx]
 
-		client := &entries[idx].client
-		seq := entries[idx].client.pub
-		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, client.seq)
-
-		idx--
-		if client.state == nil {
-			log.Debug("no state set")
+		if entry.producer == nil {
+			// this event doesn't need ACK handling
 			continue
 		}
-
-		count := (client.seq - client.state.ackedCount)
-		if count == 0 || count > math.MaxUint32/2 {
-			// seq number comparison did underflow. This happens only if st.seq has
-			// already been acknowledged
-			// log.Debug("seq number already acked: ", st.seq)
-
-			client.state = nil
+		if entry.producerIndex < entry.producer.state.ackedCount {
+			// This has a lower index than the previous ACK for this producer,
+			// so it was covered in the previous call and we can skip it.
+			entry.producer = nil
 			continue
 		}
+		count := (entry.producerIndex - entry.producer.producedCount)
 
-		log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
-			count,
-			client.state.ackedCount+1,
-			client.seq,
-		)
-
-		total += int(count)
-		if total > N {
-			panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
-				N, total,
-			))
-		}
-		client.state.cb(int(count))
-		client.state.ackedCount = client.seq
-		client.state = nil
+		entry.producer.state.cb(int(count))
+		// This update is safe because ackedCount is only used from the event loop.
+		entry.producer.state.ackedCount = entry.producerIndex + 1
+		entry.producer = nil
 	}
 }
 
@@ -360,37 +336,33 @@ func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 	}
 }
 
-func (l *bufferingEventLoop) insert(req *pushRequest, seq queue.EntryID) bool {
-	if req.state == nil {
-		l.buf.add(req.event, producerEventState{})
-		return true
-	}
-
-	st := req.state
-	if st.cancelled {
+func (l *bufferingEventLoop) insert(req *pushRequest, id queue.EntryID) bool {
+	if req.producer != nil && req.producer.state.cancelled {
 		reportCancelledState(l.broker.logger, req)
 		return false
 	}
 
-	l.buf.add(req.event, producerEventState{
-		seq:   seq,
-		state: st,
+	l.buf.add(queueEntry{
+		event:         req.event,
+		id:            id,
+		producer:      req.producer,
+		producerIndex: req.producerIndex,
 	})
 	return true
 }
 
 func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 	removed := 0
-	if st := req.state; st != nil {
+	if producer := req.producer; producer != nil {
 		// remove from actively flushed buffers
 		for buf := l.flushList.head; buf != nil; buf = buf.next {
-			removed += buf.cancel(st)
+			removed += buf.cancel(producer)
 		}
 		if !l.buf.flushed {
-			removed += l.buf.cancel(st)
+			removed += l.buf.cancel(producer)
 		}
 
-		st.cancelled = true
+		producer.state.cancelled = true
 	}
 
 	if req.resp != nil {
@@ -484,46 +456,29 @@ func (l *bufferingEventLoop) flushBuffer() {
 }
 
 func (l *bufferingEventLoop) processACK(lst chanList, N int) {
-	log := l.broker.logger
-
-	total := 0
 	lst.reverse()
 	for !lst.empty() {
 		current := lst.pop()
 		entries := current.entries
 
+		// Traverse entries from last to first, so we can acknowledge the most recent
+		// ones first and skip subsequent producer callbacks.
 		for i := len(entries) - 1; i >= 0; i-- {
-			st := &entries[i].client
-			if st.state == nil {
+			entry := &entries[i]
+			if entry.producer == nil {
 				continue
 			}
 
-			count := st.seq - st.state.ackedCount
-			if count == 0 || count > math.MaxUint32/2 {
-				// seq number comparison did underflow. This happens only if st.seq has
-				// already been acknowledged
-				// log.Debug("seq number already acked: ", st.seq)
-
-				st.state = nil
+			count := entry.producerIndex - entry.producer.state.ackedCount
+			if entry.producerIndex < entry.producer.state.ackedCount {
+				// This index was already acknowledged on a previous iteration, skip.
+				entry.producer = nil
 				continue
 			}
 
-			log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
-				count,
-				st.state.ackedCount+1,
-				st.seq,
-			)
-
-			total += int(count)
-			if total > N {
-				panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
-					N, total,
-				))
-			}
-
-			st.state.cb(int(count))
-			st.state.ackedCount = st.seq
-			st.state = nil
+			entry.producer.state.cb(int(count))
+			entry.producer.state.ackedCount = entry.producerIndex + 1
+			entry.producer = nil
 		}
 	}
 }
@@ -555,15 +510,8 @@ func (l *flushList) add(b *batchBuffer) {
 }
 
 func reportCancelledState(log *logp.Logger, req *pushRequest) {
-	log.Debugf("cancelled producer - ignore event: %v\t%v\t%p", req.event, req.state)
-
 	// do not add waiting events if producer did send cancel signal
-
-	st := req.state
-	if cb := st.dropCB; cb != nil {
-		if event, ok := req.event.(publisher.Event); ok {
-			cb(event.Content)
-		}
+	if cb := req.producer.state.dropCB; cb != nil {
+		cb(req.event)
 	}
-
 }

@@ -18,7 +18,6 @@
 package memqueue
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -44,14 +43,14 @@ type openState struct {
 
 type produceState struct {
 	cb         ackHandler
-	dropCB     func(beat.Event)
+	dropCB     func(interface{})
 	cancelled  bool
 	ackedCount uint64
 }
 
 type ackHandler func(count int)
 
-func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		log:    b.logger,
 		done:   make(chan struct{}),
@@ -83,11 +82,13 @@ func (p *forgetfulProducer) Cancel() int {
 func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
 	resp := make(chan queue.EntryID, 1)
 	if p.openState.publish(pushRequest{
-		event: event,
-		state: &p.state,
-		resp:  resp,
+		event:         event,
+		producer:      p,
+		producerIndex: p.producedCount,
+		resp:          resp,
 	}) {
 		id := <-resp
+		p.producedCount++
 		return id, true
 	}
 	return 0, false
@@ -96,11 +97,13 @@ func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
 func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
 	resp := make(chan queue.EntryID, 1)
 	if p.openState.tryPublish(pushRequest{
-		event: event,
-		state: &p.state,
-		resp:  resp,
+		event:         event,
+		producer:      p,
+		producerIndex: p.producedCount,
+		resp:          resp,
 	}) {
 		id := <-resp
+		p.producedCount++
 		return id, true
 	}
 	return 0, false
@@ -112,8 +115,8 @@ func (p *ackProducer) Cancel() int {
 	if p.dropOnCancel {
 		ch := make(chan producerCancelResponse)
 		p.broker.cancelChan <- producerCancelRequest{
-			state: &p.state,
-			resp:  ch,
+			producer: p,
+			resp:     ch,
 		}
 
 		// wait for cancel to being processed
