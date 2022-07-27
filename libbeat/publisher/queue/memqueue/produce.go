@@ -29,11 +29,11 @@ type forgetfulProducer struct {
 }
 
 type ackProducer struct {
-	broker       *broker
-	dropOnCancel bool
-	seq          uint64
-	state        produceState
-	openState    openState
+	broker        *broker
+	dropOnCancel  bool
+	producedCount uint64
+	state         produceState
+	openState     openState
 }
 
 type openState struct {
@@ -43,10 +43,10 @@ type openState struct {
 }
 
 type produceState struct {
-	cb        ackHandler
-	dropCB    func(beat.Event)
-	cancelled bool
-	lastACK   queue.EntryID
+	cb         ackHandler
+	dropCB     func(beat.Event)
+	cancelled  bool
+	ackedCount uint64
 }
 
 type ackHandler func(count int)
@@ -59,7 +59,7 @@ func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 	}
 
 	if cb != nil {
-		p := &ackProducer{broker: b, seq: 1, dropOnCancel: dropOnCancel, openState: openState}
+		p := &ackProducer{broker: b, producedCount: 1, dropOnCancel: dropOnCancel, openState: openState}
 		p.state.cb = cb
 		p.state.dropCB = dropCB
 		return p

@@ -23,8 +23,15 @@ import "github.com/elastic/beats/v7/libbeat/publisher/queue"
 
 type pushRequest struct {
 	event interface{}
-	state *produceState
-	resp  chan queue.EntryID
+
+	// The producer that generated this event, or nil if this producer does
+	// not require ack callbacks.
+	producer *ackProducer
+
+	// The index of the event in this producer only. Used to condense
+	// multiple acknowledgments for a producer to a single callback call.
+	producerIndex int
+	resp          chan queue.EntryID
 }
 
 type producerCancelRequest struct {

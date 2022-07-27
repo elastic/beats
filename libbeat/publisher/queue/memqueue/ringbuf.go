@@ -52,10 +52,10 @@ type region struct {
 	size int
 }
 
-type clientState struct {
-	//seq   queue.EntryID // event sequence number
-	state *produceState // the producer it's state used to compute and signal the ACK count
-}
+/*type producerEventState struct {
+	eventIndex uint64 // Order of the event in its originating producer, independent of queue ID
+	producer   *ackProducer
+}*/
 
 func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	*b = ringBuffer{
@@ -64,17 +64,9 @@ func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	}
 }
 
-// Old spec:
-// Returns the number of free entries left in the queue buffer after
-// insertion.
-// Also returns 0 if there is no space left in the queue to insert
-// the given event. However, this is an error state: the first time
-// it returns 0, insertion should be disabled by setting the
-// pushRequest channel in directEventLoop to nil.
-// New spec:
 // Returns true if the ringBuffer is full after handling
 // the given insertion, false otherwise.
-func (b *ringBuffer) insert(event interface{}, client clientState) {
+func (b *ringBuffer) insert(entry queueEntry) {
 	// always insert into region B, if region B exists.
 	// That is, we have 2 regions and region A is currently processed by consumers
 	if b.regB.size > 0 {
@@ -83,7 +75,7 @@ func (b *ringBuffer) insert(event interface{}, client clientState) {
 		idx := b.regB.index + b.regB.size
 		avail := b.regA.index - idx
 		if avail > 0 {
-			b.entries[idx] = queueEntry{event, client}
+			b.entries[idx] = entry
 			b.regB.size++
 		}
 		return
@@ -97,14 +89,14 @@ func (b *ringBuffer) insert(event interface{}, client clientState) {
 			// If there is space before region A, create
 			// region B there.
 			b.regB = region{index: 0, size: 1}
-			b.entries[0] = queueEntry{event, client}
+			b.entries[0] = entry
 		}
 		return
 	}
 
 	// space available in region A -> let's append the event
 	// log.Debug("  - push into region A")
-	b.entries[idx] = queueEntry{event, client}
+	b.entries[idx] = entry
 	b.regA.size++
 }
 

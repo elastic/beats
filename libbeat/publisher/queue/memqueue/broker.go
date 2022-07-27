@@ -96,9 +96,11 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event  interface{}
-	client clientState
-	id     queue.EntryID
+	event interface{}
+	id    queue.EntryID
+
+	producer      *ackProducer
+	producerIndex uint64 // The order of this entry within its producer
 }
 
 type batch struct {
@@ -391,7 +393,7 @@ func (b *batch) Entry(i int) interface{} {
 }
 
 func (b *batch) ID(i int) queue.EntryID {
-	return queue.EntryID(b.entries[i].client.seq)
+	return queue.EntryID(b.entries[i].id)
 }
 
 func (b *batch) Done() {

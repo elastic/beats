@@ -145,7 +145,7 @@ func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
 }
 
 // Returns true if the queue is full after handling the insertion request.
-func (l *directEventLoop) insert(req *pushRequest) {
+func (l *directEventLoop) insert(req *pushRequest, id queue.EntryID) {
 	log := l.broker.logger
 
 	st := req.state
@@ -155,7 +155,7 @@ func (l *directEventLoop) insert(req *pushRequest) {
 		if req.resp != nil {
 			req.resp <- l.nextEntryID
 		}
-		l.buf.insert(req.event, clientState{
+		l.buf.insert(req.event, producerEventState{
 			seq:   l.nextEntryID,
 			state: st,
 		})
@@ -220,7 +220,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 		}
 
 		client := &entries[idx].client
-		seq := entries[idx].id
+		seq := entries[idx].client.pub
 		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, client.seq)
 
 		idx--
@@ -229,7 +229,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 			continue
 		}
 
-		count := (client.seq - client.state.lastACK)
+		count := (client.seq - client.state.ackedCount)
 		if count == 0 || count > math.MaxUint32/2 {
 			// seq number comparison did underflow. This happens only if st.seq has
 			// already been acknowledged
@@ -241,7 +241,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 
 		log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
 			count,
-			client.state.lastACK+1,
+			client.state.ackedCount+1,
 			client.seq,
 		)
 
@@ -252,7 +252,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 			))
 		}
 		client.state.cb(int(count))
-		client.state.lastACK = client.seq
+		client.state.ackedCount = client.seq
 		client.state = nil
 	}
 }
@@ -362,7 +362,7 @@ func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 
 func (l *bufferingEventLoop) insert(req *pushRequest, seq queue.EntryID) bool {
 	if req.state == nil {
-		l.buf.add(req.event, clientState{})
+		l.buf.add(req.event, producerEventState{})
 		return true
 	}
 
@@ -372,7 +372,7 @@ func (l *bufferingEventLoop) insert(req *pushRequest, seq queue.EntryID) bool {
 		return false
 	}
 
-	l.buf.add(req.event, clientState{
+	l.buf.add(req.event, producerEventState{
 		seq:   seq,
 		state: st,
 	})
@@ -498,7 +498,7 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 				continue
 			}
 
-			count := st.seq - st.state.lastACK
+			count := st.seq - st.state.ackedCount
 			if count == 0 || count > math.MaxUint32/2 {
 				// seq number comparison did underflow. This happens only if st.seq has
 				// already been acknowledged
@@ -510,7 +510,7 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 
 			log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
 				count,
-				st.state.lastACK+1,
+				st.state.ackedCount+1,
 				st.seq,
 			)
 
@@ -522,7 +522,7 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 			}
 
 			st.state.cb(int(count))
-			st.state.lastACK = st.seq
+			st.state.ackedCount = st.seq
 			st.state = nil
 		}
 	}
