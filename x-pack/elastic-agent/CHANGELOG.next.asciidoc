@@ -95,6 +95,7 @@
 - Add filemod times to files in diagnostics collect bundle. {pull}31986[31986]
 - Allow ':' characters in dynamic variables. {pull}32407[32407]
 - Allow the - char to appear as part of variable names in eql expressions. {pull}32350[32350]
+- Allow the / char to appear as part of variable names in eql expressions. {pull}32528{32528}
 
 ==== New features
 

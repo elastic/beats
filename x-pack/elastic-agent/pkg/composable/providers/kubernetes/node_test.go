@@ -27,8 +27,9 @@ func TestGenerateNodeData(t *testing.T) {
 			Name: "testnode",
 			UID:  types.UID(uid),
 			Labels: map[string]string{
-				"foo":       "bar",
-				"with-dash": "dash-value",
+				"foo":        "bar",
+				"with-dash":  "dash-value",
+				"with/slash": "some/path",
 			},
 			Annotations: map[string]string{
 				"baz": "ban",
@@ -56,8 +57,9 @@ func TestGenerateNodeData(t *testing.T) {
 			"baz": "ban",
 		},
 		"labels": common.MapStr{
-			"foo":       "bar",
-			"with-dash": "dash-value",
+			"foo":        "bar",
+			"with-dash":  "dash-value",
+			"with/slash": "some/path",
 		},
 	}
 
@@ -129,8 +131,9 @@ func (n *nodeMeta) GenerateK8s(obj kubernetes.Resource, opts ...metadata.FieldOp
 			"ip":   "node1",
 		},
 		"labels": common.MapStr{
-			"foo":       "bar",
-			"with-dash": "dash-value",
+			"foo":        "bar",
+			"with-dash":  "dash-value",
+			"with/slash": "some/path",
 		},
 		"annotations": common.MapStr{
 			"baz": "ban",

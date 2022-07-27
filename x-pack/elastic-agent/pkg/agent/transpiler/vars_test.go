@@ -24,6 +24,7 @@ func TestVars_Replace(t *testing.T) {
 				"array1",
 				"array2",
 			},
+			"with/slash": "some/path",
 			"dict": map[string]interface{}{
 				"key1": "value1",
 				"key2": "value2",
@@ -165,6 +166,12 @@ func TestVars_Replace(t *testing.T) {
 				NewStrVal("array1"),
 				NewStrVal("array2"),
 			}),
+			false,
+			false,
+		},
+		{
+			`${un-der_score.with/slash}`,
+			NewStrVal(`some/path`),
 			false,
 			false,
 		},
