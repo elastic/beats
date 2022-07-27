@@ -9,7 +9,7 @@ import (
 type ExampleTestSuite struct {
 	suite.Suite
 	Cuid string
-	MetricName string
+	MetricName int
 	MetricValue float64
 	Storage *MetricsStorage
 }
@@ -19,7 +19,7 @@ func (s *ExampleTestSuite) SetupTest() {
 	pod := "pod"
 	container := "container"
 	s.Cuid = ContainerUID(ns, pod, container)
-	s.MetricName = "s.MetricName"
+	s.MetricName = CONTAINER_CORES_LIMIT
 	s.MetricValue = 0.2
 	s.Storage = NewMetricsStorage()
 }
@@ -59,7 +59,7 @@ func (s *ExampleTestSuite) TestIdNotFoundGet() {
 }
 
 func (s *ExampleTestSuite) TestMetricNotFoundGet() {
-	err := s.Storage.Set(s.Cuid, "anotherMetric", s.MetricValue)
+	err := s.Storage.Set(s.Cuid, NODE_MEMORY_ALLOCATABLE, s.MetricValue)
 	s.Nil(err)
 
 	value, err := s.Storage.Get(s.Cuid, s.MetricName)
@@ -67,7 +67,7 @@ func (s *ExampleTestSuite) TestMetricNotFoundGet() {
 	s.Nil(value)
 }
 
-func (s *ExampleTestSuite) assertGetMetric(storage *MetricsStorage, id string, name string, expectedValue float64) {
+func (s *ExampleTestSuite) assertGetMetric(storage *MetricsStorage, id string, name int, expectedValue float64) {
 	metric, err := storage.Get(id, name)
 	s.Nil(err)
 	s.NotNil(metric)

@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, containerMetrics *util.MetricsStorage, logger *logp.Logger) ([]mapstr.M, error) {
+func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *logp.Logger) ([]mapstr.M, error) {
 	events := []mapstr.M{}
 	var summary kubernetes.Summary
 
@@ -39,8 +39,8 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, containerM
 	}
 
 	node := summary.Node
-	nodeCores := perfMetrics.NodeCoresAllocatable.Get(node.NodeName)
-	nodeMem := perfMetrics.NodeMemAllocatable.Get(node.NodeName)
+	nodeCores := metricsStorage.GetWithDefault(node.NodeName, util.NODE_CORES_ALLOCATABLE, 0.0)
+	nodeMem := metricsStorage.GetWithDefault(node.NodeName, util.NODE_MEMORY_ALLOCATABLE, 0.0)
 	for _, pod := range summary.Pods {
 		for _, container := range pod.Containers {
 			containerEvent := mapstr.M{
@@ -128,13 +128,8 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, containerM
 			}
 
 			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
-			coresLimit := perfMetrics.ContainerCoresLimit.GetWithDefault(cuid, nodeCores)
-			memLimit := perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
-
-			coresLimitMetric, err := containerMetrics.Get(cuid, util.CONTAINER_CORES_LIMIT)
-			if err == nil {
-				coresLimit = coresLimitMetric.Get()
-			}
+			coresLimit := metricsStorage.GetWithDefault(cuid, util.CONTAINER_CORES_LIMIT, nodeCores)
+			memLimit := metricsStorage.GetWithDefault(cuid, util.CONTAINER_MEMORY_LIMIT, nodeMem)
 
 			if coresLimit > 0 {
 				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit, logger)
