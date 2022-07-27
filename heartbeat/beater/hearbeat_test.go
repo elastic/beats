@@ -13,12 +13,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
-	"math"
 	"testing"
 	"time"
 )
 
 func TestFactory(t *testing.T) {
+	time.Sleep(time.Second * 2)
+
 	mtr, err := runMonitorOnce(t, mapstr.M{
 		"id":       "testId",
 		"name":     "testName",
@@ -29,7 +30,7 @@ func TestFactory(t *testing.T) {
 	defer mtr.Close()
 	require.NoError(t, err)
 	require.NotNil(t, mtr.Monitor)
-	//mtr.Wait()
+	mtr.Wait()
 	require.Len(t, mtr.Events(), 10)
 }
 
@@ -85,7 +86,7 @@ func makeTestFactory() (factory *monitors.RunnerFactory, sched *scheduler.Schedu
 	}
 
 	sched = scheduler.Create(
-		math.MaxInt64,
+		1,
 		monitoring.NewRegistry(),
 		time.Local,
 		nil,

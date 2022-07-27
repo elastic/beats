@@ -229,8 +229,5 @@ func (s *Scheduler) runTaskOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn, 
 		s.stats.jobsMissedDeadline.Inc()
 	}
 
-	// Schedule task to run sometime in the future. Wrap the task in a go-routine so it doesn't
-	// blocks the timer thread.
-	asyncTask := func(now time.Time) { go taskFn(now) }
-	s.timerQueue.Push(runAt, asyncTask)
+	s.timerQueue.Push(runAt, taskFn)
 }
