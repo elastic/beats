@@ -70,8 +70,9 @@ func TestGenerateNodeData(t *testing.T) {
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
 			"labels": common.MapStr{
-				"foo":       "bar",
-				"with-dash": "dash-value",
+				"foo":        "bar",
+				"with-dash":  "dash-value",
+				"with/slash": "some/path",
 			},
 			"annotations": common.MapStr{"baz": "ban"},
 			"node": common.MapStr{
