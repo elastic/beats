@@ -39,8 +39,8 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 	}
 
 	node := summary.Node
-	nodeCores := metricsStorage.GetWithDefault(node.NodeName, util.NODE_CORES_ALLOCATABLE, 0.0)
-	nodeMem := metricsStorage.GetWithDefault(node.NodeName, util.NODE_MEMORY_ALLOCATABLE, 0.0)
+	nodeCores, _ := metricsStorage.GetNodeMetricWithDefault(node.NodeName, util.NODE_CORES_ALLOCATABLE, 0.0)
+	nodeMem, _ := metricsStorage.GetNodeMetricWithDefault(node.NodeName, util.NODE_MEMORY_ALLOCATABLE, 0.0)
 	for _, pod := range summary.Pods {
 		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults uint64
 		var coresLimit, memLimit float64
@@ -55,8 +55,11 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			pageFaults += cont.Memory.PageFaults
 			majorPageFaults += cont.Memory.MajorPageFaults
 
-			coresLimit += metricsStorage.GetWithDefault(cuid, util.CONTAINER_CORES_LIMIT, nodeCores)  // fixme: the first time when there are no container limits it get the nodeCores
-			memLimit += metricsStorage.GetWithDefault(cuid, util.CONTAINER_MEMORY_LIMIT, nodeMem)
+			containerCoreLimit, _ := metricsStorage.GetContainerMetricWithDefault(cuid, util.CONTAINER_CORES_LIMIT, nodeCores) // fixme: the first time when there are no container limits it get the nodeCores
+			coresLimit += containerCoreLimit
+
+			containerMemLimit, _ := metricsStorage.GetContainerMetricWithDefault(cuid, util.CONTAINER_MEMORY_LIMIT, nodeMem)
+			memLimit += containerMemLimit
 			fmt.Printf("container id: %s, cpu: %f, mem: %f\n", cuid, coresLimit, memLimit) // todo: remove
 		}
 
