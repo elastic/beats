@@ -2827,6 +2827,24 @@ type: double
 
 --
 
+*`aws.applicationelb.metrics.HealthyHostCount.max`*::
++
+--
+The number of targets that are considered healthy.
+
+type: long
+
+--
+
+*`aws.applicationelb.metrics.UnHealthyHostCount.max`*::
++
+--
+The number of targets that are considered unhealthy.
+
+type: long
+
+--
+
 [float]
 === networkelb
 
@@ -4930,6 +4948,26 @@ type: keyword
 
 --
 
+*`awsfargate.task_stats.task_desired_status`*::
++
+--
+The desired status for the task from Amazon ECS.
+
+
+type: keyword
+
+--
+
+*`awsfargate.task_stats.task_known_status`*::
++
+--
+The known status for the task from Amazon ECS.
+
+
+type: keyword
+
+--
+
 [float]
 === cpu
 
@@ -5562,11 +5600,6 @@ azure module
 
 
 
-[float]
-=== azure
-
-
-
 
 *`azure.timegrain`*::
 +
@@ -5639,6 +5672,16 @@ type: keyword
 +
 --
 The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.subscription_name`*::
++
+--
+The subscription name
 
 
 type: keyword
@@ -5929,7 +5972,7 @@ billing and usage details
 *`azure.billing.currency`*::
 +
 --
-The currency
+Billing Currency.
 
 
 type: keyword
@@ -5939,7 +5982,27 @@ type: keyword
 *`azure.billing.pretax_cost`*::
 +
 --
-Cost
+The amount of cost before tax.
+
+
+type: float
+
+--
+
+*`azure.billing.unit_price`*::
++
+--
+Unit Price is the price applicable to you. (your EA or other contract price).
+
+
+type: float
+
+--
+
+*`azure.billing.quantity`*::
++
+--
+Measure the quantity purchased or consumed. The amount of the meter used during the billing period.
 
 
 type: float
@@ -5959,7 +6022,7 @@ type: keyword
 *`azure.billing.product`*::
 +
 --
-The product type
+Product name for the consumed service or purchase.
 
 
 type: keyword
@@ -5989,7 +6052,7 @@ type: date
 *`azure.billing.billing_period_id`*::
 +
 --
-The billing period id
+The billing period id.
 
 
 type: keyword
@@ -5999,7 +6062,17 @@ type: keyword
 *`azure.billing.account_name`*::
 +
 --
-The billing account name
+Name of the Billing Account.
+
+
+type: keyword
+
+--
+
+*`azure.billing.account_id`*::
++
+--
+Billing Account identifier.
 
 
 type: keyword
@@ -31763,6 +31836,36 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+*`elasticsearch.node.stats.ingest.total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.current`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.ingest.total.failed`*::
++
+--
+type: long
+
+--
+
+
+
 
 *`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
 +
@@ -32349,18 +32452,14 @@ type: keyword
 *`elasticsearch.node.stats.os.cgroup.memory.limit.bytes`*::
 +
 --
-type: long
-
-format: bytes
+type: keyword
 
 --
 
 *`elasticsearch.node.stats.os.cgroup.memory.usage.bytes`*::
 +
 --
-type: long
-
-format: bytes
+type: keyword
 
 --
 
@@ -32446,6 +32545,134 @@ type: long
 +
 --
 type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.rejections`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.coordinating.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.primary.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.replica.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.total.all.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.node.stats.indexing_pressure.memory.limit_in_bytes`*::
++
+--
+type: long
+
+format: bytes
 
 --
 
@@ -34393,13 +34620,36 @@ Contains etcd leader statistics.
 
 
 [float]
-=== followers.counts
+=== follower
 
-The number of failed and successful Raft RPC requests.
+Contains follower statistics.
 
 
 
-*`etcd.leader.followers.counts.followers.counts.success`*::
+*`etcd.leader.follower.id`*::
++
+--
+ID of follower
+
+type: keyword
+
+--
+
+[float]
+=== latency
+
+latency to each peer in the cluster
+
+
+
+*`etcd.leader.follower.latency.ms`*::
++
+--
+type: scaled_float
+
+--
+
+*`etcd.leader.follower.success_operations`*::
 +
 --
 successful Raft RPC requests
@@ -34408,7 +34658,7 @@ type: integer
 
 --
 
-*`etcd.leader.followers.counts.followers.counts.fail`*::
+*`etcd.leader.follower.failed_operations`*::
 +
 --
 failed Raft RPC requests
@@ -34417,49 +34667,7 @@ type: integer
 
 --
 
-[float]
-=== followers.latency
-
-latency to each peer in the cluster
-
-
-
-*`etcd.leader.followers.latency.followers.latency.average`*::
-+
---
-type: scaled_float
-
---
-
-*`etcd.leader.followers.latency.followers.latency.current`*::
-+
---
-type: scaled_float
-
---
-
-*`etcd.leader.followers.latency.followers.latency.maximum`*::
-+
---
-type: scaled_float
-
---
-
-*`etcd.leader.followers.latency.followers.latency.minimum`*::
-+
---
-type: integer
-
---
-
-*`etcd.leader.followers.latency.follower.latency.standardDeviation`*::
-+
---
-type: scaled_float
-
---
-
-*`etcd.leader.leader`*::
+*`etcd.leader.follower.leader`*::
 +
 --
 ID of actual leader
@@ -35345,6 +35553,42 @@ type: long
 
 --
 
+*`gcp.dataproc.cluster.job.completion_time.value`*::
++
+--
+The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.job.duration.value`*::
++
+--
+The time jobs have spent in a given state.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.operation.completion_time.value`*::
++
+--
+The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.operation.duration.value`*::
++
+--
+The time operations have spent in a given state.
+
+type: object
+
+--
+
 [float]
 === firestore
 
@@ -35921,6 +36165,96 @@ type: long
 
 --
 
+*`gcp.loadbalancing.https.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.external.regional.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.external.regional.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.frontend_tcp_rtt.value`*::
++
+--
+A distribution of the RTT measured for each connection between client and proxy.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.internal.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the internal HTTP/S load balancer proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.internal.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the internal HTTP/S load balancer proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the external HTTP/S load balancer proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.l3.external.rtt_latencies.value`*::
++
+--
+A distribution of the round trip time latency, measured over TCP connections for the external network load balancer.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.l3.internal.rtt_latencies.value`*::
++
+--
+A distribution of RTT measured over TCP connections for internal TCP/UDP load balancer flows.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.value`*::
++
+--
+A distribution of the smoothed RTT (in ms) measured by the proxy's TCP stack, each minute application layer bytes pass from proxy to client.
+
+type: object
+
+--
+
 [float]
 === pubsub
 
@@ -36161,15 +36495,6 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.push_request_latencies.value`*::
-+
---
-Distribution of push request latencies (in microseconds), grouped by result.
-
-type: long
-
---
-
 *`gcp.pubsub.subscription.retained_acked.bytes`*::
 +
 --
@@ -36292,7 +36617,7 @@ type: long
 --
 Distribution of publish message sizes (in bytes)
 
-type: long
+type: object
 
 --
 
@@ -36356,6 +36681,24 @@ type: long
 Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
 
 type: long
+
+--
+
+*`gcp.pubsub.subscription.ack_latencies.value`*::
++
+--
+Distribution of ack latencies in milliseconds. The ack latency is the time between when Cloud Pub/Sub sends a message to a subscriber client and when Cloud Pub/Sub receives an Acknowledge request for that message.
+
+type: object
+
+--
+
+*`gcp.pubsub.subscription.push_request_latencies.value`*::
++
+--
+Distribution of push request latencies (in microseconds), grouped by result.
+
+type: object
 
 --
 
@@ -41667,6 +42010,154 @@ type: keyword
 --
 
 [float]
+=== cluster_actions
+
+Kibana cluster actions metrics.
+
+
+
+
+*`kibana.cluster_actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.cluster_actions.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.cluster_actions.overdue.delay.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.cluster_actions.overdue.delay.p99`*::
++
+--
+type: float
+
+--
+
+[float]
+=== cluster_rules
+
+Kibana cluster rule metrics.
+
+
+
+
+*`kibana.cluster_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.cluster_rules.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.cluster_rules.overdue.delay.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.cluster_rules.overdue.delay.p99`*::
++
+--
+type: float
+
+--
+
+[float]
+=== node_actions
+
+Kibana node actions metrics.
+
+
+
+
+*`kibana.node_actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_actions.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_actions.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_actions.timeouts`*::
++
+--
+type: long
+
+--
+
+[float]
+=== node_rules
+
+Kibana node rule metrics.
+
+
+
+
+*`kibana.node_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_rules.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.timeouts`*::
++
+--
+type: long
+
+--
+
+[float]
 === settings
 
 Kibana stats and run-time metrics.
@@ -42340,16 +42831,6 @@ Kubernetes API server metrics
 
 
 
-*`kubernetes.apiserver.request.client`*::
-+
---
-Client executing requests
-
-
-type: keyword
-
---
-
 *`kubernetes.apiserver.request.resource`*::
 +
 --
@@ -42541,46 +43022,19 @@ type: double
 --
 
 
-*`kubernetes.apiserver.http.request.duration.us.percentile.*`*::
+*`kubernetes.apiserver.watch.events.size.bytes.bucket.*`*::
 +
 --
-Request duration microseconds percentiles
+Watch event size distribution in bytes
 
 type: object
 
 --
 
-*`kubernetes.apiserver.http.request.duration.us.sum`*::
+*`kubernetes.apiserver.watch.events.size.bytes.sum`*::
 +
 --
-Request duration microseconds cumulative sum
-
-type: double
-
---
-
-*`kubernetes.apiserver.http.request.duration.us.count`*::
-+
---
-Request count for duration
-
-type: long
-
---
-
-*`kubernetes.apiserver.http.request.size.bytes.percentile.*`*::
-+
---
-Request size percentiles
-
-type: object
-
---
-
-*`kubernetes.apiserver.http.request.size.bytes.sum`*::
-+
---
-Request size cumulative sum
+Sum of watch events sizes in bytes
 
 type: long
 
@@ -42588,28 +43042,40 @@ format: bytes
 
 --
 
-*`kubernetes.apiserver.http.request.size.bytes.count`*::
+*`kubernetes.apiserver.watch.events.size.bytes.count`*::
 +
 --
-Request count for size
+Number of watch events
 
 type: long
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.percentile.*`*::
+*`kubernetes.apiserver.watch.events.kind`*::
 +
 --
-Response size percentiles
+Resource kind of the watch event
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.apiserver.response.size.bytes.bucket.*`*::
++
+--
+Response size distribution in bytes for each group, version, verb, resource, subresource, scope and component.
+
 
 type: object
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.sum`*::
+*`kubernetes.apiserver.response.size.bytes.sum`*::
 +
 --
-Response size cumulative sum
+Sum of responses sizes in bytes
 
 type: long
 
@@ -42617,19 +43083,10 @@ format: bytes
 
 --
 
-*`kubernetes.apiserver.http.response.size.bytes.count`*::
+*`kubernetes.apiserver.response.size.bytes.count`*::
 +
 --
-Response count
-
-type: long
-
---
-
-*`kubernetes.apiserver.http.request.count`*::
-+
---
-Request count for response
+Number of responses to requests
 
 type: long
 
@@ -42654,33 +43111,6 @@ type: long
 
 --
 
-*`kubernetes.apiserver.request.latency.sum`*::
-+
---
-Requests latency, sum of latencies in microseconds
-
-type: long
-
---
-
-*`kubernetes.apiserver.request.latency.count`*::
-+
---
-Request latency, number of requests
-
-type: long
-
---
-
-*`kubernetes.apiserver.request.latency.bucket.*`*::
-+
---
-Request latency histogram buckets
-
-type: object
-
---
-
 *`kubernetes.apiserver.request.duration.us.sum`*::
 +
 --
@@ -42702,7 +43132,7 @@ type: long
 *`kubernetes.apiserver.request.duration.us.bucket.*`*::
 +
 --
-Request duration, histogram buckets
+Response latency distribution, histogram buckets
 
 type: object
 
@@ -43067,10 +43497,20 @@ Controller manager metrics
 
 
 
-*`kubernetes.controllermanager.handler`*::
+*`kubernetes.controllermanager.url`*::
 +
 --
-Request handler
+Request url
+
+
+type: keyword
+
+--
+
+*`kubernetes.controllermanager.verb`*::
++
+--
+Request verb
 
 
 type: keyword
@@ -43168,6 +43608,15 @@ type: long
 
 --
 
+*`kubernetes.controllermanager.process.fds.max.count`*::
++
+--
+Maximum number of open file descriptors
+
+type: long
+
+--
+
 *`kubernetes.controllermanager.process.started.sec`*::
 +
 --
@@ -43178,105 +43627,38 @@ type: double
 --
 
 
-*`kubernetes.controllermanager.http.request.duration.us.percentile.*`*::
-+
---
-Request duration microseconds percentiles
-
-type: object
-
---
-
-*`kubernetes.controllermanager.http.request.duration.us.sum`*::
-+
---
-Request duration microseconds cumulative sum
-
-type: double
-
---
-
-*`kubernetes.controllermanager.http.request.duration.us.count`*::
-+
---
-Request count for duration
-
-type: long
-
---
-
-*`kubernetes.controllermanager.http.request.size.bytes.percentile.*`*::
-+
---
-Request size percentiles
-
-type: object
-
---
-
-*`kubernetes.controllermanager.http.request.size.bytes.sum`*::
-+
---
-Request size cumulative sum
-
-type: long
-
-format: bytes
-
---
-
-*`kubernetes.controllermanager.http.request.size.bytes.count`*::
-+
---
-Request count for size
-
-type: long
-
---
-
-*`kubernetes.controllermanager.http.response.size.bytes.percentile.*`*::
-+
---
-Response size percentiles
-
-type: object
-
---
-
-*`kubernetes.controllermanager.http.response.size.bytes.sum`*::
-+
---
-Response size cumulative sum
-
-type: long
-
-format: bytes
-
---
-
-*`kubernetes.controllermanager.http.response.size.bytes.count`*::
-+
---
-Response count
-
-type: long
-
---
-
-*`kubernetes.controllermanager.http.request.count`*::
-+
---
-Request count for response
-
-type: long
-
---
-
 *`kubernetes.controllermanager.client.request.count`*::
 +
 --
 Number of requests as client
 
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.client.request.duration.us.bucket.*`*::
++
+--
+Response latency distribution, histogram buckets
+
+type: object
+
+--
+
+*`kubernetes.controllermanager.client.request.duration.us.sum`*::
++
+--
+Request duration, sum in microseconds
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.client.request.duration.us.count`*::
++
+--
+Request duration, number of operations
 
 type: long
 
@@ -54250,6 +54632,163 @@ type: double
 --
 
 [float]
+=== sysmetric
+
+Sysmetric related metrics.
+
+
+
+*`oracle.sysmetric.session_count`*::
++
+--
+Session Count.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.average_active_sessions`*::
++
+--
+Average Active Sessions.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.current_os_load`*::
++
+--
+Current OS Load.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_reads_per_sec`*::
++
+--
+Physical Reads Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.user_transaction_per_sec`*::
++
+--
+User Transaction Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.total_table_scans_per_txn`*::
++
+--
+Total Table Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_writes_per_sec`*::
++
+--
+Physical Writes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.total_index_scans_per_txn`*::
++
+--
+Total Index Scans Per Transaction.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.host_cpu_utilization_pct`*::
++
+--
+Host CPU Utilization (%).
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.network_traffic_volume_per_sec`*::
++
+--
+Network Traffic Volume Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.user_rollbacks_per_sec`*::
++
+--
+User Rollbacks Per Second.
+
+
+type: long
+
+--
+
+*`oracle.sysmetric.cpu_usage_per_sec`*::
++
+--
+CPU Usage Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.db_block_changes_per_sec`*::
++
+--
+DB Block Changes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.physical_read_total_bytes_per_sec`*::
++
+--
+Physical Read Total Bytes Per Second.
+
+
+type: double
+
+--
+
+*`oracle.sysmetric.response_time_per_txn`*::
++
+--
+Response Time Per Transaction.
+
+
+type: double
+
+--
+
+[float]
 === tablespace
 
 tablespace
@@ -56533,6 +57072,67 @@ Total number of times messages have been written to disk by this queue since it 
 
 
 type: long
+
+--
+
+[float]
+=== shovel
+
+shovel
+
+
+
+*`rabbitmq.shovel.name`*::
++
+--
+The name of the shovel with non-ASCII characters escaped as in C.
+
+
+type: keyword
+
+--
+
+*`rabbitmq.shovel.vhost`*::
++
+--
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+type: alias
+
+alias to: rabbitmq.vhost
+
+--
+
+*`rabbitmq.shovel.node`*::
++
+--
+Node name.
+
+
+type: alias
+
+alias to: rabbitmq.node.name
+
+--
+
+*`rabbitmq.shovel.state`*::
++
+--
+The state of the shovel. Normally 'running', but could be 'starting' or 'terminated'.
+
+
+type: keyword
+
+--
+
+*`rabbitmq.shovel.type`*::
++
+--
+The type of the shovel. Either 'static' or 'dynamic'.
+
+
+type: keyword
 
 --
 
@@ -59714,6 +60314,56 @@ type: long
 
 --
 
+*`system.core.model_number`*::
++
+--
+CPU model number. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.model_name`*::
++
+--
+CPU model name. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.mhz`*::
++
+--
+CPU core current clock. Only availabe on Linux
+
+
+type: float
+
+--
+
+*`system.core.core_id`*::
++
+--
+CPU physical core ID. One core might might execute multiple threads, hence more than one `system.core.id` can share the same `system.core.core_id`. Only availabe on Linux
+
+
+type: keyword
+
+--
+
+*`system.core.physical_id`*::
++
+--
+CPU core physical ID. Only availabe on Linux
+
+
+type: keyword
+
+--
+
 [float]
 === cpu
 
@@ -60225,6 +60875,16 @@ Total number of inodes on the system, which will be a combination of files, fold
 
 
 type: long
+
+--
+
+*`system.filesystem.options`*::
++
+--
+The options present on the filesystem mount.
+
+
+type: keyword
 
 --
 

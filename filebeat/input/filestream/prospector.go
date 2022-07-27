@@ -186,6 +186,10 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
+			err := updater.ResetCursor(src, state{Offset: event.Info.Size()})
+			if err != nil {
+				log.Errorf("setting cursor for ignored file: %v", err)
+			}
 			return
 		}
 
@@ -195,7 +199,9 @@ func (p *fileProspector) onFSEvent(
 		log.Debugf("File %s has been truncated", event.NewPath)
 
 		err := updater.ResetCursor(src, state{Offset: 0})
-		log.Errorf("resseting cursor on truncated file: %v", err)
+		if err != nil {
+			log.Errorf("resetting cursor on truncated file: %v", err)
+		}
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
@@ -285,7 +291,7 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
 	err := hg.StopGroup()
 	if err != nil {
-		log.Errorf("Error while stopping harverster group: %v", err)
+		log.Errorf("Error while stopping harvester group: %v", err)
 	}
 }
 

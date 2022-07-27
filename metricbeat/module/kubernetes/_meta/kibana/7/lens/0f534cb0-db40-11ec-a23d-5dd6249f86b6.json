@@ -1,0 +1,122 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "0cea87dc-699c-4771-a908-9a6c4df97630": {
+                            "columnOrder": [
+                                "031701fd-1939-4c76-8659-5a2411cf282b",
+                                "471f1924-3b61-4633-a297-066260bf1a42"
+                            ],
+                            "columns": {
+                                "031701fd-1939-4c76-8659-5a2411cf282b": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Namespace",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "471f1924-3b61-4633-a297-066260bf1a42",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.namespace"
+                                },
+                                "471f1924-3b61-4633-a297-066260bf1a42": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Total Pods",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.pod.name"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "b895e2f3-062e-423b-a8e5-875e85744550",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "pod"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "pod"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "categoryDisplay": "default",
+                        "groups": [
+                            "031701fd-1939-4c76-8659-5a2411cf282b"
+                        ],
+                        "layerId": "0cea87dc-699c-4771-a908-9a6c4df97630",
+                        "layerType": "data",
+                        "legendDisplay": "default",
+                        "metric": "471f1924-3b61-4633-a297-066260bf1a42",
+                        "nestedLegend": false,
+                        "numberDisplay": "value",
+                        "percentDecimals": 0
+                    }
+                ],
+                "shape": "donut"
+            }
+        },
+        "title": "Total Pods per Namespace [Metricbeat Kubernetes]",
+        "visualizationType": "lnsPie"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "0f534cb0-db40-11ec-a23d-5dd6249f86b6",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-0cea87dc-699c-4771-a908-9a6c4df97630",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "b895e2f3-062e-423b-a8e5-875e85744550",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3ODQsM10="
+}

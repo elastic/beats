@@ -12,10 +12,10 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -60,7 +60,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 		return nil, err
 	}
 	if tlsConfigBuilder != nil {
-		tlsConfig = tlsConfigBuilder.BuildModuleClientConfig(addr)
+		tlsConfig = tlsConfigBuilder.BuildServerConfig(addr)
 	}
 
 	return &httpEndpoint{

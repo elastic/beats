@@ -7,7 +7,7 @@ package httpjson
 import (
 	"bytes"
 	"crypto/hmac"
-	"crypto/sha1" //nolint:gosec // Bad linter!
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -25,9 +25,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 // we define custom delimiters to prevent issues when using template values as part of other Go templates.
@@ -49,30 +49,34 @@ func (t *valueTpl) Unpack(in string) error {
 	tpl, err := template.New("").
 		Option("missingkey=error").
 		Funcs(template.FuncMap{
+			"add":                 add,
+			"base64Decode":        base64Decode,
+			"base64DecodeNoPad":   base64DecodeNoPad,
+			"base64Encode":        base64Encode,
+			"base64EncodeNoPad":   base64EncodeNoPad,
+			"beatInfo":            beatInfo,
+			"div":                 div,
+			"formatDate":          formatDate,
+			"getRFC5988Link":      getRFC5988Link,
+			"hash":                hashStringHex,
+			"hashBase64":          hashStringBase64,
+			"hexDecode":           hexDecode,
+			"hmac":                hmacStringHex,
+			"hmacBase64":          hmacStringBase64,
+			"join":                join,
+			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
-			"formatDate":          formatDate,
 			"parseDuration":       parseDuration,
 			"parseTimestamp":      parseTimestamp,
 			"parseTimestampMilli": parseTimestampMilli,
 			"parseTimestampNano":  parseTimestampNano,
-			"getRFC5988Link":      getRFC5988Link,
-			"toInt":               toInt,
-			"add":                 add,
-			"mul":                 mul,
-			"div":                 div,
-			"hmac":                hmacStringHex,
-			"base64Encode":        base64Encode,
-			"base64EncodeNoPad":   base64EncodeNoPad,
-			"base64Decode":        base64Decode,
-			"base64DecodeNoPad":   base64DecodeNoPad,
-			"join":                join,
+			"replaceAll":          replaceAll,
 			"sprintf":             fmt.Sprintf,
-			"hmacBase64":          hmacStringBase64,
-			"uuid":                uuidString,
-			"userAgent":           userAgentString,
-			"beatInfo":            beatInfo,
+			"toInt":               toInt,
 			"urlEncode":           urlEncode,
+			"userAgent":           userAgentString,
+			"uuid":                uuidString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -329,8 +333,43 @@ func hmacStringBase64(hmacType string, hmacKey string, values ...string) string 
 	}
 	bytes := hmacString(hmacType, []byte(hmacKey), data)
 
-	// Get result and encode as hexadecimal string
+	// Get result and encode as base64 string
 	return base64.StdEncoding.EncodeToString(bytes)
+}
+
+func hashStringHex(typ string, values ...string) string {
+	// Get result and encode as hexadecimal string
+	return hex.EncodeToString(hashStrings(typ, values))
+}
+
+func hashStringBase64(typ string, values ...string) string {
+	// Get result and encode as base64 string
+	return base64.StdEncoding.EncodeToString(hashStrings(typ, values))
+}
+
+func hashStrings(typ string, data []string) []byte {
+	var h hash.Hash
+	switch typ {
+	case "sha256":
+		h = sha256.New()
+	case "sha1":
+		h = sha1.New()
+	default:
+		// Upstream config validation prevents this from happening.
+		return nil
+	}
+	for _, d := range data {
+		h.Write([]byte(d))
+	}
+	return h.Sum(nil)
+}
+
+func hexDecode(enc string) string {
+	decodedString, err := hex.DecodeString(enc)
+	if err != nil {
+		return ""
+	}
+	return string(decodedString)
 }
 
 func uuidString() string {
@@ -369,7 +408,7 @@ func join(v interface{}, sep string) string {
 }
 
 func userAgentString(values ...string) string {
-	return useragent.UserAgent("Filebeat", values...)
+	return useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String(), values...)
 }
 
 func beatInfo() map[string]string {
@@ -387,4 +426,16 @@ func urlEncode(value string) string {
 		return ""
 	}
 	return url.QueryEscape(value)
+}
+
+// replaceAll returns a copy of the string s with all non-overlapping instances
+// of old replaced by new.
+//
+// Note that the order of the arguments differs from Go's [strings.ReplaceAll] to
+// make pipelining more ergonomic. This allows s to be piped in because it is
+// the final argument. For example,
+//
+//   [[ "some value" | replaceAll "some" "my" ]]  // == "my value"
+func replaceAll(old, new, s string) string {
+	return strings.ReplaceAll(s, old, new)
 }

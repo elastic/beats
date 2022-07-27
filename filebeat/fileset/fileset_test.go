@@ -31,8 +31,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -271,7 +271,7 @@ func TestGetPipelineNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 	require.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
-	version := common.MustNewVersion("5.2.0")
+	version := version.MustNew("5.2.0")
 	pipelines, err := fs.GetPipelines(*version)
 	require.NoError(t, err)
 	assert.Len(t, pipelines, 1)

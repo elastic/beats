@@ -21,23 +21,23 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
-var v640 = common.MustNewVersion("6.4.0")
+var v640 = version.MustNew("6.4.0")
 
 type fieldsTransformer struct {
 	fields                    mapping.Fields
 	transformedFields         []mapstr.M
 	transformedFieldFormatMap mapstr.M
-	version                   *common.Version
+	version                   *version.V
 	keys                      map[string]int
 	migration                 bool
 }
 
-func newFieldsTransformer(version *common.Version, fields mapping.Fields, migration bool) (*fieldsTransformer, error) {
+func newFieldsTransformer(version *version.V, fields mapping.Fields, migration bool) (*fieldsTransformer, error) {
 	if version == nil {
 		return nil, errors.New("Version must be given")
 	}
@@ -152,7 +152,7 @@ func (t *fieldsTransformer) add(f mapping.Field) {
 	}
 }
 
-func transformField(version *common.Version, f mapping.Field) (mapstr.M, mapstr.M) {
+func transformField(version *version.V, f mapping.Field) (mapstr.M, mapstr.M) {
 	field := mapstr.M{
 		"name":         f.Path,
 		"count":        f.Count,
@@ -219,7 +219,7 @@ func getVal(valP *bool, def bool) bool {
 	return def
 }
 
-func addParams(format *mapstr.M, version *common.Version, f mapping.Field) {
+func addParams(format *mapstr.M, version *version.V, f mapping.Field) {
 	addFormatParam(format, "pattern", f.Pattern)
 	addFormatParam(format, "inputFormat", f.InputFormat)
 	addFormatParam(format, "outputFormat", f.OutputFormat)
@@ -250,21 +250,21 @@ func addFormatParam(f *mapstr.M, key string, val interface{}) {
 }
 
 // takes the highest version where major version <= given version
-func addVersionedFormatParam(f *mapstr.M, version *common.Version, key string, val []mapping.VersionizedString) {
+func addVersionedFormatParam(f *mapstr.M, v *version.V, key string, val []mapping.VersionizedString) {
 	if len(val) == 0 {
 		return
 	}
-	paramVer, _ := common.NewVersion("0.0.0")
+	paramVer, _ := version.New("0.0.0")
 	var paramVal string
-	for _, v := range val {
-		minVer, err := common.NewVersion(v.MinVersion)
+	for _, vs := range val {
+		minVer, err := version.New(vs.MinVersion)
 		if err != nil {
-			msg := fmt.Sprintf("ERROR: Parameter Version <%s> for <%s> is invalid. Please update and try again.", v.MinVersion, key)
+			msg := fmt.Sprintf("ERROR: Parameter Version <%s> for <%s> is invalid. Please update and try again.", vs.MinVersion, key)
 			panic(errors.New(msg))
 		}
-		if minVer.LessThanOrEqual(true, version) && paramVer.LessThanOrEqual(true, minVer) {
+		if minVer.LessThanOrEqual(true, v) && paramVer.LessThanOrEqual(true, minVer) {
 			paramVer = minVer
-			paramVal = v.Value
+			paramVal = vs.Value
 		}
 	}
 	if paramVal != "" {

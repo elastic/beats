@@ -20,8 +20,13 @@ package shipper
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
+
+type backoffConfig struct {
+	Init time.Duration `config:"init" validate:"nonzero"`
+	Max  time.Duration `config:"max" validate:"nonzero"`
+}
 
 type Config struct {
 	// Server address in the format of host:port, e.g. `localhost:50051`
@@ -34,6 +39,8 @@ type Config struct {
 	MaxRetries int `config:"max_retries"         validate:"min=-1,nonzero"`
 	// BulkMaxSize max amount of events in a single batch
 	BulkMaxSize int `config:"bulk_max_size"`
+	// Backoff strategy for the shipper output
+	Backoff backoffConfig `config:"backoff"`
 }
 
 func defaultConfig() Config {
@@ -42,5 +49,9 @@ func defaultConfig() Config {
 		Timeout:     30 * time.Second,
 		MaxRetries:  3,
 		BulkMaxSize: 50,
+		Backoff: backoffConfig{
+			Init: 1 * time.Second,
+			Max:  60 * time.Second,
+		},
 	}
 }

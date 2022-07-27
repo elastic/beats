@@ -1,0 +1,196 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "ba7fdd7b-69d9-48d5-ac00-c5602e16ccd0": {
+                            "columnOrder": [
+                                "3d17c7ea-eb86-4234-9e24-9b304fc6da9b",
+                                "6f2b317a-fff1-4e00-81df-b3d9c05f8f54",
+                                "227c4795-30a7-48dc-990a-11fe7b4bca3c",
+                                "a551fe3f-2761-4cfe-8b47-ed8f6d9c9540",
+                                "a52b3682-8595-4cff-89b2-590cd5c3e6c2"
+                            ],
+                            "columns": {
+                                "227c4795-30a7-48dc-990a-11fe7b4bca3c": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Fs Capacity bytes",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "bytes",
+                                            "params": {
+                                                "decimals": 1
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.volume.fs.capacity.bytes"
+                                },
+                                "3d17c7ea-eb86-4234-9e24-9b304fc6da9b": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Volume",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "6f2b317a-fff1-4e00-81df-b3d9c05f8f54",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.volume.name"
+                                },
+                                "6f2b317a-fff1-4e00-81df-b3d9c05f8f54": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Fs Available bytes",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "bytes",
+                                            "params": {
+                                                "decimals": 1
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.volume.fs.available.bytes"
+                                },
+                                "a52b3682-8595-4cff-89b2-590cd5c3e6c2": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Fs Usage Pct",
+                                    "operationType": "median",
+                                    "params": {
+                                        "format": {
+                                            "id": "percent",
+                                            "params": {
+                                                "decimals": 3
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.volume.fs.used.pct"
+                                },
+                                "a551fe3f-2761-4cfe-8b47-ed8f6d9c9540": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Fs Used bytes",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "bytes",
+                                            "params": {
+                                                "decimals": 1
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.volume.fs.used.bytes"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "a5376c3d-4231-4925-ae1e-13e232df2652",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "volume"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "volume"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "3d17c7ea-eb86-4234-9e24-9b304fc6da9b",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "6f2b317a-fff1-4e00-81df-b3d9c05f8f54",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "227c4795-30a7-48dc-990a-11fe7b4bca3c",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "a551fe3f-2761-4cfe-8b47-ed8f6d9c9540",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "a52b3682-8595-4cff-89b2-590cd5c3e6c2",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "ba7fdd7b-69d9-48d5-ac00-c5602e16ccd0",
+                "layerType": "data",
+                "rowHeight": "single",
+                "rowHeightLines": 1
+            }
+        },
+        "title": "Filesystem Informations [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-43b09e30-bcba-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-ba7fdd7b-69d9-48d5-ac00-c5602e16ccd0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "a5376c3d-4231-4925-ae1e-13e232df2652",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:01.240Z",
+    "version": "WzU3MTgsM10="
+}

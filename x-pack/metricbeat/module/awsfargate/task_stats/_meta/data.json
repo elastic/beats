@@ -128,7 +128,9 @@
                     }
                 }
             },
-            "task_name": "query-metadata"
+            "task_desired_status": "RUNNING",
+            "task_known_status": "ACTIVATING",
+            "task_name": "query-metadata-1"
         }
     },
     "cloud": {
@@ -147,15 +149,6 @@
             "com_amazonaws_ecs_task-definition-version": "7"
         },
         "name": "query-metadata"
-    },
-    "event": {
-        "dataset": "awsfargate.task_stats",
-        "duration": 115000,
-        "module": "awsfargate"
-    },
-    "metricset": {
-        "name": "task_stats",
-        "period": 10000
     },
     "service": {
         "type": "awsfargate"

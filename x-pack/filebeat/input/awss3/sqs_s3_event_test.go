@@ -12,8 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws/awserr"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/smithy-go"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -176,11 +179,11 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 	}{
 		{
 			Name: "keepalive stop after ReceiptHandleIsInvalid",
-			Err:  awserr.New(sqs.ErrCodeReceiptHandleIsInvalid, "fake receipt handle is invalid.", nil),
+			Err:  &types.ReceiptHandleIsInvalid{Message: aws.String("fake receipt handle is invalid.")},
 		},
 		{
 			Name: "keepalive stop after InvalidParameterValue",
-			Err:  awserr.New(sqsInvalidParameterValueErrorCode, "The receipt handle has expired.", nil),
+			Err:  &smithy.GenericAPIError{Code: sqsInvalidParameterValueErrorCode, Message: "The receipt handle has expired."},
 		},
 	}
 

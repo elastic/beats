@@ -40,6 +40,9 @@ pipeline {
     // disable upstream trigger on a PR basis
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
+  parameters {
+    booleanParam(name: 'run_e2e', defaultValue: true, description: 'Allow to disable the e2e tets. This workaround will generate broken/buggy binaries.')
+  }
   stages {
     stage('Filter build') {
       options { skipDefaultCheckout() }
@@ -102,6 +105,9 @@ pipeline {
         }
         stage('Run E2E Tests for Packages'){
           options { skipDefaultCheckout() }
+          when {
+            expression { return params.run_e2e }
+          }
           steps {
             runE2ETests()
           }
@@ -367,7 +373,7 @@ def tagAndPush(Map args = [:]) {
   pushDockerImages(
     registry: env.DOCKER_REGISTRY,
     secret: env.DOCKERELASTIC_SECRET,
-    snapshot: env.SNAPSHOT,
+    snapshot: true,
     version: env.BEAT_VERSION,
     images: images
   )
@@ -394,6 +400,7 @@ def release(type){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+        sh(label: "mage ironbank ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage ironbank')
         def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
@@ -434,16 +441,16 @@ def runE2ETests(){
       suites += "${suite},"
     };
   }
-  echo 'runE2E will run now in a sync mode to validate packages can be published.'
+  echo 'runE2E has asynchronously triggered the end to end test job.'
   runE2E(runTestsSuites: suites,
-         testMatrixFile: '.ci/.e2e-tests-beats.yaml',
-         beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
-         gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
-         gitHubCheckRepo: env.REPO,
-         gitHubCheckSha1: env.GIT_BASE_COMMIT,
-         propagate: true,
-         wait: true)
-}
+        testMatrixFile: '.ci/.e2e-tests-beats.yaml',
+        beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
+        gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
+        gitHubCheckRepo: env.REPO,
+        gitHubCheckSha1: env.GIT_BASE_COMMIT,
+        propagate: false, // Ignore the result of the downstream E2E job.
+        wait: false) // Do not synchronously wait for the downstream E2E job to complete.
+  }
 
 /**
 * There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/

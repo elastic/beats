@@ -1,0 +1,100 @@
+{
+    "attributes": {
+        "description": "Metrics about Volumes",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "5b6faaa0-318c-4665-ba71-20f71d5ff57c",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "5b6faaa0-318c-4665-ba71-20f71d5ff57c",
+                "panelRefName": "panel_5b6faaa0-318c-4665-ba71-20f71d5ff57c",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "ffde87ff-146d-48fb-a90a-02e6813ddd8d",
+                    "w": 48,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "ffde87ff-146d-48fb-a90a-02e6813ddd8d",
+                "panelRefName": "panel_ffde87ff-146d-48fb-a90a-02e6813ddd8d",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "72eac74b-24fc-49d2-8512-2876f632a515",
+                    "w": 48,
+                    "x": 0,
+                    "y": 23
+                },
+                "panelIndex": "72eac74b-24fc-49d2-8512-2876f632a515",
+                "panelRefName": "panel_72eac74b-24fc-49d2-8512-2876f632a515",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] Volumes",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-3912d9a0-bcb2-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "kubernetes-3ebbd980-bcba-11ec-b64f-7dd6e8e82013",
+            "name": "5b6faaa0-318c-4665-ba71-20f71d5ff57c:panel_5b6faaa0-318c-4665-ba71-20f71d5ff57c",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-43b09e30-bcba-11ec-b64f-7dd6e8e82013",
+            "name": "ffde87ff-146d-48fb-a90a-02e6813ddd8d:panel_ffde87ff-146d-48fb-a90a-02e6813ddd8d",
+            "type": "lens"
+        },
+        {
+            "id": "kubernetes-48a93370-bcba-11ec-b64f-7dd6e8e82013",
+            "name": "72eac74b-24fc-49d2-8512-2876f632a515:panel_72eac74b-24fc-49d2-8512-2876f632a515",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-06-28T06:47:01.240Z",
+    "version": "WzU3MjAsM10="
+}

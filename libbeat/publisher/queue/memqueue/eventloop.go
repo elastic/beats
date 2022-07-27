@@ -22,6 +22,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -47,6 +48,9 @@ type bufferingEventLoop struct {
 	// The number of events currently waiting in the queue, including
 	// those that have not yet been acked.
 	eventCount int
+
+	// The number of events that have been read by a consumer but not yet acked
+	unackedEventCount int
 
 	minEvents    int
 	maxEvents    int
@@ -121,11 +125,18 @@ func (l *directEventLoop) run() {
 		case req := <-getChan: // consumer asking for next batch
 			l.handleGetRequest(&req)
 
+		case req := <-l.broker.metricChan: // broker asking for queue metrics
+			l.handleMetricsRequest(&req)
+
 		case schedACKs <- l.pendingACKs:
 			// on send complete list of pending batches has been forwarded -> clear list
 			l.pendingACKs = chanList{}
 		}
 	}
+}
+
+func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
+	req.responseChan <- memQueueMetrics{currentQueueSize: l.buf.Items(), occupiedRead: l.buf.reserved}
 }
 
 // Returns true if the queue is full after handling the insertion request.
@@ -174,7 +185,7 @@ func (l *directEventLoop) handleGetRequest(req *getRequest) {
 
 	ackCH := newBatchACKState(start, count, l.buf.entries)
 
-	req.responseChan <- getResponse{ackCH.ackChan, buf}
+	req.responseChan <- getResponse{ackCH.doneChan, buf}
 	l.pendingACKs.append(ackCH)
 }
 
@@ -189,14 +200,11 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 		}()
 	}
 
-	acks := lst.front()
-	start := acks.start
 	entries := l.buf.entries
 
-	idx := start + N - 1
-	if idx >= len(entries) {
-		idx -= len(entries)
-	}
+	firstIndex := lst.front().start
+	// Position the index at the end of the block of ACKed events
+	idx := (firstIndex + N - 1) % len(entries)
 
 	total := 0
 	for i := N - 1; i >= 0; i-- {
@@ -235,7 +243,6 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 				N, total,
 			))
 		}
-
 		client.state.cb(int(count))
 		client.state.lastACK = client.seq
 		client.state = nil
@@ -302,6 +309,9 @@ func (l *bufferingEventLoop) run() {
 		case count := <-l.broker.ackChan:
 			l.handleACK(count)
 
+		case req := <-l.broker.metricChan: // broker asking for queue metrics
+			l.handleMetricsRequest(&req)
+
 		case <-l.idleC:
 			l.idleC = nil
 			l.timer.Stop()
@@ -310,6 +320,10 @@ func (l *bufferingEventLoop) run() {
 			}
 		}
 	}
+}
+
+func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
+	req.responseChan <- memQueueMetrics{currentQueueSize: l.eventCount, occupiedRead: l.unackedEventCount}
 }
 
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
@@ -408,9 +422,10 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	entries := buf.entries[:count]
 	acker := newBatchACKState(0, count, entries)
 
-	req.responseChan <- getResponse{acker.ackChan, entries}
+	req.responseChan <- getResponse{acker.doneChan, entries}
 	l.pendingACKs.append(acker)
 
+	l.unackedEventCount += len(entries)
 	buf.entries = buf.entries[count:]
 	if buf.length() == 0 {
 		l.advanceFlushList()
@@ -418,6 +433,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 }
 
 func (l *bufferingEventLoop) handleACK(count int) {
+	l.unackedEventCount -= count
 	l.eventCount -= count
 }
 
@@ -532,7 +548,9 @@ func reportCancelledState(log *logp.Logger, req *pushRequest) {
 
 	st := req.state
 	if cb := st.dropCB; cb != nil {
-		cb(req.event.Content)
+		if event, ok := req.event.(publisher.Event); ok {
+			cb(event.Content)
+		}
 	}
 
 }

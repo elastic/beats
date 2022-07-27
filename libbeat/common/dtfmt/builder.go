@@ -97,42 +97,45 @@ func (b *builder) add(e element) {
 	b.elements = append(b.elements, e)
 }
 
-func (b *builder) millisOfSecond(digits int) {
+func (b *builder) nanoOfSecond(digits int) {
 	if digits <= 0 {
 		return
 	}
 
-	switch digits {
-	case 1:
-		b.appendExtDecimal(ftMillisOfSecond, 100, 1, 1)
-	case 2:
-		b.appendExtDecimal(ftMillisOfSecond, 10, 2, 2)
-	case 3:
-		b.appendExtDecimal(ftMillisOfSecond, 0, 3, 3)
-	default:
-		b.appendExtDecimal(ftMillisOfSecond, 0, 3, 3)
-		b.appendZeros(digits - 3)
+	if digits <= 9 {
+		b.appendExtDecimal(ftNanoOfSecond, 9-digits, digits, digits)
+	} else {
+		b.appendExtDecimal(ftNanoOfSecond, 0, 9, 9)
+		b.appendZeros(digits - 9)
 	}
 }
 
-func (b *builder) millisOfDay(digits int) {
-	b.appendDecimal(ftMillisOfDay, digits, 8)
+func (b *builder) fractNanoOfSecond(digits int) {
+	const fractDigits = 3
+
+	if digits <= 0 {
+		return
+	}
+
+	// cap number of digits at 9, as we do not support higher precision and
+	// would remove trailing zeroes anyway.
+	if digits > 9 {
+		digits = 9
+	}
+
+	minDigits := fractDigits
+	if digits < minDigits {
+		minDigits = digits
+	}
+	b.add(paddedNumber{ftNanoOfSecond, 9 - digits, minDigits, digits, fractDigits, false})
 }
 
 func (b *builder) secondOfMinute(digits int) {
 	b.appendDecimal(ftSecondOfMinute, digits, 2)
 }
 
-func (b *builder) secondOfDay(digits int) {
-	b.appendDecimal(ftSecondOfDay, digits, 5)
-}
-
 func (b *builder) minuteOfHour(digits int) {
 	b.appendDecimal(ftMinuteOfHour, digits, 2)
-}
-
-func (b *builder) minuteOfDay(digits int) {
-	b.appendDecimal(ftMinuteOfDay, digits, 4)
 }
 
 func (b *builder) hourOfDay(digits int) {
@@ -233,12 +236,12 @@ func (b *builder) appendDecimalValue(ft fieldType, minDigits, maxDigits int, sig
 	if minDigits <= 1 {
 		b.add(unpaddedNumber{ft, maxDigits, signed})
 	} else {
-		b.add(paddedNumber{ft, 0, minDigits, maxDigits, signed})
+		b.add(paddedNumber{ft, 0, minDigits, maxDigits, 0, signed})
 	}
 }
 
-func (b *builder) appendExtDecimal(ft fieldType, div, minDigits, maxDigits int) {
-	b.add(paddedNumber{ft, div, minDigits, maxDigits, false})
+func (b *builder) appendExtDecimal(ft fieldType, divExp, minDigits, maxDigits int) {
+	b.add(paddedNumber{ft, divExp, minDigits, maxDigits, 0, false})
 }
 
 func (b *builder) appendDecimal(ft fieldType, minDigits, maxDigits int) {

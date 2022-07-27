@@ -107,7 +107,7 @@ func TestNewTransformsFromConfig(t *testing.T) {
 			gotTransforms, gotErr := newTransformsFromConfig(transformsConfig{cfg}, tc.paramNamespace, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
-				tr := gotTransforms[0].(*set) //nolint:errcheck // Bad linter! Panic is a check.
+				tr := gotTransforms[0].(*set)
 
 				tr.runFunc = nil // we do not want to check func pointer
 				assert.EqualValues(t, tc.expectedTransforms, gotTransforms)

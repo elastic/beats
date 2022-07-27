@@ -18,6 +18,7 @@
 package util
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -25,16 +26,16 @@ import (
 
 	k8sclient "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Enricher takes Kubernetes events and enrich them with k8s metadata
@@ -81,10 +82,11 @@ const selector = "kubernetes"
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	res kubernetes.Resource,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
-	config := ValidatedConfig(base)
-	if config == nil {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
 	}
@@ -123,12 +125,12 @@ func NewResourceMetadataEnricher(
 				name := r.GetObjectMeta().GetName()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
+						perfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
+						perfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
 					}
 				}
 
@@ -182,10 +184,11 @@ func NewResourceMetadataEnricher(
 // NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
+	perfMetrics *PerfMetricsCache,
 	nodeScope bool) Enricher {
 
-	config := ValidatedConfig(base)
-	if config == nil {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
 		return &nilEnricher{}
 	}
@@ -227,12 +230,12 @@ func NewContainerMetadataEnricher(
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						PerfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+						perfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						PerfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
+						perfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
 					}
 				}
 
@@ -241,9 +244,9 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+						kubernetes2.ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
 
-						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
+						kubernetes2.ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
@@ -330,21 +333,39 @@ func GetDefaultDisabledMetaConfig() *kubernetesConfig {
 	}
 }
 
-func ValidatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
-	config := kubernetesConfig{
+func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
+	config, err := GetConfig(base)
+	if err != nil {
+		logp.Err("Error while getting config: %v", err)
+		return nil, err
+	}
+
+	config, err = validateConfig(config)
+	if err != nil {
+		logp.Err("Error while validating config: %v", err)
+		return nil, err
+	}
+	return config, nil
+}
+
+func validateConfig(config *kubernetesConfig) (*kubernetesConfig, error) {
+	if !config.AddMetadata {
+		return nil, errors.New("metadata enriching is disabled")
+	}
+	return config, nil
+}
+
+func GetConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
+	config := &kubernetesConfig{
 		AddMetadata:         true,
 		SyncPeriod:          time.Minute * 10,
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil
+		return nil, errors.New("error unpacking configs")
 	}
 
-	// Return nil if metadata enriching is disabled:
-	if !config.AddMetadata {
-		return nil
-	}
-	return &config
+	return config, nil
 }
 
 func getString(m mapstr.M, key string) string {
@@ -518,31 +539,17 @@ func CreateEvent(event mapstr.M, namespace string) (mb.Event, error) {
 	return e, err
 }
 
-func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
-	_, err := event.Put(field, value)
-	if err != nil {
-		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
-	}
-}
-
-func ShouldDelete(event mapstr.M, field string, logger *logp.Logger) {
-	err := event.Delete(field)
-	if err != nil {
-		logger.Debugf("Failed to delete field '%s': %s", field, err)
-	}
-}
-
 func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Logger) (mapstr.M, error) {
 	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
 	if err != nil {
 		return nil, fmt.Errorf("fail to get kubernetes cluster metadata: %w", err)
 	}
 	ecsClusterMeta := mapstr.M{}
-	if clusterInfo.Url != "" {
-		ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.Url, logger)
+	if clusterInfo.URL != "" {
+		kubernetes2.ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.URL, logger)
 	}
 	if clusterInfo.Name != "" {
-		ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
+		kubernetes2.ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
 	}
 	return ecsClusterMeta, nil
 }

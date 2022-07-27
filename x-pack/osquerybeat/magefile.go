@@ -125,6 +125,12 @@ func extractFromMSI() error {
 			return err
 		}
 
+		fmt.Println("copy certs.pem from MSI")
+		err = devtools.Copy(filepath.Join(dip, distro.OsquerydCertsWindowsDistroPath()), distro.OsquerydCertsPath(dip))
+		if err != nil {
+			return err
+		}
+
 		fmt.Println("copy osqueryd.exe from MSI")
 		dp := distro.OsquerydPathForOS(osarch.OS, dip)
 		err = devtools.Copy(filepath.Join(dip, "osquery", "osqueryd", "osqueryd.exe"), dp)
@@ -213,6 +219,14 @@ func Package() {
 	mg.Deps(Update, osquerybeat.FetchOsqueryDistros)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).

@@ -18,10 +18,10 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/redis"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
 	"github.com/elastic/elastic-agent-libs/config"
 	logpcfg "github.com/elastic/elastic-agent-libs/logp/configure"
+	"github.com/elastic/elastic-agent-libs/service"
 )
 
 // genNewMonitoringConfig is a hacked-in function to enable a debug stderr logger

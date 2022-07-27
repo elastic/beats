@@ -1,0 +1,123 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "0cea87dc-699c-4771-a908-9a6c4df97630": {
+                            "columnOrder": [
+                                "031701fd-1939-4c76-8659-5a2411cf282b",
+                                "471f1924-3b61-4633-a297-066260bf1a42"
+                            ],
+                            "columns": {
+                                "031701fd-1939-4c76-8659-5a2411cf282b": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Cluster Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "471f1924-3b61-4633-a297-066260bf1a42",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "secondaryFields": [],
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "orchestrator.cluster.name"
+                                },
+                                "471f1924-3b61-4633-a297-066260bf1a42": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Total Nodes",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.node.name"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "415bd77a-fa26-4e8d-a354-97ddd74f04bd",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_node"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_node"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "categoryDisplay": "default",
+                        "groups": [
+                            "031701fd-1939-4c76-8659-5a2411cf282b"
+                        ],
+                        "layerId": "0cea87dc-699c-4771-a908-9a6c4df97630",
+                        "layerType": "data",
+                        "legendDisplay": "default",
+                        "metric": "471f1924-3b61-4633-a297-066260bf1a42",
+                        "nestedLegend": false,
+                        "numberDisplay": "value",
+                        "percentDecimals": 0
+                    }
+                ],
+                "shape": "donut"
+            }
+        },
+        "title": "Total Nodes per Cluster [Metricbeat Kubernetes]",
+        "visualizationType": "lnsPie"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "0c48f2e0-db40-11ec-a23d-5dd6249f86b6",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-0cea87dc-699c-4771-a908-9a6c4df97630",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "415bd77a-fa26-4e8d-a354-97ddd74f04bd",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3ODMsM10="
+}

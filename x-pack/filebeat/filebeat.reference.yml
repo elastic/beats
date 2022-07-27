@@ -1856,6 +1856,135 @@ filebeat.modules:
     # Optional, the password to use when connecting to Redis.
     #var.password:
 
+#------------------------------ Salesforce Module ------------------------------
+- module: salesforce
+
+  apex-rest:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+      
+  login-rest:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
+  login-stream:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
+  logout-rest:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
+  logout-stream:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
+  setupaudittrail-rest:
+    enabled: false
+
+    # Oauth Client ID
+    #var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    #var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    #var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    #var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    #var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    #var.url: "https://instance_id.my.salesforce.com"
+
 #----------------------------- Google Santa Module -----------------------------
 - module: santa
   log:
@@ -2709,11 +2838,15 @@ filebeat.inputs:
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list. The include_lines is called before
   # exclude_lines. By default, no lines are dropped.
+  # Line filtering happens after the parsers pipeline. If you would like to filter lines
+  # before parsers, use include_message parser.
   #exclude_lines: ['^DBG']
 
   # Include lines. A list of regular expressions to match. It exports the lines that are
   # matching any regular expression from the list. The include_lines is called before
   # exclude_lines. By default, all the lines are exported.
+  # Line filtering happens after the parsers pipeline. If you would like to filter lines
+  # before parsers, use include_message parser.
   #include_lines: ['^ERR', '^WARN']
 
   ### Prospector options
@@ -2768,6 +2901,16 @@ filebeat.inputs:
       # unmarshaling errors or when a text key is defined in the configuration but cannot
       # be used.
       #add_error_key: false
+
+  #### Filtering messages
+
+  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # include or exclude lines before they are aggregated into multiline or the JSON contents
+  # are parsed.
+
+  #parsers:
+    #- include_message.patterns:
+      - ["WARN", "ERR"]
 
   #### Multiline options
 
@@ -3387,7 +3530,7 @@ filebeat.inputs:
 #          config:
 #            - type: container
 #              paths:
-#                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+#                - /var/log/containers/*.log
 
 # ========================== Filebeat global options ===========================
 
@@ -3403,8 +3546,8 @@ filebeat.inputs:
 # The timeout value that controls when registry entries are written to disk
 # (flushed). When an unwritten update exceeds this value, it triggers a write
 # to disk. When flush is set to 0s, the registry is written to disk after each
-# batch of events has been published successfully. The default value is 0s.
-#filebeat.registry.flush: 0s
+# batch of events has been published successfully. The default value is 1s.
+#filebeat.registry.flush: 1s
 
 
 # Starting with Filebeat 7.0, the registry uses a new directory format to store
@@ -3459,6 +3602,10 @@ filebeat.inputs:
 # fields in the output document instead of being grouped under a fields
 # sub-dictionary. Default is false.
 #fields_under_root: false
+
+# Configure the precision of all timestamps in Filebeat.
+# Available options: millisecond, microsecond, nanosecond
+#timestamp.precision: millisecond
 
 # Internal queue configuration for buffering events to be published.
 #queue:
@@ -4061,9 +4208,6 @@ output.elasticsearch:
 
     # Strategy for fetching the topics metadata from the broker. Default is false.
     #full: false
-
-  # The number of concurrent load-balanced Kafka output workers.
-  #worker: 1
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, events are typically dropped.

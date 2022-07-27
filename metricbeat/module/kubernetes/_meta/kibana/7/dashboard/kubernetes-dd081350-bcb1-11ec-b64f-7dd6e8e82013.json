@@ -1,0 +1,100 @@
+{
+    "attributes": {
+        "description": "Metrics about Persistent Volumes and  Persistent Volume Claims",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "c0d8936a-31e4-43ca-9bb2-ca240bbeccaf",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "c0d8936a-31e4-43ca-9bb2-ca240bbeccaf",
+                "panelRefName": "panel_c0d8936a-31e4-43ca-9bb2-ca240bbeccaf",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "59e9441e-2319-4cbb-b1c1-7293f013202b",
+                    "w": 48,
+                    "x": 0,
+                    "y": 7
+                },
+                "panelIndex": "59e9441e-2319-4cbb-b1c1-7293f013202b",
+                "panelRefName": "panel_59e9441e-2319-4cbb-b1c1-7293f013202b",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "bd29d415-a64b-4aa8-b8eb-489e04bc8718",
+                    "w": 48,
+                    "x": 0,
+                    "y": 16
+                },
+                "panelIndex": "bd29d415-a64b-4aa8-b8eb-489e04bc8718",
+                "panelRefName": "panel_bd29d415-a64b-4aa8-b8eb-489e04bc8718",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] PV/PVC",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-dd081350-bcb1-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "kubernetes-e485d330-bcb9-11ec-b64f-7dd6e8e82013",
+            "name": "c0d8936a-31e4-43ca-9bb2-ca240bbeccaf:panel_c0d8936a-31e4-43ca-9bb2-ca240bbeccaf",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-e94fb750-bcb9-11ec-b64f-7dd6e8e82013",
+            "name": "59e9441e-2319-4cbb-b1c1-7293f013202b:panel_59e9441e-2319-4cbb-b1c1-7293f013202b",
+            "type": "lens"
+        },
+        {
+            "id": "kubernetes-f1d25db0-bcb9-11ec-b64f-7dd6e8e82013",
+            "name": "bd29d415-a64b-4aa8-b8eb-489e04bc8718:panel_bd29d415-a64b-4aa8-b8eb-489e04bc8718",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-06-28T06:47:07.287Z",
+    "version": "WzU3NzIsM10="
+}

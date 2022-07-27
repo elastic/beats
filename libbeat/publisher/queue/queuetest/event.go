@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func makeEvent(fields mapstr.M) publisher.Event {
+func MakeEvent(fields mapstr.M) publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{
 			Timestamp: time.Now(),

@@ -28,8 +28,6 @@ import (
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
-	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
@@ -150,6 +148,15 @@ func Package() {
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	start := time.Now()
+	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
+	return devtools.Ironbank()
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).

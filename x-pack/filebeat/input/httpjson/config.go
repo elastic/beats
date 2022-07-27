@@ -8,7 +8,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type config struct {
@@ -35,6 +35,11 @@ func (ce cursorEntry) mustIgnoreEmptyValue() bool {
 func (c config) Validate() error {
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
+	}
+	for _, v := range c.Chain {
+		if v.Step == nil && v.While == nil {
+			return errors.New("both step & while blocks in a chain cannot be empty")
+		}
 	}
 	return nil
 }

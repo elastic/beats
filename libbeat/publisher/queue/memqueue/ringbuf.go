@@ -209,3 +209,8 @@ func (b *ringBuffer) Full() bool {
 func (b *ringBuffer) Size() int {
 	return len(b.entries)
 }
+
+// Items returns the count of events currently in the buffer
+func (b *ringBuffer) Items() int {
+	return b.regA.size + b.regB.size
+}

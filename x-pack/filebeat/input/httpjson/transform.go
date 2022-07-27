@@ -198,7 +198,7 @@ func (e maybeMsg) Error() string { return e.err.Error() }
 
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
 func newTransformsFromConfig(config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
-	var trans transforms //nolint:prealloc // Bad linter!
+	var trans transforms
 	for _, tfConfig := range config {
 		if len(tfConfig.GetFields()) != 1 {
 			return nil, fmt.Errorf(
@@ -236,7 +236,7 @@ func newBasicTransformsFromConfig(config transformsConfig, namespace string, log
 		return nil, err
 	}
 
-	var rts []basicTransform //nolint:prealloc // Bad linter!
+	var rts []basicTransform
 	for _, t := range ts {
 		rt, ok := t.(basicTransform)
 		if !ok {

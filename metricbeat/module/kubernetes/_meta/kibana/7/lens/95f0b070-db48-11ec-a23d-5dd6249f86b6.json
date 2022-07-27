@@ -1,0 +1,178 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "307ec163-d913-4ce0-8e9b-6dfc777def59": {
+                            "columnOrder": [
+                                "8c03fc54-6e2d-49ff-b294-bb80ae6a1a8e",
+                                "7b682fd2-3fd6-4834-8067-a546ab543764",
+                                "e9919412-9d5f-4db8-96bf-ab35a7b11c87",
+                                "b1ecf062-bf74-4458-9598-2c7018cdae3d"
+                            ],
+                            "columns": {
+                                "7b682fd2-3fd6-4834-8067-a546ab543764": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.pod.status.phase: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Phase",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.pod.status.phase"
+                                },
+                                "8c03fc54-6e2d-49ff-b294-bb80ae6a1a8e": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Pod",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": false,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 1000
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.pod.name"
+                                },
+                                "b1ecf062-bf74-4458-9598-2c7018cdae3d": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.pod.status.scheduled: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Scheduled",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.pod.status.scheduled"
+                                },
+                                "e9919412-9d5f-4db8-96bf-ab35a7b11c87": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.pod.status.ready: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Ready",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.pod.status.ready"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "8436b682-edd9-4a0c-bcf4-9dd60f324200",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_pod"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_pod"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "collapseFn": "",
+                        "columnId": "8c03fc54-6e2d-49ff-b294-bb80ae6a1a8e",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "7b682fd2-3fd6-4834-8067-a546ab543764",
+                        "hidden": false,
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "e9919412-9d5f-4db8-96bf-ab35a7b11c87",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "b1ecf062-bf74-4458-9598-2c7018cdae3d",
+                        "isTransposed": false
+                    }
+                ],
+                "headerRowHeight": "single",
+                "headerRowHeightLines": 1,
+                "layerId": "307ec163-d913-4ce0-8e9b-6dfc777def59",
+                "layerType": "data",
+                "paging": {
+                    "enabled": true,
+                    "size": 10
+                },
+                "sorting": {
+                    "direction": "none"
+                }
+            }
+        },
+        "title": "Status per Pod [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "95f0b070-db48-11ec-a23d-5dd6249f86b6",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-307ec163-d913-4ce0-8e9b-6dfc777def59",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "8436b682-edd9-4a0c-bcf4-9dd60f324200",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:02.196Z",
+    "version": "WzU3MzAsM10="
+}

@@ -325,6 +325,21 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 		},
 		{
+			name: "google must work if jwt_json is correct",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider": "google",
+					"google.jwt_json": `{
+						"type":           "service_account",
+						"project_id":     "foo",
+						"private_key_id": "x",
+						"client_email":   "foo@bar.com",
+						"client_id":      "0"
+					}`,
+				},
+			},
+		},
+		{
 			name: "google must work if credentials_json is correct",
 			input: map[string]interface{}{
 				"auth.oauth2": map[string]interface{}{
@@ -346,6 +361,16 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"auth.oauth2": map[string]interface{}{
 					"provider":                "google",
 					"google.credentials_json": `invalid`,
+				},
+			},
+		},
+		{
+			name:        "google must fail if jwt_json is not a valid JSON",
+			expectedErr: "the field can't be converted to valid JSON accessing 'auth.oauth2.google.jwt_json'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":        "google",
+					"google.jwt_json": `invalid`,
 				},
 			},
 		},

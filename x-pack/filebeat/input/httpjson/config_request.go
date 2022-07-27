@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type retryConfig struct {
@@ -49,8 +49,10 @@ func (c retryConfig) getWaitMin() time.Duration {
 }
 
 func (c retryConfig) getWaitMax() time.Duration {
-	if c.WaitMax == nil {
+	if c.WaitMax == nil && c.WaitMin == nil {
 		return 0
+	} else if c.WaitMax == nil && c.WaitMin != nil {
+		return *c.WaitMin
 	}
 	return *c.WaitMax
 }

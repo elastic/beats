@@ -24,6 +24,9 @@ echo "Update go version ${GO_RELEASE_VERSION}"
 echo "${GO_RELEASE_VERSION}" > .go-version
 git add .go-version
 
+${SED} -E -e "s#(go:) \"[0-9]+\.[0-9]+\.[0-9]+\"#\1 \"${GO_RELEASE_VERSION}\"#g" .golangci.yml
+git add .golangci.yml
+
 find . -maxdepth 3 -name Dockerfile -print0 |
     while IFS= read -r -d '' line; do
         ${SED} -E -e "s#(FROM golang):[0-9]+\.[0-9]+\.[0-9]+#\1:${GO_RELEASE_VERSION}#g" "$line"

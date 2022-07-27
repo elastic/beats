@@ -36,8 +36,6 @@ type ackLoop struct {
 
 func (l *ackLoop) run() {
 	var (
-		// log = l.broker.logger
-
 		// Buffer up event counter in ackCount. If ackCount > 0, acks will be set to
 		// the broker.acks channel for sending the ACKs while potentially receiving
 		// new batches from the broker event loop.
@@ -46,10 +44,11 @@ func (l *ackLoop) run() {
 		// loop, as the ack loop will not block on any channel
 		ackCount int
 		ackChan  chan int
-		sig      chan batchAckMsg
 	)
 
 	for {
+		nextBatchChan := l.ackChans.nextBatchChannel()
+
 		select {
 		case <-l.broker.done:
 			return
@@ -60,25 +59,12 @@ func (l *ackLoop) run() {
 		case chanList := <-l.broker.scheduledACKs:
 			l.ackChans.concat(&chanList)
 
-		case <-sig:
+		case <-nextBatchChan:
 			ackCount += l.handleBatchSig()
 			if ackCount > 0 {
 				ackChan = l.broker.ackChan
 			}
 		}
-
-		// log.Debug("ackloop INFO")
-		// log.Debug("ackloop:   total events scheduled = ", l.totalSched)
-		// log.Debug("ackloop:   total events ack = ", l.totalACK)
-		// log.Debug("ackloop:   total batches scheduled = ", l.batchesSched)
-		// log.Debug("ackloop:   total batches ack = ", l.batchesACKed)
-
-		sig = l.ackChans.channel()
-		// if l.sig == nil {
-		// 	log.Debug("ackloop: no ack scheduled")
-		// } else {
-		// 	log.Debug("ackloop: schedule ack: ", l.lst.head.seq)
-		// }
 	}
 }
 
@@ -123,7 +109,7 @@ func (l *ackLoop) collectAcked() chanList {
 	for !l.ackChans.empty() && !done {
 		acks := l.ackChans.front()
 		select {
-		case <-acks.ackChan:
+		case <-acks.doneChan:
 			lst.append(l.ackChans.pop())
 
 		default:

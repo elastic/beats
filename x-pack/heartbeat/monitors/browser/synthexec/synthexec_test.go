@@ -61,7 +61,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 				Type:                 "step/end",
 				Journey: &Journey{
 					Name: "inline",
-					Id:   "inline",
+					ID:   "inline",
 				},
 				Step: &Step{
 					Name:   "Go to home page",
@@ -97,16 +97,68 @@ func TestJsonToSynthEvent(t *testing.T) {
 
 func TestRunCmd(t *testing.T) {
 	cmd := exec.Command("go", "run", "./main.go")
-	_, filename, _, _ := runtime.Caller(0)
-	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
 
 	stdinStr := "MY_STDIN"
+	synthEvents := runAndCollect(t, cmd, stdinStr)
+
+	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
+		stdoutEvents := eventsWithType(Stdout, synthEvents)
+		require.Len(t, stdoutEvents, 1)
+		require.Equal(t, stdinStr, stdoutEvents[0].Payload["message"])
+	})
+	t.Run("has echo'd two lines to stderr", func(t *testing.T) {
+		stdoutEvents := eventsWithType("stderr", synthEvents)
+		require.Len(t, stdoutEvents, 2)
+		require.Equal(t, "Stderr 1", stdoutEvents[0].Payload["message"])
+		require.Equal(t, "Stderr 2", stdoutEvents[1].Payload["message"])
+	})
+	t.Run("should have one event per line in sampleinput", func(t *testing.T) {
+		// 27 lines are in sample.ndjson + 2 from stderr + 1 from stdout + 1 from the command exit
+		expected := 28 + 2 + 1
+		require.Len(t, synthEvents, expected)
+	})
+
+	expectedEventTypes := []string{
+		JourneyStart,
+		StepEnd,
+		JourneyEnd,
+		CmdStatus,
+	}
+	for _, typ := range expectedEventTypes {
+		t.Run(fmt.Sprintf("Should have at least one event of type %s", typ), func(t *testing.T) {
+			require.GreaterOrEqual(t, len(eventsWithType(typ, synthEvents)), 1)
+		})
+	}
+}
+
+func TestRunBadExitCodeCmd(t *testing.T) {
+	cmd := exec.Command("go", "run", "./main.go", "exit")
+	synthEvents := runAndCollect(t, cmd, "")
+
+	// go run outputs "exit status 123" to stderr so we have two messages
+	require.Len(t, synthEvents, 2)
+
+	t.Run("has a stderr line", func(t *testing.T) {
+		stderrEvents := eventsWithType(Stderr, synthEvents)
+		require.Len(t, stderrEvents, 1)
+		require.Equal(t, "exit status 123", stderrEvents[0].Payload["message"])
+	})
+	t.Run("has a cmd status event", func(t *testing.T) {
+		stdoutEvents := eventsWithType(CmdStatus, synthEvents)
+		require.Len(t, stdoutEvents, 1)
+	})
+}
+
+func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string) []*SynthEvent {
+	_, filename, _, _ := runtime.Caller(0)
+	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
 
 	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent
 	timeout := time.NewTimer(time.Minute)
+
 Loop:
 	for {
 		select {
@@ -120,71 +172,44 @@ Loop:
 		}
 	}
 
-	eventsWithType := func(typ string) (matched []*SynthEvent) {
-		for _, se := range synthEvents {
-			if se.Type == typ {
-				matched = append(matched, se)
-			}
-		}
-		return
-	}
-
-	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
-		stdoutEvents := eventsWithType("stdout")
-		require.Len(t, stdoutEvents, 1)
-		require.Equal(t, stdinStr, stdoutEvents[0].Payload["message"])
-	})
-	t.Run("has echo'd two lines to stderr", func(t *testing.T) {
-		stdoutEvents := eventsWithType("stderr")
-		require.Len(t, stdoutEvents, 2)
-		require.Equal(t, "Stderr 1", stdoutEvents[0].Payload["message"])
-		require.Equal(t, "Stderr 2", stdoutEvents[1].Payload["message"])
-	})
-	t.Run("should have one event per line in sampleinput", func(t *testing.T) {
-		// 27 lines are in sample.ndjson + 2 from stderr + 1 from stdout + 1 from the command exit
-		expected := 28 + 2 + 1
-		require.Len(t, synthEvents, expected)
-	})
-
-	expectedEventTypes := []string{
-		"journey/start",
-		"step/end",
-		"journey/end",
-		"cmd/status",
-	}
-	for _, typ := range expectedEventTypes {
-		t.Run(fmt.Sprintf("Should have at least one event of type %s", typ), func(t *testing.T) {
-			require.GreaterOrEqual(t, len(eventsWithType(typ)), 1)
-		})
-	}
+	return synthEvents
 }
 
-func TestSuiteCommandFactory(t *testing.T) {
+func eventsWithType(typ string, synthEvents []*SynthEvent) (matched []*SynthEvent) {
+	for _, se := range synthEvents {
+		if se.Type == typ {
+			matched = append(matched, se)
+		}
+	}
+	return matched
+}
+
+func TestProjectCommandFactory(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
 	origPath := path.Join(filepath.Dir(filename), "../source/fixtures/todos")
-	suitePath, err := filepath.Abs(origPath)
+	projectPath, err := filepath.Abs(origPath)
 	require.NoError(t, err)
-	binPath := path.Join(suitePath, "node_modules/.bin/elastic-synthetics")
+	binPath := path.Join(projectPath, "node_modules/.bin/elastic-synthetics")
 
 	tests := []struct {
-		name      string
-		suitePath string
-		extraArgs []string
-		want      []string
-		wantErr   bool
+		name        string
+		projectPath string
+		extraArgs   []string
+		want        []string
+		wantErr     bool
 	}{
 		{
 			"no args",
-			suitePath,
+			projectPath,
 			nil,
-			[]string{binPath, suitePath},
+			[]string{binPath, projectPath},
 			false,
 		},
 		{
 			"with args",
-			suitePath,
+			projectPath,
 			[]string{"--capability", "foo", "bar", "--rich-events"},
-			[]string{binPath, suitePath, "--capability", "foo", "bar", "--rich-events"},
+			[]string{binPath, projectPath, "--capability", "foo", "bar", "--rich-events"},
 			false,
 		},
 		{
@@ -197,7 +222,7 @@ func TestSuiteCommandFactory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory, err := suiteCommandFactory(tt.suitePath, tt.extraArgs...)
+			factory, err := projectCommandFactory(tt.projectPath, tt.extraArgs...)
 
 			if tt.wantErr {
 				require.Error(t, err)

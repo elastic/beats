@@ -203,11 +203,16 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 	}
 
 	id := getIDFromPath(filepath, inputID, fi)
-	entry, err := e.getRegistryState(id)
-	if err != nil {
-		e.t.Fatalf(err.Error())
-	}
+	var entry registryEntry
+	require.Eventually(e.t, func() bool {
+		entry, err = e.getRegistryState(id)
+		if err != nil {
+			return true
+		}
 
+		return expectedOffset == entry.Cursor.Offset
+	}, time.Second, time.Millisecond)
+	require.NoError(e.t, err)
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
 
@@ -325,6 +330,17 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 		}
 		if count < sum {
 			e.t.Fatalf("too many events; expected: %d, actual: %d", count, sum)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+// waitUntilAtLeastEventCount waits until at least count events arrive to the client.
+func (e *inputTestingEnvironment) waitUntilAtLeastEventCount(count int) {
+	for {
+		sum := len(e.pipeline.GetAllEvents())
+		if count <= sum {
+			return
 		}
 		time.Sleep(10 * time.Millisecond)
 	}

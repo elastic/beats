@@ -39,7 +39,7 @@
         "dataset":"socket",
         "kind":"event",
         "action":"network_flow",
-        "category":"network_traffic",
+        "category":"network",
         "start":"2019-08-22T20:46:35.001Z",
         "end":"2019-08-22T20:46:35.032Z"
     },

@@ -8,19 +8,22 @@ import (
 	"testing"
 	"time"
 
-	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
-	consumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 )
 
 func TestEventMapping(t *testing.T) {
+	ID := "ID"
+	kind := "legacy"
 	usageDate := "2020-08-08"
 	name := "test"
+	billingAccountId := "123"
 	startDate := date.Time{}
 
-	var charge decimal.Decimal = decimal.NewFromFloat(8.123456)
+	var charge = decimal.NewFromFloat(8.123456)
 	var prop = consumption.ForecastProperties{
 		UsageDate:        &usageDate,
 		Grain:            "",
@@ -37,26 +40,21 @@ func TestEventMapping(t *testing.T) {
 		ChargeType:       "Actual",
 		ConfidenceLevels: nil,
 	}
-	var prop1 = prevConsumption.UsageDetailProperties{
-		InstanceName:     &name,
-		SubscriptionName: &name,
-		AccountName:      &name,
-		DepartmentName:   &name,
-		Product:          &name,
-		InstanceID:       &name,
-		UsageStart:       &startDate,
-		UsageEnd:         &startDate,
+	var pros = consumption.LegacyUsageDetailProperties{
+		BillingAccountID:       &billingAccountId,
+		BillingAccountName:     &name,
+		BillingPeriodStartDate: &startDate,
+		BillingPeriodEndDate:   &startDate,
+		Cost:                   &charge,
+		InvoiceSection:         &name,
+		Product:                &name,
 	}
-	usage := Usage{
-		UsageDetails: []prevConsumption.UsageDetail{
-			{
-				UsageDetailProperties: &prop1,
-				ID:                    nil,
-				Name:                  nil,
-				Type:                  nil,
-				Tags:                  nil,
-			},
-		},
+	var legacy = consumption.LegacyUsageDetail{
+		ID:                          &ID,
+		Kind:                        consumption.Kind(kind),
+		LegacyUsageDetailProperties: &pros,
+	}
+	var usage = Usage{UsageDetails: []consumption.BasicUsageDetail{legacy},
 		ActualCosts: []consumption.Forecast{
 			{
 				ForecastProperties: &prop2,
@@ -74,8 +72,14 @@ func TestEventMapping(t *testing.T) {
 				Tags:               nil,
 			}},
 	}
-	events := EventsMapping("sub", usage)
+
+	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
+	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
+
+	events, err := EventsMapping("sub", usage, startTime, endTime)
+	assert.NoError(t, err)
 	assert.Equal(t, len(events), 2)
+
 	for _, event := range events {
 
 		if ok, _ := event.MetricSetFields.HasKey("department_name"); ok {

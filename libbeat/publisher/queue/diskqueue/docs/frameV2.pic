@@ -1,0 +1,5 @@
+boxht = 0.25
+SIZE1: box "size (uint32)" wid 4;
+DATA: box "CBOR or Protobuf serialized data" dashed wid 4 ht 2 with .nw at SIZE1.sw;
+CHECKSUM: box "checksum (uint32)" wid 4 with .nw at DATA.sw;
+SIZE2: box "size (uint32)" wid 4 with nw at CHECKSUM.sw;

@@ -22,10 +22,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // Factory for creating a queue used by a pipeline instance.
@@ -46,6 +45,9 @@ type Metrics struct {
 	ByteLimit opt.Uint
 	//EventLimit is the user-configured event limit of the queue
 	EventLimit opt.Uint
+
+	//UnackedConsumedEvents is the count of events that an output consumer has read, but not yet ack'ed
+	UnackedConsumedEvents opt.Uint
 
 	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
 	OldestActiveTimestamp common.Time
@@ -112,14 +114,14 @@ type ProducerConfig struct {
 type Producer interface {
 	// Publish adds an event to the queue, blocking if necessary, and returns
 	// true on success.
-	Publish(event publisher.Event) bool
+	Publish(event interface{}) bool
 
 	// TryPublish adds an event to the queue if doing so will not block the
 	// caller, otherwise it immediately returns. The reasons a publish attempt
 	// might block are defined by the specific queue implementation and its
 	// configuration. Returns true if the event was successfully added, false
 	// otherwise.
-	TryPublish(event publisher.Event) bool
+	TryPublish(event interface{}) bool
 
 	// Cancel closes this Producer endpoint. If the producer is configured to
 	// drop its events on Cancel, the number of dropped events is returned.
@@ -129,9 +131,10 @@ type Producer interface {
 	Cancel() int
 }
 
-// Batch of events to be returned to Consumers. The `ACK` method will send the
-// ACK signal to the queue.
+// Batch of events to be returned to Consumers. The `Done` method will tell the
+// queue that the batch has been consumed and its events can be discarded.
 type Batch interface {
-	Events() []publisher.Event
-	ACK()
+	Count() int
+	Event(i int) interface{}
+	Done()
 }
