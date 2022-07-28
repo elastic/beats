@@ -152,10 +152,10 @@ func (l *directEventLoop) insert(req *pushRequest) {
 			req.resp <- l.nextEntryID
 		}
 		l.buf.insert(queueEntry{
-			event:         req.event,
-			id:            l.nextEntryID,
-			producer:      req.producer,
-			producerIndex: req.producerIndex})
+			event:      req.event,
+			id:         l.nextEntryID,
+			producer:   req.producer,
+			producerID: req.producerID})
 		l.nextEntryID++
 	}
 }
@@ -218,17 +218,17 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 			// this event doesn't need ACK handling
 			continue
 		}
-		if entry.producerIndex < entry.producer.state.ackedCount {
+		if entry.producerID < entry.producer.state.lastACK {
 			// This has a lower index than the previous ACK for this producer,
 			// so it was covered in the previous call and we can skip it.
 			entry.producer = nil
 			continue
 		}
-		count := (entry.producerIndex - entry.producer.producedCount)
+		count := entry.producer.state.lastACK - entry.producerID
 
 		entry.producer.state.cb(int(count))
-		// This update is safe because ackedCount is only used from the event loop.
-		entry.producer.state.ackedCount = entry.producerIndex + 1
+		// This update is safe because lastACK is only used from the event loop.
+		entry.producer.state.lastACK = entry.producerID
 		entry.producer = nil
 	}
 }
@@ -343,10 +343,10 @@ func (l *bufferingEventLoop) insert(req *pushRequest, id queue.EntryID) bool {
 	}
 
 	l.buf.add(queueEntry{
-		event:         req.event,
-		id:            id,
-		producer:      req.producer,
-		producerIndex: req.producerIndex,
+		event:      req.event,
+		id:         id,
+		producer:   req.producer,
+		producerID: req.producerID,
 	})
 	return true
 }
@@ -469,15 +469,15 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 				continue
 			}
 
-			count := entry.producerIndex - entry.producer.state.ackedCount
-			if entry.producerIndex < entry.producer.state.ackedCount {
+			if entry.producerID < entry.producer.state.lastACK {
 				// This index was already acknowledged on a previous iteration, skip.
 				entry.producer = nil
 				continue
 			}
+			count := entry.producerID - entry.producer.state.lastACK
 
 			entry.producer.state.cb(int(count))
-			entry.producer.state.ackedCount = entry.producerIndex + 1
+			entry.producer.state.lastACK = entry.producerID
 			entry.producer = nil
 		}
 	}

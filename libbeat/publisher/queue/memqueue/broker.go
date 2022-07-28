@@ -99,8 +99,8 @@ type queueEntry struct {
 	event interface{}
 	id    queue.EntryID
 
-	producer      *ackProducer
-	producerIndex uint64 // The order of this entry within its producer
+	producer   *ackProducer
+	producerID producerID // The order of this entry within its producer
 }
 
 type batch struct {

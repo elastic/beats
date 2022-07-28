@@ -41,11 +41,18 @@ type openState struct {
 	events chan pushRequest
 }
 
+// producerID stores the order of events within a single producer, so multiple
+// event acknowledgement callbacks can be coalesced into a single call.
+// It is defined as an explicit type to reduce cross-confusion with the id
+// of an event in the queue itself, which is a queue.EntryID.
+// with the
+type producerID uint64
+
 type produceState struct {
-	cb         ackHandler
-	dropCB     func(interface{})
-	cancelled  bool
-	ackedCount uint64
+	cb        ackHandler
+	dropCB    func(interface{})
+	cancelled bool
+	lastACK   producerID
 }
 
 type ackHandler func(count int)
@@ -79,15 +86,21 @@ func (p *forgetfulProducer) Cancel() int {
 	return 0
 }
 
-func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
+func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
 	resp := make(chan queue.EntryID, 1)
-	if p.openState.publish(pushRequest{
-		event:         event,
-		producer:      p,
-		producerIndex: p.producedCount,
-		resp:          resp,
-	}) {
-		id := <-resp
+	return pushRequest{
+		event:    event,
+		producer: p,
+		// We add 1 to the id so the default lastACK of 0 is a
+		// valid initial state and 1 is the first real id.
+		producerID: producerID(p.producedCount + 1),
+		resp:       resp}
+}
+
+func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
+	req := p.makePushRequest(event)
+	if p.openState.publish(req) {
+		id := <-req.resp
 		p.producedCount++
 		return id, true
 	}
@@ -95,14 +108,9 @@ func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
 }
 
 func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
-	resp := make(chan queue.EntryID, 1)
-	if p.openState.tryPublish(pushRequest{
-		event:         event,
-		producer:      p,
-		producerIndex: p.producedCount,
-		resp:          resp,
-	}) {
-		id := <-resp
+	req := p.makePushRequest(event)
+	if p.openState.tryPublish(req) {
+		id := <-req.resp
 		p.producedCount++
 		return id, true
 	}
