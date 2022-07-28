@@ -70,7 +70,7 @@ If you want to use a remote debugger with Visual Studio code, you need to provid
 Currently the Tiltfile is configured in `run` mode
 
 ```python
-bet(mode="run")
+beat(mode="run")
 # beat(mode="debug")
 ```
 
