@@ -39,6 +39,8 @@ data:
 
     output.elasticsearch:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      protocol: https
+      ssl.verification_mode: "none"
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
       allow_older_versions: true
