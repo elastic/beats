@@ -114,10 +114,16 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			kubernetes2.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
+		// NOTE: nodeCores can be 0 if `state_node` and/or `node` metricsets are disabled
+		// if `nodeCores == 0 and containerCoreLimits > 0` we need to avoid that `containerCoreLimits` is
+		// incorrectly overridden to 0
 		if nodeCores > 0 && containerCoreLimits > nodeCores {
 			containerCoreLimits = nodeCores
 		}
 
+		// NOTE: nodeMem can be 0 if `state_node` and/or `node` metricsets are disabled
+		// if `nodeMem == 0 and containerCoreLimits > 0` we need to avoid that `containerCoreLimits` is
+		// incorrectly overridden to 0
 		if nodeMem > 0 && containerMemLimits > nodeMem {
 			containerMemLimits = nodeMem
 		}

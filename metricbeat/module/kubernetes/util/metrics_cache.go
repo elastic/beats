@@ -144,8 +144,3 @@ func (m *valueMap) GetTimeout() time.Duration {
 func (m *valueMap) SetTimeout(timeout time.Duration) {
 	m.timeout = timeout
 }
-
-// // ContainerUID creates an unique ID for from namespace, pod name and container name
-// func ContainerUID(namespace, pod, container string) string {
-// 	return namespace + "/" + pod + "/" + container
-// }
