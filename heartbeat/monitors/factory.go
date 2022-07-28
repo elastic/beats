@@ -41,14 +41,17 @@ import (
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
 type RunnerFactory struct {
-	info       beat.Info
-	addTask    scheduler.AddTask
-	byId       map[string]*Monitor
-	mtx        *sync.Mutex
-	pluginsReg *plugin.PluginsReg
-	logger     *logp.Logger
-	runOnce    bool
+	info                  beat.Info
+	addTask               scheduler.AddTask
+	byId                  map[string]*Monitor
+	mtx                   *sync.Mutex
+	pluginsReg            *plugin.PluginsReg
+	logger                *logp.Logger
+	runOnce               bool
+	pipelineClientFactory PipelineClientFactory
 }
+
+type PipelineClientFactory func(pipeline beat.Pipeline) (pipeline.ISyncClient, error)
 
 type publishSettings struct {
 	// Fields and tags to add to monitor.
@@ -70,15 +73,15 @@ type publishSettings struct {
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg, pipelineClientFactory func(pipeline pipeline.Pipeline) pipeline.ISyncClient) *RunnerFactory {
+func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg, pcf PipelineClientFactory) *RunnerFactory {
 	return &RunnerFactory{
-		info:       info,
-		addTask:    addTask,
-		byId:       map[string]*Monitor{},
-		mtx:        &sync.Mutex{},
-		pluginsReg: pluginsReg,
-		logger:     logp.L(),
-		runOnce:    runOnce,
+		info:                  info,
+		addTask:               addTask,
+		byId:                  map[string]*Monitor{},
+		mtx:                   &sync.Mutex{},
+		pluginsReg:            pluginsReg,
+		logger:                logp.L(),
+		pipelineClientFactory: pcf,
 	}
 }
 
@@ -120,9 +123,13 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 			}
 		}()
 	}
-	monitor, err := newMonitor(c, f.pluginsReg, p, f.addTask, safeStop, f.runOnce)
+	pc, err := f.pipelineClientFactory(p)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not create pipeline client via factory: %w", err)
+	}
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, safeStop)
+	if err != nil {
+		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
 
 	if mon, ok := f.byId[monitor.stdFields.ID]; ok {

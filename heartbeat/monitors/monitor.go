@@ -219,35 +219,9 @@ func (m *Monitor) Start() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 
-	/*
-			for _, t := range m.configuredJobs {
-			if m.runOnce {
-				client, err := pipeline.NewSyncClient(logp.L(), t.monitor.pipelineConnector, beat.ClientConfig{})
-				if err != nil {
-					logp.L().Errorf("could not start monitor: %v", err)
-					continue
-				}
-				t.Start(&PubClient{
-					Publish: func(event beat.Event) {
-						_ = client.Publish(event)
-					},
-					Close: client.Close,
-					Wait:  client.Wait,
-				})
-			} else {
-				client, err := m.pipelineConnector.Connect()
-				if err != nil {
-					logp.L().Errorf("could not start monitor: %v", err)
-					continue
-				}
-				t.Start(&PubClient{
-					Publish: client.Publish,
-					Close:   client.Close,
-					Wait:    func() {},
-				})
-			}
-		}
-	*/
+	for _, t := range m.configuredJobs {
+		t.Start(m.pubClient)
+	}
 
 	m.stats.StartMonitor(int64(m.endpoints))
 	m.state = MON_STARTED

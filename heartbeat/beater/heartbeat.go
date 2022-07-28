@@ -20,6 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"syscall"
 	"time"
 
@@ -74,7 +75,18 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		config:    parsedConfig,
 		scheduler: scheduler,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(b.Info, scheduler.Add, plugin.GlobalPluginsReg, parsedConfig.RunOnce),
+		dynamicFactory: monitors.NewFactory(b.Info, scheduler.Add, plugin.GlobalPluginsReg, func(p beat.Pipeline) (pipeline.ISyncClient, error) {
+			if parsedConfig.RunOnce {
+				client, err := pipeline.NewSyncClient(logp.L(), p, beat.ClientConfig{})
+				if err != nil {
+					return nil, fmt.Errorf("could not create pipeline sync client for run_once: %w", err)
+				}
+				return client, nil
+			} else {
+				client, err := p.Connect()
+				return SyncPipelineClientAdaptor{C: client}, err
+			}
+		}),
 	}
 	return bt, nil
 }
