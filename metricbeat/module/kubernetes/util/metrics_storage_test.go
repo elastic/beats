@@ -8,10 +8,10 @@ import (
 
 type ExampleTestSuite struct {
 	suite.Suite
-	Cuid string
-	MetricName int
-	AnotherMetricName int
-	MetricValue float64
+	Cuid              string
+	MetricName        Metric
+	AnotherMetricName Metric
+	MetricValue       float64
 	// Storage *MetricsStorage
 	MetricSet *MetricSet
 }
@@ -21,8 +21,8 @@ func (s *ExampleTestSuite) SetupTest() {
 	pod := "pod"
 	container := "container"
 	s.Cuid = ContainerUID(ns, pod, container)
-	s.MetricName = CONTAINER_CORES_LIMIT
-	s.AnotherMetricName = NODE_CORES_ALLOCATABLE
+	s.MetricName = CONTAINER_CORES_LIMIT_METRIC
+	s.AnotherMetricName = NODE_CORES_ALLOCATABLE_METRIC
 	s.MetricValue = 0.2
 	// s.Storage = NewMetricsStorage()
 	s.MetricSet = NewMetricSet()
@@ -65,7 +65,7 @@ func (s *ExampleTestSuite) TestMetricNotFoundGet() {
 	s.False(exists)
 }
 
-func (s *ExampleTestSuite) assertGetMetric(metricSet *MetricSet, id string, name int, expectedValue float64) {
+func (s *ExampleTestSuite) assertGetMetric(metricSet *MetricSet, id string, name Metric, expectedValue float64) {
 	value, exists := s.MetricSet.Get(s.Cuid, s.MetricName)
 	s.True(exists)
 	s.Equal(expectedValue, value)

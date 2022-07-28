@@ -1,30 +1,31 @@
 package util
 
 import (
+	"strings"
 	"sync"
 )
 
 type Metrics struct {
-	entries map[int]float64
+	entries map[Metric]float64
 }
 
 func NewMetrics() *Metrics {
 	ans := &Metrics{
-		entries: make(map[int]float64),
+		entries: make(map[Metric]float64),
 	}
 	return ans
 }
 
-func (m *Metrics) Set(name int, value float64) {
+func (m *Metrics) Set(name Metric, value float64) {
 	m.entries[name] = value
 }
 
-func (m *Metrics) Get(name int) (float64, bool) {
+func (m *Metrics) Get(name Metric) (float64, bool) {
 	ans, exists := m.entries[name]
 	return ans, exists
 }
 
-func (m *Metrics) GetWithDefault(name int, defaultValue float64) (float64, bool) {
+func (m *Metrics) GetWithDefault(name Metric, defaultValue float64) (float64, bool) {
 	ans, exists := m.Get(name)
 	if !exists {
 		return defaultValue, false
@@ -32,7 +33,7 @@ func (m *Metrics) GetWithDefault(name int, defaultValue float64) (float64, bool)
 	return ans, exists
 }
 
-func (m *Metrics) Delete(name int) {
+func (m *Metrics) Delete(name Metric) {
 	delete(m.entries, name)
 }
 
@@ -76,7 +77,7 @@ func (ms *MetricSet) getMetrics(id string) (*Metrics, bool) {
 	return ans, exists
 }
 
-func (ms *MetricSet) Get(id string, metricName int) (float64, bool) {
+func (ms *MetricSet) Get(id string, metricName Metric) (float64, bool) {
 	metrics, exists := ms.getMetrics(id)
 	if !exists {
 		return -1, false
@@ -85,15 +86,15 @@ func (ms *MetricSet) Get(id string, metricName int) (float64, bool) {
 	return ans, exists
 }
 
-func (ms *MetricSet) GetWithDefault(id string, metricName int, defaultValue float64) (float64, bool) {
+func (ms *MetricSet) GetWithDefault(id string, metricName Metric, defaultValue float64) (float64, bool) {
 	metrics, exists := ms.getMetrics(id)
 	if !exists {
-		return -1, false
+		return defaultValue, false
 	}
 	return metrics.GetWithDefault(metricName, defaultValue)
 }
 
-func (ms *MetricSet) Set(id string, metricName int, metricValue float64) {
+func (ms *MetricSet) Set(id string, metricName Metric, metricValue float64) {
 	metrics, exists := ms.getMetrics(id)
 	if !exists {
 		metrics = ms.addMetrics(id)
@@ -108,57 +109,80 @@ func (ms *MetricSet) Delete(id string) {
 }
 
 type MetricsStorage struct {
-	containerMetrics *MetricSet
-	nodeMetrics      *MetricSet
+	metrics *MetricSet
 }
 
 func NewMetricsStorage() *MetricsStorage {
 	ans := &MetricsStorage{
-		containerMetrics: NewMetricSet(),
-		nodeMetrics:      NewMetricSet(),
+		metrics: NewMetricSet(),
 	}
 	return ans
 }
 
 func (s *MetricsStorage) Clear() {
-	s.containerMetrics.Clear()
-	s.nodeMetrics.Clear()
+	s.metrics.Clear()
 }
 
-// todo: replace with enums with enum type
-const CONTAINER_CORES_LIMIT = 1
-const CONTAINER_MEMORY_LIMIT = 2
-const NODE_CORES_ALLOCATABLE = 3
-const NODE_MEMORY_ALLOCATABLE = 4
+type Metric int64
 
-func (s *MetricsStorage) DeleteNodeMetric(id string) {
-	s.nodeMetrics.Delete(id)
+const (
+	CONTAINER_CORES_LIMIT_METRIC Metric = iota
+	CONTAINER_MEMORY_LIMIT_METRIC
+	NODE_CORES_ALLOCATABLE_METRIC
+	NODE_MEMORY_ALLOCATABLE_METRIC
+)
+
+func (m Metric) String() string {
+	switch m {
+	case CONTAINER_CORES_LIMIT_METRIC:
+		return "container.cores.limit"
+	case CONTAINER_MEMORY_LIMIT_METRIC:
+		return "container.memory.limit"
+	case NODE_CORES_ALLOCATABLE_METRIC:
+		return "node.cores.allocatable"
+	case NODE_MEMORY_ALLOCATABLE_METRIC:
+		return "node.memory.allocatable"
+	}
+	return "unknown"
 }
 
-func (s *MetricsStorage) SetNodeMetric(id string, metricName int, metricValue float64) {
-	s.nodeMetrics.Set(id, metricName, metricValue)
+type MetricPrefix int64
+
+const (
+	CONTAINER_METRIC_PREFIX MetricPrefix = iota
+	NODE_METRIC_PREFIX
+)
+
+func (mp MetricPrefix) String() string {
+	switch mp {
+	case CONTAINER_METRIC_PREFIX:
+		return "container"
+	case NODE_METRIC_PREFIX:
+		return "node"
+	}
+	return "unknown"
 }
 
-func (s *MetricsStorage) GetNodeMetric(id string, metricName int) (float64, bool) {
-	return s.nodeMetrics.Get(id, metricName)
+func GetMetricOwner(owner string, prefix MetricPrefix) string {
+	metricPrefix := prefix.String()
+	fields := []string{metricPrefix, owner}
+	ans := strings.Join(fields, "/")
+
+	return ans
 }
 
-func (s *MetricsStorage) GetNodeMetricWithDefault(id string, metricName int, defaultValue float64) (float64, bool) {
-	return s.nodeMetrics.GetWithDefault(id, metricName, defaultValue)
+func (s *MetricsStorage) SetMetric(owner string, metricName Metric, metricValue float64) {
+	s.metrics.Set(owner, metricName, metricValue)
 }
 
-func (s *MetricsStorage) DeleteContainerMetric(id string) {
-	s.containerMetrics.Delete(id)
+func (s *MetricsStorage) Delete(owner string) {
+	s.metrics.Delete(owner)
 }
 
-func (s *MetricsStorage) SetContainerMetric(id string, metricName int, metricValue float64) {
-	s.containerMetrics.Set(id, metricName, metricValue)
+func (s *MetricsStorage) GetMetric(owner string, metricName Metric) (float64, bool) {
+	return s.metrics.Get(owner, metricName)
 }
 
-func (s *MetricsStorage) GetContainerMetric(id string, metricName int) (float64, bool) {
-	return s.containerMetrics.Get(id, metricName)
-}
-
-func (s *MetricsStorage) GetContainerMetricWithDefault(id string, metricName int, defaultValue float64) (float64, bool) {
-	return s.containerMetrics.GetWithDefault(id, metricName, defaultValue)
+func (s *MetricsStorage) GetMetricWithDefault(owner string, metricName Metric, defaultValue float64) (float64, bool) {
+	return s.metrics.GetWithDefault(owner, metricName, defaultValue)
 }
