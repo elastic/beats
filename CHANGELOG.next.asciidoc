@@ -91,6 +91,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Improve performance of disk queue by coalescing writes. {pull}31935[31935]
+- Update `elastic/go-structform` from `v0.0.9` to `v0.0.10`. {pull}32536[32536]
 
 *Auditbeat*
 
