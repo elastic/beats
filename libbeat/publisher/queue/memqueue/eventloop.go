@@ -216,16 +216,16 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 
 		producer := entry.producer
 		entry.producer = nil
-		if producer == nil || producer.state.lastACK >= entry.producerID {
+		if producer == nil || entry.producerID <= producer.state.lastACK {
 			// This has a lower index than the previous ACK for this producer,
 			// so it was covered in the previous call and we can skip it.
 			continue
 		}
-		count := entry.producerID - entry.producer.state.lastACK
+		// This update is safe because lastACK is only used from the event loop.
+		count := entry.producerID - producer.state.lastACK
+		producer.state.lastACK = entry.producerID
 
 		producer.state.cb(int(count))
-		// This update is safe because lastACK is only used from the event loop.
-		producer.state.lastACK = entry.producerID
 	}
 }
 
