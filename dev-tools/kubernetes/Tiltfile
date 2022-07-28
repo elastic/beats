@@ -96,18 +96,10 @@ def beat(
 
     allow_k8s_contexts(k8s_context())
 
-
-# beat(mode="run")
-# beat(beat="filebeat", mode="run")
-# beat(beat="metricbeat", mode="debug")
-
-beat(beat="metricbeat",
-    mode="debug",
+beat(beat="metricbeat", # change to `filebeat` to test filebeat
+    mode="debug", # debug mode only works with k8s_env=`dev`
     arch="arm64", # change if on different laptop architecture
-    k8s_env="dev")  # use ttl.sh as docker registry
-# beat(beat="metricbeat",
-#     mode="run",
-#     k8s_env="prod")  # use ttl.sh as docker registry
+    k8s_env="dev") # change to `prod` to use with EKS or GKE.
 
 
 

@@ -9,12 +9,12 @@ Kubernetes dev tools are a combination of Dockerfile, k8s manifest and Tiltfile.
 You can install Tilt by using the script
 
 ```shell
-./dev-tools/kubernetes/get_tilt.sh
+./get_tilt.sh
 ```
 
 
 ## How to run
-The Tiltfile that orchestrates everything is located at `./dev-tools/kubernetes/Tiltfile`. All the following commands need to be run from `./dev-tools/kubernetes`, in the same folder where the Tiltfile is located.
+The Tiltfile that orchestrates everything is located at `dev-tools/kubernetes/Tiltfile`. All the following commands need to be run from `dev-tools/kubernetes`, in the same folder where the Tiltfile is located.
 
 How to run Tilt
 
