@@ -1,15 +1,12 @@
 package beater
 
 import (
-	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/ftestutils"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -47,42 +44,20 @@ type MonitorTestRun struct {
 func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, err error) {
 	mtr = &MonitorTestRun{}
 
-	pipelineConnector := pubtest.FakeConnector{
-		ConnectFunc: func(clientConfig beat.ClientConfig) (beat.Client, error) {
-			fmt.Println("CONNECT FUNC")
-			clientConfig.ACKHandler = acker.Counting(func(n int) {
-				fmt.Println("COUNT 2")
-			})
-			return &pubtest.FakeClient{
-				PublishFunc: func(event beat.Event) {
-					fmt.Printf("GOT EVENT %v\n", event)
-				},
-			}, nil
-		},
-	}
-	client, err := pipelineConnector.ConnectWith(beat.ClientConfig{
-		ACKHandler: acker.Counting(func(n int) {
-			fmt.Println("COUNT")
-		}),
-	})
-	defer client.Close()
-
+	// make a pipeline
+	pipe := &ftestutils.MockPipelineConnector{}
+	// pass it to the factory
 	f, sched, closeFactory := makeTestFactory()
-
 	conf, err := config.NewConfigFrom(monitorConfig)
 	require.NoError(t, err)
 
-	acked := pipetool.WithACKer(pipelineConnector, acker.Counting(func(n int) {
-		fmt.Println("ACK333")
-	}))
-
-	conn, err := acked.Connect()
-	conn.Publish(beat.Event{})
-
-	mIface, err := f.Create(acked, conf)
+	mIface, err := f.Create(pipe, conf)
 	mtr.Monitor, _ = mIface.(*monitors.Monitor)
 
+	// start the monitor
 	mtr.Monitor.Start()
+	// wait for the monitor to stop
+	// wait for the pipeline to clear (ack)
 	mtr.Wait = func() {
 		sched.WaitForRunOnce()
 		mtr.Monitor.Stop()

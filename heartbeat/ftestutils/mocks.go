@@ -24,6 +24,8 @@ import (
 
 type MockBeatClient struct {
 	publishLog []beat.Event
+	pipeline   beat.Pipeline
+	ack        beat.ACKer
 	closed     bool
 	mtx        sync.Mutex
 }
@@ -44,6 +46,8 @@ func (c *MockBeatClient) PublishAll(events []beat.Event) {
 	defer c.mtx.Unlock()
 
 	c.publishLog = append(c.publishLog, events...)
+
+	c.ack.ACKEvents(len(events))
 }
 
 func (c *MockBeatClient) Close() error {
@@ -84,11 +88,11 @@ func (pc *MockPipelineConnector) Connect() (beat.Client, error) {
 	})
 }
 
-func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+func (pc *MockPipelineConnector) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	c := &MockBeatClient{}
+	c := &MockBeatClient{pipeline: pc, ack: clientConfig.ACKHandler}
 
 	pc.Clients = append(pc.Clients, c)
 
