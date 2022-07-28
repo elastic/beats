@@ -214,22 +214,18 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 		idx := (firstIndex + i) % len(entries)
 		entry := &entries[idx]
 
-		if entry.producer == nil {
-			// this event doesn't need ACK handling
-			continue
-		}
-		if entry.producerID < entry.producer.state.lastACK {
+		producer := entry.producer
+		entry.producer = nil
+		if producer == nil || producer.state.lastACK >= entry.producerID {
 			// This has a lower index than the previous ACK for this producer,
 			// so it was covered in the previous call and we can skip it.
-			entry.producer = nil
 			continue
 		}
-		count := entry.producer.state.lastACK - entry.producerID
+		count := entry.producerID - entry.producer.state.lastACK
 
-		entry.producer.state.cb(int(count))
+		producer.state.cb(int(count))
 		// This update is safe because lastACK is only used from the event loop.
-		entry.producer.state.lastACK = entry.producerID
-		entry.producer = nil
+		producer.state.lastACK = entry.producerID
 	}
 }
 
@@ -469,7 +465,7 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 				continue
 			}
 
-			if entry.producerID < entry.producer.state.lastACK {
+			if entry.producerID <= entry.producer.state.lastACK {
 				// This index was already acknowledged on a previous iteration, skip.
 				entry.producer = nil
 				continue

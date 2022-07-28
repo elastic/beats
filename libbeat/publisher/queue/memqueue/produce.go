@@ -65,7 +65,7 @@ func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCance
 	}
 
 	if cb != nil {
-		p := &ackProducer{broker: b, producedCount: 1, dropOnCancel: dropOnCancel, openState: openState}
+		p := &ackProducer{broker: b, dropOnCancel: dropOnCancel, openState: openState}
 		p.state.cb = cb
 		p.state.dropCB = dropCB
 		return p
