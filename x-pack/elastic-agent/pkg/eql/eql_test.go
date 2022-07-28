@@ -44,6 +44,7 @@ func TestEql(t *testing.T) {
 		{expression: "${'constant'} == 'constant'", result: true},
 		{expression: "${data.with-dash} == 'dash-value'", result: true},
 		{expression: "${'dash-value'} == 'dash-value'", result: true},
+		{expression: "${data.with/slash} == 'some/path'", result: true},
 
 		// boolean
 		{expression: "true", result: true},
@@ -308,10 +309,11 @@ func TestEql(t *testing.T) {
 
 	store := &testVarStore{
 		vars: map[string]interface{}{
-			"env.HOSTNAME":   "my-hostname",
-			"host.name":      "host-name",
-			"data.array":     []interface{}{"array1", "array2", "array3"},
-			"data.with-dash": "dash-value",
+			"env.HOSTNAME":    "my-hostname",
+			"host.name":       "host-name",
+			"data.array":      []interface{}{"array1", "array2", "array3"},
+			"data.with-dash":  "dash-value",
+			"data.with/slash": "some/path",
 			"data.dict": map[string]interface{}{
 				"key1": "dict1",
 				"key2": "dict2",
