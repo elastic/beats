@@ -3,9 +3,9 @@ load('ext://restart_process', 'docker_build_with_restart')
 
 def beat(
         mode="run",  # or debug
-        beat="metricbeat",
-        arch="arm64",
-        k8s_env="dev",
+        beat="metricbeat", # or filebeat
+        arch="arm64", # or amd64
+        k8s_env="dev", # or prod
         **kwargs):
 
     if mode not in ["run", "debug"]:

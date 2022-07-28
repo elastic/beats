@@ -10,10 +10,10 @@ In details, a combination of Dockerfiles, Kubernetes manifests and Tiltfile make
 
 
 ## Setup
-You can install Tilt by using the script
+You can install Tilt by using the command
 
 ```shell
-./get_tilt.sh
+curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
 ```
 
 
@@ -70,8 +70,8 @@ If you want to use a remote debugger with Visual Studio code, you need to provid
 Currently the Tiltfile is configured in `run` mode
 
 ```python
-metricbeat(mode="run")
-# metricbeat(mode="debug")
+bet(mode="run")
+# beat(mode="debug")
 ```
 
 This mode runs metricbeat like a single process in a pod.
@@ -79,8 +79,8 @@ This mode runs metricbeat like a single process in a pod.
 If you want to switch to `debug` mode you have to modify the Tiltfile like the following code
 
 ```python
-# metricbeat(mode="run")
-metricbeat(mode="debug")
+# beat(mode="run")
+beat(mode="debug")
 ```
 
 You can make this change while Tilt is running in the background. Tilt will
