@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 )
@@ -175,19 +174,19 @@ func GetMetricOwner(owner string, prefix MetricPrefix) string {
 func (s *MetricsStorage) SetMetric(owner string, metricName Metric, metricValue float64) {
 	s.metrics.Set(owner, metricName, metricValue)
 
-	fmt.Printf("Set metric owner: %s, name: %s, value: %f", owner, metricName, metricValue)
+	// fmt.Printf("Set metric owner: %s, name: %s, value: %f\n", owner, metricName, metricValue)
 }
 
 func (s *MetricsStorage) Delete(owner string) {
 	s.metrics.Delete(owner)
 
-	fmt.Printf("Delete metric owner: %s", owner)
+	// fmt.Printf("Delete metric owner: %s", owner)
 }
 
 func (s *MetricsStorage) GetMetric(owner string, metricName Metric) (float64, bool) {
 	ans, exists := s.metrics.Get(owner, metricName)
 
-	fmt.Printf("Get metric owner: %s, name: %s, value: %f, exists: %v", owner, metricName, ans, exists)
+	// fmt.Printf("Get metric owner: %s, name: %s, value: %f, exists: %v\n", owner, metricName, ans, exists)
 
 	return ans, exists
 }
@@ -195,7 +194,7 @@ func (s *MetricsStorage) GetMetric(owner string, metricName Metric) (float64, bo
 func (s *MetricsStorage) GetMetricWithDefault(owner string, metricName Metric, defaultValue float64) (float64, bool) {
 	ans, exists := s.metrics.GetWithDefault(owner, metricName, defaultValue)
 
-	fmt.Printf("Get metric with default owner: %s, name: %s, value: %f, defaultValue: %f, exists: %v", owner, metricName, ans, defaultValue, exists)
+	// fmt.Printf("Get metric with default owner: %s, name: %s, value: %f, defaultValue: %f, exists: %v\n", owner, metricName, ans, defaultValue, exists)
 
 	return ans, exists
 }
