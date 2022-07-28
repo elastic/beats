@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -69,7 +70,7 @@ type publishSettings struct {
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg, runOnce bool) *RunnerFactory {
+func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg, pipelineClientFactory func(pipeline pipeline.Pipeline) pipeline.ISyncClient) *RunnerFactory {
 	return &RunnerFactory{
 		info:       info,
 		addTask:    addTask,
