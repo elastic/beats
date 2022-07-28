@@ -39,11 +39,12 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 	}
 
 	node := summary.Node
-	nodeCores, _ := metricsStorage.GetNodeMetricWithDefault(node.NodeName, util.NODE_CORES_ALLOCATABLE, 0.0)
-	nodeMem, _ := metricsStorage.GetNodeMetricWithDefault(node.NodeName, util.NODE_MEMORY_ALLOCATABLE, 0.0)
+	nodeMetricOwner := util.GetMetricOwner(node.NodeName, util.NODE_METRIC_PREFIX)
+	nodeCores, _ := metricsStorage.GetMetricWithDefault(nodeMetricOwner, util.NODE_CORES_ALLOCATABLE_METRIC, 0.0)
+	nodeMem, _ := metricsStorage.GetMetricWithDefault(nodeMetricOwner, util.NODE_MEMORY_ALLOCATABLE_METRIC, 0.0)
 	for _, pod := range summary.Pods {
 		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults uint64
-		var coresLimit, memLimit float64
+		var containerCoreLimits, containerMemLimits float64
 
 		for _, cont := range pod.Containers {
 			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, cont.Name)
@@ -55,15 +56,14 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			pageFaults += cont.Memory.PageFaults
 			majorPageFaults += cont.Memory.MajorPageFaults
 
-			containerCoreLimit, _ := metricsStorage.GetContainerMetricWithDefault(cuid, util.CONTAINER_CORES_LIMIT, nodeCores) // fixme: the first time when there are no container limits it get the nodeCores
-			coresLimit += containerCoreLimit
+			containerMetricOwner := util.GetMetricOwner(cuid, util.CONTAINER_METRIC_PREFIX)
 
-			containerMemLimit, _ := metricsStorage.GetContainerMetricWithDefault(cuid, util.CONTAINER_MEMORY_LIMIT, nodeMem)
-			memLimit += containerMemLimit
-			fmt.Printf("container id: %s, cpu: %f, mem: %f\n", cuid, coresLimit, memLimit) // todo: remove
+			containerCoreLimit, _ := metricsStorage.GetMetricWithDefault(containerMetricOwner, util.CONTAINER_CORES_LIMIT_METRIC, nodeCores)
+			containerCoreLimits += containerCoreLimit
+
+			containerMemLimit, _ := metricsStorage.GetMetricWithDefault(containerMetricOwner, util.CONTAINER_MEMORY_LIMIT_METRIC, nodeMem)
+			containerMemLimits += containerMemLimit
 		}
-
-		fmt.Printf("pod id: %s, cpu: %f, mem: %f\n", pod.PodRef.Name, coresLimit, memLimit) // todo: remove
 
 		podEvent := mapstr.M{
 			mb.ModuleDataKey: mapstr.M{
@@ -114,29 +114,29 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			kubernetes2.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
-		if nodeCores > 0 && coresLimit > nodeCores {
-			coresLimit = nodeCores
+		if nodeCores > 0 && containerCoreLimits > nodeCores {
+			containerCoreLimits = nodeCores
 		}
 
-		if nodeMem > 0 && memLimit > nodeMem {
-			memLimit = nodeMem
+		if nodeMem > 0 && containerMemLimits > nodeMem {
+			containerMemLimits = nodeMem
 		}
 
 		if nodeCores > 0 {
 			kubernetes2.ShouldPut(podEvent, "cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores, logger)
 		}
 
-		if coresLimit > 0 {
-			kubernetes2.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit, logger)
+		if containerCoreLimits > 0 {
+			kubernetes2.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/containerCoreLimits, logger)
 		}
 
 		if usageMem > 0 {
 			if nodeMem > 0 {
 				kubernetes2.ShouldPut(podEvent, "memory.usage.node.pct", float64(usageMem)/nodeMem, logger)
 			}
-			if memLimit > 0 {
-				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/memLimit, logger)
-				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/memLimit, logger)
+			if containerMemLimits > 0 {
+				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/containerMemLimits, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/containerMemLimits, logger)
 			}
 		}
 
@@ -144,10 +144,10 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			if nodeMem > 0 {
 				kubernetes2.ShouldPut(podEvent, "memory.usage.node.pct", float64(workingSet)/nodeMem, logger)
 			}
-			if memLimit > 0 {
-				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/memLimit, logger)
+			if containerMemLimits > 0 {
+				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/containerMemLimits, logger)
 
-				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/memLimit, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/containerMemLimits, logger)
 			}
 		}
 

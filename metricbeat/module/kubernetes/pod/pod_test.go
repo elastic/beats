@@ -44,9 +44,9 @@ func TestEventMapping(t *testing.T) {
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
 	metricsStorage := util.NewMetricsStorage()
-	metricsStorage.SetNodeMetric("gke-beats-default-pool-a5b33e2e-hdww", util.NODE_CORES_ALLOCATABLE, 2)
-	metricsStorage.SetNodeMetric("gke-beats-default-pool-a5b33e2e-hdww", util.NODE_MEMORY_ALLOCATABLE, 146227200)
-	metricsStorage.SetContainerMetric(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), util.CONTAINER_MEMORY_LIMIT, 14622720)
+	metricsStorage.SetMetric("gke-beats-default-pool-a5b33e2e-hdww", util.NODE_CORES_ALLOCATABLE_METRIC, 2)
+	metricsStorage.SetMetric("gke-beats-default-pool-a5b33e2e-hdww", util.NODE_MEMORY_ALLOCATABLE_METRIC, 146227200)
+	metricsStorage.SetMetric(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), util.CONTAINER_MEMORY_LIMIT_METRIC, 14622720)
 
 	events, err := eventMapping(body, metricsStorage, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
