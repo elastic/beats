@@ -1,12 +1,15 @@
 package beater
 
 import (
-	"github.com/elastic/beats/v7/heartbeat/ftestutils"
+	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -44,15 +47,39 @@ type MonitorTestRun struct {
 func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, err error) {
 	mtr = &MonitorTestRun{}
 
-	f, sched, closeFactory := makeTestFactory()
+	pipelineConnector := pubtest.FakeConnector{
+		ConnectFunc: func(clientConfig beat.ClientConfig) (beat.Client, error) {
+			fmt.Println("CONNECT FUNC")
+			clientConfig.ACKHandler = acker.Counting(func(n int) {
+				fmt.Println("COUNT 2")
+			})
+			return &pubtest.FakeClient{
+				PublishFunc: func(event beat.Event) {
+					fmt.Printf("GOT EVENT %v\n", event)
+				},
+			}, nil
+		},
+	}
+	client, err := pipelineConnector.ConnectWith(beat.ClientConfig{
+		ACKHandler: acker.Counting(func(n int) {
+			fmt.Println("COUNT")
+		}),
+	})
+	defer client.Close()
 
-	pipelineConnector := &ftestutils.MockPipelineConnector{}
-	mtr.Events = pipelineConnector.PublishedEvents
+	f, sched, closeFactory := makeTestFactory()
 
 	conf, err := config.NewConfigFrom(monitorConfig)
 	require.NoError(t, err)
 
-	mIface, err := f.Create(pipelineConnector, conf)
+	acked := pipetool.WithACKer(pipelineConnector, acker.Counting(func(n int) {
+		fmt.Println("ACK333")
+	}))
+
+	conn, err := acked.Connect()
+	conn.Publish(beat.Event{})
+
+	mIface, err := f.Create(acked, conf)
 	mtr.Monitor, _ = mIface.(*monitors.Monitor)
 
 	mtr.Monitor.Start()

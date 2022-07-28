@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -76,7 +77,11 @@ type MockPipelineConnector struct {
 }
 
 func (pc *MockPipelineConnector) Connect() (beat.Client, error) {
-	return pc.ConnectWith(beat.ClientConfig{})
+	return pc.ConnectWith(beat.ClientConfig{
+		ACKHandler: acker.Counting(func(n int) {
+			fmt.Printf("acked %d", n)
+		}),
+	})
 }
 
 func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, error) {
