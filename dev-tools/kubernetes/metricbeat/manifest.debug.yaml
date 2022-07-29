@@ -162,7 +162,8 @@ spec:
         image: metricbeat-debug-image
         args: [
           "-c", "/etc/metricbeat.yml",
-          "-e"
+          "-e",
+          "-system.hostfs=/hostfs",
         ]
         ports:
         - containerPort: 56268
