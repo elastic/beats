@@ -39,15 +39,15 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 	}
 
 	node := summary.Node
-	nodeMetricOwner := util.GetMetricOwner(node.NodeName, util.NODE_METRIC_PREFIX)
-	nodeCores, _ := metricsStorage.GetMetricWithDefault(nodeMetricOwner, util.NODE_CORES_ALLOCATABLE_METRIC, 0.0)
-	nodeMem, _ := metricsStorage.GetMetricWithDefault(nodeMetricOwner, util.NODE_MEMORY_ALLOCATABLE_METRIC, 0.0)
+	nodeMetricId := util.GetMetricId(node.NodeName, util.NodeMetricPrefix)
+	nodeCores, _ := metricsStorage.GetWithDefault(nodeMetricId, util.NodeCoresAllocatableMetric, 0.0)
+	nodeMem, _ := metricsStorage.GetWithDefault(nodeMetricId, util.NodeMemoryAllocatableMetric, 0.0)
 	for _, pod := range summary.Pods {
 		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults uint64
 		var containerCoreLimits, containerMemLimits float64
 
 		for _, cont := range pod.Containers {
-			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, cont.Name)
+			containerUID := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, cont.Name)
 			usageNanoCores += cont.CPU.UsageNanoCores
 			usageMem += cont.Memory.UsageBytes
 			availMem += cont.Memory.AvailableBytes
@@ -56,12 +56,12 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			pageFaults += cont.Memory.PageFaults
 			majorPageFaults += cont.Memory.MajorPageFaults
 
-			containerMetricOwner := util.GetMetricOwner(cuid, util.CONTAINER_METRIC_PREFIX)
+			containerMetricId := util.GetMetricId(containerUID, util.ContainerMetricPrefix)
 
-			containerCoreLimit, _ := metricsStorage.GetMetricWithDefault(containerMetricOwner, util.CONTAINER_CORES_LIMIT_METRIC, nodeCores)
+			containerCoreLimit, _ := metricsStorage.GetWithDefault(containerMetricId, util.ContainerCoresLimitMetric, nodeCores)
 			containerCoreLimits += containerCoreLimit
 
-			containerMemLimit, _ := metricsStorage.GetMetricWithDefault(containerMetricOwner, util.CONTAINER_MEMORY_LIMIT_METRIC, nodeMem)
+			containerMemLimit, _ := metricsStorage.GetWithDefault(containerMetricId, util.ContainerMemoryLimitMetric, nodeMem)
 			containerMemLimits += containerMemLimit
 		}
 

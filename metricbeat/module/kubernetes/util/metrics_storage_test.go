@@ -8,67 +8,69 @@ import (
 
 type ExampleTestSuite struct {
 	suite.Suite
-	Cuid              string
+	MetricId          string
 	MetricName        Metric
 	AnotherMetricName Metric
 	MetricValue       float64
-	// Storage *MetricsStorage
-	MetricSet *MetricSet
+	MetricsStorage    *MetricsStorage
 }
 
 func (s *ExampleTestSuite) SetupTest() {
 	ns := "namespace"
 	pod := "pod"
 	container := "container"
-	s.Cuid = ContainerUID(ns, pod, container)
-	s.MetricName = CONTAINER_CORES_LIMIT_METRIC
-	s.AnotherMetricName = NODE_CORES_ALLOCATABLE_METRIC
+	s.MetricId = ContainerUID(ns, pod, container)
+	s.MetricName = ContainerCoresLimitMetric
+	s.AnotherMetricName = NodeCoresAllocatableMetric
 	s.MetricValue = 0.2
-	// s.Storage = NewMetricsStorage()
-	s.MetricSet = NewMetricSet()
+	s.MetricsStorage = NewMetricsStorage()
 }
 
 func (s *ExampleTestSuite) TestNotFoundSet() {
-	s.MetricSet.Clear()
-	s.MetricSet.Set(s.Cuid, s.MetricName, s.MetricValue)
+	s.MetricsStorage.Clear()
+	s.MetricsStorage.Set(s.MetricId, s.MetricName, s.MetricValue)
 
-	s.assertGetMetric(s.MetricSet, s.Cuid, s.MetricName, s.MetricValue)
+	s.assertGetMetric(s.MetricsStorage, s.MetricId, s.MetricName, s.MetricValue)
 }
 
 func (s *ExampleTestSuite) TestSetChange() {
-	s.MetricSet.Clear()
-	s.MetricSet.Set(s.Cuid, s.MetricName, s.MetricValue)
+	s.MetricsStorage.Clear()
+	s.MetricsStorage.Set(s.MetricId, s.MetricName, s.MetricValue)
 
-	s.assertGetMetric(s.MetricSet, s.Cuid, s.MetricName, s.MetricValue)
+	s.assertGetMetric(s.MetricsStorage, s.MetricId, s.MetricName, s.MetricValue)
 
 	changedMetricValue := 0.4
 
-	s.MetricSet.Set(s.Cuid, s.MetricName, changedMetricValue)
+	s.MetricsStorage.Set(s.MetricId, s.MetricName, changedMetricValue)
 
-	s.assertGetMetric(s.MetricSet, s.Cuid, s.MetricName, changedMetricValue)
+	s.assertGetMetric(s.MetricsStorage, s.MetricId, s.MetricName, changedMetricValue)
 }
 
 func (s *ExampleTestSuite) TestIdNotFoundGet() {
-	s.MetricSet.Clear()
+	s.MetricsStorage.Clear()
 
-	_, exists := s.MetricSet.Get(s.Cuid, s.MetricName)
+	_, exists := s.MetricsStorage.Get(s.MetricId, s.MetricName)
 	s.False(exists)
 }
 
 func (s *ExampleTestSuite) TestMetricNotFoundGet() {
-	s.MetricSet.Clear()
+	s.MetricsStorage.Clear()
 
-	s.MetricSet.Set(s.Cuid, s.MetricName, s.MetricValue)
-	s.assertGetMetric(s.MetricSet, s.Cuid, s.MetricName, s.MetricValue)
+	s.MetricsStorage.Set(s.MetricId, s.MetricName, s.MetricValue)
+	s.assertGetMetric(s.MetricsStorage, s.MetricId, s.MetricName, s.MetricValue)
 
-	_, exists := s.MetricSet.Get(s.Cuid, s.AnotherMetricName)
+	_, exists := s.MetricsStorage.Get(s.MetricId, s.AnotherMetricName)
 	s.False(exists)
 }
 
-func (s *ExampleTestSuite) assertGetMetric(metricSet *MetricSet, id string, name Metric, expectedValue float64) {
-	value, exists := s.MetricSet.Get(s.Cuid, s.MetricName)
+func (s *ExampleTestSuite) assertGetMetric(metricsStorage *MetricsStorage, id string, name Metric, expectedValue float64) {
+	value, exists := s.MetricsStorage.Get(s.MetricId, s.MetricName)
 	s.True(exists)
 	s.Equal(expectedValue, value)
+}
+
+func (s *ExampleTestSuite) TestContainerUID() {
+	s.Equal("a/b/c", ContainerUID("a", "b", "c"))
 }
 
 func TestExampleTestSuite(t *testing.T) {

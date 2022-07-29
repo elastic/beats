@@ -39,9 +39,9 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 	}
 
 	node := summary.Node
-	nodeMetricOwner := util.GetMetricOwner(node.NodeName, util.NODE_METRIC_PREFIX)
-	nodeCores, _ := metricsStorage.GetMetricWithDefault(nodeMetricOwner, util.NODE_CORES_ALLOCATABLE_METRIC, 0.0)
-	nodeMem, _ := metricsStorage.GetMetricWithDefault(nodeMetricOwner, util.NODE_MEMORY_ALLOCATABLE_METRIC, 0.0)
+	nodeMetricId := util.GetMetricId(node.NodeName, util.NodeMetricPrefix)
+	nodeCores, _ := metricsStorage.GetWithDefault(nodeMetricId, util.NodeCoresAllocatableMetric, 0.0)
+	nodeMem, _ := metricsStorage.GetWithDefault(nodeMetricId, util.NodeMemoryAllocatableMetric, 0.0)
 	for _, pod := range summary.Pods {
 		for _, container := range pod.Containers {
 			containerEvent := mapstr.M{
@@ -128,11 +128,11 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 				kubernetes2.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
 			}
 
-			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
-			containerMetricOwner := util.GetMetricOwner(cuid, util.CONTAINER_METRIC_PREFIX)
-			
-			containerCoresLimit, _ := metricsStorage.GetMetricWithDefault(containerMetricOwner, util.CONTAINER_CORES_LIMIT_METRIC, nodeCores)
-			containerMemLimit, _ := metricsStorage.GetMetricWithDefault(containerMetricOwner, util.CONTAINER_MEMORY_LIMIT_METRIC, nodeMem)
+			containerUID := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
+			containerMetricId := util.GetMetricId(containerUID, util.ContainerMetricPrefix)
+
+			containerCoresLimit, _ := metricsStorage.GetWithDefault(containerMetricId, util.ContainerCoresLimitMetric, nodeCores)
+			containerMemLimit, _ := metricsStorage.GetWithDefault(containerMetricId, util.ContainerMemoryLimitMetric, nodeMem)
 
 			if containerCoresLimit > 0 {
 				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresLimit, logger)
