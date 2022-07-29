@@ -163,7 +163,8 @@ spec:
         imagePullPolicy: Never
         args: [
           "-c", "/etc/metricbeat.yml",
-          "-e"
+          "-e",
+          "-system.hostfs=/hostfs",
         ]
         env:
         - name: ELASTICSEARCH_HOST
