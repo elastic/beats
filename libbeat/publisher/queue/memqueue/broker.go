@@ -393,7 +393,7 @@ func (b *batch) Entry(i int) interface{} {
 }
 
 func (b *batch) ID(i int) queue.EntryID {
-	return queue.EntryID(b.entries[i].id)
+	return b.entries[i].id
 }
 
 func (b *batch) Done() {
