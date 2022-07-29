@@ -1,15 +1,19 @@
 package functests
 
 import (
+	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/ftestutils"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
+	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -19,21 +23,34 @@ import (
 	"time"
 )
 
-func TestFactory(t *testing.T) {
-	time.Sleep(time.Second * 2)
+func TestSimpleScenariosBasicFields(t *testing.T) {
+	scenarios := []Scenario{SimpleBrowserScenario, SimpleHTTPScenario, SimpleICMPScenario, SimpleICMPScenario}
+	for _, scenario := range scenarios {
+		t.Run(fmt.Sprintf("basic fields: %s", scenario.Name), func(t *testing.T) {
+			scenario := scenario // scope correctly for parallel test
+			t.Parallel()
 
-	mtr, err := runMonitorOnce(t, mapstr.M{
-		"id":       "testId",
-		"name":     "testName",
-		"type":     "http",
-		"schedule": "@every 1m",
-		"urls":     []string{"https://elastic.github.io/synthetics-demo/"},
-	})
-	require.NoError(t, err)
-	require.NotNil(t, mtr.Monitor)
-	mtr.Wait()
-	require.Len(t, mtr.Events(), 10)
-	mtr.Close()
+			_, mtr, err := scenario.Run(t)
+			defer mtr.Close()
+			require.NoError(t, err)
+			if err != nil {
+				return
+			}
+
+			require.GreaterOrEqual(t, len(mtr.Events()), 1)
+			lastCg := ""
+			for i, e := range mtr.Events() {
+				cg, err := e.GetValue("monitor.check_group")
+				require.NoError(t, err)
+				cgStr := cg.(string)
+				if i == 0 {
+					lastCg = cgStr
+				} else {
+					require.Equal(t, lastCg, cgStr)
+				}
+			}
+		})
+	}
 }
 
 type MonitorTestRun struct {
