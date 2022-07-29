@@ -1,9 +1,66 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package util
 
 import (
 	"strings"
 	"sync"
 )
+
+type Metric int64
+
+const (
+	ContainerCoresLimitMetric Metric = iota
+	ContainerMemoryLimitMetric
+	NodeCoresAllocatableMetric
+	NodeMemoryAllocatableMetric
+)
+
+type MetricPrefix int64
+
+const (
+	ContainerMetricPrefix MetricPrefix = iota
+	NodeMetricPrefix
+)
+
+func (m Metric) String() string {
+	switch m {
+	case ContainerCoresLimitMetric:
+		return "container.cores.limit"
+	case ContainerMemoryLimitMetric:
+		return "container.memory.limit"
+	case NodeCoresAllocatableMetric:
+		return "node.cores.allocatable"
+	case NodeMemoryAllocatableMetric:
+		return "node.memory.allocatable"
+	}
+	return "unknown"
+}
+
+func (mp MetricPrefix) String() string {
+	switch mp {
+	case ContainerMetricPrefix:
+		return "container"
+	case NodeMetricPrefix:
+		return "node"
+	}
+	return "unknown"
+}
 
 type Metrics struct {
 	entries map[Metric]float64
@@ -43,19 +100,19 @@ func (m *Metrics) Clear() {
 	}
 }
 
-type MetricSet struct {
+type MetricsStorage struct {
 	sync.RWMutex
 	metrics map[string]*Metrics
 }
 
-func NewMetricSet() *MetricSet {
-	ans := &MetricSet{
+func NewMetricsStorage() *MetricsStorage {
+	ans := &MetricsStorage{
 		metrics: make(map[string]*Metrics),
 	}
 	return ans
 }
 
-func (ms *MetricSet) Clear() {
+func (ms *MetricsStorage) Clear() {
 	ms.Lock()
 	defer ms.Unlock()
 	for k := range ms.metrics {
@@ -63,22 +120,22 @@ func (ms *MetricSet) Clear() {
 	}
 }
 
-func (ms *MetricSet) addMetrics(id string) *Metrics {
+func (ms *MetricsStorage) addMetrics(metricId string) *Metrics {
 	ms.Lock()
 	defer ms.Unlock()
-	ms.metrics[id] = NewMetrics()
-	return ms.metrics[id]
+	ms.metrics[metricId] = NewMetrics()
+	return ms.metrics[metricId]
 }
 
-func (ms *MetricSet) getMetrics(id string) (*Metrics, bool) {
+func (ms *MetricsStorage) getMetrics(metricId string) (*Metrics, bool) {
 	ms.RLock()
 	defer ms.RUnlock()
-	ans, exists := ms.metrics[id]
+	ans, exists := ms.metrics[metricId]
 	return ans, exists
 }
 
-func (ms *MetricSet) Get(id string, metricName Metric) (float64, bool) {
-	metrics, exists := ms.getMetrics(id)
+func (ms *MetricsStorage) Get(metricId string, metricName Metric) (float64, bool) {
+	metrics, exists := ms.getMetrics(metricId)
 	if !exists {
 		return -1, false
 	}
@@ -86,115 +143,32 @@ func (ms *MetricSet) Get(id string, metricName Metric) (float64, bool) {
 	return ans, exists
 }
 
-func (ms *MetricSet) GetWithDefault(id string, metricName Metric, defaultValue float64) (float64, bool) {
-	metrics, exists := ms.getMetrics(id)
+func (ms *MetricsStorage) GetWithDefault(metricId string, metricName Metric, defaultValue float64) (float64, bool) {
+	metrics, exists := ms.getMetrics(metricId)
 	if !exists {
 		return defaultValue, false
 	}
 	return metrics.GetWithDefault(metricName, defaultValue)
 }
 
-func (ms *MetricSet) Set(id string, metricName Metric, metricValue float64) {
-	metrics, exists := ms.getMetrics(id)
+func (ms *MetricsStorage) Set(metricId string, metricName Metric, metricValue float64) {
+	metrics, exists := ms.getMetrics(metricId)
 	if !exists {
-		metrics = ms.addMetrics(id)
+		metrics = ms.addMetrics(metricId)
 	}
 	metrics.Set(metricName, metricValue)
 }
 
-func (ms *MetricSet) Delete(id string) {
+func (ms *MetricsStorage) Delete(metricId string) {
 	ms.Lock()
 	defer ms.Unlock()
-	delete(ms.metrics, id)
+	delete(ms.metrics, metricId)
 }
 
-type MetricsStorage struct {
-	metrics *MetricSet
-}
-
-func NewMetricsStorage() *MetricsStorage {
-	ans := &MetricsStorage{
-		metrics: NewMetricSet(),
-	}
-	return ans
-}
-
-func (s *MetricsStorage) Clear() {
-	s.metrics.Clear()
-}
-
-type Metric int64
-
-const (
-	CONTAINER_CORES_LIMIT_METRIC Metric = iota
-	CONTAINER_MEMORY_LIMIT_METRIC
-	NODE_CORES_ALLOCATABLE_METRIC
-	NODE_MEMORY_ALLOCATABLE_METRIC
-)
-
-func (m Metric) String() string {
-	switch m {
-	case CONTAINER_CORES_LIMIT_METRIC:
-		return "container.cores.limit"
-	case CONTAINER_MEMORY_LIMIT_METRIC:
-		return "container.memory.limit"
-	case NODE_CORES_ALLOCATABLE_METRIC:
-		return "node.cores.allocatable"
-	case NODE_MEMORY_ALLOCATABLE_METRIC:
-		return "node.memory.allocatable"
-	}
-	return "unknown"
-}
-
-type MetricPrefix int64
-
-const (
-	CONTAINER_METRIC_PREFIX MetricPrefix = iota
-	NODE_METRIC_PREFIX
-)
-
-func (mp MetricPrefix) String() string {
-	switch mp {
-	case CONTAINER_METRIC_PREFIX:
-		return "container"
-	case NODE_METRIC_PREFIX:
-		return "node"
-	}
-	return "unknown"
-}
-
-func GetMetricOwner(owner string, prefix MetricPrefix) string {
+func GetMetricId(owner string, prefix MetricPrefix) string {
 	metricPrefix := prefix.String()
 	fields := []string{metricPrefix, owner}
 	ans := strings.Join(fields, "/")
 
 	return ans
-}
-
-func (s *MetricsStorage) SetMetric(owner string, metricName Metric, metricValue float64) {
-	s.metrics.Set(owner, metricName, metricValue)
-
-	// fmt.Printf("Set metric owner: %s, name: %s, value: %f\n", owner, metricName, metricValue)
-}
-
-func (s *MetricsStorage) Delete(owner string) {
-	s.metrics.Delete(owner)
-
-	// fmt.Printf("Delete metric owner: %s", owner)
-}
-
-func (s *MetricsStorage) GetMetric(owner string, metricName Metric) (float64, bool) {
-	ans, exists := s.metrics.Get(owner, metricName)
-
-	// fmt.Printf("Get metric owner: %s, name: %s, value: %f, exists: %v\n", owner, metricName, ans, exists)
-
-	return ans, exists
-}
-
-func (s *MetricsStorage) GetMetricWithDefault(owner string, metricName Metric, defaultValue float64) (float64, bool) {
-	ans, exists := s.metrics.GetWithDefault(owner, metricName, defaultValue)
-
-	// fmt.Printf("Get metric with default owner: %s, name: %s, value: %f, defaultValue: %f, exists: %v\n", owner, metricName, ans, defaultValue, exists)
-
-	return ans, exists
 }

@@ -122,15 +122,15 @@ func NewResourceMetadataEnricher(
 
 			case *kubernetes.Node:
 				nodeName := r.GetObjectMeta().GetName()
-				nodeMetricOwner := GetMetricOwner(nodeName, NODE_METRIC_PREFIX)
+				nodeMetricId := GetMetricId(nodeName, NodeMetricPrefix)
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						metricsStorage.SetMetric(nodeMetricOwner, NODE_CORES_ALLOCATABLE_METRIC, float64(q.MilliValue())/1000)
+						metricsStorage.Set(nodeMetricId, NodeCoresAllocatableMetric, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						metricsStorage.SetMetric(nodeMetricOwner, NODE_MEMORY_ALLOCATABLE_METRIC, float64(q.Value()))
+						metricsStorage.Set(nodeMetricId, NodeMemoryAllocatableMetric, float64(q.Value()))
 					}
 				}
 
@@ -167,8 +167,8 @@ func NewResourceMetadataEnricher(
 			switch r := r.(type) {
 			case *kubernetes.Node:
 				nodeName := r.GetObjectMeta().GetName()
-				nodeMetricOwner := GetMetricOwner(nodeName, NODE_METRIC_PREFIX)
-				metricsStorage.Delete(nodeMetricOwner)
+				nodeMetricId := GetMetricId(nodeName, NodeMetricPrefix)
+				metricsStorage.Delete(nodeMetricId)
 			}
 
 			id := join(accessor.GetNamespace(), accessor.GetName())
@@ -233,18 +233,18 @@ func NewContainerMetadataEnricher(
 			mapStatuses(pod.Status.ContainerStatuses)
 			mapStatuses(pod.Status.InitContainerStatuses)
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-				containerMetricOwner := GetMetricOwner(cuid, CONTAINER_METRIC_PREFIX)
+				containerUID := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
+				containerMetricId := GetMetricId(containerUID, ContainerMetricPrefix)
 
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						metricsStorage.SetMetric(containerMetricOwner, CONTAINER_CORES_LIMIT_METRIC, float64(q.MilliValue())/1000)
+						metricsStorage.Set(containerMetricId, ContainerCoresLimitMetric, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						metricsStorage.SetMetric(containerMetricOwner, CONTAINER_MEMORY_LIMIT_METRIC, float64(q.Value()))
+						metricsStorage.Set(containerMetricId, ContainerMemoryLimitMetric, float64(q.Value()))
 					}
 				}
 
@@ -269,9 +269,9 @@ func NewContainerMetadataEnricher(
 				base.Logger().Debugf("Error while casting event: %s", ok)
 			}
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-				containerMetricOwner := GetMetricOwner(cuid, CONTAINER_METRIC_PREFIX)
-				metricsStorage.Delete(containerMetricOwner)
+				containerUID := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
+				containerMetricId := GetMetricId(containerUID, ContainerMetricPrefix)
+				metricsStorage.Delete(containerMetricId)
 
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
@@ -565,4 +565,9 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 		kubernetes2.ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
 	}
 	return ecsClusterMeta, nil
+}
+
+// ContainerUID creates an unique ID for from namespace, pod name and container name
+func ContainerUID(namespace, pod, container string) string {
+	return namespace + "/" + pod + "/" + container
 }
