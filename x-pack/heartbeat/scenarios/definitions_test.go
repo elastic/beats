@@ -1,4 +1,4 @@
-package functests
+package scenarios
 
 import (
 	"fmt"
