@@ -39,9 +39,9 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 	}
 
 	node := summary.Node
-	nodeMetricId := util.GetMetricId(node.NodeName, util.NodeMetricPrefix)
-	nodeCores, _ := metricsStorage.GetWithDefault(nodeMetricId, util.NodeCoresAllocatableMetric, 0.0)
-	nodeMem, _ := metricsStorage.GetWithDefault(nodeMetricId, util.NodeMemoryAllocatableMetric, 0.0)
+	nodeMetricsStorageUID := util.GetMetricsStorageUID(util.NodeMetricPrefix, node.NodeName)
+	nodeCores, _ := metricsStorage.GetWithDefault(nodeMetricsStorageUID, util.NodeCoresAllocatableMetric, 0.0)
+	nodeMem, _ := metricsStorage.GetWithDefault(nodeMetricsStorageUID, util.NodeMemoryAllocatableMetric, 0.0)
 	for _, pod := range summary.Pods {
 		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults uint64
 		var containerCoreLimits, containerMemLimits float64
@@ -56,12 +56,12 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			pageFaults += cont.Memory.PageFaults
 			majorPageFaults += cont.Memory.MajorPageFaults
 
-			containerMetricId := util.GetMetricId(containerUID, util.ContainerMetricPrefix)
+			containerMetricsStorageUID := util.GetMetricsStorageUID(util.ContainerMetricPrefix, containerUID)
 
-			containerCoreLimit, _ := metricsStorage.GetWithDefault(containerMetricId, util.ContainerCoresLimitMetric, nodeCores)
+			containerCoreLimit, _ := metricsStorage.GetWithDefault(containerMetricsStorageUID, util.ContainerCoresLimitMetric, nodeCores)
 			containerCoreLimits += containerCoreLimit
 
-			containerMemLimit, _ := metricsStorage.GetWithDefault(containerMetricId, util.ContainerMemoryLimitMetric, nodeMem)
+			containerMemLimit, _ := metricsStorage.GetWithDefault(containerMetricsStorageUID, util.ContainerMemoryLimitMetric, nodeMem)
 			containerMemLimits += containerMemLimit
 		}
 
