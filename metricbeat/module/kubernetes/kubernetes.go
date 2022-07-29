@@ -42,7 +42,7 @@ type Module interface {
 	mb.Module
 	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
 	GetKubeletStats(http *helper.HTTP) ([]byte, error)
-	GetMetricsStorage() *util.MetricsStorage
+	GetMetricsRepo() *util.MetricsRepo
 }
 
 type familiesCache struct {
@@ -86,7 +86,7 @@ type module struct {
 
 	kubeStateMetricsCache *kubeStateMetricsCache
 	kubeletStatsCache     *kubeletStatsCache
-	metricsStorage        *util.MetricsStorage
+	metricsRepo        *util.MetricsRepo
 	cacheHash             uint64
 }
 
@@ -97,7 +97,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	kubeletStatsCache := &kubeletStatsCache{
 		cacheMap: make(map[uint64]*statsCache),
 	}
-	metricsStorage := util.NewMetricsStorage()
+	metricsRepo := util.NewMetricsRepo()
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
@@ -108,7 +108,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
 			kubeletStatsCache:     kubeletStatsCache,
-			metricsStorage:        metricsStorage,
+			metricsRepo:        metricsRepo,
 			cacheHash:             hash,
 		}
 		return &m, nil
@@ -160,6 +160,6 @@ func generateCacheHash(host []string) (uint64, error) {
 	return id, nil
 }
 
-func (m *module) GetMetricsStorage() *util.MetricsStorage {
-	return m.metricsStorage
+func (m *module) GetMetricsRepo() *util.MetricsRepo {
+	return m.metricsRepo
 }

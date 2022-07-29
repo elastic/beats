@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *logp.Logger) ([]mapstr.M, error) {
+func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]mapstr.M, error) {
 	events := []mapstr.M{}
 	var summary kubernetes.Summary
 
@@ -39,9 +39,9 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 	}
 
 	node := summary.Node
-	nodeMetricsStorageUID := util.GetMetricsStorageUID(util.NodeMetricPrefix, node.NodeName)
-	nodeCores, _ := metricsStorage.GetWithDefault(nodeMetricsStorageUID, util.NodeCoresAllocatableMetric, 0.0)
-	nodeMem, _ := metricsStorage.GetWithDefault(nodeMetricsStorageUID, util.NodeMemoryAllocatableMetric, 0.0)
+	nodeMetricsRepoId := util.GetMetricsRepoId(util.NodeMetricSource, node.NodeName)
+	nodeCores := metricsRepo.GetWithDefault(nodeMetricsRepoId, util.NodeCoresAllocatableMetric, 0.0)
+	nodeMem := metricsRepo.GetWithDefault(nodeMetricsRepoId, util.NodeMemoryAllocatableMetric, 0.0)
 	for _, pod := range summary.Pods {
 		for _, container := range pod.Containers {
 			containerEvent := mapstr.M{
@@ -129,10 +129,10 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			}
 
 			containerUID := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
-			containerMetricsStorageUID := util.GetMetricsStorageUID(util.ContainerMetricPrefix, containerUID)
+			containerMetricsRepoId := util.GetMetricsRepoId(util.ContainerMetricSource, containerUID)
 
-			containerCoresLimit, _ := metricsStorage.GetWithDefault(containerMetricsStorageUID, util.ContainerCoresLimitMetric, nodeCores)
-			containerMemLimit, _ := metricsStorage.GetWithDefault(containerMetricsStorageUID, util.ContainerMemoryLimitMetric, nodeMem)
+			containerCoresLimit := metricsRepo.GetWithDefault(containerMetricsRepoId, util.ContainerCoresLimitMetric, nodeCores)
+			containerMemLimit := metricsRepo.GetWithDefault(containerMetricsRepoId, util.ContainerMemoryLimitMetric, nodeMem)
 
 			if containerCoresLimit > 0 {
 				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresLimit, logger)
