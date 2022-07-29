@@ -18,19 +18,15 @@
 package monitors
 
 import (
+	"github.com/stretchr/testify/require"
 	"regexp"
 	"testing"
-	"time"
 
-	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var binfo = beat.Info{
@@ -161,17 +157,16 @@ func TestPreProcessors(t *testing.T) {
 }
 
 func TestDuplicateMonitorIDs(t *testing.T) {
-	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
-	badConf := mockBadPluginConf(t, "custom")
-	reg, built, closed := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
+	serverMonConf := MockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
+	badConf := MockBadPluginConf(t, "custom")
+	reg, built, closed := MockPluginsReg()
+	mockPipeline := &MockPipeline{}
 
-	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
-	defer sched.Stop()
+	f, sched, close := MakeMockFactory(reg)
+	defer close()
 
-	f := NewFactory(binfo, sched.Add, reg, false)
 	makeTestMon := func() (*Monitor, error) {
-		mIface, err := f.Create(pipelineConnector, serverMonConf)
+		mIface, err := f.Create(mockPipeline, serverMonConf)
 		if mIface == nil {
 			return nil, err
 		} else {
@@ -180,7 +175,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	}
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched.Add, nil, false)
+	_, m0Err := newMonitor(badConf, reg, mockPipeline.ConnectSync(), sched.Add, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

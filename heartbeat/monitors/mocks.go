@@ -1,4 +1,4 @@
-package ftestutils
+package monitors
 
 import (
 	"fmt"
@@ -7,51 +7,93 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	beatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 	"regexp"
 	"sync"
 	"testing"
+	"time"
 )
 
-type MockBeatClient struct {
+func MakeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
+	id, _ := uuid.NewV4()
+	eid, _ := uuid.NewV4()
+	info := beat.Info{
+		Beat:            "heartbeat",
+		IndexPrefix:     "heartbeat",
+		Version:         beatversion.GetDefaultVersion(),
+		ElasticLicensed: true,
+		Name:            "heartbeat",
+		Hostname:        "localhost",
+		ID:              id,
+		EphemeralID:     eid,
+		FirstStart:      time.Now(),
+		StartTime:       time.Now(),
+		Monitoring: struct {
+			DefaultUsername string
+		}{
+			DefaultUsername: "test",
+		},
+	}
+
+	sched = scheduler.Create(
+		1,
+		monitoring.NewRegistry(),
+		time.Local,
+		nil,
+		true,
+	)
+
+	return NewFactory(info, sched.Add, pluginsReg, func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
+			c, _ := pipeline.Connect()
+			return SyncPipelineClientAdaptor{C: c}, nil
+		}),
+		sched,
+		sched.Stop
+}
+
+type MockClient struct {
 	publishLog []beat.Event
 	pipeline   beat.Pipeline
 	closed     bool
 	mtx        sync.Mutex
 }
 
-func (c *MockBeatClient) IsClosed() bool {
+func (c *MockClient) IsClosed() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	return c.closed
 }
 
-func (c *MockBeatClient) Publish(e beat.Event) {
+func (c *MockClient) Publish(e beat.Event) {
 	c.PublishAll([]beat.Event{e})
 }
 
-func (c *MockBeatClient) PublishAll(events []beat.Event) {
+func (c *MockClient) PublishAll(events []beat.Event) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	c.publishLog = append(c.publishLog, events...)
 }
 
-func (c *MockBeatClient) Wait() {
+func (c *MockClient) Wait() {
 	c.mtx.Lock()
 	c.mtx.Unlock()
 }
 
-func (c *MockBeatClient) Close() error {
+func (c *MockClient) Close() error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -63,7 +105,7 @@ func (c *MockBeatClient) Close() error {
 	return nil
 }
 
-func (c *MockBeatClient) PublishedEvents() []*beat.Event {
+func (c *MockClient) PublishedEvents() []*beat.Event {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -77,7 +119,7 @@ func (c *MockBeatClient) PublishedEvents() []*beat.Event {
 }
 
 type MockPipeline struct {
-	Clients []*MockBeatClient
+	Clients []*MockClient
 	mtx     sync.Mutex
 }
 
@@ -89,11 +131,17 @@ func (pc *MockPipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	c := &MockBeatClient{pipeline: pc}
+	c := &MockClient{pipeline: pc}
 
 	pc.Clients = append(pc.Clients, c)
 
 	return c, nil
+}
+
+// Convenience function for tests
+func (pc *MockPipeline) ConnectSync() pipeline.ISyncClient {
+	c, _ := pc.Connect()
+	return SyncPipelineClientAdaptor{C: c}
 }
 
 func (pc *MockPipeline) PublishedEvents() []*beat.Event {

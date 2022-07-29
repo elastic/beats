@@ -70,23 +70,25 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	scheduler := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
 
+	pipelineClientFactory := func(p beat.Pipeline) (pipeline.ISyncClient, error) {
+		if parsedConfig.RunOnce {
+			client, err := pipeline.NewSyncClient(logp.L(), p, beat.ClientConfig{})
+			if err != nil {
+				return nil, fmt.Errorf("could not create pipeline sync client for run_once: %w", err)
+			}
+			return client, nil
+		} else {
+			client, err := p.Connect()
+			return monitors.SyncPipelineClientAdaptor{C: client}, err
+		}
+	}
+
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
 		config:    parsedConfig,
 		scheduler: scheduler,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(b.Info, scheduler.Add, plugin.GlobalPluginsReg, func(p beat.Pipeline) (pipeline.ISyncClient, error) {
-			if parsedConfig.RunOnce {
-				client, err := pipeline.NewSyncClient(logp.L(), p, beat.ClientConfig{})
-				if err != nil {
-					return nil, fmt.Errorf("could not create pipeline sync client for run_once: %w", err)
-				}
-				return client, nil
-			} else {
-				client, err := p.Connect()
-				return SyncPipelineClientAdaptor{C: client}, err
-			}
-		}),
+		dynamicFactory: monitors.NewFactory(b.Info, scheduler.Add, plugin.GlobalPluginsReg, pipelineClientFactory),
 	}
 	return bt, nil
 }

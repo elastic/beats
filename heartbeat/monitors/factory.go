@@ -47,7 +47,6 @@ type RunnerFactory struct {
 	mtx                   *sync.Mutex
 	pluginsReg            *plugin.PluginsReg
 	logger                *logp.Logger
-	runOnce               bool
 	pipelineClientFactory PipelineClientFactory
 }
 

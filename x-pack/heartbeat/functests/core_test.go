@@ -2,8 +2,6 @@ package functests
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/beater"
-	"github.com/elastic/beats/v7/heartbeat/ftestutils"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
@@ -64,7 +62,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, 
 	mtr = &MonitorTestRun{}
 
 	// make a pipeline
-	pipe := &ftestutils.MockPipeline{}
+	pipe := &monitors.MockPipeline{}
 	// pass it to the factory
 	f, sched, closeFactory := makeTestFactory()
 	conf, err := config.NewConfigFrom(monitorConfig)
@@ -121,7 +119,7 @@ func makeTestFactory() (factory *monitors.RunnerFactory, sched *scheduler.Schedu
 
 	return monitors.NewFactory(info, sched.Add, plugin.GlobalPluginsReg, func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
 			c, _ := pipeline.Connect()
-			return beater.SyncPipelineClientAdaptor{C: c}, nil
+			return monitors.SyncPipelineClientAdaptor{C: c}, nil
 		}),
 		sched,
 		sched.Stop
