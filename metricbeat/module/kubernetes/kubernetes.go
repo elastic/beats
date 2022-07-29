@@ -86,7 +86,7 @@ type module struct {
 
 	kubeStateMetricsCache *kubeStateMetricsCache
 	kubeletStatsCache     *kubeletStatsCache
-	metricsRepo        *util.MetricsRepo
+	metricsRepo           *util.MetricsRepo
 	cacheHash             uint64
 }
 
@@ -108,7 +108,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
 			kubeletStatsCache:     kubeletStatsCache,
-			metricsRepo:        metricsRepo,
+			metricsRepo:           metricsRepo,
 			cacheHash:             hash,
 		}
 		return &m, nil
