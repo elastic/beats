@@ -43,18 +43,18 @@ func TestEventMapping(t *testing.T) {
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	metricsStorage := util.NewMetricsStorage()
-	
+	metricsRepo := util.NewMetricsRepo()
+
 	nodeUID := "gke-beats-default-pool-a5b33e2e-hdww"
-	nodeMetricsStorageUID := util.GetMetricsStorageUID(util.NodeMetricPrefix, nodeUID)
-	metricsStorage.Set(nodeMetricsStorageUID, util.NodeCoresAllocatableMetric, 2)
-	metricsStorage.Set(nodeMetricsStorageUID, util.NodeMemoryAllocatableMetric, 146227200)
+	nodeMetricsRepoId := util.GetMetricsRepoId(util.NodeMetricSource, nodeUID)
+	metricsRepo.Set(nodeMetricsRepoId, util.NodeCoresAllocatableMetric, 2)
+	metricsRepo.Set(nodeMetricsRepoId, util.NodeMemoryAllocatableMetric, 146227200)
 
 	containerUID := util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx")
-	containerMetricsStorageUID := util.GetMetricsStorageUID(util.ContainerMetricPrefix, containerUID)
-	metricsStorage.Set(containerMetricsStorageUID, util.ContainerMemoryLimitMetric, 14622720)
+	containerMetricsRepoId := util.GetMetricsRepoId(util.ContainerMetricSource, containerUID)
+	metricsRepo.Set(containerMetricsRepoId, util.ContainerMemoryLimitMetric, 14622720)
 
-	events, err := eventMapping(body, metricsStorage, logger)
+	events, err := eventMapping(body, metricsRepo, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")

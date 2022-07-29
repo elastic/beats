@@ -22,6 +22,7 @@ import (
 	"sync"
 )
 
+// Metric defines a enumeration for all possible metrics.
 type Metric int64
 
 const (
@@ -31,13 +32,26 @@ const (
 	NodeMemoryAllocatableMetric
 )
 
-type MetricPrefix int64
+// MetricSource defines an optional prefix for MetricRepoID to distinguish metrics for container, nodes, etc.
+type MetricSource int64
 
 const (
-	ContainerMetricPrefix MetricPrefix = iota
-	NodeMetricPrefix
+	ContainerMetricSource MetricSource = iota
+	NodeMetricSource
 )
 
+// Metrics stores a group of metrics in a dictionary of (name Metric, value float64). The name of a metric must be unique.
+type Metrics struct {
+	entries map[Metric]float64
+}
+
+// MetricsRepo stores a dictionary of (uid String, metrics Metrics). MetricsRepo is the top level object used to store/access metrics from the Kubernetes metricsets. Uid is typically made of a MetricSource and a name. Eg. a uid might be "container.metricbeat-abcd" where `container` is the MetricSource and `metricbeat-abcd` is the id of the container in Kubernetes). Access to entries in this dictionary is thread-safe by using a sync.RWMutex.
+type MetricsRepo struct {
+	sync.RWMutex
+	metrics map[string]*Metrics
+}
+
+// Converts a Metric type into a string.
 func (m Metric) String() string {
 	switch m {
 	case ContainerCoresLimitMetric:
@@ -52,20 +66,18 @@ func (m Metric) String() string {
 	return "unknown"
 }
 
-func (mp MetricPrefix) String() string {
+// Converts a MetricSource type into a string.
+func (mp MetricSource) String() string {
 	switch mp {
-	case ContainerMetricPrefix:
+	case ContainerMetricSource:
 		return "container"
-	case NodeMetricPrefix:
+	case NodeMetricSource:
 		return "node"
 	}
 	return "unknown"
 }
 
-type Metrics struct {
-	entries map[Metric]float64
-}
-
+// NewMetrics initializes and returns a new Metrics.
 func NewMetrics() *Metrics {
 	ans := &Metrics{
 		entries: make(map[Metric]float64),
@@ -73,46 +85,48 @@ func NewMetrics() *Metrics {
 	return ans
 }
 
+// Sets the value of a metric given a name and a value. If a value for that metric is already present, it overwrites it.
 func (m *Metrics) Set(name Metric, value float64) {
 	m.entries[name] = value
 }
 
+// Returns the value of a metric by name and whether the entry already exists in Metrics.
 func (m *Metrics) Get(name Metric) (float64, bool) {
 	ans, exists := m.entries[name]
 	return ans, exists
 }
 
-func (m *Metrics) GetWithDefault(name Metric, defaultValue float64) (float64, bool) {
+// Returns the value of a metric by name. If the metric doesn't exists, it returns the defaultValue provided instead.
+func (m *Metrics) GetWithDefault(name Metric, defaultValue float64) float64 {
 	ans, exists := m.Get(name)
 	if !exists {
-		return defaultValue, false
+		return defaultValue
 	}
-	return ans, exists
+	return ans
 }
 
+// Deletes a metric by name from Metrics.
 func (m *Metrics) Delete(name Metric) {
 	delete(m.entries, name)
 }
 
+// Deletes all entries from Metrics.
 func (m *Metrics) Clear() {
 	for k := range m.entries {
 		delete(m.entries, k)
 	}
 }
 
-type MetricsStorage struct {
-	sync.RWMutex
-	metrics map[string]*Metrics
-}
-
-func NewMetricsStorage() *MetricsStorage {
-	ans := &MetricsStorage{
+// NewMetricsRepo initializes and returns a new MetricsRepo.
+func NewMetricsRepo() *MetricsRepo {
+	ans := &MetricsRepo{
 		metrics: make(map[string]*Metrics),
 	}
 	return ans
 }
 
-func (ms *MetricsStorage) Clear() {
+// Deletes all entries from MetricsRepo
+func (ms *MetricsRepo) Clear() {
 	ms.Lock()
 	defer ms.Unlock()
 	for k := range ms.metrics {
@@ -120,22 +134,25 @@ func (ms *MetricsStorage) Clear() {
 	}
 }
 
-func (ms *MetricsStorage) addMetrics(uuid string) *Metrics {
+// Initialize an empty Metrics for a UID.
+func (ms *MetricsRepo) initMetrics(uid string) *Metrics {
 	ms.Lock()
 	defer ms.Unlock()
-	ms.metrics[uuid] = NewMetrics()
-	return ms.metrics[uuid]
+	ms.metrics[uid] = NewMetrics()
+	return ms.metrics[uid]
 }
 
-func (ms *MetricsStorage) getMetrics(uuid string) (*Metrics, bool) {
+// Returns all the Metrics for a UID.
+func (ms *MetricsRepo) getMetrics(uid string) (*Metrics, bool) {
 	ms.RLock()
 	defer ms.RUnlock()
-	ans, exists := ms.metrics[uuid]
+	ans, exists := ms.metrics[uid]
 	return ans, exists
 }
 
-func (ms *MetricsStorage) Get(uuid string, metricName Metric) (float64, bool) {
-	metrics, exists := ms.getMetrics(uuid)
+// Returns the value of a metric for a (UID, metricName) in MetricsRepo and whether it already exist. If the metrics doesn't exists it return (-1, false).
+func (ms *MetricsRepo) Get(uid string, metricName Metric) (float64, bool) {
+	metrics, exists := ms.getMetrics(uid)
 	if !exists {
 		return -1, false
 	}
@@ -143,29 +160,33 @@ func (ms *MetricsStorage) Get(uuid string, metricName Metric) (float64, bool) {
 	return ans, exists
 }
 
-func (ms *MetricsStorage) GetWithDefault(uuid string, metricName Metric, defaultValue float64) (float64, bool) {
-	metrics, exists := ms.getMetrics(uuid)
+// Returns the value of a metric for a (UID, metricName) in MetricsRepo. If the metric doesn't exists, it returns the defaultValue provided instead.
+func (ms *MetricsRepo) GetWithDefault(uid string, metricName Metric, defaultValue float64) float64 {
+	metrics, exists := ms.getMetrics(uid)
 	if !exists {
-		return defaultValue, false
+		return defaultValue
 	}
 	return metrics.GetWithDefault(metricName, defaultValue)
 }
 
-func (ms *MetricsStorage) Set(uuid string, metricName Metric, metricValue float64) {
-	metrics, exists := ms.getMetrics(uuid)
+// Set the value of a metric for a (UID, metricName) in MetricsRepo.
+func (ms *MetricsRepo) Set(uid string, metricName Metric, metricValue float64) {
+	metrics, exists := ms.getMetrics(uid)
 	if !exists {
-		metrics = ms.addMetrics(uuid)
+		metrics = ms.initMetrics(uid)
 	}
 	metrics.Set(metricName, metricValue)
 }
 
-func (ms *MetricsStorage) Delete(uuid string) {
+// Delete the value of a metric by UID in MetricsRepo.
+func (ms *MetricsRepo) Delete(uid string) {
 	ms.Lock()
 	defer ms.Unlock()
-	delete(ms.metrics, uuid)
+	delete(ms.metrics, uid)
 }
 
-func GetMetricsStorageUID(prefix MetricPrefix, name string) string {
+// Returns a MetricRepoID used as key in MetricsRepo dictionary by combining a MetricSource and a name. Eg. a MetricRepoID might be "container.metricbeat-abcd" where `container` is the MetricSource and `metricbeat-abcd` is the id of the container in Kubernetes.
+func GetMetricsRepoId(prefix MetricSource, name string) string {
 	metricPrefix := prefix.String()
 	fields := []string{metricPrefix, name}
 	ans := strings.Join(fields, "/")

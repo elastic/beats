@@ -82,7 +82,7 @@ const selector = "kubernetes"
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	res kubernetes.Resource,
-	metricsStorage *MetricsStorage,
+	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
@@ -122,15 +122,15 @@ func NewResourceMetadataEnricher(
 
 			case *kubernetes.Node:
 				nodeName := r.GetObjectMeta().GetName()
-				nodeMetricsStorageUID := GetMetricsStorageUID(NodeMetricPrefix, nodeName)
+				nodeMetricsRepoID := GetMetricsRepoId(NodeMetricSource, nodeName)
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						metricsStorage.Set(nodeMetricsStorageUID, NodeCoresAllocatableMetric, float64(q.MilliValue())/1000)
+						metricsRepo.Set(nodeMetricsRepoID, NodeCoresAllocatableMetric, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						metricsStorage.Set(nodeMetricsStorageUID, NodeMemoryAllocatableMetric, float64(q.Value()))
+						metricsRepo.Set(nodeMetricsRepoID, NodeMemoryAllocatableMetric, float64(q.Value()))
 					}
 				}
 
@@ -167,8 +167,8 @@ func NewResourceMetadataEnricher(
 			switch r := r.(type) {
 			case *kubernetes.Node:
 				nodeName := r.GetObjectMeta().GetName()
-				nodeMetricsStorageUID := GetMetricsStorageUID(NodeMetricPrefix, nodeName)
-				metricsStorage.Delete(nodeMetricsStorageUID)
+				nodeMetricsRepoID := GetMetricsRepoId(NodeMetricSource, nodeName)
+				metricsRepo.Delete(nodeMetricsRepoID)
 			}
 
 			id := join(accessor.GetNamespace(), accessor.GetName())
@@ -192,7 +192,7 @@ func NewResourceMetadataEnricher(
 // NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
-	metricsStorage *MetricsStorage,
+	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
@@ -234,17 +234,17 @@ func NewContainerMetadataEnricher(
 			mapStatuses(pod.Status.InitContainerStatuses)
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				containerUID := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-				containerMetricsStorageUID := GetMetricsStorageUID(ContainerMetricPrefix, containerUID)
+				containerMetricsRepoID := GetMetricsRepoId(ContainerMetricSource, containerUID)
 
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						metricsStorage.Set(containerMetricsStorageUID, ContainerCoresLimitMetric, float64(q.MilliValue())/1000)
+						metricsRepo.Set(containerMetricsRepoID, ContainerCoresLimitMetric, float64(q.MilliValue())/1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						metricsStorage.Set(containerMetricsStorageUID, ContainerMemoryLimitMetric, float64(q.Value()))
+						metricsRepo.Set(containerMetricsRepoID, ContainerMemoryLimitMetric, float64(q.Value()))
 					}
 				}
 
@@ -270,8 +270,8 @@ func NewContainerMetadataEnricher(
 			}
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				containerUID := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-				containerMetricsStorageUID := GetMetricsStorageUID(ContainerMetricPrefix, containerUID)
-				metricsStorage.Delete(containerMetricsStorageUID)
+				containerMetricsRepoID := GetMetricsRepoId(ContainerMetricSource, containerUID)
+				metricsRepo.Delete(containerMetricsRepoID)
 
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)

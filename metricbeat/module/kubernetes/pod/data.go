@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *logp.Logger) ([]mapstr.M, error) {
+func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]mapstr.M, error) {
 	events := []mapstr.M{}
 
 	var summary kubernetes.Summary
@@ -39,9 +39,9 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 	}
 
 	node := summary.Node
-	nodeMetricsStorageUID := util.GetMetricsStorageUID(util.NodeMetricPrefix, node.NodeName)
-	nodeCores, _ := metricsStorage.GetWithDefault(nodeMetricsStorageUID, util.NodeCoresAllocatableMetric, 0.0)
-	nodeMem, _ := metricsStorage.GetWithDefault(nodeMetricsStorageUID, util.NodeMemoryAllocatableMetric, 0.0)
+	nodeMetricsRepoId := util.GetMetricsRepoId(util.NodeMetricSource, node.NodeName)
+	nodeCores := metricsRepo.GetWithDefault(nodeMetricsRepoId, util.NodeCoresAllocatableMetric, 0.0)
+	nodeMem := metricsRepo.GetWithDefault(nodeMetricsRepoId, util.NodeMemoryAllocatableMetric, 0.0)
 	for _, pod := range summary.Pods {
 		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults uint64
 		var containerCoreLimits, containerMemLimits float64
@@ -56,13 +56,9 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			pageFaults += cont.Memory.PageFaults
 			majorPageFaults += cont.Memory.MajorPageFaults
 
-			containerMetricsStorageUID := util.GetMetricsStorageUID(util.ContainerMetricPrefix, containerUID)
-
-			containerCoreLimit, _ := metricsStorage.GetWithDefault(containerMetricsStorageUID, util.ContainerCoresLimitMetric, nodeCores)
-			containerCoreLimits += containerCoreLimit
-
-			containerMemLimit, _ := metricsStorage.GetWithDefault(containerMetricsStorageUID, util.ContainerMemoryLimitMetric, nodeMem)
-			containerMemLimits += containerMemLimit
+			containerMetricsRepoId := util.GetMetricsRepoId(util.ContainerMetricSource, containerUID)
+			containerCoreLimits += metricsRepo.GetWithDefault(containerMetricsRepoId, util.ContainerCoresLimitMetric, nodeCores)
+			containerMemLimits += metricsRepo.GetWithDefault(containerMetricsRepoId, util.ContainerMemoryLimitMetric, nodeMem)
 		}
 
 		podEvent := mapstr.M{
