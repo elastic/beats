@@ -73,12 +73,19 @@ func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCance
 	return &forgetfulProducer{broker: b, openState: openState}
 }
 
+func (p *forgetfulProducer) makePushRequest(event interface{}) pushRequest {
+	resp := make(chan queue.EntryID, 1)
+	return pushRequest{
+		event: event,
+		resp:  resp}
+}
+
 func (p *forgetfulProducer) Publish(event interface{}) (queue.EntryID, bool) {
-	return 0, p.openState.publish(pushRequest{event: event})
+	return p.openState.publish(p.makePushRequest(event))
 }
 
 func (p *forgetfulProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
-	return 0, p.openState.tryPublish(pushRequest{event: event})
+	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
 func (p *forgetfulProducer) Cancel() int {
@@ -98,23 +105,19 @@ func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
 }
 
 func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
-	req := p.makePushRequest(event)
-	if p.openState.publish(req) {
-		id := <-req.resp
+	id, published := p.openState.publish(p.makePushRequest(event))
+	if published {
 		p.producedCount++
-		return id, true
 	}
-	return 0, false
+	return id, published
 }
 
 func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
-	req := p.makePushRequest(event)
-	if p.openState.tryPublish(req) {
-		id := <-req.resp
+	id, published := p.openState.tryPublish(p.makePushRequest(event))
+	if published {
 		p.producedCount++
-		return id, true
 	}
-	return 0, false
+	return id, published
 }
 
 func (p *ackProducer) Cancel() int {
@@ -138,25 +141,25 @@ func (st *openState) Close() {
 	close(st.done)
 }
 
-func (st *openState) publish(req pushRequest) bool {
+func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return true
+		return <-req.resp, true
 	case <-st.done:
 		st.events = nil
-		return false
+		return 0, false
 	}
 }
 
-func (st *openState) tryPublish(req pushRequest) bool {
+func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return true
+		return <-req.resp, true
 	case <-st.done:
 		st.events = nil
-		return false
+		return 0, false
 	default:
 		st.log.Debugf("Dropping event, queue is blocked")
-		return false
+		return 0, false
 	}
 }
