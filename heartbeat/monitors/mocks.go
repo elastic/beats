@@ -64,7 +64,7 @@ func MakeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 }
 
 type MockClient struct {
-	publishLog []beat.Event
+	publishLog []*beat.Event
 	pipeline   beat.Pipeline
 	closed     bool
 	mtx        sync.Mutex
@@ -85,7 +85,10 @@ func (c *MockClient) PublishAll(events []beat.Event) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	c.publishLog = append(c.publishLog, events...)
+	for _, e := range events {
+		eLocal := e
+		c.publishLog = append(c.publishLog, &eLocal)
+	}
 }
 
 func (c *MockClient) Wait() {
@@ -109,13 +112,7 @@ func (c *MockClient) PublishedEvents() []*beat.Event {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	copies := make([]beat.Event, len(c.publishLog))
-	copy(copies, c.publishLog)
-	dstPtrs := make([]*beat.Event, 0, len(copies))
-	for _, e := range copies {
-		dstPtrs = append(dstPtrs, &e)
-	}
-	return dstPtrs
+	return c.publishLog
 }
 
 type MockPipeline struct {
@@ -148,7 +145,7 @@ func (pc *MockPipeline) PublishedEvents() []*beat.Event {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	events := []*beat.Event{}
+	var events []*beat.Event
 	for _, c := range pc.Clients {
 		events = append(events, c.PublishedEvents()...)
 	}
