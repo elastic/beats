@@ -39,9 +39,9 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 	}
 
 	node := summary.Node
-	nodeMetricId := util.GetMetricId(node.NodeName, util.NodeMetricPrefix)
-	nodeCores, _ := metricsStorage.GetWithDefault(nodeMetricId, util.NodeCoresAllocatableMetric, 0.0)
-	nodeMem, _ := metricsStorage.GetWithDefault(nodeMetricId, util.NodeMemoryAllocatableMetric, 0.0)
+	nodeMetricsStorageUID := util.GetMetricsStorageUID(util.NodeMetricPrefix, node.NodeName)
+	nodeCores, _ := metricsStorage.GetWithDefault(nodeMetricsStorageUID, util.NodeCoresAllocatableMetric, 0.0)
+	nodeMem, _ := metricsStorage.GetWithDefault(nodeMetricsStorageUID, util.NodeMemoryAllocatableMetric, 0.0)
 	for _, pod := range summary.Pods {
 		for _, container := range pod.Containers {
 			containerEvent := mapstr.M{
@@ -129,10 +129,10 @@ func eventMapping(content []byte, metricsStorage *util.MetricsStorage, logger *l
 			}
 
 			containerUID := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
-			containerMetricId := util.GetMetricId(containerUID, util.ContainerMetricPrefix)
+			containerMetricsStorageUID := util.GetMetricsStorageUID(util.ContainerMetricPrefix, containerUID)
 
-			containerCoresLimit, _ := metricsStorage.GetWithDefault(containerMetricId, util.ContainerCoresLimitMetric, nodeCores)
-			containerMemLimit, _ := metricsStorage.GetWithDefault(containerMetricId, util.ContainerMemoryLimitMetric, nodeMem)
+			containerCoresLimit, _ := metricsStorage.GetWithDefault(containerMetricsStorageUID, util.ContainerCoresLimitMetric, nodeCores)
+			containerMemLimit, _ := metricsStorage.GetWithDefault(containerMetricsStorageUID, util.ContainerMemoryLimitMetric, nodeMem)
 
 			if containerCoresLimit > 0 {
 				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresLimit, logger)

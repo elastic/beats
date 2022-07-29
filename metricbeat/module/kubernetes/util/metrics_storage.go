@@ -120,22 +120,22 @@ func (ms *MetricsStorage) Clear() {
 	}
 }
 
-func (ms *MetricsStorage) addMetrics(metricId string) *Metrics {
+func (ms *MetricsStorage) addMetrics(uuid string) *Metrics {
 	ms.Lock()
 	defer ms.Unlock()
-	ms.metrics[metricId] = NewMetrics()
-	return ms.metrics[metricId]
+	ms.metrics[uuid] = NewMetrics()
+	return ms.metrics[uuid]
 }
 
-func (ms *MetricsStorage) getMetrics(metricId string) (*Metrics, bool) {
+func (ms *MetricsStorage) getMetrics(uuid string) (*Metrics, bool) {
 	ms.RLock()
 	defer ms.RUnlock()
-	ans, exists := ms.metrics[metricId]
+	ans, exists := ms.metrics[uuid]
 	return ans, exists
 }
 
-func (ms *MetricsStorage) Get(metricId string, metricName Metric) (float64, bool) {
-	metrics, exists := ms.getMetrics(metricId)
+func (ms *MetricsStorage) Get(uuid string, metricName Metric) (float64, bool) {
+	metrics, exists := ms.getMetrics(uuid)
 	if !exists {
 		return -1, false
 	}
@@ -143,31 +143,31 @@ func (ms *MetricsStorage) Get(metricId string, metricName Metric) (float64, bool
 	return ans, exists
 }
 
-func (ms *MetricsStorage) GetWithDefault(metricId string, metricName Metric, defaultValue float64) (float64, bool) {
-	metrics, exists := ms.getMetrics(metricId)
+func (ms *MetricsStorage) GetWithDefault(uuid string, metricName Metric, defaultValue float64) (float64, bool) {
+	metrics, exists := ms.getMetrics(uuid)
 	if !exists {
 		return defaultValue, false
 	}
 	return metrics.GetWithDefault(metricName, defaultValue)
 }
 
-func (ms *MetricsStorage) Set(metricId string, metricName Metric, metricValue float64) {
-	metrics, exists := ms.getMetrics(metricId)
+func (ms *MetricsStorage) Set(uuid string, metricName Metric, metricValue float64) {
+	metrics, exists := ms.getMetrics(uuid)
 	if !exists {
-		metrics = ms.addMetrics(metricId)
+		metrics = ms.addMetrics(uuid)
 	}
 	metrics.Set(metricName, metricValue)
 }
 
-func (ms *MetricsStorage) Delete(metricId string) {
+func (ms *MetricsStorage) Delete(uuid string) {
 	ms.Lock()
 	defer ms.Unlock()
-	delete(ms.metrics, metricId)
+	delete(ms.metrics, uuid)
 }
 
-func GetMetricId(owner string, prefix MetricPrefix) string {
+func GetMetricsStorageUID(prefix MetricPrefix, name string) string {
 	metricPrefix := prefix.String()
-	fields := []string{metricPrefix, owner}
+	fields := []string{metricPrefix, name}
 	ans := strings.Join(fields, "/")
 
 	return ans
