@@ -99,10 +99,10 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	if err := re.query.CollectData(); err != nil {
 		// users can encounter the case no counters are found (services/processes stopped), this should not generate an event with the error message,
 		//could be the case the specific services are started after and picked up by the next RefreshCounterPaths func
-		if err == pdh.PDH_NO_COUNTERS {
+		if err == pdh.PDH_NO_COUNTERS { //nolint:errorlint // Bad linter! This is always errno or nil.
 			re.log.Warnf("%s %v", collectFailedMsg, err)
 		} else {
-			return nil, fmt.Errorf("%v, %w", err, collectFailedMsg)
+			return nil, fmt.Errorf("%v, %w", collectFailedMsg, err)
 		}
 	}
 
@@ -154,7 +154,7 @@ func (re *Reader) getCounterPaths() ([]string, error) {
 		childQueries, err := re.query.GetCounterPaths(counter.QueryName)
 		if err != nil {
 			if re.config.IgnoreNECounters {
-				switch err {
+				switch err { //nolint:errorlint // Bad linter! This is always errno or nil.
 				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
 					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
 					re.log.Infow("Ignoring non existent counter", "error", err,
