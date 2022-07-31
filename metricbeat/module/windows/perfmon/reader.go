@@ -29,8 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -85,11 +83,11 @@ func NewReader(config Config) (*Reader, error) {
 func (re *Reader) RefreshCounterPaths() error {
 	newCounters, err := re.getCounterPaths()
 	if err != nil {
-		return errors.Wrap(err, "failed retrieving counter paths")
+		return fmt.Errorf("failed retrieving counter paths: %w", err)
 	}
 	err = re.query.RemoveUnusedCounters(newCounters)
 	if err != nil {
-		return errors.Wrap(err, "failed removing unused counter values")
+		return fmt.Errorf("failed removing unused counter values: %w", err)
 	}
 	return nil
 }
@@ -104,14 +102,14 @@ func (re *Reader) Read() ([]mb.Event, error) {
 		if err == pdh.PDH_NO_COUNTERS {
 			re.log.Warnf("%s %v", collectFailedMsg, err)
 		} else {
-			return nil, errors.Wrap(err, collectFailedMsg)
+			return nil, fmt.Errorf("%v, %w", err, collectFailedMsg)
 		}
 	}
 
 	// Get the values.
 	values, err := re.getValues()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed formatting counter values")
+		return nil, fmt.Errorf("failed formatting counter values: %w", err)
 	}
 	var events []mb.Event
 	// GroupAllCountersTo config option where counters for all instances are aggregated and instance count is added in the event under the string value provided by this option.
@@ -164,7 +162,7 @@ func (re *Reader) getCounterPaths() ([]string, error) {
 					continue
 				}
 			} else {
-				return newCounters, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.QueryName)
+				return newCounters, fmt.Errorf("failed to expand counter (query='%v'): %w", counter.QueryName, err)
 			}
 		}
 		newCounters = append(newCounters, childQueries...)
@@ -172,7 +170,7 @@ func (re *Reader) getCounterPaths() ([]string, error) {
 		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
 			for _, v := range childQueries {
 				if err := re.query.AddCounter(v, counter.InstanceName, counter.Format, isWildcard(childQueries, counter.InstanceName)); err != nil {
-					return newCounters, errors.Wrapf(err, "failed to add counter (query='%v')", counter.QueryName)
+					return newCounters, fmt.Errorf("failed to add counter (query='%v'): %w", counter.QueryName, err)
 				}
 				re.counters[i].ChildQueries = append(re.counters[i].ChildQueries, v)
 			}
