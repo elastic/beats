@@ -2,9 +2,7 @@ package management
 
 import (
 	"fmt"
-	"regexp"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/helpers/transpiler"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -41,11 +39,6 @@ func (unit *UnitInput) InjectIndex(streamType string) error {
 	return nil
 }
 
-// InjectStreamProcessor adds the `add_fields processors` for stream type, namespace and dataset fields.
-func (uint *UnitInput) InjectStreamProcessor(streamType string) {
-
-}
-
 // var Metricbeat transpiler.RuleList = transpiler.RuleList{Rules: []transpiler.Rule{
 // 	&transpiler.FixStreamRule{},
 // 	&transpiler.InjectIndexRule{Type: "metrics"},
@@ -75,33 +68,3 @@ func (uint *UnitInput) InjectStreamProcessor(streamType string) {
 // 	&transpiler.FilterRule{Selectors: []transpiler.Selector{"metricbeat", "output", "keystore"}},
 // 	//&transpiler.InjectHeadersRule{},
 // }}
-
-var MetricbeatV2 transpiler.RuleList = transpiler.RuleList{Rules: []transpiler.Rule{
-	&transpiler.FixStreamRule{},
-	&transpiler.InjectIndexRule{Type: "metrics"},
-	&transpiler.InjectStreamProcessorRule{Type: "metrics", OnConflict: "insert_after"},
-	//&transpiler.RenameRule{From: "inputs", To: "inputsstreams"},
-	// &transpiler.MapRule{Path: "inputsstreams", Rules: []transpiler.Rule{
-	// 	&transpiler.CopyAllToListRule{To: "streams", OnConflict: "noop", Except: []string{"streams", "id", "enabled", "processors"}},
-	// 	&transpiler.CopyToListRule{Item: "processors", To: "streams", OnConflict: "insert_before"},
-	// }},
-	//&transpiler.ExtractListItemRule{Path: "inputsstreams", Item: "streams", To: "inputs"},
-	//&transpiler.FilterValuesWithRegexpRule{Key: "type", Re: regexp.MustCompile("^.+/metrics$"), Selector: "inputs"},
-	//&transpiler.FilterValuesRule{Selector: "inputs", Key: "enabled", Values: []interface{}{true}},
-	//&transpiler.MapRule{Path: "inputs", Rules: []transpiler.Rule{
-	&transpiler.TranslateWithRegexpRule{Path: "type", Re: regexp.MustCompile("^(?P<type>.+)/metrics$"), With: "$type"},
-	&transpiler.RenameRule{From: "type", To: "module"},
-	&transpiler.MakeArrayRule{Item: "metricset", To: "metricsets"},
-	// &transpiler.RemoveKeyRule{Key: "metricset"},
-	// &transpiler.RemoveKeyRule{Key: "enabled"},
-	&transpiler.RemoveKeyRule{Key: "data_stream"},
-	// &transpiler.RemoveKeyRule{Key: "data_stream.dataset"},
-	// &transpiler.RemoveKeyRule{Key: "data_stream.namespace"},
-	// &transpiler.RemoveKeyRule{Key: "use_output"},
-	//}},
-	&transpiler.InjectAgentInfoRule{},
-	//&transpiler.CopyRule{From: "inputs", To: "metricbeat"},
-	//&transpiler.RenameRule{From: "metricbeat.inputs", To: "modules"},
-	//&transpiler.FilterRule{Selectors: []transpiler.Selector{"metricbeat", "output", "keystore"}},
-	//&transpiler.InjectHeadersRule{},
-}}

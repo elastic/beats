@@ -1,28 +1,15 @@
 package management
 
 import (
-	"context"
-	"fmt"
-	"sync"
 	"testing"
-	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
-// func TestV2InputTranspile(t *testing.T) {
-// 	testConfig := Config{}
-// 	NewV2AgentManagerWithClient(&testConfig, reload.RegisterV2)
-// }
-
-var raw = `
+func TestMBGenerate(t *testing.T) {
+	raw := `
     id: system/metrics-system-default-system
     name: system-1
     revision: 1
@@ -78,7 +65,7 @@ var raw = `
           dataset: system.load
           type: metrics
         metricsets:
-          - load 
+          - load
         period: 10s
       - id: system/metrics-system.memory-default-system
         data_stream:
@@ -132,107 +119,35 @@ var raw = `
         period: 10s	
 `
 
-func TestAgentControl(t *testing.T) {
-	unitOneID := mock.NewID()
+	exeName = "metricbeat"
+	reloadCfg, err := generateBeatConfig(raw)
+	require.NoError(t, err, "error in generateBeatConfig")
+	//unpack, again, so we can read it
+	for _, stream := range reloadCfg {
+		cfgMap := mapstr.M{}
+		err = stream.Config.Unpack(&cfgMap)
+		require.NoError(t, err, "error in unpack for config %#v", stream.Config)
+		t.Logf("Config: %s", cfgMap.StringToPrint())
+	}
+	//t.Logf("Final config: \n%#v", reloadCfg)
 
-	token := mock.NewID()
-	//var gotConfig bool
+}
 
-	var mut sync.Mutex
+func TestOutputGen(t *testing.T) {
+	testIn := `
+    type: elasticsearch
+    hosts: [shoebill.nest:9200]
+    username: "elastic"
+    password: "changeme"
+`
 
-	t.Logf("Creating mock server")
-	srv := mock.StubServerV2{
-		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			mut.Lock()
-			defer mut.Unlock()
-			if observed.Token == token {
-				// if len(observed.Units) > 0 {
-				// 	t.Logf("Current unit state is: %v", observed.Units[0].State)
-				// }
-
-				// initial checkin
-				if len(observed.Units) == 0 || observed.Units[0].State == proto.State_STARTING {
-					//gotConfig = true
-					t.Logf("Got initial checkin, sending config...")
-					return &proto.CheckinExpected{
-						Units: []*proto.UnitExpected{
-							{
-								Id:             unitOneID,
-								Type:           proto.UnitType_INPUT,
-								ConfigStateIdx: 1,
-								Config:         raw,
-								State:          proto.State_HEALTHY,
-							},
-						},
-					}
-				} else if observed.Units[0].State == proto.State_STOPPED {
-					// remove the unit? I think?
-					return &proto.CheckinExpected{
-						Units: nil,
-					}
-				} else if observed.Units[0].State == proto.State_FAILED {
-					t.Logf("Unit failed with: %#v", observed.Units[0].Message)
-					return &proto.CheckinExpected{
-						Units: nil,
-					}
-				}
-
-			}
-
-			return nil
-		},
-		ActionImpl: func(response *proto.ActionResponse) error {
-
-			return nil
-		},
-		ActionsChan: make(chan *mock.PerformAction, 100),
-	} // end of srv declaration
-
-	require.NoError(t, srv.Start())
-	defer srv.Stop()
-
-	// initialize
-	reloader := TestReloader{}
-	reload.RegisterV2.MustRegisterList("input", reloader)
-
-	t.Logf("creating client")
-	// connect with client
-	client := client.NewV2(fmt.Sprintf(":%d", srv.Port), token, client.VersionInfo{
-		Name:    "program",
-		Version: "v1.0.0",
-		Meta: map[string]string{
-			"key": "value",
-		},
-	}, grpc.WithTransportCredentials(insecure.NewCredentials()))
-
-	t.Logf("starting beats client")
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
-	defer cancel()
-	testConfig := Config{Enabled: true}
-	mgr, err := NewV2AgentManagerWithClient(&testConfig, reload.RegisterV2, client)
-	assert.NoError(t, err)
-
-	err = mgr.Start()
+	cfg, err := groupByOutputs(testIn)
 	require.NoError(t, err)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		}
-	}
+	testStruct := mapstr.M{}
+	cfg.Config.Unpack(&testStruct)
+	innerCfg, exists := testStruct["elasticsearch"]
+	assert.True(t, exists, "elasticsearch key does not exist")
+	_, pwExists := innerCfg.(map[string]interface{})["password"]
+	assert.True(t, pwExists, "password config not found")
 
-	//assert.True(t, gotConfig, "config state")
-	// assert.True(t, gotHealthy, "healthy state")
-	// assert.True(t, gotStopped, "stopped state")
-}
-
-// TestReloader is a little test interface so we can register a reloader for the V2 config
-type TestReloader struct {
-}
-
-func (tr TestReloader) Reload(configs []*reload.ConfigWithMeta) error {
-	for _, cfg := range configs {
-		fmt.Printf("Got config: \n\t%#v\n", cfg.Config)
-	}
-	return nil
 }
