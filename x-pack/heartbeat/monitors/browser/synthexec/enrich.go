@@ -172,7 +172,7 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		down = 0
 	}
 
-	// Incase of syntax errors or incorrect runner options, the Synthetics
+	// In case of syntax errors or incorrect runner options, the Synthetics
 	// runner would exit immediately with exitCode 1 and we do not set the duration
 	// to inform the journey never ran
 	if !je.start.IsZero() {

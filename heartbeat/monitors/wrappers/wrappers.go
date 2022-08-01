@@ -200,7 +200,7 @@ func addMonitorError() jobs.JobWrapper {
 					eventext.MergeEventFields(event, mapstr.M{"error": look.Reason(err)})
 				}
 			}
-			return cont, nil
+			return cont, err
 		}
 	}
 }
@@ -209,12 +209,15 @@ func addMonitorError() jobs.JobWrapper {
 // by the original Job will be set as a field. The original error will not be
 // passed through as a return value. Errors may still be present but only if there
 // is an actual error wrapping the error.
-func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
+//
+// onSummaryOnly is useful for browser monitors where we only want to add these
+// fields on the summary event.
+func addMonitorStatus(onSummaryOnly bool) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
 
-			if summaryOnly {
+			if onSummaryOnly {
 				hasSummary, _ := event.Fields.HasKey("summary.up")
 				if !hasSummary {
 					return cont, nil
@@ -228,6 +231,7 @@ func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 			}
 
 			eventext.MergeEventFields(event, fields)
+			// Note that we fully consume the error and always pass nil on here
 			return cont, nil
 		}
 	}
