@@ -236,7 +236,6 @@ func NewContainerMetadataEnricher(
 				containerUID := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				containerMetricsRepoID := GetMetricsRepoId(ContainerMetricSource, containerUID)
 
-				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
 						metricsRepo.Set(containerMetricsRepoID, ContainerCoresLimitMetric, float64(q.MilliValue())/1000)
