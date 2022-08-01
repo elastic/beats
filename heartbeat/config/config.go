@@ -46,4 +46,10 @@ type Scheduler struct {
 }
 
 // DefaultConfig is the canonical instantiation of Config.
-var DefaultConfig = Config{}
+var DefaultConfig = Config{
+	Jobs: map[string]JobLimit{
+		"browser": {
+			Limit: 2,
+		},
+	},
+}
