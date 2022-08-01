@@ -76,6 +76,7 @@ func getJobLimitSem(jobLimitByType map[string]config.JobLimit) map[string]*semap
 	jobLimitSem := map[string]*semaphore.Weighted{}
 	for jobType, jobLimit := range jobLimitByType {
 		if jobLimit.Limit > 0 {
+			logp.L().Info("limiting to %d concurrent jobs for '%s' type", jobLimit, jobType)
 			jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
 		}
 	}
