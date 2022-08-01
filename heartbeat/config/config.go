@@ -32,7 +32,7 @@ type Config struct {
 	ConfigMonitors *conf.C              `config:"config.monitors"`
 	Scheduler      Scheduler            `config:"scheduler"`
 	Autodiscover   *autodiscover.Config `config:"autodiscover"`
-	Jobs           map[string]JobLimit  `config:"jobs"`
+	Jobs           map[string]*JobLimit `config:"jobs"`
 }
 
 type JobLimit struct {
@@ -46,4 +46,10 @@ type Scheduler struct {
 }
 
 // DefaultConfig is the canonical instantiation of Config.
-var DefaultConfig = Config{}
+var DefaultConfig = Config{
+	Jobs: map[string]*JobLimit{
+		"browser": {
+			Limit: 2,
+		},
+	},
+}
