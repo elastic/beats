@@ -185,6 +185,17 @@ func (ms *MetricsRepo) Delete(uid string) {
 	delete(ms.metrics, uid)
 }
 
+// Keys returns all the UIDs in MetricsRepo.
+func (ms *MetricsRepo) Keys() []string {
+	ms.Lock()
+	defer ms.Unlock()
+	ans := make([]string, 0, len(ms.metrics))
+	for repoId := range ms.metrics {
+		ans = append(ans, repoId)
+	}
+	return ans
+}
+
 // Returns a MetricRepoID used as key in MetricsRepo dictionary by combining a MetricSource and a name. Eg. a MetricRepoID might be "container.metricbeat-abcd" where `container` is the MetricSource and `metricbeat-abcd` is the id of the container in Kubernetes.
 func GetMetricsRepoId(prefix MetricSource, name string) string {
 	metricPrefix := prefix.String()
