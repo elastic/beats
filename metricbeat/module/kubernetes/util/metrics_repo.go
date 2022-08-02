@@ -17,190 +17,251 @@
 
 package util
 
-import (
-	"strings"
-	"sync"
-)
-
-// Metric defines a enumeration for all possible metrics.
-type Metric int64
-
-const (
-	ContainerCoresLimitMetric Metric = iota
-	ContainerMemoryLimitMetric
-	NodeCoresAllocatableMetric
-	NodeMemoryAllocatableMetric
-)
-
-// MetricSource defines an optional prefix for MetricRepoID to distinguish metrics for container, nodes, etc.
-type MetricSource int64
-
-const (
-	ContainerMetricSource MetricSource = iota
-	NodeMetricSource
-)
-
-// Metrics stores a group of metrics in a dictionary of (name Metric, value float64). The name of a metric must be unique.
-type Metrics struct {
-	entries map[Metric]float64
+type PodId struct {
+	Namespace string
+	PodName   string
+}
+type ContainerId struct {
+	PodId
+	ContainerName string
 }
 
-// MetricsRepo stores a dictionary of (uid String, metrics Metrics). MetricsRepo is the top level object used to store/access metrics from the Kubernetes metricsets. Uid is typically made of a MetricSource and a name. Eg. a uid might be "container.metricbeat-abcd" where `container` is the MetricSource and `metricbeat-abcd` is the id of the container in Kubernetes). Access to entries in this dictionary is thread-safe by using a sync.RWMutex.
+type ContainerMetrics struct {
+	CoresLimit  float64
+	MemoryLimit float64
+}
+
+type NodeMetrics struct {
+	CoresAllocatable  float64
+	MemoryAllocatable float64
+}
+
+type PodStore struct {
+	// sync.RWMutex
+	containers map[string]*ContainerMetrics
+}
+
+type NodeStore struct {
+	// sync.RWMutex
+	metrics *NodeMetrics
+	pods    map[PodId]*PodStore
+}
+
 type MetricsRepo struct {
-	sync.RWMutex
-	metrics map[string]*Metrics
+	// sync.RWMutex
+	nodes map[string]*NodeStore
 }
 
-// Converts a Metric type into a string.
-func (m Metric) String() string {
-	switch m {
-	case ContainerCoresLimitMetric:
-		return "container.cores.limit"
-	case ContainerMemoryLimitMetric:
-		return "container.memory.limit"
-	case NodeCoresAllocatableMetric:
-		return "node.cores.allocatable"
-	case NodeMemoryAllocatableMetric:
-		return "node.memory.allocatable"
+func NewPodId(namespace, podName string) PodId {
+	return PodId{
+		Namespace: namespace,
+		PodName: podName,
 	}
-	return "unknown"
 }
 
-// Converts a MetricSource type into a string.
-func (mp MetricSource) String() string {
-	switch mp {
-	case ContainerMetricSource:
-		return "container"
-	case NodeMetricSource:
-		return "node"
+func NewContainerId(podId PodId, containerName string) ContainerId {
+	return ContainerId{
+		PodId:         podId,
+		ContainerName: containerName,
 	}
-	return "unknown"
 }
 
-// NewMetrics initializes and returns a new Metrics.
-func NewMetrics() *Metrics {
-	ans := &Metrics{
-		entries: make(map[Metric]float64),
+func NewContainerMetrics() *ContainerMetrics {
+	return &ContainerMetrics{
+		CoresLimit:  -1,
+		MemoryLimit: -1,
 	}
-	return ans
 }
 
-// Sets the value of a metric given a name and a value. If a value for that metric is already present, it overwrites it.
-func (m *Metrics) Set(name Metric, value float64) {
-	m.entries[name] = value
+func (cm *ContainerMetrics) set(metrics *ContainerMetrics) {
+	cm.CoresLimit = metrics.CoresLimit
+	cm.MemoryLimit = metrics.MemoryLimit
 }
 
-// Returns the value of a metric by name and whether the entry already exists in Metrics.
-func (m *Metrics) Get(name Metric) (float64, bool) {
-	ans, exists := m.entries[name]
-	return ans, exists
-}
-
-// Returns the value of a metric by name. If the metric doesn't exists, it returns the defaultValue provided instead.
-func (m *Metrics) GetWithDefault(name Metric, defaultValue float64) float64 {
-	ans, exists := m.Get(name)
-	if !exists {
-		return defaultValue
+func (cm *ContainerMetrics) clone() *ContainerMetrics {
+	ans := &ContainerMetrics{
+		CoresLimit:  cm.CoresLimit,
+		MemoryLimit: cm.MemoryLimit,
 	}
 	return ans
 }
 
-// Deletes a metric by name from Metrics.
-func (m *Metrics) Delete(name Metric) {
-	delete(m.entries, name)
-}
-
-// Deletes all entries from Metrics.
-func (m *Metrics) Clear() {
-	for k := range m.entries {
-		delete(m.entries, k)
+func NewNodeMetrics() *NodeMetrics {
+	return &NodeMetrics{
+		CoresAllocatable:  -1,
+		MemoryAllocatable: -1,
 	}
 }
 
-// NewMetricsRepo initializes and returns a new MetricsRepo.
+func (nm *NodeMetrics) set(metrics *NodeMetrics) {
+	nm.CoresAllocatable = metrics.CoresAllocatable
+	nm.MemoryAllocatable = metrics.MemoryAllocatable
+}
+
+func (nm *NodeMetrics) clone() *NodeMetrics {
+	ans := &NodeMetrics{
+		CoresAllocatable:  nm.CoresAllocatable,
+		MemoryAllocatable: nm.MemoryAllocatable,
+	}
+	return ans
+}
+
 func NewMetricsRepo() *MetricsRepo {
 	ans := &MetricsRepo{
-		metrics: make(map[string]*Metrics),
+		nodes: make(map[string]*NodeStore),
 	}
 	return ans
 }
 
-// Deletes all entries from MetricsRepo
-func (ms *MetricsRepo) Clear() {
-	ms.Lock()
-	defer ms.Unlock()
-	for k := range ms.metrics {
-		delete(ms.metrics, k)
-	}
-}
-
-// Initialize an empty Metrics for a UID.
-func (ms *MetricsRepo) initMetrics(uid string) *Metrics {
-	ms.Lock()
-	defer ms.Unlock()
-	ms.metrics[uid] = NewMetrics()
-	return ms.metrics[uid]
-}
-
-// Returns all the Metrics for a UID.
-func (ms *MetricsRepo) getMetrics(uid string) (*Metrics, bool) {
-	ms.RLock()
-	defer ms.RUnlock()
-	ans, exists := ms.metrics[uid]
-	return ans, exists
-}
-
-// Returns the value of a metric for a (UID, metricName) in MetricsRepo and whether it already exist. If the metrics doesn't exists it return (-1, false).
-func (ms *MetricsRepo) Get(uid string, metricName Metric) (float64, bool) {
-	metrics, exists := ms.getMetrics(uid)
-	if !exists {
-		return -1, false
-	}
-	ans, exists := metrics.Get(metricName)
-	return ans, exists
-}
-
-// Returns the value of a metric for a (UID, metricName) in MetricsRepo. If the metric doesn't exists, it returns the defaultValue provided instead.
-func (ms *MetricsRepo) GetWithDefault(uid string, metricName Metric, defaultValue float64) float64 {
-	metrics, exists := ms.getMetrics(uid)
-	if !exists {
-		return defaultValue
-	}
-	return metrics.GetWithDefault(metricName, defaultValue)
-}
-
-// Set the value of a metric for a (UID, metricName) in MetricsRepo.
-func (ms *MetricsRepo) Set(uid string, metricName Metric, metricValue float64) {
-	metrics, exists := ms.getMetrics(uid)
-	if !exists {
-		metrics = ms.initMetrics(uid)
-	}
-	metrics.Set(metricName, metricValue)
-}
-
-// Delete the value of a metric by UID in MetricsRepo.
-func (ms *MetricsRepo) Delete(uid string) {
-	ms.Lock()
-	defer ms.Unlock()
-	delete(ms.metrics, uid)
-}
-
-// Keys returns all the UIDs in MetricsRepo.
-func (ms *MetricsRepo) Keys() []string {
-	ms.Lock()
-	defer ms.Unlock()
-	ans := make([]string, 0, len(ms.metrics))
-	for repoId := range ms.metrics {
-		ans = append(ans, repoId)
+func NewNodeStore() *NodeStore {
+	ans := &NodeStore{
+		metrics: NewNodeMetrics(),
+		pods:    make(map[PodId]*PodStore),
 	}
 	return ans
 }
 
-// Returns a MetricRepoID used as key in MetricsRepo dictionary by combining a MetricSource and a name. Eg. a MetricRepoID might be "container.metricbeat-abcd" where `container` is the MetricSource and `metricbeat-abcd` is the id of the container in Kubernetes.
-func GetMetricsRepoId(prefix MetricSource, name string) string {
-	metricPrefix := prefix.String()
-	fields := []string{metricPrefix, name}
-	ans := strings.Join(fields, "/")
-
+func NewPodStore() *PodStore {
+	ans := &PodStore{
+		containers: make(map[string]*ContainerMetrics),
+	}
 	return ans
+}
+
+func (mr *MetricsRepo) SetNodeMetrics(nodeName string, metrics *NodeMetrics) {
+	// mr.Lock()
+	// defer mr.Unlock()
+	nodeStore, _ := mr.add(nodeName)
+	nodeStore.metrics.set(metrics)
+}
+
+func (mr *MetricsRepo) SetContainerMetrics(nodeName string, containerId ContainerId, metrics *ContainerMetrics) {
+	// mr.Lock()
+	// defer mr.Unlock()
+	nodeStore, _ := mr.add(nodeName)
+	podStore, _ := nodeStore.add(containerId.PodId)
+	podStore.setContainerMetrics(containerId.ContainerName, metrics)
+}
+
+func (mr *MetricsRepo) GetNodeMetrics(nodeName string) *NodeMetrics {
+	// mr.RLock()
+	// defer mr.RLock()
+	nodeStore := mr.get(nodeName)
+	if nodeStore == nil {
+		return NewNodeMetrics()
+	}
+	return nodeStore.metrics.clone()
+}
+
+func (mr *MetricsRepo) GetContainerMetrics(nodeName string, containerId ContainerId) *ContainerMetrics {
+	// mr.RLock()
+	// defer mr.RLock()
+	nodeStore := mr.get(nodeName)
+	if nodeStore == nil {
+		return NewContainerMetrics()
+	}
+	podStore := nodeStore.get(containerId.PodId)
+	if podStore == nil {
+		return NewContainerMetrics()
+	}
+	return podStore.get(containerId.ContainerName)
+}
+
+func (mr *MetricsRepo) add(nodeName string) (*NodeStore, bool) {
+	node, exists := mr.nodes[nodeName]
+	if !exists {
+		mr.nodes[nodeName] = NewNodeStore()
+		return mr.nodes[nodeName], true
+	}
+	return node, false
+}
+
+func (mr *MetricsRepo) get(nodeName string) *NodeStore {
+	ans, exists := mr.nodes[nodeName]
+	if !exists {
+		return nil
+	}
+	return ans
+}
+
+func (ns *NodeStore) add(podId PodId) (*PodStore, bool) {
+	pod, exists := ns.pods[podId]
+	if !exists {
+		ns.pods[podId] = NewPodStore()
+		return ns.pods[podId], true
+	}
+	return pod, false
+}
+
+func (ns *NodeStore) get(podId PodId) *PodStore {
+	pod, exists := ns.pods[podId]
+	if !exists {
+		return nil
+	}
+	return pod
+}
+
+func (ps *PodStore) get(containerName string) *ContainerMetrics {
+	container, exists := ps.containers[containerName]
+	if !exists {
+		return nil
+	}
+	return container.clone()
+}
+
+func (ps *PodStore) setContainerMetrics(containerName string, metrics *ContainerMetrics) {
+	container, exists := ps.containers[containerName]
+	if !exists {
+		ps.containers[containerName] = NewContainerMetrics()
+		container = ps.containers[containerName]
+	}
+	container.set(metrics)
+}
+
+func (mr *MetricsRepo) DeleteAllNodes() {
+	// mr.Lock()
+	// defer mr.Unlock()
+	for nodeName := range mr.nodes {
+		delete(mr.nodes, nodeName)
+	}
+}
+
+func (mr *MetricsRepo) PodNames(nodeName string) []PodId {
+	// mr.RLock()
+	// defer mr.RUnlock()
+	nodeStore := mr.get(nodeName)
+	if nodeStore == nil {
+		return []PodId{}
+	}
+
+	ans := make([]PodId, 0, len(nodeStore.pods))
+	for podId := range nodeStore.pods {
+		ans = append(ans, podId)
+	}
+	return ans
+}
+
+func (mr *MetricsRepo) NodeNames() []string {
+	// mr.RLock()
+	// defer mr.RUnlock()
+	ans := make([]string, 0, len(mr.nodes))
+	for nodeName := range mr.nodes {
+		ans = append(ans, nodeName)
+	}
+	return ans
+}
+
+func (mr *MetricsRepo) DeleteNode(nodeName string) {
+	// mr.Lock()
+	// defer mr.Unlock()
+	delete(mr.nodes, nodeName)
+}
+
+func (mr *MetricsRepo) DeletePod(nodeName string, podId PodId) {
+	// mr.Lock()
+	// defer mr.Unlock()
+	node, exists := mr.nodes[nodeName]
+	if exists {
+		delete(node.pods, podId)
+	}
 }
