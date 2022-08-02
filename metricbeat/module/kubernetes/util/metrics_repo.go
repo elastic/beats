@@ -34,18 +34,6 @@ type Float64Metric struct {
 	Value float64
 }
 
-func NewFloat64Metric(value float64) *Float64Metric {
-	return &Float64Metric{
-		Value: value,
-	}
-}
-
-func (m *Float64Metric) clone() *Float64Metric {
-	return &Float64Metric{
-		Value: m.Value,
-	}
-}
-
 type ContainerMetrics struct {
 	CoresLimit  *Float64Metric
 	MemoryLimit *Float64Metric
@@ -86,6 +74,12 @@ func NewContainerId(podId PodId, containerName string) ContainerId {
 	}
 }
 
+func NewFloat64Metric(value float64) *Float64Metric {
+	return &Float64Metric{
+		Value: value,
+	}
+}
+
 func NewContainerMetrics() *ContainerMetrics {
 	return &ContainerMetrics{
 		CoresLimit:  nil,
@@ -93,9 +87,39 @@ func NewContainerMetrics() *ContainerMetrics {
 	}
 }
 
-func (cm *ContainerMetrics) set(metrics *ContainerMetrics) {
-	cm.CoresLimit = metrics.CoresLimit
-	cm.MemoryLimit = metrics.MemoryLimit
+func NewNodeMetrics() *NodeMetrics {
+	return &NodeMetrics{
+		CoresAllocatable:  nil,
+		MemoryAllocatable: nil,
+	}
+}
+
+func NewPodStore() *PodStore {
+	ans := &PodStore{
+		containers: make(map[string]*ContainerMetrics),
+	}
+	return ans
+}
+
+func NewNodeStore() *NodeStore {
+	ans := &NodeStore{
+		metrics: NewNodeMetrics(),
+		pods:    make(map[PodId]*PodStore),
+	}
+	return ans
+}
+
+func NewMetricsRepo() *MetricsRepo {
+	ans := &MetricsRepo{
+		nodes: make(map[string]*NodeStore),
+	}
+	return ans
+}
+
+func (m *Float64Metric) clone() *Float64Metric {
+	return &Float64Metric{
+		Value: m.Value,
+	}
 }
 
 func (cm *ContainerMetrics) clone() *ContainerMetrics {
@@ -109,18 +133,6 @@ func (cm *ContainerMetrics) clone() *ContainerMetrics {
 	return ans
 }
 
-func NewNodeMetrics() *NodeMetrics {
-	return &NodeMetrics{
-		CoresAllocatable:  nil,
-		MemoryAllocatable: nil,
-	}
-}
-
-func (nm *NodeMetrics) set(metrics *NodeMetrics) {
-	nm.CoresAllocatable = metrics.CoresAllocatable
-	nm.MemoryAllocatable = metrics.MemoryAllocatable
-}
-
 func (nm *NodeMetrics) clone() *NodeMetrics {
 	ans := NewNodeMetrics()
 	if nm.CoresAllocatable != nil {
@@ -128,28 +140,6 @@ func (nm *NodeMetrics) clone() *NodeMetrics {
 	}
 	if nm.MemoryAllocatable != nil {
 		ans.MemoryAllocatable = nm.MemoryAllocatable.clone()
-	}
-	return ans
-}
-
-func NewMetricsRepo() *MetricsRepo {
-	ans := &MetricsRepo{
-		nodes: make(map[string]*NodeStore),
-	}
-	return ans
-}
-
-func NewNodeStore() *NodeStore {
-	ans := &NodeStore{
-		metrics: NewNodeMetrics(),
-		pods:    make(map[PodId]*PodStore),
-	}
-	return ans
-}
-
-func NewPodStore() *PodStore {
-	ans := &PodStore{
-		containers: make(map[string]*ContainerMetrics),
 	}
 	return ans
 }
@@ -191,6 +181,54 @@ func (mr *MetricsRepo) GetContainerMetrics(nodeName string, containerId Containe
 		return NewContainerMetrics()
 	}
 	return podStore.get(containerId.ContainerName)
+}
+
+func (mr *MetricsRepo) DeleteNode(nodeName string) {
+	mr.Lock()
+	defer mr.Unlock()
+	delete(mr.nodes, nodeName)
+}
+
+func (mr *MetricsRepo) DeletePod(nodeName string, podId PodId) {
+	mr.Lock()
+	defer mr.Unlock()
+	node, exists := mr.nodes[nodeName]
+	if exists {
+		delete(node.pods, podId)
+	}
+}
+
+func (mr *MetricsRepo) DeleteAllNodes() {
+	mr.Lock()
+	defer mr.Unlock()
+	for nodeName := range mr.nodes {
+		delete(mr.nodes, nodeName)
+	}
+}
+
+func (mr *MetricsRepo) PodNames(nodeName string) []PodId {
+	mr.RLock()
+	defer mr.RUnlock()
+	nodeStore := mr.get(nodeName)
+	if nodeStore == nil {
+		return []PodId{}
+	}
+
+	ans := make([]PodId, 0, len(nodeStore.pods))
+	for podId := range nodeStore.pods {
+		ans = append(ans, podId)
+	}
+	return ans
+}
+
+func (mr *MetricsRepo) NodeNames() []string {
+	mr.RLock()
+	defer mr.RUnlock()
+	ans := make([]string, 0, len(mr.nodes))
+	for nodeName := range mr.nodes {
+		ans = append(ans, nodeName)
+	}
+	return ans
 }
 
 func (mr *MetricsRepo) add(nodeName string) (*NodeStore, bool) {
@@ -244,50 +282,12 @@ func (ps *PodStore) setContainerMetrics(containerName string, metrics *Container
 	container.set(metrics)
 }
 
-func (mr *MetricsRepo) DeleteAllNodes() {
-	mr.Lock()
-	defer mr.Unlock()
-	for nodeName := range mr.nodes {
-		delete(mr.nodes, nodeName)
-	}
+func (cm *ContainerMetrics) set(metrics *ContainerMetrics) {
+	cm.CoresLimit = metrics.CoresLimit
+	cm.MemoryLimit = metrics.MemoryLimit
 }
 
-func (mr *MetricsRepo) PodNames(nodeName string) []PodId {
-	mr.RLock()
-	defer mr.RUnlock()
-	nodeStore := mr.get(nodeName)
-	if nodeStore == nil {
-		return []PodId{}
-	}
-
-	ans := make([]PodId, 0, len(nodeStore.pods))
-	for podId := range nodeStore.pods {
-		ans = append(ans, podId)
-	}
-	return ans
-}
-
-func (mr *MetricsRepo) NodeNames() []string {
-	mr.RLock()
-	defer mr.RUnlock()
-	ans := make([]string, 0, len(mr.nodes))
-	for nodeName := range mr.nodes {
-		ans = append(ans, nodeName)
-	}
-	return ans
-}
-
-func (mr *MetricsRepo) DeleteNode(nodeName string) {
-	mr.Lock()
-	defer mr.Unlock()
-	delete(mr.nodes, nodeName)
-}
-
-func (mr *MetricsRepo) DeletePod(nodeName string, podId PodId) {
-	mr.Lock()
-	defer mr.Unlock()
-	node, exists := mr.nodes[nodeName]
-	if exists {
-		delete(node.pods, podId)
-	}
+func (nm *NodeMetrics) set(metrics *NodeMetrics) {
+	nm.CoresAllocatable = metrics.CoresAllocatable
+	nm.MemoryAllocatable = metrics.MemoryAllocatable
 }
