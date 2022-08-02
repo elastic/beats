@@ -43,6 +43,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
+- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
+- Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
 
 *Heartbeat*
 
