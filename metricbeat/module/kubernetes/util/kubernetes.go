@@ -125,12 +125,12 @@ func NewResourceMetadataEnricher(
 				metrics := NewNodeMetrics()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						metrics.CoresAllocatable = float64(q.MilliValue()) / 1000
+						metrics.CoresAllocatable = NewFloat64Metric(float64(q.MilliValue()) / 1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						metrics.MemoryAllocatable = float64(q.Value())
+						metrics.MemoryAllocatable = NewFloat64Metric(float64(q.Value()))
 					}
 				}
 				metricsRepo.SetNodeMetrics(nodeName, metrics)
@@ -240,12 +240,12 @@ func NewContainerMetadataEnricher(
 
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						containerMetrics.CoresLimit = float64(q.MilliValue()) / 1000
+						containerMetrics.CoresLimit = NewFloat64Metric(float64(q.MilliValue()) / 1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						containerMetrics.MemoryLimit = float64(q.Value())
+						containerMetrics.MemoryLimit = NewFloat64Metric(float64(q.Value()))
 					}
 				}
 

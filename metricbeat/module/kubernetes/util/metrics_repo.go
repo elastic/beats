@@ -30,14 +30,30 @@ type ContainerId struct {
 	ContainerName string
 }
 
+type Float64Metric struct {
+	Value float64
+}
+
+func NewFloat64Metric(value float64) *Float64Metric {
+	return &Float64Metric{
+		Value: value,
+	}
+}
+
+func (m *Float64Metric) clone() *Float64Metric {
+	return &Float64Metric{
+		Value: m.Value,
+	}
+}
+
 type ContainerMetrics struct {
-	CoresLimit  float64
-	MemoryLimit float64
+	CoresLimit  *Float64Metric
+	MemoryLimit *Float64Metric
 }
 
 type NodeMetrics struct {
-	CoresAllocatable  float64
-	MemoryAllocatable float64
+	CoresAllocatable  *Float64Metric
+	MemoryAllocatable *Float64Metric
 }
 
 type PodStore struct {
@@ -72,8 +88,8 @@ func NewContainerId(podId PodId, containerName string) ContainerId {
 
 func NewContainerMetrics() *ContainerMetrics {
 	return &ContainerMetrics{
-		CoresLimit:  -1,
-		MemoryLimit: -1,
+		CoresLimit:  nil,
+		MemoryLimit: nil,
 	}
 }
 
@@ -83,17 +99,20 @@ func (cm *ContainerMetrics) set(metrics *ContainerMetrics) {
 }
 
 func (cm *ContainerMetrics) clone() *ContainerMetrics {
-	ans := &ContainerMetrics{
-		CoresLimit:  cm.CoresLimit,
-		MemoryLimit: cm.MemoryLimit,
+	ans := NewContainerMetrics()
+	if cm.CoresLimit != nil {
+		ans.CoresLimit = cm.CoresLimit.clone()
+	}
+	if cm.MemoryLimit != nil {
+		ans.MemoryLimit = cm.MemoryLimit.clone()
 	}
 	return ans
 }
 
 func NewNodeMetrics() *NodeMetrics {
 	return &NodeMetrics{
-		CoresAllocatable:  -1,
-		MemoryAllocatable: -1,
+		CoresAllocatable:  nil,
+		MemoryAllocatable: nil,
 	}
 }
 
@@ -103,9 +122,12 @@ func (nm *NodeMetrics) set(metrics *NodeMetrics) {
 }
 
 func (nm *NodeMetrics) clone() *NodeMetrics {
-	ans := &NodeMetrics{
-		CoresAllocatable:  nm.CoresAllocatable,
-		MemoryAllocatable: nm.MemoryAllocatable,
+	ans := NewNodeMetrics()
+	if nm.CoresAllocatable != nil {
+		ans.CoresAllocatable = nm.CoresAllocatable.clone()
+	}
+	if nm.MemoryAllocatable != nil {
+		ans.MemoryAllocatable = nm.MemoryAllocatable.clone()
 	}
 	return ans
 }

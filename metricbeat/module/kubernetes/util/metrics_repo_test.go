@@ -50,11 +50,11 @@ func (s *MetricsRepoTestSuite) SetupTest() {
 	s.SecondPodContainerId = NewContainerId(anotherPodId, "container")
 
 	s.ContainerMetric = NewContainerMetrics()
-	s.ContainerMetric.CoresLimit = 0.2
+	s.ContainerMetric.CoresLimit = NewFloat64Metric(0.2)
 
 	s.AnotherContainerMetric = NewContainerMetrics()
-	s.AnotherContainerMetric.CoresLimit = 0.3
-	s.AnotherContainerMetric.MemoryLimit = 50
+	s.AnotherContainerMetric.CoresLimit = NewFloat64Metric(0.3)
+	s.AnotherContainerMetric.MemoryLimit = NewFloat64Metric(50)
 }
 
 func (s *MetricsRepoTestSuite) TestSetContainerMetrics() {
@@ -128,8 +128,8 @@ func (s *MetricsRepoTestSuite) TestGetContainerMetricsNotFound() {
 	ans := s.MetricsRepo.GetContainerMetrics(s.NodeName, s.ContainerId)
 
 	s.Equal(0, len(s.MetricsRepo.NodeNames()))
-	s.Equal(-1.0, ans.CoresLimit)
-	s.Equal(-1.0, ans.MemoryLimit)
+	s.Nil(ans.CoresLimit)
+	s.Nil(ans.MemoryLimit)
 }
 
 func (s *MetricsRepoTestSuite) TestDeleteNodeNotFound() {
