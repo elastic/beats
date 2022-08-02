@@ -37,7 +37,7 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		senr.je = newJourneyEnricher(senr)
 	}
 
-	_, _ = event.PutValue("monitor.check_group", senr.checkGroup)
+	eventext.MergeEventFields(event, map[string]interface{}{"monitor": map[string]interface{}{"check_group": senr.checkGroup}})
 
 	return senr.je.enrich(event, se)
 }
