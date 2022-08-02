@@ -39,10 +39,21 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 	}
 
 	node := summary.Node
-	nodeMetricsRepoId := util.GetMetricsRepoId(util.NodeMetricSource, node.NodeName)
-	nodeCores := metricsRepo.GetWithDefault(nodeMetricsRepoId, util.NodeCoresAllocatableMetric, 0.0)
-	nodeMem := metricsRepo.GetWithDefault(nodeMetricsRepoId, util.NodeMemoryAllocatableMetric, 0.0)
+	nodeMetrics := metricsRepo.GetNodeMetrics(node.NodeName)
+
+	nodeCores := 0.0
+	if nodeMetrics.CoresAllocatable > 0 {
+		nodeCores = nodeMetrics.CoresAllocatable
+	}
+
+	nodeMem := 0.0
+	if nodeMetrics.MemoryAllocatable > 0 {
+		nodeMem = nodeMetrics.MemoryAllocatable
+	}
+
 	for _, pod := range summary.Pods {
+		podId := util.NewPodId(pod.PodRef.Namespace, pod.PodRef.Name)
+
 		for _, container := range pod.Containers {
 			containerEvent := mapstr.M{
 				mb.ModuleDataKey: mapstr.M{
@@ -128,11 +139,18 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 				kubernetes2.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
 			}
 
-			containerUID := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
-			containerMetricsRepoId := util.GetMetricsRepoId(util.ContainerMetricSource, containerUID)
+			containerId := util.NewContainerId(podId, container.Name)
+			containerMetrics := metricsRepo.GetContainerMetrics(node.NodeName, containerId)
 
-			containerCoresLimit := metricsRepo.GetWithDefault(containerMetricsRepoId, util.ContainerCoresLimitMetric, nodeCores)
-			containerMemLimit := metricsRepo.GetWithDefault(containerMetricsRepoId, util.ContainerMemoryLimitMetric, nodeMem)
+			containerCoresLimit := nodeCores
+			if containerMetrics.CoresLimit > 0 {
+				containerCoresLimit = containerMetrics.CoresLimit
+			}
+
+			containerMemLimit := nodeMem
+			if containerMetrics.MemoryLimit > 0 {
+				containerMemLimit = containerMetrics.MemoryLimit
+			}
 
 			if containerCoresLimit > 0 {
 				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresLimit, logger)

@@ -45,14 +45,22 @@ func TestEventMapping(t *testing.T) {
 
 	metricsRepo := util.NewMetricsRepo()
 
-	nodeUID := "gke-beats-default-pool-a5b33e2e-hdww"
-	nodeMetricsRepoId := util.GetMetricsRepoId(util.NodeMetricSource, nodeUID)
-	metricsRepo.Set(nodeMetricsRepoId, util.NodeCoresAllocatableMetric, 2)
-	metricsRepo.Set(nodeMetricsRepoId, util.NodeMemoryAllocatableMetric, 146227200)
+	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
 
-	containerUID := util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx")
-	containerMetricsRepoId := util.GetMetricsRepoId(util.ContainerMetricSource, containerUID)
-	metricsRepo.Set(containerMetricsRepoId, util.ContainerMemoryLimitMetric, 14622720)
+	nodeMetrics := util.NewNodeMetrics()
+	nodeMetrics.CoresAllocatable = 2
+	nodeMetrics.MemoryAllocatable = 146227200
+	metricsRepo.SetNodeMetrics(nodeName, nodeMetrics)
+
+	namespace := "default"
+	podName := "nginx-deployment-2303442956-pcqfc"
+	podId := util.NewPodId(namespace, podName)
+	containerName := "nginx"
+	containerId := util.NewContainerId(podId, containerName)
+
+	containerMetrics := util.NewContainerMetrics()
+	containerMetrics.MemoryLimit = 14622720
+	metricsRepo.SetContainerMetrics(nodeName, containerId, containerMetrics)
 
 	events, err := eventMapping(body, metricsRepo, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
