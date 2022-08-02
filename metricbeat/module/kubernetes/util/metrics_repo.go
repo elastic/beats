@@ -25,16 +25,13 @@ type PodId struct {
 	Namespace string
 	PodName   string
 }
-type ContainerId struct {
-	PodId
-	ContainerName string
-}
 
 type Float64Metric struct {
 	Value float64
 }
 
 type ContainerMetrics struct {
+	sync.RWMutex
 	CoresLimit  *Float64Metric
 	MemoryLimit *Float64Metric
 }
@@ -45,12 +42,12 @@ type NodeMetrics struct {
 }
 
 type PodStore struct {
-	// sync.RWMutex
+	sync.RWMutex
 	containers map[string]*ContainerMetrics
 }
 
 type NodeStore struct {
-	// sync.RWMutex
+	sync.RWMutex
 	metrics *NodeMetrics
 	pods    map[PodId]*PodStore
 }
@@ -64,13 +61,6 @@ func NewPodId(namespace, podName string) PodId {
 	return PodId{
 		Namespace: namespace,
 		PodName:   podName,
-	}
-}
-
-func NewContainerId(podId PodId, containerName string) ContainerId {
-	return ContainerId{
-		PodId:         podId,
-		ContainerName: containerName,
 	}
 }
 
@@ -144,61 +134,13 @@ func (nm *NodeMetrics) clone() *NodeMetrics {
 	return ans
 }
 
-func (mr *MetricsRepo) SetNodeMetrics(nodeName string, metrics *NodeMetrics) {
-	mr.Lock()
-	defer mr.Unlock()
-	nodeStore, _ := mr.add(nodeName)
-	nodeStore.metrics.set(metrics)
-}
-
-func (mr *MetricsRepo) SetContainerMetrics(nodeName string, containerId ContainerId, metrics *ContainerMetrics) {
-	mr.Lock()
-	defer mr.Unlock()
-	nodeStore, _ := mr.add(nodeName)
-	podStore, _ := nodeStore.add(containerId.PodId)
-	podStore.setContainerMetrics(containerId.ContainerName, metrics)
-}
-
-func (mr *MetricsRepo) GetNodeMetrics(nodeName string) *NodeMetrics {
-	mr.RLock()
-	defer mr.RUnlock()
-	nodeStore := mr.get(nodeName)
-	if nodeStore == nil {
-		return NewNodeMetrics()
-	}
-	return nodeStore.metrics.clone()
-}
-
-func (mr *MetricsRepo) GetContainerMetrics(nodeName string, containerId ContainerId) *ContainerMetrics {
-	mr.RLock()
-	defer mr.RUnlock()
-	nodeStore := mr.get(nodeName)
-	if nodeStore == nil {
-		return NewContainerMetrics()
-	}
-	podStore := nodeStore.get(containerId.PodId)
-	if podStore == nil {
-		return NewContainerMetrics()
-	}
-	return podStore.get(containerId.ContainerName)
-}
-
-func (mr *MetricsRepo) DeleteNode(nodeName string) {
+func (mr *MetricsRepo) Delete(nodeName string) {
 	mr.Lock()
 	defer mr.Unlock()
 	delete(mr.nodes, nodeName)
 }
 
-func (mr *MetricsRepo) DeletePod(nodeName string, podId PodId) {
-	mr.Lock()
-	defer mr.Unlock()
-	node, exists := mr.nodes[nodeName]
-	if exists {
-		delete(node.pods, podId)
-	}
-}
-
-func (mr *MetricsRepo) DeleteAllNodes() {
+func (mr *MetricsRepo) DeleteAll() {
 	mr.Lock()
 	defer mr.Unlock()
 	for nodeName := range mr.nodes {
@@ -209,7 +151,7 @@ func (mr *MetricsRepo) DeleteAllNodes() {
 func (mr *MetricsRepo) PodNames(nodeName string) []PodId {
 	mr.RLock()
 	defer mr.RUnlock()
-	nodeStore := mr.get(nodeName)
+	nodeStore := mr.Get(nodeName)
 	if nodeStore == nil {
 		return []PodId{}
 	}
@@ -231,7 +173,9 @@ func (mr *MetricsRepo) NodeNames() []string {
 	return ans
 }
 
-func (mr *MetricsRepo) add(nodeName string) (*NodeStore, bool) {
+func (mr *MetricsRepo) Add(nodeName string) (*NodeStore, bool) {
+	mr.Lock()
+	defer mr.Unlock()
 	node, exists := mr.nodes[nodeName]
 	if !exists {
 		mr.nodes[nodeName] = NewNodeStore()
@@ -240,15 +184,19 @@ func (mr *MetricsRepo) add(nodeName string) (*NodeStore, bool) {
 	return node, false
 }
 
-func (mr *MetricsRepo) get(nodeName string) *NodeStore {
+func (mr *MetricsRepo) Get(nodeName string) *NodeStore {
+	mr.RLock()
+	defer mr.RUnlock()
 	ans, exists := mr.nodes[nodeName]
 	if !exists {
-		return nil
+		return NewNodeStore() // TODO: REVIEW PATTERN nullObject
 	}
 	return ans
 }
 
-func (ns *NodeStore) add(podId PodId) (*PodStore, bool) {
+func (ns *NodeStore) Add(podId PodId) (*PodStore, bool) {
+	ns.Lock()
+	defer ns.Unlock()
 	pod, exists := ns.pods[podId]
 	if !exists {
 		ns.pods[podId] = NewPodStore()
@@ -257,37 +205,61 @@ func (ns *NodeStore) add(podId PodId) (*PodStore, bool) {
 	return pod, false
 }
 
-func (ns *NodeStore) get(podId PodId) *PodStore {
+func (ns *NodeStore) Get(podId PodId) *PodStore {
+	ns.RLock()
+	defer ns.RUnlock()
 	pod, exists := ns.pods[podId]
 	if !exists {
-		return nil
+		return NewPodStore() // TODO: REVIEW PATTERN nullObject
 	}
 	return pod
 }
 
-func (ps *PodStore) get(containerName string) *ContainerMetrics {
+func (ns *NodeStore) Delete(podId PodId) {
+	ns.Lock()
+	defer ns.Unlock()
+	_, exists := ns.pods[podId]
+	if exists {
+		delete(ns.pods, podId)
+	}
+}
+
+func (ns *NodeStore) GetMetrics() *NodeMetrics {
+	ns.RLock()
+	defer ns.RUnlock()
+	return ns.metrics.clone()
+}
+
+func (ns *NodeStore) SetMetrics(metrics *NodeMetrics) {
+	ns.Lock()
+	defer ns.Unlock()
+	ns.metrics = metrics
+}
+
+func (ps *PodStore) Get(containerName string) *ContainerMetrics {
+	ps.RLock()
+	defer ps.RUnlock()
 	container, exists := ps.containers[containerName]
 	if !exists {
-		return nil
+		return NewContainerMetrics() // TODO: review use of nullobect pattern
 	}
 	return container.clone()
 }
 
-func (ps *PodStore) setContainerMetrics(containerName string, metrics *ContainerMetrics) {
+func (ps *PodStore) Add(containerName string) (*ContainerMetrics, bool) {
+	ps.Lock()
+	defer ps.Unlock()
 	container, exists := ps.containers[containerName]
 	if !exists {
 		ps.containers[containerName] = NewContainerMetrics()
-		container = ps.containers[containerName]
+		return ps.containers[containerName], true
 	}
-	container.set(metrics)
+	return container, false
 }
 
-func (cm *ContainerMetrics) set(metrics *ContainerMetrics) {
+func (cm *ContainerMetrics) Set(metrics *ContainerMetrics) {
+	cm.Lock()
+	defer cm.Unlock()
 	cm.CoresLimit = metrics.CoresLimit
 	cm.MemoryLimit = metrics.MemoryLimit
-}
-
-func (nm *NodeMetrics) set(metrics *NodeMetrics) {
-	nm.CoresAllocatable = metrics.CoresAllocatable
-	nm.MemoryAllocatable = metrics.MemoryAllocatable
 }

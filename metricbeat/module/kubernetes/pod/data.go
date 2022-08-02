@@ -39,14 +39,15 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 	}
 
 	node := summary.Node
-	nodeMetrics := metricsRepo.GetNodeMetrics(node.NodeName)
 
 	nodeCores := 0.0
+	nodeMem := 0.0
+
+	nodeStore := metricsRepo.Get(node.NodeName)
+	nodeMetrics := nodeStore.GetMetrics()
 	if nodeMetrics.CoresAllocatable != nil {
 		nodeCores = nodeMetrics.CoresAllocatable.Value
 	}
-
-	nodeMem := 0.0
 	if nodeMetrics.MemoryAllocatable != nil {
 		nodeMem = nodeMetrics.MemoryAllocatable.Value
 	}
@@ -55,6 +56,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 		var podCoreLimit, podMemLimit float64
 
 		podId := util.NewPodId(pod.PodRef.Namespace, pod.PodRef.Name)
+		podStore := nodeStore.Get(podId)
 
 		for _, container := range pod.Containers {
 			usageNanoCores += container.CPU.UsageNanoCores
@@ -65,8 +67,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			pageFaults += container.Memory.PageFaults
 			majorPageFaults += container.Memory.MajorPageFaults
 
-			containerId := util.NewContainerId(podId, container.Name)
-			containerMetrics := metricsRepo.GetContainerMetrics(node.NodeName, containerId)
+			containerMetrics := podStore.Get(container.Name)
 
 			containerCoresLimit := nodeCores
 			if containerMetrics.CoresLimit != nil {
