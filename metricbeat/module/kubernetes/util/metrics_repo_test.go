@@ -177,11 +177,6 @@ func addContainerMetric(metricsRepo *MetricsRepo, nodeName string, podId PodId, 
 	containerMetrics.Set(containerMetric)
 }
 
-func addNodeMetric(metricsRepo *MetricsRepo, nodeName string, nodeMetrics *NodeMetrics) {
-	nodeStore, _ := metricsRepo.Add(nodeName)
-	nodeStore.SetMetrics(nodeMetrics)
-}
-
 func GetMetric(metricsRepo *MetricsRepo, nodeName string, podId PodId, containerName string) *ContainerMetrics {
 	nodeStore := metricsRepo.Get(nodeName)
 	podStore := nodeStore.Get(podId)
