@@ -74,6 +74,9 @@ type Settings struct {
 
 	// UseCompression enables or disables LZ4 compression
 	UseCompression bool
+
+	// UseProtobuf enables protobuf serialization instead of CBOR
+	UseProtobuf bool
 }
 
 // userConfig holds the parameters for a disk queue that are configurable

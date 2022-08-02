@@ -99,7 +99,7 @@
         "title": "Total Pods per Namespace [Metricbeat Kubernetes]",
         "visualizationType": "lnsPie"
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "0f534cb0-db40-11ec-a23d-5dd6249f86b6",
     "migrationVersion": {
         "lens": "8.3.0"
@@ -117,6 +117,6 @@
         }
     ],
     "type": "lens",
-    "updated_at": "2022-05-24T09:01:12.319Z",
-    "version": "Wzk5ODYsMV0="
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3ODQsM10="
 }

@@ -32,7 +32,7 @@ import (
 )
 
 func TestEventIterator(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:errcheck // Not needed.
 
 	writer, tearDown := createLog(t)
 	defer tearDown()

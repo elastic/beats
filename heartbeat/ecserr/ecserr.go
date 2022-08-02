@@ -19,6 +19,7 @@ package ecserr
 
 import (
 	"fmt"
+	"time"
 )
 
 // ECSErr represents an error per the ECS specification
@@ -70,5 +71,13 @@ func NewBadCmdStatusErr(exitCode int, cmd string) *ECSErr {
 		ETYPE_IO,
 		"BAD_CMD_STATUS",
 		fmt.Sprintf("command '%s' exited unexpectedly with code: %d", cmd, exitCode),
+	)
+}
+
+func NewCmdTimeoutStatusErr(timeout time.Duration, cmd string) *ECSErr {
+	return NewECSErr(
+		ETYPE_IO,
+		"CMD_TIMEOUT",
+		fmt.Sprintf("command '%s' did not exit before extended timeout: %s", cmd, timeout.String()),
 	)
 }

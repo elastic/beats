@@ -4948,6 +4948,26 @@ type: keyword
 
 --
 
+*`awsfargate.task_stats.task_desired_status`*::
++
+--
+The desired status for the task from Amazon ECS.
+
+
+type: keyword
+
+--
+
+*`awsfargate.task_stats.task_known_status`*::
++
+--
+The known status for the task from Amazon ECS.
+
+
+type: keyword
+
+--
+
 [float]
 === cpu
 
@@ -5580,11 +5600,6 @@ azure module
 
 
 
-[float]
-=== azure
-
-
-
 
 *`azure.timegrain`*::
 +
@@ -5657,6 +5672,16 @@ type: keyword
 +
 --
 The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.subscription_name`*::
++
+--
+The subscription name
 
 
 type: keyword
@@ -5947,7 +5972,7 @@ billing and usage details
 *`azure.billing.currency`*::
 +
 --
-The currency
+Billing Currency.
 
 
 type: keyword
@@ -5957,7 +5982,27 @@ type: keyword
 *`azure.billing.pretax_cost`*::
 +
 --
-Cost
+The amount of cost before tax.
+
+
+type: float
+
+--
+
+*`azure.billing.unit_price`*::
++
+--
+Unit Price is the price applicable to you. (your EA or other contract price).
+
+
+type: float
+
+--
+
+*`azure.billing.quantity`*::
++
+--
+Measure the quantity purchased or consumed. The amount of the meter used during the billing period.
 
 
 type: float
@@ -5977,7 +6022,7 @@ type: keyword
 *`azure.billing.product`*::
 +
 --
-The product type
+Product name for the consumed service or purchase.
 
 
 type: keyword
@@ -6007,7 +6052,7 @@ type: date
 *`azure.billing.billing_period_id`*::
 +
 --
-The billing period id
+The billing period id.
 
 
 type: keyword
@@ -6017,7 +6062,17 @@ type: keyword
 *`azure.billing.account_name`*::
 +
 --
-The billing account name
+Name of the Billing Account.
+
+
+type: keyword
+
+--
+
+*`azure.billing.account_id`*::
++
+--
+Billing Account identifier.
 
 
 type: keyword
@@ -32397,18 +32452,14 @@ type: keyword
 *`elasticsearch.node.stats.os.cgroup.memory.limit.bytes`*::
 +
 --
-type: long
-
-format: bytes
+type: keyword
 
 --
 
 *`elasticsearch.node.stats.os.cgroup.memory.usage.bytes`*::
 +
 --
-type: long
-
-format: bytes
+type: keyword
 
 --
 
@@ -35502,6 +35553,42 @@ type: long
 
 --
 
+*`gcp.dataproc.cluster.job.completion_time.value`*::
++
+--
+The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.job.duration.value`*::
++
+--
+The time jobs have spent in a given state.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.operation.completion_time.value`*::
++
+--
+The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.operation.duration.value`*::
++
+--
+The time operations have spent in a given state.
+
+type: object
+
+--
+
 [float]
 === firestore
 
@@ -36078,6 +36165,96 @@ type: long
 
 --
 
+*`gcp.loadbalancing.https.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.external.regional.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.external.regional.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.frontend_tcp_rtt.value`*::
++
+--
+A distribution of the RTT measured for each connection between client and proxy.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.internal.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the internal HTTP/S load balancer proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.internal.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the internal HTTP/S load balancer proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the external HTTP/S load balancer proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.l3.external.rtt_latencies.value`*::
++
+--
+A distribution of the round trip time latency, measured over TCP connections for the external network load balancer.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.l3.internal.rtt_latencies.value`*::
++
+--
+A distribution of RTT measured over TCP connections for internal TCP/UDP load balancer flows.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.value`*::
++
+--
+A distribution of the smoothed RTT (in ms) measured by the proxy's TCP stack, each minute application layer bytes pass from proxy to client.
+
+type: object
+
+--
+
 [float]
 === pubsub
 
@@ -36318,15 +36495,6 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.push_request_latencies.value`*::
-+
---
-Distribution of push request latencies (in microseconds), grouped by result.
-
-type: long
-
---
-
 *`gcp.pubsub.subscription.retained_acked.bytes`*::
 +
 --
@@ -36449,7 +36617,7 @@ type: long
 --
 Distribution of publish message sizes (in bytes)
 
-type: long
+type: object
 
 --
 
@@ -36513,6 +36681,24 @@ type: long
 Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
 
 type: long
+
+--
+
+*`gcp.pubsub.subscription.ack_latencies.value`*::
++
+--
+Distribution of ack latencies in milliseconds. The ack latency is the time between when Cloud Pub/Sub sends a message to a subscriber client and when Cloud Pub/Sub receives an Acknowledge request for that message.
+
+type: object
+
+--
+
+*`gcp.pubsub.subscription.push_request_latencies.value`*::
++
+--
+Distribution of push request latencies (in microseconds), grouped by result.
+
+type: object
 
 --
 
@@ -43311,10 +43497,20 @@ Controller manager metrics
 
 
 
-*`kubernetes.controllermanager.handler`*::
+*`kubernetes.controllermanager.url`*::
 +
 --
-Request handler
+Request url
+
+
+type: keyword
+
+--
+
+*`kubernetes.controllermanager.verb`*::
++
+--
+Request verb
 
 
 type: keyword
@@ -43412,6 +43608,15 @@ type: long
 
 --
 
+*`kubernetes.controllermanager.process.fds.max.count`*::
++
+--
+Maximum number of open file descriptors
+
+type: long
+
+--
+
 *`kubernetes.controllermanager.process.started.sec`*::
 +
 --
@@ -43422,105 +43627,38 @@ type: double
 --
 
 
-*`kubernetes.controllermanager.http.request.duration.us.percentile.*`*::
-+
---
-Request duration microseconds percentiles
-
-type: object
-
---
-
-*`kubernetes.controllermanager.http.request.duration.us.sum`*::
-+
---
-Request duration microseconds cumulative sum
-
-type: double
-
---
-
-*`kubernetes.controllermanager.http.request.duration.us.count`*::
-+
---
-Request count for duration
-
-type: long
-
---
-
-*`kubernetes.controllermanager.http.request.size.bytes.percentile.*`*::
-+
---
-Request size percentiles
-
-type: object
-
---
-
-*`kubernetes.controllermanager.http.request.size.bytes.sum`*::
-+
---
-Request size cumulative sum
-
-type: long
-
-format: bytes
-
---
-
-*`kubernetes.controllermanager.http.request.size.bytes.count`*::
-+
---
-Request count for size
-
-type: long
-
---
-
-*`kubernetes.controllermanager.http.response.size.bytes.percentile.*`*::
-+
---
-Response size percentiles
-
-type: object
-
---
-
-*`kubernetes.controllermanager.http.response.size.bytes.sum`*::
-+
---
-Response size cumulative sum
-
-type: long
-
-format: bytes
-
---
-
-*`kubernetes.controllermanager.http.response.size.bytes.count`*::
-+
---
-Response count
-
-type: long
-
---
-
-*`kubernetes.controllermanager.http.request.count`*::
-+
---
-Request count for response
-
-type: long
-
---
-
 *`kubernetes.controllermanager.client.request.count`*::
 +
 --
 Number of requests as client
 
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.client.request.duration.us.bucket.*`*::
++
+--
+Response latency distribution, histogram buckets
+
+type: object
+
+--
+
+*`kubernetes.controllermanager.client.request.duration.us.sum`*::
++
+--
+Request duration, sum in microseconds
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.client.request.duration.us.count`*::
++
+--
+Request duration, number of operations
 
 type: long
 

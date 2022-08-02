@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Elasticsearch module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is the elasticsearch module.
 
 include::../include/what-happens.asciidoc[]
@@ -136,4 +138,4 @@ include::../include/timezone-support.asciidoc[]
 For a description of each field in the module, see the
 <<exported-fields-elasticsearch,exported fields>> section.
 
-edit_url!:
+:edit_url!:
