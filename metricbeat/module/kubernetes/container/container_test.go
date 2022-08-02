@@ -50,18 +50,16 @@ func TestEventMapping(t *testing.T) {
 	nodeMetrics := util.NewNodeMetrics()
 	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
 	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	metricsRepo.SetNodeMetrics(nodeName, nodeMetrics)
+	addNodeMetric(metricsRepo, nodeName, nodeMetrics)
 
 	namespace := "default"
 	podName := "nginx-deployment-2303442956-pcqfc"
 	podId := util.NewPodId(namespace, podName)
-
 	containerName := "nginx"
-	containerId := util.NewContainerId(podId, containerName)
 
 	containerMetrics := util.NewContainerMetrics()
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	metricsRepo.SetContainerMetrics(nodeName, containerId, containerMetrics)
+	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
 
 	events, err := eventMapping(body, metricsRepo, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
@@ -120,4 +118,16 @@ func testValue(t *testing.T, event mapstr.M, field string, value interface{}) {
 	data, err := event.GetValue(field)
 	assert.NoError(t, err, "Could not read field "+field)
 	assert.EqualValues(t, data, value, "Wrong value for field "+field)
+}
+
+func addContainerMetric(metricsRepo *util.MetricsRepo, nodeName string, podId util.PodId, containerName string, containerMetric *util.ContainerMetrics) {
+	nodeStore, _ := metricsRepo.Add(nodeName)
+	podStore, _ := nodeStore.Add(podId)
+	containerMetrics, _ := podStore.Add(containerName)
+	containerMetrics.Set(containerMetric)
+}
+
+func addNodeMetric(metricsRepo *util.MetricsRepo, nodeName string, nodeMetrics *util.NodeMetrics) {
+	nodeStore, _ := metricsRepo.Add(nodeName)
+	nodeStore.SetMetrics(nodeMetrics)
 }
