@@ -50,6 +50,10 @@ type Metrics struct {
 
 	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
 	OldestActiveTimestamp common.Time
+
+	// OldestActiveID is ID of the oldest unacknowledged event in the queue, or
+	// the next ID that will be assigned if the queue is empty.
+	OldestEntryID EntryID
 }
 
 // ErrMetricsNotImplemented is a hopefully temporary type to mark queue metrics as not yet implemented

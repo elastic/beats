@@ -27,7 +27,7 @@ import (
 // directEventLoop implements the broker main event loop. It buffers events,
 // but tries to forward events as early as possible.
 type directEventLoop struct {
-	broker *broker
+	broker *Broker
 	buf    ringBuffer
 
 	// pendingACKs aggregates a list of ACK channels for batches that have been sent
@@ -40,7 +40,7 @@ type directEventLoop struct {
 // bufferingEventLoop implements the broker main event loop.
 // Events in the buffer are forwarded to consumers only if the buffer is full or on flush timeout.
 type bufferingEventLoop struct {
-	broker *broker
+	broker *Broker
 
 	buf       *batchBuffer
 	flushList flushList
@@ -73,7 +73,7 @@ type flushList struct {
 	count int
 }
 
-func newDirectEventLoop(b *broker, size int) *directEventLoop {
+func newDirectEventLoop(b *Broker, size int) *directEventLoop {
 	l := &directEventLoop{
 		broker: b,
 	}
@@ -138,7 +138,19 @@ func (l *directEventLoop) run() {
 }
 
 func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
-	req.responseChan <- memQueueMetrics{currentQueueSize: l.buf.Items(), occupiedRead: l.buf.reserved}
+	// If the queue is empty, we report the "oldest" ID as the next
+	// one that will be assigned. Otherwise, we report the ID attached
+	// to the oldest queueEntry.
+	oldestEntryID := l.nextEntryID
+	if oldestEntry := l.buf.OldestEntry(); oldestEntry != nil {
+		oldestEntryID = oldestEntry.id
+	}
+
+	req.responseChan <- memQueueMetrics{
+		currentQueueSize: l.buf.Items(),
+		occupiedRead:     l.buf.reserved,
+		oldestEntryID:    oldestEntryID,
+	}
 }
 
 func (l *directEventLoop) insert(req *pushRequest) {
@@ -235,7 +247,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 	}
 }
 
-func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time.Duration) *bufferingEventLoop {
+func newBufferingEventLoop(b *Broker, size int, minEvents int, flushTimeout time.Duration) *bufferingEventLoop {
 	l := &bufferingEventLoop{
 		broker:       b,
 		maxEvents:    size,
@@ -309,7 +321,20 @@ func (l *bufferingEventLoop) run() {
 }
 
 func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
-	req.responseChan <- memQueueMetrics{currentQueueSize: l.eventCount, occupiedRead: l.unackedEventCount}
+	oldestEntryID := l.nextEntryID
+	// If we have ACKs pending, the oldest id is the first one.
+	// Otherwise, it's still in the flush list. If both are empty,
+	// then we report the "oldest" as the next id that will be assigned.
+	if !l.pendingACKs.empty() {
+		oldestEntryID = l.pendingACKs.head.entries[0].id
+	} else if !l.flushList.empty() {
+		oldestEntryID = l.flushList.head.entries[0].id
+	}
+	req.responseChan <- memQueueMetrics{
+		currentQueueSize: l.eventCount,
+		occupiedRead:     l.unackedEventCount,
+		oldestEntryID:    oldestEntryID,
+	}
 }
 
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {

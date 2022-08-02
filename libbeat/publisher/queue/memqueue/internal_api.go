@@ -69,4 +69,6 @@ type memQueueMetrics struct {
 	currentQueueSize int
 	// the number of items that have been read by a consumer but not yet ack'ed
 	occupiedRead int
+
+	oldestEntryID queue.EntryID
 }

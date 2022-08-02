@@ -201,3 +201,10 @@ func (b *ringBuffer) Size() int {
 func (b *ringBuffer) Items() int {
 	return b.regA.size + b.regB.size
 }
+
+func (b *ringBuffer) OldestEntry() *queueEntry {
+	if b.regA.size == 0 {
+		return nil
+	}
+	return &b.entries[b.regA.index]
+}

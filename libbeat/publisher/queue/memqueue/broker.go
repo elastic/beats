@@ -34,7 +34,7 @@ const (
 	maxInputQueueSizeRatio = 0.1
 )
 
-type broker struct {
+type Broker struct {
 	done chan struct{}
 
 	logger *logp.Logger
@@ -104,7 +104,7 @@ type queueEntry struct {
 }
 
 type batch struct {
-	queue    *broker
+	queue    *Broker
 	entries  []queueEntry
 	doneChan chan batchDoneMsg
 }
@@ -161,7 +161,7 @@ func create(
 func NewQueue(
 	logger *logp.Logger,
 	settings Settings,
-) queue.Queue {
+) *Broker {
 	var (
 		sz           = settings.Events
 		minEvents    = settings.FlushMinEvents
@@ -185,7 +185,7 @@ func NewQueue(
 		logger = logp.NewLogger("memqueue")
 	}
 
-	b := &broker{
+	b := &Broker{
 		done:   make(chan struct{}),
 		logger: logger,
 
@@ -231,22 +231,22 @@ func NewQueue(
 	return b
 }
 
-func (b *broker) Close() error {
+func (b *Broker) Close() error {
 	close(b.done)
 	return nil
 }
 
-func (b *broker) BufferConfig() queue.BufferConfig {
+func (b *Broker) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
 		MaxEvents: b.bufSize,
 	}
 }
 
-func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
+func (b *Broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
 }
 
-func (b *broker) Get(count int) (queue.Batch, error) {
+func (b *Broker) Get(count int) (queue.Batch, error) {
 	responseChan := make(chan getResponse, 1)
 	select {
 	case <-b.done:
@@ -264,7 +264,7 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	}, nil
 }
 
-func (b *broker) Metrics() (queue.Metrics, error) {
+func (b *Broker) Metrics() (queue.Metrics, error) {
 
 	responseChan := make(chan memQueueMetrics, 1)
 	select {
@@ -279,6 +279,7 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
 		EventLimit:            opt.UintWith(uint64(b.bufSize)),
 		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
+		OldestEntryID:         resp.oldestEntryID,
 	}, nil
 }
 
