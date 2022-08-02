@@ -48,8 +48,8 @@ func TestEventMapping(t *testing.T) {
 	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
 
 	nodeMetrics := util.NewNodeMetrics()
-	nodeMetrics.CoresAllocatable = 2
-	nodeMetrics.MemoryAllocatable = 146227200
+	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
+	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
 	metricsRepo.SetNodeMetrics(nodeName, nodeMetrics)
 
 	namespace := "default"
@@ -60,7 +60,7 @@ func TestEventMapping(t *testing.T) {
 	containerId := util.NewContainerId(podId, containerName)
 
 	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = 14622720
+	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
 	metricsRepo.SetContainerMetrics(nodeName, containerId, containerMetrics)
 
 	events, err := eventMapping(body, metricsRepo, logger)
