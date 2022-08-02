@@ -11712,11 +11712,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-structform
-Version: v0.0.9
+Version: v0.0.10
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v0.0.9/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v0.0.10/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
