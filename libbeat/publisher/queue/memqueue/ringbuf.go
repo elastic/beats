@@ -52,11 +52,6 @@ type region struct {
 	size int
 }
 
-/*type producerEventState struct {
-	eventIndex uint64 // Order of the event in its originating producer, independent of queue ID
-	producer   *ackProducer
-}*/
-
 func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	*b = ringBuffer{
 		logger:  logger,
