@@ -23,12 +23,12 @@ import (
 )
 
 type forgetfulProducer struct {
-	broker    *Broker
+	broker    *broker
 	openState openState
 }
 
 type ackProducer struct {
-	broker        *Broker
+	broker        *broker
 	dropOnCancel  bool
 	producedCount uint64
 	state         produceState
@@ -57,7 +57,7 @@ type produceState struct {
 
 type ackHandler func(count int)
 
-func newProducer(b *Broker, cb ackHandler, dropCB func(interface{}), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		log:    b.logger,
 		done:   make(chan struct{}),

@@ -23,7 +23,7 @@ package memqueue
 // broker event loop.
 // Producer ACKs are run in the ackLoop go-routine.
 type ackLoop struct {
-	broker *Broker
+	broker *broker
 
 	// A list of ACK channels given to queue consumers,
 	// used to maintain sequencing of event acknowledgements.

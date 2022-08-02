@@ -27,7 +27,7 @@ import (
 // directEventLoop implements the broker main event loop. It buffers events,
 // but tries to forward events as early as possible.
 type directEventLoop struct {
-	broker *Broker
+	broker *broker
 	buf    ringBuffer
 
 	// pendingACKs aggregates a list of ACK channels for batches that have been sent
@@ -40,7 +40,7 @@ type directEventLoop struct {
 // bufferingEventLoop implements the broker main event loop.
 // Events in the buffer are forwarded to consumers only if the buffer is full or on flush timeout.
 type bufferingEventLoop struct {
-	broker *Broker
+	broker *broker
 
 	buf       *batchBuffer
 	flushList flushList
@@ -73,7 +73,7 @@ type flushList struct {
 	count int
 }
 
-func newDirectEventLoop(b *Broker, size int) *directEventLoop {
+func newDirectEventLoop(b *broker, size int) *directEventLoop {
 	l := &directEventLoop{
 		broker: b,
 	}
@@ -247,7 +247,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 	}
 }
 
-func newBufferingEventLoop(b *Broker, size int, minEvents int, flushTimeout time.Duration) *bufferingEventLoop {
+func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time.Duration) *bufferingEventLoop {
 	l := &bufferingEventLoop{
 		broker:       b,
 		maxEvents:    size,
