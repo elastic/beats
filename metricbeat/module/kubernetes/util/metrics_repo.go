@@ -17,6 +17,10 @@
 
 package util
 
+import (
+	"sync"
+)
+
 type PodId struct {
 	Namespace string
 	PodName   string
@@ -48,14 +52,14 @@ type NodeStore struct {
 }
 
 type MetricsRepo struct {
-	// sync.RWMutex
+	sync.RWMutex
 	nodes map[string]*NodeStore
 }
 
 func NewPodId(namespace, podName string) PodId {
 	return PodId{
 		Namespace: namespace,
-		PodName: podName,
+		PodName:   podName,
 	}
 }
 
@@ -129,23 +133,23 @@ func NewPodStore() *PodStore {
 }
 
 func (mr *MetricsRepo) SetNodeMetrics(nodeName string, metrics *NodeMetrics) {
-	// mr.Lock()
-	// defer mr.Unlock()
+	mr.Lock()
+	defer mr.Unlock()
 	nodeStore, _ := mr.add(nodeName)
 	nodeStore.metrics.set(metrics)
 }
 
 func (mr *MetricsRepo) SetContainerMetrics(nodeName string, containerId ContainerId, metrics *ContainerMetrics) {
-	// mr.Lock()
-	// defer mr.Unlock()
+	mr.Lock()
+	defer mr.Unlock()
 	nodeStore, _ := mr.add(nodeName)
 	podStore, _ := nodeStore.add(containerId.PodId)
 	podStore.setContainerMetrics(containerId.ContainerName, metrics)
 }
 
 func (mr *MetricsRepo) GetNodeMetrics(nodeName string) *NodeMetrics {
-	// mr.RLock()
-	// defer mr.RLock()
+	mr.RLock()
+	defer mr.RUnlock()
 	nodeStore := mr.get(nodeName)
 	if nodeStore == nil {
 		return NewNodeMetrics()
@@ -154,8 +158,8 @@ func (mr *MetricsRepo) GetNodeMetrics(nodeName string) *NodeMetrics {
 }
 
 func (mr *MetricsRepo) GetContainerMetrics(nodeName string, containerId ContainerId) *ContainerMetrics {
-	// mr.RLock()
-	// defer mr.RLock()
+	mr.RLock()
+	defer mr.RUnlock()
 	nodeStore := mr.get(nodeName)
 	if nodeStore == nil {
 		return NewContainerMetrics()
@@ -219,16 +223,16 @@ func (ps *PodStore) setContainerMetrics(containerName string, metrics *Container
 }
 
 func (mr *MetricsRepo) DeleteAllNodes() {
-	// mr.Lock()
-	// defer mr.Unlock()
+	mr.Lock()
+	defer mr.Unlock()
 	for nodeName := range mr.nodes {
 		delete(mr.nodes, nodeName)
 	}
 }
 
 func (mr *MetricsRepo) PodNames(nodeName string) []PodId {
-	// mr.RLock()
-	// defer mr.RUnlock()
+	mr.RLock()
+	defer mr.RUnlock()
 	nodeStore := mr.get(nodeName)
 	if nodeStore == nil {
 		return []PodId{}
@@ -242,8 +246,8 @@ func (mr *MetricsRepo) PodNames(nodeName string) []PodId {
 }
 
 func (mr *MetricsRepo) NodeNames() []string {
-	// mr.RLock()
-	// defer mr.RUnlock()
+	mr.RLock()
+	defer mr.RUnlock()
 	ans := make([]string, 0, len(mr.nodes))
 	for nodeName := range mr.nodes {
 		ans = append(ans, nodeName)
@@ -252,14 +256,14 @@ func (mr *MetricsRepo) NodeNames() []string {
 }
 
 func (mr *MetricsRepo) DeleteNode(nodeName string) {
-	// mr.Lock()
-	// defer mr.Unlock()
+	mr.Lock()
+	defer mr.Unlock()
 	delete(mr.nodes, nodeName)
 }
 
 func (mr *MetricsRepo) DeletePod(nodeName string, podId PodId) {
-	// mr.Lock()
-	// defer mr.Unlock()
+	mr.Lock()
+	defer mr.Unlock()
 	node, exists := mr.nodes[nodeName]
 	if exists {
 		delete(node.pods, podId)
