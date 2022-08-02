@@ -62,11 +62,7 @@ setup.template.settings:
 #fields:
 #  env: staging
 
-heartbeat:
-  jobs:
-    browser:
-      limit: 42
-#heartbeat.scheduler.limit: 20
+
 # =================================== Kibana ===================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
