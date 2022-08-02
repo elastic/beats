@@ -217,6 +217,10 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 		entry := &entries[idx]
 
 		producer := entry.producer
+
+		// Set the producer in the entires array to nil to mark it as visited; a nil
+		// producer indicates that an entry requires no more ack processing (either
+		// because it has already been ACKed, or because its producer does not listen to ACKs).
 		entry.producer = nil
 		if producer == nil || entry.producerID <= producer.state.lastACK {
 			// This has a lower index than the previous ACK for this producer,
