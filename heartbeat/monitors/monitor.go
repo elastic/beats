@@ -19,8 +19,9 @@ package monitors
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
 

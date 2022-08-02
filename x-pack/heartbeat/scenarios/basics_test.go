@@ -1,12 +1,18 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package scenarios
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestSimpleScenariosBasicFields(t *testing.T) {

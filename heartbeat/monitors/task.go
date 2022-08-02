@@ -20,6 +20,7 @@ package monitors
 import (
 	"context"
 	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -81,14 +82,14 @@ func (t *configuredJob) Start(pubClient pipeline.ISyncClient) {
 	t.pubClient = pubClient
 
 	if err != nil {
-		logp.Err("could not start monitor: %v", err)
+		logp.L().Info("could not start monitor: %v", err)
 		return
 	}
 
 	tf := t.makeSchedulerTaskFunc()
 	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, pubClient.Wait)
 	if err != nil {
-		logp.Err("could not start monitor: %v", err)
+		logp.L().Info("could not start monitor: %v", err)
 	}
 }
 
@@ -109,7 +110,7 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient) []scheduler.Tas
 
 	conts, err := job(event)
 	if err != nil {
-		logp.Err("Job failed with: %s", err)
+		logp.L().Info("Job failed with: %s", err)
 	}
 
 	hasContinuations := len(conts) > 0
@@ -124,10 +125,10 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient) []scheduler.Tas
 				Meta:      event.Meta.Clone(),
 				Fields:    event.Fields.Clone(),
 			}
-			pubClient.Publish(clone)
+			_ = pubClient.Publish(clone)
 		} else {
 			// no clone needed if no continuations
-			pubClient.Publish(*event)
+			_ = pubClient.Publish(*event)
 		}
 	}
 

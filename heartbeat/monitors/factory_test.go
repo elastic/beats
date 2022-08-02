@@ -18,9 +18,10 @@
 package monitors
 
 import (
-	"github.com/stretchr/testify/require"
 	"regexp"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -162,8 +163,8 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	reg, built, closed := MockPluginsReg()
 	mockPipeline := &MockPipeline{}
 
-	f, sched, close := MakeMockFactory(reg)
-	defer close()
+	f, sched, fClose := MakeMockFactory(reg)
+	defer fClose()
 
 	makeTestMon := func() (*Monitor, error) {
 		mIface, err := f.Create(mockPipeline, serverMonConf)

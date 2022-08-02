@@ -1,7 +1,21 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package scenarios
 
 import (
 	"fmt"
+	"net/http/httptest"
+	"net/url"
+	"os"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -12,14 +26,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/gofrs/uuid"
-	"github.com/stretchr/testify/require"
-	"net/http/httptest"
-	"net/url"
-	"os"
-	"sync"
-	"testing"
-	"time"
 )
 
 type ScenarioRun func() (config mapstr.M, close func(), err error)
@@ -31,8 +37,8 @@ type Scenario struct {
 }
 
 func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error)) {
-	config, close, err := s.Runner()
-	defer close()
+	cfg, rClose, err := s.Runner()
+	defer rClose()
 	if err != nil {
 		callback(nil, err)
 		return
@@ -40,8 +46,8 @@ func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error
 
 	t.Run(s.Name, func(t *testing.T) {
 		t.Parallel()
-		mtr, err := runMonitorOnce(t, config)
-		mtr.Config = config
+		mtr, err := runMonitorOnce(t, cfg)
+		mtr.Config = cfg
 		mtr.Wait()
 		callback(mtr, err)
 		mtr.Close()
@@ -137,7 +143,10 @@ var Scenarios = ScenarioDB{
 			Name: "simple-browser",
 			Tags: []string{},
 			Runner: func() (config mapstr.M, close func(), err error) {
-				os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
+				err = os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
+				if err != nil {
+					return nil, nil, err
+				}
 				server := httptest.NewServer(hbtest.HelloWorldHandler(200))
 				config = mapstr.M{
 					"id":       "browser-test-id",

@@ -19,7 +19,6 @@ package monitors
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -32,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
