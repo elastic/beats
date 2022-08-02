@@ -206,7 +206,7 @@ func (c *Client) handleError(err error) error {
 		c.log.Debugf("handle error: %+v", err)
 
 		var nerr net.Error
-		if errors.As(err, &nerr) && !(nerr.Temporary() || nerr.Timeout()) {
+		if errors.As(err, &nerr) && !nerr.Timeout() {
 			_ = c.Close()
 		}
 	}

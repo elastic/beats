@@ -6,13 +6,23 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Add option to `file.NewFileRotator` to allow setting file extension. #68
-
 ### Changed
 
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+## [0.2.10]
+
+### Added
+
+- Add option to `file.NewFileRotator` to allow setting file extension. #68
+
+### Changed
+
+- dev-tools: remove support for golanci-lint version templating, fix for notice target modifying go.sum. #70
 
 ### Fixed
 

@@ -105,7 +105,7 @@ func TestCAPinning(t *testing.T) {
 
 				l, err := net.Listen("tcp", addr)
 
-				server := &http.Server{
+				server := &http.Server{ //nolint:gosec // testing
 					Handler: mux,
 					TLSConfig: &tls.Config{ //nolint:gosec // testing
 						Certificates: []tls.Certificate{
@@ -191,7 +191,7 @@ func TestCAPinning(t *testing.T) {
 		// RootCAs will trust the intermediate, intermediate will trust the server.
 		serverCert.Certificate = append(serverCert.Certificate, intermediate.Certificate...)
 
-		server := &http.Server{
+		server := &http.Server{ //nolint:gosec // testing
 			Handler: mux,
 			TLSConfig: &tls.Config{ //nolint:gosec // testing
 				Certificates: []tls.Certificate{
@@ -265,7 +265,7 @@ func TestCAPinning(t *testing.T) {
 		// RootCAs will trust the intermediate, intermediate will trust the server.
 		serverCert.Certificate = append(serverCert.Certificate, intermediate.Certificate...)
 
-		server := &http.Server{
+		server := &http.Server{ //nolint:gosec // testing
 			Handler: mux,
 			TLSConfig: &tls.Config{ //nolint:gosec // testing
 				Certificates: []tls.Certificate{

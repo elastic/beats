@@ -21,71 +21,25 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
-	"text/template"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
 const (
-	linterInstallURL             = "https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
-	linterInstallFilename        = "./build/intall-golang-ci.sh"
-	linterBinaryFilename         = "./build/golangci-lint"
-	linterVersion                = "v1.45.2"
-	linterConfigFilename         = "./.golangci.yml"
-	linterConfigTemplateFilename = "./dev-tools/templates/.golangci.yml"
+	linterInstallURL      = "https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
+	linterInstallFilename = "./build/install-golang-ci.sh"
+	linterBinaryFilename  = "./build/golangci-lint"
+	linterVersion         = "v1.47.2"
+	linterConfigFilename  = "./.golangci.yml"
 )
 
 // Linter contains targets related to linting the Go code
 type Linter mg.Namespace
-
-// UpdateGoVersion updates the linter configuration with the new version of Go.
-func (Linter) UpdateGoVersion() error {
-	goVersionBytes, err := ioutil.ReadFile(goVersionFilename)
-	if err != nil {
-		return fmt.Errorf("failed to read the %q file: %w", goVersionFilename, err)
-	}
-	goVersion := strings.TrimSpace(string(goVersionBytes))
-	log.Printf("The Go version is %s\n", goVersion)
-
-	templateContext := struct{ GoVersion string }{GoVersion: goVersion}
-	template, err := template.ParseFiles(linterConfigTemplateFilename)
-	if err != nil {
-		return fmt.Errorf("failed to read the template file %q: %w", linterConfigTemplateFilename, err)
-	}
-
-	configFile, err := os.OpenFile(linterConfigFilename, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0700)
-	if err != nil {
-		return fmt.Errorf("failed to create/replace the linter config %q: %w", linterConfigFilename, err)
-	}
-	defer configFile.Close()
-
-	warning := fmt.Sprintf("# DO NOT EDIT!\n# This file is a rendered template, the source can be found in %q\n#\n", linterConfigTemplateFilename)
-	_, err = configFile.WriteString(warning)
-	if err != nil {
-		return fmt.Errorf("failed to write into the linter config %q: %w", linterConfigFilename, err)
-	}
-
-	err = template.Execute(configFile, templateContext)
-	if err != nil {
-		return fmt.Errorf("failed to execute the template %q: %w", linterConfigTemplateFilename, err)
-	}
-
-	err = assertUnchanged(linterConfigFilename)
-	if err != nil {
-		log.Printf("Successfully updated the linter configuration %q to Go version %s, please commit the changes now", linterConfigFilename, goVersion)
-	} else {
-		log.Printf("The linter configuration %q is up to date, no changes made", linterConfigFilename)
-	}
-
-	return nil
-}
 
 // CheckConfig makes sure that the `.golangci.yml` does not have uncommitted changes
 func (Linter) CheckConfig() error {
@@ -100,6 +54,16 @@ func (Linter) CheckConfig() error {
 // using the official installation script downloaded from GitHub.
 // If the linter binary already exists does nothing.
 func (Linter) Install() error {
+	return install(false)
+}
+
+// ForceInstall force installs the linter regardless of whether it exists or not.
+// Useful primarily when the linter version should be updated.
+func (Linter) ForceInstall() error {
+	return install(true)
+}
+
+func install(force bool) error {
 	dirPath := filepath.Dir(linterBinaryFilename)
 	err := os.MkdirAll(dirPath, 0700)
 	if err != nil {
@@ -107,11 +71,11 @@ func (Linter) Install() error {
 	}
 
 	_, err = os.Stat(linterBinaryFilename)
-	if err == nil {
+	if !force && err == nil {
 		log.Println("The linter has been already installed, skipping...")
 		return nil
 	}
-	if !errors.Is(err, os.ErrNotExist) {
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("failed check if file %q exists: %w", linterBinaryFilename, err)
 	}
 

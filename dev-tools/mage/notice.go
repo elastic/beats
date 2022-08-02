@@ -34,6 +34,11 @@ func GenerateNotice(overrides, rules, noticeTemplate string) error {
 		return fmt.Errorf("error while downloading dependencies: %w", err)
 	}
 
+	// Ensure the go.mod file is left unchanged after go mod download all runs.
+	// go mod download will modify go.sum in a way that conflicts with go mod tidy.
+	// https://github.com/golang/go/issues/43994#issuecomment-770053099
+	defer gotool.Mod.Tidy() //nolint:errcheck // No value in handling this error.
+
 	out, _ := gotool.ListDepsForNotice()
 	depsFile, _ := os.CreateTemp("", "depsout")
 	defer os.Remove(depsFile.Name())

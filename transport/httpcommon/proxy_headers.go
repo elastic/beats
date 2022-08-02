@@ -75,7 +75,7 @@ func (p *ProxyHeaders) UnmarshalYAML(unmarshal func(interface{}) error) error {
 // URI returns conventional url.URL structure.
 func (p ProxyHeaders) Headers() http.Header {
 	var httpHeaders http.Header
-	if p != nil && len(p) > 0 {
+	if len(p) > 0 {
 		httpHeaders = http.Header{}
 		for k, v := range p {
 			httpHeaders.Add(k, v)
