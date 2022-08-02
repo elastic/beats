@@ -218,14 +218,12 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 func TestEnrichSynthEvent(t *testing.T) {
 	tests := []struct {
 		name    string
-		je      *journeyEnricher
 		se      *SynthEvent
 		wantErr bool
 		check   func(t *testing.T, e *beat.Event, je *journeyEnricher)
 	}{
 		{
 			"cmd/status - with error",
-			&journeyEnricher{},
 			&SynthEvent{
 				Type:  CmdStatus,
 				Error: &SynthError{Name: "cmdexit", Message: "cmd err msg"},
@@ -245,7 +243,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 			// If a journey did not emit `journey/end` but exited without
 			// errors, we consider the journey to be up.
 			"cmd/status - without error",
-			&journeyEnricher{},
 			&SynthEvent{
 				Type:  CmdStatus,
 				Error: nil,
@@ -263,7 +260,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"journey/end",
-			&journeyEnricher{},
 			&SynthEvent{Type: JourneyEnd},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -278,7 +274,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"step/end",
-			&journeyEnricher{},
 			&SynthEvent{Type: "step/end"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -287,7 +282,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"step/screenshot",
-			&journeyEnricher{},
 			&SynthEvent{Type: "step/screenshot"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -296,7 +290,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"step/screenshot_ref",
-			&journeyEnricher{},
 			&SynthEvent{Type: "step/screenshot_ref"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -305,7 +298,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"step/screenshot_block",
-			&journeyEnricher{},
 			&SynthEvent{Type: "screenshot/block", Id: "my_id"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -316,7 +308,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"journey/network_info",
-			&journeyEnricher{},
 			&SynthEvent{Type: "journey/network_info"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -327,11 +318,12 @@ func TestEnrichSynthEvent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			je := newJourneyEnricher(newStreamEnricher(stdfields.StdMonitorFields{}))
 			e := &beat.Event{}
-			if err := tt.je.enrichSynthEvent(e, tt.se); (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
+			if err := je.enrichSynthEvent(e, tt.se); (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
 				t.Errorf("journeyEnricher.enrichSynthEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			tt.check(t, e, tt.je)
+			tt.check(t, e, je)
 		})
 	}
 }
