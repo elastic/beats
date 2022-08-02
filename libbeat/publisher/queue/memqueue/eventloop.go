@@ -141,16 +141,13 @@ func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
 	req.responseChan <- memQueueMetrics{currentQueueSize: l.buf.Items(), occupiedRead: l.buf.reserved}
 }
 
-// Returns true if the queue is full after handling the insertion request.
 func (l *directEventLoop) insert(req *pushRequest) {
 	log := l.broker.logger
 
 	if req.producer != nil && req.producer.state.cancelled {
 		reportCancelledState(log, req)
 	} else {
-		if req.resp != nil {
-			req.resp <- l.nextEntryID
-		}
+		req.resp <- l.nextEntryID
 		l.buf.insert(queueEntry{
 			event:      req.event,
 			id:         l.nextEntryID,
@@ -207,10 +204,15 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 	entries := l.buf.entries
 
 	firstIndex := lst.front().start
-	// We traverse the block of events newest to oldest so we encounter the
+
+	// We want to acknowledge N events starting at position firstIndex
+	// in the entries array.
+	// We iterate over the events from last to first, so we encounter the
 	// highest produer IDs first and can skip subsequent callbacks to the
 	// same producer.
 	for i := N - 1; i >= 0; i-- {
+		// idx is the index in entries of the i-th event after firstIndex, wrapping
+		// around the end of the array.
 		idx := (firstIndex + i) % len(entries)
 		entry := &entries[idx]
 
@@ -308,10 +310,9 @@ func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
 
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 	if l.insert(req, l.nextEntryID) {
-		if req.resp != nil {
-			// If there is a response channel, send back the new event id.
-			req.resp <- l.nextEntryID
-		}
+		// Send back the new event id.
+		req.resp <- l.nextEntryID
+
 		l.nextEntryID++
 		l.eventCount++
 
