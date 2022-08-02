@@ -55,7 +55,6 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 			addMonitorTimespan(stdMonFields),
 			addServiceName(stdMonFields),
 			addMonitorMeta(stdMonFields, len(js) > 1),
-			addMonitorError(),
 			addMonitorStatus(false),
 			addMonitorDuration,
 		),
@@ -68,19 +67,14 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
 func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
-	return jobs.WrapAllSeparately(
-		jobs.WrapAll(
-			js,
-			addMonitorTimespan(stdMonFields),
-			addServiceName(stdMonFields),
-			addMonitorMeta(stdMonFields, false),
-			addMonitorError(),
-			addMonitorStatus(true),
-			logJourneySummaries,
-		),
-		func() jobs.JobWrapper {
-			return makeAddSummary()
-		})
+	return jobs.WrapAll(
+		js,
+		addMonitorTimespan(stdMonFields),
+		addServiceName(stdMonFields),
+		addMonitorMeta(stdMonFields, false),
+		addMonitorStatus(true),
+		logJourneySummaries,
+	)
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
@@ -186,38 +180,16 @@ func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration
 	}
 }
 
-func addMonitorError() jobs.JobWrapper {
-	return func(origJob jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, err := origJob(event)
-			if err != nil {
-				var asECS *ecserr.ECSErr
-				if errors.As(err, &asECS) {
-					// Override the message of the error in the event it was wrapped
-					asECS.Message = err.Error()
-					eventext.MergeEventFields(event, mapstr.M{"error": asECS})
-				} else {
-					eventext.MergeEventFields(event, mapstr.M{"error": look.Reason(err)})
-				}
-			}
-			return cont, err
-		}
-	}
-}
-
 // addMonitorStatus wraps the given Job's execution such that any error returned
 // by the original Job will be set as a field. The original error will not be
 // passed through as a return value. Errors may still be present but only if there
 // is an actual error wrapping the error.
-//
-// onSummaryOnly is useful for browser monitors where we only want to add these
-// fields on the summary event.
-func addMonitorStatus(onSummaryOnly bool) jobs.JobWrapper {
+func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
 
-			if onSummaryOnly {
+			if summaryOnly {
 				hasSummary, _ := event.Fields.HasKey("summary.up")
 				if !hasSummary {
 					return cont, nil
@@ -229,9 +201,17 @@ func addMonitorStatus(onSummaryOnly bool) jobs.JobWrapper {
 					"status": look.Status(err),
 				},
 			}
-
+			if err != nil {
+				var asECS *ecserr.ECSErr
+				if errors.As(err, &asECS) {
+					// Override the message of the error in the event it was wrapped
+					asECS.Message = err.Error()
+					fields["error"] = asECS
+				} else {
+					fields["error"] = look.Reason(err)
+				}
+			}
 			eventext.MergeEventFields(event, fields)
-			// Note that we fully consume the error and always pass nil on here
 			return cont, nil
 		}
 	}
@@ -292,7 +272,6 @@ func makeAddSummary() jobs.JobWrapper {
 		down       uint16
 		checkGroup string
 		generation uint64
-		sawSummary bool
 	}{
 		mtx: sync.Mutex{},
 	}
@@ -316,11 +295,6 @@ func makeAddSummary() jobs.JobWrapper {
 			state.mtx.Lock()
 			defer state.mtx.Unlock()
 
-			sawSummary, _ := event.Fields.HasKey("summary")
-			if sawSummary {
-				state.sawSummary = true
-			}
-
 			// If the event is cancelled we don't record it as being either up or down since
 			// we discard the event anyway.
 			var eventStatus interface{}
@@ -342,7 +316,7 @@ func makeAddSummary() jobs.JobWrapper {
 			state.remaining--
 
 			// After last job
-			if state.remaining == 0 && !state.sawSummary {
+			if state.remaining == 0 {
 				up := state.up
 				down := state.down
 

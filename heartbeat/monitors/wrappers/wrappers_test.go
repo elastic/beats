@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"net/url"
 	"reflect"
-	"regexp"
 	"testing"
 	"time"
 
@@ -491,19 +490,13 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 				"type":        "browser",
 				"check_group": inlineMonitorValues.checkGroup,
 			},
-			"summary": mapstr.M{
-				"up":   1,
-				"down": 0,
-			},
 		})
 		return nil, nil
 	}
 }
 
-var uuidishRegexp = regexp.MustCompile("^[a-f0-9\\-]+$")
-
-// Browser inline jobs monitor information should be altered
-// by the wrappers, unlike zip_url jobs
+// Browser inline jobs monitor information should not be altered
+// by the wrappers as they are handled separately in synth enricher
 func TestInlineBrowserJob(t *testing.T) {
 	sFields := testBrowserMonFields
 	sFields.ID = inlineMonitorValues.id
@@ -519,18 +512,9 @@ func TestInlineBrowserJob(t *testing.T) {
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{
 							"type":        "browser",
-							"status":      "up",
 							"id":          inlineMonitorValues.id,
 							"name":        inlineMonitorValues.name,
-							"check_group": isdef.IsStringMatching(uuidishRegexp),
-						},
-						// Gets marked as down because no status is reported
-						// TODO: enrich this test since it's not representative
-						// of real synthetics data, where much of the field logic
-						// is in enrich.go
-						"summary": map[string]interface{}{
-							"up":   1,
-							"down": 0,
+							"check_group": inlineMonitorValues.checkGroup,
 						},
 					}),
 					hbtestllext.MonitorTimespanValidator,
@@ -558,7 +542,7 @@ var legacyProjectMonitorValues = BrowserMonitor{
 	legacyProjectName: "My Project",
 }
 
-func makeProjectBrowserJob(t *testing.T, u string, projectErr error, bm BrowserMonitor) jobs.Job {
+func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr error, bm BrowserMonitor) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
@@ -573,17 +557,17 @@ func makeProjectBrowserJob(t *testing.T, u string, projectErr error, bm BrowserM
 				"duration":    mapstr.M{"us": bm.durationMs},
 			},
 		})
-
-		sumFields := mapstr.M{"up": 0, "down": 0}
-		if projectErr == nil {
-			sumFields["up"] = 1
-		} else {
-			sumFields["down"] = 1
+		if summary {
+			sumFields := mapstr.M{"up": 0, "down": 0}
+			if projectErr == nil {
+				sumFields["up"] = 1
+			} else {
+				sumFields["down"] = 1
+			}
+			eventext.MergeEventFields(event, mapstr.M{
+				"summary": sumFields,
+			})
 		}
-		eventext.MergeEventFields(event, mapstr.M{
-			"summary": sumFields,
-		})
-
 		return nil, projectErr
 	}
 }
@@ -617,17 +601,12 @@ func TestProjectBrowserJob(t *testing.T) {
 			"id":          projectMonitorValues.id,
 			"name":        projectMonitorValues.name,
 			"duration":    mapstr.M{"us": time.Second.Microseconds()},
-			"status":      "down",
 			"origin":      "my-origin",
-			"check_group": isdef.IsStringMatching(uuidishRegexp),
+			"check_group": projectMonitorValues.checkGroup,
 			"timespan": mapstr.M{
 				"gte": hbtestllext.IsTime,
 				"lt":  hbtestllext.IsTime,
 			},
-		},
-		"summary": map[string]interface{}{
-			"up":   0,
-			"down": 1,
 		},
 		"url": URLFields(urlU),
 	})
@@ -635,7 +614,7 @@ func TestProjectBrowserJob(t *testing.T) {
 	testCommonWrap(t, testDef{
 		"simple", // has no summary fields!
 		sFields,
-		[]jobs.Job{makeProjectBrowserJob(t, urlStr, nil, projectMonitorValues)},
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil, projectMonitorValues)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -648,7 +627,7 @@ func TestProjectBrowserJob(t *testing.T) {
 	testCommonWrap(t, testDef{
 		"with up summary",
 		sFields,
-		[]jobs.Job{makeProjectBrowserJob(t, urlStr, nil, projectMonitorValues)},
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, nil, projectMonitorValues)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -665,7 +644,7 @@ func TestProjectBrowserJob(t *testing.T) {
 	testCommonWrap(t, testDef{
 		"with down summary",
 		sFields,
-		[]jobs.Job{makeProjectBrowserJob(t, urlStr, fmt.Errorf("testerr"), projectMonitorValues)},
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, fmt.Errorf("testerr"), projectMonitorValues)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -711,7 +690,7 @@ func TestProjectBrowserJob(t *testing.T) {
 	testCommonWrap(t, testDef{
 		"legacy", // has no summary fields!
 		legacySFields,
-		[]jobs.Job{makeProjectBrowserJob(t, urlStr, nil, legacyProjectMonitorValues)},
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil, legacyProjectMonitorValues)},
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
@@ -732,7 +711,7 @@ func TestECSErrors(t *testing.T) {
 		wrappedEcsErr.Error(),
 	)
 
-	j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", wrappedEcsErr, projectMonitorValues)}, testBrowserMonFields)
+	j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", true, wrappedEcsErr, projectMonitorValues)}, testBrowserMonFields)
 	event := &beat.Event{}
 	_, err := j[0](event)
 	require.NoError(t, err)

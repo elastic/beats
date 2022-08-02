@@ -35,10 +35,9 @@ func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
 func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	if senr.je == nil || (se != nil && se.Type == JourneyStart) {
 		senr.je = newJourneyEnricher(senr)
-		if senr.je != nil {
-			senr.checkGroup = makeUuid()
-		}
 	}
+
+	_, _ = event.PutValue("monitor.check_group", senr.checkGroup)
 
 	return senr.je.enrich(event, se)
 }
@@ -115,9 +114,8 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	if je.journey != nil {
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{
-				"check_group": je.streamEnricher.checkGroup,
-				"id":          je.journey.ID,
-				"name":        je.journey.Name,
+				"id":   je.journey.ID,
+				"name": je.journey.Name,
 			},
 		})
 	}
@@ -206,6 +204,9 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	if je.journeyComplete {
 		return je.error
 	}
+
+	// create a new check group for the next journey
+	je.streamEnricher.checkGroup = makeUuid()
 
 	return fmt.Errorf("journey did not finish executing, %d steps ran: %w", je.stepCount, je.error)
 }

@@ -94,7 +94,9 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 			return nil, err
 		}
 		senr := newStreamEnricher(sFields)
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
+		// We don't just return the readResultsJob, otherwise we'd just send an empty event, execute it right away
+		// then it'll keep executing itself until we're truly done
+		return readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)(event)
 	}
 }
 
