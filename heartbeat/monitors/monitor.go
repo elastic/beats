@@ -35,7 +35,7 @@ import (
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
-var ErrMonitorDisabled = fmt.Errorf("monitor not loaded, disabled with enabled: false")
+var ErrMonitorDisabled = fmt.Errorf("monitor not loaded because its 'enabled' key was set to false")
 
 const (
 	MON_INIT = iota
