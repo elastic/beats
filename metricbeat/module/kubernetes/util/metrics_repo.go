@@ -313,10 +313,10 @@ func (ps *PodStore) GetContainerStore(containerName string) *ContainerStore {
 }
 
 // SetContainerMetrics set the container metrics.
-func (cm *ContainerStore) SetContainerMetrics(metrics *ContainerMetrics) {
-	cm.Lock()
-	defer cm.Unlock()
-	cm.metrics = metrics
+func (cs *ContainerStore) SetContainerMetrics(metrics *ContainerMetrics) {
+	cs.Lock()
+	defer cs.Unlock()
+	cs.metrics = metrics
 }
 
 // GetContainerMetrics returns a copy of the container metrics
