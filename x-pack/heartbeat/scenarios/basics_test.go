@@ -5,11 +5,13 @@
 package scenarios
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
-	"github.com/stretchr/testify/require"
-	"testing"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
