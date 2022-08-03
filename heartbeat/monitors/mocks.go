@@ -45,7 +45,7 @@ import (
 	"github.com/elastic/go-lookslike/validator"
 )
 
-func MakeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
+func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
 	id, _ := uuid.NewV4()
 	eid, _ := uuid.NewV4()
 	info := beat.Info{
@@ -82,25 +82,25 @@ func MakeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		sched.Stop
 }
 
-type MockClient struct {
+type mockClient struct {
 	publishLog []*beat.Event
 	pipeline   beat.Pipeline
 	closed     bool
 	mtx        sync.Mutex
 }
 
-func (c *MockClient) IsClosed() bool {
+func (c *mockClient) IsClosed() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	return c.closed
 }
 
-func (c *MockClient) Publish(e beat.Event) {
+func (c *mockClient) Publish(e beat.Event) {
 	c.PublishAll([]beat.Event{e})
 }
 
-func (c *MockClient) PublishAll(events []beat.Event) {
+func (c *mockClient) PublishAll(events []beat.Event) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -110,10 +110,10 @@ func (c *MockClient) PublishAll(events []beat.Event) {
 	}
 }
 
-func (c *MockClient) Wait() {
+func (c *mockClient) Wait() {
 }
 
-func (c *MockClient) Close() error {
+func (c *mockClient) Close() error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -125,7 +125,7 @@ func (c *MockClient) Close() error {
 	return nil
 }
 
-func (c *MockClient) PublishedEvents() []*beat.Event {
+func (c *mockClient) PublishedEvents() []*beat.Event {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -133,7 +133,7 @@ func (c *MockClient) PublishedEvents() []*beat.Event {
 }
 
 type MockPipeline struct {
-	Clients []*MockClient
+	Clients []*mockClient
 	mtx     sync.Mutex
 }
 
@@ -145,7 +145,7 @@ func (pc *MockPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	c := &MockClient{pipeline: pc}
+	c := &mockClient{pipeline: pc}
 
 	pc.Clients = append(pc.Clients, c)
 
@@ -170,7 +170,7 @@ func (pc *MockPipeline) PublishedEvents() []*beat.Event {
 	return events
 }
 
-func BaseMockEventMonitorValidator(id string, name string, status string) validator.Validator {
+func baseMockEventMonitorValidator(id string, name string, status string) validator.Validator {
 	var idMatcher isdef.IsDef
 	if id == "" {
 		idMatcher = isdef.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
@@ -189,9 +189,9 @@ func BaseMockEventMonitorValidator(id string, name string, status string) valida
 	})
 }
 
-func MockEventMonitorValidator(id string, name string) validator.Validator {
+func mockEventMonitorValidator(id string, name string) validator.Validator {
 	return lookslike.Strict(lookslike.Compose(
-		BaseMockEventMonitorValidator(id, name, "up"),
+		baseMockEventMonitorValidator(id, name, "up"),
 		hbtestllext.MonitorTimespanValidator,
 		hbtest.SummaryChecks(1, 0),
 		lookslike.MustCompile(mockEventCustomFields()),
@@ -211,7 +211,7 @@ func createMockJob() []jobs.Job {
 	return []jobs.Job{j}
 }
 
-func MockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
+func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 	reg := monitoring.NewRegistry()
 
 	built := atomic.NewInt(0)
@@ -246,14 +246,14 @@ func MockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 		closed
 }
 
-func MockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
+func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
 	reg := plugin.NewPluginsReg()
-	builder, built, closed := MockPluginBuilder()
+	builder, built, closed := mockPluginBuilder()
 	_ = reg.Add(builder)
 	return reg, built, closed
 }
 
-func MockPluginConf(t *testing.T, id string, name string, schedule string, url string) *config.C {
+func mockPluginConf(t *testing.T, id string, name string, schedule string, url string) *config.C {
 	confMap := map[string]interface{}{
 		"type":     "test",
 		"urls":     []string{url},
@@ -274,7 +274,7 @@ func MockPluginConf(t *testing.T, id string, name string, schedule string, url s
 
 // mockBadPluginConf returns a conf with an invalid plugin config.
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
-func MockBadPluginConf(t *testing.T, id string) *config.C {
+func mockBadPluginConf(t *testing.T, id string) *config.C {
 	confMap := map[string]interface{}{
 		"type":        "test",
 		"notanoption": []string{"foo"},
@@ -290,7 +290,7 @@ func MockBadPluginConf(t *testing.T, id string) *config.C {
 	return conf
 }
 
-func MockInvalidPluginConf(t *testing.T) *config.C {
+func mockInvalidPluginConf(t *testing.T) *config.C {
 	confMap := map[string]interface{}{
 		"hoeutnheou": "oueanthoue",
 	}
@@ -301,7 +301,7 @@ func MockInvalidPluginConf(t *testing.T) *config.C {
 	return conf
 }
 
-func MockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *config.C {
+func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *config.C {
 	confMap := map[string]interface{}{
 		"type":     "test",
 		"id":       id,

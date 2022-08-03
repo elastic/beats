@@ -38,8 +38,8 @@ import (
 func TestMonitorBasic(t *testing.T) {
 	testMonitorConfig(
 		t,
-		MockPluginConf(t, "myId", "myName", "@every 1ms", "http://example.net"),
-		MockEventMonitorValidator("myId", "myName"),
+		mockPluginConf(t, "myId", "myName", "@every 1ms", "http://example.net"),
+		mockEventMonitorValidator("myId", "myName"),
 	)
 }
 
@@ -50,7 +50,7 @@ func TestMonitorCfgError(t *testing.T) {
 		t,
 		MockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
 		lookslike.Compose(
-			BaseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
+			baseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
 			lookslike.MustCompile(mapstr.M{
 				"error": mapstr.M{
 					"message": isdef.IsStringContaining("missing required field"),
@@ -62,7 +62,7 @@ func TestMonitorCfgError(t *testing.T) {
 }
 
 func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Validator) {
-	reg, built, closed := MockPluginsReg()
+	reg, built, closed := mockPluginsReg()
 	pipel := &MockPipeline{}
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
@@ -108,8 +108,8 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 }
 
 func TestCheckInvalidConfig(t *testing.T) {
-	serverMonConf := MockInvalidPluginConf(t)
-	reg, built, closed := MockPluginsReg()
+	serverMonConf := mockInvalidPluginConf(t)
+	reg, built, closed := mockPluginsReg()
 	pipel := &MockPipeline{}
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)

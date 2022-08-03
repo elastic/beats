@@ -158,12 +158,12 @@ func TestPreProcessors(t *testing.T) {
 }
 
 func TestDuplicateMonitorIDs(t *testing.T) {
-	serverMonConf := MockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
-	badConf := MockBadPluginConf(t, "custom")
-	reg, built, closed := MockPluginsReg()
+	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
+	badConf := mockBadPluginConf(t, "custom")
+	reg, built, closed := mockPluginsReg()
 	mockPipeline := &MockPipeline{}
 
-	f, sched, fClose := MakeMockFactory(reg)
+	f, sched, fClose := makeMockFactory(reg)
 	defer fClose()
 
 	makeTestMon := func() (*Monitor, error) {
