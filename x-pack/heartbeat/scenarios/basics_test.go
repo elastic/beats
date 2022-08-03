@@ -5,6 +5,9 @@
 package scenarios
 
 import (
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/testslike"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -20,6 +23,17 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 		require.GreaterOrEqual(t, len(mtr.Events()), 1)
 		lastCg := ""
 		for i, e := range mtr.Events() {
+			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
+				"monitor": map[string]interface{}{
+					"id":          mtr.StdFields.ID,
+					"name":        mtr.StdFields.Name,
+					"type":        mtr.StdFields.Type,
+					"check_group": isdef.IsString,
+				},
+			}), e.Fields)
+
+			// Ensure that all check groups are equal and don't change
+			isdef.ScopedIsUnique()
 			cg, err := e.GetValue("monitor.check_group")
 			require.NoError(t, err)
 			cgStr := cg.(string)

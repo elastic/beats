@@ -100,6 +100,7 @@ func goCmd(args ...string) *exec.Cmd {
 	goBinary := "go" // relative by default
 	// GET the GOROOT if defined, this helps in scenarios where
 	// GOROOT is defined, but GOROOT/bin is not in the path
+	// This can happen when targeting WSL from intellij running on windows
 	goRoot := os.Getenv("GOROOT")
 	if goRoot != "" {
 		goBinary = filepath.Join(goRoot, "bin", "go")

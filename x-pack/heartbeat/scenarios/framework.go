@@ -6,6 +6,7 @@ package scenarios
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"net/http/httptest"
 	"net/url"
 	"os"
@@ -37,7 +38,7 @@ type Scenario struct {
 }
 
 func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error)) {
-	cfg, rClose, err := s.Runner()
+	cfgMap, rClose, err := s.Runner()
 	defer rClose()
 	if err != nil {
 		callback(nil, err)
@@ -46,8 +47,7 @@ func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error
 
 	t.Run(s.Name, func(t *testing.T) {
 		t.Parallel()
-		mtr, err := runMonitorOnce(t, cfg)
-		mtr.Config = cfg
+		mtr, err := runMonitorOnce(t, cfgMap)
 		mtr.Wait()
 		callback(mtr, err)
 		mtr.Close()
@@ -167,21 +167,27 @@ var Scenarios = ScenarioDB{
 }
 
 type MonitorTestRun struct {
-	Config  mapstr.M
-	Monitor *monitors.Monitor
-	Events  func() []*beat.Event
-	Wait    func()
-	Close   func()
+	StdFields stdfields.StdMonitorFields
+	Config    mapstr.M
+	Monitor   *monitors.Monitor
+	Events    func() []*beat.Event
+	Wait      func()
+	Close     func()
 }
 
 func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, err error) {
-	mtr = &MonitorTestRun{}
+	mtr = &MonitorTestRun{
+		Config:    monitorConfig,
+		StdFields: stdfields.StdMonitorFields{},
+	}
 
 	// make a pipeline
 	pipe := &monitors.MockPipeline{}
 	// pass it to the factory
 	f, sched, closeFactory := makeTestFactory()
 	conf, err := config.NewConfigFrom(monitorConfig)
+	require.NoError(t, err)
+	err = conf.Unpack(&mtr.StdFields)
 	require.NoError(t, err)
 
 	mIface, err := f.Create(pipe, conf)
