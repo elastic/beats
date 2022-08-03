@@ -171,15 +171,15 @@ func TestExampleTestSuite(t *testing.T) {
 }
 
 func addContainerMetric(metricsRepo *MetricsRepo, nodeName string, podId PodId, containerName string, containerMetric *ContainerMetrics) {
-	nodeStore, _ := metricsRepo.Add(nodeName)
-	podStore, _ := nodeStore.Add(podId)
-	containerMetrics, _ := podStore.Add(containerName)
-	containerMetrics.Set(containerMetric)
+	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+	podStore, _ := nodeStore.AddPodStore(podId)
+	containerMetrics, _ := podStore.AddContainerMetrics(containerName)
+	containerMetrics.SetContainerMetrics(containerMetric)
 }
 
 func GetMetric(metricsRepo *MetricsRepo, nodeName string, podId PodId, containerName string) *ContainerMetrics {
-	nodeStore := metricsRepo.Get(nodeName)
-	podStore := nodeStore.Get(podId)
-	containerMetrics := podStore.Get(containerName)
+	nodeStore := metricsRepo.GetNodeStore(nodeName)
+	podStore := nodeStore.GetPodStore(podId)
+	containerMetrics := podStore.GetContainerMetrics(containerName)
 	return containerMetrics
 }

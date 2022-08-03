@@ -134,7 +134,7 @@ func (nm *NodeMetrics) clone() *NodeMetrics {
 	return ans
 }
 
-func (mr *MetricsRepo) Delete(nodeName string) {
+func (mr *MetricsRepo) DeleteNodeStore(nodeName string) {
 	mr.Lock()
 	defer mr.Unlock()
 	delete(mr.nodes, nodeName)
@@ -151,7 +151,7 @@ func (mr *MetricsRepo) DeleteAll() {
 func (mr *MetricsRepo) PodNames(nodeName string) []PodId {
 	mr.RLock()
 	defer mr.RUnlock()
-	nodeStore := mr.Get(nodeName)
+	nodeStore := mr.GetNodeStore(nodeName)
 	if nodeStore == nil {
 		return []PodId{}
 	}
@@ -173,7 +173,7 @@ func (mr *MetricsRepo) NodeNames() []string {
 	return ans
 }
 
-func (mr *MetricsRepo) Add(nodeName string) (*NodeStore, bool) {
+func (mr *MetricsRepo) AddNodeStore(nodeName string) (*NodeStore, bool) {
 	mr.Lock()
 	defer mr.Unlock()
 	node, exists := mr.nodes[nodeName]
@@ -184,7 +184,7 @@ func (mr *MetricsRepo) Add(nodeName string) (*NodeStore, bool) {
 	return node, false
 }
 
-func (mr *MetricsRepo) Get(nodeName string) *NodeStore {
+func (mr *MetricsRepo) GetNodeStore(nodeName string) *NodeStore {
 	mr.RLock()
 	defer mr.RUnlock()
 	ans, exists := mr.nodes[nodeName]
@@ -194,7 +194,7 @@ func (mr *MetricsRepo) Get(nodeName string) *NodeStore {
 	return ans
 }
 
-func (ns *NodeStore) Add(podId PodId) (*PodStore, bool) {
+func (ns *NodeStore) AddPodStore(podId PodId) (*PodStore, bool) {
 	ns.Lock()
 	defer ns.Unlock()
 	pod, exists := ns.pods[podId]
@@ -205,7 +205,7 @@ func (ns *NodeStore) Add(podId PodId) (*PodStore, bool) {
 	return pod, false
 }
 
-func (ns *NodeStore) Get(podId PodId) *PodStore {
+func (ns *NodeStore) GetPodStore(podId PodId) *PodStore {
 	ns.RLock()
 	defer ns.RUnlock()
 	pod, exists := ns.pods[podId]
@@ -215,7 +215,7 @@ func (ns *NodeStore) Get(podId PodId) *PodStore {
 	return pod
 }
 
-func (ns *NodeStore) Delete(podId PodId) {
+func (ns *NodeStore) DeletePodStore(podId PodId) {
 	ns.Lock()
 	defer ns.Unlock()
 	_, exists := ns.pods[podId]
@@ -224,19 +224,19 @@ func (ns *NodeStore) Delete(podId PodId) {
 	}
 }
 
-func (ns *NodeStore) GetMetrics() *NodeMetrics {
+func (ns *NodeStore) GetNodeMetrics() *NodeMetrics {
 	ns.RLock()
 	defer ns.RUnlock()
 	return ns.metrics.clone()
 }
 
-func (ns *NodeStore) SetMetrics(metrics *NodeMetrics) {
+func (ns *NodeStore) SetNodeMetrics(metrics *NodeMetrics) {
 	ns.Lock()
 	defer ns.Unlock()
 	ns.metrics = metrics
 }
 
-func (ps *PodStore) Get(containerName string) *ContainerMetrics {
+func (ps *PodStore) GetContainerMetrics(containerName string) *ContainerMetrics {
 	ps.RLock()
 	defer ps.RUnlock()
 	container, exists := ps.containers[containerName]
@@ -246,7 +246,7 @@ func (ps *PodStore) Get(containerName string) *ContainerMetrics {
 	return container.clone()
 }
 
-func (ps *PodStore) Add(containerName string) (*ContainerMetrics, bool) {
+func (ps *PodStore) AddContainerMetrics(containerName string) (*ContainerMetrics, bool) {
 	ps.Lock()
 	defer ps.Unlock()
 	container, exists := ps.containers[containerName]
@@ -257,7 +257,7 @@ func (ps *PodStore) Add(containerName string) (*ContainerMetrics, bool) {
 	return container, false
 }
 
-func (cm *ContainerMetrics) Set(metrics *ContainerMetrics) {
+func (cm *ContainerMetrics) SetContainerMetrics(metrics *ContainerMetrics) {
 	cm.Lock()
 	defer cm.Unlock()
 	cm.CoresLimit = metrics.CoresLimit

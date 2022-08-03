@@ -133,8 +133,8 @@ func NewResourceMetadataEnricher(
 						metrics.MemoryAllocatable = NewFloat64Metric(float64(q.Value()))
 					}
 				}
-				nodeStore, _ := metricsRepo.Add(nodeName)
-				nodeStore.SetMetrics(metrics)
+				nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+				nodeStore.SetNodeMetrics(metrics)
 
 				m[id] = metaGen.Generate("node", r)
 
@@ -169,7 +169,7 @@ func NewResourceMetadataEnricher(
 			switch r := r.(type) {
 			case *kubernetes.Node:
 				nodeName := r.GetObjectMeta().GetName()
-				metricsRepo.Delete(nodeName)
+				metricsRepo.DeleteNodeStore(nodeName)
 			}
 
 			id := join(accessor.GetNamespace(), accessor.GetName())
@@ -234,9 +234,9 @@ func NewContainerMetadataEnricher(
 			mapStatuses(pod.Status.ContainerStatuses)
 			mapStatuses(pod.Status.InitContainerStatuses)
 
-			nodeStore, _ := metricsRepo.Add(pod.Spec.NodeName)
+			nodeStore, _ := metricsRepo.AddNodeStore(pod.Spec.NodeName)
 			podId := NewPodId(pod.Namespace, pod.Name)
-			podStore, _ := nodeStore.Add(podId)
+			podStore, _ := nodeStore.AddPodStore(podId)
 
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				metrics := NewContainerMetrics()
@@ -252,8 +252,8 @@ func NewContainerMetadataEnricher(
 					}
 				}
 
-				containerMetrics, _ := podStore.Add(container.Name)
-				containerMetrics.Set(metrics)
+				containerMetrics, _ := podStore.AddContainerMetrics(container.Name)
+				containerMetrics.SetContainerMetrics(metrics)
 
 				if s, ok := statuses[container.Name]; ok {
 					// Extracting id and runtime ECS fields from ContainerID
@@ -276,8 +276,8 @@ func NewContainerMetadataEnricher(
 				base.Logger().Debugf("Error while casting event: %s", ok)
 			}
 			podId := NewPodId(pod.Namespace, pod.Name)
-			nodeStore := metricsRepo.Get(pod.Spec.NodeName)
-			nodeStore.Delete(podId)
+			nodeStore := metricsRepo.GetNodeStore(pod.Spec.NodeName)
+			nodeStore.DeletePodStore(podId)
 
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
