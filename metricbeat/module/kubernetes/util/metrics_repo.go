@@ -21,42 +21,58 @@ import (
 	"sync"
 )
 
+// PodId defines a composite key for a Pod in NodeStore. A Pod is uniquely identified by a Namespace and a Name.
 type PodId struct {
 	Namespace string
 	PodName   string
 }
 
+// Float64Metric is a wrapper for a float64 primitive type. The reason for this wrapper is to handle missing metrics with a `nil` pointer instead of a null value like `-1`. This is a better option since you could have metrics with negative values.
 type Float64Metric struct {
 	Value float64
 }
 
+// ContainerMetrics contains all the metrics for a Container.
 type ContainerMetrics struct {
-	sync.RWMutex
 	CoresLimit  *Float64Metric
 	MemoryLimit *Float64Metric
 }
 
+// NodeMetrics contains all the metrics for a Node.
 type NodeMetrics struct {
 	CoresAllocatable  *Float64Metric
 	MemoryAllocatable *Float64Metric
 }
 
+// ContainerStore contains the name of a container and its metrics.
+type ContainerStore struct {
+	sync.RWMutex
+	ContainerName string
+	metrics       *ContainerMetrics
+}
+
+// PodStore contains the PodId of that Pod and a set of (containerName, ContainerStore) entries for each Container under a Pod.
 type PodStore struct {
 	sync.RWMutex
-	containers map[string]*ContainerMetrics
+	PodId      PodId
+	containers map[string]*ContainerStore
 }
 
+// NodeStore contains the name of the node, the metrics for a Node and a set of (podId, PodStore) entries for each Pod under that Node.
 type NodeStore struct {
 	sync.RWMutex
-	metrics *NodeMetrics
-	pods    map[PodId]*PodStore
+	NodeName string
+	metrics  *NodeMetrics
+	pods     map[PodId]*PodStore
 }
 
+// MetricsRepo contains a set of (nodeName, NodeStore) for each Node in the cluster.
 type MetricsRepo struct {
 	sync.RWMutex
 	nodes map[string]*NodeStore
 }
 
+// NewPodId returns a new PodId object given a Namespace and a Pod name.
 func NewPodId(namespace, podName string) PodId {
 	return PodId{
 		Namespace: namespace,
@@ -64,12 +80,14 @@ func NewPodId(namespace, podName string) PodId {
 	}
 }
 
+// NewFloat64Metrics returns a Float64Metric given a float64 value.
 func NewFloat64Metric(value float64) *Float64Metric {
 	return &Float64Metric{
 		Value: value,
 	}
 }
 
+// NewContainerMetrics creates an empty ContainerMetrics object.
 func NewContainerMetrics() *ContainerMetrics {
 	return &ContainerMetrics{
 		CoresLimit:  nil,
@@ -77,6 +95,7 @@ func NewContainerMetrics() *ContainerMetrics {
 	}
 }
 
+// NewNodeMetrics creates an empty NodeMetrics object.
 func NewNodeMetrics() *NodeMetrics {
 	return &NodeMetrics{
 		CoresAllocatable:  nil,
@@ -84,21 +103,35 @@ func NewNodeMetrics() *NodeMetrics {
 	}
 }
 
-func NewPodStore() *PodStore {
+// NewContainerStore creates an empty ContainerStore object.
+func NewContainerStore(containerName string) *ContainerStore {
+	ans := &ContainerStore{
+		ContainerName: containerName,
+		metrics:       NewContainerMetrics(),
+	}
+	return ans
+}
+
+// NewPodStore creates an empty PodStore object.
+func NewPodStore(podId PodId) *PodStore {
 	ans := &PodStore{
-		containers: make(map[string]*ContainerMetrics),
+		PodId:      podId,
+		containers: make(map[string]*ContainerStore),
 	}
 	return ans
 }
 
-func NewNodeStore() *NodeStore {
+// NewNodeStore creates an empty NodeStore object.
+func NewNodeStore(nodeName string) *NodeStore {
 	ans := &NodeStore{
-		metrics: NewNodeMetrics(),
-		pods:    make(map[PodId]*PodStore),
+		NodeName: nodeName,
+		metrics:  NewNodeMetrics(),
+		pods:     make(map[PodId]*PodStore),
 	}
 	return ans
 }
 
+// NewMetricsRepo creates an empty MetricsRepo object.
 func NewMetricsRepo() *MetricsRepo {
 	ans := &MetricsRepo{
 		nodes: make(map[string]*NodeStore),
@@ -106,12 +139,14 @@ func NewMetricsRepo() *MetricsRepo {
 	return ans
 }
 
+// Clone clones a Float64Metric object.
 func (m *Float64Metric) Clone() *Float64Metric {
 	return &Float64Metric{
 		Value: m.Value,
 	}
 }
 
+// Clone returns a copy of a ContainerMetrics object.
 func (cm *ContainerMetrics) Clone() *ContainerMetrics {
 	ans := NewContainerMetrics()
 	if cm.CoresLimit != nil {
@@ -123,6 +158,7 @@ func (cm *ContainerMetrics) Clone() *ContainerMetrics {
 	return ans
 }
 
+// Clone returns a copy of a NodeMetric object.
 func (nm *NodeMetrics) Clone() *NodeMetrics {
 	ans := NewNodeMetrics()
 	if nm.CoresAllocatable != nil {
@@ -134,13 +170,15 @@ func (nm *NodeMetrics) Clone() *NodeMetrics {
 	return ans
 }
 
+// DeleteNodeStore deletes a NodeStore from the MetricsRepo given the Node name.
 func (mr *MetricsRepo) DeleteNodeStore(nodeName string) {
 	mr.Lock()
 	defer mr.Unlock()
 	delete(mr.nodes, nodeName)
 }
 
-func (mr *MetricsRepo) DeleteAll() {
+// DeleteAllNodeStore deletes all NodeStores from the MetricsRepo.
+func (mr *MetricsRepo) DeleteAllNodeStore() {
 	mr.Lock()
 	defer mr.Unlock()
 	for nodeName := range mr.nodes {
@@ -148,21 +186,7 @@ func (mr *MetricsRepo) DeleteAll() {
 	}
 }
 
-func (mr *MetricsRepo) PodNames(nodeName string) []PodId {
-	mr.RLock()
-	defer mr.RUnlock()
-	nodeStore := mr.GetNodeStore(nodeName)
-	if nodeStore == nil {
-		return []PodId{}
-	}
-
-	ans := make([]PodId, 0, len(nodeStore.pods))
-	for podId := range nodeStore.pods {
-		ans = append(ans, podId)
-	}
-	return ans
-}
-
+// NodeNames returns the names of all the Nodes.
 func (mr *MetricsRepo) NodeNames() []string {
 	mr.RLock()
 	defer mr.RUnlock()
@@ -173,48 +197,75 @@ func (mr *MetricsRepo) NodeNames() []string {
 	return ans
 }
 
+// PodNames returns the names of all the Pods under a Node.
+func (ns *NodeStore) PodNames() []PodId {
+	ns.Lock()
+	defer ns.Unlock()
+	ans := make([]PodId, 0, len(ns.pods))
+	for podId := range ns.pods {
+		ans = append(ans, podId)
+	}
+	return ans
+}
+
+// ContainerNames returns the names of all the Containers under a Pod.
+func (ps *PodStore) ContainerNames() []string {
+	ps.Lock()
+	defer ps.Unlock()
+	ans := make([]string, 0, len(ps.containers))
+	for containerName := range ps.containers {
+		ans = append(ans, containerName)
+	}
+	return ans
+}
+
+// AddNodeStore returns/create a NodeStore given a Node name. If the NodeStore already exists, it returns the object and `false` to indicate that it didn't create a new NodeStore. Otherwise if the NodeStore doesn't exists, it creates it and it returns the new object together with `true` to indicate that it created a new NodeStore.
 func (mr *MetricsRepo) AddNodeStore(nodeName string) (*NodeStore, bool) {
 	mr.Lock()
 	defer mr.Unlock()
 	node, exists := mr.nodes[nodeName]
 	if !exists {
-		mr.nodes[nodeName] = NewNodeStore()
+		mr.nodes[nodeName] = NewNodeStore(nodeName)
 		return mr.nodes[nodeName], true
 	}
 	return node, false
 }
 
+// GetNodeStore returns/create a NodeStore given a Node name. If the NodeStore already exists, it returns the object. Otherwise if the NodeStore doesn't exists, it creates an empty NodeStore and it returns it. This last behavior is to implement a [Null Object Design Pattern](https://en.wikipedia.org/wiki/Null_object_pattern).
 func (mr *MetricsRepo) GetNodeStore(nodeName string) *NodeStore {
 	mr.RLock()
 	defer mr.RUnlock()
 	ans, exists := mr.nodes[nodeName]
 	if !exists {
-		return NewNodeStore()
+		return NewNodeStore(nodeName)
 	}
 	return ans
 }
 
+// AddPodStore returns/create a PodStore given a PodId. If the PodStore already exists, it returns the object and `false` to indicate that it didn't create a new PodStore. Otherwise if the PodStore doesn't exists, it creates it and it returns the new object together with `true` to indicate that it created a new PodStore.
 func (ns *NodeStore) AddPodStore(podId PodId) (*PodStore, bool) {
 	ns.Lock()
 	defer ns.Unlock()
 	pod, exists := ns.pods[podId]
 	if !exists {
-		ns.pods[podId] = NewPodStore()
+		ns.pods[podId] = NewPodStore(podId)
 		return ns.pods[podId], true
 	}
 	return pod, false
 }
 
+// GetPodStore returns/create a PodStore given a PodId. If the PodStore already exists, it returns the object. Otherwise if the PodStore doesn't exists, it creates an empty PodStore and it returns it. This last behavior is to implement a [Null Object Design Pattern](https://en.wikipedia.org/wiki/Null_object_pattern).
 func (ns *NodeStore) GetPodStore(podId PodId) *PodStore {
 	ns.RLock()
 	defer ns.RUnlock()
 	pod, exists := ns.pods[podId]
 	if !exists {
-		return NewPodStore()
+		return NewPodStore(podId)
 	}
 	return pod
 }
 
+// DeletePodStore delete a PodStore given a PodId from a NodeStore.
 func (ns *NodeStore) DeletePodStore(podId PodId) {
 	ns.Lock()
 	defer ns.Unlock()
@@ -224,42 +275,53 @@ func (ns *NodeStore) DeletePodStore(podId PodId) {
 	}
 }
 
+// GetNodeMetrics returns a copy of the Node metrics.
 func (ns *NodeStore) GetNodeMetrics() *NodeMetrics {
 	ns.RLock()
 	defer ns.RUnlock()
 	return ns.metrics.Clone()
 }
 
+// SetNodeMetrics set the Node metrics for a NodeStore.
 func (ns *NodeStore) SetNodeMetrics(metrics *NodeMetrics) {
 	ns.Lock()
 	defer ns.Unlock()
 	ns.metrics = metrics
 }
 
-func (ps *PodStore) GetContainerMetrics(containerName string) *ContainerMetrics {
-	ps.RLock()
-	defer ps.RUnlock()
-	container, exists := ps.containers[containerName]
-	if !exists {
-		return NewContainerMetrics()
-	}
-	return container.Clone()
-}
-
-func (ps *PodStore) AddContainerMetrics(containerName string) (*ContainerMetrics, bool) {
+// AddContainerStore returns/create a ContainerStore given a Container name. If the ContainerStore already exists, it returns the object and `false` to indicate that it didn't create a new ContainerStore. Otherwise if the ContainerStore doesn't exists, it creates it and it returns the new object together with `true` to indicate that it created a new ContainerStore.
+func (ps *PodStore) AddContainerStore(containerName string) (*ContainerStore, bool) {
 	ps.Lock()
 	defer ps.Unlock()
 	container, exists := ps.containers[containerName]
 	if !exists {
-		ps.containers[containerName] = NewContainerMetrics()
+		ps.containers[containerName] = NewContainerStore(containerName)
 		return ps.containers[containerName], true
 	}
 	return container, false
 }
 
-func (cm *ContainerMetrics) SetContainerMetrics(metrics *ContainerMetrics) {
+// GetContainerStore returns/create a ContainerStore given a Container name. If the ContainerStore already exists, it returns the object. Otherwise if the ContainerStore doesn't exists, it creates an empty ContainerStore and it returns it. This last behavior is to implement a [Null Object Design Pattern](https://en.wikipedia.org/wiki/Null_object_pattern).
+func (ps *PodStore) GetContainerStore(containerName string) *ContainerStore {
+	ps.RLock()
+	defer ps.RUnlock()
+	container, exists := ps.containers[containerName]
+	if !exists {
+		return NewContainerStore(containerName)
+	}
+	return container
+}
+
+// SetContainerMetrics set the container metrics.
+func (cm *ContainerStore) SetContainerMetrics(metrics *ContainerMetrics) {
 	cm.Lock()
 	defer cm.Unlock()
-	cm.CoresLimit = metrics.CoresLimit
-	cm.MemoryLimit = metrics.MemoryLimit
+	cm.metrics = metrics
+}
+
+// GetContainerMetrics returns a copy of the container metrics
+func (cs *ContainerStore) GetContainerMetrics() *ContainerMetrics {
+	cs.RLock()
+	defer cs.RUnlock()
+	return cs.metrics.Clone()
 }

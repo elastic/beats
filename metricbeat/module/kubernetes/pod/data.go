@@ -67,7 +67,8 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			pageFaults += container.Memory.PageFaults
 			majorPageFaults += container.Memory.MajorPageFaults
 
-			containerMetrics := podStore.GetContainerMetrics(container.Name)
+			containerStore := podStore.GetContainerStore(container.Name)
+			containerMetrics := containerStore.GetContainerMetrics()
 
 			containerCoresLimit := nodeCores
 			if containerMetrics.CoresLimit != nil {

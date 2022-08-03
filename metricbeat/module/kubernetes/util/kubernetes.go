@@ -252,8 +252,8 @@ func NewContainerMetadataEnricher(
 					}
 				}
 
-				containerMetrics, _ := podStore.AddContainerMetrics(container.Name)
-				containerMetrics.SetContainerMetrics(metrics)
+				containerStore, _ := podStore.AddContainerStore(container.Name)
+				containerStore.SetContainerMetrics(metrics)
 
 				if s, ok := statuses[container.Name]; ok {
 					// Extracting id and runtime ECS fields from ContainerID
