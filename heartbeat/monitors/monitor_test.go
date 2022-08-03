@@ -48,7 +48,7 @@ func TestMonitorBasic(t *testing.T) {
 func TestMonitorCfgError(t *testing.T) {
 	testMonitorConfig(
 		t,
-		MockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
+		mockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
 		lookslike.Compose(
 			baseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
 			lookslike.MustCompile(mapstr.M{
