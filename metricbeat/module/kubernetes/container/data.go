@@ -43,8 +43,8 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 	nodeCores := 0.0
 	nodeMem := 0.0
 
-	nodeStore := metricsRepo.Get(node.NodeName)
-	nodeMetrics := nodeStore.GetMetrics()
+	nodeStore := metricsRepo.GetNodeStore(node.NodeName)
+	nodeMetrics := nodeStore.GetNodeMetrics()
 	if nodeMetrics.CoresAllocatable != nil {
 		nodeCores = nodeMetrics.CoresAllocatable.Value
 	}
@@ -54,7 +54,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 
 	for _, pod := range summary.Pods {
 		podId := util.NewPodId(pod.PodRef.Namespace, pod.PodRef.Name)
-		podStore := nodeStore.Get(podId)
+		podStore := nodeStore.GetPodStore(podId)
 
 		for _, container := range pod.Containers {
 			containerEvent := mapstr.M{
@@ -141,7 +141,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 				kubernetes2.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
 			}
 
-			containerMetrics := podStore.Get(container.Name)
+			containerMetrics := podStore.GetContainerMetrics(container.Name)
 
 			containerCoresLimit := nodeCores
 			if containerMetrics.CoresLimit != nil {

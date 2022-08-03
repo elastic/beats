@@ -121,13 +121,13 @@ func testValue(t *testing.T, event mapstr.M, field string, value interface{}) {
 }
 
 func addContainerMetric(metricsRepo *util.MetricsRepo, nodeName string, podId util.PodId, containerName string, containerMetric *util.ContainerMetrics) {
-	nodeStore, _ := metricsRepo.Add(nodeName)
-	podStore, _ := nodeStore.Add(podId)
-	containerMetrics, _ := podStore.Add(containerName)
-	containerMetrics.Set(containerMetric)
+	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+	podStore, _ := nodeStore.AddPodStore(podId)
+	containerMetrics, _ := podStore.AddContainerMetrics(containerName)
+	containerMetrics.SetContainerMetrics(containerMetric)
 }
 
 func addNodeMetric(metricsRepo *util.MetricsRepo, nodeName string, nodeMetrics *util.NodeMetrics) {
-	nodeStore, _ := metricsRepo.Add(nodeName)
-	nodeStore.SetMetrics(nodeMetrics)
+	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+	nodeStore.SetNodeMetrics(nodeMetrics)
 }
