@@ -5,13 +5,18 @@
 package scenarios
 
 import (
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -19,9 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type ScenarioRun func() (config mapstr.M, close func(), err error)
