@@ -119,7 +119,7 @@ var Scenarios = ScenarioDB{
 				config = mapstr.M{
 					"id":       "tcp-test-id",
 					"name":     "tcp-test-name",
-					"type":     "icmp",
+					"type":     "tcp",
 					"schedule": "@every 1m",
 					"hosts":    []string{fmt.Sprintf("%s:%s", parsedUrl.Host, parsedUrl.Port())},
 				}
@@ -128,7 +128,7 @@ var Scenarios = ScenarioDB{
 		},
 		{
 			Name: "simple-icmp",
-			Tags: []string{"lightweight", "icmp"},
+			Tags: []string{"icmp"},
 			Runner: func() (config mapstr.M, close func(), err error) {
 				return mapstr.M{
 					"id":       "icmp-test-id",
@@ -141,7 +141,7 @@ var Scenarios = ScenarioDB{
 		},
 		{
 			Name: "simple-browser",
-			Tags: []string{},
+			Tags: []string{"browser", "browser-inline"},
 			Runner: func() (config mapstr.M, close func(), err error) {
 				err = os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
 				if err != nil {

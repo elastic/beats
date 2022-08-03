@@ -5,17 +5,15 @@
 package scenarios
 
 import (
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/testslike"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/testslike"
+	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestSimpleScenariosBasicFields(t *testing.T) {
@@ -33,7 +31,6 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 			}), e.Fields)
 
 			// Ensure that all check groups are equal and don't change
-			isdef.ScopedIsUnique()
 			cg, err := e.GetValue("monitor.check_group")
 			require.NoError(t, err)
 			cgStr := cg.(string)
@@ -53,11 +50,10 @@ func TestLightweightSummaries(t *testing.T) {
 
 		for i, e := range mtr.Events() {
 			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
-				"monitor": map[string]interface{}{
-					"id":          mtr.StdFields.ID,
-					"name":        mtr.StdFields.Name,
-					"type":        mtr.StdFields.Type,
-					"check_group": isdef.IsString,
+				"url": map[string]interface{}{
+					"full":   isdef.IsNonEmptyString,
+					"domain": isdef.IsNonEmptyString,
+					"scheme": mtr.StdFields.Type,
 				},
 			}), e.Fields)
 
