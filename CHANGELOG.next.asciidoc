@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Reduced memory usage slightly for browser monitors. {pull}32317[32317]
 - Automatically kill zombie-ish node processes. {pull}32393[32393]
 - Added timeout for browser monitors. {pull}32434[32434]
+- Fix bug browser jobs would sometimes be missing check groups or send empty events. {pull}32542[32542]
 
 *Metricbeat*
 
