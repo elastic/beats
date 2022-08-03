@@ -234,10 +234,10 @@ func TestEntryIDs(t *testing.T) {
 
 			// Hard to remove this delay since the Done signal is propagated
 			// asynchronously to the queue...
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 			metrics, err := q.Metrics()
 			assert.NilError(t, err, "Queue metrics call should succeed")
-			assert.Equal(t, metrics.OldestEntryID, 0,
+			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(0),
 				fmt.Sprintf("Oldest entry ID after ACKing event %v should be 0", i))
 		}
 		// ACK the first batch, which should unblock all the later ones
@@ -245,7 +245,7 @@ func TestEntryIDs(t *testing.T) {
 		time.Sleep(1 * time.Millisecond)
 		metrics, err := q.Metrics()
 		assert.NilError(t, err, "Queue metrics call should succeed")
-		assert.Equal(t, metrics.OldestEntryID, 0,
+		assert.Equal(t, metrics.OldestEntryID, queue.EntryID(100),
 			fmt.Sprintf("Oldest entry ID after ACKing event 0 should be %v", queue.EntryID(entryCount)))
 
 	}
