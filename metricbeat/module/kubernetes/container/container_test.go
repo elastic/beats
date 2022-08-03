@@ -120,11 +120,11 @@ func testValue(t *testing.T, event mapstr.M, field string, value interface{}) {
 	assert.EqualValues(t, data, value, "Wrong value for field "+field)
 }
 
-func addContainerMetric(metricsRepo *util.MetricsRepo, nodeName string, podId util.PodId, containerName string, containerMetric *util.ContainerMetrics) {
+func addContainerMetric(metricsRepo *util.MetricsRepo, nodeName string, podId util.PodId, containerName string, metrics *util.ContainerMetrics) {
 	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
 	podStore, _ := nodeStore.AddPodStore(podId)
-	containerMetrics, _ := podStore.AddContainerMetrics(containerName)
-	containerMetrics.SetContainerMetrics(containerMetric)
+	containerStore, _ := podStore.AddContainerStore(containerName)
+	containerStore.SetContainerMetrics(metrics)
 }
 
 func addNodeMetric(metricsRepo *util.MetricsRepo, nodeName string, nodeMetrics *util.NodeMetrics) {

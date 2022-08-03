@@ -141,7 +141,8 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 				kubernetes2.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
 			}
 
-			containerMetrics := podStore.GetContainerMetrics(container.Name)
+			containerStore := podStore.GetContainerStore(container.Name)
+			containerMetrics := containerStore.GetContainerMetrics()
 
 			containerCoresLimit := nodeCores
 			if containerMetrics.CoresLimit != nil {
