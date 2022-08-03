@@ -175,3 +175,57 @@ func TestAdjustInputQueueSize(t *testing.T) {
 		assert.Equal(t, int(float64(mainQueue)*maxInputQueueSizeRatio), AdjustInputQueueSize(mainQueue, mainQueue))
 	})
 }
+
+func TestEntryIDs(t *testing.T) {
+	entryCount := 100
+
+	testForward := func(q queue.Queue) {
+		producer := q.Producer(queue.ProducerConfig{})
+		for i := 0; i < entryCount; i++ {
+			id, success := producer.Publish(nil)
+			assert.Equal(t, success, true, "Queue publish should succeed")
+			assert.Equal(t, id, queue.EntryID(i), "Entry ID should match publication order")
+		}
+
+		for i := 0; i < entryCount; i++ {
+			batch, err := q.Get(1)
+			assert.NilError(t, err, "Queue read should succeed")
+			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
+			assert.Equal(t, batch.ID(0), queue.EntryID(i), "Consumed entry IDs should be ordered the same as when they were produced")
+
+			time.Sleep(100 * time.Millisecond)
+			metrics, err := q.Metrics()
+			assert.NilError(t, err, "Queue metrics call should succeed")
+			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(i),
+				fmt.Sprintf("Oldest entry ID before ACKing event %v should be %v", i, i))
+
+			batch.Done()
+			// Hard to remove this delay since the Done signal is propagated
+			// asynchronously to the queue...
+			time.Sleep(1 * time.Millisecond)
+			metrics, err = q.Metrics()
+			assert.NilError(t, err, "Queue metrics call should succeed")
+			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(i+1),
+				fmt.Sprintf("Oldest entry ID after ACKing event %v should be %v", i, i+1))
+
+		}
+	}
+
+	t.Run("acking in forward order with directEventLoop reports the right event IDs", func(t *testing.T) {
+		testQueue := NewQueue(nil, Settings{Events: 1000})
+		testForward(testQueue)
+	})
+
+	t.Run("acking in reverse order with directEventLoop reports the right event IDs", func(t *testing.T) {
+
+	})
+
+	t.Run("acking in forward order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
+		testQueue := NewQueue(nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond})
+		testForward(testQueue)
+	})
+
+	t.Run("acking in reverse order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
+
+	})
+}
