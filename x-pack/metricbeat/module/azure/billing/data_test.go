@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
+
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -18,29 +20,15 @@ import (
 func TestEventMapping(t *testing.T) {
 	ID := "ID"
 	kind := "legacy"
-	usageDate := "2020-08-08"
 	name := "test"
 	billingAccountId := "123"
 	startDate := date.Time{}
 
+	//
+	// Usage Details
+	//
 	var charge = decimal.NewFromFloat(8.123456)
-	var prop = consumption.ForecastProperties{
-		UsageDate:        &usageDate,
-		Grain:            "",
-		Charge:           &charge,
-		Currency:         &name,
-		ChargeType:       "Forecast",
-		ConfidenceLevels: nil,
-	}
-	var prop2 = consumption.ForecastProperties{
-		UsageDate:        &usageDate,
-		Grain:            "",
-		Charge:           &charge,
-		Currency:         &name,
-		ChargeType:       "Actual",
-		ConfidenceLevels: nil,
-	}
-	var pros = consumption.LegacyUsageDetailProperties{
+	var props = consumption.LegacyUsageDetailProperties{
 		BillingAccountID:       &billingAccountId,
 		BillingAccountName:     &name,
 		BillingPeriodStartDate: &startDate,
@@ -52,36 +40,61 @@ func TestEventMapping(t *testing.T) {
 	var legacy = consumption.LegacyUsageDetail{
 		ID:                          &ID,
 		Kind:                        consumption.Kind(kind),
-		LegacyUsageDetailProperties: &pros,
-	}
-	var usage = Usage{UsageDetails: []consumption.BasicUsageDetail{legacy},
-		ActualCosts: []consumption.Forecast{
-			{
-				ForecastProperties: &prop2,
-				ID:                 nil,
-				Name:               nil,
-				Type:               nil,
-				Tags:               nil,
-			}},
-		ForecastCosts: []consumption.Forecast{
-			{
-				ForecastProperties: &prop,
-				ID:                 nil,
-				Name:               nil,
-				Type:               nil,
-				Tags:               nil,
-			}},
+		LegacyUsageDetailProperties: &props,
 	}
 
-	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
-	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
+	//
+	// Forecast
+	//
+	actualCost := float64(0.11)
+	forecastCost := float64(0.11)
+	// I know, it's weird, but the API returns the usage date as a number using
+	// this unusual format.
+	actualUsageDate := float64(20200807)
+	forecastUsageDate := float64(20200808)
+	rows := [][]interface{}{
+		{actualCost, actualUsageDate, "Actual", "USD"},
+		{forecastCost, forecastUsageDate, "Forecast", "USD"},
+	}
 
-	events, err := EventsMapping("sub", usage, startTime, endTime)
+	var forecastQueryResult = costmanagement.QueryResult{
+		QueryProperties: &costmanagement.QueryProperties{
+			Columns: &[]costmanagement.QueryColumn{
+				column("Cost", "Number"),
+				column("UsageDate", "Number"),
+				column("CostStatus", "String"),
+				column("Currency", "String"),
+			},
+			Rows: &rows,
+		},
+	}
+
+	var usage = Usage{
+		UsageDetails: []consumption.BasicUsageDetail{legacy},
+		Forecasts:    forecastQueryResult,
+	}
+
+	//
+	// Run the tests
+	//
+	usageStart, usageEnd := usageIntervalFrom(time.Now())
+	forecastStart, forecastEnd := forecastIntervalFrom(time.Now())
+	opts := TimeIntervalOptions{
+		usageStart:    usageStart,
+		usageEnd:      usageEnd,
+		forecastStart: forecastStart,
+		forecastEnd:   forecastEnd,
+	}
+
+	events, err := EventsMapping("sub", usage, opts)
 	assert.NoError(t, err)
-	assert.Equal(t, len(events), 2)
+	assert.Equal(t, 3, len(events))
 
+	//
+	// Check the results
+	//
 	for _, event := range events {
-
+		// if is an usage event
 		if ok, _ := event.MetricSetFields.HasKey("department_name"); ok {
 			val1, _ := event.MetricSetFields.GetValue("account_name")
 			assert.Equal(t, val1, &name)
@@ -90,14 +103,34 @@ func TestEventMapping(t *testing.T) {
 			val3, _ := event.MetricSetFields.GetValue("department_name")
 			assert.Equal(t, val3, &name)
 		} else {
-			dt, _ := time.Parse("2006-01-02", usageDate)
-			val1, _ := event.MetricSetFields.GetValue("usage_date")
-			assert.Equal(t, val1, dt)
-			val2, _ := event.MetricSetFields.GetValue("forecast_cost")
-			assert.Equal(t, val2, &charge)
-			val3, _ := event.MetricSetFields.GetValue("actual_cost")
-			assert.Equal(t, val3, &charge)
 
+			// Check the actual cost
+			isActual, _ := event.MetricSetFields.HasKey("actual_cost")
+			if isActual {
+				cost, _ := event.MetricSetFields.GetValue("actual_cost")
+				assert.Equal(t, actualCost, cost)
+				dt, _ := time.Parse("2006-01-02", "2020-08-07")
+				usageDate, _ := event.MetricSetFields.GetValue("usage_date")
+				assert.Equal(t, usageDate, dt)
+			}
+
+			// Check the forecast cost
+			isForecast, _ := event.MetricSetFields.HasKey("forecast_cost")
+			if isForecast {
+				cost, _ := event.MetricSetFields.GetValue("forecast_cost")
+				assert.Equal(t, forecastCost, cost)
+				dt, _ := time.Parse("2006-01-02", "2020-08-08")
+				usageDate, _ := event.MetricSetFields.GetValue("usage_date")
+				assert.Equal(t, usageDate, dt)
+			}
+
+			if !isActual && !isForecast {
+				assert.Fail(t, "Event is neither an actual nor a forecast")
+			}
 		}
 	}
+}
+
+func column(name, type_ string) costmanagement.QueryColumn {
+	return costmanagement.QueryColumn{Name: &name, Type: &type_}
 }
