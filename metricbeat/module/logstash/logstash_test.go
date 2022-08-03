@@ -32,20 +32,20 @@ import (
 
 func TestGetVertexClusterUUID(t *testing.T) {
 	tests := map[string]struct {
-		vertex              map[string]interface{}
+		vertex              logstash.Vertex
 		overrideClusterUUID string
 		expectedClusterUUID string
 	}{
 		"vertex_and_override": {
-			map[string]interface{}{
-				"cluster_uuid": "v",
+			logstash.Vertex{
+				ClusterUUID: "v",
 			},
 			"o",
 			"v",
 		},
 		"vertex_only": {
-			vertex: map[string]interface{}{
-				"cluster_uuid": "v",
+			vertex: logstash.Vertex{
+				ClusterUUID: "v",
 			},
 			expectedClusterUUID: "v",
 		},

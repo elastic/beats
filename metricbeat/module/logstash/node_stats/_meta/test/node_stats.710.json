@@ -1,197 +1,207 @@
 {
-    "host" : "logstash",
-    "version" : "7.10.0",
-    "http_address" : "0.0.0.0:9600",
-    "id" : "84539cd1-193c-4439-8432-5a160911f135",
-    "name" : "logstash",
-    "ephemeral_id" : "9c6737de-dde2-4926-bee3-9ccc0ed1d2a6",
-    "status" : "green",
-    "snapshot" : false,
-    "pipeline" : {
-      "workers" : 8,
-      "batch_size" : 125,
-      "batch_delay" : 50
+  "host": "logstash",
+  "version": "7.10.0",
+  "http_address": "0.0.0.0:9600",
+  "id": "84539cd1-193c-4439-8432-5a160911f135",
+  "name": "logstash",
+  "ephemeral_id": "9c6737de-dde2-4926-bee3-9ccc0ed1d2a6",
+  "status": "green",
+  "snapshot": false,
+  "pipeline": {
+    "workers": 8,
+    "batch_size": 125,
+    "batch_delay": 50
+  },
+  "jvm": {
+    "threads": {
+      "count": 35,
+      "peak_count": 35
     },
-    "jvm" : {
-      "threads" : {
-        "count" : 35,
-        "peak_count" : 35
-      },
-      "mem" : {
-        "heap_used_percent" : 13,
-        "heap_committed_in_bytes" : 1037959168,
-        "heap_max_in_bytes" : 1037959168,
-        "heap_used_in_bytes" : 144995280,
-        "non_heap_used_in_bytes" : 148041864,
-        "non_heap_committed_in_bytes" : 172560384,
-        "pools" : {
-          "survivor" : {
-            "committed_in_bytes" : 35782656,
-            "used_in_bytes" : 23405920,
-            "peak_max_in_bytes" : 35782656,
-            "peak_used_in_bytes" : 35782656,
-            "max_in_bytes" : 35782656
-          },
-          "young" : {
-            "committed_in_bytes" : 286326784,
-            "used_in_bytes" : 16565808,
-            "peak_max_in_bytes" : 286326784,
-            "peak_used_in_bytes" : 286326784,
-            "max_in_bytes" : 286326784
-          },
-          "old" : {
-            "committed_in_bytes" : 715849728,
-            "used_in_bytes" : 105023552,
-            "peak_max_in_bytes" : 715849728,
-            "peak_used_in_bytes" : 105023552,
-            "max_in_bytes" : 715849728
-          }
-        }
-      },
-      "gc" : {
-        "collectors" : {
-          "young" : {
-            "collection_time_in_millis" : 335,
-            "collection_count" : 7
-          },
-          "old" : {
-            "collection_time_in_millis" : 374,
-            "collection_count" : 2
-          }
-        }
-      },
-      "uptime_in_millis" : 17006
-    },
-    "process" : {
-      "open_file_descriptors" : 140,
-      "peak_open_file_descriptors" : 140,
-      "max_file_descriptors" : 1048576,
-      "mem" : {
-        "total_virtual_in_bytes" : 6392164352
-      },
-      "cpu" : {
-        "total_in_millis" : 58710,
-        "percent" : 23,
-        "load_average" : {
-          "1m" : 0.87,
-          "5m" : 0.22,
-          "15m" : 0.13
+    "mem": {
+      "heap_used_percent": 13,
+      "heap_committed_in_bytes": 1037959168,
+      "heap_max_in_bytes": 1037959168,
+      "heap_used_in_bytes": 144995280,
+      "non_heap_used_in_bytes": 148041864,
+      "non_heap_committed_in_bytes": 172560384,
+      "pools": {
+        "survivor": {
+          "committed_in_bytes": 35782656,
+          "used_in_bytes": 23405920,
+          "peak_max_in_bytes": 35782656,
+          "peak_used_in_bytes": 35782656,
+          "max_in_bytes": 35782656
+        },
+        "young": {
+          "committed_in_bytes": 286326784,
+          "used_in_bytes": 16565808,
+          "peak_max_in_bytes": 286326784,
+          "peak_used_in_bytes": 286326784,
+          "max_in_bytes": 286326784
+        },
+        "old": {
+          "committed_in_bytes": 715849728,
+          "used_in_bytes": 105023552,
+          "peak_max_in_bytes": 715849728,
+          "peak_used_in_bytes": 105023552,
+          "max_in_bytes": 715849728
         }
       }
     },
-    "events" : {
-      "in" : 0,
-      "filtered" : 0,
-      "out" : 0,
-      "duration_in_millis" : 0,
-      "queue_push_duration_in_millis" : 0
-    },
-    "pipelines" : {
-      "main" : {
-        "events" : {
-          "filtered" : 0,
-          "duration_in_millis" : 0,
-          "out" : 0,
-          "queue_push_duration_in_millis" : 0,
-          "in" : 0
+    "gc": {
+      "collectors": {
+        "young": {
+          "collection_time_in_millis": 335,
+          "collection_count": 7
         },
-        "plugins" : {
-          "inputs" : [ {
-            "id" : "0710cad67e8f47667bc7612580d5b91f691dd8262a4187d9eca8cf87229d04aa",
-            "name" : "beats",
-            "events" : {
-              "out" : 0,
-              "queue_push_duration_in_millis" : 0
-            }
-          } ],
-          "codecs" : [ {
-            "id" : "plain_be1a2b95-edff-4dc2-94b5-b902f11bfb07",
-            "encode" : {
-              "duration_in_millis" : 0,
-              "writes_in" : 0
-            },
-            "name" : "plain",
-            "decode" : {
-              "duration_in_millis" : 0,
-              "writes_in" : 0,
-              "out" : 0
-            }
-          }, {
-            "id" : "rubydebug_93993219-1a2d-493c-a63c-341a0a5c86ac",
-            "encode" : {
-              "duration_in_millis" : 9,
-              "writes_in" : 0
-            },
-            "name" : "rubydebug",
-            "decode" : {
-              "duration_in_millis" : 0,
-              "writes_in" : 0,
-              "out" : 0
-            }
-          } ],
-          "filters" : [ ],
-          "outputs" : [ {
-            "id" : "f4944472678ac54e7343c1a49748c402b0bafd76ebab7fe2f3930269e0e5097b",
-            "name" : "stdout",
-            "events" : {
-              "duration_in_millis" : 20,
-              "out" : 0,
-              "in" : 0
-            }
-          } ]
-        },
-        "reloads" : {
-          "last_success_timestamp" : null,
-          "last_failure_timestamp" : null,
-          "last_error" : null,
-          "successes" : 0,
-          "failures" : 0
-        },
-        "queue" : {
-          "type" : "memory",
-          "events_count" : 0,
-          "queue_size_in_bytes" : 0,
-          "max_queue_size_in_bytes" : 0
-        },
-        "hash" : "1e3da6bfb66bd25bbb98769a5dcdc16c06f98a333675d3b71cccad117e103b99",
-        "ephemeral_id" : "793497fe-de31-4b3a-bfbd-0b77eb7a2d9b",
-        "vertices" : [ {
-          "id" : "0710cad67e8f47667bc7612580d5b91f691dd8262a4187d9eca8cf87229d04aa",
-          "pipeline_ephemeral_id" : "793497fe-de31-4b3a-bfbd-0b77eb7a2d9b",
-          "events_out" : 0,
-          "queue_push_duration_in_millis" : 0
-        }, {
-          "id" : "f4944472678ac54e7343c1a49748c402b0bafd76ebab7fe2f3930269e0e5097b",
-          "pipeline_ephemeral_id" : "793497fe-de31-4b3a-bfbd-0b77eb7a2d9b",
-          "duration_in_millis" : 20,
-          "events_out" : 0,
-          "events_in" : 0
-        } ]
-      }
-    },
-    "reloads" : {
-      "successes" : 0,
-      "failures" : 0
-    },
-    "os" : {
-      "cgroup" : {
-        "cpuacct" : {
-          "control_group" : "/",
-          "usage_nanos" : 58485023221
-        },
-        "cpu" : {
-          "cfs_quota_micros" : -1,
-          "cfs_period_micros" : 100000,
-          "control_group" : "/",
-          "stat" : {
-            "number_of_elapsed_periods" : 0,
-            "number_of_times_throttled" : 0,
-            "time_throttled_nanos" : 0
-          }
+        "old": {
+          "collection_time_in_millis": 374,
+          "collection_count": 2
         }
       }
     },
-    "queue" : {
-      "events_count" : 0
+    "uptime_in_millis": 17006
+  },
+  "process": {
+    "open_file_descriptors": 140,
+    "peak_open_file_descriptors": 140,
+    "max_file_descriptors": 1048576,
+    "mem": {
+      "total_virtual_in_bytes": 6392164352
+    },
+    "cpu": {
+      "total_in_millis": 58710,
+      "percent": 23,
+      "load_average": {
+        "1m": 0.87,
+        "5m": 0.22,
+        "15m": 0.13
+      }
     }
+  },
+  "events": {
+    "in": 0,
+    "filtered": 0,
+    "out": 0,
+    "duration_in_millis": 0,
+    "queue_push_duration_in_millis": 0
+  },
+  "pipelines": {
+    "main": {
+      "events": {
+        "filtered": 0,
+        "duration_in_millis": 5,
+        "out": 0,
+        "queue_push_duration_in_millis": 0,
+        "in": 0
+      },
+      "plugins": {
+        "inputs": [
+          {
+            "id": "0710cad67e8f47667bc7612580d5b91f691dd8262a4187d9eca8cf87229d04aa",
+            "name": "beats",
+            "events": {
+              "out": 0,
+              "queue_push_duration_in_millis": 0
+            }
+          }
+        ],
+        "codecs": [
+          {
+            "id": "plain_be1a2b95-edff-4dc2-94b5-b902f11bfb07",
+            "encode": {
+              "duration_in_millis": 0,
+              "writes_in": 0
+            },
+            "name": "plain",
+            "decode": {
+              "duration_in_millis": 0,
+              "writes_in": 0,
+              "out": 0
+            }
+          },
+          {
+            "id": "rubydebug_93993219-1a2d-493c-a63c-341a0a5c86ac",
+            "encode": {
+              "duration_in_millis": 9,
+              "writes_in": 0
+            },
+            "name": "rubydebug",
+            "decode": {
+              "duration_in_millis": 0,
+              "writes_in": 0,
+              "out": 0
+            }
+          }
+        ],
+        "filters": [],
+        "outputs": [
+          {
+            "id": "f4944472678ac54e7343c1a49748c402b0bafd76ebab7fe2f3930269e0e5097b",
+            "name": "stdout",
+            "events": {
+              "duration_in_millis": 20,
+              "out": 0,
+              "in": 0
+            }
+          }
+        ]
+      },
+      "reloads": {
+        "last_success_timestamp": null,
+        "last_failure_timestamp": null,
+        "last_error": null,
+        "successes": 0,
+        "failures": 0
+      },
+      "queue": {
+        "type": "memory",
+        "events_count": 100,
+        "queue_size_in_bytes": 0,
+        "max_queue_size_in_bytes": 0
+      },
+      "hash": "1e3da6bfb66bd25bbb98769a5dcdc16c06f98a333675d3b71cccad117e103b99",
+      "ephemeral_id": "793497fe-de31-4b3a-bfbd-0b77eb7a2d9b",
+      "vertices": [
+        {
+          "id": "0710cad67e8f47667bc7612580d5b91f691dd8262a4187d9eca8cf87229d04aa",
+          "pipeline_ephemeral_id": "793497fe-de31-4b3a-bfbd-0b77eb7a2d9b",
+          "events_out": 0,
+          "queue_push_duration_in_millis": 2
+        },
+        {
+          "id": "f4944472678ac54e7343c1a49748c402b0bafd76ebab7fe2f3930269e0e5097b",
+          "pipeline_ephemeral_id": "793497fe-de31-4b3a-bfbd-0b77eb7a2d9b",
+          "duration_in_millis": 20,
+          "events_out": 0,
+          "events_in": 0
+        }
+      ]
+    }
+  },
+  "reloads": {
+    "successes": 0,
+    "failures": 0
+  },
+  "os": {
+    "cgroup": {
+      "cpuacct": {
+        "control_group": "/",
+        "usage_nanos": 58485023221
+      },
+      "cpu": {
+        "cfs_quota_micros": -1,
+        "cfs_period_micros": 100000,
+        "control_group": "/",
+        "stat": {
+          "number_of_elapsed_periods": 0,
+          "number_of_times_throttled": 0,
+          "time_throttled_nanos": 0
+        }
+      }
+    }
+  },
+  "queue": {
+    "events_count": 0
   }
+}

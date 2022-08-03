@@ -188,13 +188,9 @@ func getUserDefinedPipelines(pipelines []logstash.PipelineState) []logstash.Pipe
 	return userDefinedPipelines
 }
 
+// TODO: make test for this
 func removeClusterUUIDsFromPipeline(pipeline logstash.PipelineState) {
-	for _, vertex := range pipeline.Graph.Graph.Vertices {
-		_, exists := vertex["cluster_uuid"]
-		if !exists {
-			continue
-		}
-
-		delete(vertex, "cluster_uuid")
+	for iter := range pipeline.Graph.Graph.Vertices {
+		pipeline.Graph.Graph.Vertices[iter].ClusterUUID = ""
 	}
 }

@@ -138,14 +138,15 @@ type LogstashStats struct {
 }
 
 // PipelineStats represents the stats of a Logstash pipeline
+// fields here aren't all documented, see https://github.com/elastic/logstash/issues/14381
 type PipelineStats struct {
-	ID          string                   `json:"id"`
-	Hash        string                   `json:"hash"`
-	EphemeralID string                   `json:"ephemeral_id"`
-	Events      map[string]interface{}   `json:"events"`
-	Reloads     reloads                  `json:"reloads"`
-	Queue       map[string]interface{}   `json:"queue"`
-	Vertices    []map[string]interface{} `json:"vertices"`
+	ID          string            `json:"id"`
+	Hash        string            `json:"hash"`
+	EphemeralID string            `json:"ephemeral_id"`
+	Events      map[string]int64  `json:"events"`
+	Reloads     reloads           `json:"reloads"`
+	Queue       logstash.Queue    `json:"queue"`
+	Vertices    []logstash.Vertex `json:"vertices"`
 }
 
 func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger) error {
@@ -185,7 +186,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 	pipelineDocumentsShouldContainHash := !StatsVersion.LessThan(PipelineDocumentsContainHashVersion)
 
 	for pipelineID, pipeline := range nodeStats.Pipelines {
-		if pipelineDocumentsShouldContainHash && (pipeline.Hash == "" || pipeline.Vertices == nil) {
+		if pipelineDocumentsShouldContainHash && (pipeline.Hash == "" || pipeline.Vertices == nil || len(pipeline.Vertices) == 0) {
 			logger.Warn(fmt.Sprintf("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed. Pipeline ID: %s", pipelineID))
 		} else {
 			pipeline.ID = pipelineID

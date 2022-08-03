@@ -29,7 +29,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -53,6 +55,37 @@ func TestEventMapping(t *testing.T) {
 	EventMappingForFiles(t, partialVersions, 0, 0)
 }
 
+func TestPipelineMarshal(t *testing.T) {
+	logger := logp.NewLogger("logstash.node_stats")
+
+	path := "./_meta/test/node_stats.710.json"
+	input, err := ioutil.ReadFile(path)
+	require.NoError(t, err, "error reading file %s", path)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventMapping(reporter, input, true, logger)
+	require.NoError(t, err, "error in event mapping for file %s", path)
+
+	events := reporter.GetEvents()
+	nodeStats := events[0].ModuleFields["node"].(mapstr.M)["stats"]
+	pipeline := nodeStats.(LogstashStats).Pipelines[0]
+	t.Logf("Event: %#v", pipeline)
+
+	assert.Equal(t, "main", pipeline.ID)
+	assert.Equal(t, int64(0), pipeline.Events["filtered"])
+	assert.Equal(t, int64(5), pipeline.Events["duration_in_millis"])
+	assert.Equal(t, "memory", pipeline.Queue.Type)
+	assert.Equal(t, int64(100), pipeline.Queue.EventsCount)
+	assert.Equal(t, int64(0), pipeline.Queue.QueueSizeInBytes)
+
+	assert.Len(t, pipeline.Vertices, 2)
+	assert.Equal(t, "0710cad67e8f47667bc7612580d5b91f691dd8262a4187d9eca8cf87229d04aa", pipeline.Vertices[0].ID)
+	assert.Equal(t, "f4944472678ac54e7343c1a49748c402b0bafd76ebab7fe2f3930269e0e5097b", pipeline.Vertices[1].ID)
+	assert.Equal(t, int64(2), pipeline.Vertices[0].QueuePushDurationInMillis)
+	assert.Equal(t, int64(20), pipeline.Vertices[1].DurationInMillis)
+
+}
+
 func EventMappingForFiles(t *testing.T, fixtureVersions []string, expectedEvents int, expectedErrors int) {
 	logger := logp.NewLogger("logstash.node_stats")
 
@@ -63,7 +96,7 @@ func EventMappingForFiles(t *testing.T, fixtureVersions []string, expectedEvents
 
 		reporter := &mbtest.CapturingReporterV2{}
 		err = eventMapping(reporter, input, true, logger)
-		require.NoError(t, err, f)
+		require.NoError(t, err, "error in event mapping for file %s", path)
 		require.True(t, len(reporter.GetEvents()) >= expectedEvents, f)
 		require.Equal(t, expectedErrors, len(reporter.GetErrors()), f)
 	}
@@ -113,15 +146,15 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline",
-					Vertices: []map[string]interface{}{
+					Vertices: []logstash.Vertex{
 						{
-							"id": "vertex_1",
+							ID: "vertex_1",
 						},
 						{
-							"id": "vertex_2",
+							ID: "vertex_2",
 						},
 						{
-							"id": "vertex_3",
+							ID: "vertex_3",
 						},
 					},
 				},
@@ -131,15 +164,15 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline",
-						Vertices: []map[string]interface{}{
+						Vertices: []logstash.Vertex{
 							{
-								"id": "vertex_1",
+								ID: "vertex_1",
 							},
 							{
-								"id": "vertex_2",
+								ID: "vertex_2",
 							},
 							{
-								"id": "vertex_3",
+								ID: "vertex_3",
 							},
 						},
 					},
@@ -150,16 +183,16 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline",
-					Vertices: []map[string]interface{}{
+					Vertices: []logstash.Vertex{
 						{
-							"id":           "vertex_1",
-							"cluster_uuid": "es_1",
+							ID:          "vertex_1",
+							ClusterUUID: "es_1",
 						},
 						{
-							"id": "vertex_2",
+							ID: "vertex_2",
 						},
 						{
-							"id": "vertex_3",
+							ID: "vertex_3",
 						},
 					},
 				},
@@ -169,16 +202,16 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline",
-						Vertices: []map[string]interface{}{
+						Vertices: []logstash.Vertex{
 							{
-								"id":           "vertex_1",
-								"cluster_uuid": "es_1",
+								ID:          "vertex_1",
+								ClusterUUID: "es_1",
 							},
 							{
-								"id": "vertex_2",
+								ID: "vertex_2",
 							},
 							{
-								"id": "vertex_3",
+								ID: "vertex_3",
 							},
 						},
 					},
@@ -189,30 +222,30 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline_1",
-					Vertices: []map[string]interface{}{
+					Vertices: []logstash.Vertex{
 						{
-							"id":           "vertex_1_1",
-							"cluster_uuid": "es_1",
+							ID:          "vertex_1_1",
+							ClusterUUID: "es_1",
 						},
 						{
-							"id": "vertex_1_2",
+							ID: "vertex_1_2",
 						},
 						{
-							"id": "vertex_1_3",
+							ID: "vertex_1_3",
 						},
 					},
 				},
 				{
 					ID: "test_pipeline_2",
-					Vertices: []map[string]interface{}{
+					Vertices: []logstash.Vertex{
 						{
-							"id": "vertex_2_1",
+							ID: "vertex_2_1",
 						},
 						{
-							"id": "vertex_2_2",
+							ID: "vertex_2_2",
 						},
 						{
-							"id": "vertex_2_3",
+							ID: "vertex_2_3",
 						},
 					},
 				},
@@ -222,30 +255,30 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []logstash.Vertex{
 							{
-								"id":           "vertex_1_1",
-								"cluster_uuid": "es_1",
+								ID:          "vertex_1_1",
+								ClusterUUID: "es_1",
 							},
 							{
-								"id": "vertex_1_2",
+								ID: "vertex_1_2",
 							},
 							{
-								"id": "vertex_1_3",
+								ID: "vertex_1_3",
 							},
 						},
 					},
 					{
 						ID: "test_pipeline_2",
-						Vertices: []map[string]interface{}{
+						Vertices: []logstash.Vertex{
 							{
-								"id": "vertex_2_1",
+								ID: "vertex_2_1",
 							},
 							{
-								"id": "vertex_2_2",
+								ID: "vertex_2_2",
 							},
 							{
-								"id": "vertex_2_3",
+								ID: "vertex_2_3",
 							},
 						},
 					},
@@ -256,31 +289,31 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline_1",
-					Vertices: []map[string]interface{}{
+					Vertices: []logstash.Vertex{
 						{
-							"id":           "vertex_1_1",
-							"cluster_uuid": "es_1",
+							ID:          "vertex_1_1",
+							ClusterUUID: "es_1",
 						},
 						{
-							"id":           "vertex_1_2",
-							"cluster_uuid": "es_2",
+							ID:          "vertex_1_2",
+							ClusterUUID: "es_2",
 						},
 						{
-							"id": "vertex_1_3",
+							ID: "vertex_1_3",
 						},
 					},
 				},
 				{
 					ID: "test_pipeline_2",
-					Vertices: []map[string]interface{}{
+					Vertices: []logstash.Vertex{
 						{
-							"id": "vertex_2_1",
+							ID: "vertex_2_1",
 						},
 						{
-							"id": "vertex_2_2",
+							ID: "vertex_2_2",
 						},
 						{
-							"id": "vertex_2_3",
+							ID: "vertex_2_3",
 						},
 					},
 				},
@@ -289,17 +322,17 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"es_1": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []logstash.Vertex{
 							{
-								"id":           "vertex_1_1",
-								"cluster_uuid": "es_1",
+								ID:          "vertex_1_1",
+								ClusterUUID: "es_1",
 							},
 							{
-								"id":           "vertex_1_2",
-								"cluster_uuid": "es_2",
+								ID:          "vertex_1_2",
+								ClusterUUID: "es_2",
 							},
 							{
-								"id": "vertex_1_3",
+								ID: "vertex_1_3",
 							},
 						},
 					},
@@ -307,17 +340,17 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"es_2": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []logstash.Vertex{
 							{
-								"id":           "vertex_1_1",
-								"cluster_uuid": "es_1",
+								ID:          "vertex_1_1",
+								ClusterUUID: "es_1",
 							},
 							{
-								"id":           "vertex_1_2",
-								"cluster_uuid": "es_2",
+								ID:          "vertex_1_2",
+								ClusterUUID: "es_2",
 							},
 							{
-								"id": "vertex_1_3",
+								ID: "vertex_1_3",
 							},
 						},
 					},
@@ -325,15 +358,15 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"": {
 					{
 						ID: "test_pipeline_2",
-						Vertices: []map[string]interface{}{
+						Vertices: []logstash.Vertex{
 							{
-								"id": "vertex_2_1",
+								ID: "vertex_2_1",
 							},
 							{
-								"id": "vertex_2_2",
+								ID: "vertex_2_2",
 							},
 							{
-								"id": "vertex_2_3",
+								ID: "vertex_2_3",
 							},
 						},
 					},

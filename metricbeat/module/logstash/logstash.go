@@ -58,7 +58,7 @@ type MetricSet struct {
 }
 
 type Graph struct {
-	Vertices []map[string]interface{} `json:"vertices"`
+	Vertices []Vertex                 `json:"vertices"`
 	Edges    []map[string]interface{} `json:"edges"`
 }
 
@@ -78,6 +78,24 @@ type PipelineState struct {
 	Representation *GraphContainer `json:"representation"`
 	BatchSize      int             `json:"batch_size"`
 	Workers        int             `json:"workers"`
+}
+
+// Vertex represents a vertex in node_stats
+type Vertex struct {
+	ID                        string `json:"id"`
+	PipelineEphemeralID       string `json:"pipeline_ephemeral_id"`
+	ClusterUUID               string `json:"cluster_uuid"`
+	EventsOut                 int64  `json:"events_out"`
+	EventsIn                  int64  `json:"events_in"`
+	DurationInMillis          int64  `json:"duration_in_millis"`
+	QueuePushDurationInMillis int64  `json:"queue_push_duration_in_millis"`
+}
+
+type Queue struct {
+	Type                string `json:"type,omitempty"`
+	EventsCount         int64  `json:"events_count"`
+	QueueSizeInBytes    int64  `json:"queue_size_in_bytes"`
+	MaxQueueSizeInBytes int64  `json:"max_queue_size_in_bytes"`
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
@@ -154,17 +172,8 @@ func (m *MetricSet) CheckPipelineGraphAPIsAvailable() error {
 // GetVertexClusterUUID returns the correct cluster UUID value for the given Elasticsearch
 // vertex from a Logstash pipeline. If the vertex has no cluster UUID associated with it,
 // the given override cluster UUID is returned.
-func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID string) string {
-	c, ok := vertex["cluster_uuid"]
-	if !ok {
-		return overrideClusterUUID
-	}
-
-	clusterUUID, ok := c.(string)
-	if !ok {
-		return overrideClusterUUID
-	}
-
+func GetVertexClusterUUID(vertex Vertex, overrideClusterUUID string) string {
+	clusterUUID := vertex.ClusterUUID
 	if clusterUUID == "" {
 		return overrideClusterUUID
 	}
