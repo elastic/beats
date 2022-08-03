@@ -5,16 +5,17 @@
 package scenarios
 
 import (
-	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
-	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
 )
 
 func TestSimpleScenariosBasicFields(t *testing.T) {

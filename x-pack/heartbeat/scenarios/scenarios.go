@@ -2,12 +2,13 @@ package scenarios
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"sync"
+
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
 )
 
 var Scenarios = ScenarioDB{
