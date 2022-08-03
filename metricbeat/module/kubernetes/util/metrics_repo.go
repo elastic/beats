@@ -106,30 +106,30 @@ func NewMetricsRepo() *MetricsRepo {
 	return ans
 }
 
-func (m *Float64Metric) clone() *Float64Metric {
+func (m *Float64Metric) Clone() *Float64Metric {
 	return &Float64Metric{
 		Value: m.Value,
 	}
 }
 
-func (cm *ContainerMetrics) clone() *ContainerMetrics {
+func (cm *ContainerMetrics) Clone() *ContainerMetrics {
 	ans := NewContainerMetrics()
 	if cm.CoresLimit != nil {
-		ans.CoresLimit = cm.CoresLimit.clone()
+		ans.CoresLimit = cm.CoresLimit.Clone()
 	}
 	if cm.MemoryLimit != nil {
-		ans.MemoryLimit = cm.MemoryLimit.clone()
+		ans.MemoryLimit = cm.MemoryLimit.Clone()
 	}
 	return ans
 }
 
-func (nm *NodeMetrics) clone() *NodeMetrics {
+func (nm *NodeMetrics) Clone() *NodeMetrics {
 	ans := NewNodeMetrics()
 	if nm.CoresAllocatable != nil {
-		ans.CoresAllocatable = nm.CoresAllocatable.clone()
+		ans.CoresAllocatable = nm.CoresAllocatable.Clone()
 	}
 	if nm.MemoryAllocatable != nil {
-		ans.MemoryAllocatable = nm.MemoryAllocatable.clone()
+		ans.MemoryAllocatable = nm.MemoryAllocatable.Clone()
 	}
 	return ans
 }
@@ -189,7 +189,7 @@ func (mr *MetricsRepo) GetNodeStore(nodeName string) *NodeStore {
 	defer mr.RUnlock()
 	ans, exists := mr.nodes[nodeName]
 	if !exists {
-		return NewNodeStore() // TODO: REVIEW PATTERN nullObject
+		return NewNodeStore()
 	}
 	return ans
 }
@@ -210,7 +210,7 @@ func (ns *NodeStore) GetPodStore(podId PodId) *PodStore {
 	defer ns.RUnlock()
 	pod, exists := ns.pods[podId]
 	if !exists {
-		return NewPodStore() // TODO: REVIEW PATTERN nullObject
+		return NewPodStore()
 	}
 	return pod
 }
@@ -227,7 +227,7 @@ func (ns *NodeStore) DeletePodStore(podId PodId) {
 func (ns *NodeStore) GetNodeMetrics() *NodeMetrics {
 	ns.RLock()
 	defer ns.RUnlock()
-	return ns.metrics.clone()
+	return ns.metrics.Clone()
 }
 
 func (ns *NodeStore) SetNodeMetrics(metrics *NodeMetrics) {
@@ -241,9 +241,9 @@ func (ps *PodStore) GetContainerMetrics(containerName string) *ContainerMetrics 
 	defer ps.RUnlock()
 	container, exists := ps.containers[containerName]
 	if !exists {
-		return NewContainerMetrics() // TODO: review use of nullobect pattern
+		return NewContainerMetrics()
 	}
-	return container.clone()
+	return container.Clone()
 }
 
 func (ps *PodStore) AddContainerMetrics(containerName string) (*ContainerMetrics, bool) {
