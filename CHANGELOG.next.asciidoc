@@ -54,6 +54,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
 - Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
+- Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
 
 *Heartbeat*
 
