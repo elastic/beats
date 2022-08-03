@@ -553,7 +553,6 @@ func TestCreateSummaryEvent(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-			//nolint:errcheck // There are no new changes to this line but
 			// linter has been activated in the meantime. We'll cleanup separately.
 			err = mapstr.MergeFields(tt.expected, mapstr.M{
 				"monitor":            monitorField,

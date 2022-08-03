@@ -111,8 +111,6 @@ func (c *MockClient) PublishAll(events []beat.Event) {
 }
 
 func (c *MockClient) Wait() {
-	c.mtx.Lock()
-	c.mtx.Unlock()
 }
 
 func (c *MockClient) Close() error {
