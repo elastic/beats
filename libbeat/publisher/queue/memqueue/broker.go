@@ -57,11 +57,6 @@ type broker struct {
 	///////////////////////////
 	// internal channels
 
-	// When ackLoop receives events ACKs from a consumer, it sends the number
-	// of ACKed events to ackChan to notify the event loop that those
-	// events can be removed from the queue.
-	ackChan chan int
-
 	// When events are sent to consumers, the ACK channels for their batches
 	// are collected into chanLists and sent to scheduledACKs.
 	// These are then read by ackLoop and concatenated to its internal
@@ -195,7 +190,6 @@ func NewQueue(
 		cancelChan: make(chan producerCancelRequest, 5),
 
 		// internal broker and ACK handler channels
-		ackChan:       make(chan int),
 		scheduledACKs: make(chan chanList),
 
 		ackListener: settings.ACKListener,

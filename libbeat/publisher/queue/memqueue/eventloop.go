@@ -27,8 +27,9 @@ import (
 // directEventLoop implements the broker main event loop. It buffers events,
 // but tries to forward events as early as possible.
 type directEventLoop struct {
-	broker *broker
-	buf    ringBuffer
+	broker     *broker
+	buf        ringBuffer
+	deleteChan chan int
 
 	// pendingACKs aggregates a list of ACK channels for batches that have been sent
 	// to consumers, which is then sent to the broker's scheduledACKs channel.
@@ -40,9 +41,10 @@ type directEventLoop struct {
 // bufferingEventLoop implements the broker main event loop.
 // Events in the buffer are forwarded to consumers only if the buffer is full or on flush timeout.
 type bufferingEventLoop struct {
-	broker *broker
+	broker     *broker
+	buf        *batchBuffer
+	deleteChan chan int
 
-	buf       *batchBuffer
 	flushList flushList
 
 	// The number of events currently waiting in the queue, including
@@ -75,7 +77,8 @@ type flushList struct {
 
 func newDirectEventLoop(b *broker, size int) *directEventLoop {
 	l := &directEventLoop{
-		broker: b,
+		broker:     b,
+		deleteChan: make(chan int),
 	}
 	l.buf.init(b.logger, size)
 
@@ -116,8 +119,7 @@ func (l *directEventLoop) run() {
 		case req := <-pushChan: // producer pushing new event
 			l.insert(&req)
 
-		case count := <-l.broker.ackChan:
-			// Events have been ACKed, remove them from the internal buffer.
+		case count := <-l.deleteChan:
 			l.buf.removeEntries(count)
 
 		case req := <-l.broker.cancelChan: // producer cancelling active events
@@ -222,6 +224,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 	// We iterate over the events from last to first, so we encounter the
 	// highest produer IDs first and can skip subsequent callbacks to the
 	// same producer.
+	producerCallbacks := []func(){}
 	for i := N - 1; i >= 0; i-- {
 		// idx is the index in entries of the i-th event after firstIndex, wrapping
 		// around the end of the array.
@@ -240,16 +243,21 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 			continue
 		}
 		// This update is safe because lastACK is only used from the event loop.
-		count := entry.producerID - producer.state.lastACK
+		count := int(entry.producerID - producer.state.lastACK)
 		producer.state.lastACK = entry.producerID
 
-		producer.state.cb(int(count))
+		producerCallbacks = append(producerCallbacks, func() { producer.state.cb(count) })
+	}
+	l.deleteChan <- N
+	for _, f := range producerCallbacks {
+		f()
 	}
 }
 
 func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time.Duration) *bufferingEventLoop {
 	l := &bufferingEventLoop{
 		broker:       b,
+		deleteChan:   make(chan int),
 		maxEvents:    size,
 		minEvents:    minEvents,
 		flushTimeout: flushTimeout,
@@ -304,8 +312,8 @@ func (l *bufferingEventLoop) run() {
 		case schedACKs <- l.pendingACKs:
 			l.pendingACKs = chanList{}
 
-		case count := <-l.broker.ackChan:
-			l.handleACK(count)
+		case count := <-l.deleteChan:
+			l.handleDelete(count)
 
 		case req := <-l.broker.metricChan: // broker asking for queue metrics
 			l.handleMetricsRequest(&req)
@@ -443,7 +451,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	}
 }
 
-func (l *bufferingEventLoop) handleACK(count int) {
+func (l *bufferingEventLoop) handleDelete(count int) {
 	l.unackedEventCount -= count
 	l.eventCount -= count
 }
@@ -481,7 +489,13 @@ func (l *bufferingEventLoop) flushBuffer() {
 	l.flushList.add(l.buf)
 }
 
+// Called by ackLoop. This function exists to decouple the work of collecting
+// and running producer callbacks from logical deletion of the events, so
+// input callbacks can't block the main queue goroutine.
 func (l *bufferingEventLoop) processACK(lst chanList, N int) {
+	ackCallbacks := []func(){}
+	// First we traverse the entries we're about to remove, collecting any callbacks
+	// we need to run.
 	lst.reverse()
 	for !lst.empty() {
 		current := lst.pop()
@@ -500,12 +514,19 @@ func (l *bufferingEventLoop) processACK(lst chanList, N int) {
 				entry.producer = nil
 				continue
 			}
-			count := entry.producerID - entry.producer.state.lastACK
-
-			entry.producer.state.cb(int(count))
+			producerState := entry.producer.state
+			count := int(entry.producerID - producerState.lastACK)
+			ackCallbacks = append(ackCallbacks, func() { producerState.cb(count) })
 			entry.producer.state.lastACK = entry.producerID
 			entry.producer = nil
 		}
+	}
+	// Signal the queue to delete the events
+	l.deleteChan <- N
+
+	// The events have been removed; notify their listeners.
+	for _, f := range ackCallbacks {
+		f()
 	}
 }
 
