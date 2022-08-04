@@ -45,7 +45,7 @@ func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error
 	}
 
 	t.Run(s.Name, func(t *testing.T) {
-		t.Parallel()
+		//t.Parallel()
 		mtr, err := runMonitorOnce(t, cfgMap)
 		mtr.Wait()
 		callback(mtr, err)
