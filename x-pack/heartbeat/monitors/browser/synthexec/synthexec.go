@@ -180,6 +180,7 @@ func runCmd(
 		logp.L().Info("soutpipe %v", stdoutPipe)
 		logp.L().Info("stdoutToSynthEvent %v", stdoutToSynthEvent)
 		logp.L().Info("mpx %v", mpx)
+		logp.L().Info("mpx %v", mpx.writeSynthEvent)
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			logp.Warn("could not scan stdout events from synthetics: %s", err)
