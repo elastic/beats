@@ -60,7 +60,7 @@ type ScenarioDB struct {
 	initOnce *sync.Once
 }
 
-func (sdb ScenarioDB) Init() {
+func (sdb *ScenarioDB) Init() {
 	var prunedList []Scenario
 	browserCapable := os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") == "true"
 	icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
@@ -82,14 +82,14 @@ func (sdb ScenarioDB) Init() {
 	sdb.All = prunedList
 }
 
-func (sdb ScenarioDB) RunAll(t *testing.T, callback func(*MonitorTestRun, error)) {
+func (sdb *ScenarioDB) RunAll(t *testing.T, callback func(*MonitorTestRun, error)) {
 	sdb.Init()
 	for _, s := range sdb.All {
 		s.Run(t, callback)
 	}
 }
 
-func (sdb ScenarioDB) RunTag(t *testing.T, tagName string, callback func(*MonitorTestRun, error)) {
+func (sdb *ScenarioDB) RunTag(t *testing.T, tagName string, callback func(*MonitorTestRun, error)) {
 	sdb.Init()
 	if len(sdb.ByTag[tagName]) < 1 {
 		require.Failf(t, "no scenarios have tags matching %s", tagName)

@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 )
 
-var Scenarios = ScenarioDB{
+var Scenarios = &ScenarioDB{
 	initOnce: &sync.Once{},
 	ByTag:    map[string][]Scenario{},
 	All: []Scenario{
