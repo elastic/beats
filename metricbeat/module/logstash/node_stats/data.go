@@ -236,8 +236,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 }
 
 func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID string) map[string][]PipelineStats {
-	var clusterToPipelinesMap map[string][]PipelineStats
-	clusterToPipelinesMap = make(map[string][]PipelineStats)
+	clusterToPipelinesMap := make(map[string][]PipelineStats)
 
 	if overrideClusterUUID != "" {
 		clusterToPipelinesMap[overrideClusterUUID] = pipelines

@@ -67,7 +67,7 @@ func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 	if err != nil {
 		return elastic.MakeErrorForMissingField("version", elastic.Logstash)
 	}
-	event.RootFields.Put("service.version", version)
+	_, _ = event.RootFields.Put("service.version", version)
 	_ = fields.Delete("version")
 
 	// Set PID
