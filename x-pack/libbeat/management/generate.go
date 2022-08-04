@@ -3,7 +3,6 @@ package management
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
@@ -12,22 +11,41 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ===========
+// Config Transformation Registry
+// ===========
+
+var ConfigTransform = TransformRegister{}
+
 // TransformRegister is a hack that allows an individual beat to set a transform function
 // so the V2 controller can perform beat-specific config transformations.
 // This is mostly done this way so we can avoid mixing up code with different licenses,
-// as this is entirely xpack/Elastic License code, and the entire beats setup process happens in libbeat/
+// as this is entirely xpack/Elastic License code, and the entire beats setup process happens in libbeat.
+// This is fairly simple, as only one beat will ever register a callback.
 type TransformRegister struct {
 	transformFunc func(UnitsConfig) ([]*reload.ConfigWithMeta, error)
 }
 
 // SetTransform sets a transform function callback
-func (r *TransformRegister) SetTransform(func(UnitsConfig) ([]*reload.ConfigWithMeta, error)) {
-
+func (r *TransformRegister) SetTransform(transform func(UnitsConfig) ([]*reload.ConfigWithMeta, error)) {
+	r.transformFunc = transform
 }
 
 // SetTransform sets a transform function callback
-func (r *TransformRegister) Transform(UnitsConfig) ([]*reload.ConfigWithMeta, error) {
-	return nil, nil
+func (r *TransformRegister) Transform(cfg UnitsConfig) ([]*reload.ConfigWithMeta, error) {
+	// If no transform is registered, fallback to a basic setup
+	if r.transformFunc == nil {
+		InjectStreamProcessor(&cfg, "logs")
+		InjectIndexProcessor(&cfg, "logs")
+		// format for the reloadable list needed bythe cm.Reload() method
+		configList, err := CreateReloadConfigFromStreams(cfg)
+		if err != nil {
+			return nil, fmt.Errorf("error creating reloader config: %w", err)
+		}
+		return configList, nil
+	}
+
+	return r.transformFunc(cfg)
 }
 
 // StreamConfig is a wrapper type so we can correct the behavior of yaml.Unmarshal, see UnmarshalYAML() below
@@ -78,6 +96,10 @@ type StreamMetadata struct {
 	Processors []mapstr.M `yaml:"processors" struct:"processors"`
 }
 
+// ===========
+// StreamConfig YAML implementation
+// ===========
+
 // UnmarshalYAML is a little helper to deal with the fact that the yaml unmarshaler will create
 // hashmaps of type map[interface{}]interface{}, which breaks a bunch of stuff.
 // This code was actually taken from an old version of libbeat circa 2015, which was removed for reasons I don't understand.
@@ -121,6 +143,10 @@ func cleanUpInterfaceArray(in []interface{}) []interface{} {
 	}
 	return result
 }
+
+// ===========
+// Config Processors
+// ===========
 
 func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 	return mapstr.M{
@@ -171,13 +197,13 @@ func generateBeatConfig(unitRaw string) ([]*reload.ConfigWithMeta, error) {
 	// This requires an AgentInfo Struct that I don't seem to have access to.
 	// Ditto for InjectHeadersRule
 
-	// sort the config object to the applicable beat
-	var metaConfig []*reload.ConfigWithMeta
-	if strings.Contains(exeName, "metricbeat") {
-		metaConfig, err = metricbeatCfg(rawIn)
-	} else if strings.Contains(exeName, "filebeat") {
-		metaConfig, err = filebeatCfg(rawIn)
-	}
+	// Generate the config that's unique to a beat
+	metaConfig, err := ConfigTransform.Transform(rawIn)
+	// if strings.Contains(exeName, "metricbeat") {
+	// 	metaConfig, err = metricbeatCfg(rawIn)
+	// } else if strings.Contains(exeName, "filebeat") {
+	// 	metaConfig, err = filebeatCfg(rawIn)
+	// }
 
 	return metaConfig, err
 }
@@ -301,76 +327,78 @@ func InjectStreamProcessor(rawIn *UnitsConfig, inputType string) {
 
 }
 
-// FormatMetricbeatModules is a combination of the map and rename rules in the metricbeat spec file,
-// and formats various key values needed by metricbeat
-func FormatMetricbeatModules(rawIn *UnitsConfig) {
-	// Extract the module name from the type, usually in the form system/metric
-	module := strings.Split(rawIn.UnitType, "/")[0]
+// func translateFilebeatType(rawIn *UnitsConfig) {
+// 	// I'm not sure what this does
+// 	if rawIn.UnitType == "logfile" || rawIn.UnitType == "event/file" {
+// 		rawIn.UnitType = "log"
+// 	} else if rawIn.UnitType == "event/stdin" {
+// 		rawIn.UnitType = "stdin"
+// 	} else if rawIn.UnitType == "event/tcp" {
+// 		rawIn.UnitType = "tcp"
+// 	} else if rawIn.UnitType == "event/udp" {
+// 		rawIn.UnitType = "udp"
+// 	} else if rawIn.UnitType == "log/docker" {
+// 		rawIn.UnitType = "docker"
+// 	} else if rawIn.UnitType == "log/redis_slowlog" {
+// 		rawIn.UnitType = "redis"
+// 	} else if rawIn.UnitType == "log/syslog" {
+// 		rawIn.UnitType = "syslog"
+// 	}
 
-	for iter := range rawIn.Streams {
-		rawIn.Streams[iter]["module"] = module
-	}
+// }
 
-}
-
-func translateFilebeatType(rawIn *UnitsConfig) {
-	// I'm not sure what this does
-	if rawIn.UnitType == "logfile" || rawIn.UnitType == "event/file" {
-		rawIn.UnitType = "log"
-	} else if rawIn.UnitType == "event/stdin" {
-		rawIn.UnitType = "stdin"
-	} else if rawIn.UnitType == "event/tcp" {
-		rawIn.UnitType = "tcp"
-	} else if rawIn.UnitType == "event/udp" {
-		rawIn.UnitType = "udp"
-	} else if rawIn.UnitType == "log/docker" {
-		rawIn.UnitType = "docker"
-	} else if rawIn.UnitType == "log/redis_slowlog" {
-		rawIn.UnitType = "redis"
-	} else if rawIn.UnitType == "log/syslog" {
-		rawIn.UnitType = "syslog"
-	}
-
-}
-
-func metricbeatCfg(rawIn UnitsConfig) ([]*reload.ConfigWithMeta, error) {
-
-	InjectStreamProcessor(&rawIn, "metrics")
-	InjectIndexProcessor(&rawIn, "metrics")
-	FormatMetricbeatModules(&rawIn)
-
+func CreateReloadConfigFromStreams(raw UnitsConfig) ([]*reload.ConfigWithMeta, error) {
 	// format for the reloadable list needed bythe cm.Reload() method
-	configList := make([]*reload.ConfigWithMeta, len(rawIn.Streams))
+	configList := make([]*reload.ConfigWithMeta, len(raw.Streams))
 
-	for iter := range rawIn.Streams {
-		//cfg := mapstr.M{"modules": withProcessors.Streams[iter]}
-		uconfig, err := conf.NewConfigFrom(rawIn.Streams[iter])
+	for iter := range raw.Streams {
+		uconfig, err := conf.NewConfigFrom(raw.Streams[iter])
 		if err != nil {
 			return nil, fmt.Errorf("error in conversion to conf.C:")
 		}
 		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
 	}
-
 	return configList, nil
 }
 
-func filebeatCfg(rawIn UnitsConfig) ([]*reload.ConfigWithMeta, error) {
-	InjectStreamProcessor(&rawIn, "logs")
-	InjectIndexProcessor(&rawIn, "logs")
-	translateFilebeatType(&rawIn)
+// func metricbeatCfg(rawIn UnitsConfig) ([]*reload.ConfigWithMeta, error) {
 
-	// format for the reloadable list needed bythe cm.Reload() method
-	configList := make([]*reload.ConfigWithMeta, len(rawIn.Streams))
-	for iter := range rawIn.Streams {
-		uconfig, err := conf.NewConfigFrom(rawIn.Streams[iter])
-		if err != nil {
-			return nil, fmt.Errorf("error in conversion to conf.C:")
-		}
-		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
-	}
+// 	InjectStreamProcessor(&rawIn, "metrics")
+// 	InjectIndexProcessor(&rawIn, "metrics")
+// 	FormatMetricbeatModules(&rawIn)
 
-	return configList, nil
-}
+// 	// format for the reloadable list needed bythe cm.Reload() method
+// 	configList := make([]*reload.ConfigWithMeta, len(rawIn.Streams))
+
+// 	for iter := range rawIn.Streams {
+// 		//cfg := mapstr.M{"modules": withProcessors.Streams[iter]}
+// 		uconfig, err := conf.NewConfigFrom(rawIn.Streams[iter])
+// 		if err != nil {
+// 			return nil, fmt.Errorf("error in conversion to conf.C:")
+// 		}
+// 		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
+// 	}
+
+// 	return configList, nil
+// }
+
+// func filebeatCfg(rawIn UnitsConfig) ([]*reload.ConfigWithMeta, error) {
+// 	InjectStreamProcessor(&rawIn, "logs")
+// 	InjectIndexProcessor(&rawIn, "logs")
+// 	translateFilebeatType(&rawIn)
+
+// 	// format for the reloadable list needed bythe cm.Reload() method
+// 	configList := make([]*reload.ConfigWithMeta, len(rawIn.Streams))
+// 	for iter := range rawIn.Streams {
+// 		uconfig, err := conf.NewConfigFrom(rawIn.Streams[iter])
+// 		if err != nil {
+// 			return nil, fmt.Errorf("error in conversion to conf.C:")
+// 		}
+// 		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
+// 	}
+
+// 	return configList, nil
+// }
 
 // A little debug helper to print everything in a config once its been rendered
 // TODO: turn this into a debug flag or something?

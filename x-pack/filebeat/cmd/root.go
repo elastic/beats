@@ -7,6 +7,7 @@ package cmd
 import (
 	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/include"
@@ -18,6 +19,7 @@ const Name = fbcmd.Name
 
 // Filebeat build the beat root command for executing filebeat and it's subcommands.
 func Filebeat() *cmd.BeatsRootCmd {
+	management.ConfigTransform.SetTransform(filebeatCfg)
 	settings := fbcmd.FilebeatSettings()
 	settings.ElasticLicensed = true
 	command := fbcmd.Filebeat(inputs.Init, settings)
