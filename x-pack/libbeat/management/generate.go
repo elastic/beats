@@ -12,6 +12,24 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// TransformRegister is a hack that allows an individual beat to set a transform function
+// so the V2 controller can perform beat-specific config transformations.
+// This is mostly done this way so we can avoid mixing up code with different licenses,
+// as this is entirely xpack/Elastic License code, and the entire beats setup process happens in libbeat/
+type TransformRegister struct {
+	transformFunc func(UnitsConfig) ([]*reload.ConfigWithMeta, error)
+}
+
+// SetTransform sets a transform function callback
+func (r *TransformRegister) SetTransform(func(UnitsConfig) ([]*reload.ConfigWithMeta, error)) {
+
+}
+
+// SetTransform sets a transform function callback
+func (r *TransformRegister) Transform(UnitsConfig) ([]*reload.ConfigWithMeta, error) {
+	return nil, nil
+}
+
 // StreamConfig is a wrapper type so we can correct the behavior of yaml.Unmarshal, see UnmarshalYAML() below
 type StreamConfig map[string]interface{}
 
@@ -344,7 +362,6 @@ func filebeatCfg(rawIn UnitsConfig) ([]*reload.ConfigWithMeta, error) {
 	// format for the reloadable list needed bythe cm.Reload() method
 	configList := make([]*reload.ConfigWithMeta, len(rawIn.Streams))
 	for iter := range rawIn.Streams {
-		//cfg := mapstr.M{"modules": withProcessors.Streams[iter]}
 		uconfig, err := conf.NewConfigFrom(rawIn.Streams[iter])
 		if err != nil {
 			return nil, fmt.Errorf("error in conversion to conf.C:")
