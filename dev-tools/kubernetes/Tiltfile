@@ -1,24 +1,27 @@
 
 load('ext://restart_process', 'docker_build_with_restart')
 
-def compile(
-        beat="metricbeat",
-        mode="debug",
-        arch="arm64",
-    ):
+def beat(
+        mode="run",  # or debug
+        beat="metricbeat", # or filebeat
+        arch="arm64", # or amd64
+        k8s_env="dev", # or prod
+        **kwargs):
+
+    if mode not in ["run", "debug"]:
+        exit(-1)
+
+    print("Mode: {}".format(mode))
+
+    ## Compile
     flags = ""
-    suffix = ""
     if mode == "debug":
         flags = '-gcflags "-N -l"'
-        suffix = "-debugger"
-    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH={} go build {} -o build/{}{} ../../{}".format(arch, flags, beat, suffix, beat)
+    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH={} go build {} -o build/{} ../../{}".format(arch, flags, beat, beat)
     print("Build cmd: {}".format(build_cmd))
 
-    resource_name = '{}-compile{}'.format(beat, suffix)
-    print("Resource name: {}".format(resource_name))
-
     local_resource(
-        resource_name,
+        '{}-compile'.format(beat),
         build_cmd,
         deps=['.'],
         ignore=[
@@ -26,11 +29,8 @@ def compile(
             "Tiltfile"
         ])
 
-def build(
-        beat="metricbeat",
-        mode="run",
-        k8s_env="dev",
-    ):
+
+    ## Docker Build
     docker_image = '{}-{}-image'.format(beat, mode)
     if k8s_env == "prod":
         # More info at https://ttl.sh/
@@ -51,16 +51,14 @@ def build(
     docker_file = '{}/Dockerfile.{}'.format(beat, mode)
     print("Docker file: {}".format(docker_file))
 
-    suffix = ""
     if mode == "run":
         docker_entrypoint = [
-                '/usr/share/{}/{}{}'.format(beat, beat, suffix),
-                # "-c",
-                # "/etc/{}.yml".format(beat),
-                # "-e"
+                '/usr/share/{}/{}'.format(beat, beat),
+                "-c",
+                "/etc/{}.yml".format(beat),
+                "-e"
             ]
     else:
-        suffix = "-debugger"
         docker_entrypoint = [
             "dlv",
             "--headless=true",
@@ -68,7 +66,7 @@ def build(
             "--api-version=2",
             "--log",
             "exec",
-            "/usr/share/{}/{}{}".format(beat, beat, suffix),
+            "/usr/share/{}/{}".format(beat, beat),
             "--"
         ]
     print("Docker entrypoint: {}".format(docker_entrypoint))
@@ -80,105 +78,28 @@ def build(
         dockerfile=docker_file,
         only=["build"],
         live_update=[
-            sync('./build/{}{}', '/usr/share/{}'.format(beat, suffix, beat)),
+            sync('./build', '/usr/share/{}'.format(beat)),
         ],
     )
 
-def k8s_deploy(
-        beat="metricbeat",
-        mode="run",
-        k8s_env="dev",
-        k8s_cluster="single",
-    ):
-
-    if k8s_cluster == "multi":
-        k8s_manifest = '{}/manifest.{}.{}.{}.yaml'.format(beat, mode, k8s_env, k8s_cluster)
-    else:
-        k8s_manifest = '{}/manifest.{}.{}.yaml'.format(beat, mode, k8s_env)
+    ## Deploy to k8s
+    k8s_manifest = '{}/manifest.{}.{}.yaml'.format(beat, mode, k8s_env)
     print("K8s manifest: {}".format(k8s_manifest))
 
     k8s_yaml(k8s_manifest)
 
-def k8s_expose(
-        beat="metricbeat",
-        mode="run",
-        k8s_cluster="single",
-    ):
+    ## Expose resource
     if mode == "run":
         k8s_resource(beat)
-    elif mode == "debug" and k8s_cluster == "multi":
-        runner_resource = "{}-runner".format(beat)
-        k8s_resource(runner_resource)
-
-        debugger_resource = "{}-debugger".format(beat)
-        k8s_resource(debugger_resource, port_forwards=56268)
     else:
         k8s_resource(beat, port_forwards=56268)
 
     allow_k8s_contexts(k8s_context())
 
-
-def beat(
-        beat="metricbeat",
-        mode="run",
-        arch="arm64",
-        k8s_env="dev",
-        k8s_cluster="single",
-        **kwargs):
-    if beat not in ["metricbeat", "filebeat"]:
-        print("Invalid beat: {}".format(beat))
-        exit(-1)
-    if mode not in ["run", "debug"]:
-        print("Invalid mode: {}".format(mode))
-        exit(-1)
-    if arch not in ["arm64", "amd64"]:
-        print("Invalid arch: {}".format(arch))
-        exit(-1)
-    if k8s_env not in ["dev", "prod"]:
-        print("Invalid k8s_env: {}".format(k8s_env))
-        exit(-1)
-    if k8s_cluster not in ["single", "multi"]:
-        print("Invalid k8s_cluster: {}".format(k8s_cluster))
-        exit(-1)
-
-    print("Mode: {}".format(mode))
-    print("Beat: {}".format(beat))
-    print("Arch: {}".format(arch))
-    print("K8s_env: {}".format(k8s_env))
-    print("K8s_cluster: {}".format(k8s_cluster))
-
-    ## Compile
-    if k8s_cluster == "multi":
-        compile(beat=beat, mode="debug", arch=arch)
-        compile(beat=beat, mode="run", arch=arch)
-    else:
-        compile(beat=beat, mode=mode, arch=arch)
-
-    ## Docker Build
-    if k8s_cluster == "multi":
-        build(beat=beat, mode="debug", k8s_env=k8s_env)
-        build(beat=beat, mode="run", k8s_env=k8s_env)
-    else:
-        build(beat=beat, mode=mode, k8s_env=k8s_env)
-
-    ## Deploy to k8s
-    k8s_deploy(beat=beat, mode=mode, k8s_env=k8s_env, k8s_cluster=k8s_cluster)
-
-    # ## Expose resource
-    k8s_expose(beat, mode, k8s_cluster)
-
-# beat(beat="metricbeat", # change to `filebeat` to test filebeat
-#     mode="debug", # debug mode only works with k8s_env=`dev`
-#     arch="arm64", # change if on different laptop architecture
-#     k8s_env="dev") # change to `prod` to use with EKS or GKE.
-
-
 beat(beat="metricbeat", # change to `filebeat` to test filebeat
     mode="debug", # debug mode only works with k8s_env=`dev`
     arch="arm64", # change if on different laptop architecture
-    k8s_env="dev", # change to `prod` to use with EKS or GKE.
-    k8s_cluster="multi", # change to `single` to use a single node k8s cluster
-)
+    k8s_env="dev") # change to `prod` to use with EKS or GKE.
 
 
 
