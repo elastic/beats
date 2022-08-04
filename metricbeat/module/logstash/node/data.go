@@ -19,8 +19,7 @@ package node
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -53,7 +52,7 @@ func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 		return elastic.MakeErrorForMissingField("id", elastic.Logstash)
 	}
 	event.RootFields.Put("service.id", serviceID)
-	fields.Delete("id")
+	_ = fields.Delete("id")
 
 	// Set service hostname
 	host, err := fields.GetValue("host")
@@ -61,7 +60,7 @@ func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 		return elastic.MakeErrorForMissingField("host", elastic.Logstash)
 	}
 	event.RootFields.Put("service.hostname", host)
-	fields.Delete("host")
+	_ = fields.Delete("host")
 
 	// Set service version
 	version, err := fields.GetValue("version")
@@ -69,7 +68,7 @@ func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 		return elastic.MakeErrorForMissingField("version", elastic.Logstash)
 	}
 	event.RootFields.Put("service.version", version)
-	fields.Delete("version")
+	_ = fields.Delete("version")
 
 	// Set PID
 	pid, err := fields.GetValue("jvm.pid")
@@ -77,7 +76,7 @@ func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 		return elastic.MakeErrorForMissingField("jvm.pid", elastic.Logstash)
 	}
 	event.RootFields.Put("process.pid", pid)
-	fields.Delete("jvm.pid")
+	_ = fields.Delete("jvm.pid")
 
 	return nil
 }
@@ -86,7 +85,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Logstash Node API response")
+		return fmt.Errorf("failure parsing Logstash Node API response: %w", err)
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
@@ -96,7 +95,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 		for _, pipeline := range pipelines {
 			fields, err := schema.Apply(data)
 			if err != nil {
-				return errors.Wrap(err, "failure applying node schema")
+				return fmt.Errorf("failure applying node schema: %w", err)
 			}
 			removeClusterUUIDsFromPipeline(pipeline)
 
@@ -143,8 +142,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 }
 
 func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClusterUUID string) map[string][]logstash.PipelineState {
-	var clusterToPipelinesMap map[string][]logstash.PipelineState
-	clusterToPipelinesMap = make(map[string][]logstash.PipelineState)
+	clusterToPipelinesMap := make(map[string][]logstash.PipelineState)
 
 	if overrideClusterUUID != "" {
 		clusterToPipelinesMap[overrideClusterUUID] = pipelines

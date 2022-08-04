@@ -29,8 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -153,7 +151,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
-		return errors.Wrap(err, "could not parse node stats response")
+		return fmt.Errorf("could not parse node stats response: %w", err)
 	}
 
 	timestamp := common.Time(time.Now())
@@ -214,14 +212,14 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 			ModuleFields: mapstr.M{},
 		}
 
-		event.ModuleFields.Put("node.stats", logstashStats)
-		event.RootFields.Put("service.id", nodeStats.ID)
-		event.RootFields.Put("service.hostname", nodeStats.Host)
-		event.RootFields.Put("service.version", nodeStats.Version)
+		_, _ = event.ModuleFields.Put("node.stats", logstashStats)
+		_, _ = event.RootFields.Put("service.id", nodeStats.ID)
+		_, _ = event.RootFields.Put("service.hostname", nodeStats.Host)
+		_, _ = event.RootFields.Put("service.version", nodeStats.Version)
 
 		if clusterUUID != "" {
-			event.ModuleFields.Put("cluster.id", clusterUUID)
-			event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
+			_, _ = event.ModuleFields.Put("cluster.id", clusterUUID)
+			_, _ = event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 		}
 
 		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
