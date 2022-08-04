@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"gopkg.in/yaml.v2"
@@ -23,16 +24,16 @@ var ConfigTransform = TransformRegister{}
 // as this is entirely xpack/Elastic License code, and the entire beats setup process happens in libbeat.
 // This is fairly simple, as only one beat will ever register a callback.
 type TransformRegister struct {
-	transformFunc func(UnitsConfig) ([]*reload.ConfigWithMeta, error)
+	transformFunc func(*proto.UnitExpectedConfig) ([]*reload.ConfigWithMeta, error)
 }
 
 // SetTransform sets a transform function callback
-func (r *TransformRegister) SetTransform(transform func(UnitsConfig) ([]*reload.ConfigWithMeta, error)) {
+func (r *TransformRegister) SetTransform(transform func(*proto.UnitExpectedConfig) ([]*reload.ConfigWithMeta, error)) {
 	r.transformFunc = transform
 }
 
 // SetTransform sets a transform function callback
-func (r *TransformRegister) Transform(cfg UnitsConfig) ([]*reload.ConfigWithMeta, error) {
+func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig) ([]*reload.ConfigWithMeta, error) {
 	// If no transform is registered, fallback to a basic setup
 	if r.transformFunc == nil {
 		InjectStreamProcessor(&cfg, "logs")
@@ -160,19 +161,19 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 // This generates an opaque config blob used by all the beats
 // This has to handle both universal config changes and changes specific to the beats
 // This is a replacement for the AST code that lived in V1
-func generateBeatConfig(unitRaw string) ([]*reload.ConfigWithMeta, error) {
-	rawIn := UnitsConfig{}
+func generateBeatConfig(unitRaw *proto.UnitExpectedConfig) ([]*reload.ConfigWithMeta, error) {
+	// rawIn := UnitsConfig{}
 
-	err := yaml.Unmarshal([]byte(unitRaw), &rawIn)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshalling unit config: %w", err)
-	}
+	// err := yaml.Unmarshal([]byte(unitRaw), &rawIn)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error unmarshalling unit config: %w", err)
+	// }
 	//FixStreamRule
-	if rawIn.DataStream.Namespace == "" {
-		rawIn.DataStream.Namespace = "default"
+	if unitRaw.DataStream.Namespace == "" {
+		unitRaw.DataStream.Namespace = "default"
 	}
-	if rawIn.DataStream.Dataset == "" {
-		rawIn.DataStream.Dataset = "generic"
+	if unitRaw.DataStream.Dataset == "" {
+		unitRaw.DataStream.Dataset = "generic"
 	}
 
 	// InjectAgentInfoRule
@@ -198,7 +199,7 @@ func generateBeatConfig(unitRaw string) ([]*reload.ConfigWithMeta, error) {
 	// Ditto for InjectHeadersRule
 
 	// Generate the config that's unique to a beat
-	metaConfig, err := ConfigTransform.Transform(rawIn)
+	metaConfig, err := ConfigTransform.Transform(unitRaw)
 	// if strings.Contains(exeName, "metricbeat") {
 	// 	metaConfig, err = metricbeatCfg(rawIn)
 	// } else if strings.Contains(exeName, "filebeat") {
@@ -265,11 +266,11 @@ func InjectIndexProcessor(rawIn *UnitsConfig, inputType string) {
 }
 
 //InjectStreamProcessor is an emulation of the InjectStreamProcessorRule AST code
-func InjectStreamProcessor(rawIn *UnitsConfig, inputType string) {
+func InjectStreamProcessor(rawIn *proto.UnitExpectedConfig, inputType string) {
 	// logic from datastreamTypeFromInputNode
 	procInputType := inputType
-	if rawIn.DataStream.StreamType != "" {
-		procInputType = rawIn.DataStream.StreamType
+	if rawIn.DataStream.Type != "" {
+		procInputType = rawIn.DataStream.Type
 	}
 
 	procInputNamespace := "default"
@@ -309,11 +310,9 @@ func InjectStreamProcessor(rawIn *UnitsConfig, inputType string) {
 		processors = append(processors, event)
 
 		// source stream
-		streamID, ok := streamCfg["id"]
-		if ok {
-			sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
-			processors = append(processors, sourceStream)
-		}
+		streamID := streamCfg.Id
+		sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
+		processors = append(processors, sourceStream)
 
 		var updatedProcs = []mapstr.M{}
 		// append to the existing processor list, if it exists

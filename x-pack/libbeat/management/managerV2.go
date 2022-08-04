@@ -275,7 +275,7 @@ func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 }
 
 func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
-	_, rawConfig := unit.Expected()
+	_, _, rawConfig := unit.Expected()
 	reloadConfig, err := groupByOutputs(rawConfig)
 	if err != nil {
 		errString := fmt.Errorf("Failed to generate config for output: %w", err)
@@ -298,7 +298,7 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 }
 
 func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
-	_, rawConfig := unit.Expected()
+	_, _, rawConfig := unit.Expected()
 	cm.setMainUnitValue(unit)
 
 	// Find the V2 inputs we need to reload
