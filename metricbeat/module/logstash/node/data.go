@@ -44,14 +44,14 @@ var (
 
 func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 	event.RootFields = mapstr.M{}
-	event.RootFields.Put("service.name", logstash.ModuleName)
+	_, _ = event.RootFields.Put("service.name", logstash.ModuleName)
 
 	// Set service ID
 	serviceID, err := fields.GetValue("id")
 	if err != nil {
 		return elastic.MakeErrorForMissingField("id", elastic.Logstash)
 	}
-	event.RootFields.Put("service.id", serviceID)
+	_, _ = event.RootFields.Put("service.id", serviceID)
 	_ = fields.Delete("id")
 
 	// Set service hostname
@@ -59,7 +59,7 @@ func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 	if err != nil {
 		return elastic.MakeErrorForMissingField("host", elastic.Logstash)
 	}
-	event.RootFields.Put("service.hostname", host)
+	_, _ = event.RootFields.Put("service.hostname", host)
 	_ = fields.Delete("host")
 
 	// Set service version
@@ -121,8 +121,8 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 			}
 
 			if clusterUUID != "" {
-				event.ModuleFields.Put("cluster.id", clusterUUID)
-				event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
+				_, _ = event.ModuleFields.Put("cluster.id", clusterUUID)
+				_, _ = event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 			}
 
 			event.ID = pipeline.EphemeralID

@@ -110,13 +110,15 @@ func TestData(t *testing.T) {
 		}
 
 		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
-		w.Write(input)
+		_, err := w.Write(input)
+		require.NoError(t, err, "error writing file in / for TestData")
 	}))
 
 	mux.Handle("/_node/stats", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			input, _ := ioutil.ReadFile("./_meta/test/node_stats.710.json")
-			w.Write(input)
+			_, err := w.Write(input)
+			require.NoError(t, err, "error writing file in /_node/stats for TestData")
 		}))
 
 	server := httptest.NewServer(mux)
