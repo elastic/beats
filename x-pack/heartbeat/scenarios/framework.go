@@ -117,7 +117,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, 
 	// make a pipeline
 	pipe := &monitors.MockPipeline{}
 	// pass it to the factory
-	f, sched, closeFactory := makeTestFactory()
+	f, sched, closeFactory := setupFactoryAndSched()
 	conf, err := config.NewConfigFrom(monitorConfig)
 	require.NoError(t, err)
 	err = conf.Unpack(&mtr.StdFields)
@@ -142,7 +142,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, 
 	return mtr, err
 }
 
-func makeTestFactory() (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
+func setupFactoryAndSched() (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
 	id, _ := uuid.NewV4()
 	eid, _ := uuid.NewV4()
 	info := beat.Info{
