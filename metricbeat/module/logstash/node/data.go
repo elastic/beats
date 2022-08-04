@@ -75,7 +75,7 @@ func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
 	if err != nil {
 		return elastic.MakeErrorForMissingField("jvm.pid", elastic.Logstash)
 	}
-	event.RootFields.Put("process.pid", pid)
+	_, _ = event.RootFields.Put("process.pid", pid)
 	_ = fields.Delete("jvm.pid")
 
 	return nil
