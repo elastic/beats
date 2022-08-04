@@ -22,6 +22,7 @@ var Scenarios = ScenarioDB{
 	All: []Scenario{
 		{
 			Name: "http-simple",
+			Type: "http",
 			Tags: []string{"lightweight", "http"},
 			Runner: func() (config mapstr.M, close func(), err error) {
 				server := httptest.NewServer(hbtest.HelloWorldHandler(200))
@@ -37,6 +38,7 @@ var Scenarios = ScenarioDB{
 		},
 		{
 			Name: "tcp-simple",
+			Type: "tcp",
 			Tags: []string{"lightweight", "tcp"},
 			Runner: func() (config mapstr.M, close func(), err error) {
 				server := httptest.NewServer(hbtest.HelloWorldHandler(200))
@@ -54,9 +56,9 @@ var Scenarios = ScenarioDB{
 				return config, server.Close, nil
 			},
 		},
-		/* ICMP is disabled because it's only available some of the time, leading to flakiness
 		{
 			Name: "simple-icmp",
+			Type: "icmp",
 			Tags: []string{"icmp"},
 			Runner: func() (config mapstr.M, close func(), err error) {
 				return mapstr.M{
@@ -68,9 +70,9 @@ var Scenarios = ScenarioDB{
 				}, func() {}, nil
 			},
 		},
-		*/
 		{
 			Name: "simple-browser",
+			Type: "browser",
 			Tags: []string{"browser", "browser-inline"},
 			Runner: func() (config mapstr.M, close func(), err error) {
 				err = os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")

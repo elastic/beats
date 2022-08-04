@@ -194,6 +194,9 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
+		logp.L().Info("soutpipe %v", stdoutPipe)
+		logp.L().Info("stdoutToSynthEvent %v", stdoutToSynthEvent)
+		logp.L().Info("mpx %v", mpx)
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			logp.Warn("could not scan stderr events from synthetics: %s", err)

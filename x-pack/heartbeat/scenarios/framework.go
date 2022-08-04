@@ -5,6 +5,7 @@
 package scenarios
 
 import (
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -30,6 +31,7 @@ type ScenarioRun func() (config mapstr.M, close func(), err error)
 
 type Scenario struct {
 	Name   string
+	Type   string
 	Runner ScenarioRun
 	Tags   []string
 }
@@ -59,13 +61,25 @@ type ScenarioDB struct {
 }
 
 func (sdb ScenarioDB) Init() {
+	var prunedList []Scenario
+	browserCapable := os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") == "true"
+	icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
 	sdb.initOnce.Do(func() {
 		for _, s := range sdb.All {
+			if s.Type == "browser" && !browserCapable {
+				continue
+			}
+			if s.Type == "icmp" && !icmpCapable {
+				continue
+			}
+			prunedList = append(prunedList, s)
+
 			for _, t := range s.Tags {
 				sdb.ByTag[t] = append(sdb.ByTag[t], s)
 			}
 		}
 	})
+	sdb.All = prunedList
 }
 
 func (sdb ScenarioDB) RunAll(t *testing.T, callback func(*MonitorTestRun, error)) {
