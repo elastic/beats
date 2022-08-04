@@ -20,12 +20,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const debugSelector = "synthexec"
@@ -176,6 +177,9 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
+		logp.L().Info("soutpipe %v", stdoutPipe)
+		logp.L().Info("stdoutToSynthEvent %v", stdoutToSynthEvent)
+		logp.L().Info("mpx %v", mpx)
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			logp.Warn("could not scan stdout events from synthetics: %s", err)
