@@ -54,6 +54,7 @@ var Scenarios = ScenarioDB{
 				return config, server.Close, nil
 			},
 		},
+		/* ICMP is disabled because it's only available some of the time, leading to flakiness
 		{
 			Name: "simple-icmp",
 			Tags: []string{"icmp"},
@@ -67,6 +68,7 @@ var Scenarios = ScenarioDB{
 				}, func() {}, nil
 			},
 		},
+		*/
 		{
 			Name: "simple-browser",
 			Tags: []string{"browser", "browser-inline"},

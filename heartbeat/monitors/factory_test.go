@@ -18,6 +18,8 @@
 package monitors
 
 import (
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"regexp"
 	"testing"
 
@@ -27,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var binfo = beat.Info{
@@ -157,6 +158,26 @@ func TestPreProcessors(t *testing.T) {
 	}
 }
 
+func TestDisabledMonitor(t *testing.T) {
+	confMap := map[string]interface{}{
+		"type":    "test",
+		"enabled": "false",
+	}
+
+	conf, err := config.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	reg, built, closed := mockPluginsReg()
+	f, sched, fClose := makeMockFactory(reg)
+	defer fClose()
+	defer sched.Stop()
+	runner, err := f.Create(&MockPipeline{}, conf)
+	require.IsType(t, runner, NoopRunner{})
+
+	require.Equal(t, 0, built.Load())
+	require.Equal(t, 0, closed.Load())
+}
+
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
 	badConf := mockBadPluginConf(t, "custom")
@@ -165,6 +186,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 
 	f, sched, fClose := makeMockFactory(reg)
 	defer fClose()
+	defer sched.Stop()
 
 	makeTestMon := func() (*Monitor, error) {
 		mIface, err := f.Create(mockPipeline, serverMonConf)

@@ -21,6 +21,10 @@ import (
 	"fmt"
 	"sync"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -33,9 +37,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
@@ -84,8 +85,24 @@ func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.Pl
 	}
 }
 
+type NoopRunner struct{}
+
+func (NoopRunner) String() string {
+	return "<noop runner>"
+}
+
+func (NoopRunner) Start() {
+}
+
+func (NoopRunner) Stop() {
+}
+
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
+	if !c.Enabled() {
+		return NoopRunner{}, nil
+	}
+
 	c, err := stdfields.UnnestStream(c)
 	if err != nil {
 		return nil, err
@@ -144,6 +161,9 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *conf.C) error {
+	if !config.Enabled() {
+		return nil
+	}
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
 }
 
