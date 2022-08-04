@@ -160,10 +160,10 @@ spec:
       containers:
       - name: metricbeat
         image: metricbeat-debug-image
-        imagePullPolicy: Never
         args: [
           "-c", "/etc/metricbeat.yml",
-          "-e"
+          "-e",
+          "-system.hostfs=/hostfs",
         ]
         ports:
         - containerPort: 56268
