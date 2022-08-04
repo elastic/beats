@@ -327,26 +327,6 @@ func InjectStreamProcessor(rawIn *UnitsConfig, inputType string) {
 
 }
 
-// func translateFilebeatType(rawIn *UnitsConfig) {
-// 	// I'm not sure what this does
-// 	if rawIn.UnitType == "logfile" || rawIn.UnitType == "event/file" {
-// 		rawIn.UnitType = "log"
-// 	} else if rawIn.UnitType == "event/stdin" {
-// 		rawIn.UnitType = "stdin"
-// 	} else if rawIn.UnitType == "event/tcp" {
-// 		rawIn.UnitType = "tcp"
-// 	} else if rawIn.UnitType == "event/udp" {
-// 		rawIn.UnitType = "udp"
-// 	} else if rawIn.UnitType == "log/docker" {
-// 		rawIn.UnitType = "docker"
-// 	} else if rawIn.UnitType == "log/redis_slowlog" {
-// 		rawIn.UnitType = "redis"
-// 	} else if rawIn.UnitType == "log/syslog" {
-// 		rawIn.UnitType = "syslog"
-// 	}
-
-// }
-
 func CreateReloadConfigFromStreams(raw UnitsConfig) ([]*reload.ConfigWithMeta, error) {
 	// format for the reloadable list needed bythe cm.Reload() method
 	configList := make([]*reload.ConfigWithMeta, len(raw.Streams))
@@ -360,45 +340,6 @@ func CreateReloadConfigFromStreams(raw UnitsConfig) ([]*reload.ConfigWithMeta, e
 	}
 	return configList, nil
 }
-
-// func metricbeatCfg(rawIn UnitsConfig) ([]*reload.ConfigWithMeta, error) {
-
-// 	InjectStreamProcessor(&rawIn, "metrics")
-// 	InjectIndexProcessor(&rawIn, "metrics")
-// 	FormatMetricbeatModules(&rawIn)
-
-// 	// format for the reloadable list needed bythe cm.Reload() method
-// 	configList := make([]*reload.ConfigWithMeta, len(rawIn.Streams))
-
-// 	for iter := range rawIn.Streams {
-// 		//cfg := mapstr.M{"modules": withProcessors.Streams[iter]}
-// 		uconfig, err := conf.NewConfigFrom(rawIn.Streams[iter])
-// 		if err != nil {
-// 			return nil, fmt.Errorf("error in conversion to conf.C:")
-// 		}
-// 		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
-// 	}
-
-// 	return configList, nil
-// }
-
-// func filebeatCfg(rawIn UnitsConfig) ([]*reload.ConfigWithMeta, error) {
-// 	InjectStreamProcessor(&rawIn, "logs")
-// 	InjectIndexProcessor(&rawIn, "logs")
-// 	translateFilebeatType(&rawIn)
-
-// 	// format for the reloadable list needed bythe cm.Reload() method
-// 	configList := make([]*reload.ConfigWithMeta, len(rawIn.Streams))
-// 	for iter := range rawIn.Streams {
-// 		uconfig, err := conf.NewConfigFrom(rawIn.Streams[iter])
-// 		if err != nil {
-// 			return nil, fmt.Errorf("error in conversion to conf.C:")
-// 		}
-// 		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
-// 	}
-
-// 	return configList, nil
-// }
 
 // A little debug helper to print everything in a config once its been rendered
 // TODO: turn this into a debug flag or something?
