@@ -117,18 +117,11 @@ def k8s_expose(
     allow_k8s_contexts(k8s_context())
 
 
-
-# beat(beat="metricbeat",  # change to `filebeat` to test filebeat
-#      mode="debug", # debug mode only works with k8s_env=`dev`
-#      arch="arm64",  # change if on different laptop architecture
-#      k8s_env="dev",  # change to `prod` to use with EKS or GKE.
-#      k8s_cluster="multi",  # change to `single` to use a single node k8s cluster
-#      )
-
 # Beat() is used to test beats in k8s cluster
-#
+
 # Parameters:
 # `beat`: `metricbeat` to test Metricbeat, `filebeat` to test Filebeat
+# `mode`: `debug` to start a remote debugger that you can connect to from your IDE with hot reloading enabled, `run` to just run Metricbeat without a debugger but still with hot reloading enabled
 # `arch`: `amd64` to build go binary for amd64 architecture, `arm64` to build go binary for arm64 (aka M1 Apple chip) architecture
 # `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP
 # `k8s_cluster`: `single` to use a single node k8s cluster, `multi` to use a k8s with more than 1 node.
