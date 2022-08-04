@@ -45,7 +45,7 @@ func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error
 	}
 
 	t.Run(s.Name, func(t *testing.T) {
-		//t.Parallel()
+		t.Parallel()
 		mtr, err := runMonitorOnce(t, cfgMap)
 		mtr.Wait()
 		callback(mtr, err)
@@ -131,11 +131,10 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, 
 
 	// start the monitor
 	mtr.Monitor.Start()
-	// wait for the monitor to stop
-	// wait for the pipeline to clear (ack)
 	mtr.Wait = func() {
-		time.Sleep(time.Second)
+		// wait for the monitor to stop
 		sched.WaitForRunOnce()
+		// stop the monitor itself
 		mtr.Monitor.Stop()
 		closeFactory()
 	}

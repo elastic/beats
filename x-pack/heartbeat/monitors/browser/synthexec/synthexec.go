@@ -90,11 +90,15 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
 func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
+		senr := newStreamEnricher(sFields)
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
+			err := senr.enrich(event, &SynthEvent{
+				Type:  "cmd/could_not_start",
+				Error: ECSErrToSynthError(ecserr.NewSyntheticsCmdCouldNotStartErr(err)),
+			})
 			return nil, err
 		}
-		senr := newStreamEnricher(sFields)
 		// We don't just return the readResultsJob, otherwise we'd just send an empty event, execute it right away
 		// then it'll keep executing itself until we're truly done
 		return readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)(event)
@@ -177,10 +181,6 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
-		logp.L().Info("soutpipe %v", stdoutPipe)
-		logp.L().Info("stdoutToSynthEvent %v", stdoutToSynthEvent)
-		logp.L().Info("mpx %v", mpx)
-		logp.L().Info("mpx %v", mpx.writeSynthEvent)
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			logp.Warn("could not scan stdout events from synthetics: %s", err)
@@ -195,9 +195,6 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
-		logp.L().Info("soutpipe %v", stdoutPipe)
-		logp.L().Info("stdoutToSynthEvent %v", stdoutToSynthEvent)
-		logp.L().Info("mpx %v", mpx)
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
 			logp.Warn("could not scan stderr events from synthetics: %s", err)
@@ -208,7 +205,9 @@ func runCmd(
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		defer jsonReader.Close()
+		defer func() {
+			_ = jsonReader.Close()
+		}()
 
 		// We don't use scanToSynthEvents here because all lines here will be JSON
 		// It's more efficient to let the json decoder handle the ndjson than
@@ -273,7 +272,7 @@ func runCmd(
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
 		err := <-cmdDone
-		jsonWriter.Close()
+		_ = jsonWriter.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 
 		var cmdError *SynthError = nil
@@ -307,7 +306,9 @@ func runCmd(
 // scanToSynthEvents takes a reader, a transform function, and a callback, and processes
 // each scanned line via the reader before invoking it with the callback.
 func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) (*SynthEvent, error), cb func(*SynthEvent)) error {
-	defer rdr.Close()
+	defer func() {
+		_ = rdr.Close()
+	}()
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*10)      // 10KiB initial buffer
 	scanner.Buffer(buf, 1024*1024*10) // Max 10MiB Buffer

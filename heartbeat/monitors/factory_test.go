@@ -173,6 +173,7 @@ func TestDisabledMonitor(t *testing.T) {
 	defer fClose()
 	defer sched.Stop()
 	runner, err := f.Create(&MockPipeline{}, conf)
+	require.NoError(t, err)
 	require.IsType(t, runner, NoopRunner{})
 
 	require.Equal(t, 0, built.Load())

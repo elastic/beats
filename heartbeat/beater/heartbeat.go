@@ -25,6 +25,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -35,8 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 )
@@ -202,7 +203,7 @@ func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	autodisco, err := autodiscover.NewAutodiscover(
+	ad, err := autodiscover.NewAutodiscover(
 		"heartbeat",
 		b.Publisher,
 		bt.dynamicFactory,
@@ -213,7 +214,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 	if err != nil {
 		return nil, err
 	}
-	return autodisco, nil
+	return ad, nil
 }
 
 // Stop stops the beat.
