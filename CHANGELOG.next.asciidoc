@@ -37,6 +37,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+
 *Auditbeat*
 
 - system/socket: Reduce memory usage of the dataset. {issue}32191[32191] {pull}32192[32192]
