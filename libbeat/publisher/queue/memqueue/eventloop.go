@@ -42,25 +42,37 @@ type directEventLoop struct {
 // Events in the buffer are forwarded to consumers only if the buffer is full or on flush timeout.
 type bufferingEventLoop struct {
 	broker     *broker
-	buf        *batchBuffer
 	deleteChan chan int
 
+	// The current buffer that incoming events are appended to. When it gets
+	// full enough, or enough time has passed, it is added to flushList.
+	// Events will still be added to buf even after it is in flushList, until
+	// either it reaches minEvents or a consumer requests it.
+	buf *batchBuffer
+
+	// flushList is the list of buffers that are ready to be sent to consumers.
 	flushList flushList
+
+	// pendingACKs aggregates a list of ACK channels for batches that have been sent
+	// to consumers, which is then sent to the broker's scheduledACKs channel.
+	pendingACKs chanList
 
 	// The number of events currently waiting in the queue, including
 	// those that have not yet been acked.
 	eventCount int
 
-	// The number of events that have been read by a consumer but not yet acked
-	unackedEventCount int
+	// The next entry ID that will be read by a consumer, and the next
+	// entry ID that has been consumed and is waiting for acknowledgment.
+	// We need to track these here because bufferingEventLoop discards
+	// its event buffers when they are sent to consumers, so we can't
+	// look directly at the event itself to get the current id like we
+	// do in the unbuffered loop.
+	nextConsumedID queue.EntryID
+	nextACKedID    queue.EntryID
 
 	minEvents    int
 	maxEvents    int
 	flushTimeout time.Duration
-
-	// pendingACKs aggregates a list of ACK channels for batches that have been sent
-	// to consumers, which is then sent to the broker's scheduledACKs channel.
-	pendingACKs chanList
 
 	// buffer flush timer state
 	timer *time.Timer
@@ -222,7 +234,7 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 	// We want to acknowledge N events starting at position firstIndex
 	// in the entries array.
 	// We iterate over the events from last to first, so we encounter the
-	// highest produer IDs first and can skip subsequent callbacks to the
+	// highest producer IDs first and can skip subsequent callbacks to the
 	// same producer.
 	producerCallbacks := []func(){}
 	for i := N - 1; i >= 0; i-- {
@@ -329,19 +341,10 @@ func (l *bufferingEventLoop) run() {
 }
 
 func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
-	oldestEntryID := l.nextEntryID
-	// If we have ACKs pending, the oldest id is the first one.
-	// Otherwise, it's still in the flush list. If both are empty,
-	// then we report the "oldest" as the next id that will be assigned.
-	if !l.pendingACKs.empty() {
-		oldestEntryID = l.pendingACKs.head.entries[0].id
-	} else if !l.flushList.empty() {
-		oldestEntryID = l.flushList.head.entries[0].id
-	}
 	req.responseChan <- memQueueMetrics{
 		currentQueueSize: l.eventCount,
-		occupiedRead:     l.unackedEventCount,
-		oldestEntryID:    oldestEntryID,
+		occupiedRead:     int(l.nextConsumedID - l.nextACKedID),
+		oldestEntryID:    l.nextACKedID,
 	}
 }
 
@@ -362,10 +365,8 @@ func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 				l.flushBuffer()
 				l.buf = newBatchBuffer(l.minEvents)
 			}
-		} else {
-			if L >= l.minEvents {
-				l.buf = newBatchBuffer(l.minEvents)
-			}
+		} else if L >= l.minEvents {
+			l.buf = newBatchBuffer(l.minEvents)
 		}
 	}
 }
@@ -444,7 +445,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	req.responseChan <- getResponse{acker.doneChan, entries}
 	l.pendingACKs.append(acker)
 
-	l.unackedEventCount += len(entries)
+	l.nextConsumedID += queue.EntryID(len(entries))
 	buf.entries = buf.entries[count:]
 	if buf.length() == 0 {
 		l.advanceFlushList()
@@ -452,7 +453,7 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 }
 
 func (l *bufferingEventLoop) handleDelete(count int) {
-	l.unackedEventCount -= count
+	l.nextACKedID += queue.EntryID(count)
 	l.eventCount -= count
 }
 
@@ -481,11 +482,6 @@ func (l *bufferingEventLoop) advanceFlushList() {
 
 func (l *bufferingEventLoop) flushBuffer() {
 	l.buf.flushed = true
-
-	if l.buf.length() == 0 {
-		panic("flushing empty buffer")
-	}
-
 	l.flushList.add(l.buf)
 }
 

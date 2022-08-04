@@ -45,7 +45,6 @@ type openState struct {
 // event acknowledgement callbacks can be coalesced into a single call.
 // It is defined as an explicit type to reduce cross-confusion with the id
 // of an event in the queue itself, which is a queue.EntryID.
-// with the
 type producerID uint64
 
 type produceState struct {
