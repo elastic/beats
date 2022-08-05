@@ -67,19 +67,30 @@ func NewService(config azure.Config) (*UsageService, error) {
 	return &service, nil
 }
 
-// GetForecast fetches the forecast for the given scope.
+// GetForecast fetches the forecast for the given scope and time interval.
 func (service *UsageService) GetForecast(scope string, startTime, endTime time.Time) (costmanagement.QueryResult, error) {
 	// With this flag, the Forecast API will also return actual usage data
-	// from the first day of the current month.
+	// for the given time interval (usually the current month).
+	//
+	// We can get both "Actual" and "Forecast" data from the same API call.
 	includeActualCost := true
 
+	// With this flag, the Forecast API will include "freshpartialCost" the response. This means we'll find
+	// both "Forecast" and "Actual" mixed data for the same usage date.
+	//
+	// The current dashboard is designed to use final costs only (it averages actual/forecasts values), so we are
+	// setting this flag to false for now. The downside is final data are available with a one-day delay.
+	includeFreshPartialCost := false
+
+	// The aggregation is performed by the "sum" of "cost" for each day.
 	aggregationName := "Cost"
+	aggregationFunction := costmanagement.FunctionTypeSum
 
 	forecastDefinition := costmanagement.ForecastDefinition{
 		Dataset: &costmanagement.QueryDataset{
 			Aggregation: map[string]*costmanagement.QueryAggregation{
 				"totalCost": {
-					Function: costmanagement.FunctionTypeSum,
+					Function: aggregationFunction,
 					Name:     &aggregationName,
 				},
 			},
@@ -87,17 +98,21 @@ func (service *UsageService) GetForecast(scope string, startTime, endTime time.T
 		},
 
 		// Time frame/period of the forecast. Required for MCA accounts.
+		//
+		// If omitted, EA users will get a forecast for the current month, and
+		// MCA users will get an error.
 		Timeframe: costmanagement.ForecastTimeframeTypeCustom,
 		TimePeriod: &costmanagement.QueryTimePeriod{
 			From: &date.Time{Time: startTime},
 			To:   &date.Time{Time: endTime},
 		},
 
-		Type:              costmanagement.ForecastTypeActualCost,
-		IncludeActualCost: &includeActualCost,
+		Type:                    costmanagement.ForecastTypeActualCost,
+		IncludeActualCost:       &includeActualCost,
+		IncludeFreshPartialCost: &includeFreshPartialCost,
 	}
 
-	// required, but I don't have a value for it yet.
+	// required, but I don't have a use for it, yet.
 	filter := ""
 
 	queryResult, err := service.forecastClient.Usage(service.context, scope, forecastDefinition, filter)
