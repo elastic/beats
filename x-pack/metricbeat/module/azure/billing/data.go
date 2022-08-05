@@ -6,10 +6,11 @@ package billing
 
 import (
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
 
 	"errors"
 
@@ -159,10 +160,10 @@ func getResourceNameFromPath(path string) string {
 //
 func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID string) ([]mb.Event, error) {
 	// the number of columns expected in the QueryResult supported by this input.
-	expectedColumns := 4
+	expectedNumberOfColumns := 4
 
-	if result.Columns == nil || len(*result.Columns) != expectedColumns {
-		return []mb.Event{}, fmt.Errorf("unsupported forecasts QueryResult format: %d instead of %d", len(*result.Columns), expectedColumns)
+	if result.Columns == nil || len(*result.Columns) != expectedNumberOfColumns {
+		return []mb.Event{}, fmt.Errorf("unsupported forecasts QueryResult format: %d instead of %d", len(*result.Columns), expectedNumberOfColumns)
 	}
 
 	if result.Rows == nil {
@@ -176,8 +177,8 @@ func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID 
 		var costStatus string
 		var usageDate time.Time
 
-		if len(row) != expectedColumns {
-			return events, fmt.Errorf("unsupported forecasts QueryResult.Rows format: %d instead of %d", len(row), expectedColumns)
+		if len(row) != expectedNumberOfColumns {
+			return events, fmt.Errorf("unsupported forecasts QueryResult.Rows format: %d instead of %d", len(row), expectedNumberOfColumns)
 		}
 
 		// cost
