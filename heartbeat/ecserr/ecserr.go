@@ -81,3 +81,11 @@ func NewCmdTimeoutStatusErr(timeout time.Duration, cmd string) *ECSErr {
 		fmt.Sprintf("command '%s' did not exit before extended timeout: %s", cmd, timeout.String()),
 	)
 }
+
+func NewSyntheticsCmdCouldNotStartErr(reason error) *ECSErr {
+	return NewECSErr(
+		ETYPE_IO,
+		"SYNTHETICS_CMD_COULD_NOT_START",
+		fmt.Sprintf("could not start command not found: %s", reason),
+	)
+}
