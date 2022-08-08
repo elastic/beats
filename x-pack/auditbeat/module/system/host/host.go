@@ -155,14 +155,26 @@ func (host *Host) toMapStr() mapstr.M {
 
 	var macStrings []string
 	for _, mac := range host.Macs {
-		macStr := mac.String()
-		if macStr != "" {
-			macStrings = append(macStrings, macStr)
+		if len(mac) != 0 {
+			macStrings = append(macStrings, formatHardwareAddr(mac))
 		}
 	}
 	mapstr.Put("mac", macStrings)
 
 	return mapstr
+}
+
+// formatHardwareAddr formats hardware addresses according to the ECS spec.
+func formatHardwareAddr(addr net.HardwareAddr) string {
+	buf := make([]byte, 0, len(addr)*3-1)
+	for _, b := range addr {
+		if len(buf) != 0 {
+			buf = append(buf, '-')
+		}
+		const hexDigit = "0123456789ABCDEF"
+		buf = append(buf, hexDigit[b>>4], hexDigit[b&0xf])
+	}
+	return string(buf)
 }
 
 func init() {

@@ -70,14 +70,14 @@ func TestCreateEvent(t *testing.T) {
 	// Validate the contents of the event.
 	validate := lookslike.MustCompile(map[string]interface{}{
 		"source": map[string]interface{}{
-			"mac":     "01:02:03:04:05:06",
+			"mac":     "01-02-03-04-05-06",
 			"ip":      "203.0.113.3",
 			"port":    port1,
 			"bytes":   uint64(10),
 			"packets": uint64(1),
 		},
 		"destination": map[string]interface{}{
-			"mac":     "06:05:04:03:02:01",
+			"mac":     "06-05-04-03-02-01",
 			"ip":      "198.51.100.2",
 			"port":    port2,
 			"bytes":   uint64(460),
