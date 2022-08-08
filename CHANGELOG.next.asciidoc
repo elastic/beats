@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
 
 *Heartbeat*
 
