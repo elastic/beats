@@ -95,6 +95,7 @@ type Host struct {
 
 // changeDetectionHash creates a hash of selected parts of the host information.
 // This is used later to detect changes to a host over time.
+//nolint:errcheck // All checks are for writes to a hasher.
 func (host *Host) changeDetectionHash() uint64 {
 	h := xxhash.New()
 
@@ -114,6 +115,7 @@ func (host *Host) changeDetectionHash() uint64 {
 	return h.Sum64()
 }
 
+//nolint:errcheck // All checks are for mapstr.Put.
 func (host *Host) toMapStr() mapstr.M {
 	mapstr := mapstr.M{
 		// https://github.com/elastic/ecs#-host-fields
@@ -285,6 +287,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	var events []mb.Event
 
 	// Report ID changes as a separate, special event.
+	//nolint:errcheck // All checks are for mapstr.Put.
 	if ms.lastHost.Info.UniqueID != currentHost.Info.UniqueID {
 		/*
 		 Issue two events - one for the host with the old ID, one for the new
@@ -321,7 +324,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	if len(events) > 0 {
-		ms.saveStateToDisk()
+		return ms.saveStateToDisk()
 	}
 
 	return nil
@@ -348,6 +351,7 @@ func getHost() (*Host, error) {
 	return host, nil
 }
 
+//nolint:errcheck // All checks are for mapstr.CopyFieldsTo.
 func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	hostFields := host.toMapStr()
 
@@ -472,9 +476,11 @@ func (ms *MetricSet) restoreStateFromDisk() error {
 	if decoder != nil {
 		var lastHost Host
 		err = decoder.Decode(&lastHost)
-		if err == nil {
+		switch err { //nolint:errorlint // Bad linter! io.EOF is never wrapped.
+		case nil:
 			ms.lastHost = &lastHost
-		} else if err != io.EOF {
+		case io.EOF:
+		default:
 			return fmt.Errorf("error decoding host information: %w", err)
 		}
 	}

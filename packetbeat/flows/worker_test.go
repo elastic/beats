@@ -116,7 +116,7 @@ func TestCreateEvent(t *testing.T) {
 
 	// Write the event to disk if -data is used.
 	if *dataFlag {
-		_, _ = event.Fields.Put("@timestamp", common.Time(end))
+		event.Fields.Put("@timestamp", common.Time(end)) //nolint:errcheck // Never fails.
 		output, err := json.MarshalIndent(&event.Fields, "", "  ")
 		if err != nil {
 			t.Fatal(err)
