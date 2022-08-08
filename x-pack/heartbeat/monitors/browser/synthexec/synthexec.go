@@ -205,9 +205,7 @@ func runCmd(
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		defer func() {
-			_ = jsonReader.Close()
-		}()
+		defer jsonReader.Close()
 
 		// We don't use scanToSynthEvents here because all lines here will be JSON
 		// It's more efficient to let the json decoder handle the ndjson than

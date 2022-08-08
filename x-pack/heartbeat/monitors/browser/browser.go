@@ -28,8 +28,6 @@ func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
 	// We don't want users running synthetics in environments that don't have the required GUI libraries etc, so we check
 	// this flag. When we're ready to support the many possible configurations of systems outside the docker environment
 	// we can remove this check.
-	ev := os.Environ()
-	logp.L().Info("EV %v", ev)
 	if os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") != "true" {
 		return plugin.Plugin{}, ErrNotSyntheticsCapableError
 	}
