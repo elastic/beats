@@ -1,0 +1,106 @@
+
+load('ext://restart_process', 'docker_build_with_restart')
+
+def beat(
+        mode="run",  # or debug
+        beat="metricbeat", # or filebeat
+        arch="arm64", # or amd64
+        k8s_env="dev", # or prod
+        **kwargs):
+
+    if mode not in ["run", "debug"]:
+        exit(-1)
+
+    print("Mode: {}".format(mode))
+
+    ## Compile
+    flags = ""
+    if mode == "debug":
+        flags = '-gcflags "-N -l"'
+    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH={} go build {} -o build/{} ../../{}".format(arch, flags, beat, beat)
+    print("Build cmd: {}".format(build_cmd))
+
+    local_resource(
+        '{}-compile'.format(beat),
+        build_cmd,
+        deps=['.'],
+        ignore=[
+            "build",
+            "Tiltfile"
+        ])
+
+
+    ## Docker Build
+    docker_image = '{}-{}-image'.format(beat, mode)
+    if k8s_env == "prod":
+        # More info at https://ttl.sh/
+        # docker_registry = 'ttl.sh/{}'.format(docker_image)
+
+        # In order to push to GCR you need
+        #   gcloud auth login
+        #   gcloud auth configure-docker
+        #
+        # More info at https://cloud.google.com/container-registry/docs/advanced-authentication#gcloud-helper
+        docker_registry = "us.gcr.io/elastic-observability".format(docker_image)
+
+        default_registry(docker_registry)
+        print("Docker registry: {}".format(docker_registry))
+
+    print("Docker image: {}".format(docker_image))
+
+    docker_file = '{}/Dockerfile.{}'.format(beat, mode)
+    print("Docker file: {}".format(docker_file))
+
+    if mode == "run":
+        docker_entrypoint = [
+                '/usr/share/{}/{}'.format(beat, beat),
+                "-c",
+                "/etc/{}.yml".format(beat),
+                "-e"
+            ]
+    else:
+        docker_entrypoint = [
+            "dlv",
+            "--headless=true",
+            "--listen=:56268",
+            "--api-version=2",
+            "--log",
+            "exec",
+            "/usr/share/{}/{}".format(beat, beat),
+            "--"
+        ]
+    print("Docker entrypoint: {}".format(docker_entrypoint))
+
+    docker_build_with_restart(
+        docker_image,
+        '.',
+        entrypoint=docker_entrypoint,
+        dockerfile=docker_file,
+        only=["build"],
+        live_update=[
+            sync('./build', '/usr/share/{}'.format(beat)),
+        ],
+    )
+
+    ## Deploy to k8s
+    k8s_manifest = '{}/manifest.{}.{}.yaml'.format(beat, mode, k8s_env)
+    print("K8s manifest: {}".format(k8s_manifest))
+
+    k8s_yaml(k8s_manifest)
+
+    ## Expose resource
+    if mode == "run":
+        k8s_resource(beat)
+    else:
+        k8s_resource(beat, port_forwards=56268)
+
+    allow_k8s_contexts(k8s_context())
+
+beat(beat="metricbeat", # change to `filebeat` to test filebeat
+    mode="debug", # debug mode only works with k8s_env=`dev`
+    arch="arm64", # change if on different laptop architecture
+    k8s_env="dev") # change to `prod` to use with EKS or GKE.
+
+
+
+

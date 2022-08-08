@@ -177,7 +177,7 @@
         "title": "[Metricbeat Kubernetes] Pods",
         "version": 1
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013",
     "migrationVersion": {
         "dashboard": "8.3.0"
@@ -230,6 +230,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-05-24T10:02:18.712Z",
-    "version": "WzExNDEyLDFd"
+    "updated_at": "2022-06-28T06:47:02.196Z",
+    "version": "WzU3MzEsM10="
 }

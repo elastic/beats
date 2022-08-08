@@ -97,7 +97,8 @@ func TestJourneyEnricher(t *testing.T) {
 		} else {
 			u, _ := url.Parse(url1)
 			// journey end gets a summary
-			v = append(v, lookslike.MustCompile(mapstr.M{
+			v = append(v, lookslike.MustCompile(map[string]interface{}{
+				"event.type":          "heartbeat/summary",
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
@@ -110,7 +111,9 @@ func TestJourneyEnricher(t *testing.T) {
 	check := func(t *testing.T, se *SynthEvent, je *journeyEnricher) {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event: %s", se.Type), func(t *testing.T) {
-			enrichErr := je.enrich(e, se)
+			// we invoke the stream enricher's enrich function, which in turn calls the journey enricher
+			// we do this because we want the check group set
+			enrichErr := je.streamEnricher.enrich(e, se)
 			if se.Error != nil {
 				require.Equal(t, stepError(se.Error), enrichErr)
 			}
@@ -150,13 +153,11 @@ func TestJourneyEnricher(t *testing.T) {
 func TestEnrichConsoleSynthEvents(t *testing.T) {
 	tests := []struct {
 		name  string
-		je    *journeyEnricher
 		se    *SynthEvent
 		check func(t *testing.T, e *beat.Event, je *journeyEnricher)
 	}{
 		{
 			"stderr",
-			&journeyEnricher{},
 			&SynthEvent{
 				Type: Stderr,
 				Payload: mapstr.M{
@@ -180,7 +181,6 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 		},
 		{
 			"stdout",
-			&journeyEnricher{},
 			&SynthEvent{
 				Type: Stdout,
 				Payload: mapstr.M{
@@ -207,9 +207,10 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &beat.Event{}
-			err := tt.je.enrichSynthEvent(e, tt.se)
+			je := newJourneyEnricher(newStreamEnricher(stdfields.StdMonitorFields{}))
+			err := je.enrichSynthEvent(e, tt.se)
 			require.NoError(t, err)
-			tt.check(t, e, tt.je)
+			tt.check(t, e, je)
 		})
 	}
 }
@@ -217,14 +218,12 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 func TestEnrichSynthEvent(t *testing.T) {
 	tests := []struct {
 		name    string
-		je      *journeyEnricher
 		se      *SynthEvent
 		wantErr bool
 		check   func(t *testing.T, e *beat.Event, je *journeyEnricher)
 	}{
 		{
 			"cmd/status - with error",
-			&journeyEnricher{},
 			&SynthEvent{
 				Type:  CmdStatus,
 				Error: &SynthError{Name: "cmdexit", Message: "cmd err msg"},
@@ -244,7 +243,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 			// If a journey did not emit `journey/end` but exited without
 			// errors, we consider the journey to be up.
 			"cmd/status - without error",
-			&journeyEnricher{},
 			&SynthEvent{
 				Type:  CmdStatus,
 				Error: nil,
@@ -262,7 +260,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"journey/end",
-			&journeyEnricher{},
 			&SynthEvent{Type: JourneyEnd},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -277,7 +274,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"step/end",
-			&journeyEnricher{},
 			&SynthEvent{Type: "step/end"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -286,7 +282,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"step/screenshot",
-			&journeyEnricher{},
 			&SynthEvent{Type: "step/screenshot"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -295,7 +290,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"step/screenshot_ref",
-			&journeyEnricher{},
 			&SynthEvent{Type: "step/screenshot_ref"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -304,7 +298,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"step/screenshot_block",
-			&journeyEnricher{},
 			&SynthEvent{Type: "screenshot/block", Id: "my_id"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -315,7 +308,6 @@ func TestEnrichSynthEvent(t *testing.T) {
 		},
 		{
 			"journey/network_info",
-			&journeyEnricher{},
 			&SynthEvent{Type: "journey/network_info"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
@@ -326,11 +318,12 @@ func TestEnrichSynthEvent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			je := newJourneyEnricher(newStreamEnricher(stdfields.StdMonitorFields{}))
 			e := &beat.Event{}
-			if err := tt.je.enrichSynthEvent(e, tt.se); (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
+			if err := je.enrichSynthEvent(e, tt.se); (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
 				t.Errorf("journeyEnricher.enrichSynthEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			tt.check(t, e, tt.je)
+			tt.check(t, e, je)
 		})
 	}
 }
@@ -519,6 +512,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			end:             baseTime.Add(10 * time.Microsecond),
 			stepCount:       0,
 			journeyComplete: false,
+			streamEnricher:  newStreamEnricher(stdfields.StdMonitorFields{}),
 		},
 		expected: mapstr.M{
 			"monitor.duration.us": int64(10),
@@ -535,6 +529,7 @@ func TestCreateSummaryEvent(t *testing.T) {
 			end:             time.Now().Add(10 * time.Microsecond),
 			journeyComplete: false,
 			errorCount:      1,
+			streamEnricher:  newStreamEnricher(stdfields.StdMonitorFields{}),
 		},
 		expected: mapstr.M{
 			"summary": mapstr.M{
@@ -558,20 +553,22 @@ func TestCreateSummaryEvent(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-			//nolint:errcheck // There are no new changes to this line but
 			// linter has been activated in the meantime. We'll cleanup separately.
-			mapstr.MergeFields(tt.expected, mapstr.M{
+			err = mapstr.MergeFields(tt.expected, mapstr.M{
 				"monitor":            monitorField,
 				"url":                mapstr.M{},
 				"event.type":         "heartbeat/summary",
 				"synthetics.type":    "heartbeat/summary",
 				"synthetics.journey": testJourney,
 			}, true)
+			require.NoError(t, err)
 			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
 		})
 	}
 }
 
 func makeTestJourneyEnricher(sFields stdfields.StdMonitorFields) *journeyEnricher {
-	return &journeyEnricher{streamEnricher: newStreamEnricher(sFields)}
+	return &journeyEnricher{
+		streamEnricher: newStreamEnricher(sFields),
+	}
 }

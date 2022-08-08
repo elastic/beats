@@ -21,6 +21,10 @@ import (
 	"fmt"
 	"sync"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -31,23 +35,23 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
 type RunnerFactory struct {
-	info       beat.Info
-	addTask    scheduler.AddTask
-	byId       map[string]*Monitor
-	mtx        *sync.Mutex
-	pluginsReg *plugin.PluginsReg
-	logger     *logp.Logger
-	runOnce    bool
+	info                  beat.Info
+	addTask               scheduler.AddTask
+	byId                  map[string]*Monitor
+	mtx                   *sync.Mutex
+	pluginsReg            *plugin.PluginsReg
+	logger                *logp.Logger
+	pipelineClientFactory PipelineClientFactory
 }
+
+type PipelineClientFactory func(pipeline beat.Pipeline) (pipeline.ISyncClient, error)
 
 type publishSettings struct {
 	// Fields and tags to add to monitor.
@@ -69,20 +73,36 @@ type publishSettings struct {
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg, runOnce bool) *RunnerFactory {
+func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg, pcf PipelineClientFactory) *RunnerFactory {
 	return &RunnerFactory{
-		info:       info,
-		addTask:    addTask,
-		byId:       map[string]*Monitor{},
-		mtx:        &sync.Mutex{},
-		pluginsReg: pluginsReg,
-		logger:     logp.L(),
-		runOnce:    runOnce,
+		info:                  info,
+		addTask:               addTask,
+		byId:                  map[string]*Monitor{},
+		mtx:                   &sync.Mutex{},
+		pluginsReg:            pluginsReg,
+		logger:                logp.L(),
+		pipelineClientFactory: pcf,
 	}
+}
+
+type NoopRunner struct{}
+
+func (NoopRunner) String() string {
+	return "<noop runner>"
+}
+
+func (NoopRunner) Start() {
+}
+
+func (NoopRunner) Stop() {
 }
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
+	if !c.Enabled() {
+		return NoopRunner{}, nil
+	}
+
 	c, err := stdfields.UnnestStream(c)
 	if err != nil {
 		return nil, err
@@ -119,9 +139,13 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 			}
 		}()
 	}
-	monitor, err := newMonitor(c, f.pluginsReg, p, f.addTask, safeStop, f.runOnce)
+	pc, err := f.pipelineClientFactory(p)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not create pipeline client via factory: %w", err)
+	}
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, safeStop)
+	if err != nil {
+		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
 
 	if mon, ok := f.byId[monitor.stdFields.ID]; ok {
@@ -137,6 +161,9 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *conf.C) error {
+	if !config.Enabled() {
+		return nil
+	}
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
 }
 

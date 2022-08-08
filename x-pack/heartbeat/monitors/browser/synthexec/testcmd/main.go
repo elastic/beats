@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	//Sleep first to test timeout feature async
+	time.Sleep(time.Millisecond * 500)
 	// For sending JSON results
 	pipe := os.NewFile(3, "pipe")
 

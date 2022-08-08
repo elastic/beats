@@ -57,8 +57,8 @@
                                     "layers": {
                                         "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9": {
                                             "columnOrder": [
-                                                "35a11916-4ca3-421b-9df2-521f52f21fbb",
                                                 "ed3c7efa-0467-4a57-8d06-0f4775906cc5",
+                                                "35a11916-4ca3-421b-9df2-521f52f21fbb",
                                                 "43097f7a-e478-47bc-81c1-7541bd899d46",
                                                 "43097f7a-e478-47bc-81c1-7541bd899d46X0",
                                                 "43097f7a-e478-47bc-81c1-7541bd899d46X1",
@@ -105,7 +105,7 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of Request Latency",
+                                                    "label": "Part of Request Latency in Milliseconds",
                                                     "operationType": "sum",
                                                     "params": {
                                                         "emptyAsNull": false
@@ -117,7 +117,7 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of Request Latency",
+                                                    "label": "Part of Request Latency in Milliseconds",
                                                     "operationType": "sum",
                                                     "params": {
                                                         "emptyAsNull": false
@@ -129,7 +129,7 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of Request Latency",
+                                                    "label": "Part of Request Latency in Milliseconds",
                                                     "operationType": "math",
                                                     "params": {
                                                         "tinymathAst": {
@@ -189,6 +189,22 @@
                                 "query": "NOT (kubernetes.apiserver.request.verb: WATCH or kubernetes.apiserver.request.verb: CONNECT)"
                             },
                             "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
                                 "layers": [
                                     {
                                         "accessors": [
@@ -209,7 +225,11 @@
                                     "position": "right"
                                 },
                                 "preferredSeriesType": "area",
-                                "title": "Empty XY chart",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
                                 "valueLabels": "hide",
                                 "valuesInLegend": true
                             }
@@ -249,8 +269,8 @@
                                     "layers": {
                                         "8df21ece-205d-4542-bec9-e381eca92895": {
                                             "columnOrder": [
-                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
                                                 "cff4229b-4050-47ef-bb61-9790c5596064",
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
                                                 "2e2bcfec-99ac-47fd-b901-bab26b32b3d1",
                                                 "20b53c0c-0338-468b-9254-4918ddb4438b"
                                             ],
@@ -324,6 +344,22 @@
                                 "query": ""
                             },
                             "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
                                 "layers": [
                                     {
                                         "accessors": [
@@ -344,7 +380,11 @@
                                     "position": "right"
                                 },
                                 "preferredSeriesType": "area",
-                                "title": "Empty XY chart",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
                                 "valueLabels": "hide",
                                 "valuesInLegend": true
                             }
@@ -384,8 +424,8 @@
                                     "layers": {
                                         "8df21ece-205d-4542-bec9-e381eca92895": {
                                             "columnOrder": [
-                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
                                                 "cff4229b-4050-47ef-bb61-9790c5596064",
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
                                                 "2e2bcfec-99ac-47fd-b901-bab26b32b3d1",
                                                 "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0",
                                                 "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1",
@@ -510,6 +550,22 @@
                                 "query": ""
                             },
                             "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
                                 "layers": [
                                     {
                                         "accessors": [
@@ -530,7 +586,11 @@
                                     "position": "right"
                                 },
                                 "preferredSeriesType": "area",
-                                "title": "Empty XY chart",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
                                 "valueLabels": "hide",
                                 "valuesInLegend": true
                             }
@@ -570,8 +630,8 @@
                                     "layers": {
                                         "8df21ece-205d-4542-bec9-e381eca92895": {
                                             "columnOrder": [
-                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
                                                 "cff4229b-4050-47ef-bb61-9790c5596064",
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
                                                 "2e2bcfec-99ac-47fd-b901-bab26b32b3d1",
                                                 "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0",
                                                 "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1",
@@ -697,6 +757,22 @@
                                 "query": ""
                             },
                             "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
                                 "layers": [
                                     {
                                         "accessors": [
@@ -717,7 +793,11 @@
                                     "position": "right"
                                 },
                                 "preferredSeriesType": "area",
-                                "title": "Empty XY chart",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
                                 "valueLabels": "hide",
                                 "valuesInLegend": true
                             }
@@ -1020,6 +1100,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-06-17T11:52:30.850Z",
-    "version": "WzUzOTgsMV0="
+    "updated_at": "2022-06-28T06:54:10.210Z",
+    "version": "WzU5OTgsM10="
 }

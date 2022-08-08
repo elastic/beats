@@ -13,10 +13,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
+
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
-	aggRecProto "github.com/awslabs/kinesis-aggregation/go/records"
-	"github.com/golang/protobuf/proto"
+	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
+	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
+	"github.com/golang/protobuf/proto" //nolint:staticcheck // SA1019 dependency uses deprecated package
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -112,7 +114,7 @@ func TestKinesis(t *testing.T) {
 			"kinesis_partition_key":   "abc123",
 			"kinesis_schema_version":  "1.0",
 			"kinesis_sequence_number": "12345",
-			"kinesis_encryption_type": "test",
+			"kinesis_encryption_type": types.EncryptionType("test"),
 		}
 
 		assert.Equal(t, fields, events[0].Fields)
@@ -164,7 +166,7 @@ func TestKinesis(t *testing.T) {
 			"aws_region":              "us-east-1",
 			"kinesis_schema_version":  "1.0",
 			"kinesis_sequence_number": "12345",
-			"kinesis_encryption_type": "test",
+			"kinesis_encryption_type": types.EncryptionType("test"),
 		}
 
 		var expectedInnerFields []mapstr.M
@@ -258,7 +260,7 @@ func TestKinesis(t *testing.T) {
 			"aws_region":              "us-east-1",
 			"kinesis_schema_version":  "1.0",
 			"kinesis_sequence_number": "12345",
-			"kinesis_encryption_type": "test",
+			"kinesis_encryption_type": types.EncryptionType("test"),
 			"kinesis_partition_key":   "z2JJ9ztX",
 			"message":                 `{"key":"value"}`,
 		}

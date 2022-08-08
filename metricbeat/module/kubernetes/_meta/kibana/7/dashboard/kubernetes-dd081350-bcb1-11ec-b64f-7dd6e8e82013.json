@@ -72,7 +72,7 @@
         "title": "[Metricbeat Kubernetes] PV/PVC",
         "version": 1
     },
-    "coreMigrationVersion": "8.3.0",
+    "coreMigrationVersion": "8.4.0",
     "id": "kubernetes-dd081350-bcb1-11ec-b64f-7dd6e8e82013",
     "migrationVersion": {
         "dashboard": "8.3.0"
@@ -95,6 +95,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-05-23T08:46:50.843Z",
-    "version": "WzcyOCwxXQ=="
+    "updated_at": "2022-06-28T06:47:07.287Z",
+    "version": "WzU3NzIsM10="
 }

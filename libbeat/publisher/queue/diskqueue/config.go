@@ -71,6 +71,12 @@ type Settings struct {
 
 	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
 	EncryptionKey []byte
+
+	// UseCompression enables or disables LZ4 compression
+	UseCompression bool
+
+	// UseProtobuf enables protobuf serialization instead of CBOR
+	UseProtobuf bool
 }
 
 // userConfig holds the parameters for a disk queue that are configurable

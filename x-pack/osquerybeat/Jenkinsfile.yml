@@ -28,7 +28,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "orka && darwin && poc"
+          - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/osquerybeat for macos"
@@ -57,6 +57,11 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
+        stage: extended_win
+    windows-11:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-11"
         stage: extended_win
     windows-10:
         mage: "mage build unitTest"

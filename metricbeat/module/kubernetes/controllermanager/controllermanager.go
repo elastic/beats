@@ -25,15 +25,15 @@ import (
 func init() {
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
-			"process_cpu_seconds_total":                   prometheus.Metric("process.cpu.sec"),
-			"process_resident_memory_bytes":               prometheus.Metric("process.memory.resident.bytes"),
-			"process_virtual_memory_bytes":                prometheus.Metric("process.memory.virtual.bytes"),
-			"process_open_fds":                            prometheus.Metric("process.fds.open.count"),
-			"process_start_time_seconds":                  prometheus.Metric("process.started.sec"),
-			"http_request_duration_microseconds":          prometheus.Metric("http.request.duration.us"),
-			"http_request_size_bytes":                     prometheus.Metric("http.request.size.bytes"),
-			"http_response_size_bytes":                    prometheus.Metric("http.response.size.bytes"),
-			"http_requests_total":                         prometheus.Metric("http.request.count"),
+			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
+			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
+			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
+			"process_open_fds":              prometheus.Metric("process.fds.open.count"),
+			"process_max_fds":               prometheus.Metric("process.fds.max.count"),
+			"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
+			// rest_client_request_duration_seconds buckets declared in
+			// https://github.com/kubernetes/component-base/blob/3b9b201c27aa896b98da61b94545efe442ae597e/metrics/prometheus/restclient/metrics.go#L39
+			"rest_client_request_duration_seconds":        prometheus.Metric("client.request.duration.us", prometheus.OpMultiplyBuckets(1000000)),
 			"rest_client_requests_total":                  prometheus.Metric("client.request.count"),
 			"workqueue_longest_running_processor_seconds": prometheus.Metric("workqueue.longestrunning.sec"),
 			"workqueue_unfinished_work_seconds":           prometheus.Metric("workqueue.unfinished.sec"),
@@ -48,12 +48,13 @@ func init() {
 		},
 
 		Labels: map[string]prometheus.LabelMap{
-			"handler": prometheus.KeyLabel("handler"),
-			"code":    prometheus.KeyLabel("code"),
-			"method":  prometheus.KeyLabel("method"),
-			"host":    prometheus.KeyLabel("host"),
-			"name":    prometheus.KeyLabel("name"),
-			"zone":    prometheus.KeyLabel("zone"),
+			"code":   prometheus.KeyLabel("code"),
+			"method": prometheus.KeyLabel("method"),
+			"host":   prometheus.KeyLabel("host"),
+			"name":   prometheus.KeyLabel("name"),
+			"zone":   prometheus.KeyLabel("zone"),
+			"url":    prometheus.KeyLabel("url"),
+			"verb":   prometheus.KeyLabel("verb"),
 		},
 	}
 

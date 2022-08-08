@@ -23,18 +23,21 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je      *journeyEnricher
-	sFields stdfields.StdMonitorFields
+	je         *journeyEnricher
+	sFields    stdfields.StdMonitorFields
+	checkGroup string
 }
 
 func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
-	return &streamEnricher{sFields: sFields}
+	return &streamEnricher{sFields: sFields, checkGroup: makeUuid()}
 }
 
 func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	if senr.je == nil || (se != nil && se.Type == JourneyStart) {
 		senr.je = newJourneyEnricher(senr)
 	}
+
+	eventext.MergeEventFields(event, map[string]interface{}{"monitor": map[string]interface{}{"check_group": senr.checkGroup}})
 
 	return senr.je.enrich(event, se)
 }
@@ -44,7 +47,6 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 type journeyEnricher struct {
 	journeyComplete bool
 	journey         *Journey
-	checkGroup      string
 	errorCount      int
 	error           error
 	stepCount       int
@@ -58,7 +60,6 @@ type journeyEnricher struct {
 
 func newJourneyEnricher(senr *streamEnricher) *journeyEnricher {
 	return &journeyEnricher{
-		checkGroup:     makeUuid(),
 		streamEnricher: senr,
 	}
 }
@@ -82,7 +83,6 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		switch se.Type {
 		case JourneyStart:
 			je.error = nil
-			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
 		case JourneyEnd, CmdStatus:
@@ -93,7 +93,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	}
 
 	eventext.MergeEventFields(event, mapstr.M{
-		"event.type": se.Type,
+		"event": mapstr.M{"type": se.Type},
 	})
 
 	return je.enrichSynthEvent(event, se)
@@ -114,9 +114,8 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	if je.journey != nil {
 		eventext.MergeEventFields(event, mapstr.M{
 			"monitor": mapstr.M{
-				"check_group": je.checkGroup,
-				"id":          je.journey.ID,
-				"name":        je.journey.Name,
+				"id":   je.journey.ID,
+				"name": je.journey.Name,
 			},
 		})
 	}
@@ -172,7 +171,7 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		down = 0
 	}
 
-	// Incase of syntax errors or incorrect runner options, the Synthetics
+	// In case of syntax errors or incorrect runner options, the Synthetics
 	// runner would exit immediately with exitCode 1 and we do not set the duration
 	// to inform the journey never ran
 	if !je.start.IsZero() {
@@ -205,6 +204,9 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	if je.journeyComplete {
 		return je.error
 	}
+
+	// create a new check group for the next journey
+	je.streamEnricher.checkGroup = makeUuid()
 
 	return fmt.Errorf("journey did not finish executing, %d steps ran: %w", je.stepCount, je.error)
 }
