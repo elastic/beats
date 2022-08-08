@@ -26,7 +26,7 @@ func main() {
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		atomic.AddUint64(&reqs, 1)
 
-		writer.Write([]byte("Dummy HTTP Server"))
+		_, _ = writer.Write([]byte("Dummy HTTP Server"))
 	})
 
 	http.HandleFunc("/pattern", func(writer http.ResponseWriter, request *http.Request) {
@@ -34,21 +34,24 @@ func main() {
 
 		status, body := handlePattern(states, request.URL)
 		writer.WriteHeader(status)
-		writer.Write([]byte(body))
+		_, _ = writer.Write([]byte(body))
 	})
 
 	go func() {
 		for {
 			time.Sleep(time.Second * 10)
 			r := atomic.LoadUint64(&reqs)
+			// nolint forbidigo
 			fmt.Printf("Processed %d reqs\n", r)
 		}
 	}()
 
 	port := 5678
+	// nolint forbidigo
 	fmt.Printf("Starting server on port %d\n", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {
+		// nolint forbidigo
 		fmt.Printf("Could not start server: %s", err)
 		os.Exit(1)
 	}
@@ -63,6 +66,7 @@ type responsePattern struct {
 func (rp *responsePattern) next() (status int, body string) {
 	var idx int
 	if rp.httpStatusesLen > 1 {
+		// nolint forbidigo
 		fmt.Printf("INTN %d\n", rp.httpStatusesLen)
 		idx = rand.Intn(rp.httpStatusesLen)
 	} else {
@@ -83,7 +87,7 @@ type responsePatternSequence struct {
 
 func (ps *responsePatternSequence) next() (status int, body string) {
 	ps.mtx.Lock()
-	ps.mtx.Unlock()
+	defer ps.mtx.Unlock()
 
 	if ps.currentPatternCount >= ps.currentPattern.countLimit {
 		ps.advancePattern()
@@ -109,7 +113,7 @@ func (ps *responsePatternSequence) advancePattern() {
 	ps.currentPatternCount = 0
 }
 
-var statusListRegexp = regexp.MustCompile("^[|\\d]+$")
+var statusListRegexp = regexp.MustCompile(`^[|\\d]+$`)
 
 func handlePattern(states *sync.Map, url *url.URL) (status int, body string) {
 	query := url.Query()
@@ -162,7 +166,7 @@ func compilePattern(patternStr string) (*responsePattern, error) {
 
 	splitPattern := strings.Split(patternStr, "x")
 	if len(splitPattern) != 2 {
-		return nil, fmt.Errorf("Bad pattern '%s', expected a STATUSxCOUNT as pattern. Got %s")
+		return nil, fmt.Errorf("bad pattern '%s', expected a STATUSxCOUNT as pattern", patternStr)
 	}
 
 	statusDefStr := splitPattern[0]

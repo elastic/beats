@@ -20,6 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -60,24 +61,11 @@ type EsConfig struct {
 
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
-
-	esConfig := EsConfig{}
-	err := b.Config.Output.Config().Unpack(&esConfig)
-
+	esc, err := getESClient(b.Config.Output.Config())
 	if err != nil {
-		logp.L().Info("could not unpack cloud config for heartbeat: %w", err)
-	} else {
-		esc, err := elasticsearch.NewClient(elasticsearch.Config{
-			Addresses: esConfig.Hosts,
-			Username:  esConfig.Username,
-			Password:  esConfig.Password,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("could not initialize elasticsearch client: %w", err)
-		}
-		monitorstate.SetEsClient(esc)
-		logp.Info("successfully connected to ES for state tracking: %v", esConfig.Hosts)
+		return nil, err
 	}
+	monitorstate.SetEsClient(esc)
 
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
@@ -244,4 +232,25 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	close(bt.done)
+}
+
+// getESClient returns an ES client if one is configured. Will return nil, nil, if none is configured.
+func getESClient(outputConfig *conf.C) (esc *elasticsearch.Client, err error) {
+	esConfig := EsConfig{}
+	err = outputConfig.Unpack(&esConfig)
+	if err != nil {
+		logp.L().Info("output is not elasticsearch, error / state tracking will not be enabled: %w", err)
+		return nil, nil
+	}
+	esc, err = elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: esConfig.Hosts,
+		Username:  esConfig.Username,
+		Password:  esConfig.Password,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not initialize elasticsearch client: %w", err)
+	}
+	logp.L().Infof("successfully connected to elasticsearch for error / state tracking: %v", esConfig.Hosts)
+
+	return esc, nil
 }
