@@ -27,6 +27,9 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -36,8 +39,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
@@ -99,7 +100,7 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 				return nil, fmt.Errorf("could not wrap state for '%s', no status assigned: %w", sf.ID, err)
 			}
 
-			ms := mst.Compute(sf.ID, status == "up")
+			ms := mst.RecordStatus(sf.ID, monitorstate.MonitorStatus(status.(string)))
 
 			logp.Warn("CHECKS: %s - s:%s u:%d d:%d", sf.ID, ms.Status, ms.Up, ms.Down)
 

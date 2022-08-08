@@ -7,38 +7,37 @@ import (
 
 const FlappingThreshold time.Duration = time.Second * 10
 
+type MonitorStatus string
+
 const (
-	StatusUp       = "up"
-	StatusDown     = "down"
-	StatusFlapping = "flap"
+	StatusUp       MonitorStatus = "up"
+	StatusDown     MonitorStatus = "down"
+	StatusFlapping MonitorStatus = "flap"
 )
 
-func NewMonitorState(monitorId string, isUp bool) *MonitorState {
+func NewMonitorState(monitorId string, status MonitorStatus) *MonitorState {
 	startedAtMs := float64(time.Now().UnixMilli())
 	ms := &MonitorState{
 		Id:          fmt.Sprintf("%s-%x", monitorId, startedAtMs),
 		MonitorId:   monitorId,
 		StartedAtMs: startedAtMs,
 		Checks:      1,
+		Status:      status,
 	}
-	if isUp {
-		ms.Status = StatusUp
-	} else {
-		ms.Status = StatusDown
-	}
+
 	return ms
 }
 
 type HistoricalStatus struct {
-	TsMs   float64 `json:"ts_ms"`
-	Status string  `json:"status"`
+	TsMs   float64       `json:"ts_ms"`
+	Status MonitorStatus `json:"status"`
 }
 
 type MonitorState struct {
 	MonitorId   string             `json:"monitorId"`
 	Id          string             `json:"id"`
 	StartedAtMs float64            `json:"started_at_ms"`
-	Status      string             `json:"status"`
+	Status      MonitorStatus      `json:"status"`
 	Checks      int                `json:"checks"`
 	Up          int                `json:"up"`
 	Down        int                `json:"down"`
@@ -46,25 +45,25 @@ type MonitorState struct {
 	Ends        *MonitorState      `json:"ends"`
 }
 
-func (state *MonitorState) IsFlapping() bool {
+func (state *MonitorState) isFlapping() bool {
 	return len(state.FlapHistory) > 0
 }
 
-func (state *MonitorState) recordCheck(up bool) {
+func (state *MonitorState) recordCheck(status MonitorStatus) {
 	state.Checks++
-	if up {
+	if status == StatusUp {
 		state.Up++
 	} else {
 		state.Down++
 	}
 }
 
-func (state *MonitorState) isStateStillStable(currentStatus string) bool {
-	return state.Status == currentStatus && state.IsFlapping()
+func (state *MonitorState) isStateStillStable(currentStatus MonitorStatus) bool {
+	return state.Status == currentStatus && state.isFlapping()
 }
 
-// flapCompute returns true if we are still flapping, false if we no longer are.
-func (state *MonitorState) flapCompute(currentStatus string) bool {
+// wouldStatusEndFlapping returns true if the next status would end the current flapping state.
+func (state *MonitorState) wouldStatusEndFlapping(currentStatus MonitorStatus) bool {
 	state.FlapHistory = append(state.FlapHistory, HistoricalStatus{float64(time.Now().UnixMilli()), state.Status})
 	state.Status = currentStatus
 
