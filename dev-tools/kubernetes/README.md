@@ -73,7 +73,7 @@ The behavior of the Tiltfile can be changed by calling the function `beat()` wit
 - `beat`: `metricbeat` to test Metricbeat, `filebeat` to test Filebeat
 - `mode`: `debug` to start a remote debugger that you can connect to from your IDE with hot reloading enabled, `run` to just run Metricbeat without a debugger but still with hot reloading enabled
 - `arch`: `amd64` to build go binary for amd64 architecture, `arm64` to build go binary for arm64 (aka M1 Apple chip) architecture
-- `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP
+- `k8s_env`: `kind` to run against a Kind cluster with no docker registry, `gcp` to use a docker registry on GCP. More info on docker registry on GCP at https://cloud.google.com/container-registry/docs/advanced-authentication#gcloud-helper.
 - `k8s_cluster`: `single` to use a single node k8s cluster, `multi` to use a k8s with more than 1 node.
       if running on a multi-node cluster we expect to have at least 2 workers and a control plane node.
       A Beat in debugger mode will run on a node with a Tain `debugger=yes:NoSchedule`, while 1 Beat per node will run on all the other worker nodes.

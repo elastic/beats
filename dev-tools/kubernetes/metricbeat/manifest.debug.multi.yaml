@@ -239,11 +239,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx
+      app: metricbeat-debugger
   template:
     metadata:
       labels:
-        app: nginx
+        app: metricbeat-debugger
     spec:
       serviceAccountName: metricbeat
       terminationGracePeriodSeconds: 30

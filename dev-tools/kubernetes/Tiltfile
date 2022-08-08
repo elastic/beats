@@ -126,7 +126,7 @@ def k8s_expose(
 # `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP
 # `k8s_cluster`: `single` to use a single node k8s cluster, `multi` to use a k8s with more than 1 node.
 #       if running on a multi-node cluster we expect to have at least 2 workers and a control plane node.
-#       A Beat in debugger mode will run on a node with a Tain `debugger=yes:NoSchedule`, while 1 Beat per node will run on all the other worker nodes.
+#       A Beat in debugger mode will run on a node with a Taint `debugger=yes:NoSchedule`, while 1 Beat per node will run on all the other worker nodes.
 #       More info on Taints and Tolerations at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/.
 #       You can add a taint with the following command:
 #           `kubectl taint nodes <node_name> debugger=yes:NoSchedule`
