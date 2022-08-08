@@ -1,6 +1,3 @@
-# DO NOT EDIT!
-# This file is a rendered template, the source can be found in "./dev-tools/templates/.golangci.yml"
-#
 # options for analysis running
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
