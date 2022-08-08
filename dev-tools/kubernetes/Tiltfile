@@ -102,4 +102,3 @@ beat(beat="metricbeat", # change to `filebeat` to test filebeat
     k8s_env="dev") # change to `prod` to use with EKS or GKE.
 
 
-
