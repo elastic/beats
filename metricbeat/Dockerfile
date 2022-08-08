@@ -1,4 +1,4 @@
-FROM golang:1.17.12
+FROM golang:1.19
 
 RUN \
     apt update \
