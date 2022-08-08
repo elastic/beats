@@ -18,6 +18,7 @@
 package util
 
 import (
+	"strings"
 	"sync"
 )
 
@@ -197,8 +198,8 @@ func (mr *MetricsRepo) NodeNames() []string {
 	return ans
 }
 
-// PodNames returns the names of all the Pods under a Node.
-func (ns *NodeStore) PodNames() []PodId {
+// PodIds returns the names of all the Pods under a Node.
+func (ns *NodeStore) PodIds() []PodId {
 	ns.Lock()
 	defer ns.Unlock()
 	ans := make([]PodId, 0, len(ns.pods))
@@ -324,4 +325,10 @@ func (cs *ContainerStore) GetContainerMetrics() *ContainerMetrics {
 	cs.RLock()
 	defer cs.RUnlock()
 	return cs.metrics.Clone()
+}
+
+// String concatenates Namespace and PodName by "/"
+func (pi PodId) String() string {
+	fields := []string{pi.Namespace, pi.PodName}
+	return strings.Join(fields, "/")
 }
