@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const FlappingThreshold time.Duration = time.Second * 10
+const FlappingThreshold = 3
 
 type MonitorStatus string
 
@@ -15,15 +15,15 @@ const (
 	StatusFlapping MonitorStatus = "flap"
 )
 
-func NewMonitorState(monitorId string, status MonitorStatus) *MonitorState {
+func newMonitorState(monitorId string, status MonitorStatus) *MonitorState {
 	startedAtMs := float64(time.Now().UnixMilli())
 	ms := &MonitorState{
 		Id:          fmt.Sprintf("%s-%x", monitorId, startedAtMs),
 		MonitorId:   monitorId,
 		StartedAtMs: startedAtMs,
-		Checks:      1,
 		Status:      status,
 	}
+	ms.recordCheck(status)
 
 	return ms
 }
@@ -49,6 +49,7 @@ func (state *MonitorState) isFlapping() bool {
 	return len(state.FlapHistory) > 0
 }
 
+// recordCheck records a new check to the stat counters only, it does not do any flap computation
 func (state *MonitorState) recordCheck(status MonitorStatus) {
 	state.Checks++
 	if status == StatusUp {
@@ -56,10 +57,6 @@ func (state *MonitorState) recordCheck(status MonitorStatus) {
 	} else {
 		state.Down++
 	}
-}
-
-func (state *MonitorState) isStateStillStable(currentStatus MonitorStatus) bool {
-	return state.Status == currentStatus && state.isFlapping()
 }
 
 // wouldStatusEndFlapping returns true if the next status would end the current flapping state.

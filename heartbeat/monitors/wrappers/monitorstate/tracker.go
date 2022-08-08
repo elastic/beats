@@ -48,7 +48,7 @@ func (mst *MonitorStateTracker) RecordStatus(monitorId string, newStatus Monitor
 	}
 
 	// No previous state, so make a new one
-	newState := *NewMonitorState(monitorId, newStatus)
+	newState := *newMonitorState(monitorId, newStatus)
 	internalNewState := newState
 	// Use a copy of the struct so that return values can safely be used concurrently
 	mst.states[monitorId] = &internalNewState
@@ -99,7 +99,7 @@ func (mst *MonitorStateTracker) computeNewCurrentState(state *MonitorState, newS
 			return state
 		} else { // the flap has ended
 			state.Ends = state
-			newState := *NewMonitorState(monitorId, newStatus)
+			newState := *newMonitorState(monitorId, newStatus)
 			internalNewState := newState // Copy the struct since the returned value is read after the mutex
 			mst.states[monitorId] = &internalNewState
 			return &newState
