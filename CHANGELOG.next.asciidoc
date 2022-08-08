@@ -10,8 +10,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix namespacing on self-monitoring {pull}32336[32336]
-
 
 *Auditbeat*
 
@@ -22,7 +20,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Heartbeat*
 - Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
 - Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
-
 
 *Metricbeat*
 
@@ -40,6 +37,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix namespacing on self-monitoring {pull}32336[32336]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
 - Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
 - Fix race condition when reloading runners {pull}32309[32309]
