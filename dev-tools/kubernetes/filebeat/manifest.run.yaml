@@ -68,10 +68,10 @@ spec:
       containers:
       - name: filebeat
         image: filebeat-run-image
-        imagePullPolicy: Never
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
+          "-system.hostfs=/hostfs",
         ]
         env:
         - name: ELASTICSEARCH_HOST
