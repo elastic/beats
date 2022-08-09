@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Heartbeat*
 - Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
 - Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
+- Browserc monitors now default to a max concurrency of two. {pull}32564[32564]
 
 
 *Metricbeat*
@@ -54,6 +55,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
 - Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
+- Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
 
 *Heartbeat*
 
@@ -61,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Reduced memory usage slightly for browser monitors. {pull}32317[32317]
 - Automatically kill zombie-ish node processes. {pull}32393[32393]
 - Added timeout for browser monitors. {pull}32434[32434]
+- Fix bug browser jobs would sometimes be missing check groups or send empty events. {pull}32542[32542]
 
 *Metricbeat*
 
@@ -68,6 +71,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Check for nil metadata in GCP. {pull}32281[32281]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
+- Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
 
 *Packetbeat*
 
@@ -91,6 +95,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Improve performance of disk queue by coalescing writes. {pull}31935[31935]
+- Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
 
 *Auditbeat*
 
@@ -115,6 +120,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
 - Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
 - add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
+- httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
 
 *Auditbeat*
 

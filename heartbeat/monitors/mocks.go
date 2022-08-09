@@ -22,7 +22,9 @@ import (
 	"regexp"
 	"sync"
 	"testing"
+	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -30,9 +32,12 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	beatversion "github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-lookslike"
@@ -40,24 +45,75 @@ import (
 	"github.com/elastic/go-lookslike/validator"
 )
 
-type MockBeatClient struct {
-	publishes []beat.Event
-	closed    bool
-	mtx       sync.Mutex
+func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
+	id, _ := uuid.NewV4()
+	eid, _ := uuid.NewV4()
+	info := beat.Info{
+		Beat:            "heartbeat",
+		IndexPrefix:     "heartbeat",
+		Version:         beatversion.GetDefaultVersion(),
+		ElasticLicensed: true,
+		Name:            "heartbeat",
+		Hostname:        "localhost",
+		ID:              id,
+		EphemeralID:     eid,
+		FirstStart:      time.Now(),
+		StartTime:       time.Now(),
+		Monitoring: struct {
+			DefaultUsername string
+		}{
+			DefaultUsername: "test",
+		},
+	}
+
+	sched = scheduler.Create(
+		1,
+		monitoring.NewRegistry(),
+		time.Local,
+		nil,
+		true,
+	)
+
+	return NewFactory(info, sched.Add, pluginsReg, func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
+			c, _ := pipeline.Connect()
+			return SyncPipelineClientAdaptor{C: c}, nil
+		}),
+		sched,
+		sched.Stop
 }
 
-func (c *MockBeatClient) Publish(e beat.Event) {
-	c.PublishAll([]beat.Event{e})
+type mockClient struct {
+	publishLog []*beat.Event
+	pipeline   beat.Pipeline
+	closed     bool
+	mtx        sync.Mutex
 }
 
-func (c *MockBeatClient) PublishAll(events []beat.Event) {
+func (c *mockClient) IsClosed() bool {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	c.publishes = append(c.publishes, events...)
+	return c.closed
 }
 
-func (c *MockBeatClient) Close() error {
+func (c *mockClient) Publish(e beat.Event) {
+	c.PublishAll([]beat.Event{e})
+}
+
+func (c *mockClient) PublishAll(events []beat.Event) {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	for _, e := range events {
+		eLocal := e
+		c.publishLog = append(c.publishLog, &eLocal)
+	}
+}
+
+func (c *mockClient) Wait() {
+}
+
+func (c *mockClient) Close() error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -69,33 +125,49 @@ func (c *MockBeatClient) Close() error {
 	return nil
 }
 
-func (c *MockBeatClient) Publishes() []beat.Event {
+func (c *mockClient) PublishedEvents() []*beat.Event {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	dst := make([]beat.Event, len(c.publishes))
-	copy(dst, c.publishes)
-	return dst
+	return c.publishLog
 }
 
-type MockPipelineConnector struct {
-	clients []*MockBeatClient
+type MockPipeline struct {
+	Clients []*mockClient
 	mtx     sync.Mutex
 }
 
-func (pc *MockPipelineConnector) Connect() (beat.Client, error) {
+func (pc *MockPipeline) Connect() (beat.Client, error) {
 	return pc.ConnectWith(beat.ClientConfig{})
 }
 
-func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+func (pc *MockPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	c := &MockBeatClient{}
+	c := &mockClient{pipeline: pc}
 
-	pc.clients = append(pc.clients, c)
+	pc.Clients = append(pc.Clients, c)
 
 	return c, nil
+}
+
+// Convenience function for tests
+func (pc *MockPipeline) ConnectSync() pipeline.ISyncClient {
+	c, _ := pc.Connect()
+	return SyncPipelineClientAdaptor{C: c}
+}
+
+func (pc *MockPipeline) PublishedEvents() []*beat.Event {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	var events []*beat.Event
+	for _, c := range pc.Clients {
+		events = append(events, c.PublishedEvents()...)
+	}
+
+	return events
 }
 
 func baseMockEventMonitorValidator(id string, name string, status string) validator.Validator {
@@ -148,7 +220,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
-			Make: func(s string, config *conf.C) (plugin.Plugin, error) {
+			Make: func(s string, config *config.C) (plugin.Plugin, error) {
 				built.Inc()
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
@@ -181,7 +253,7 @@ func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.I
 	return reg, built, closed
 }
 
-func mockPluginConf(t *testing.T, id string, name string, schedule string, url string) *conf.C {
+func mockPluginConf(t *testing.T, id string, name string, schedule string, url string) *config.C {
 	confMap := map[string]interface{}{
 		"type":     "test",
 		"urls":     []string{url},
@@ -194,7 +266,7 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 		confMap["id"] = id
 	}
 
-	conf, err := conf.NewConfigFrom(confMap)
+	conf, err := config.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf
@@ -202,7 +274,7 @@ func mockPluginConf(t *testing.T, id string, name string, schedule string, url s
 
 // mockBadPluginConf returns a conf with an invalid plugin config.
 // This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set.
-func mockBadPluginConf(t *testing.T, id string) *conf.C {
+func mockBadPluginConf(t *testing.T, id string) *config.C {
 	confMap := map[string]interface{}{
 		"type":        "test",
 		"notanoption": []string{"foo"},
@@ -212,24 +284,24 @@ func mockBadPluginConf(t *testing.T, id string) *conf.C {
 		confMap["id"] = id
 	}
 
-	conf, err := conf.NewConfigFrom(confMap)
+	conf, err := config.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf
 }
 
-func mockInvalidPluginConf(t *testing.T) *conf.C {
+func mockInvalidPluginConf(t *testing.T) *config.C {
 	confMap := map[string]interface{}{
 		"hoeutnheou": "oueanthoue",
 	}
 
-	conf, err := conf.NewConfigFrom(confMap)
+	conf, err := config.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf
 }
 
-func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *conf.C {
+func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *config.C {
 	confMap := map[string]interface{}{
 		"type":     "test",
 		"id":       id,
@@ -237,7 +309,7 @@ func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, sc
 		"schedule": schedule,
 	}
 
-	conf, err := conf.NewConfigFrom(confMap)
+	conf, err := config.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf
