@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Reduced memory usage slightly for browser monitors. {pull}32317[32317]
 - Automatically kill zombie-ish node processes. {pull}32393[32393]
 - Added timeout for browser monitors. {pull}32434[32434]
+- Fix bug browser jobs would sometimes be missing check groups or send empty events. {pull}32542[32542]
 
 *Metricbeat*
 
@@ -71,6 +72,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
 - Fix an infinite loop in AWS billing metricset. {pull}32626[32626]
+- Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
 
 *Packetbeat*
 
