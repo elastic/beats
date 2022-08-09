@@ -1,0 +1,120 @@
+{
+    "@timestamp": "2022-07-29T14:06:00.000Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.3.2"
+    },
+    "aws": {
+        "tags": {
+            "Key11": "1"
+        },
+        "cloudwatch": {
+            "namespace": "AWS/AutoScaling"
+        },
+        "dimensions": {
+            "AutoScalingGroupName": "test-name"
+        },
+        "autoscaling": {
+            "metrics": {
+                "GroupAndWarmPoolDesiredCapacity": {
+                    "max": 2
+                },
+                "GroupAndWarmPoolTotalCapacity": {
+                    "max": 2
+                },
+                "GroupDesiredCapacity": {
+                    "min": 2
+                },
+                "GroupInServiceCapacity": {
+                    "min": 2
+                },
+                "GroupInServiceInstances": {
+                    "min": 1
+                },
+                "GroupMaxSize": {
+                    "min": 2
+                },
+                "GroupMinSize": {
+                    "min": 2
+                },
+                "GroupPendingCapacity": {
+                    "min": 0
+                },
+                "GroupPendingInstances": {
+                    "min": 0
+                },
+                "GroupStandbyCapacity": {
+                    "min": 0
+                },
+                "GroupStandbyInstances": {
+                    "min": 0
+                },
+                "GroupTerminatingCapacity": {
+                    "max": 0
+                },
+                "GroupTerminatingInstances": {
+                    "max": 0
+                },
+                "GroupTotalCapacity": {
+                    "max": 2
+                },
+                "GroupTotalInstances": {
+                    "max": 1
+                },
+                "WarmPoolDesiredCapacity": {
+                    "min": 0
+                },
+                "WarmPoolMinSize": {
+                    "min": 0
+                },
+                "WarmPoolPendingCapacity": {
+                    "min": 0
+                },
+                "WarmPoolTerminatingCapacity": {
+                    "max": 0
+                },
+                "WarmPoolTotalCapacity": {
+                    "max": 0
+                },
+                "WarmPoolWarmedCapacity": {
+                    "max": 0
+                }
+            },
+            "arn": "arn:aws:autoscaling:ap-northeast-2:012345678901:autoScalingGroup:964cf7cd-c7ce-1111-0000-028032dff0a8:autoScalingGroupName/test-name"
+        }
+    },
+    "event": {
+        "dataset": "aws.autoscaling",
+        "module": "aws",
+        "duration": 3747563543
+    },
+    "metricset": {
+        "period": 300000,
+        "name": "autoscaling"
+    },
+    "service": {
+        "type": "aws"
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "ap-northeast-2",
+        "account": {
+            "name": "aws-test-account",
+            "id": "012345678901"
+        }
+    },
+    "host": {
+        "name": "test-host"
+    },
+    "agent": {
+        "version": "8.3.2",
+        "ephemeral_id": "1ecaa5bd-90c4-4017-b226-8a86c50f3fa2",
+        "id": "a75beacd-8853-4940-bca5-b25452b23769",
+        "name": "test-host",
+        "type": "metricbeat"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    }
+}

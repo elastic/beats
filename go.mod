@@ -196,6 +196,7 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.4
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
 	github.com/aws/smithy-go v1.12.0

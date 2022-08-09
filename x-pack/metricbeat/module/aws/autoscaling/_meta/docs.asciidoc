@@ -1,0 +1,71 @@
+The autoscaling metricset of aws module allows you to monitor your AWS EC2 AutoScalingGroups,
+including all metrics from
+https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-cloudwatch-monitoring.html[Cloudwatch AWS Auto Scaling groups].
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS EC2 metrics.
+----
+autoscaling:DescribeAutoScalingGroups
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+sts:GetCallerIdentity
+iam:ListAccountAliases
+----
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - autoscaling
+  access_key_id: '<access_key_id>'
+  secret_access_key: '<secret_access_key>'
+  session_token: '<session_token>'
+  tags_filter:
+    - key: "Organization"
+      value: "Engineering"
+  metrics:
+    - name: GroupMaxSize
+      statistic: ["Average"]
+----
+
+`tags_filter` can be specified to only collect metrics with certain tag keys/values.
+For example, with the configuration example above, autoscaling metricset will only collect
+metrics from auto scaling groups that have tag key equals "Organization" and tag value
+equals to "Engineering".
+
+[float]
+=== Metrics
+Please see more details for each metric in
+https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-cloudwatch-monitoring.html[Cloudwatch AWS Auto Scaling groups].
+
+If there is no metrics in config file, autoscaling metricset fetch metrics with one default statistic.
+|===
+|Metric Name|Statistic Method
+|GroupAndWarmPoolDesiredCapacity | Maximum
+|GroupAndWarmPoolTotalCapacity | Maximum
+|GroupDesiredCapacity | Minimum
+|GroupInServiceCapacity | Minimum
+|GroupInServiceInstances | Minimum
+|GroupMaxSize | Minimum
+|GroupMinSize | Minimum
+|GroupPendingCapacity | Minimum
+|GroupPendingInstances | Minimum
+|GroupStandbyCapacity | Minimum
+|GroupStandbyInstances | Minimum
+|GroupTerminatingCapacity | Maximum
+|GroupTerminatingInstances | Maximum
+|GroupTotalCapacity | Maximum
+|GroupTotalInstances | Maximum
+|PredictiveScalingCapacityForecast | Minimum
+|PredictiveScalingLoadForecast | Minimum
+|WarmPoolDesiredCapacity | Minimum
+|WarmPoolMinSize | Minimum
+|WarmPoolPendingCapacity | Minimum
+|WarmPoolTerminatingCapacity | Maximum
+|WarmPoolTotalCapacity | Maximum
+|WarmPoolWarmedCapacity | Maximum
+|===

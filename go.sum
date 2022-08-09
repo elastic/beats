@@ -258,6 +258,8 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.3.14 h1:bJv4Y9QOiW0GZPStgLgpGrpdfRD
 github.com/aws/aws-sdk-go-v2/internal/ini v1.3.14/go.mod h1:R1HF8ZDdcRFfAGF+13En4LSHi2IrrNuPQCaxgWCeGyY=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.4 h1:wusoY1MJ9JNrPoX3n4kxY4MTIUivCiXvTYQbYh59yxs=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.4/go.mod h1:cHTMyJVEXRUZ25f8V+pq6CAwoYARarJRFGf3XH4eIxE=
+github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.4 h1:Qop3ydJL2UUp7ploxghzC4p4uUZZR8ibL//tTWpBlAU=
+github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.4/go.mod h1:5BgmRWVztWrXOkafO2vCDxsBVCUIXTX+hGBFgoqEbKA=
 github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4 h1:faP794ma9ZY/24XAV8cm/lkQzRFSg3zBHCi5Nc8+CaM=
 github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4/go.mod h1:ybjChNDMfPtc7f8ILTb+ov6CpE/KtAae9fD8HHtYfzU=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.18.2 h1:UecVUEdx3xe80X+guNwR2hN1d4L4v4qX2SHLYd/4cIk=
