@@ -35,24 +35,14 @@ type MonitorStateTracker struct {
 }
 
 func (mst *MonitorStateTracker) RecordStatus(monitorId string, newStatus MonitorStatus) (urState *MonitorState) {
-
 	//note: the return values have no concurrency controls, they may be unsafely read unless
 	//copied to the stack, copying the structs before  returning
 	mst.mtx.Lock()
 	defer mst.mtx.Unlock()
 
-	currentState, hasCurrentState := mst.states[monitorId]
-
-	if hasCurrentState {
-		mst.computeNewCurrentState(currentState, newStatus, monitorId)
-	}
-
-	// No previous state, so make a new one
-	newState := *newMonitorState(monitorId, newStatus)
-	internalNewState := newState
-	// Use a copy of the struct so that return values can safely be used concurrently
-	mst.states[monitorId] = &internalNewState
-	return &newState
+	state := mst.getCurrentState(monitorId)
+	state.recordCheck(newStatus)
+	return state.copy()
 }
 
 func (mst *MonitorStateTracker) getCurrentState(monitorId string) (state *MonitorState) {
@@ -69,7 +59,7 @@ func (mst *MonitorStateTracker) getCurrentState(monitorId string) (state *Monito
 	var loadedState *MonitorState
 	var err error
 	for i := 0; i < tries; i++ {
-		loadedState, err = LoadLastESState(monitorId, esClient)
+		loadedState, err = loadLastESState(monitorId, esClient)
 		if err != nil {
 			sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
 			logp.L().Warnf("could not load last state from elasticsearch, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
@@ -91,34 +81,7 @@ func (mst *MonitorStateTracker) getCurrentState(monitorId string) (state *Monito
 	return loadedState
 }
 
-func (mst *MonitorStateTracker) computeNewCurrentState(state *MonitorState, newStatus MonitorStatus, monitorId string) *MonitorState {
-	// If we were flapping before see if we've finally hit a steady state
-	if state.isFlapping() {
-		if state.wouldStatusEndFlapping(newStatus) { // still flapping
-			state.recordCheck(newStatus)
-			return state
-		} else { // the flap has ended
-			state.Ends = state
-			newState := *newMonitorState(monitorId, newStatus)
-			internalNewState := newState // Copy the struct since the returned value is read after the mutex
-			mst.states[monitorId] = &internalNewState
-			return &newState
-		}
-	} else if state.Status == newStatus { // status has not changed, definitely not flapping
-		// The state is stable, no changes needed
-		state.recordCheck(newStatus)
-		return state
-	} else if state.StartedAtMs > float64(time.Now().Add(-FlappingThreshold).UnixMilli()) {
-		// The state changed too quickly, we're now flapping
-		// TODO: is the above conditional right?
-		state.wouldStatusEndFlapping(newStatus) // record the new state to the flap history
-		state.recordCheck(newStatus)
-		return state
-	}
-	return state
-}
-
-func LoadLastESState(monitorId string, esc *elasticsearch.Client) (*MonitorState, error) {
+func loadLastESState(monitorId string, esc *elasticsearch.Client) (*MonitorState, error) {
 	reqBody, err := json.Marshal(mapstr.M{
 		"sort": mapstr.M{"@timestamp": "desc"},
 		"query": mapstr.M{
