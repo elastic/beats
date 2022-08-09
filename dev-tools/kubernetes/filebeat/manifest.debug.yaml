@@ -68,10 +68,10 @@ spec:
       containers:
       - name: filebeat
         image: filebeat-debug-image
-        imagePullPolicy: Never
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
+          "-system.hostfs=/hostfs",
         ]
         ports:
         - containerPort: 56268

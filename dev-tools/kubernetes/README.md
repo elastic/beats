@@ -30,6 +30,8 @@ This will open a terminal and optionally a web UI where you can interact with Ti
 
 Once you are done with Tilt, you can simply `CTRL+C` from the open Tilt terminal. The resources that you started in k8s will still be running though.
 
+For more information on how to configure Tilt to run different scenarios look at the comments in the Tiltfile.
+
 If you want to remove all the k8s resources that you started with Tilt, you can run
 
 ```shell
@@ -67,28 +69,16 @@ If you want to use a remote debugger with Visual Studio code, you need to provid
 
 
 ## Run vs debug mode
-Currently the Tiltfile is configured in `run` mode
+The behavior of the Tiltfile can be changed by calling the function `beat()` with different parameters:
+- `beat`: `metricbeat` to test Metricbeat, `filebeat` to test Filebeat
+- `mode`: `debug` to start a remote debugger that you can connect to from your IDE with hot reloading enabled, `run` to just run Metricbeat without a debugger but still with hot reloading enabled
+- `arch`: `amd64` to build go binary for amd64 architecture, `arm64` to build go binary for arm64 (aka M1 Apple chip) architecture
+- `k8s_env`: `kind` to run against a Kind cluster with no docker registry, `gcp` to use a docker registry on GCP. More info on docker registry on GCP at https://cloud.google.com/container-registry/docs/advanced-authentication#gcloud-helper.
+- `k8s_cluster`: `single` to use a single node k8s cluster, `multi` to use a k8s with more than 1 node.
+      if running on a multi-node cluster we expect to have at least 2 workers and a control plane node.
+      A Beat in debugger mode will run on a node with a Tain `debugger=yes:NoSchedule`, while 1 Beat per node will run on all the other worker nodes.
+      More info on Taints and Tolerations at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/.
+      You can add a taint with the following command:
+          `kubectl taint nodes <node_name> debugger=yes:NoSchedule`
 
-```python
-beat(mode="run")
-# beat(mode="debug")
-```
-
-This mode runs metricbeat like a single process in a pod.
-
-If you want to switch to `debug` mode you have to modify the Tiltfile like the following code
-
-```python
-# beat(mode="run")
-beat(mode="debug")
-```
-
-You can make this change while Tilt is running in the background. Tilt will
-stop the running container and swap it with a debug container instead.
-
-Both mode support `hot reloading`, meaning that if Tilt is running, when you make a change to
-the source code, Tilt will:
-
-1. Automatically compile the source code
-2. Live sync the new binary to the running container
-3. Restart the container to run the new binary
+You can modify the Tiltfile while `tilt up` is running in the background. Tilt will try its best to update everything in place but depending what changes you made, you might want to `tilt down` and `tilt up` again just to make sure that everything was updated correctly.
