@@ -23,10 +23,10 @@ type Client struct {
 	Log            *logp.Logger
 }
 
+// Usage contains the usage details and forecast values.
 type Usage struct {
 	UsageDetails []consumption.BasicUsageDetail
 	Forecasts    costmanagement.QueryResult
-	// ForecastCosts []consumption.Forecast
 }
 
 // NewClient builds a new client for the azure billing service
@@ -44,7 +44,7 @@ func NewClient(config azure.Config) (*Client, error) {
 }
 
 // GetMetrics returns the usage detail and forecast values.
-func (client *Client) GetMetrics(opts TimeIntervalOptions) (Usage, error) {
+func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 	var usage Usage
 
 	//
@@ -64,32 +64,34 @@ func (client *Client) GetMetrics(opts TimeIntervalOptions) (Usage, error) {
 
 	client.Log.
 		With("billing.scope", scope).
-		With("billing.usage.start_time", opts.usageStart).
-		With("billing.usage.end_time", opts.usageEnd).
+		With("billing.usage.start_time", timeOpts.usageStart).
+		With("billing.usage.end_time", timeOpts.usageEnd).
 		Infow("Getting usage details for scope")
 
-	page, err := client.BillingService.GetUsageDetails(
+	filter := fmt.Sprintf(
+		"properties/usageStart eq '%s' and properties/usageEnd eq '%s'",
+		timeOpts.usageStart.Format(time.RFC3339Nano),
+		timeOpts.usageEnd.Format(time.RFC3339Nano),
+	)
+
+	paginator, err := client.BillingService.GetUsageDetails(
 		scope,
 		"properties/meterDetails",
-		fmt.Sprintf(
-			"properties/usageStart eq '%s' and properties/usageEnd eq '%s'",
-			opts.usageStart.Format(time.RFC3339Nano),
-			opts.usageEnd.Format(time.RFC3339Nano),
-		),
+		filter,
 		"", // skipToken
 		//&pageSize,
 		nil,
 		consumption.MetrictypeActualCostMetricType,
-		opts.usageStart.Format("2006-01-02"), // startDate
-		opts.usageEnd.Format("2006-01-02"),   // endDate
+		timeOpts.usageStart.Format("2006-01-02"), // startDate
+		timeOpts.usageEnd.Format("2006-01-02"),   // endDate
 	)
 	if err != nil {
 		return usage, fmt.Errorf("retrieving usage details failed in client: %w", err)
 	}
 
-	for page.NotDone() {
-		usage.UsageDetails = append(usage.UsageDetails, page.Values()...)
-		if err := page.NextWithContext(context.Background()); err != nil {
+	for paginator.NotDone() {
+		usage.UsageDetails = append(usage.UsageDetails, paginator.Values()...)
+		if err := paginator.NextWithContext(context.Background()); err != nil {
 			return usage, fmt.Errorf("retrieving usage details failed in client: %w", err)
 		}
 	}
@@ -100,11 +102,11 @@ func (client *Client) GetMetrics(opts TimeIntervalOptions) (Usage, error) {
 
 	client.Log.
 		With("billing.scope", scope).
-		With("billing.forecast.start_time", opts.forecastStart).
-		With("billing.forecast.end_time", opts.forecastEnd).
+		With("billing.forecast.start_time", timeOpts.forecastStart).
+		With("billing.forecast.end_time", timeOpts.forecastEnd).
 		Infow("Getting forecast for scope")
 
-	queryResult, err := client.BillingService.GetForecast(scope, opts.forecastStart, opts.forecastEnd)
+	queryResult, err := client.BillingService.GetForecast(scope, timeOpts.forecastStart, timeOpts.forecastEnd)
 	if err != nil {
 		return usage, fmt.Errorf("retrieving forecast - forecast costs failed in client: %w", err)
 	}

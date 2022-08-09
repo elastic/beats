@@ -57,10 +57,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // TimeIntervalOptions represents the options used to retrieve the billing data.
 type TimeIntervalOptions struct {
-	usageStart    time.Time
-	usageEnd      time.Time
+	// Usage details start time (UTC).
+	usageStart time.Time
+	// Usage details end time (UTC).
+	usageEnd time.Time
+	// Forecast start time (UTC).
 	forecastStart time.Time
-	forecastEnd   time.Time
+	// Forecast end time (UTC).
+	forecastEnd time.Time
 }
 
 // Fetch methods implements the data gathering and data conversion to the right metricset
@@ -73,7 +77,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	usageStart, usageEnd := usageIntervalFrom(referenceTime)
 	forecastStart, forecastEnd := forecastIntervalFrom(referenceTime)
 
-	options := TimeIntervalOptions{
+	timeIntervalOptions := TimeIntervalOptions{
 		usageStart:    usageStart,
 		usageEnd:      usageEnd,
 		forecastStart: forecastStart,
@@ -84,12 +88,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		With("billing.reference_time", referenceTime).
 		Infow("Fetching billing data")
 
-	results, err := m.client.GetMetrics(options)
+	results, err := m.client.GetMetrics(timeIntervalOptions)
 	if err != nil {
 		return fmt.Errorf("error retrieving usage information: %w", err)
 	}
 
-	events, err := EventsMapping(m.client.Config.SubscriptionId, results, options)
+	events, err := EventsMapping(m.client.Config.SubscriptionId, results, timeIntervalOptions)
 	if err != nil {
 		return fmt.Errorf("error mapping events: %w", err)
 	}

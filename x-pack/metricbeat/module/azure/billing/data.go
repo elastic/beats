@@ -18,8 +18,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// EventsMapping maps the usage details to a slice of metricbeat events.
-func EventsMapping(subscriptionId string, results Usage, opts TimeIntervalOptions) ([]mb.Event, error) {
+// EventsMapping maps the usage details and forecast data to a list of metricbeat events to
+// send to Elasticsearch.
+func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOptions) ([]mb.Event, error) {
 	events := make([]mb.Event, 0, len(results.UsageDetails))
 
 	//
@@ -58,8 +59,8 @@ func EventsMapping(subscriptionId string, results Usage, opts TimeIntervalOption
 					"currency":          legacy.BillingCurrency,
 					"department_name":   legacy.InvoiceSection,
 					"account_name":      legacy.BillingAccountName,
-					"usage_start":       opts.usageStart,
-					"usage_end":         opts.usageEnd,
+					"usage_start":       timeOpts.usageStart,
+					"usage_end":         timeOpts.usageEnd,
 
 					// additional fields
 					"usage_date": legacy.Date, // Date for the usage record.
@@ -94,8 +95,8 @@ func EventsMapping(subscriptionId string, results Usage, opts TimeIntervalOption
 					"currency":          modern.BillingCurrencyCode,
 					"department_name":   modern.InvoiceSectionName,
 					"account_name":      modern.BillingAccountName,
-					"usage_start":       opts.usageStart,
-					"usage_end":         opts.usageEnd,
+					"usage_start":       timeOpts.usageStart,
+					"usage_end":         timeOpts.usageEnd,
 
 					// additional fields
 					"usage_date": modern.Date, // Date for the usage record.
@@ -159,8 +160,10 @@ func getResourceNameFromPath(path string) string {
 // 1: []interface {}{0.11, 2.0200808e+07, "Forecast", "USD"}
 //
 func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID string) ([]mb.Event, error) {
-	// the number of columns expected in the QueryResult supported by this input.
-	expectedNumberOfColumns := 4
+	// The number of columns expected in the QueryResult supported by this input.
+	// The structure of the QueryResult is determined by the value we set in
+	// the `costmanagement.ForecastDefinition` struct at query time.
+	const expectedNumberOfColumns = 4
 
 	if result.Columns == nil || len(*result.Columns) != expectedNumberOfColumns {
 		return []mb.Event{}, fmt.Errorf("unsupported forecasts QueryResult format: %d instead of %d", len(*result.Columns), expectedNumberOfColumns)
@@ -181,14 +184,14 @@ func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID 
 			return events, fmt.Errorf("unsupported forecasts QueryResult.Rows format: %d instead of %d", len(row), expectedNumberOfColumns)
 		}
 
-		// cost
+		// Cost
 		if value, ok := row[0].(float64); !ok {
 			return events, errors.New("unsupported cost format: not float64")
 		} else {
 			cost = value
 		}
 
-		// usage date
+		// Usage date
 		if value, ok := row[1].(float64); !ok {
 			return events, errors.New("unsupported usage date format: not float64")
 		} else {
@@ -211,14 +214,14 @@ func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID 
 			}
 		}
 
-		// cost status (can be "Actual" or "Forecast")
+		// Cost status (can be "Actual" or "Forecast")
 		if value, ok := row[2].(string); !ok {
 			return events, errors.New("unsupported cost status format: not string")
 		} else {
 			costStatus = value
 		}
 
-		// currency (can be "USD", "EUR", or other currency symbols)
+		// Currency code (can be "USD", "EUR", or other currency codes)
 		if value, ok := row[3].(string); !ok {
 			return events, errors.New("unsupported currency format: not string")
 		} else {
