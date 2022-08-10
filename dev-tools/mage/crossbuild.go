@@ -301,7 +301,7 @@ func (b GolangCrossBuilder) Build() error {
 	// basically, apt-get has a bug where will try to iterate through every possible FD as set by the NOFILE ulimit.
 	// On certain docker installs, docker will set the ulimit to a value > 10^9, which means apt-get will take >1 hour.
 	// This runs across all possible debian platforms, since there's no real harm in it.
-	if strings.Contains(b.Platform, "debian") {
+	if strings.Contains(image, "debian") {
 		args = append(args, "--ulimit", "nofile=262144:262144")
 	}
 
