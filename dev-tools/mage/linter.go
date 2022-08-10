@@ -31,11 +31,15 @@ import (
 )
 
 const (
-	linterInstallURL      = "https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
-	linterInstallFilename = "./build/install-golang-ci.sh"
-	linterBinaryFilename  = "./build/golangci-lint"
-	linterVersion         = "v1.47.2"
-	linterConfigFilename  = "./.golangci.yml"
+	linterVersion    = "v1.47.2"
+	linterInstallURL = "https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
+)
+
+var (
+	linterConfigFilename = filepath.Join(".", ".golangci.yml")
+	linterInstallDir     = filepath.Join(".", "build")
+	linterInstallFile    = filepath.Join(linterInstallDir, "install-golang-ci.sh")
+	linterBinaryFile     = filepath.Join(linterInstallDir, linterVersion, "golangci-lint")
 )
 
 // Linter contains targets related to linting the Go code
@@ -58,32 +62,31 @@ func (Linter) Install() error {
 }
 
 // ForceInstall force installs the linter regardless of whether it exists or not.
-// Useful primarily when the linter version should be updated.
 func (Linter) ForceInstall() error {
 	return install(true)
 }
 
 func install(force bool) error {
-	dirPath := filepath.Dir(linterBinaryFilename)
+	dirPath := filepath.Dir(linterBinaryFile)
 	err := os.MkdirAll(dirPath, 0700)
 	if err != nil {
 		return fmt.Errorf("failed to create path %q: %w", dirPath, err)
 	}
 
-	_, err = os.Stat(linterBinaryFilename)
+	_, err = os.Stat(linterBinaryFile)
 	if !force && err == nil {
 		log.Println("The linter has been already installed, skipping...")
 		return nil
 	}
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("failed check if file %q exists: %w", linterBinaryFilename, err)
+		return fmt.Errorf("failed check if file %q exists: %w", linterBinaryFile, err)
 	}
 
 	log.Println("Preparing the installation script file...")
 
-	installScript, err := os.OpenFile(linterInstallFilename, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0700)
+	installScript, err := os.OpenFile(linterInstallFile, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0700)
 	if err != nil {
-		return fmt.Errorf("failed to create file %q: %w", linterInstallFilename, err)
+		return fmt.Errorf("failed to create file %q: %w", linterInstallFile, err)
 	}
 	defer installScript.Close()
 
@@ -103,23 +106,29 @@ func install(force bool) error {
 
 	err = installScript.Close() // otherwise we cannot run the script
 	if err != nil {
-		return fmt.Errorf("failed to close file %q: %w", linterInstallFilename, err)
+		return fmt.Errorf("failed to close file %q: %w", linterInstallFile, err)
 	}
 
-	binaryDir := filepath.Dir(linterBinaryFilename)
+	binaryDir := filepath.Dir(linterBinaryFile)
 	err = os.MkdirAll(binaryDir, 0700)
 	if err != nil {
 		return fmt.Errorf("cannot create path %q: %w", binaryDir, err)
 	}
 
 	// there must be no space after `-b`, otherwise the script does not work correctly ¯\_(ツ)_/¯
-	return sh.Run(linterInstallFilename, "-b"+binaryDir, linterVersion)
+	return sh.Run(linterInstallFile, "-b"+binaryDir, linterVersion)
 }
 
 // All runs the linter against the entire codebase
 func (l Linter) All() error {
 	mg.Deps(l.Install, l.CheckConfig)
 	return runLinter()
+}
+
+// Prints the version of the linter in use.
+func (l Linter) Version() error {
+	mg.Deps(l.Install)
+	return runLinter("--version")
 }
 
 // LastChange runs the linter against all files changed since the fork point from `main`.
@@ -162,5 +171,5 @@ func runLinter(runFlags ...string) error {
 	args = append(args, "-c", linterConfigFilename)
 	args = append(args, "./...")
 
-	return runWithStdErr(linterBinaryFilename, args...)
+	return runWithStdErr(linterBinaryFile, args...)
 }

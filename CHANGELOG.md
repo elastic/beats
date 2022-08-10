@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.2.11]
+
+### Changed
+
+- The mage linter targets now automatically upgrades the linter when necessary. #73
+
 ## [0.2.10]
 
 ### Added
