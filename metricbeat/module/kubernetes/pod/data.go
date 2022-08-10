@@ -132,16 +132,28 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			kubernetes2.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
-		// NOTE: nodeCores can be 0 if `state_node` and/or `node` metricsets are disabled
-		// if `nodeCores == 0 and containerCoreLimits > 0` we need to avoid that `containerCoreLimits` is
-		// incorrectly overridden to 0
+	  // NOTE:
+		// - `podCoreLimit > `nodeCores` is possible if a pod has more than one container
+		// and at least one of them doesn't have a limit set. The container without limits
+		// inherit a limit = `nodeCores` and the sum of all limits for all the
+		// containers will be > `nodeCores`. In this case we want to cap the
+		// value of `podCoreLimit` to `nodeCores`.
+		// - `nodeCores` can be 0 if `state_node` and/or `node` metricsets are disabled.
+		// - if `nodeCores` == 0 and podCoreLimit > 0` we need to avoid that `podCoreLimit` is
+		// incorrectly overridden to 0. That's why we check for `nodeCores > 0`.
 		if nodeCores > 0 && podCoreLimit > nodeCores {
 			podCoreLimit = nodeCores
 		}
 
-		// NOTE: nodeMem can be 0 if `state_node` and/or `node` metricsets are disabled
-		// if `nodeMem == 0 and containerCoreLimits > 0` we need to avoid that `containerCoreLimits` is
-		// incorrectly overridden to 0
+	  // NOTE:
+		// - `podMemLimit > `nodeMem` is possible if a pod has more than one container
+		// and at least one of them doesn't have a limit set. The container without limits
+		// inherit a limit = `nodeMem` and the sum of all limits for all the
+		// containers will be > `nodeMem`. In this case we want to cap the
+		// value of `podMemLimit` to `nodeMem`.
+		// - `nodeMem` can be 0 if `state_node` and/or `node` metricsets are disabled.
+		// - if `nodeMem` == 0 and podMemLimit > 0` we need to avoid that `podMemLimit` is
+		// incorrectly overridden to 0. That's why we check for `nodeMem > 0`.
 		if nodeMem > 0 && podMemLimit > nodeMem {
 			podMemLimit = nodeMem
 		}

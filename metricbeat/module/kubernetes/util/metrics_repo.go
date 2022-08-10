@@ -200,8 +200,8 @@ func (mr *MetricsRepo) NodeNames() []string {
 
 // PodIds returns the names of all the Pods under a Node.
 func (ns *NodeStore) PodIds() []PodId {
-	ns.Lock()
-	defer ns.Unlock()
+	ns.RLock()
+	defer ns.RUnlock()
 	ans := make([]PodId, 0, len(ns.pods))
 	for podId := range ns.pods {
 		ans = append(ans, podId)
@@ -211,8 +211,8 @@ func (ns *NodeStore) PodIds() []PodId {
 
 // ContainerNames returns the names of all the Containers under a Pod.
 func (ps *PodStore) ContainerNames() []string {
-	ps.Lock()
-	defer ps.Unlock()
+	ps.RLock()
+	defer ps.RUnlock()
 	ans := make([]string, 0, len(ps.containers))
 	for containerName := range ps.containers {
 		ans = append(ans, containerName)

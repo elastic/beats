@@ -154,6 +154,11 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 				containerMemLimit = containerMetrics.MemoryLimit.Value
 			}
 
+			// NOTE:
+			// we don't currently check if `containerMemLimit` > `nodeMem` as we do in `kubernetes/pod/data.go`.
+			// There we do check, since if a container doesn't have a limit set, it will inherit the node limits and the sum of all
+			// the container limits can be greater than the node limits. We assume here the user can set correct limits on containers.
+
 			if containerCoresLimit > 0 {
 				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresLimit, logger)
 			}
