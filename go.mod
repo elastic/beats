@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/docker/docker v20.10.12+incompatible
 	github.com/docker/go-connections v0.4.0
-	github.com/elastic/elastic-agent-libs v0.2.5
+	github.com/elastic/elastic-agent-libs v0.2.11
 	github.com/magefile/mage v1.12.1
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
