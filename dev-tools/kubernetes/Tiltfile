@@ -10,7 +10,7 @@ def compile(
     flags = ""
     suffix = ""
     if mode == "debug":
-        flags = '-gcflags "-N -l"'
+        flags = '-gcflags=all="-N -l"'
         suffix = "-debugger"
     build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH={} go build {} -o build/{}{} ../../{}".format(
         arch, flags, beat, suffix, beat)
@@ -61,10 +61,12 @@ def build(
         suffix = "-debugger"
         docker_entrypoint = [
             "dlv",
-            "--headless=true",
+            "--headless",
             "--listen=:56268",
             "--api-version=2",
             "--log",
+            "--log-output",
+            "debugger",
             "exec",
             "/usr/share/{}/{}{}".format(beat, beat, suffix),
             "--"
@@ -125,11 +127,12 @@ def k8s_expose(
 # `arch`: `amd64` to build go binary for amd64 architecture, `arm64` to build go binary for arm64 (aka M1 Apple chip) architecture
 # `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP
 # `k8s_cluster`: `single` to use a single node k8s cluster, `multi` to use a k8s with more than 1 node.
-#       if running on a multi-node cluster we expect to have at least 2 workers and a control plane node.
-#       A Beat in debugger mode will run on a node with a Taint `debugger=yes:NoSchedule`, while 1 Beat per node will run on all the other worker nodes.
+#       if running on a multi-node cluster we expect to have at least 2 workers and a control plane node. One of the workers (eg. worker1)
+#       should have a taint and a label (for node affinity) to make sure that only the debugger runs on that node. You need to run the following commands:
+#         kubectl taint nodes worker1 debugger=ok:NoSchedule
+#         kubectl label nodes worker1 debugger=ok
 #       More info on Taints and Tolerations at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/.
-#       You can add a taint with the following command:
-#           `kubectl taint nodes <node_name> debugger=yes:NoSchedule`
+#       More on node affinity at https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity.
 def beat(
         beat="metricbeat",
         mode="run",
