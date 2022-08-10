@@ -3,7 +3,7 @@ module github.com/elastic/elastic-agent-system-metrics
 go 1.17
 
 require (
-	github.com/elastic/elastic-agent-libs v0.2.2
+	github.com/elastic/elastic-agent-libs v0.2.11
 	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.7.1
@@ -21,7 +21,7 @@ require (
 require (
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/elastic/go-ucfg v0.8.4 // indirect
+	github.com/elastic/go-ucfg v0.8.5 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
 	github.com/google/licenseclassifier v0.0.0-20200402202327-879cb1424de0 // indirect
@@ -47,6 +47,6 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.0 // indirect
 )
