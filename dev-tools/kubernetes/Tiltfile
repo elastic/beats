@@ -10,7 +10,7 @@ def compile(
     flags = ""
     suffix = ""
     if mode == "debug":
-        flags = '-gcflags "-N -l"'
+        flags = '-gcflags=all="-N -l"'
         suffix = "-debugger"
     build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH={} go build {} -o build/{}{} ../../{}".format(
         arch, flags, beat, suffix, beat)
@@ -61,10 +61,12 @@ def build(
         suffix = "-debugger"
         docker_entrypoint = [
             "dlv",
-            "--headless=true",
+            "--headless",
             "--listen=:56268",
             "--api-version=2",
             "--log",
+            "--log-output",
+            "debugger",
             "exec",
             "/usr/share/{}/{}{}".format(beat, beat, suffix),
             "--"
@@ -189,8 +191,8 @@ def beat(
 
 
 beat(beat="metricbeat",
-     mode="run",
+     mode="debug",
      arch="arm64",
      k8s_env="kind",
-     k8s_cluster="single",
+     k8s_cluster="multi",
      )
