@@ -17,5 +17,5 @@ WORKDIR /usr/share/metricbeat
 COPY --from=builder /go/bin/dlv /go/bin/dlv
 COPY --from=builder /usr/share/metricbeat/metricbeat-debugger /usr/share/metricbeat/metricbeat-debugger
 
-ENTRYPOINT ["dlv", "--headless=true", "--listen=:56268", "--api-version=2", "--log", "exec", "/usr/share/metricbeat/metricbeat-debugger", "--"]
+ENTRYPOINT ["dlv", "--headless", "--listen=:56268", "--api-version=2", "--log",  "--log-output", "debugger", "exec", "/usr/share/metricbeat/metricbeat-debugger", "--"]
 CMD [ "-e" ]

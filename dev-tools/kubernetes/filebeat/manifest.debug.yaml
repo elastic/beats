@@ -99,8 +99,9 @@ spec:
           # If using Red Hat OpenShift uncomment this:
           #privileged: true
         resources:
-          limits:
-            memory: 200Mi
+          ## on debugger image cause pod to crash since we use > 350MB of memory
+          # limits:
+          #   memory: 200Mi
           requests:
             cpu: 100m
             memory: 100Mi
