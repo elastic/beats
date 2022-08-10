@@ -296,8 +296,7 @@ func (b GolangCrossBuilder) Build() error {
 		verbose = "true"
 	}
 	var args []string
-<<<<<<< HEAD
-=======
+
 	// There's a bug on certain debian versions:
 	// https://discuss.linuxcontainers.org/t/debian-jessie-containers-have-extremely-low-performance/1272
 	// basically, apt-get has a bug where will try to iterate through every possible FD as set by the NOFILE ulimit.
@@ -307,7 +306,6 @@ func (b GolangCrossBuilder) Build() error {
 		args = append(args, "--ulimit", "nofile=262144:262144")
 	}
 
->>>>>>> d938679b49 (fix string used to check image name (#32582))
 	if runtime.GOOS != "windows" {
 		args = append(args,
 			"--env", "EXEC_UID="+strconv.Itoa(os.Getuid()),
