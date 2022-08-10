@@ -162,7 +162,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.2.1
 	github.com/elastic/elastic-agent-libs v0.2.9
-	github.com/elastic/elastic-agent-system-metrics v0.4.2 // do not upgrade until https://github.com/elastic/beats/issues/32467 is fixed
+	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
