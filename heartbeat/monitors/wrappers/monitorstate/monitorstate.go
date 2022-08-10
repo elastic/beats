@@ -7,15 +7,15 @@ import (
 
 const FlappingThreshold = 3
 
-type MonitorStatus string
+type StateStatus string
 
 const (
-	StatusUp       MonitorStatus = "up"
-	StatusDown     MonitorStatus = "down"
-	StatusFlapping MonitorStatus = "flap"
+	StatusUp       StateStatus = "up"
+	StatusDown     StateStatus = "down"
+	StatusFlapping StateStatus = "flap"
 )
 
-func newMonitorState(monitorId string, status MonitorStatus) *MonitorState {
+func newMonitorState(monitorId string, status StateStatus) *MonitorState {
 	startedAtMs := float64(time.Now().UnixMilli())
 	ms := &MonitorState{
 		Id:          fmt.Sprintf("%s-%x", monitorId, startedAtMs),
@@ -29,87 +29,93 @@ func newMonitorState(monitorId string, status MonitorStatus) *MonitorState {
 }
 
 type HistoricalStatus struct {
-	TsMs   float64       `json:"ts_ms"`
-	Status MonitorStatus `json:"status"`
+	TsMs   float64     `json:"ts_ms"`
+	Status StateStatus `json:"status"`
 }
 
 type MonitorState struct {
-	MonitorId   string          `json:"monitorId"`
-	Id          string          `json:"id"`
-	StartedAtMs float64         `json:"started_at_ms"`
-	Status      MonitorStatus   `json:"status"`
-	Checks      int             `json:"checks"`
-	Up          int             `json:"up"`
-	Down        int             `json:"down"`
-	FlapHistory []MonitorStatus `json:"flap_history"`
-	Ends        *MonitorState   `json:"ends"`
+	MonitorId   string        `json:"monitorId"`
+	Id          string        `json:"id"`
+	StartedAtMs float64       `json:"started_at_ms"`
+	Status      StateStatus   `json:"status"`
+	Checks      int           `json:"checks"`
+	Up          int           `json:"up"`
+	Down        int           `json:"down"`
+	FlapHistory []StateStatus `json:"flap_history"`
+	Ends        *MonitorState `json:"ends"`
 }
 
-func (state *MonitorState) isFlapping() bool {
-	return len(state.FlapHistory) > 0
-}
-
-func (state *MonitorState) incrementCounters(status MonitorStatus) {
-	state.Checks++
+func (ms *MonitorState) incrementCounters(status StateStatus) {
+	ms.Checks++
 	if status == StatusUp {
-		state.Up++
+		ms.Up++
 	} else {
-		state.Down++
+		ms.Down++
 	}
 }
 
-func (state *MonitorState) truncateFlapHistoryToThreshold() {
-	endIdx := len(state.FlapHistory) - 1
-	startIdx := endIdx - FlappingThreshold
-	if startIdx < 0 {
-		startIdx = 0
+// truncate flap history to be at most as many items as the threshold indicates, minus one
+func (ms *MonitorState) truncateFlapHistory() {
+	endIdx := len(ms.FlapHistory)
+	if endIdx < 0 {
+		return // flap history is empty
 	}
-	state.FlapHistory = state.FlapHistory[startIdx:endIdx]
+	// truncate to one less than the threshold since our later calculations
+	// an item that would stabilize the history at the threshold would start a new state
+	startIdx := endIdx - (FlappingThreshold - 1)
+	if startIdx <= 0 {
+		return
+	}
+	ms.FlapHistory = ms.FlapHistory[startIdx:endIdx]
 }
 
-// recordCheck records a new check to the stat counters only, it does not do any flap computation
-func (state *MonitorState) recordCheck(newStatus MonitorStatus) {
-	if state.isFlapping() {
-		newFlapHistory := append(state.FlapHistory, newStatus)
-		var lastStatus MonitorStatus
-		isStable := true
-		for _, histStatus := range newFlapHistory {
-			if lastStatus != histStatus {
-				isStable = false
+// recordCheck updates the current state pointer to what the new state should be.
+// If the current state is continued it just updates counters and other record keeping,
+// if the state ends it actually swaps out the full value the state points to
+// and sets state.Ends.
+func (ms *MonitorState) recordCheck(newStatus StateStatus) {
+	if ms.Status == StatusFlapping {
+		ms.truncateFlapHistory()
+
+		// Check if all statuses in flap history are identical, including the new status
+		hasStabilized := true
+		for _, histStatus := range ms.FlapHistory {
+			if newStatus != histStatus {
+				hasStabilized = false
 				break
 			}
-			lastStatus = histStatus
 		}
 
-		if !isStable { // continue flapping
+		if !hasStabilized { // continue flapping
 			// Use the new flap history as part of the state
-			state.FlapHistory = newFlapHistory
-			state.incrementCounters(newStatus)
+			ms.FlapHistory = append(ms.FlapHistory, newStatus)
+			ms.incrementCounters(newStatus)
 		} else { // flap has ended
-			oldState := *state
-			state = newMonitorState(state.MonitorId, newStatus)
-			state.Ends = &oldState
+			oldState := *ms
+			*ms = *newMonitorState(ms.MonitorId, newStatus)
+			ms.Ends = &oldState
 		}
-	} else if state.Status == newStatus { // stable state, status has not changed
+	} else if ms.Status == newStatus { // stable state, status has not changed
 		// The state is stable, no changes needed
-		state.incrementCounters(newStatus)
-	} else if state.Checks < FlappingThreshold {
+		ms.incrementCounters(newStatus)
+	} else if ms.Checks < FlappingThreshold {
 		// The state changed too quickly, we're now flapping
-		state.incrementCounters(newStatus)
-		state.FlapHistory = append(state.FlapHistory, newStatus)
+		ms.incrementCounters(newStatus)
+		ms.Status = StatusFlapping
+		ms.FlapHistory = append(ms.FlapHistory, newStatus)
 	} else {
 		// state has changed, but we aren't flapping (yet), since we've been stable past the
 		// flapping threshold
-		oldState := *state
-		state = newMonitorState(state.MonitorId, newStatus)
-		state.Ends = &oldState
+		oldState := *ms
+		*ms = *newMonitorState(ms.MonitorId, newStatus)
+		ms.Ends = &oldState
 	}
 }
 
 // copy returns a threadsafe copy since the instance used in the tracker is frequently mutated
-func (state *MonitorState) copy() *MonitorState {
-	copied := *state
-	copied.FlapHistory = make([]MonitorStatus, len(state.FlapHistory))
-	copy(copied.FlapHistory, state.FlapHistory)
+func (ms *MonitorState) copy() *MonitorState {
+	copied := *ms
+	copied.FlapHistory = make([]StateStatus, len(ms.FlapHistory))
+	copy(copied.FlapHistory, ms.FlapHistory)
 	return &copied
 }

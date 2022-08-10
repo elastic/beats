@@ -100,7 +100,7 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 				return nil, fmt.Errorf("could not wrap state for '%s', no status assigned: %w", sf.ID, err)
 			}
 
-			ms := mst.RecordStatus(sf.ID, monitorstate.MonitorStatus(status.(string)))
+			ms := mst.RecordStatus(sf.ID, monitorstate.StateStatus(status.(string)))
 
 			logp.Warn("CHECKS: %s - s:%s u:%d d:%d", sf.ID, ms.Status, ms.Up, ms.Down)
 

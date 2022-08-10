@@ -23,25 +23,41 @@ func SetEsClient(c *elasticsearch.Client) {
 }
 
 func NewMonitorStateTracker() *MonitorStateTracker {
-	return &MonitorStateTracker{
-		states: map[string]*MonitorState{},
-		mtx:    sync.Mutex{},
+	mst := &MonitorStateTracker{
+		states:      map[string]*MonitorState{},
+		mtx:         sync.Mutex{},
+		stateLoader: NilStateLoader,
 	}
+	if esClient != nil {
+		mst.stateLoader = LoadLastESState
+	}
+	return mst
 }
 
 type MonitorStateTracker struct {
-	states map[string]*MonitorState
-	mtx    sync.Mutex
+	states      map[string]*MonitorState
+	mtx         sync.Mutex
+	stateLoader StateLoader
 }
 
-func (mst *MonitorStateTracker) RecordStatus(monitorId string, newStatus MonitorStatus) (urState *MonitorState) {
+// StateLoader has signature as loadLastESState, useful for test mocking, and maybe for a future impl
+// other than ES if necessary
+type StateLoader func(monitorId string) (*MonitorState, error)
+
+func (mst *MonitorStateTracker) RecordStatus(monitorId string, newStatus StateStatus) (ms *MonitorState) {
 	//note: the return values have no concurrency controls, they may be unsafely read unless
 	//copied to the stack, copying the structs before  returning
 	mst.mtx.Lock()
 	defer mst.mtx.Unlock()
 
 	state := mst.getCurrentState(monitorId)
-	state.recordCheck(newStatus)
+	if state == nil {
+		state = newMonitorState(monitorId, newStatus)
+		mst.states[monitorId] = state
+	} else {
+		state.recordCheck(newStatus)
+	}
+	// return a copy since the state itself is a pointer that is frequently mutated
 	return state.copy()
 }
 
@@ -59,29 +75,29 @@ func (mst *MonitorStateTracker) getCurrentState(monitorId string) (state *Monito
 	var loadedState *MonitorState
 	var err error
 	for i := 0; i < tries; i++ {
-		loadedState, err = loadLastESState(monitorId, esClient)
+		loadedState, err = mst.stateLoader(monitorId)
 		if err != nil {
 			sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
-			logp.L().Warnf("could not load last state from elasticsearch, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
+			logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
 			time.Sleep(sleepFor)
-			return nil
 		}
 	}
 	if err != nil {
-		logp.Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor %s", tries, monitorId)
-		return nil
-	}
-
-	// loadedState could be nil if we have no previous state history
-	if loadedState != nil {
-		mst.states[monitorId] = loadedState
+		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor %s", tries, monitorId)
 	}
 
 	// Return what we found, even if nil
 	return loadedState
 }
 
-func loadLastESState(monitorId string, esc *elasticsearch.Client) (*MonitorState, error) {
+// NilStateLoader always returns nil, nil. It's the default when no ES conn is available
+// or during testing
+func NilStateLoader(_ string) (*MonitorState, error) {
+	return nil, nil
+}
+
+// LoadLastESState attempts to find a matching prior state in Elasticsearch. If none, returns nil, nil
+func LoadLastESState(monitorId string) (*MonitorState, error) {
 	reqBody, err := json.Marshal(mapstr.M{
 		"sort": mapstr.M{"@timestamp": "desc"},
 		"query": mapstr.M{
@@ -101,7 +117,7 @@ func loadLastESState(monitorId string, esc *elasticsearch.Client) (*MonitorState
 		return nil, fmt.Errorf("could not serialize query for state save: %w", err)
 	}
 
-	r, err := esc.Search(func(sr *esapi.SearchRequest) {
+	r, err := esClient.Search(func(sr *esapi.SearchRequest) {
 		sr.Index = []string{"synthetics-*"}
 		size := 1
 		sr.Size = &size
