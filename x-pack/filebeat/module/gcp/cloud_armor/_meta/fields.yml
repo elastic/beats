@@ -1,0 +1,108 @@
+- name: cloud_armor
+  type: group
+  description: >
+    Fields for Google Cloud HTTP load balancer cloud armor logs
+  fields:
+  - name: type
+    type: keyword
+    description: >
+      Type property.
+  - name: http_request
+    type: group
+    description: >
+      HTTP request information.
+    fields:
+    - name: method
+      type: keyword
+      description: >
+        The HTTP method of the request.
+    - name: url
+      type: keyword
+      description: >
+        The HTTP method URL of the request.
+    - name: request_size
+      type: keyword
+      description: >
+        The HTTP request size.
+    - name: status_code
+      type: short
+      description: >
+        The HTTP response status code.
+    - name: response_size
+      type: keyword
+      description: >
+        The HTTP response size.
+    - name: user_agent
+      type: keyword
+      description: >
+        The provided user agent header in the HTTP request.
+    - name: remote_ip
+      type: ip
+      description: >
+        The IP address of the client (this is what will enable us to do nice attack maps).
+    - name: server_ip
+      type: ip
+      description: >
+        The IP address of the server.
+    - name: referer
+      type: keyword
+      description: >
+        Referer HTTP header value.
+  - name: enforced_security_policy
+    type: group
+    description: >
+      Cloud armor enforced security policy information.
+    fields:
+    - name: action
+      type: keyword
+      description: >
+        Action from the policy (either ALLOW or DENY).
+        The action != outcome when the policy is in preview mode.
+    - name: outcome
+      type: keyword
+      description: >
+        Outcome from the policy (either ACCEPT or DENY).
+        The action != outcome when the policy is in preview mode.
+    - name: signature_ids
+      type: array
+      description: >
+        Array of signatures that matched the request.
+    - name: priority
+      type: integer
+      description: >
+        Priority of the security policy rule that affected the request.
+    - name: name
+      type: keyword
+      description: >
+        Name of the security policy.
+  - name: preview_security_policy
+    type: group
+    description: >
+      Cloud armor preview security policy information.
+    fields:
+    - name: action
+      type: keyword
+      description: >
+        Action from the policy (either ALLOW or DENY).
+        The action != outcome when the policy is in preview mode.
+    - name: outcome
+      type: keyword
+      description: >
+        Outcome from the policy (either ACCEPT or DENY).
+        The action != outcome when the policy is in preview mode.
+    - name: signature_ids
+      type: array
+      description: >
+        Array of signatures that matched the request.
+    - name: priority
+      type: integer
+      description: >
+        Priority of the security policy rule that affected the request.
+    - name: name
+      type: keyword
+      description: >
+        Name of the security policy.
+  - name: signature_ids
+    type: array
+    description: >
+      Field which aggregates either the value of enforced_security_policy.signature_ids or preview_security_policy.signature_ids (for ease of use when using these values in visualisations).

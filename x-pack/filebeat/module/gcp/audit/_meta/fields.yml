@@ -10,17 +10,17 @@
   - name: authentication_info
     type: group
     description: >
-      Authentication information. 
+      Authentication information.
     fields:
     - name: principal_email
       type: keyword
       description: >
-        The email address of the authenticated user making the request. 
+        The email address of the authenticated user making the request.
     - name: authority_selector
       type: keyword
       description: >
-        The authority selector specified by the requestor, if any. It is not guaranteed 
-        that the principal was allowed to use this authority. 
+        The authority selector specified by the requestor, if any. It is not guaranteed
+        that the principal was allowed to use this authority.
   - name: authorization_info
     type: array
     description: >
@@ -29,11 +29,11 @@
     - name: permission
       type: keyword
       description: >
-        The required IAM permission. 
+        The required IAM permission.
     - name: granted
       type: boolean
       description: >
-        Whether or not authorization for resource and permission was granted. 
+        Whether or not authorization for resource and permission was granted.
     - name: resource_attributes
       type: group
       description: >
@@ -54,8 +54,8 @@
   - name: method_name
     type: keyword
     description: >
-      The name of the service method or operation. For API calls, this 
-      should be the name of the API method. 
+      The name of the service method or operation. For API calls, this
+      should be the name of the API method.
       For example, 'google.datastore.v1.Datastore.RunQuery'.
   - name: num_response_items
     type: long
@@ -77,11 +77,11 @@
     - name: name
       type: keyword
       description: >
-        Name of the request. 
+        Name of the request.
     - name: resource_name
       type: keyword
       description: >
-        Name of the request resource. 
+        Name of the request resource.
   - name: request_metadata
     type: group
     description: >
@@ -90,11 +90,11 @@
     - name: caller_ip
       type: ip
       description: >
-        The IP address of the caller. 
+        The IP address of the caller.
     - name: caller_supplied_user_agent
       type: keyword
       description: >
-        The user agent of the caller. This information is not authenticated and 
+        The user agent of the caller. This information is not authenticated and
         should be treated accordingly.
   - name: response
     type: group
@@ -129,12 +129,12 @@
     - name: status
       type: keyword
       description: >
-       Status of the response. 
+       Status of the response.
   - name: resource_name
     type: keyword
     description: >
-      The resource or collection that is the target of the operation. 
-      The name is a scheme-less URI, not including the API service name. 
+      The resource or collection that is the target of the operation.
+      The name is a scheme-less URI, not including the API service name.
       For example, 'shelves/SHELF_ID/books'.
   - name: resource_location
     type: group
@@ -145,23 +145,82 @@
       type: keyword
       description: >
         Current locations of the resource.
+  - name: policy_delta
+    type: group
+    description: >
+      Details of the changes within IAM policies.
+    fields:
+    - name: binding_deltas
+      type: nested
+      description: >
+        Bindings changes within IAM policies.
+    - name: audit_config_deltas
+      type: nested
+      description: >
+        Audit config changes within IAM policies.
+  - name: iap
+    type: group
+    description: >
+      Details of an IAP HTTP request.
+    fields:
+    - name: host
+      type: keyword
+      description: >
+        Host being called through the IAP.
+    - name: path
+      type: keyword
+      description: >
+        Path of the HTTP request going through the IAP.
   - name: service_name
     type: keyword
     description: >
-      The name of the API service performing the operation. 
+      The name of the API service performing the operation.
       For example, datastore.googleapis.com.
   - name: status
     type: group
     description: >
-      The status of the overall operation. 
+      The status of the overall operation.
     fields:
     - name: code
       type: integer
       description: >
-        The status code, which should be an enum value of google.rpc.Code. 
+        The status code, which should be an enum value of google.rpc.Code.
     - name: message
       type: keyword
       description: >
-        A developer-facing error message, which should be in English. Any user-facing 
-        error message should be localized and sent in the google.rpc.Status.details 
-        field, or localized by the client. 
+        A developer-facing error message, which should be in English. Any user-facing
+        error message should be localized and sent in the google.rpc.Status.details
+        field, or localized by the client.
+  - name: bigquery
+    type: group
+    description: >
+      Details pertaining to different BigQuery jobs.
+    fields:
+    - name: query
+      type: text
+      description: >
+        The query executed as part of the BigQuery operation.
+    - name: table_id
+      type: keyword
+      description: >
+        The BigQuery table ID on which the query is being ran.
+    - name: dataset_id
+      type: keyword
+      description: >
+        The BigQuery dataset ID on which the query is being ran.
+    - name: tmp_table_id
+      type: keyword
+      description: >
+        The temporary BigQuery table ID on which the data is exported to.
+    - name: tmp_dataset_id
+      type: keyword
+      description: >
+        The temporary BigQuery dataset ID on which the data is exported to.
+    - name: export_destination
+      type: keyword
+      description: >
+        The BigQuery export destination (example GCS bucket URI).
+    - name: output_row_count
+      type: integer
+      description: >
+        The BigQuery query output row count.

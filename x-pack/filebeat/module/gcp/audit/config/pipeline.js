@@ -64,7 +64,7 @@ function Audit(keep_original_message) {
     });
 
     var setOrchestratorMetadata = function(evt) {
-          if (evt.Get("json.resource.type") === "k8s_cluster") {
+        if (evt.Get("json.resource.type") === "k8s_cluster") {
             evt.Put("orchestrator.type", "kubernetes");
             var convert_processor = new processor.Convert({
                 fields: [
@@ -174,6 +174,12 @@ function Audit(keep_original_message) {
                 type: "string"
             },
             {
+                from: "json.response.reason",
+                to: "event.reason",
+                type: "string"
+                // ravelin addition: view specific details of response status (for example binary authorization policy violation)
+            },
+            {
                 from: "json.response.details.group",
                 to: "gcp.audit.response.details.group",
                 type: "string"
@@ -202,6 +208,30 @@ function Audit(keep_original_message) {
                 from: "json.resourceLocation.currentLocations",
                 to: "gcp.audit.resource_location.current_locations"
                 // Type is a string array.
+            },
+            {
+                from: "json.serviceData.policyDelta.auditConfigDeltas",
+                to: "gcp.audit.policy_delta.audit_config_deltas"
+                // Type is an array of objects.
+                // ravelin addition: view specific details of audit config changes
+            },
+            {
+                from: "json.serviceData.policyDelta.bindingDeltas",
+                to: "gcp.audit.policy_delta.binding_deltas"
+                // Type is an array of objects.
+                // ravelin addition: view specific details of policy changes
+            },
+            {
+                from: "json.requestMetadata.requestAttributes.host",
+                to: "gcp.audit.iap.host",
+                type: "string",
+                // ravelin addition: host of IAP endpoint
+            },
+            {
+                from: "json.requestMetadata.requestAttributes.path",
+                to: "gcp.audit.iap.path",
+                type: "string",
+                // ravelin addition: path of IAP endpoint
             },
             {
                 from: "json.serviceName",
@@ -276,6 +306,49 @@ function Audit(keep_original_message) {
         }
     };
 
+    var copyBigQueryFields = function(evt) {
+        // SQL query job
+        var query = evt.Get("json.metadata.jobChange.job.jobConfig.queryConfig.query");
+        if (query != undefined) {
+            evt.Put("gcp.audit.bigquery.query", query)
+            if (query.toUpperCase().indexOf("EXPORT DATA OPTIONS") != -1) { // sometimes exports are performed in SQL query
+                var res = query.match(/uri=['"]\S+['"]/)
+                evt.Put("gcp.audit.bigquery.export_destination", res[0].slice(5, -1))
+            }
+        }
+
+        var arr = evt.Get("json.serviceData.jobGetQueryResultsResponse.job.jobStatistics.referencedTables");
+        if (Array.isArray(arr)) {
+            evt.Put("gcp.audit.bigquery.dataset_id", arr[0].datasetId);
+            evt.Put("gcp.audit.bigquery.table_id", arr[0].tableId);
+        }
+
+        // Fetching temporary dataset and table IDs to match export sizes
+        var tmpDatasetId = evt.Get("json.serviceData.jobGetQueryResultsResponse.job.jobConfiguration.query.destinationTable.datasetId");
+        if (tmpDatasetId != undefined) {
+            evt.Put("gcp.audit.bigquery.tmp_dataset_id", tmpDatasetId)
+        }
+        var tmpTableId = evt.Get("json.serviceData.jobGetQueryResultsResponse.job.jobConfiguration.query.destinationTable.tableId");
+        if (tmpTableId != undefined) {
+            evt.Put("gcp.audit.bigquery.tmp_table_id", tmpTableId)
+        }
+        var outputRowCount = evt.Get("json.serviceData.jobGetQueryResultsResponse.job.jobStatistics.queryOutputRowCount")
+        if (outputRowCount != undefined) {
+            evt.Put("gcp.audit.bigquery.output_row_count", outputRowCount)
+        }
+        // Export job (usually export to gdrive)
+        var config = evt.Get("json.metadata.jobInsertion.job.jobConfig.extractConfig");
+        if (config != undefined){
+            if (config.hasOwnProperty('destinationUris')) {
+                if (Array.isArray(config.destinationUris) && config.destinationUris.length > 0) {
+                    evt.Put("gcp.audit.bigquery.export_destination", config.destinationUris[0])
+                    evt.Put("gcp.audit.bigquery.tmp_dataset_id", config.sourceTable.split("/")[3])
+                    evt.Put("gcp.audit.bigquery.tmp_table_id", config.sourceTable.split("/")[5])
+                }
+            }
+        }
+    }
+
     // Set ECS categorization fields.
     var setECSCategorization = function(evt) {
         evt.Put("event.kind", "event");
@@ -316,6 +389,7 @@ function Audit(keep_original_message) {
         .Add(convertLogEntry)
         .Add(convertProtoPayload)
         .Add(copyFields)
+        .Add(copyBigQueryFields)
         .Add(dropExtraFields)
         .Add(renameNestedFields)
         .Add(setECSCategorization)
