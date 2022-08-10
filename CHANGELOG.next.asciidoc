@@ -10,6 +10,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+* Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
+
 
 
 *Auditbeat*
@@ -22,7 +24,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
 - Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
 - Browserc monitors now default to a max concurrency of two. {pull}32564[32564]
-
 
 *Metricbeat*
 
@@ -41,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
+- Fix namespacing on self-monitoring {pull}32336[32336]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
