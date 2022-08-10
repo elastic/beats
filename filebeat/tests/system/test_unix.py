@@ -59,7 +59,7 @@ class Test(BaseTest):
 
             filebeat = self.start_beat()
 
-            self.wait_until(lambda: self.log_contains("Started listening for UNIX connection"))
+            self.wait_until(lambda: self.log_contains("Start accepting connections"))
 
             sock = send_stream_socket(path, delimiter)
 

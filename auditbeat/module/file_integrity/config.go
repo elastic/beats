@@ -18,6 +18,7 @@
 package file_integrity
 
 import (
+	"fmt"
 	"math"
 	"path/filepath"
 	"sort"
@@ -25,7 +26,6 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
@@ -110,19 +110,21 @@ nextHash:
 				continue nextHash
 			}
 		}
-		errs = append(errs, errors.Errorf("invalid hash_types value '%v'", ht))
+		errs = append(errs, fmt.Errorf("invalid hash_types value '%v'", ht))
 	}
 
 	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)
-	if err != nil || c.MaxFileSizeBytes > MaxValidFileSizeLimit {
-		errs = append(errs, errors.Wrap(err, "invalid max_file_size value"))
+	if err != nil {
+		errs = append(errs, fmt.Errorf("invalid max_file_size value: %w", err))
+	} else if c.MaxFileSizeBytes > MaxValidFileSizeLimit {
+		errs = append(errs, fmt.Errorf("invalid max_file_size value: %s is too large (max=%s)", c.MaxFileSize, humanize.Bytes(MaxValidFileSizeLimit)))
 	} else if c.MaxFileSizeBytes <= 0 {
-		errs = append(errs, errors.Errorf("max_file_size value (%v) must be positive", c.MaxFileSize))
+		errs = append(errs, fmt.Errorf("max_file_size value (%v) must be positive", c.MaxFileSize))
 	}
 
 	c.ScanRateBytesPerSec, err = humanize.ParseBytes(c.ScanRatePerSec)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "invalid scan_rate_per_sec value"))
+		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
 	return errs.Err()
 }

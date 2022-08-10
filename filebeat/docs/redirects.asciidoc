@@ -8,3 +8,7 @@ The following pages have moved or been deleted.
 
 See <<filebeat-module-gcp>>.
 
+[role="exclude",id="filebeat-module-gsuite"]
+== GSuite module
+
+The GSuite module has been replaced by the <<filebeat-module-google_workspace>>.

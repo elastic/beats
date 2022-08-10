@@ -21,9 +21,10 @@ import (
 	"syscall"
 
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/net"
+	"github.com/shirou/gopsutil/v3/net"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -45,12 +46,15 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	sockstat string
+	mod      resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
+		mod:           sys,
 		BaseMetricSet: base,
 	}, nil
 }
@@ -155,7 +159,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	stats := calculateConnStats(conns)
-	newStats, err := applyEnhancements(stats)
+	newStats, err := applyEnhancements(stats, m.mod)
 	if err != nil {
 		m.Logger().Debugf("error applying enhancements: %s", err)
 		newStats = stats

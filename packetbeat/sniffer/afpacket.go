@@ -24,8 +24,8 @@ import "fmt"
 // The restriction is that the block_size must be divisible by both the
 // frame size and page size.
 func afpacketComputeSize(targetSizeMb int, snaplen int, pageSize int) (
-	frameSize int, blockSize int, numBlocks int, err error) {
-
+	frameSize int, blockSize int, numBlocks int, err error,
+) {
 	if snaplen < pageSize {
 		frameSize = pageSize / (pageSize / snaplen)
 	} else {

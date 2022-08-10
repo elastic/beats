@@ -1,0 +1,5 @@
+# this file is invalid because the inputs section is missing
+- data_stream:
+    dataset: system.auth
+    type: logs
+

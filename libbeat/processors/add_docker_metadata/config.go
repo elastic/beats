@@ -35,7 +35,7 @@ type Config struct {
 	MatchShortID bool              `config:"match_short_id"`     // Match to container short ID from a log path present in source field.
 	SourceIndex  int               `config:"match_source_index"` // Index in the source path split by / to look for container ID.
 	MatchPIDs    []string          `config:"match_pids"`         // A list of fields containing process IDs (PIDs).
-	HostFS       string            `config:"system.hostfs"`      // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
+	HostFS       string            `config:"hostfs"`             // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
 	DeDot        bool              `config:"labels.dedot"`       // If set to true, replace dots in labels with `_`.
 
 	// Annotations are kept after container is killed, until they haven't been

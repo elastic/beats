@@ -44,6 +44,28 @@ func TestMimeTypeFromTo(t *testing.T) {
 	require.Equal(t, "text/plain; charset=utf-8", enriched)
 }
 
+func TestMimeTypeFromToMetadata(t *testing.T) {
+	evt := beat.Event{
+		Meta: common.MapStr{},
+		Fields: common.MapStr{
+			"foo.bar.baz": "hello world!",
+		},
+	}
+	expectedMeta := common.MapStr{
+		"field": "text/plain; charset=utf-8",
+	}
+	p, err := NewDetectMimeType(common.MustNewConfigFrom(map[string]interface{}{
+		"field":  "foo.bar.baz",
+		"target": "@metadata.field",
+	}))
+	require.NoError(t, err)
+
+	observed, err := p.Run(&evt)
+	require.NoError(t, err)
+	require.Equal(t, expectedMeta, observed.Meta)
+	require.Equal(t, evt.Fields, observed.Fields)
+}
+
 func TestMimeTypeTestNoMatch(t *testing.T) {
 	evt := beat.Event{
 		Fields: common.MapStr{

@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// getTable updates fields with the table data at the given offset.
+// fields must be non_nil on entry.
 func getTable(fields common.MapStr, data []byte, offset uint32) (next uint32, err bool, exists bool) {
-	ret := common.MapStr{}
-
 	length := binary.BigEndian.Uint32(data[offset : offset+4])
 
 	// size declared too big
@@ -39,23 +39,20 @@ func getTable(fields common.MapStr, data []byte, offset uint32) (next uint32, er
 	}
 	if length > 0 {
 		exists = true
-		err := fieldUnmarshal(ret, data[offset+4:offset+4+length], 0, length, -1)
+		table := common.MapStr{}
+		err := fieldUnmarshal(table, data[offset+4:offset+4+length], 0, length, -1)
 		if err {
 			logp.Warn("Error while parsing a field table")
 			return 0, true, false
 		}
-		if fields == nil {
-			fields = ret
-		} else {
-			fields.Update(ret)
-		}
+		fields.Update(table)
 	}
 	return length + 4 + offset, false, exists
 }
 
+// getTable updates fields with the array data at the given offset.
+// fields must be non_nil on entry.
 func getArray(fields common.MapStr, data []byte, offset uint32) (next uint32, err bool, exists bool) {
-	ret := common.MapStr{}
-
 	length := binary.BigEndian.Uint32(data[offset : offset+4])
 
 	// size declared too big
@@ -64,30 +61,27 @@ func getArray(fields common.MapStr, data []byte, offset uint32) (next uint32, er
 	}
 	if length > 0 {
 		exists = true
-		err := fieldUnmarshal(ret, data[offset+4:offset+4+length], 0, length, 0)
+		array := common.MapStr{}
+		err := fieldUnmarshal(array, data[offset+4:offset+4+length], 0, length, 0)
 		if err {
 			logp.Warn("Error while parsing a field array")
 			return 0, true, false
 		}
-		if fields == nil {
-			fields = ret
-		} else {
-			fields.Update(ret)
-		}
+		fields.Update(array)
 	}
 	return length + 4 + offset, false, exists
 }
 
-//The index parameter, when set at -1, indicates that the entry is a field table.
-//If it's set at 0, it is an array.
+// The index parameter, when set at -1, indicates that the entry is a field table.
+// If it's set at 0, it is an array.
 func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint32, index int) (err bool) {
 	var name string
 
 	if offset >= length {
 		return false
 	}
-	//get name of the field. If it's an array, it will be the index parameter as a
-	//string. If it's a table, it will be the name of the field.
+	// get name of the field. If it's an array, it will be the index parameter as a
+	// string. If it's a table, it will be the name of the field.
 	if index < 0 {
 		fieldName, offsetTemp, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
@@ -199,10 +193,10 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 		table[name] = bodyToByteArray(data[offset+1+size : offset+5+size])
 		offset += 5 + size
 	default:
-		//unknown field
+		// unknown field
 		return true
 	}
-	//advance to next field recursively
+	// advance to next field recursively
 	return fieldUnmarshal(table, data, offset, length, index)
 }
 

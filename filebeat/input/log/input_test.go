@@ -140,7 +140,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 	}
 	defer os.RemoveAll(tmpdir)
 	logs := []byte("some log line\nother log line\n")
-	err = ioutil.WriteFile(path.Join(tmpdir, "some.log"), logs, 0644)
+	err = ioutil.WriteFile(path.Join(tmpdir, "some.log"), logs, 0o644)
 	assert.NoError(t, err)
 
 	// Setup the input

@@ -29,13 +29,11 @@ type config struct {
 	KeepOriginal       bool `config:"keep_original"`
 }
 
-var (
-	defaultConfig = config{
-		ProtocolCommon: cfg.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-		ParseAuthorization: true,
-		ParseBody:          true,
-		KeepOriginal:       true,
-	}
-)
+var defaultConfig = config{
+	ProtocolCommon: cfg.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+	},
+	ParseAuthorization: true,
+	ParseBody:          true,
+	KeepOriginal:       true,
+}

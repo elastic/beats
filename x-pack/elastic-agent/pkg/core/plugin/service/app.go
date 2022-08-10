@@ -259,7 +259,10 @@ func (a *Application) Stop() {
 
 	if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
 		a.appLock.Lock()
-		a.setState(state.Failed, errors.New(err, "Failed to stopped").Error(), nil)
+		a.setState(
+			state.Failed,
+			fmt.Errorf("failed to stop after %s: %w", a.processConfig.StopTimeout, err).Error(),
+			nil)
 	} else {
 		a.appLock.Lock()
 		a.setState(state.Stopped, "Stopped", nil)
@@ -275,6 +278,7 @@ func (a *Application) Stop() {
 func (a *Application) Shutdown() {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
+	a.logger.Infof("signaling service to stop because of shutdown: %s", a.id)
 
 	if a.srvState == nil {
 		return
@@ -292,7 +296,7 @@ func (a *Application) Shutdown() {
 
 // OnStatusChange is the handler called by the GRPC server code.
 //
-// It updates the status of the application and handles restarting the application is needed.
+// It updates the status of the application and handles restarting the application when needed.
 func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()

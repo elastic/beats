@@ -17,6 +17,10 @@
 
 package kubernetes
 
+import (
+	"sync"
+)
+
 // ResourceEventHandler can handle notifications for events that happen to a
 // resource. The events are informational only, so you can't return an
 // error.
@@ -120,3 +124,108 @@ func (r FilteringResourceEventHandler) OnDelete(obj interface{}) {
 	}
 	r.Handler.OnDelete(obj)
 }
+
+// podUpdaterHandlerFunc is a function that handles pod updater notifications.
+type podUpdaterHandlerFunc func(interface{})
+
+// podUpdaterStore is the interface that an object needs to implement to be
+// used as a pod updater store.
+type podUpdaterStore interface {
+	List() []interface{}
+}
+
+// namespacePodUpdater notifies updates on pods when their namespaces are updated.
+type namespacePodUpdater struct {
+	handler podUpdaterHandlerFunc
+	store   podUpdaterStore
+	locker  sync.Locker
+}
+
+// NewNamespacePodUpdater creates a namespacePodUpdater
+func NewNamespacePodUpdater(handler podUpdaterHandlerFunc, store podUpdaterStore, locker sync.Locker) *namespacePodUpdater {
+	return &namespacePodUpdater{
+		handler: handler,
+		store:   store,
+		locker:  locker,
+	}
+}
+
+// OnUpdate handles update events on namespaces.
+func (n *namespacePodUpdater) OnUpdate(obj interface{}) {
+	ns, ok := obj.(*Namespace)
+	if !ok {
+		return
+	}
+
+	// n.store.List() returns a snapshot at this point. If a delete is received
+	// from the main watcher, this loop may generate an update event after the
+	// delete is processed, leaving configurations that would never be deleted.
+	// Also this loop can miss updates, what could leave outdated configurations.
+	// Avoid these issues by locking the processing of events from the main watcher.
+	if n.locker != nil {
+		n.locker.Lock()
+		defer n.locker.Unlock()
+	}
+	for _, pod := range n.store.List() {
+		pod, ok := pod.(*Pod)
+		if ok && pod.Namespace == ns.Name {
+			n.handler(pod)
+		}
+	}
+}
+
+// OnAdd handles add events on namespaces. Nothing to do, if pods are added to this
+// namespace they will generate their own add events.
+func (*namespacePodUpdater) OnAdd(interface{}) {}
+
+// OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
+// namespace they will generate their own delete events.
+func (*namespacePodUpdater) OnDelete(interface{}) {}
+
+// nodePodUpdater notifies updates on pods when their nodes are updated.
+type nodePodUpdater struct {
+	handler podUpdaterHandlerFunc
+	store   podUpdaterStore
+	locker  sync.Locker
+}
+
+// NewNodePodUpdater creates a nodePodUpdater
+func NewNodePodUpdater(handler podUpdaterHandlerFunc, store podUpdaterStore, locker sync.Locker) *nodePodUpdater {
+	return &nodePodUpdater{
+		handler: handler,
+		store:   store,
+		locker:  locker,
+	}
+}
+
+// OnUpdate handles update events on nodes.
+func (n *nodePodUpdater) OnUpdate(obj interface{}) {
+	node, ok := obj.(*Node)
+	if !ok {
+		return
+	}
+
+	// n.store.List() returns a snapshot at this point. If a delete is received
+	// from the main watcher, this loop may generate an update event after the
+	// delete is processed, leaving configurations that would never be deleted.
+	// Also this loop can miss updates, what could leave outdated configurations.
+	// Avoid these issues by locking the processing of events from the main watcher.
+	if n.locker != nil {
+		n.locker.Lock()
+		defer n.locker.Unlock()
+	}
+	for _, pod := range n.store.List() {
+		pod, ok := pod.(*Pod)
+		if ok && pod.Spec.NodeName == node.Name {
+			n.handler(pod)
+		}
+	}
+}
+
+// OnAdd handles add events on namespaces. Nothing to do, if pods are added to this
+// namespace they will generate their own add events.
+func (*nodePodUpdater) OnAdd(interface{}) {}
+
+// OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
+// namespace they will generate their own delete events.
+func (*nodePodUpdater) OnDelete(interface{}) {}

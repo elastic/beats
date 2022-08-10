@@ -2,7 +2,7 @@
 
 # Script to run {{.BeatName | title}} in foreground with the same path settings that
 # the init script / systemd unit file would do.
-
+umask 0027
 exec /usr/share/{{.BeatName}}/bin/{{.BeatName}} \
   --path.home /var/lib/{{.BeatName}} \
   --path.config /etc/{{.BeatName}} \

@@ -93,7 +93,7 @@ func CustomizePackaging() {
 			switch pkgType {
 			case devtools.TarGz, devtools.Zip, devtools.Docker:
 				args.Spec.Files[modulesDTarget] = modulesD
-			case devtools.Deb, devtools.RPM, devtools.DMG:
+			case devtools.Deb, devtools.RPM:
 				args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
@@ -219,8 +219,6 @@ func customizeLightModulesPackaging() error {
 			args.Spec.Files[moduleTarget] = module
 		case devtools.Deb, devtools.RPM:
 			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
-		case devtools.DMG:
-			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/"+moduleTarget] = module
 		default:
 			return fmt.Errorf("unhandled package type: %v", pkgType)
 		}

@@ -18,73 +18,105 @@
 package memory
 
 import (
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
-	sysinfo "github.com/elastic/go-sysinfo"
-	sysinfotypes "github.com/elastic/go-sysinfo/types"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux
-func FetchLinuxMemStats(baseMap common.MapStr) error {
-
-	vmstat, err := GetVMStat()
+func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
+	vmstat, err := GetVMStat(hostfs)
 	if err != nil {
 		return errors.Wrap(err, "error fetching VMStats")
 	}
 
-	pageStats := common.MapStr{
-		"pgscan_kswapd": common.MapStr{
-			"pages": vmstat.PgscanKswapd,
-		},
-		"pgscan_direct": common.MapStr{
-			"pages": vmstat.PgscanDirect,
-		},
-		"pgfree": common.MapStr{
-			"pages": vmstat.Pgfree,
-		},
-		"pgsteal_kswapd": common.MapStr{
-			"pages": vmstat.PgstealKswapd,
-		},
-		"pgsteal_direct": common.MapStr{
-			"pages": vmstat.PgstealDirect,
-		},
-	}
-	// This is similar to the vmeff stat gathered by sar
-	// these ratios calculate thhe efficiency of page reclaim
-	if vmstat.PgscanDirect != 0 {
-		pageStats["direct_efficiency"] = common.MapStr{
-			"pct": common.Round(float64(vmstat.PgstealDirect)/float64(vmstat.PgscanDirect), common.DefaultDecimalPlacesCount),
-		}
-	}
+	pageStats := common.MapStr{}
 
-	if vmstat.PgscanKswapd != 0 {
-		pageStats["kswapd_efficiency"] = common.MapStr{
-			"pct": common.Round(float64(vmstat.PgstealKswapd)/float64(vmstat.PgscanKswapd), common.DefaultDecimalPlacesCount),
-		}
-	}
+	insertPagesChild("pgscan_kswapd", vmstat, pageStats)
+	insertPagesChild("pgscan_direct", vmstat, pageStats)
+	insertPagesChild("pgfree", vmstat, pageStats)
+	insertPagesChild("pgsteal_kswapd", vmstat, pageStats)
+	insertPagesChild("pgsteal_direct", vmstat, pageStats)
+
+	computeEfficiency("pgscan_direct", "pgsteal_direct", "direct_efficiency", vmstat, pageStats)
+	computeEfficiency("pgscan_kswapd", "pgsteal_kswapd", "kswapd_efficiency", vmstat, pageStats)
+
 	baseMap["page_stats"] = pageStats
 
-	thp, err := getHugePages()
+	thp, err := getHugePages(hostfs)
 	if err != nil {
 		return errors.Wrap(err, "error getting huge pages")
 	}
-	thp["swap"] = common.MapStr{
-		"out": common.MapStr{
-			"pages":    vmstat.ThpSwpout,
-			"fallback": vmstat.ThpSwpoutFallback,
-		},
+	baseMap["hugepages"] = thp
+
+	// huge pages swap out
+	if thbswpout, ok := vmstat["thp_swpout"]; ok {
+		baseMap.Put("hugepages.swap.out.pages", thbswpout)
+	}
+	if thbswpfall, ok := vmstat["thp_swpout_fallback"]; ok {
+		baseMap.Put("hugepages.swap.out.fallback", thbswpfall)
 	}
 
-	baseMap["hugepages"] = thp
+	// This is largely for convenience, and allows the swap.* metrics to more closely emulate how they're reported on system/memory
+	// This way very similar metrics aren't split across different modules, even though Linux reports them in different places.
+	eventRaw, err := metrics.Get(hostfs)
+	if err != nil {
+		return errors.Wrap(err, "error fetching memory metrics")
+	}
+	swap := common.MapStr{}
+	err = typeconv.Convert(&swap, &eventRaw.Swap)
+
+	baseMap["swap"] = swap
+
+	// linux-exclusive swap data
+	map2evt("pswpin", "swap.in.pages", vmstat, baseMap)
+	map2evt("pswpout", "swap.out.pages", vmstat, baseMap)
+	map2evt("swap_ra", "swap.readahead.pages", vmstat, baseMap)
+	map2evt("swap_ra_hit", "swap.readahead.cached", vmstat, baseMap)
+
+	baseMap["vmstat"] = vmstat
 
 	return nil
 }
 
-func getHugePages() (common.MapStr, error) {
+func map2evt(inName string, outName string, rawEvt map[string]uint64, outEvt common.MapStr) {
+	if selected, ok := rawEvt[inName]; ok {
+		outEvt.Put(outName, selected)
+	}
+}
+
+// insertPagesChild inserts a "child" MapStr into given events. This is mostly so we don't break mapping for fields that have been around.
+// most of the fields in vmstat are fairly esoteric and (somewhat) self-documenting, so use of this shouldn't expand beyond what's needed for backwards compat.
+func insertPagesChild(field string, raw map[string]uint64, evt common.MapStr) {
+	stat, ok := raw[field]
+	if ok {
+		evt.Put(fmt.Sprintf("%s.pages", field), stat)
+	}
+}
+
+func computeEfficiency(scanName string, stealName string, fieldName string, raw map[string]uint64, inMap common.MapStr) {
+	scanVal, _ := raw[scanName]
+	stealVal, stealOk := raw[stealName]
+	if scanVal != 0 && stealOk {
+		inMap[fieldName] = common.MapStr{
+			"pct": common.Round(float64(stealVal)/float64(scanVal), common.DefaultDecimalPlacesCount),
+		}
+	}
+
+}
+
+func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
 	// see https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
-	table, err := memory.ParseMeminfo("")
+	table, err := memory.ParseMeminfo(hostfs)
 	if err != nil {
 		return nil, errors.Wrap(err, "error parsing meminfo")
 	}
@@ -128,21 +160,28 @@ func getHugePages() (common.MapStr, error) {
 }
 
 // GetVMStat gets linux vmstat metrics
-func GetVMStat() (*sysinfotypes.VMStatInfo, error) {
-	// TODO: We may want to pull this code out of go-sysinfo.
-	// It's platform specific, and not used by anything else.
-	h, err := sysinfo.Host()
+func GetVMStat(hostfs resolve.Resolver) (map[string]uint64, error) {
+	vmstatFile := hostfs.ResolveHostFS("proc/vmstat")
+	content, err := os.ReadFile(vmstatFile)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read self process information")
+		return nil, errors.Wrapf(err, "error reading vmstat from %s", vmstatFile)
 	}
-	vmstatHandle, ok := h.(sysinfotypes.VMStat)
-	if !ok {
-		return nil, errors.New("VMStat not available for platform")
-	}
-	info, err := vmstatHandle.VMStat()
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting VMStat info")
-	}
-	return info, nil
 
+	// I'm not a fan of throwing stuff directly to maps, but this is a huge amount of kernel/config specific metrics, and we're the only consumer of this for now.
+	vmstat := map[string]uint64{}
+	for _, metric := range strings.Split(string(content), "\n") {
+		parts := strings.SplitN(metric, " ", 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		num, err := strconv.ParseUint(string(parts[1]), 10, 64)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to parse value %s", parts[1])
+		}
+		vmstat[parts[0]] = num
+
+	}
+
+	return vmstat, nil
 }

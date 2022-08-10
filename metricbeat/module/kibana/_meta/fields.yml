@@ -63,3 +63,5 @@
     - name: kibana
       type: group
       fields:
+        - name: elasticsearch.cluster.id
+          type: keyword

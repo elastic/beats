@@ -22,9 +22,9 @@ processors:
 - remove:
     field: zookeeper.log.process
     ignore_missing: true
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - date:
     if: ctx.event.timezone == null
     field: zookeeper.log.timestamp

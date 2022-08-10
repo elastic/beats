@@ -54,7 +54,6 @@ func TestMetaFieldsOffset(t *testing.T) {
 		if err == io.EOF {
 			break
 		}
-		offset += int64(msg.Bytes)
 
 		expectedFields := common.MapStr{}
 		if len(msg.Content) != 0 {
@@ -67,6 +66,8 @@ func TestMetaFieldsOffset(t *testing.T) {
 				},
 			}
 		}
+		offset += int64(msg.Bytes)
+
 		require.Equal(t, expectedFields, msg.Fields)
 		require.Equal(t, offset, in.offset)
 	}

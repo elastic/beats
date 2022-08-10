@@ -1,0 +1,37 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "container": {
+        "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+    },
+    "containerd": {
+        "blkio": {
+            "device": "/dev/vda",
+            "read": {
+                "bytes": 69246976,
+                "ops": 830
+            },
+            "summary": {
+                "bytes": 69271552,
+                "ops": 832
+            },
+            "write": {
+                "bytes": 24576,
+                "ops": 2
+            }
+        },
+        "namespace": "k8s.io"
+    },
+    "event": {
+        "dataset": "containerd.blkio",
+        "duration": 115000,
+        "module": "containerd"
+    },
+    "metricset": {
+        "name": "blkio",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "containerd"
+    }
+}

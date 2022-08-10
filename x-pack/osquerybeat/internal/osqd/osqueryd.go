@@ -22,6 +22,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 )
 
@@ -180,6 +181,13 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	err = cmd.Start()
 	if err != nil {
 		return err
+	}
+
+	// Assign osqueryd process to the JobObject on windows
+	// in order to assure no orphan process is left behind
+	// after osquerybeat process is killed.
+	if err := proc.JobObject.Assign(cmd.Process); err != nil {
+		q.log.Errorf("osqueryd process failed job assign: %v", err)
 	}
 
 	var (
@@ -409,11 +417,23 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
-	if runtime.GOOS == "darwin" {
-		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename())
+	return QsquerydPathForPlatform(runtime.GOOS, dir)
+}
+
+// QsquerydPathForPlatform returns the full path to osqueryd binary for platform
+func QsquerydPathForPlatform(platform, dir string) string {
+	if platform == "darwin" {
+		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename(platform))
 
 	}
-	return filepath.Join(dir, osquerydFilename())
+	return filepath.Join(dir, osquerydFilename(platform))
+}
+
+func osquerydFilename(platform string) string {
+	if platform == "windows" {
+		return osqueryDName + ".exe"
+	}
+	return osqueryDName
 }
 
 func osqueryExtensionPath(dir string) string {

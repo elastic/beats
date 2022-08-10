@@ -65,6 +65,7 @@ func (f *fakeInput) Test(ctx TestContext) error {
 	}
 	return nil
 }
+
 func (f *fakeInput) Run(ctx Context, pipeline beat.PipelineConnector) error {
 	if f.OnRun != nil {
 		return f.OnRun(ctx, pipeline)

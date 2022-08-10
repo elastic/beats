@@ -104,21 +104,21 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
+	backup := event.Clone()
+
 	if convertDataType {
 		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
 	} else {
 		event, err = p.mapper(event, mapToMapStr(m))
 	}
 	if err != nil {
-		return event, err
+		return backup, err
 	}
 
 	return event, nil
 }
 
 func (p *processor) mapper(event *beat.Event, m common.MapStr) (*beat.Event, error) {
-	copy := event.Fields.Clone()
-
 	prefix := ""
 	if p.config.TargetPrefix != "" {
 		prefix = p.config.TargetPrefix + "."
@@ -129,7 +129,6 @@ func (p *processor) mapper(event *beat.Event, m common.MapStr) (*beat.Event, err
 		if _, err := event.GetValue(prefixKey); err == common.ErrKeyNotFound || p.config.OverwriteKeys {
 			event.PutValue(prefixKey, v)
 		} else {
-			event.Fields = copy
 			// When the target key exists but is a string instead of a map.
 			if err != nil {
 				return event, errors.Wrapf(err, "cannot override existing key with `%s`", prefixKey)

@@ -88,8 +88,8 @@
         "input.type": "log",
         "log.offset": 536,
         "process.args": [
-            "-p",
             "/usr/lib64/nagios/plugins/check_asterisk_sip_peers",
+            "-p",
             "202"
         ],
         "process.args_count": 3,
@@ -290,7 +290,6 @@
     },
     {
         "@timestamp": "2020-02-10T21:59:44.206Z",
-        "auditd.log.a0": "top",
         "auditd.log.sequence": 579393,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -300,7 +299,11 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2688,
+        "process.args": [
+            "top"
+        ],
         "process.args_count": 1,
+        "process.executable": "top",
         "service.type": "auditd"
     },
     {

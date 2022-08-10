@@ -19,6 +19,7 @@ package reader
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -54,6 +55,20 @@ func TestToEvent(t *testing.T) {
 		"content, meta, message field": {
 			Message{Content: []byte("my message"), Fields: common.MapStr{"my_field": "my_value"}, Meta: common.MapStr{"meta": "id"}},
 			beat.Event{Fields: common.MapStr{"message": "my message", "my_field": "my_value"}, Meta: common.MapStr{"meta": "id"}},
+		},
+		"content, meta, message and private fields": {
+			Message{
+				Ts:      time.Date(2022, 1, 9, 10, 42, 0, 0, time.UTC),
+				Content: []byte("my message"),
+				Meta:    common.MapStr{"foo": "bar"},
+				Private: 42,
+			},
+			beat.Event{
+				Timestamp: time.Date(2022, 1, 9, 10, 42, 0, 0, time.UTC),
+				Fields:    common.MapStr{"message": "my message"},
+				Meta:      common.MapStr{"foo": "bar"},
+				Private:   42,
+			},
 		},
 	}
 

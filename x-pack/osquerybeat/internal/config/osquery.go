@@ -59,12 +59,15 @@ type Events struct {
 }
 
 type OsqueryConfig struct {
-	Options   map[string]interface{} `config:"options" json:"options,omitempty"`
-	Schedule  map[string]Query       `config:"schedule" json:"schedule,omitempty"`
-	Packs     map[string]Pack        `config:"packs" json:"packs,omitempty"`
-	Filepaths map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
-	Views     map[string]string      `config:"views" json:"views,omitempty"`
-	Events    *Events                `config:"events" json:"events,omitempty"`
+	Options               map[string]interface{} `config:"options" json:"options,omitempty"`
+	Schedule              map[string]Query       `config:"schedule" json:"schedule,omitempty"`
+	Packs                 map[string]Pack        `config:"packs" json:"packs,omitempty"`
+	Filepaths             map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
+	Views                 map[string]string      `config:"views" json:"views,omitempty"`
+	Events                *Events                `config:"events" json:"events,omitempty"`
+	Yara                  map[string]interface{} `config:"yara" json:"yara,omitempty"`
+	PrometheusTargets     map[string]interface{} `config:"prometheus_targets" json:"prometheus_targets,omitempty"`
+	AutoTableConstruction map[string]interface{} `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
 }
 
 func (c OsqueryConfig) Render() ([]byte, error) {

@@ -84,7 +84,7 @@ var (
 	}
 )
 
-func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
+func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var queues []map[string]interface{}
 	err := json.Unmarshal(content, &queues)
 	if err != nil {
@@ -92,25 +92,15 @@ func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
 	}
 
 	for _, queue := range queues {
-		evt, err := eventMapping(queue)
-		if err != nil {
-			m.Logger().Errorf("error in mapping: %s", err)
-			r.Error(err)
-			continue
-		}
-		if !r.Event(evt) {
-			return nil
-		}
+		evt := eventMapping(queue)
+		r.Event(evt)
 	}
 
 	return nil
 }
 
-func eventMapping(queue map[string]interface{}) (mb.Event, error) {
-	fields, err := schema.Apply(queue)
-	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying schema")
-	}
+func eventMapping(queue map[string]interface{}) mb.Event {
+	fields, _ := schema.Apply(queue)
 
 	moduleFields := common.MapStr{}
 	if v, err := fields.GetValue("vhost"); err == nil {
@@ -127,5 +117,5 @@ func eventMapping(queue map[string]interface{}) (mb.Event, error) {
 		MetricSetFields: fields,
 		ModuleFields:    moduleFields,
 	}
-	return event, nil
+	return event
 }

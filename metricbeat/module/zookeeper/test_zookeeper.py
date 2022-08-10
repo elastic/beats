@@ -14,6 +14,7 @@ MNTR_FIELDS = ["latency.avg", "latency.max",
                "approximate_data_size", "num_alive_connections"]
 
 
+@metricbeat.parameterized_with_supported_versions
 class ZooKeeperMntrTest(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['zookeeper']

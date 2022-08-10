@@ -106,6 +106,39 @@ func TestCommonPaths(t *testing.T) {
 		// Event must be present, even on error
 		assert.NotNil(t, event)
 	}
+
+	t.Run("supports a metadata field", func(t *testing.T) {
+		var config, _ = common.NewConfigFrom(map[string]interface{}{
+			"field":     "field",
+			"separator": "/",
+			"index":     3,
+			"target":    "@metadata.field",
+		})
+
+		event := &beat.Event{
+			Meta: common.MapStr{},
+			Fields: common.MapStr{
+				"field": "/var/lib/foo/bar",
+			},
+		}
+
+		expectedFields := common.MapStr{
+			"field": "/var/lib/foo/bar",
+		}
+		expectedMeta := common.MapStr{
+			"field": "bar",
+		}
+
+		p, err := NewExtractField(config)
+		if err != nil {
+			t.Fatalf("error initializing extract_field: %s", err)
+		}
+
+		newEvent, err := p.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedFields, newEvent.Fields)
+		assert.Equal(t, expectedMeta, newEvent.Meta)
+	})
 }
 
 func runExtractField(t *testing.T, config *common.Config, input common.MapStr) (*beat.Event, error) {

@@ -5,55 +5,14 @@ winlogbeat.event_logs:
   - name: System
 
   - name: Security
-    processors:
-      - script:
-          lang: javascript
-          id: security
-          file: ${path.home}/module/security/config/winlogbeat-security.js
 
   - name: Microsoft-Windows-Sysmon/Operational
-    processors:
-      - script:
-          lang: javascript
-          id: sysmon
-          file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
 
   - name: Windows PowerShell
     event_id: 400, 403, 600, 800
-    processors:
-      - script:
-          lang: javascript
-          id: powershell
-          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js
 
   - name: Microsoft-Windows-PowerShell/Operational
     event_id: 4103, 4104, 4105, 4106
-    processors:
-      - script:
-          lang: javascript
-          id: powershell
-          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js
 
   - name: ForwardedEvents
     tags: [forwarded]
-    processors:
-      - script:
-          when.equals.winlog.channel: Security
-          lang: javascript
-          id: security
-          file: ${path.home}/module/security/config/winlogbeat-security.js
-      - script:
-          when.equals.winlog.channel: Microsoft-Windows-Sysmon/Operational
-          lang: javascript
-          id: sysmon
-          file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
-      - script:
-          when.equals.winlog.channel: Windows PowerShell
-          lang: javascript
-          id: powershell
-          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js
-      - script:
-          when.equals.winlog.channel: Microsoft-Windows-PowerShell/Operational
-          lang: javascript
-          id: powershell
-          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js

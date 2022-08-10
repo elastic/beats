@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
@@ -44,7 +44,7 @@ func NewStdinFunction(
 
 // Run reads events from the STDIN and send them to the publisher pipeline, will stop reading by
 // either by an external signal to stop or by reaching EOF. When EOF is reached functionbeat will shutdown.
-func (s *StdinFunction) Run(ctx context.Context, client core.Client, _ telemetry.T) error {
+func (s *StdinFunction) Run(ctx context.Context, client pipeline.ISyncClient, _ telemetry.T) error {
 	errChan := make(chan error)
 	defer close(errChan)
 	lineChan := make(chan string)

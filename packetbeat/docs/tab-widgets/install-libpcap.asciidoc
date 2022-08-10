@@ -18,10 +18,6 @@ sudo yum install libpcap
 You probably do not need to install libpcap.
 // end::mac[]
 
-// tag::brew[]
-You probably do not need to install libpcap.
-// end::brew[]
-
 // tag::linux[]
 You probably do not need to install libpcap.
 // end::linux[]

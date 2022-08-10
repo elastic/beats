@@ -52,6 +52,8 @@ const (
 	tabMessage = "CEF:0|security|threatmanager|1.0|100|message is padded|10|spt=1232 msg=Tabs\tand\rcontrol\ncharacters are preserved\t src=127.0.0.1"
 
 	tabNoSepMessage = "CEF:0|security|threatmanager|1.0|100|message has tabs|10|spt=1232 msg=Tab is not a separator\tsrc=127.0.0.1"
+
+	escapedMessage = `CEF:0|security\\compliance|threat\|->manager|1.0|100|message contains escapes|10|spt=1232 msg=Newlines in messages\nare allowed.\r\nAnd so are carriage feeds\\newlines\\\=.`
 )
 
 var testMessages = []string{
@@ -71,6 +73,7 @@ var testMessages = []string{
 	paddedMessage,
 	crlfMessage,
 	tabMessage,
+	escapedMessage,
 }
 
 func TestGenerateFuzzCorpus(t *testing.T) {
@@ -83,7 +86,7 @@ func TestGenerateFuzzCorpus(t *testing.T) {
 		h.Write([]byte(m))
 		name := hex.EncodeToString(h.Sum(nil))
 
-		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0644)
+		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
 	}
 }
 
@@ -374,6 +377,30 @@ func TestEventUnpack(t *testing.T) {
 			"spt": IntegerField(1232),
 		}, e.Extensions)
 	})
+
+	t.Run("escapes are replaced", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(escapedMessage)
+		assert.NoError(t, err)
+		assert.Equal(t, `security\compliance`, e.DeviceVendor)
+		assert.Equal(t, `threat|->manager`, e.DeviceProduct)
+		assert.Equal(t, map[string]*Field{
+			"spt": IntegerField(1232),
+			"msg": StringField("Newlines in messages\nare allowed.\r\nAnd so are carriage feeds\\newlines\\=."),
+		}, e.Extensions)
+	})
+
+	t.Run("error recovery with escape", func(t *testing.T) {
+		// Ensure no panic or regression of https://github.com/elastic/beats/issues/30010.
+		// key1 contains an escape, but then an invalid non-escaped =.
+		// This triggers the error recovery to try to read the next key.
+		var e Event
+		err := e.Unpack(`CEF:0|||||||key1=\\hi= key2=a`)
+		assert.Error(t, err)
+		assert.Equal(t, map[string]*Field{
+			"key2": UndocumentedField("a"),
+		}, e.Extensions)
+	})
 }
 
 func TestEventUnpackWithFullExtensionNames(t *testing.T) {
@@ -406,6 +433,7 @@ func StringField(v string) *Field { return &Field{String: v, Type: StringType, I
 func IntegerField(v int32) *Field {
 	return &Field{String: strconv.Itoa(int(v)), Type: IntegerType, Interface: v}
 }
+
 func LongField(v int64) *Field {
 	return &Field{String: strconv.Itoa(int(v)), Type: LongType, Interface: v}
 }

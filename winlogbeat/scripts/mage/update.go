@@ -35,10 +35,8 @@ func init() {
 	docs.RegisterDeps(Update.FieldDocs, Update.ModuleDocs)
 }
 
-var (
-	// SelectLogic configures the types of project logic to use (OSS vs X-Pack).
-	SelectLogic devtools.ProjectType
-)
+// SelectLogic configures the types of project logic to use (OSS vs X-Pack).
+var SelectLogic devtools.ProjectType
 
 // Update target namespace.
 type Update mg.Namespace

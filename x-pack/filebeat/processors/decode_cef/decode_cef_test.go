@@ -28,7 +28,7 @@ func TestProcessorRun(t *testing.T) {
 		fields  common.MapStr
 	}
 
-	var testCases = map[string]testCase{
+	testCases := map[string]testCase{
 		"custom_target_root": {
 			config: func() config {
 				c := defaultConfig()
@@ -251,7 +251,7 @@ func readGoldenJSON(t testing.TB, source string) []common.MapStr {
 func writeGoldenJSON(t testing.TB, source string, events []common.MapStr) {
 	dest := source + ".golden.json"
 
-	f, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		t.Fatal(err)
 	}

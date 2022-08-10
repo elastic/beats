@@ -22,4 +22,6 @@ ingest_pipeline:
   - ingest/pipeline.yml
   - ingest/pipeline-plaintext.yml
   - ingest/pipeline-json.yml
+  - ingest/pipeline-json-7.yml
+  - ingest/pipeline-json-8.yml
 input: config/slowlog.yml

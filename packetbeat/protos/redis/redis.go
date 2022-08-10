@@ -140,6 +140,7 @@ func (redis *redisPlugin) Parse(
 	}
 	return conn
 }
+
 func (redis *redisPlugin) newConnectionData() *redisConnectionData {
 	return &redisConnectionData{
 		requests:  NewMessageQueue(redis.queueConfig),
@@ -171,7 +172,6 @@ func (redis *redisPlugin) doParse(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *redisConnectionData {
-
 	st := conn.streams[dir]
 	if st == nil {
 		st = newStream(pkt.Ts, tcptuple)
@@ -339,8 +339,8 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 }
 
 func (redis *redisPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+) {
 	// tsg: being packet loss tolerant is probably not very useful for Redis,
 	// because most requests/response tend to fit in a single packet.
 
@@ -348,8 +348,8 @@ func (redis *redisPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 }
 
 func (redis *redisPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	// TODO: check if we have pending data that we can send up the stack
 
 	return private

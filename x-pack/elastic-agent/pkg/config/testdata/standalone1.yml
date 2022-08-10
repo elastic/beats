@@ -1,0 +1,6 @@
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [127.0.0.1:9201]
+    api-key: "my-secret-key"
+

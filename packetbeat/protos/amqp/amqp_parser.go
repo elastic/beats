@@ -42,10 +42,10 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 
 		f, err := readFrameHeader(s.data[s.parseOffset:])
 		if err {
-			//incorrect header
+			// incorrect header
 			return false, false
 		} else if f == nil {
-			//header not complete
+			// header not complete
 			return true, false
 		}
 
@@ -67,15 +67,12 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 		s.parseOffset += 8 + int(f.size)
 		if !ok {
 			return false, false
-		} else if complete {
+		}
+		if complete {
 			return true, true
 		}
 	}
 	return ok, complete
-}
-
-func (s *amqpStream) prepareForNewMessage() {
-	s.message = nil
 }
 
 func isProtocolHeader(data []byte) (isHeader bool, version string) {
@@ -85,7 +82,7 @@ func isProtocolHeader(data []byte) (isHeader bool, version string) {
 	return false, ""
 }
 
-//func to read a frame header and check if it is valid and complete
+// func to read a frame header and check if it is valid and complete
 func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	var frame amqpFrame
 	if len(data) < 8 {
@@ -103,7 +100,7 @@ func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	}
 	frame.Type = frameType(data[0])
 	if frame.size == 0 {
-		//frame content is nil with heartbeat frames
+		// frame content is nil with heartbeat frames
 		frame.content = nil
 	} else {
 		frame.content = data[7 : frame.size+7]
@@ -159,7 +156,7 @@ func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) bool {
 	s.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
 	debugf("Received Header frame. A message of %d bytes is expected", s.message.bodySize)
 
-	if amqp.parseHeaders == true {
+	if amqp.parseHeaders {
 		err := getMessageProperties(s, buf[12:])
 		if err {
 			return false
@@ -180,7 +177,7 @@ func (s *amqpStream) decodeBodyFrame(buf []byte) (ok bool, complete bool) {
 
 	debugf("A body frame of %d bytes long has been transmitted",
 		len(buf))
-	//is the message complete ? If yes, let's publish it
+	// is the message complete ? If yes, let's publish it
 
 	complete = uint64(len(s.message.body)) >= s.message.bodySize
 	return true, complete
@@ -190,16 +187,16 @@ func hasProperty(prop, flag byte) bool {
 	return (prop & flag) == flag
 }
 
-//function to get message content-type and content-encoding
+// function to get message content-type and content-encoding
 func getMessageProperties(s *amqpStream, data []byte) bool {
 	m := s.message
 
-	//properties are coded in the two first bytes
+	// properties are coded in the two first bytes
 	prop1 := data[0]
 	prop2 := data[1]
 	var offset uint32 = 2
 
-	//while last bit set, we have another property flag field
+	// while last bit set, we have another property flag field
 	for lastbit := 1; data[lastbit]&1 == 1; {
 		lastbit += 2
 		offset += 2
@@ -238,9 +235,10 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop1, deliveryModeProp) {
-		if data[offset] == 1 {
+		switch data[offset] {
+		case 1:
 			m.fields["delivery-mode"] = "non-persistent"
-		} else if data[offset] == 2 {
+		case 2:
 			m.fields["delivery-mode"] = "persistent"
 		}
 		offset++
@@ -337,20 +335,20 @@ func (amqp *amqpPlugin) handleAmqp(m *amqpMessage, tcptuple *common.TCPTuple, di
 	m.direction = dir
 	m.cmdlineTuple = amqp.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
-	if m.method == "basic.publish" {
+	switch {
+	case m.method == "basic.publish":
 		amqp.handlePublishing(m)
-	} else if m.method == "basic.deliver" || m.method == "basic.return" ||
-		m.method == "basic.get-ok" {
+	case m.method == "basic.deliver" || m.method == "basic.return" || m.method == "basic.get-ok":
 		amqp.handleDelivering(m)
-	} else if m.isRequest == true {
+	case m.isRequest:
 		amqp.handleAmqpRequest(m)
-	} else if m.isRequest == false {
+	default: // !m.isRequest
 		amqp.handleAmqpResponse(m)
 	}
 }
 
 func (amqp *amqpPlugin) mustHideCloseMethod(m *amqpMessage) bool {
-	return amqp.hideConnectionInformation == true &&
+	return amqp.hideConnectionInformation &&
 		(m.method == "connection.close" || m.method == "channel.close") &&
-		getReplyCode(m.fields) < uint16(300)
+		getReplyCode(m.fields) < 300
 }

@@ -370,7 +370,6 @@ func (client *Client) ImportMultiPartFormFile(url string, params url.Values, fil
 
 	headers := http.Header{}
 	headers.Add("Content-Type", w.FormDataContentType())
-
 	statusCode, response, err := client.Connection.Request("POST", url, params, headers, buf)
 	if err != nil || statusCode >= 300 {
 		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)

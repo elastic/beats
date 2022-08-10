@@ -22,14 +22,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/gopacket/layers"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-
-	"github.com/tsg/gopacket/layers"
 )
 
 const TCPMaxDataInStream = 10 * (1 << 20)
@@ -61,9 +61,7 @@ type Processor interface {
 	Process(flow *flows.FlowID, hdr *layers.TCP, pkt *protos.Packet)
 }
 
-var (
-	droppedBecauseOfGaps = monitoring.NewInt(nil, "tcp.dropped_because_of_gaps")
-)
+var droppedBecauseOfGaps = monitoring.NewInt(nil, "tcp.dropped_because_of_gaps")
 
 type seqCompare int
 
@@ -271,7 +269,8 @@ func (tcp *TCP) getStream(pkt *protos.Packet) (stream TCPStream, created bool) {
 		id:       tcp.getID(),
 		tuple:    &pkt.Tuple,
 		protocol: protocol,
-		tcp:      tcp}
+		tcp:      tcp,
+	}
 	conn.tcptuple = common.TCPTupleFromIPPort(conn.tuple, conn.id)
 	tcp.streams.PutWithTimeout(pkt.Tuple.Hashable(), conn, timeout)
 	return TCPStream{conn: conn, dir: TCPDirectionOriginal}, true
@@ -289,16 +288,12 @@ func tcpSeqCompare(seq1, seq2 uint32) seqCompare {
 	}
 }
 
-func tcpSeqBefore(seq1 uint32, seq2 uint32) bool {
-	return int32(seq1-seq2) < 0
-}
-
 func tcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
 	return int32(seq1-seq2) <= 0
 }
 
 func buildPortsMap(plugins map[protos.Protocol]protos.TCPPlugin) (map[uint16]protos.Protocol, error) {
-	var res = map[uint16]protos.Protocol{}
+	res := map[uint16]protos.Protocol{}
 
 	for proto, protoPlugin := range plugins {
 		for _, port := range protoPlugin.GetPorts() {

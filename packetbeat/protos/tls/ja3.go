@@ -24,8 +24,8 @@ import (
 	"strings"
 )
 
+// See https://engineering.salesforce.com/open-sourcing-ja3-92c9e53c3c41.
 func getJa3Fingerprint(hello *helloMessage) (hash string, ja3str string) {
-
 	// build the array of arrays of numbers
 
 	data := make([][]uint16, 5)
@@ -94,6 +94,7 @@ func extractJa3Array(raw []byte, size int) []uint16 {
 	return array
 }
 
+// See https://tools.ietf.org/id/draft-ietf-tls-grease-01.html#rfc.section.2
 func isGreaseValue(num uint16) bool {
 	hi, lo := byte(num>>8), byte(num)
 	return hi == lo && lo&0xf == 0xa

@@ -119,8 +119,8 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 func (p *NetflowV9Protocol) parseSet(
 	setID uint16,
 	session *SessionState,
-	buf *bytes.Buffer) (flows []record.Record, err error) {
-
+	buf *bytes.Buffer) (flows []record.Record, err error,
+) {
 	if setID >= 256 {
 		// Flow of Options record, lookup template and generate flows
 		if template := session.GetTemplate(setID); template != nil {

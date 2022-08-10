@@ -154,9 +154,9 @@ processors:
       out: ->>
       outbound: outbound
     if: ctx.network?.direction != null
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - date:
     field: nats.log.timestamp
     target_field: '@timestamp'

@@ -31,10 +31,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
+
 	"github.com/stretchr/testify/assert"
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
-	"github.com/tsg/gopacket/pcap"
 )
 
 const (
@@ -42,9 +43,7 @@ const (
 	goldenDir = "testdata/golden"
 )
 
-var (
-	update = flag.Bool("update", false, "updates the golden files")
-)
+var update = flag.Bool("update", false, "updates the golden files")
 
 func TestPCAPFiles(t *testing.T) {
 	pcaps, err := filepath.Glob(filepath.Join(pcapDir, "*.pcap"))

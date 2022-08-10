@@ -7,6 +7,11 @@ See the {observability-guide}/synthetics-quickstart.html[quick start guide].
 beta[] The options described here configure {beatname_uc} to run the synthetic
 monitoring test suites via Synthetic Agent on the Chromium browser.
 Additional shared options are defined in <<monitor-options>>.
+
+Browser based monitors can only be run in our {beatname_uc} docker image,
+or via the `elastic-agent-complete` docker image.
+For more information, see {observability-guide}/synthetics-quickstart.html[Synthetic monitoring using Docker].
+
 Example configuration:
 
 [source,yaml]
@@ -181,7 +186,7 @@ Defaults to false.
 
 Set this option to control the network throttling. By default, all journeys are
 run with 5Mbps download, 3Mbps upload and 20ms latency which emulates a standard
-Cabel connection.
+Cable connection.
 
 Users can control the throttling parameters, Below is an example of emulating a
 3G connection with 1.6Mbps download, 750Kbps upload and 150ms round trip time.

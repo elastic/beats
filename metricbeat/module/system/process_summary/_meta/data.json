@@ -15,14 +15,10 @@
     "system": {
         "process": {
             "summary": {
-                "dead": 0,
-                "idle": 63,
-                "running": 3,
-                "sleeping": 117,
-                "stopped": 0,
-                "total": 185,
-                "unknown": 2,
-                "zombie": 0
+                "idle": 122,
+                "running": 1,
+                "sleeping": 222,
+                "total": 345
             }
         }
     }

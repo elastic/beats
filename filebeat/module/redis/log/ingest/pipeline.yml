@@ -57,9 +57,9 @@ processors:
       child: child
       sentinel_abbrev: X
       sentinel: sentinel
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - date:
     field: redis.log.timestamp
     target_field: '@timestamp'

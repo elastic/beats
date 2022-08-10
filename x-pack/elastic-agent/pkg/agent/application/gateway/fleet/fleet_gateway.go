@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
@@ -127,7 +127,8 @@ func newFleetGatewayWithScheduler(
 	stateStore stateStore,
 ) (gateway.FleetGateway, error) {
 
-	// Backoff implementation doesn't support the using context as the shutdown mechanism.
+	// Backoff implementation doesn't support the use of a context [cancellation]
+	// as the shutdown mechanism.
 	// So we keep a done channel that will be closed when the current context is shutdown.
 	done := make(chan struct{})
 

@@ -7,7 +7,7 @@
 
 The `copy_fields` processor copies a field to another one.
 
-`fields`:: List of `from` and `to` pairs to copy from and to.
+`fields`:: List of `from` and `to` pairs to copy from and to. It's supported to use `@metadata.` prefix for `from` and `to` and copy values not just in/from/to the event fields but also in/from/to the event metadata.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original is returned. If set to `false`,
 processing continues if an error occurs. Default is `true`.
 `ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source

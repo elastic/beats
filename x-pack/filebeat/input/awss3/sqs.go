@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -23,7 +24,7 @@ const (
 
 type sqsReader struct {
 	maxMessagesInflight int
-	workerSem           *sem
+	workerSem           *awscommon.Sem
 	sqs                 sqsAPI
 	msgHandler          sqsProcessor
 	log                 *logp.Logger
@@ -36,7 +37,7 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 	}
 	return &sqsReader{
 		maxMessagesInflight: maxMessagesInflight,
-		workerSem:           newSem(maxMessagesInflight),
+		workerSem:           awscommon.NewSem(maxMessagesInflight),
 		sqs:                 sqs,
 		msgHandler:          msgHandler,
 		log:                 log,
@@ -88,7 +89,10 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 				}()
 
 				if err := r.msgHandler.ProcessSQS(ctx, &msg); err != nil {
-					r.log.Warnw("Failed processing SQS message.", "error", err, "message_id", *msg.MessageId)
+					r.log.Warnw("Failed processing SQS message.",
+						"error", err,
+						"message_id", *msg.MessageId,
+						"elapsed_time_ns", time.Since(start))
 				}
 			}(msg, time.Now())
 		}

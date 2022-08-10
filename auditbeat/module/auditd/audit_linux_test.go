@@ -329,7 +329,7 @@ func buildSampleEvent(t testing.TB, lines []string, filename string) {
 		t.Fatal(err)
 	}
 
-	if err := ioutil.WriteFile(filename, output, 0644); err != nil {
+	if err := ioutil.WriteFile(filename, output, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }

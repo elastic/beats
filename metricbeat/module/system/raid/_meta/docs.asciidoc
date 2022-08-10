@@ -4,4 +4,3 @@ This metricset is available on:
 
 - Linux
 
-The config option `raid.mount_point:` can be used to configure the location of the raid metadata. If running this metricset inside a container, you will need to mount `/sys/block` inside the container under the path specified by `--system.hostfs`

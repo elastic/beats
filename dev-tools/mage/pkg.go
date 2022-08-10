@@ -56,11 +56,6 @@ func Package() error {
 					continue
 				}
 
-				if pkgType == DMG && runtime.GOOS != "darwin" {
-					log.Printf("Skipping DMG package type because build host isn't darwin")
-					continue
-				}
-
 				if target.Name == "linux/arm64" && pkgType == Docker && runtime.GOARCH != "arm64" {
 					log.Printf("Skipping Docker package type because build host isn't arm")
 					continue
@@ -117,17 +112,19 @@ func Package() error {
 	return nil
 }
 
+// isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
+// pkgType is present on SelectedPackageTypes. It returns false otherwise.
 func isPackageTypeSelected(pkgType PackageType) bool {
-	if SelectedPackageTypes != nil {
-		selected := false
-		for _, t := range SelectedPackageTypes {
-			if t == pkgType {
-				selected = true
-			}
-		}
-		return selected
+	if len(SelectedPackageTypes) == 0 {
+		return true
 	}
-	return true
+
+	for _, t := range SelectedPackageTypes {
+		if t == pkgType {
+			return true
+		}
+	}
+	return false
 }
 
 type packageBuilder struct {

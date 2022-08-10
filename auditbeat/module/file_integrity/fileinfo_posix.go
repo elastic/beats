@@ -21,13 +21,13 @@
 package file_integrity
 
 import (
+	"fmt"
 	"os"
 	"os/user"
 	"strconv"
 	"syscall"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 )
 
 // NewMetadata returns a new Metadata object. If an error is returned it is
@@ -36,7 +36,7 @@ import (
 func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
-		return nil, errors.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
+		return nil, fmt.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
 	}
 
 	fileInfo := &Metadata{

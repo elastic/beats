@@ -33,9 +33,6 @@ import (
 	// import modules
 	_ "github.com/elastic/beats/v7/metricbeat/include"
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
-
-	// Import processors.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
 const (

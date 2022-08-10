@@ -1,0 +1,13 @@
+// tag::metricset-generator[]
+IMPORTANT: Elastic provides no warranty or support for the code used to generate
+metricsets. The generator is mainly offered as guidance for developers who want
+to create their own data shippers.
+
+// end::metricset-generator[]
+
+// tag::filebeat-generator[]
+IMPORTANT: Elastic provides no warranty or support for the code used to generate
+modules and filesets. The generator is mainly offered as guidance for developers
+who want to create their own data shippers.
+
+// end::filebeat-generator[]

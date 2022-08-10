@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
@@ -50,9 +51,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
+	sys := base.Module().(resolve.Resolver)
 	if config.IgnoreTypes == nil {
-		config.IgnoreTypes = DefaultIgnoredTypes()
+		config.IgnoreTypes = DefaultIgnoredTypes(sys)
 	}
 	if len(config.IgnoreTypes) > 0 {
 		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))

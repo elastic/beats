@@ -41,13 +41,11 @@ const (
 	identitySep           = "::"
 )
 
-var (
-	identifierFactories = map[string]identifierFactory{
-		nativeName:      newINodeDeviceIdentifier,
-		pathName:        newPathIdentifier,
-		inodeMarkerName: newINodeMarkerIdentifier,
-	}
-)
+var identifierFactories = map[string]identifierFactory{
+	nativeName:      newINodeDeviceIdentifier,
+	pathName:        newPathIdentifier,
+	inodeMarkerName: newINodeMarkerIdentifier,
+}
 
 type identifierFactory func(*common.Config) (fileIdentifier, error)
 

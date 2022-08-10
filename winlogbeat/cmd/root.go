@@ -29,7 +29,6 @@ import (
 	_ "github.com/elastic/beats/v7/winlogbeat/include"
 
 	// Import processors and supporting modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 

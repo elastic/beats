@@ -181,12 +181,12 @@
         "event.code": 609002,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2021-05-05T17:51:17.000-02:00",
+        "event.end": "2022-05-05T17:51:17.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-7-609002: Teardown local-host net:192.168.2.2 duration 0:00:00",
         "event.severity": 7,
-        "event.start": "2021-05-05T19:51:17.000Z",
+        "event.start": "2022-05-05T19:51:17.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -443,8 +443,8 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -701,12 +701,12 @@
         "event.code": 609002,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2021-05-05T18:24:31.000-02:00",
+        "event.end": "2022-05-05T18:24:31.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-7-609002: Teardown local-host identity:10.10.10.10 duration 0:00:00",
         "event.severity": 7,
-        "event.start": "2021-05-05T20:24:31.000Z",
+        "event.start": "2022-05-05T20:24:31.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -849,13 +849,13 @@
         "event.code": 302014,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2021-05-05T18:29:32.000-02:00",
+        "event.end": "2022-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 2960892904 for out111:10.10.10.10/443 to fw111:192.168.2.2/55225 duration 0:00:00 bytes 0 TCP Reset-I",
         "event.reason": "TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2021-05-05T20:29:32.000Z",
+        "event.start": "2022-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -966,12 +966,12 @@
         "event.code": 305012,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2021-05-05T18:29:32.000-02:00",
+        "event.end": "2022-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00",
         "event.severity": 6,
-        "event.start": "2021-05-05T20:29:32.000Z",
+        "event.start": "2022-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -1022,12 +1022,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-313004: Denied ICMP type=0, from laddr 10.10.10.10 on interface fw502 to 192.168.2.2: no matching session",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1123,12 +1123,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106001: Inbound TCP connection denied from 192.168.2.2/43803 to 10.10.10.10/14322 flags SYN  on interface out111",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1175,12 +1175,12 @@
         "event.code": 302016,
         "event.dataset": "cisco.asa",
         "event.duration": 124000000000,
-        "event.end": "2021-05-05T18:40:50.000-02:00",
+        "event.end": "2022-05-05T18:40:50.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-302016: Teardown UDP connection 1671727 for intfacename:10.10.10.10/161 to net:192.186.2.2/53356 duration 0:02:04 bytes 64585",
         "event.severity": 2,
-        "event.start": "2021-05-05T20:38:46.000Z",
+        "event.start": "2022-05-05T20:38:46.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -1356,12 +1356,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src fw111:10.10.10.10/64388 dst out111:192.168.2.2/443 by access-group \"out1111_access_out\" [0x47e21ef4, 0x47e21ef4]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1407,12 +1407,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106021: Deny TCP reverse path check from 192.168.2.2 to 10.10.10.10 on interface fw111",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1456,12 +1456,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106006: Deny inbound UDP from 192.168.2.2/65020 to 10.10.10.10/65020 on interface fw111",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1508,12 +1508,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/53089 to 10.10.10.10/443 flags FIN PSH ACK  on interface out111",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1559,12 +1559,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/17127 to 10.10.10.10/443 flags PSH ACK  on interface out111",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1610,12 +1610,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/24223 to 10.10.10.10/443 flags RST  on interface fw111",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1812,13 +1812,13 @@
         "event.code": 302023,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2021-05-05T19:02:58.000-02:00",
+        "event.end": "2022-05-05T19:02:58.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302023: Teardown stub TCP connection for fw111:10.10.10.10/39210 to net:192.168.2.2/10051 duration 0:00:00 forwarded bytes 0 Cluster flow with CLU closed on owner",
         "event.reason": "Cluster flow with CLU closed on owner",
         "event.severity": 6,
-        "event.start": "2021-05-05T21:02:58.000Z",
+        "event.start": "2022-05-05T21:02:58.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -1868,13 +1868,13 @@
         "event.code": 302023,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2021-05-05T19:02:58.000-02:00",
+        "event.end": "2022-05-05T19:02:58.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302023: Teardown stub TCP connection for net:10.10.10.10/10051 to unknown:192.168.2.2/39222 duration 0:00:00 forwarded bytes 0 Forwarding or redirect flow removed to create director or backup flow",
         "event.reason": "Forwarding or redirect flow removed to create director or backup flow",
         "event.severity": 6,
-        "event.start": "2021-05-05T21:02:58.000Z",
+        "event.start": "2022-05-05T21:02:58.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -2010,7 +2010,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2064,7 +2064,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2183,8 +2183,8 @@
         "event.severity": 7,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2298,12 +2298,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-106014: Deny inbound icmp src fw111:10.10.10.10 dst fw111:10.10.10.10(type 8, code 0)",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2391,12 +2391,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-106010: Deny inbound sctp src fw111:10.10.10.10/5114 dst fw111:10.10.10.10/2",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2496,7 +2496,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2543,7 +2543,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2590,7 +2590,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2637,7 +2637,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2687,13 +2687,13 @@
         "event.code": 302304,
         "event.dataset": "cisco.asa",
         "event.duration": 3602000000000,
-        "event.end": "2021-04-27T04:12:23.000-02:00",
+        "event.end": "2022-04-27T04:12:23.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302304: Teardown TCP state-bypass connection 2751765169 from server.deflan:81.2.69.143/54242 to server.deflan:67.43.156.12/9101 duration 1:00:02 bytes 245 Connection timeout",
         "event.reason": "Connection timeout",
         "event.severity": 6,
-        "event.start": "2021-04-27T05:12:21.000Z",
+        "event.start": "2022-04-27T05:12:21.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -2755,12 +2755,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:10.10.10.2/56444 dst srv:192.168.2.2/51635(testhostname.domain) by access-group \"global_access_1\"",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2809,12 +2809,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list testrulename denied tcp insideintf/somedomainname.local(27218) -> OUTSIDE/195.122.12.242(53) hit-cnt 1 first hit [0x16847359, 0x00000000]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2860,7 +2860,6 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "allowed",
             "info"
         ],
         "fileset.name": "asa",
@@ -2982,12 +2981,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-605004: Login denied from 10.10.1.212/51923 to FCD-FS-LAN:10.10.1.254/https for user \"*****\"",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -3083,7 +3082,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -3228,13 +3227,13 @@
         "event.code": 113019,
         "event.dataset": "cisco.asa",
         "event.duration": 1936000000000,
-        "event.end": "2021-04-27T02:03:03.000-02:00",
+        "event.end": "2022-04-27T02:03:03.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-113019: Group = 81.2.69.143, Username = 81.2.69.143, IP = 81.2.69.143, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested",
         "event.reason": "User Requested",
         "event.severity": 4,
-        "event.start": "2021-04-27T03:30:47.000Z",
+        "event.start": "2022-04-27T03:30:47.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -3424,12 +3423,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-710003: TCP access denied by ACL from 67.43.156.13/6370 to outside:195.74.114.34/23",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -3594,8 +3593,8 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -3759,7 +3758,6 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "allowed",
             "deletion",
             "info",
             "user"
@@ -3934,7 +3932,6 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "allowed",
             "info"
         ],
         "fileset.name": "asa",
@@ -4024,7 +4021,6 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "error"
         ],
         "fileset.name": "asa",
@@ -4072,7 +4068,6 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "error"
         ],
         "fileset.name": "asa",
@@ -4104,6 +4099,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-713903: IP = 67.43.156.12, All IPSec SA proposals found unacceptable!",
+        "event.outcome": "failure",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4143,7 +4139,6 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "error"
         ],
         "fileset.name": "asa",
@@ -4180,7 +4175,6 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "error"
         ],
         "fileset.name": "asa",
@@ -4279,12 +4273,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny protocol 47 src outside:100.66.124.24 dst inside:172.31.98.44 by access-group \"inbound\"",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -4330,12 +4324,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny icmp src OUTSIDE:2a02:cf40:add:4002:91f2:a9b2:e09a:6fc6 dst OUTSIDE:fe00:afa0::1 (type 128, code 0) by access-group \"OUTSIDE_in\"",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",

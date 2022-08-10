@@ -122,6 +122,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 
 			if clusterUUID != "" {
 				event.ModuleFields.Put("cluster.id", clusterUUID)
+				event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 			}
 
 			event.ID = pipeline.EphemeralID

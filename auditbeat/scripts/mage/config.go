@@ -18,9 +18,8 @@
 package mage
 
 import (
+	"fmt"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -56,12 +55,12 @@ func configFileParams(dirs ...string) (devtools.ConfigFileParams, error) {
 
 	configFiles, err := devtools.FindFiles(globs...)
 	if err != nil {
-		return devtools.ConfigFileParams{}, errors.Wrap(err, "failed to find config templates")
+		return devtools.ConfigFileParams{}, fmt.Errorf("failed to find config templates: %w", err)
 	}
 	if len(configFiles) == 0 {
-		return devtools.ConfigFileParams{}, errors.Errorf("no config files found in %v", globs)
+		return devtools.ConfigFileParams{}, fmt.Errorf("no config files found in %v", globs)
 	}
-	devtools.MustFileConcat("build/config.modules.yml.tmpl", 0644, configFiles...)
+	devtools.MustFileConcat("build/config.modules.yml.tmpl", 0o644, configFiles...)
 
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))

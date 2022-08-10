@@ -40,15 +40,12 @@ That means in case there are some states where the TTL expired, these are only r
 
 The permissions mask to apply on registry data file. The default value is 0600. The permissions option must be a valid Unix-style file permissions mask expressed in octal notation. In Go, numbers in octal notation must start with 0.
 
-The most permissive mask allowed is 0640. If a higher permissions mask is
-specified via this setting, it will be subject to a umask of 0027.
-
 This option is not supported on Windows.
 
 Examples:
 
-    0640: give read and write access to the file owner, and read access to members of the group associated with the file.
-    0600: give read and write access to the file owner, and no access to all others.
+* 0640: give read and write access to the file owner, and read access to members of the group associated with the file.
+* 0600: give read and write access to the file owner, and no access to all others.
 
 [source,yaml]
 -------------------------------------------------------------------------------------

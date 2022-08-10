@@ -7,9 +7,9 @@
         "value": "{{_ingest.timestamp}}"
       }
     }, {
-      "rename": {
-        "field": "@timestamp",
-        "target_field": "event.created"
+      "set": {
+        "copy_from": "@timestamp",
+        "field": "event.created"
       }
     }, {
       "date": {

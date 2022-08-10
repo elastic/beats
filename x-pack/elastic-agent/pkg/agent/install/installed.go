@@ -19,16 +19,24 @@ type StatusType int
 const (
 	// NotInstalled returned when Elastic Agent is not installed.
 	NotInstalled StatusType = iota
-	// Installed returned when Elastic Agent is installed currectly.
+	// Installed returned when Elastic Agent is installed correctly.
 	Installed
 	// Broken returned when Elastic Agent is installed but broken.
 	Broken
+	// PackageInstall returned when the Elastic agent has been installed through a package manager (deb/rpm)
+	PackageInstall
 )
 
 // Status returns the installation status of Agent.
 func Status() (StatusType, string) {
 	expected := filepath.Join(paths.InstallPath, paths.BinaryName)
 	status, reason := checkService()
+	if checkPackageInstall() {
+		if status == Installed {
+			return PackageInstall, "service running"
+		}
+		return PackageInstall, "service not running"
+	}
 	_, err := os.Stat(expected)
 	if os.IsNotExist(err) {
 		if status == Installed {

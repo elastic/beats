@@ -39,7 +39,7 @@ func TestIsEnabled(t *testing.T) {
 		t.Fatal("OAuth2 should be enabled by default")
 	}
 
-	var enabled = false
+	enabled := false
 	oauth2.Enabled = &enabled
 
 	assert.False(t, oauth2.isEnabled())
@@ -69,19 +69,19 @@ func TestGetTokenURLWithAzure(t *testing.T) {
 }
 
 func TestGetEndpointParams(t *testing.T) {
-	var expected = map[string][]string{"foo": {"bar"}}
+	expected := map[string][]string{"foo": {"bar"}}
 	oauth2 := oAuth2Config{EndpointParams: map[string][]string{"foo": {"bar"}}}
 	assert.Equal(t, expected, oauth2.getEndpointParams())
 }
 
 func TestGetEndpointParamsWithAzure(t *testing.T) {
-	var expectedWithoutResource = map[string][]string{"foo": {"bar"}}
+	expectedWithoutResource := map[string][]string{"foo": {"bar"}}
 	oauth2 := oAuth2Config{Provider: "azure", EndpointParams: map[string][]string{"foo": {"bar"}}}
 
 	assert.Equal(t, expectedWithoutResource, oauth2.getEndpointParams())
 
 	oauth2.AzureResource = "baz"
-	var expectedWithResource = map[string][]string{"foo": {"bar"}, "resource": {"baz"}}
+	expectedWithResource := map[string][]string{"foo": {"bar"}, "resource": {"baz"}}
 
 	assert.Equal(t, expectedWithResource, oauth2.getEndpointParams())
 }
@@ -150,6 +150,48 @@ func TestConfigOauth2Validation(t *testing.T) {
 			expectedErr: "both token_url and client credentials must be provided accessing 'auth.oauth2'",
 			input: map[string]interface{}{
 				"auth.oauth2": map[string]interface{}{},
+			},
+		},
+		{
+			name: "if user and password is set oauth2 must use user-password authentication",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"user":      "a_client_user",
+					"password":  "a_client_password",
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
+			},
+		},
+		{
+			name:        "if user is set password credentials must be set for user-password authentication",
+			expectedErr: "both user and password credentials must be provided accessing 'auth.oauth2'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"user":      "a_client_user",
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
+			},
+		},
+		{
+			name:        "if password is set user credentials must be set for user-password authentication",
+			expectedErr: "both user and password credentials must be provided accessing 'auth.oauth2'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"password":  "a_client_password",
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "a_client_secret",
+					},
+				},
 			},
 		},
 		{

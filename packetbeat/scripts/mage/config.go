@@ -23,11 +23,6 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-const (
-	// configTemplateGlob matches Packetbeat protocol config file templates.
-	configTemplateGlob = "protos/*/_meta/config*.yml.tmpl"
-)
-
 var defaultDevice = map[string]string{
 	"darwin":  "en0",
 	"linux":   "any",

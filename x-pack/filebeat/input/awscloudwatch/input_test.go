@@ -15,7 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -127,10 +126,6 @@ type MockCloudwatchlogsClient struct {
 	cloudwatchlogsiface.ClientAPI
 }
 
-var (
-	mockSvc = &MockCloudwatchlogsClient{}
-)
-
 func (m *MockCloudwatchlogsClient) FilterLogEventsRequest(input *cloudwatchlogs.FilterLogEventsInput) cloudwatchlogs.FilterLogEventsRequest {
 	events := []cloudwatchlogs.FilteredLogEvent{
 		{
@@ -196,12 +191,4 @@ func TestParseARN(t *testing.T) {
 	assert.Equal(t, "test", logGroup)
 	assert.Equal(t, "us-east-1", regionName)
 	assert.NoError(t, err)
-}
-
-func TestNewInputDone(t *testing.T) {
-	config := common.MapStr{
-		"log_group_name": "some-group",
-		"region_name":    "eu-west-1",
-	}
-	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }

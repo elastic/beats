@@ -18,8 +18,11 @@
 package tlscommon
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/hex"
 	"fmt"
 	"net"
 	"time"
@@ -73,6 +76,10 @@ type TLSConfig struct {
 	// CASha256 is the CA certificate pin, this is used to validate the CA that will be used to trust
 	// the server certificate.
 	CASha256 []string
+
+	// CATrustedFingerprint is the HEX encoded fingerprint of a CA certificate. If present in the chain
+	// this certificate will be added to the list of trusted CAs (RootCAs) during the handshake.
+	CATrustedFingerprint string
 
 	// time returns the current time as the number of seconds since the epoch.
 	// If time is nil, TLS uses time.Now.
@@ -151,10 +158,45 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	return config
 }
 
+func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
+	logger := logp.NewLogger("tls")
+	logger.Info("'ca_trusted_fingerprint' set, looking for matching fingerprints")
+	fingerprint, err := hex.DecodeString(cfg.CATrustedFingerprint)
+	if err != nil {
+		return fmt.Errorf("decode 'ca_trusted_fingerprint': %w", err)
+	}
+
+	for _, cert := range peerCerts {
+		// Compute digest for each certificate.
+		digest := sha256.Sum256(cert.Raw)
+
+		if bytes.Equal(digest[0:], fingerprint) {
+			logger.Info("CA certificate matching 'ca_trusted_fingerprint' found, adding it to 'certificate_authorities'")
+			// Make sure the fingerprint matches a CA certificate
+			if cert.IsCA {
+				if cfg.RootCAs == nil {
+					cfg.RootCAs = x509.NewCertPool()
+				}
+
+				cfg.RootCAs.AddCert(cert)
+				return nil
+			}
+		}
+	}
+
+	logger.Warn("no CA certificate matching the fingerprint")
+	return nil
+}
+
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
 	case VerifyFull:
 		return func(cs tls.ConnectionState) error {
+			if cfg.CATrustedFingerprint != "" {
+				if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
+					return err
+				}
+			}
 			// On the client side, PeerCertificates can't be empty.
 			if len(cs.PeerCertificates) == 0 {
 				return MissingPeerCertificate
@@ -172,6 +214,11 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		}
 	case VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
+			if cfg.CATrustedFingerprint != "" {
+				if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
+					return err
+				}
+			}
 			// On the client side, PeerCertificates can't be empty.
 			if len(cs.PeerCertificates) == 0 {
 				return MissingPeerCertificate
@@ -186,6 +233,11 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	case VerifyStrict:
 		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
+				if cfg.CATrustedFingerprint != "" {
+					if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
+						return err
+					}
+				}
 				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
 			}
 		}
@@ -193,7 +245,6 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	}
 
 	return nil
-
 }
 
 func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error {

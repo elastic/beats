@@ -5,16 +5,16 @@
 <titleabbrev>replace</titleabbrev>
 ++++
 
-The `replace` processor takes a list of fields to replace the field value 
-matching a pattern with replacement string. Under the `fields` key, each entry 
-contains a `field: field-name`, `pattern: regex-pattern` and 
+The `replace` processor takes a list of fields to replace the field value
+matching a pattern with replacement string. Under the `fields` key, each entry
+contains a `field: field-name`, `pattern: regex-pattern` and
 `replacement: replacement-string`, where:
 
-* `field` is the original field name
+* `field` is the original field name. It's supported to use `@metadata.` prefix for the fields and replace values in the event metadata instead of event fields.
 * `pattern` is the regex pattern to match the field's value
 * `replacement` is the replacement string to use to update the field's value
 
-The `replace` processor cannot be used to replace value with a completely new value. 
+The `replace` processor cannot be used to replace value with a completely new value.
 
 TIP: The `replacement` field value can be used to truncate the `field` value or replace
 it with a new string. It can also be used for masking PII information.
@@ -35,7 +35,7 @@ processors:
 
 The `replace` processor has following configuration settings:
 
-`ignore_missing`:: (Optional) If set to `true`, no error is logged if the specified field 
+`ignore_missing`:: (Optional) If set to `true`, no error is logged if the specified field
 is missing. The default is `false`.
 
 `fail_on_error`:: (Optional) If set to `true` and there's an error, the replacement of

@@ -18,12 +18,12 @@
 package file_integrity
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"time"
 
 	flatbuffers "github.com/google/flatbuffers/go"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/schema"
 )
@@ -332,7 +332,7 @@ func fbDecodeHash(e *schema.Event) map[HashType]Digest {
 			length = hash.Xxh64Length()
 			producer = hash.Xxh64
 		default:
-			panic(errors.Errorf("unhandled hash type: %v", hashType))
+			panic(fmt.Errorf("unhandled hash type: %v", hashType))
 		}
 
 		if length > 0 {

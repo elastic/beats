@@ -8,7 +8,7 @@ for capturing:
 
 [horizontal]
 Audit data:: https://www.elastic.co/products/beats/auditbeat[Auditbeat]
-Log files:: https://www.elastic.co/products/beats/filebeat[Filebeat]
+Log files and journals:: https://www.elastic.co/products/beats/filebeat[Filebeat]
 Cloud data:: https://www.elastic.co/products/beats/functionbeat[Functionbeat]
 Availability:: https://www.elastic.co/products/beats/heartbeat[Heartbeat]
 Metrics:: https://www.elastic.co/products/beats/metricbeat[Metricbeat]

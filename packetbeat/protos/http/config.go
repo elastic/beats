@@ -39,12 +39,10 @@ type httpConfig struct {
 	RedactHeaders          []string `config:"redact_headers"`
 }
 
-var (
-	defaultConfig = httpConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-		MaxMessageSize: tcp.TCPMaxDataInStream,
-		DecodeBody:     true,
-	}
-)
+var defaultConfig = httpConfig{
+	ProtocolCommon: config.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+	},
+	MaxMessageSize: tcp.TCPMaxDataInStream,
+	DecodeBody:     true,
+}

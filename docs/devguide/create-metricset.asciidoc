@@ -1,6 +1,8 @@
 [[creating-metricsets]]
 === Creating a Metricset
 
+include::generator-support-note.asciidoc[tag=metricset-generator]
+
 A metricset is the part of a Metricbeat module that fetches and structures the
 data from the remote service. Each module can have multiple metricsets. In this guide, you learn how to create your own metricset.
 
@@ -61,7 +63,7 @@ The first file is `{metricset}.go`. It contains the logic on how to fetch data f
 
 The generated file looks like this:
 
-https://github.com/elastic/beats/blob/master/metricbeat/scripts/module/metricset/metricset.go.tmpl
+https://github.com/elastic/beats/blob/main/metricbeat/scripts/module/metricset/metricset.go.tmpl
 
 [source,go]
 ----

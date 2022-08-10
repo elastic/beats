@@ -1,0 +1,24 @@
+[
+    {
+        "@timestamp": "2022-01-25T15:12:08.472Z",
+        "elasticsearch.cluster.name": "main",
+        "elasticsearch.cluster.uuid": "28iKoFsvTJ6HEyXbdLL-PQ",
+        "elasticsearch.node.id": "tc3nhgC0SFCKfwwy6jCmkw",
+        "elasticsearch.node.name": "matschaffer-mbp2019.lan",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.server",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.type": "info",
+        "fileset.name": "server",
+        "host.id": "tc3nhgC0SFCKfwwy6jCmkw",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "org.elasticsearch.cluster.metadata.MetadataIndexTemplateService",
+        "log.offset": 0,
+        "message": "adding template [.monitoring-kibana] for index patterns [.monitoring-kibana-7-*]",
+        "process.thread.name": "elasticsearch[matschaffer-mbp2019.lan][masterService#updateTask][T#1]",
+        "service.name": "ES_ECS",
+        "service.type": "elasticsearch"
+    }
+]

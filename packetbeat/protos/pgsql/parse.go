@@ -158,7 +158,7 @@ func (pgsql *pgsqlPlugin) parseSimpleQuery(s *pgsqlStream, length int) (bool, bo
 	m.start = s.parseOffset
 	m.isRequest = true
 
-	s.parseOffset++ //type
+	s.parseOffset++ // type
 	s.parseOffset += length
 	m.end = s.parseOffset
 	m.size = uint64(m.end - m.start)
@@ -190,8 +190,8 @@ func (pgsql *pgsqlPlugin) parseRowDescription(s *pgsqlStream, length int) (bool,
 	}
 	pgsql.detailf("Fields: %s", m.fields)
 
-	s.parseOffset++         //type
-	s.parseOffset += length //length
+	s.parseOffset++         // type
+	s.parseOffset += length // length
 	s.parseState = pgsqlGetDataState
 	return pgsql.parseMessageData(s)
 }
@@ -238,7 +238,7 @@ func (pgsql *pgsqlPlugin) parseCommandComplete(s *pgsqlStream, length int) (bool
 	m.isOK = true
 	m.toExport = true
 
-	s.parseOffset++ //type
+	s.parseOffset++ // type
 	name, err := pgsqlString(s.data[s.parseOffset+4:], length-4)
 	if err != nil {
 		return false, false
@@ -276,10 +276,10 @@ func (pgsql *pgsqlPlugin) parseErrorResponse(s *pgsqlStream, length int) (bool, 
 	m.isError = true
 	m.toExport = true
 
-	s.parseOffset++ //type
+	s.parseOffset++ // type
 	pgsql.parseError(s, s.data[s.parseOffset+4:s.parseOffset+length])
 
-	s.parseOffset += length //length
+	s.parseOffset += length // length
 	m.end = s.parseOffset
 	m.size = uint64(m.end - m.start)
 
@@ -294,7 +294,7 @@ func (pgsql *pgsqlPlugin) parseExtReq(s *pgsqlStream, length int) (bool, bool) {
 	m.start = s.parseOffset
 	m.isRequest = true
 
-	s.parseOffset++ //type
+	s.parseOffset++ // type
 	s.parseOffset += length
 	m.end = s.parseOffset
 	m.size = uint64(m.end - m.start)
@@ -326,7 +326,7 @@ func (pgsql *pgsqlPlugin) parseExtResp(s *pgsqlStream, length int) (bool, bool) 
 	m.isOK = true
 	m.toExport = true
 
-	s.parseOffset++ //type
+	s.parseOffset++ // type
 	s.parseOffset += length
 	pgsql.detailf("Parse completion in an extended query response")
 	s.parseState = pgsqlGetDataState
@@ -336,7 +336,7 @@ func (pgsql *pgsqlPlugin) parseExtResp(s *pgsqlStream, length int) (bool, bool) 
 func (pgsql *pgsqlPlugin) parseSkipMessage(s *pgsqlStream, length int) (bool, bool) {
 	// TODO: add info from NoticeResponse in case there are warning messages for a query
 	// ignore command
-	s.parseOffset++ //type
+	s.parseOffset++ // type
 	s.parseOffset += length
 
 	m := s.message
@@ -615,21 +615,21 @@ func (pgsql *pgsqlPlugin) parseMessageExtendedQuery(s *pgsqlStream) (bool, bool)
 			// skip type
 			s.parseOffset++
 			s.parseOffset += length
-			//TODO: pgsql.parseBind(s)
+			// TODO: pgsql.parseBind(s)
 		case 'D':
 			// Bind -> Describe
 
 			// skip type
 			s.parseOffset++
 			s.parseOffset += length
-			//TODO: pgsql.parseDescribe(s)
+			// TODO: pgsql.parseDescribe(s)
 		case 'E':
 			// Bind(or Describe) -> Execute
 
 			// skip type
 			s.parseOffset++
 			s.parseOffset += length
-			//TODO: pgsql.parseExecute(s)
+			// TODO: pgsql.parseExecute(s)
 		case 'S':
 			// Execute -> Sync
 

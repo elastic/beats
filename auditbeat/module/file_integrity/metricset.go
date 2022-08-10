@@ -19,11 +19,11 @@ package file_integrity
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/pkg/errors"
 	bolt "go.etcd.io/bbolt"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -89,7 +89,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	r, err := NewEventReader(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize file event reader")
+		return nil, fmt.Errorf("failed to initialize file event reader: %w", err)
 	}
 
 	ms := &MetricSet{
@@ -154,7 +154,7 @@ func (ms *MetricSet) Close() error {
 func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
-		err = errors.Wrap(err, "failed to open persistent datastore")
+		err = fmt.Errorf("failed to open persistent datastore: %w", err)
 		reporter.Error(err)
 		ms.log.Errorw("Failed to initialize", "error", err)
 		return false
@@ -163,7 +163,7 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 
 	ms.fsnotifyChan, err = ms.reader.Start(reporter.Done())
 	if err != nil {
-		err = errors.Wrap(err, "failed to start fsnotify event producer")
+		err = fmt.Errorf("failed to start fsnotify event producer: %w", err)
 		reporter.Error(err)
 		ms.log.Errorw("Failed to initialize", "error", err)
 		return false
@@ -173,7 +173,7 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 	if ms.config.ScanAtStart {
 		ms.scanner, err = NewFileSystemScanner(ms.config, ms.findNewPaths())
 		if err != nil {
-			err = errors.Wrap(err, "failed to initialize file scanner")
+			err = fmt.Errorf("failed to initialize file scanner: %w", err)
 			reporter.Error(err)
 			ms.log.Errorw("Failed to initialize", "error", err)
 			return false
@@ -181,7 +181,7 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 
 		ms.scanChan, err = ms.scanner.Start(reporter.Done())
 		if err != nil {
-			err = errors.Wrap(err, "failed to start file scanner")
+			err = fmt.Errorf("failed to start file scanner: %w", err)
 			reporter.Error(err)
 			ms.log.Errorw("Failed to initialize", "error", err)
 			return false
@@ -370,7 +370,7 @@ func store(b datastore.Bucket, e *Event) error {
 	data := fbEncodeEvent(builder, e)
 
 	if err := b.Store(e.Path, data); err != nil {
-		return errors.Wrapf(err, "failed to locally store event for %v", e.Path)
+		return fmt.Errorf("failed to locally store event for %v: %w", e.Path, err)
 	}
 	return nil
 }
@@ -385,7 +385,7 @@ func load(b datastore.Bucket, path string) (*Event, error) {
 		return nil
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to load locally persisted event for %v", path)
+		return nil, fmt.Errorf("failed to load locally persisted event for %v: %w", path, err)
 	}
 	return e, nil
 }

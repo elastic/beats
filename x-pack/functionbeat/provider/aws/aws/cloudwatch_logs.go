@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
@@ -106,7 +106,7 @@ func CloudwatchLogsDetails() feature.Details {
 }
 
 // Run start the AWS lambda handles and will transform any events received to the pipeline.
-func (c *CloudwatchLogs) Run(_ context.Context, client core.Client, t telemetry.T) error {
+func (c *CloudwatchLogs) Run(_ context.Context, client pipeline.ISyncClient, t telemetry.T) error {
 	t.AddTriggeredFunction()
 
 	lambdarunner.Start(c.createHandler(client))
@@ -114,7 +114,7 @@ func (c *CloudwatchLogs) Run(_ context.Context, client core.Client, t telemetry.
 }
 
 func (c *CloudwatchLogs) createHandler(
-	client core.Client,
+	client pipeline.ISyncClient,
 ) func(request events.CloudwatchLogsEvent) error {
 	return func(request events.CloudwatchLogsEvent) error {
 		parsedEvent, err := request.AWSLogs.Parse()

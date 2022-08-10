@@ -21,16 +21,14 @@
 package process_summary
 
 import (
-	"runtime"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	sigar "github.com/elastic/gosigar"
 )
 
 // init registers the MetricSet with the central registry.
@@ -48,14 +46,17 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sys resolve.Resolver
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		BaseMetricSet: base,
+		sys:           sys,
 	}, nil
 }
 
@@ -63,75 +64,28 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	pids, err := process.Pids()
+
+	procList, err := process.ListStates(m.sys)
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch the list of PIDs")
+		return errors.Wrap(err, "error fetching process list")
 	}
 
-	var summary struct {
-		sleeping int
-		running  int
-		idle     int
-		stopped  int
-		zombie   int
-		unknown  int
-		dead     int
-	}
-
-	for _, pid := range pids {
-		state := sigar.ProcState{}
-		err = state.Get(pid)
-		if err != nil {
-			summary.unknown++
-			continue
-		}
-
-		switch byte(state.State) {
-		case 'S':
-			summary.sleeping++
-		case 'R':
-			summary.running++
-		case 'D':
-			summary.idle++
-		case 'I':
-			summary.idle++
-		case 'T':
-			summary.stopped++
-		case 'Z':
-			summary.zombie++
-		case 'X':
-			summary.dead++
-		default:
-			logp.Err("Unknown or unexpected state <%c> for process with pid %d", state.State, pid)
-			summary.unknown++
+	procStates := map[string]int{}
+	for _, proc := range procList {
+		if count, ok := procStates[string(proc.State)]; ok {
+			procStates[string(proc.State)] = count + 1
+		} else {
+			procStates[string(proc.State)] = 1
 		}
 	}
 
-	event := common.MapStr{}
-	if runtime.GOOS == "windows" {
-		event = common.MapStr{
-			"total":    len(pids),
-			"sleeping": summary.sleeping,
-			"running":  summary.running,
-			"unknown":  summary.unknown,
-		}
-	} else {
-		event = common.MapStr{
-			"total":    len(pids),
-			"sleeping": summary.sleeping,
-			"running":  summary.running,
-			"idle":     summary.idle,
-			"stopped":  summary.stopped,
-			"zombie":   summary.zombie,
-			"unknown":  summary.unknown,
-			"dead":     summary.dead,
-		}
-	}
-
+	outMap := common.MapStr{}
+	typeconv.Convert(&outMap, procStates)
+	outMap["total"] = len(procList)
 	r.Event(mb.Event{
 		// change the name space to use . instead of _
 		Namespace:       "system.process.summary",
-		MetricSetFields: event,
+		MetricSetFields: outMap,
 	})
 
 	return nil

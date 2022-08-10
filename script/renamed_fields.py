@@ -3,7 +3,7 @@ import yaml
 
 def migration():
 
-    beats = ["Auditbeat", "Filebeat", "Heartbeat", "Journalbeat", "Metricbeat", "Packetbeat", "Winlogbeat"]
+    beats = ["Auditbeat", "Filebeat", "Heartbeat", "Metricbeat", "Packetbeat", "Winlogbeat"]
 
     for beat in beats:
         print(".{} renamed fields in 7.0".format(beat))

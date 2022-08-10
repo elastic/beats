@@ -26,12 +26,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/gopacket/layers"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tsg/gopacket/layers"
 )
 
 // Test Constants
@@ -41,9 +42,7 @@ const (
 	ClientIP   = "10.0.0.1"
 )
 
-var (
-	httpProtocol, mysqlProtocol, redisProtocol protos.Protocol
-)
+var httpProtocol, mysqlProtocol, redisProtocol protos.Protocol
 
 func init() {
 	new := func(_ bool, _ protos.Reporter, _ procs.ProcessesWatcher, _ *common.Config) (protos.Plugin, error) {
@@ -199,7 +198,7 @@ func (p protocols) GetUDP(proto protos.Protocol) protos.UDPPlugin        { retur
 func (p protocols) GetAll() map[protos.Protocol]protos.Plugin            { return nil }
 func (p protocols) GetAllTCP() map[protos.Protocol]protos.TCPPlugin      { return p.tcp }
 func (p protocols) GetAllUDP() map[protos.Protocol]protos.UDPPlugin      { return nil }
-func (p protocols) Register(proto protos.Protocol, plugin protos.Plugin) { return }
+func (p protocols) Register(proto protos.Protocol, plugin protos.Plugin) {}
 
 func TestTCSeqPayload(t *testing.T) {
 	type segment struct {
@@ -213,7 +212,8 @@ func TestTCSeqPayload(t *testing.T) {
 		expectedGaps  int
 		expectedState []byte
 	}{
-		{"No overlap",
+		{
+			"No overlap",
 			[]segment{
 				{1, []byte{1, 2, 3, 4, 5}},
 				{6, []byte{6, 7, 8, 9, 10}},
@@ -221,7 +221,8 @@ func TestTCSeqPayload(t *testing.T) {
 			0,
 			[]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
-		{"Gap drop state",
+		{
+			"Gap drop state",
 			[]segment{
 				{1, []byte{1, 2, 3, 4}},
 				{15, []byte{5, 6, 7, 8}},
@@ -229,7 +230,8 @@ func TestTCSeqPayload(t *testing.T) {
 			10,
 			[]byte{5, 6, 7, 8},
 		},
-		{"ACK same sequence number",
+		{
+			"ACK same sequence number",
 			[]segment{
 				{1, []byte{1, 2}},
 				{3, nil},
@@ -239,7 +241,8 @@ func TestTCSeqPayload(t *testing.T) {
 			0,
 			[]byte{1, 2, 3, 4, 5, 6},
 		},
-		{"ACK same sequence number 2",
+		{
+			"ACK same sequence number 2",
 			[]segment{
 				{1, nil},
 				{2, nil},
@@ -253,7 +256,8 @@ func TestTCSeqPayload(t *testing.T) {
 			0,
 			[]byte{1, 2, 3, 4, 5, 6, 7, 8},
 		},
-		{"Overlap, first segment bigger",
+		{
+			"Overlap, first segment bigger",
 			[]segment{
 				{1, []byte{1, 2}},
 				{3, []byte{3, 4}},
@@ -263,7 +267,8 @@ func TestTCSeqPayload(t *testing.T) {
 			0,
 			[]byte{1, 2, 3, 4, 5, 6},
 		},
-		{"Overlap, second segment bigger",
+		{
+			"Overlap, second segment bigger",
 			[]segment{
 				{1, []byte{1, 2}},
 				{3, []byte{3}},
@@ -273,7 +278,8 @@ func TestTCSeqPayload(t *testing.T) {
 			0,
 			[]byte{1, 2, 3, 4, 5, 6},
 		},
-		{"Overlap, covered",
+		{
+			"Overlap, covered",
 			[]segment{
 				{1, []byte{1, 2, 3, 4}},
 				{2, []byte{2, 3}},

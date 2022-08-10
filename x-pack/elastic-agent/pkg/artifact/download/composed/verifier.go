@@ -33,9 +33,8 @@ func NewVerifier(verifiers ...download.Verifier) *Verifier {
 func (e *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool) (bool, error) {
 	var err error
 
-	for i, v := range e.vv {
-		isLast := (i + 1) == len(e.vv)
-		b, e := v.Verify(spec, version, isLast && removeOnFailure)
+	for _, v := range e.vv {
+		b, e := v.Verify(spec, version, removeOnFailure)
 		if e == nil {
 			return b, nil
 		}

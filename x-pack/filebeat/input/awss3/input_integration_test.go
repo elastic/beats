@@ -211,7 +211,7 @@ func TestInputRunSQS(t *testing.T) {
 	go func() {
 		for event := range client.Channel {
 			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		}
 	}()
 
@@ -274,7 +274,7 @@ func TestInputRunS3(t *testing.T) {
 	go func() {
 		for event := range client.Channel {
 			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		}
 	}()
 
@@ -479,7 +479,7 @@ func TestInputRunSNS(t *testing.T) {
 	defer close(client.Channel)
 	go func() {
 		for event := range client.Channel {
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		}
 	}()
 

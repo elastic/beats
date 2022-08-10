@@ -80,19 +80,19 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	// Backup original event.
-	saved := *event
+	saved := event
+
 	if len(p.Fields) > 1 && p.FailOnError {
 		// Clone the fields to allow the processor to undo the operation on
 		// failure (like a transaction). If there is only one conversion then
 		// cloning is unnecessary because there are no previous changes to
 		// rollback (so avoid the expensive clone operation).
-		saved.Fields = event.Fields.Clone()
-		saved.Meta = event.Meta.Clone()
+		saved = event.Clone()
 	}
 
 	// Update the event with the converted values.
 	if err := p.writeToEvent(event, converted); err != nil {
-		return &saved, err
+		return saved, err
 	}
 
 	return event, nil

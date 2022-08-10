@@ -56,8 +56,10 @@ type binValueWriter interface {
 	WriteNetUint64At(uint64, int) error
 }
 
-type extraFn func(binValueWriter) int
-type valueFn func(*streambuf.Buffer, int) int
+type (
+	extraFn func(binValueWriter) int
+	valueFn func(*streambuf.Buffer, int) int
+)
 
 type offsetBinWriter struct {
 	w      binValueWriter

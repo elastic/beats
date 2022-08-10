@@ -31,9 +31,9 @@ processors:
 - remove:
     field: kafka.log.trace.full
     ignore_missing: true
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - date:
     if: ctx.event.timezone == null
     field: kafka.log.timestamp

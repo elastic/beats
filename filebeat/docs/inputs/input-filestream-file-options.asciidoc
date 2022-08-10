@@ -15,6 +15,19 @@ in the `paths` option. At the moment only simple file system scanning is
 supported.
 
 [float]
+[[filestream-input-id]]
+===== `id`
+
+A unique identifier for this filestream input. Each filestream input
+must have a unique ID.
+
+WARNING: If there are multiple inputs without an ID, there will be
+data duplication when {beatname_lc} is restarted.
+
+WARNING: Adding an ID to an existing configuration will read the files
+from the beginning.
+
+[float]
 [[filestream-input-paths]]
 ===== `paths`
 
@@ -319,7 +332,7 @@ the `close.reader.after_interval` period has elapsed. This option can be useful 
 files when you want to spend only a predefined amount of time on the files.
 While `close.reader.after_interval` will close the file after the predefined timeout, if the
 file is still being updated, {beatname_uc} will start a new harvester again per
-the defined `scan_frequency`. And the close.reader.after_interval for this harvester will
+the defined `prospector.scanner.check_interval`. And the close.reader.after_interval for this harvester will
 start again with the countdown for the timeout.
 
 This option is particularly useful in case the output is blocked, which makes
@@ -358,7 +371,7 @@ When this option is enabled, {beatname_uc} removes the state of a file after the
 specified period of inactivity has elapsed. The  state can only be removed if
 the file is already ignored by {beatname_uc} (the file is older than
 `ignore_older`). The `clean_inactive` setting must be greater than `ignore_older +
-scan_frequency` to make sure that no states are removed while a file is still
+prospector.scanner.check_interval` to make sure that no states are removed while a file is still
 being harvested. Otherwise, the setting could result in {beatname_uc} resending
 the full content constantly because  `clean_inactive` removes state for files
 that are still detected by {beatname_uc}. If a file is updated or appears
@@ -403,42 +416,32 @@ You must disable this option if you also disable `close_removed`.
 The backoff options specify how aggressively {beatname_uc} crawls open files for
 updates. You can use the default values in most cases.
 
-The `backoff` option defines how long {beatname_uc} waits before checking a file
-again after EOF is reached. The default is 1s, which means the file is checked
-every second if new lines were added. This enables near real-time crawling.
-Every time a new line appears in the file, the `backoff` value is reset to the
-initial value. The default is 1s.
 
 [float]
 ===== `backoff.init`
 
-The maximum time for {beatname_uc} to wait before checking a file again after
-EOF is reached. After having backed off multiple times from checking the file,
-the wait time will never exceed `max_backoff` regardless of what is specified
-for  `backoff_factor`. Because it takes a maximum of 10s to read a new line,
-specifying 10s for `max_backoff` means that, at the worst, a new line could be
-added to the log file if {beatname_uc} has backed off multiple times. The
-default is 10s.
-
-Requirement: Set `max_backoff` to be greater than or equal to `backoff` and
-less than or equal to `scan_frequency` (`backoff <= max_backoff <= scan_frequency`).
-If `max_backoff` needs to be higher, it is recommended to close the file handler
-instead and let {beatname_uc} pick up the file again.
+The `backoff.init` option defines how long {beatname_uc} waits for the first time
+before checking a file again after EOF is reached. The backoff intervals increase exponentially.
+The default is 2s. Thus, the file is checked after 2 seconds, then 4 seconds,
+then 8 seconds and so on until it reaches the limit defined in `backoff.max`.
+Every time a new line appears in the file, the `backoff.init` value is reset to the
+initial value.
 
 [float]
 ===== `backoff.max`
 
 The maximum time for {beatname_uc} to wait before checking a file again after
 EOF is reached. After having backed off multiple times from checking the file,
-the wait time will never exceed `max_backoff` regardless of what is specified
-for  `backoff_factor`. Because it takes a maximum of 10s to read a new line,
-specifying 10s for `max_backoff` means that, at the worst, a new line could be
+the wait time will never exceed `backoff.max`.
+Because it takes a maximum of 10s to read a new line,
+specifying 10s for `backoff.max` means that, at the worst, a new line could be
 added to the log file if {beatname_uc} has backed off multiple times. The
 default is 10s.
 
-Requirement: Set `max_backoff` to be greater than or equal to `backoff` and
-less than or equal to `scan_frequency` (`backoff <= max_backoff <= scan_frequency`).
-If `max_backoff` needs to be higher, it is recommended to close the file handler
+Requirement: Set `backoff.max` to be greater than or equal to `backoff.init` and
+less than or equal to `prospector.scanner.check_interval`
+(`backoff.init <= backoff.max <= prospector.scanner.check_interval`).
+If `backoff.max` needs to be higher, it is recommended to close the file handler
 instead and let {beatname_uc} pick up the file again.
 
 [float]

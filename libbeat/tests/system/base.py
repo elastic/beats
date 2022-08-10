@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from beat.beat import TestCase
-from elasticsearch import Elasticsearch, NotFoundError
 
 
 class BaseTest(TestCase):
@@ -26,5 +25,5 @@ class BaseTest(TestCase):
         if self._es:
             return self._es
 
-        self._es = Elasticsearch([self.get_elasticsearch_url()])
+        self._es = self.get_elasticsearch_instance()
         return self._es

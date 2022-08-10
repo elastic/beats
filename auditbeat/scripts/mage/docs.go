@@ -18,12 +18,12 @@
 package mage
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -40,7 +40,7 @@ func ModuleDocs() error {
 	for _, path := range dirsWithModules {
 		files, err := devtools.FindFiles(filepath.Join(path, configTemplateGlob))
 		if err != nil {
-			return errors.Wrap(err, "failed to find config templates")
+			return fmt.Errorf("failed to find config templates: %w", err)
 		}
 
 		configFiles = append(configFiles, files...)
@@ -65,7 +65,7 @@ func ModuleDocs() error {
 		if err := os.RemoveAll(filepath.Join(path, "docs/modules")); err != nil {
 			return err
 		}
-		if err := os.MkdirAll(filepath.Join(path, "docs/modules"), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Join(path, "docs/modules"), 0o755); err != nil {
 			return err
 		}
 	}

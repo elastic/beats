@@ -21,12 +21,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 // getCPU implements NumCPU on linux
@@ -45,20 +42,19 @@ func getCPU() (int, bool, error) {
 	if isPresent {
 		cpuPath = "/sys/devices/system/cpu/present"
 	}
-	sysfspath := filepath.Join(paths.Paths.Hostfs, cpuPath)
 
-	rawFile, err := ioutil.ReadFile(sysfspath)
+	rawFile, err := ioutil.ReadFile(cpuPath)
 	// if the file doesn't exist, assume it's a support issue and not a bug
 	if errors.Is(err, os.ErrNotExist) {
 		return -1, false, nil
 	}
 	if err != nil {
-		return -1, false, errors.Wrapf(err, "error reading file %s", sysfspath)
+		return -1, false, errors.Wrapf(err, "error reading file %s", cpuPath)
 	}
 
 	cpuCount, err := parseCPUList(string(rawFile))
 	if err != nil {
-		return -1, false, errors.Wrapf(err, "error parsing file %s", sysfspath)
+		return -1, false, errors.Wrapf(err, "error parsing file %s", cpuPath)
 	}
 	return cpuCount, true, nil
 }

@@ -19,9 +19,7 @@ const (
 	timeDay       = time.Hour * 24
 )
 
-var (
-	errTypeCastFailed = errors.New("key is not expected type")
-)
+var errTypeCastFailed = errors.New("key is not expected type")
 
 // Date formats used in the JSON objects returned by the API.
 // This is just a safeguard in case the date format used by the API is

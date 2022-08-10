@@ -1,7 +1,7 @@
 - name: log
   type: group
   description: >
-    Kafka log lines.
+    Kibana log lines.
   fields:
     - name: tags
       type: keyword

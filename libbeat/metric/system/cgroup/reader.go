@@ -21,12 +21,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgv1"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgv2"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 // StatsV1 contains metrics and limits from each of the cgroup subsystems.
@@ -71,7 +73,7 @@ type mount struct {
 type Reader struct {
 	// Mountpoint of the root filesystem. Defaults to / if not set. This can be
 	// useful for example if you mount / as /rootfs inside of a container.
-	rootfsMountpoint         string
+	rootfsMountpoint         resolve.Resolver
 	ignoreRootCgroups        bool // Ignore a cgroup when its path is "/".
 	cgroupsHierarchyOverride string
 	cgroupMountpoints        Mountpoints // Mountpoints for each subsystem (e.g. cpu, cpuacct, memory, blkio).
@@ -81,8 +83,8 @@ type Reader struct {
 type ReaderOptions struct {
 	// RootfsMountpoint holds the mountpoint of the root filesystem.
 	//
-	// If unspecified, "/" is assumed.
-	RootfsMountpoint string
+	// pass
+	RootfsMountpoint resolve.Resolver
 
 	// IgnoreRootCgroups ignores cgroup subsystem with the path "/".
 	IgnoreRootCgroups bool
@@ -98,7 +100,7 @@ type ReaderOptions struct {
 }
 
 // NewReader creates and returns a new Reader.
-func NewReader(rootfsMountpoint string, ignoreRootCgroups bool) (*Reader, error) {
+func NewReader(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (*Reader, error) {
 	return NewReaderOptions(ReaderOptions{
 		RootfsMountpoint:  rootfsMountpoint,
 		IgnoreRootCgroups: ignoreRootCgroups,
@@ -107,10 +109,6 @@ func NewReader(rootfsMountpoint string, ignoreRootCgroups bool) (*Reader, error)
 
 // NewReaderOptions creates and returns a new Reader with the given options.
 func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
-	if opts.RootfsMountpoint == "" {
-		opts.RootfsMountpoint = "/"
-	}
-
 	// Determine what subsystems are supported by the kernel.
 	subsystems, err := SupportedSubsystems(opts.RootfsMountpoint)
 	// We can return a not-quite-an-error ErrCgroupsMissing here, so return the bare error.
@@ -134,7 +132,8 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 
 // CgroupsVersion reports if the given PID is attached to a V1 or V2 controller
 func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
-	cgPath := filepath.Join(r.rootfsMountpoint, "/proc/", fmt.Sprintf("%d", pid), "cgroup")
+	cgPath := filepath.Join("/proc/", strconv.Itoa(pid), "cgroup")
+	cgPath = r.rootfsMountpoint.ResolveHostFS(cgPath)
 	cgraw, err := ioutil.ReadFile(cgPath)
 	if err != nil {
 		return CgroupsV1, errors.Wrapf(err, "error reading %s", cgPath)
@@ -227,7 +226,7 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 
 // ProcessCgroupPaths is a wrapper around Reader.ProcessCgroupPaths for libraries that only need the slimmer functionality from
 // the gosigar cgroups code. This does not have the same function signature, and consumers still need to distinguish between v1 and v2 cgroups.
-func ProcessCgroupPaths(hostfs string, pid int) (PathList, error) {
+func ProcessCgroupPaths(hostfs resolve.Resolver, pid int) (PathList, error) {
 	reader, err := NewReader(hostfs, false)
 	if err != nil {
 		return PathList{}, errors.Wrap(err, "error creating cgroups reader")

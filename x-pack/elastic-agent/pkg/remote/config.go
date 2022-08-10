@@ -15,8 +15,6 @@ import (
 type Config struct {
 	Protocol Protocol `config:"protocol" yaml:"protocol"`
 	SpaceID  string   `config:"space.id" yaml:"space.id,omitempty"`
-	Username string   `config:"username" yaml:"username,omitempty"`
-	Password string   `config:"password" yaml:"password,omitempty"`
 	Path     string   `config:"path" yaml:"path,omitempty"`
 	Host     string   `config:"host" yaml:"host,omitempty"`
 	Hosts    []string `config:"hosts" yaml:"hosts,omitempty"`
@@ -55,15 +53,8 @@ func DefaultClientConfig() Config {
 		Host:      "localhost:5601",
 		Path:      "",
 		SpaceID:   "",
-		Username:  "",
-		Password:  "",
 		Transport: transport,
 	}
-}
-
-// IsBasicAuth returns true if the username and password are both defined.
-func (c *Config) IsBasicAuth() bool {
-	return len(c.Username) > 0 && len(c.Password) > 0
 }
 
 // GetHosts returns the hosts to connect.

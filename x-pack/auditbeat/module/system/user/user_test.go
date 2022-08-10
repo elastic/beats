@@ -64,11 +64,11 @@ func testUser() *User {
 		UID:  "9999",
 		GID:  "1001",
 		Groups: []*user.Group{
-			&user.Group{
+			{
 				Gid:  "1001",
 				Name: "__elastic",
 			},
-			&user.Group{
+			{
 				Gid:  "1002",
 				Name: "docker",
 			},

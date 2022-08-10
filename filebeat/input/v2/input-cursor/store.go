@@ -316,7 +316,6 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 
 		return true, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

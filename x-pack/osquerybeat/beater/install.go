@@ -34,9 +34,7 @@ func installOsqueryWithDir(ctx context.Context, dir string) error {
 	fn := distro.OsquerydDistroFilename()
 	var installFunc func(context.Context, string, string, bool) error
 
-	if runtime.GOOS == "windows" {
-		installFunc = install.InstallFromMSI
-	} else if runtime.GOOS == "darwin" {
+	if runtime.GOOS == "darwin" {
 		installFunc = install.InstallFromPkg
 	}
 

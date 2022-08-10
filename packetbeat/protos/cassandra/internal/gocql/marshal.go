@@ -271,60 +271,6 @@ func (t Type) String() string {
 	}
 }
 
-const (
-	apacheCassandraTypePrefix = "org.apache.cassandra.db.marshal."
-)
-
-// get Apache Cassandra types
-func getApacheCassandraType(class string) Type {
-	switch strings.TrimPrefix(class, apacheCassandraTypePrefix) {
-	case "AsciiType":
-		return TypeASCII
-	case "LongType":
-		return TypeBigInt
-	case "BytesType":
-		return TypeBlob
-	case "BooleanType":
-		return TypeBoolean
-	case "CounterColumnType":
-		return TypeCounter
-	case "DecimalType":
-		return TypeDecimal
-	case "DoubleType":
-		return TypeDouble
-	case "FloatType":
-		return TypeFloat
-	case "Int32Type":
-		return TypeInt
-	case "ShortType":
-		return TypeSmallInt
-	case "ByteType":
-		return TypeTinyInt
-	case "DateType", "TimestampType":
-		return TypeTimestamp
-	case "UUIDType", "LexicalUUIDType":
-		return TypeUUID
-	case "UTF8Type":
-		return TypeVarchar
-	case "IntegerType":
-		return TypeVarint
-	case "TimeUUIDType":
-		return TypeTimeUUID
-	case "InetAddressType":
-		return TypeInet
-	case "MapType":
-		return TypeMap
-	case "ListType":
-		return TypeList
-	case "SetType":
-		return TypeSet
-	case "TupleType":
-		return TypeTuple
-	default:
-		return TypeCustom
-	}
-}
-
 // error Types
 type ErrType int
 
@@ -349,8 +295,8 @@ const (
 	errUnprepared      ErrType = 0x2500
 )
 
-func (this ErrType) String() string {
-	switch this {
+func (e ErrType) String() string {
+	switch e {
 	case errUnavailable:
 		return "errUnavailable"
 	case errWriteTimeout:
@@ -565,15 +511,6 @@ const (
 	flagHasMorePages    int = 0x02
 	flagNoMetaData      int = 0x04
 
-	// query flags
-	flagValues                byte = 0x01
-	flagSkipMetaData          byte = 0x02
-	flagPageSize              byte = 0x04
-	flagWithPagingState       byte = 0x08
-	flagWithSerialConsistency byte = 0x10
-	flagDefaultTimestamp      byte = 0x20
-	flagWithNameValues        byte = 0x40
-
 	// header flags
 	flagDefault       byte = 0x00
 	flagCompress      byte = 0x01
@@ -680,7 +617,7 @@ func (u UUID) Bytes() []byte {
 // String returns the UUID in it's canonical form, a 32 digit hexadecimal
 // number in the form of xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
 func (u UUID) String() string {
-	var offsets = [...]int{0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24, 26, 28, 30, 32, 34}
+	offsets := [...]int{0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24, 26, 28, 30, 32, 34}
 	const hexString = "0123456789abcdef"
 	r := make([]byte, 36)
 	for i, b := range u {

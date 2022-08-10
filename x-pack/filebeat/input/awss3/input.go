@@ -111,7 +111,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   inputContext.Cancelation,
-		ACKHandler: newEventACKHandler(),
+		ACKHandler: awscommon.NewEventACKHandler(),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
@@ -155,13 +155,11 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 }
 
 func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsReader, error) {
-	s3ServiceName := "s3"
-	if in.config.FIPSEnabled {
-		s3ServiceName = "s3-fips"
-	}
+	s3ServiceName := awscommon.CreateServiceName("s3", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
+	sqsServiceName := awscommon.CreateServiceName("sqs", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
 
 	sqsAPI := &awsSQSAPI{
-		client:            sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, "sqs", in.awsConfig.Region, in.awsConfig)),
+		client:            sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, sqsServiceName, in.awsConfig.Region, in.awsConfig)),
 		queueURL:          in.config.QueueURL,
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
@@ -198,10 +196,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 }
 
 func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
-	s3ServiceName := "s3"
-	if in.config.FIPSEnabled {
-		s3ServiceName = "s3-fips"
-	}
+	s3ServiceName := awscommon.CreateServiceName("s3", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
 	var bucketName string
 	var bucketID string
 	if in.config.NonAWSBucketName != "" {
@@ -298,7 +293,7 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		return "aws"
 	}
 	// List of popular S3 SaaS providers
-	var providers = map[string]string{
+	providers := map[string]string{
 		"amazonaws.com":          "aws",
 		"c2s.sgov.gov":           "aws",
 		"c2s.ic.gov":             "aws",

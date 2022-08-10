@@ -29,40 +29,40 @@ func TestAddTags(t *testing.T) {
 
 	testProcessors(t, map[string]testCase{
 		"create tags": {
-			event: common.MapStr{},
-			want:  common.MapStr{"tags": []string{"t1", "t2"}},
-			cfg:   single(`{add_tags: {tags: [t1, t2]}}`),
+			eventFields: common.MapStr{},
+			wantFields:  common.MapStr{"tags": []string{"t1", "t2"}},
+			cfg:         single(`{add_tags: {tags: [t1, t2]}}`),
 		},
 		"append to tags": {
-			event: common.MapStr{"tags": []string{"t1"}},
-			want:  common.MapStr{"tags": []string{"t1", "t2", "t3"}},
-			cfg:   single(`{add_tags: {tags: [t2, t3]}}`),
+			eventFields: common.MapStr{"tags": []string{"t1"}},
+			wantFields:  common.MapStr{"tags": []string{"t1", "t2", "t3"}},
+			cfg:         single(`{add_tags: {tags: [t2, t3]}}`),
 		},
 		"combine from 2 processors": {
-			event: common.MapStr{},
-			want:  common.MapStr{"tags": []string{"t1", "t2", "t3", "t4"}},
+			eventFields: common.MapStr{},
+			wantFields:  common.MapStr{"tags": []string{"t1", "t2", "t3", "t4"}},
 			cfg: multi(
 				`{add_tags: {tags: [t1, t2]}}`,
 				`{add_tags: {tags: [t3, t4]}}`,
 			),
 		},
 		"with custom target": {
-			event: common.MapStr{},
-			want:  common.MapStr{"custom": []string{"t1", "t2"}},
-			cfg:   single(`{add_tags: {tags: [t1, t2], target: custom}}`),
+			eventFields: common.MapStr{},
+			wantFields:  common.MapStr{"custom": []string{"t1", "t2"}},
+			cfg:         single(`{add_tags: {tags: [t1, t2], target: custom}}`),
 		},
 		"different targets": {
-			event: common.MapStr{},
-			want:  common.MapStr{"tags1": []string{"t1"}, "tags2": []string{"t2"}},
+			eventFields: common.MapStr{},
+			wantFields:  common.MapStr{"tags1": []string{"t1"}, "tags2": []string{"t2"}},
 			cfg: multi(
 				`{add_tags: {target: tags1, tags: [t1]}}`,
 				`{add_tags: {target: tags2, tags: [t2]}}`,
 			),
 		},
 		"single tag config without array notation": {
-			event: common.MapStr{},
-			want:  common.MapStr{"tags": []string{"t1"}},
-			cfg:   single(`{add_tags: {tags: t1}}`),
+			eventFields: common.MapStr{},
+			wantFields:  common.MapStr{"tags": []string{"t1"}},
+			cfg:         single(`{add_tags: {tags: t1}}`),
 		},
 	})
 }

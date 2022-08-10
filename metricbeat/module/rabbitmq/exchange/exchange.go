@@ -55,5 +55,5 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error in fetch")
 	}
 
-	return eventsMapping(content, r, m)
+	return eventsMapping(content, r)
 }

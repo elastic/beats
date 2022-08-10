@@ -21,7 +21,9 @@ const (
 )
 
 type listingInfo struct {
-	totObjects    int
+	totObjects int
+
+	mu            sync.Mutex
 	storedObjects int
 	errorObjects  int
 	finalCheck    bool
@@ -105,11 +107,19 @@ func (s *states) Delete(id string) {
 func (s *states) IsListingFullyStored(listingID string) bool {
 	info, _ := s.listingInfo.Load(listingID)
 	listingInfo := info.(*listingInfo)
+	listingInfo.mu.Lock()
+	defer listingInfo.mu.Unlock()
 	if listingInfo.finalCheck {
 		return false
 	}
 
 	listingInfo.finalCheck = (listingInfo.storedObjects + listingInfo.errorObjects) == listingInfo.totObjects
+
+	if (listingInfo.storedObjects + listingInfo.errorObjects) > listingInfo.totObjects {
+		s.log.Warnf("unexepected mixmatch between storedObjects (%d), errorObjects (%d) and totObjects (%d)",
+			listingInfo.storedObjects, listingInfo.errorObjects, listingInfo.totObjects)
+	}
+
 	return listingInfo.finalCheck
 }
 
@@ -154,6 +164,9 @@ func (s *states) Update(newState state, listingID string) {
 	// here we increase the number of stored object
 	info, _ := s.listingInfo.Load(listingID)
 	listingInfo := info.(*listingInfo)
+
+	listingInfo.mu.Lock()
+
 	if newState.Stored {
 		listingInfo.storedObjects++
 	}
@@ -161,6 +174,8 @@ func (s *states) Update(newState state, listingID string) {
 	if newState.Error {
 		listingInfo.errorObjects++
 	}
+
+	listingInfo.mu.Unlock()
 
 	if _, ok := s.statesByListingID[listingID]; !ok {
 		s.statesByListingID[listingID] = make([]state, 0)
@@ -274,7 +289,6 @@ func (s *states) readStatesFrom(store *statestore.Store) error {
 		states = append(states, st)
 		return true, nil
 	})
-
 	if err != nil {
 		return err
 	}

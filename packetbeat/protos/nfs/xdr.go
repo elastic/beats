@@ -40,21 +40,9 @@ func (r *xdr) size() int {
 	return len(r.data)
 }
 
-func (r *xdr) getInt() int32 {
-	i := int32(binary.BigEndian.Uint32(r.data[r.offset : r.offset+4]))
-	r.offset += 4
-	return int32(i)
-}
-
 func (r *xdr) getUInt() uint32 {
 	i := uint32(binary.BigEndian.Uint32(r.data[r.offset : r.offset+4]))
 	r.offset += 4
-	return i
-}
-
-func (r *xdr) getHyper() int64 {
-	i := int64(binary.BigEndian.Uint64(r.data[r.offset : r.offset+8]))
-	r.offset += 8
 	return i
 }
 

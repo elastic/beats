@@ -24,7 +24,7 @@
     - name: files
       type: long
       description: >
-        The total number of file nodes in the file system.
+        Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices.
     - name: free
       type: long
       format: bytes
@@ -33,7 +33,7 @@
     - name: free_files
       type: long
       description: >
-        The number of free file nodes in the file system.
+        The number of free inodes in the file system.
     - name: total
       type: long
       format: bytes

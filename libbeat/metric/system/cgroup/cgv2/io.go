@@ -25,6 +25,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 )
 
@@ -59,6 +60,13 @@ func (io *IOSubsystem) Get(path string, resolveDevIDs bool) error {
 	io.Stats, err = getIOStats(path, resolveDevIDs)
 	if err != nil {
 		return errors.Wrapf(err, "error getting io.stats for path %s", path)
+	}
+
+	//Pressure doesn't exist on certain V2 implementations.
+	_, err = os.Stat(filepath.Join(path, "io.pressure"))
+	if errors.Is(err, os.ErrNotExist) {
+		logp.L().Debugf("io.pressure does not exist. Skipping.")
+		return nil
 	}
 
 	io.Pressure, err = cgcommon.GetPressure(filepath.Join(path, "io.pressure"))

@@ -1,0 +1,13 @@
+Firestore metricset fetches metrics from https://cloud.google.com/firestore/[Firestore] in Google Cloud Platform.
+
+The `firestore` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-firestore[GCP Firestore Monitoring API]. The field names have been left untouched for people already familiar with them.
+
+You can specify a single region to fetch metrics like `us-central1`. Be aware that GCP Storage does not use zones so `us-central1-a` will return nothing. If no region is specified, it will return metrics from all buckets.
+
+[float]
+=== Metrics
+Here is a list of metrics collected by `firestore` metricset:
+
+- `firestore.document.delete_count`: The number of successful document deletes.
+- `firestore.document.read_count`: The number of successful document reads from queries or lookups.
+- `firestore.document.write_count`: The number of successful document writes.

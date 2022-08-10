@@ -316,8 +316,10 @@ func TestRRsToMapStrsWithOPTRecord(t *testing.T) {
 	o.Hdr.Rrtype = mkdns.TypeOPT
 
 	r := new(mkdns.MX)
-	r.Hdr = mkdns.RR_Header{Name: "miek.nl", Rrtype: mkdns.TypeMX,
-		Class: mkdns.ClassINET, Ttl: 3600}
+	r.Hdr = mkdns.RR_Header{
+		Name: "miek.nl", Rrtype: mkdns.TypeMX,
+		Class: mkdns.ClassINET, Ttl: 3600,
+	}
 	r.Preference = 10
 	r.Mx = "mx.miek.nl"
 

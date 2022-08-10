@@ -40,10 +40,9 @@ processors:
     - message
     - host
     ignore_missing: true
-- rename:
-    field: "@timestamp"
-    target_field: "event.created"
-    ignore_missing: true
+- set:
+    copy_from: "@timestamp"
+    field: "event.created"
 - date:
     field: "syslog5424_ts"
     formats: ["ISO8601", "UNIX"]

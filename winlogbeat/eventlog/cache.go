@@ -65,8 +65,8 @@ type messageFilesCache struct {
 // initialized (including starting a periodic janitor goroutine to purge
 // expired Handles).
 func newMessageFilesCache(eventLogName string, loader messageFileLoaderFunc,
-	freer freeHandleFunc) *messageFilesCache {
-
+	freer freeHandleFunc,
+) *messageFilesCache {
 	size := &expvar.Int{}
 	cacheStats.Set(eventLogName+"Size", size)
 

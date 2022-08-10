@@ -75,6 +75,7 @@ func (r *Poller) Run(item Transaction) error {
 	}
 	return nil
 }
+
 func (r *Poller) fetch(item Transaction) error {
 	return r.fetchWithDelay(item, r.interval)
 }

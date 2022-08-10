@@ -16,9 +16,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/pcap"
 	"github.com/stretchr/testify/assert"
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/pcap"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -79,11 +79,11 @@ func TestPCAPFiles(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				if err = os.MkdirAll(goldenDir, 0755); err != nil {
+				if err = os.MkdirAll(goldenDir, 0o755); err != nil {
 					t.Fatal(err)
 				}
 
-				err = ioutil.WriteFile(goldenName, data, 0644)
+				err = ioutil.WriteFile(goldenName, data, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -111,11 +111,11 @@ func TestDatFiles(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				if err = os.MkdirAll(goldenDir, 0755); err != nil {
+				if err = os.MkdirAll(goldenDir, 0o755); err != nil {
 					t.Fatal(err)
 				}
 
-				err = ioutil.WriteFile(goldenName, data, 0644)
+				err = ioutil.WriteFile(goldenName, data, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -201,7 +201,7 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 				flow.Fields.Delete("event.created")
 				ev[i] = flow
 			}
-			//return TestResult{Name: name, Error: err.Error(), Events: flowsToEvents(flows)}
+			// return TestResult{Name: name, Error: err.Error(), Events: flowsToEvents(flows)}
 			events = append(events, ev...)
 		}
 	}

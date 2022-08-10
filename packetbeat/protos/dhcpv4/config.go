@@ -25,10 +25,8 @@ type dhcpv4Config struct {
 	config.ProtocolCommon `config:",inline"`
 }
 
-var (
-	defaultConfig = dhcpv4Config{
-		ProtocolCommon: config.ProtocolCommon{
-			Ports: []int{67, 68},
-		},
-	}
-)
+var defaultConfig = dhcpv4Config{
+	ProtocolCommon: config.ProtocolCommon{
+		Ports: []int{67, 68},
+	},
+}

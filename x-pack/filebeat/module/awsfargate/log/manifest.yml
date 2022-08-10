@@ -6,6 +6,7 @@ var:
   - name: shared_credential_file
   - name: credential_profile_name
   - name: endpoint
+  - name: default_region
   - name: access_key_id
   - name: secret_access_key
   - name: session_token
@@ -20,6 +21,8 @@ var:
   - name: scan_frequency
   - name: api_timeout
   - name: api_sleep
+  - name: proxy_url
+  - name: ssl
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

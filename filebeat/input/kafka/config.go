@@ -166,8 +166,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Fetch.Default = config.Fetch.Default
 	k.Consumer.Fetch.Max = config.Fetch.Max
 
-	k.Consumer.Group.Rebalance.Strategy =
-		config.Rebalance.Strategy.asSaramaStrategy()
+	k.Consumer.Group.Rebalance.Strategy = config.Rebalance.Strategy.asSaramaStrategy()
 	k.Consumer.Group.Rebalance.Timeout = config.Rebalance.Timeout
 	k.Consumer.Group.Rebalance.Retry.Backoff = config.Rebalance.RetryBackoff
 	k.Consumer.Group.Rebalance.Retry.Max = config.Rebalance.MaxRetries

@@ -59,7 +59,3 @@ func killProcessGroup(cmd *exec.Cmd) error {
 	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	return errors.Wrapf(err, "kill process group %d", cmd.Process.Pid)
 }
-
-func osquerydFilename() string {
-	return osqueryDName
-}

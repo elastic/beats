@@ -10,6 +10,7 @@ package login
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"io"
 	"net"
 	"os"
@@ -18,8 +19,6 @@ import (
 	"sort"
 	"strconv"
 	"syscall"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -77,7 +76,7 @@ func NewUtmpFileReader(log *logp.Logger, bucket datastore.Bucket, config config)
 	// Load state (file records, tty mapping) from disk
 	err := r.restoreStateFromDisk()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to restore state from disk")
+		return nil, fmt.Errorf("failed to restore state from disk: %w", err)
 	}
 
 	return r, nil
@@ -103,13 +102,13 @@ func (r *UtmpFileReader) ReadNew() (<-chan LoginRecord, <-chan error) {
 
 		wtmpFiles, err := r.findFiles(r.config.WtmpFilePattern, Wtmp)
 		if err != nil {
-			errorC <- errors.Wrap(err, "failed to expand file pattern")
+			errorC <- fmt.Errorf("failed to expand file pattern: %w", err)
 			return
 		}
 
 		btmpFiles, err := r.findFiles(r.config.BtmpFilePattern, Btmp)
 		if err != nil {
-			errorC <- errors.Wrap(err, "failed to expand file pattern")
+			errorC <- fmt.Errorf("failed to expand file pattern: %w", err)
 			return
 		}
 
@@ -127,7 +126,7 @@ func (r *UtmpFileReader) ReadNew() (<-chan LoginRecord, <-chan error) {
 func (r *UtmpFileReader) findFiles(filePattern string, utmpType UtmpType) ([]UtmpFile, error) {
 	paths, err := filepath.Glob(filePattern)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to expand file pattern %v", filePattern)
+		return nil, fmt.Errorf("failed to expand file pattern %v: %w", filePattern, err)
 	}
 
 	// Sort paths in reverse order (oldest/most-rotated file first)
@@ -142,7 +141,7 @@ func (r *UtmpFileReader) findFiles(filePattern string, utmpType UtmpType) ([]Utm
 				r.log.Debugf("File %v does not exist anymore.", path)
 				continue
 			} else {
-				return nil, errors.Wrapf(err, "unexpected error when looking up file %v", path)
+				return nil, fmt.Errorf("unexpected error when looking up file %v: %w", path, err)
 			}
 		}
 
@@ -196,7 +195,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 		// Empty new file - save but don't read.
 		err := r.updateSavedUtmpFile(utmpFile, nil)
 		if err != nil {
-			errorC <- errors.Wrapf(err, "error updating file record for file %v", utmpFile.Path)
+			errorC <- fmt.Errorf("error updating file record for file %v: %w", utmpFile.Path, err)
 		}
 		return
 	}
@@ -206,7 +205,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 
 		f, err := os.Open(utmpFile.Path)
 		if err != nil {
-			errorC <- errors.Wrapf(err, "error opening file %v", utmpFile.Path)
+			errorC <- fmt.Errorf("error opening file %v: %w", utmpFile.Path, err)
 			return
 		}
 		defer func() {
@@ -214,7 +213,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 			// otherwise we will just keep trying to re-read very frequently forever.
 			err := r.updateSavedUtmpFile(utmpFile, f)
 			if err != nil {
-				errorC <- errors.Wrapf(err, "error updating file record for file %v", utmpFile.Path)
+				errorC <- fmt.Errorf("error updating file record for file %v: %w", utmpFile.Path, err)
 			}
 
 			f.Close()
@@ -225,7 +224,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 		if size >= oldSize && utmpFile.Offset <= size {
 			_, err = f.Seek(utmpFile.Offset, 0)
 			if err != nil {
-				errorC <- errors.Wrapf(err, "error setting offset %d for file %v", utmpFile.Offset, utmpFile.Path)
+				errorC <- fmt.Errorf("error setting offset %d for file %v: %w", utmpFile.Offset, utmpFile.Path, err)
 			}
 		}
 
@@ -234,7 +233,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 		if size < oldSize || utmpFile.Offset > size || err != nil {
 			_, err = f.Seek(0, 0)
 			if err != nil {
-				errorC <- errors.Wrapf(err, "error setting offset 0 for file %v", utmpFile.Path)
+				errorC <- fmt.Errorf("error setting offset 0 for file %v: %w", utmpFile.Path, err)
 
 				// Even that did not work, so return.
 				return
@@ -244,7 +243,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 		for {
 			utmp, err := ReadNextUtmp(f)
 			if err != nil && err != io.EOF {
-				errorC <- errors.Wrapf(err, "error reading entry in UTMP file %v", utmpFile.Path)
+				errorC <- fmt.Errorf("error reading entry in UTMP file %v: %w", utmpFile.Path, err)
 				return
 			}
 
@@ -279,7 +278,7 @@ func (r *UtmpFileReader) updateSavedUtmpFile(utmpFile UtmpFile, f *os.File) erro
 	if f != nil {
 		offset, err := f.Seek(0, 1)
 		if err != nil {
-			return errors.Wrap(err, "error calling Seek")
+			return fmt.Errorf("error calling Seek: %w", err)
 		}
 		utmpFile.Offset = offset
 	}
@@ -314,7 +313,7 @@ func (r *UtmpFileReader) processBadLoginRecord(utmp *Utmp) (*LoginRecord, error)
 		record.Hostname = utmp.UtHost
 	default:
 		// This should not happen.
-		return nil, errors.Errorf("UTMP record with unexpected type %v in bad login file", utmp.UtType)
+		return nil, fmt.Errorf("UTMP record with unexpected type %v in bad login file", utmp.UtType)
 	}
 
 	return &record, nil
@@ -470,13 +469,13 @@ func (r *UtmpFileReader) saveFileRecordsToDisk() error {
 	for _, utmpFile := range r.savedUtmpFiles {
 		err := encoder.Encode(utmpFile)
 		if err != nil {
-			return errors.Wrap(err, "error encoding UTMP file record")
+			return fmt.Errorf("error encoding UTMP file record: %w", err)
 		}
 	}
 
 	err := r.bucket.Store(bucketKeyFileRecords, buf.Bytes())
 	if err != nil {
-		return errors.Wrap(err, "error writing UTMP file records to disk")
+		return fmt.Errorf("error writing UTMP file records to disk: %w", err)
 	}
 
 	r.log.Debugf("Wrote %d UTMP file records to disk", len(r.savedUtmpFiles))
@@ -490,13 +489,13 @@ func (r *UtmpFileReader) saveLoginSessionsToDisk() error {
 	for _, loginRecord := range r.loginSessions {
 		err := encoder.Encode(loginRecord)
 		if err != nil {
-			return errors.Wrap(err, "error encoding login record")
+			return fmt.Errorf("error encoding login record: %w", err)
 		}
 	}
 
 	err := r.bucket.Store(bucketKeyLoginSessions, buf.Bytes())
 	if err != nil {
-		return errors.Wrap(err, "error writing login records to disk")
+		return fmt.Errorf("error writing login records to disk: %w", err)
 	}
 
 	r.log.Debugf("Wrote %d open login sessions to disk", len(r.loginSessions))
@@ -540,7 +539,7 @@ func (r *UtmpFileReader) restoreFileRecordsFromDisk() error {
 				// Read all
 				break
 			} else {
-				return errors.Wrap(err, "error decoding file record")
+				return fmt.Errorf("error decoding file record: %w", err)
 			}
 		}
 	}
@@ -572,7 +571,7 @@ func (r *UtmpFileReader) restoreLoginSessionsFromDisk() error {
 				// Read all
 				break
 			} else {
-				return errors.Wrap(err, "error decoding login record")
+				return fmt.Errorf("error decoding login record: %w", err)
 			}
 		}
 	}

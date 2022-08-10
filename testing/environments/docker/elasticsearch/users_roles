@@ -1,0 +1,11 @@
+beats:beats
+beats_system:beats,filebeat_user,heartbeat_user,metricbeat_user,auditbeat_user,journalbeat_user
+filebeat:filebeat_user
+heartbeat:heartbeat_user
+ingest_admin:apm_server_user
+kibana_system:kibana_system_user
+kibana_admin:apm_server_user,apm_user_ro,beats,filebeat_user,heartbeat_user,metricbeat_user,auditbeat_user,journalbeat_user
+metricbeat:metricbeat_user
+auditbeat:auditbeat_user
+journalbeat:journalbeat_user
+superuser:admin

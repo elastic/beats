@@ -50,9 +50,7 @@ type stream struct {
 	parser parser
 }
 
-var (
-	debugf = logp.MakeDebug("cassandra")
-)
+var debugf = logp.MakeDebug("cassandra")
 
 func init() {
 	protos.Register("cassandra", New)
@@ -200,11 +198,6 @@ func (cassandra *cassandra) ensureConnection(private protos.ProtocolData) *conne
 		conn.trans.init(&cassandra.transConfig, cassandra.watcher, cassandra.pub.onTransaction)
 	}
 	return conn
-}
-
-func (conn *connection) dropStreams() {
-	conn.streams[0] = nil
-	conn.streams[1] = nil
 }
 
 func getConnection(private protos.ProtocolData) *connection {

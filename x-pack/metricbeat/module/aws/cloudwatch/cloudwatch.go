@@ -140,18 +140,25 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	m.logger.Debugf("listMetricDetailTotal = %s", listMetricDetailTotal)
 	m.logger.Debugf("namespaceDetailTotal = %s", namespaceDetailTotal)
 
+	var config aws.Config
+	err = m.Module().UnpackConfig(&config)
+	if err != nil {
+		return err
+	}
+
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
 		for _, regionName := range m.MetricSet.RegionsList {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
+			monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
 
 			svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
-				m.Endpoint, "monitoring", regionName, awsConfig))
+				m.Endpoint, monitoringServiceName, regionName, awsConfig))
 
 			svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
-				m.Endpoint, "tagging", regionName, awsConfig))
+				m.Endpoint, "tagging", regionName, awsConfig)) //Does not support FIPS
 
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
 			if err != nil {
@@ -173,11 +180,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 
+		monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
 		svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
-			m.Endpoint, "monitoring", regionName, awsConfig))
+			m.Endpoint, monitoringServiceName, regionName, awsConfig))
 
 		svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
-			m.Endpoint, "tagging", regionName, awsConfig))
+			m.Endpoint, "tagging", regionName, awsConfig)) //Does not support FIPS
 
 		for namespace, namespaceDetails := range namespaceDetailTotal {
 			m.logger.Debugf("Collected metrics from namespace %s", namespace)
@@ -204,7 +212,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
-			err = reportEvents(addMetadata(namespace, m.Endpoint, regionName, awsConfig, eventsWithIdentifier), report)
+			err = reportEvents(addMetadata(namespace, m.Endpoint, regionName, awsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier), report)
 			if err != nil {
 				return errors.Wrap(err, "reportEvents failed")
 			}

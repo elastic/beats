@@ -44,7 +44,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "macosx&&x86_64"
+          - "orka && darwin && poc"
         when:                  ## Override the top-level when.
             comments:
                 - "/test auditbeat for macos"
@@ -59,6 +59,11 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
         stage: mandatory
+    windows-2022:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2022"
+        stage: extended
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
@@ -79,21 +84,6 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
         stage: extended
-    #windows-2008:  See https://github.com/elastic/beats/issues/19799
-    #    mage: "mage build unitTest"
-    #    platforms:             ## override default labels in this specific stage.
-    #        - "windows-2008-r2"
-    #    stage: extended
-    #windows-7:  See https://github.com/elastic/beats/issues/19831
-    #    mage: "mage build unitTest"
-    #    platforms:             ## override default labels in this specific stage.
-    #        - "windows-7"
-    #    stage: extended
-    #windows-7-32:  See https://github.com/elastic/beats/issues/19831
-    #    mage: "mage build unitTest"
-    #    platforms:             ## override default labels in this specific stage.
-    #        - "windows-7-32-bit"
-    #    stage: extended
     packaging-linux:
         packaging-linux: "mage package"
         e2e:

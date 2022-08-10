@@ -144,8 +144,8 @@
         },
         "related": {
           "ip": [
-            "172.16.32.248",
-            "172.16.32.100"
+            "172.16.32.100",
+            "172.16.32.248"
           ]
         },
         "source": {
@@ -302,8 +302,8 @@
         },
         "related": {
           "ip": [
-            "172.16.32.201",
-            "172.16.32.100"
+            "172.16.32.100",
+            "172.16.32.201"
           ]
         },
         "source": {
@@ -460,8 +460,8 @@
         },
         "related": {
           "ip": [
-            "172.16.32.202",
-            "172.16.32.100"
+            "172.16.32.100",
+            "172.16.32.202"
           ]
         },
         "source": {
@@ -480,6 +480,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "ff02::1",
+          "locality": "internal",
           "port": 34304
         },
         "event": {
@@ -497,7 +499,7 @@
           ]
         },
         "flow": {
-          "id": "tYpw8DU5u10",
+          "id": "hsSxbBU-M1o",
           "locality": "internal"
         },
         "netflow": {
@@ -526,7 +528,7 @@
         },
         "network": {
           "bytes": 672,
-          "community_id": "1:vK+Zeop1Y3GHxfFGVF2/COcNBWw=",
+          "community_id": "1:z1qoJyUMuKy3HX8rkIDvBK/vyL8=",
           "direction": "unknown",
           "iana_number": 58,
           "packets": 7,
@@ -535,8 +537,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::20c:29ff:fe83:3b6e",
+            "ff02::1"
+          ]
+        },
         "source": {
           "bytes": 672,
+          "ip": "fe80::20c:29ff:fe83:3b6e",
+          "locality": "internal",
           "packets": 7,
           "port": 0
         }

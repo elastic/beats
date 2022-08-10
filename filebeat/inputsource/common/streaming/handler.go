@@ -56,7 +56,7 @@ func SplitHandlerFactory(family inputsource.Family, logger *logp.Logger, metadat
 			buf := bufio.NewReader(r)
 			scanner := bufio.NewScanner(buf)
 			scanner.Split(splitFunc)
-			//16 is ratio of MaxScanTokenSize/startBufSize
+			// 16 is ratio of MaxScanTokenSize/startBufSize
 			buffer := make([]byte, maxMessageSize/16)
 			scanner.Buffer(buffer, int(maxMessageSize))
 			for {

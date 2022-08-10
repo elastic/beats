@@ -59,7 +59,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("Started listening for TCP connection"))
+        self.wait_until(lambda: self.log_contains("Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         sock.connect((host, port))
@@ -100,7 +100,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("Started listening for TCP connection"))
+        self.wait_until(lambda: self.log_contains("Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         sock.connect((host, port))

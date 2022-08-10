@@ -237,14 +237,14 @@ func (f *Fields) ComputeValues(localIPs []net.IP, internalNetworks []string) err
 	}
 
 	// network.community_id
-	switch {
-	case f.Network.Transport == "udp":
+	switch f.Network.Transport {
+	case "udp":
 		flow.Protocol = 17
-	case f.Network.Transport == "tcp":
+	case "tcp":
 		flow.Protocol = 6
-	case f.Network.Transport == "icmp":
+	case "icmp":
 		flow.Protocol = 1
-	case f.Network.Transport == "ipv6-icmp":
+	case "ipv6-icmp":
 		flow.Protocol = 58
 	}
 	flow.ICMP.Type = f.ICMPType

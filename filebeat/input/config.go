@@ -24,12 +24,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
-var (
-	defaultConfig = inputConfig{
-		ScanFrequency: 10 * time.Second,
-		Type:          cfg.DefaultType,
-	}
-)
+var defaultConfig = inputConfig{
+	ScanFrequency: 10 * time.Second,
+	Type:          cfg.DefaultType,
+}
 
 type inputConfig struct {
 	ScanFrequency time.Duration `config:"scan_frequency" validate:"min=0,nonzero"`

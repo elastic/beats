@@ -1,0 +1,30 @@
+default: false
+input:
+  module: gcp
+  metricset: metrics
+  defaults:
+    metrics:
+      - service: dataproc
+        metric_types:
+          - "batch/spark/executors"
+          - "cluster/hdfs/datanodes"
+          - "cluster/hdfs/storage_capacity"
+          - "cluster/hdfs/storage_utilization"
+          - "cluster/hdfs/unhealthy_blocks"
+          - "cluster/job/completion_time"
+          - "cluster/job/duration"
+          - "cluster/job/failed_count"
+          - "cluster/job/running_count"
+          - "cluster/job/submitted_count"
+          - "cluster/operation/completion_time"
+          - "cluster/operation/duration"
+          - "cluster/operation/failed_count"
+          - "cluster/operation/running_count"
+          - "cluster/operation/submitted_count"
+          - "cluster/yarn/allocated_memory_percentage"
+          - "cluster/yarn/apps"
+          - "cluster/yarn/containers"
+          - "cluster/yarn/memory_size"
+          - "cluster/yarn/nodemanagers"
+          - "cluster/yarn/pending_memory_size"
+          - "cluster/yarn/virtual_cores"

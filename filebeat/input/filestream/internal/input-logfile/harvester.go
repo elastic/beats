@@ -141,7 +141,7 @@ type defaultHarvesterGroup struct {
 func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 	sourceName := hg.identifier.ID(s)
 
-	ctx.Logger = ctx.Logger.With("source", sourceName)
+	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Starting harvester for file")
 
 	hg.tg.Go(startHarvester(ctx, hg, s, false))
@@ -152,7 +152,7 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 func (hg *defaultHarvesterGroup) Restart(ctx input.Context, s Source) {
 	sourceName := hg.identifier.ID(s)
 
-	ctx.Logger = ctx.Logger.With("source", sourceName)
+	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
 	hg.tg.Go(startHarvester(ctx, hg, s, true))

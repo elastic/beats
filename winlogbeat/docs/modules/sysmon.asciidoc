@@ -8,26 +8,25 @@ System Monitor] (Sysmon) which is a Windows service and device driver that logs
 system activity to the event log. Sysmon is not bundled with Windows or
 Winlogbeat and must be installed independently.
 
-The default configuration file includes configuration for Sysmon. If you do not
-have Sysmon installed Winlogbeat will log a warning that it could not read from
-the `Microsoft-Windows-Sysmon/Operational` channel. It will continue to read
-from the other configured channels. If you do install Sysmon at a later time
-then a restart of Winlogbeat is required to make it begin reading from the
+The default configuration file includes configuration for the Sysmon channel. If
+you do not have Sysmon installed Winlogbeat will log a warning that it could not
+read from the `Microsoft-Windows-Sysmon/Operational` channel. It will continue
+to read from the other configured channels. If you do install Sysmon at a later
+time then a restart of Winlogbeat is required to make it begin reading from the
 channel.
 
-This module was built based on Sysmon v10 event manifests. It contains
+This module was built based on Sysmon v13 event manifests. It contains
 transformations for each of the defined event IDs.
 
 [float]
 === Configuration
 
-[source,yaml]
+[source,yaml,subs="attributes,callouts"]]
 ----
 winlogbeat.event_logs:
   - name: Microsoft-Windows-Sysmon/Operational
-    processors:
-      - script:
-          lang: javascript
-          id: sysmon
-          file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+
+output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing <1>
 ----
+<1> All module processing is handled via Elasticsearch Ingest Node pipelines.
+See <<{beatname_lc}-modules-setup>> for details.

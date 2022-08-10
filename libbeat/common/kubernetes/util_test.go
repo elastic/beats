@@ -73,7 +73,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			namespace:   "",
 		},
 		{
-			name:        "test value with not incluster, machine id not retrieved, env var not set",
+			name:        "test value with not incluster, machine ID not retrieved, env var not set",
 			host:        "",
 			node:        "",
 			err:         ge,
@@ -130,7 +130,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			init:        createResources,
 		},
 		{
-			name:        "test value without inCluster, machine-id empty and env var not set",
+			name:        "test value without inCluster, machine-ID empty and env var not set",
 			host:        "",
 			isInCluster: false,
 			node:        "",
@@ -141,7 +141,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			namespace:   "",
 		},
 		{
-			name:        "test value without inCluster, machine-id set, node not found and env var not set",
+			name:        "test value without inCluster, machine-ID set, node not found and env var not set",
 			host:        "",
 			isInCluster: false,
 			node:        "",
@@ -152,7 +152,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			namespace:   "",
 		},
 		{
-			name:        "test value without inCluster, machine-id set, node found and env var not set",
+			name:        "test value without inCluster, machine-ID set, node found and env var not set",
 			host:        "",
 			isInCluster: false,
 			node:        "worker-2",
@@ -164,7 +164,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			init:        createResources,
 		},
 		{
-			name:        "test value without inCluster, machine-id set, node not found and env var set",
+			name:        "test value without inCluster, machine-ID set, node not found and env var set",
 			host:        "",
 			isInCluster: false,
 			node:        "worker-2",

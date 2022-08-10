@@ -56,7 +56,6 @@
         "tls.detailed.client_hello.extensions._unparsed_": [
             "23",
             "renegotiation_info",
-            "status_request",
             "51",
             "45",
             "28",
@@ -86,6 +85,9 @@
             "ecdsa_sha1",
             "rsa_pkcs1_sha1"
         ],
+        "tls.detailed.client_hello.extensions.status_request.request_extensions": 0,
+        "tls.detailed.client_hello.extensions.status_request.responder_id_list_length": 0,
+        "tls.detailed.client_hello.extensions.status_request.type": "ocsp",
         "tls.detailed.client_hello.extensions.supported_groups": [
             "x25519",
             "secp256r1",
@@ -100,6 +102,7 @@
             "TLS 1.1",
             "TLS 1.0"
         ],
+        "tls.detailed.client_hello.random": "86380030181f1268bb724c6c922e330e5b479b5f16ae54b592471581a178540b",
         "tls.detailed.client_hello.session_id": "e0181848607f91f9b42672de709ed1df3a811c7b913f9348da2136b758d0242f",
         "tls.detailed.client_hello.supported_compression_methods": [
             "NULL"

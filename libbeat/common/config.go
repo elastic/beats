@@ -259,6 +259,11 @@ func (c *Config) IsArray() bool {
 	return c.access().IsArray()
 }
 
+// FlattenedKeys return a sorted flattened views of the set keys in the configuration.
+func (c *Config) FlattenedKeys() []string {
+	return c.access().FlattenedKeys(configOpts...)
+}
+
 func (c *Config) PrintDebugf(msg string, params ...interface{}) {
 	selector := selectorConfigWithPassword
 	filtered := false

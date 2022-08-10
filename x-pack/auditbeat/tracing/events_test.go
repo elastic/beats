@@ -209,7 +209,7 @@ func TestKProbeReal(t *testing.T) {
 	probe := Probe{
 		Name:    "test_kprobe",
 		Address: "sys_connect",
-		//Fetchargs: "exe=$comm fd=%di +0(%si) +8(%si) +16(%si) +24(%si) +99999(%ax):string",
+		// Fetchargs: "exe=$comm fd=%di +0(%si) +8(%si) +16(%si) +24(%si) +99999(%ax):string",
 		Fetchargs: "ax=%ax bx=%bx:u8 cx=%cx:u32 dx=%dx:s16",
 	}
 	err = evs.AddKProbe(probe)
@@ -220,19 +220,19 @@ func TestKProbeReal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	//fmt.Fprintf(os.Stderr, "desc=%+v\n", desc)
+	// fmt.Fprintf(os.Stderr, "desc=%+v\n", desc)
 	var decoder Decoder
 	const useStructDecoder = false
 	if useStructDecoder {
 		type myStruct struct {
-			//Exe string `kprobe:"exe"`
+			// Exe string `kprobe:"exe"`
 			PID uint32 `kprobe:"common_pid"`
 			AX  int64  `kprobe:"ax"`
 			BX  uint8  `kprobe:"bx"`
 			CX  int32  `kprobe:"cx"`
 			DX  uint16 `kprobe:"dx"`
 		}
-		var allocFn = func() interface{} {
+		allocFn := func() interface{} {
 			return new(myStruct)
 		}
 		if decoder, err = NewStructDecoder(desc, allocFn); err != nil {
@@ -308,7 +308,7 @@ func TestKProbeEventsList(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	if err := os.MkdirAll(tmpDir, 0700); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o700); err != nil {
 		t.Fatal(err)
 	}
 	file, err := os.Create(filepath.Join(tmpDir, "kprobe_events"))
@@ -365,7 +365,7 @@ func TestKProbeEventsAddRemoveKProbe(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	if err := os.MkdirAll(tmpDir, 0700); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o700); err != nil {
 		t.Fatal(err)
 	}
 	file, err := os.Create(filepath.Join(tmpDir, "kprobe_events"))

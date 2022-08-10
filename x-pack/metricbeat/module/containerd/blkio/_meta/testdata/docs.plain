@@ -1,0 +1,15 @@
+# TYPE container_blkio_io_service_bytes_recursive_bytes gauge
+container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Async"} 0
+container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Discard"} 0
+container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Read"} 6.9246976e+07
+container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Sync"} 6.9271552e+07
+container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Total"} 6.9271552e+07
+container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Write"} 24576
+# TYPE container_blkio_io_serviced_recursive_total gauge
+container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Async"} 0
+container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Discard"} 0
+container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Read"} 830
+container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Sync"} 832
+container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Total"} 832
+container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Write"} 2
+

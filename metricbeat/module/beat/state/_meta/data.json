@@ -1,6 +1,11 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
+        "elasticsearch": {
+            "cluster": {
+                "id": "foobar"
+            }
+        },
         "state": {
             "beat": {
                 "host": "2963d991095f",

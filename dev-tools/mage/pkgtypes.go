@@ -60,7 +60,6 @@ const (
 	Deb
 	Zip
 	TarGz
-	DMG
 	Docker
 )
 
@@ -122,10 +121,6 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 	},
 	"darwin": map[PackageType]map[string]string{
 		TarGz: map[string]string{
-			"386":   "x86",
-			"amd64": "x86_64",
-		},
-		DMG: map[string]string{
 			"386":   "x86",
 			"amd64": "x86_64",
 		},
@@ -217,8 +212,6 @@ func (typ PackageType) String() string {
 		return "zip"
 	case TarGz:
 		return "tar.gz"
-	case DMG:
-		return "dmg"
 	case Docker:
 		return "docker"
 	default:
@@ -242,8 +235,6 @@ func (typ *PackageType) UnmarshalText(text []byte) error {
 		*typ = TarGz
 	case "zip":
 		*typ = Zip
-	case "dmg":
-		*typ = DMG
 	case "docker":
 		*typ = Docker
 	default:
@@ -289,8 +280,6 @@ func (typ PackageType) Build(spec PackageSpec) error {
 		return PackageZip(spec)
 	case TarGz:
 		return PackageTarGz(spec)
-	case DMG:
-		return PackageDMG(spec)
 	case Docker:
 		return PackageDocker(spec)
 	default:
@@ -971,21 +960,6 @@ func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile Pack
 
 		return nil
 	})
-}
-
-// PackageDMG packages the Beat into a .dmg file containing an installer pkg
-// and uninstaller app.
-func PackageDMG(spec PackageSpec) error {
-	if runtime.GOOS != "darwin" {
-		return errors.New("packaging a dmg requires darwin")
-	}
-
-	b, err := newDMGBuilder(spec)
-	if err != nil {
-		return err
-	}
-
-	return b.Build()
 }
 
 // PackageDocker packages the Beat into a docker image.

@@ -73,9 +73,9 @@ func New(c *common.Config) (processors.Processor, error) {
 }
 
 func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
-	var backup common.MapStr
+	var backup *beat.Event
 	if p.config.FailOnError {
-		backup = event.Fields.Clone()
+		backup = event.Clone()
 	}
 
 	for _, field := range p.config.Fields {
@@ -84,7 +84,7 @@ func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
 			errMsg := fmt.Errorf("failed to decode fields in urldecode processor: %v", err)
 			p.log.Debug(errMsg.Error())
 			if p.config.FailOnError {
-				event.Fields = backup
+				event = backup
 				event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}

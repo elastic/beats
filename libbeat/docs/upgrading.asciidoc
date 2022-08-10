@@ -3,27 +3,29 @@
 
 This section gives general recommendations for upgrading {beats} shippers:
 
-* <<upgrading-minor-versions>>
-* <<upgrading-6-to-7>>
+* <<upgrade-minor-versions>>
+* <<upgrade-7-to-8>>
 * <<troubleshooting-upgrade>>
 
 If you're upgrading other products in the stack, also read the
 {stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide].
 
-[[upgrading-minor-versions]]
+[discrete]
+[[upgrade-minor-versions]]
 === Upgrade between minor versions
 
-As a general rule, you can upgrade between minor versions (for example, 7.x to
-7.y, where x < y) by simply installing the new release and restarting the Beat
+As a general rule, you can upgrade between minor versions (for example, 8.x to
+8.y, where x < y) by simply installing the new release and restarting the Beat
 process. {beats} typically maintain backwards compatibility for configuration
 settings and exported fields. Please review the
 <<release-notes,release notes>> for potential exceptions.
 
-Upgrading between non-consecutive major versions (e.g. 5.x to 7.x) is not
+Upgrading between non-consecutive major versions (e.g. 6.x to 8.x) is not
 supported.
 
-[[upgrading-6-to-7]]
-=== Upgrade from 6.x to 7.x
+[discrete]
+[[upgrade-7-to-8]]
+=== Upgrade from 7.x to 8.x
 
 Before upgrading your {beats}, review the <<breaking-changes,breaking changes>>
 and the <<release-notes>>.
@@ -31,52 +33,43 @@ and the <<release-notes>>.
 If you're upgrading other products in the stack, also read the
 {stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide].
 
-We recommend that you fully upgrade {es} and {kib} to version 7.0
-before upgrading {beats}. If you're on {beats} 6.0 through 6.7,
-upgrade the {stack} and {beats} to version 6.8 *before* proceeding with the
-7.0 upgrade.
+We recommend that you fully upgrade {es} and {kib} to version 8.0
+before upgrading {beats}. The {beats} version must be lower than or equal to the
+{es} version. {beats} cannot send data to older versions of {es}.
 
-Upgrading between non-consecutive major versions (e.g. 5.x to 7.x) is not
+If you're on {beats} 7.0 through 7.16, upgrade the {stack} and {beats} to
+version 7.17 *before* proceeding with the 8.0 upgrade.
+
+Upgrading between non-consecutive major versions (e.g. 6.x to 8.x) is not
 supported.
 
 IMPORTANT: Please read through all upgrade steps before proceeding. These steps
 are required before running the software for the first time.
 
-[[upgrading-to-6.8]]
-==== Upgrade to {beats} 6.8 before upgrading to 7.0
+[discrete]
+[[upgrade-to-7.17]]
+==== Upgrade to {beats} 7.17 before upgrading to 8.0
 
-The upgrade procedure assumes that you have {beats} 6.8 installed. If you're on
-a previous 6.x version of {beats}, upgrade to version 6.8 first. If you're using
-other products in the {stack}, upgrade {beats} as part of the
+The upgrade procedure assumes that you have {beats} 7.17 installed. If you're on
+a previous 7.x version of {beats}, *upgrade to version 7.17 first*. If you're
+using other products in the {stack}, upgrade {beats} as part of the
 {stack-ref}/upgrading-elastic-stack.html[{stack} upgrade process].
 
-Upgrading to 6.8 is required because the {es} index template was modified to
-be compatible with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
+After upgrading to 7.17, go to *Index Management* in {kib} and verify
+that the 7.17 index template has been loaded into {es}.
 
-After upgrading to 6.8, use the {ref}/index-templates.html#getting[Index
-Template API] to verify that the 6.8 index template has been created in {ES}.
+[role="screenshot"]
+image::images/confirm-index-template.png[Screen capture showing that metricbeat-1.17.0 index template is loaded]
 
-:asset: the index template
-:option: template
+If the 7.17 index template is not loaded, load it now.
 
-include::upgrade-setup-commands.asciidoc[]
+If you created custom dashboards prior to version 7.17, you must upgrade them to
+7.17 before proceeding. Otherwise, the dashboards will stop working because
+{kib} no longer provides the API used for dashboards in 7.x.
 
-NOTE: In previous versions, we advised users to manually force loading of the
-index template. This is no longer recommended. Use the `setup` command instead.
-
-*Metricbeat and Filebeat users:* If you use {beats} central management,
-make sure you migrate the {beats} central management index to 6.8 before you
-upgrade to 7.0. Although central management is not a GA-level feature in 7.0,
-we've provided a migration tool to help you migrate your configurations from
-version 6.6 to 6.7 or later. For more information, see the
-https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
-
-NOTE: {beats} central management has been removed starting in version 7.14.0.
-Looking for a replacement? Refer to the
-{fleet-guide}/index.html[Fleet and Elastic Agent Guide] to learn how to deploy
-and centrally manage a single {agent} to monitor and secure each host. 
-
-==== Upgrade {beats} binaries to 7.0
+[discrete]
+[[upgrade-beats-binaries]]
+==== Upgrade {beats} binaries to 8.0
 
 Before upgrading:
 
@@ -116,195 +109,111 @@ the archive to.
 Complete the upgrade tasks described in the following sections *before*
 restarting the {beats} process.
 
+[discrete]
 [[migrate-config-files]]
 ==== Migrate configuration files
 
-{beats} 7.0 comes with several backwards incompatible configuration changes.
-Before upgrading, review the <<breaking-changes-7.0>> document. Also review
-the full list of breaking changes in the <<release-notes>> for 7.0.
+{beats} 8.0 comes with several backwards incompatible configuration changes.
+Before upgrading, review the <<breaking-changes-8.0>> document. Also review
+the full list of breaking changes in the <<release-notes-8.0.0>>.
 
 Where possible, we kept the old configuration options working, but deprecated
 them. However, deprecation was not always possible, so if you use any of the
 settings described under breaking changes, make sure you understand the
 alternatives that we provide.
 
-[[enable-ecs-compatibility]]
-==== Enable the compatibility layer for Elastic Common Schema (ECS) fields
 
-Starting with 7.0, the fields exported by {beats} conform to the
-{ecs-ref}/index.html[Elastic Common Schema (ECS)]. Many of the exported fields
-have been renamed. See {beats-ref}/breaking-changes-7.0.html[Breaking
-changes in 7.0] for the full list of changed names.
-
-To help you transition to the new fields, we provide a compatibility layer in
-the form of ECS-compatible field aliases. To use the aliases, set the following
-option in the Beat's configuration file *before* you upgrade the {es} index
-template to 7.0.
-
-[source,yaml]
-----
-migration.6_to_7.enabled: true
-----
-
-The field aliases let you use 6.x dashboards and visualizations with indices
-created by {beats} 7.0 or later. The aliases do *not* work with saved searches
-or with API calls that manipulate documents directly.
-
-Some fields also have type changes in 7.0 that affect the behavior of older
-dashboards and visualizations. To clarify:
-
-* *Some fields have type changes.* Your {kib} visualizations and aggregations
-will not work on these fields until the conflicts are resolved.
-
-* *Some fields have name changes, but no type changes.* The field aliases
-created by the compatibility layer ensure that visualizations and aggregations
-on the old field names work on old and new data. 7.0 dashboards work
-only on new field names (and therefore only on new data).
-
-* *Some fields have both name and type changes.* Field aliases are created for
-these fields, but your {kib} visualizations and aggregations will not work on
-these fields until the conflicts are resolved. Some of your  {es} API queries
-may continue to work, if the old and new types are compatible.
-
-We strongly advise that you adjust your custom {kib} dashboards, machine
-learning jobs, and other content to use the new ECS field names. To learn more
-about migrating to ECS, see the
-https://www.elastic.co/blog/migrating-to-elastic-common-schema-in-beats-environments[Migrating
-to Elastic Common Schema (ECS) in Beats environments] blog post.
-
-After removing all references to old fields, you should set
-`migration.6_to_7.enabled: false` so that field aliases will not be created
-during your next minor upgrade.
-
-The aliases will be removed in 8.0.
-
-TIP: Did you run the Beat or load the index template before reading this section?
-That's OK. See the clean-up steps described under <<missing-fields>>.
-
+[discrete]
 [[upgrade-index-template]]
-==== Upgrade the {es} index template
+==== Load the 8.0 {es} index templates
 
-Index templates and the default index names are versioned. For example,
-{metricbeat} {version} typically creates indices like this:
+Starting in version 8.0, the default {es} index templates configure data streams
+instead of traditional {es} indices. Data streams are optimized for storing
+append-only time series data. They are well-suited for logs, events, metrics,
+and other continuously generated data. However, unlike traditional {es} indices,
+data streams support create operations only; they do not support update and
+delete operations.
 
-["source","sh",subs="attributes"]
-------------------------------------------------------------------------------
-metricbeat-{version}-2019.04.02
-------------------------------------------------------------------------------
+To use data streams, load the default index templates *before* ingesting any
+data into {es}.
 
-And the corresponding {es} index template is named +metricbeat-{version}+.
+include::{libbeat-dir}/tab-widgets/load-index-template-widget.asciidoc[]
 
-This means that each version of the Beat creates a new index, and it's
-guaranteed that the correct index template for that version is applied. With
-these changes in place, you generally don't have to do anything to upgrade the
-index template when you move to a new version. Just load the new version of the
-index template *before* ingesting any data into {es}.
+If you're not collecting time series data, you can continue to use {beats}
+to send data to aliases and indices. To do this, create a custom index template
+and load it manually. To learn more about creating index templates, refer to
+{ref}/index-templates.html[Index templates].
 
-If you plan to run {beats} 6.7 or higher and 7.0 in parallel, make sure you
-<<enable-ecs-compatibility,enable the compatibility layer>> *before* you load
-the index template.
+[discrete]
+[[load-8.0-dashboards]]
+==== Load 8.0 dashboards
 
-:asset: the index template
-:option: template
+We recommend that you load the 8.0 {kib} dashboards after upgrading {kib} and
+{beats}. That way, you can take advantage of improvements added in 8.0. To load
+the dashboards, run:
 
-include::upgrade-setup-commands.asciidoc[]
+include::{libbeat-dir}/tab-widgets/load-dashboards-widget.asciidoc[]
 
-TIP: When loading the index template, you can also specify
-`-E setup.template.settings.index.number_of_shards=n` where `n` is the number of
-shards to use for the index.
 
-[[non-es-outputs]]
-==== How to use versioned index templates when the output is not {es}
+[discrete]
+[[migrate-custom-dashboards]]
+==== Migrate custom dashboards and visualizations
 
-If you've configured {beats} to send events to a different output, such as {ls},
-make sure you use versioned index templates and indices. Otherwise, after you
-upgrade, there will be field conflicts.
+All Elastic {beats} send events with ECS-compliant field names. If you have any
+custom {kib} dashboards or visualizations that use old fields, adjust them now
+to use ECS field names.
 
-To use versioned index templates and indices with {ls}, configure your
-{ls} pipeline to use the metadata from {beats} to set the index, and allow
-Beats to manage the index template:
+To learn more about ECS, refer to the {ecs-ref}/ecs-reference.html[ECS overview].
 
-[source,json]
-----
-    manage_template => false
-    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
-----
+NOTE: If you enabled the compatibility layer in 7.x (that is, if you set
+`migration.6_to_7.enabled: true`), make sure your custom dashboards no longer
+rely on the old aliases created by that setting. The old aliases are no longer
+supported. They may continue to work, but will be removed without notice in
+a future release.
 
-When you use this configuration, the index name is set to match the index
-pattern in the {beats} index template. See the
-{logstash-ref}/plugins-inputs-beats.html[{beats} input plugin] documentation
-for more information.
+[discrete]
+[[start-beats]]
+==== Start your upgraded {beats}
 
-For other non-{es} outputs, use the metadata from {beats} to set the index, and
-allow {beats} to load and manage the index template, as described under
-<<upgrade-index-template>>.
+After you've completed the migration, start the upgraded Beat. Use the command
+that works with your system.
 
-IMPORTANT: The index name must match the index pattern in the {beats} index
-template. For example, if {ls} sends events to an index called
-+metricbeat-7-2019.04.02+, but the index template expects indices to match
-+metricbeat-{version}-*+, you may encounter mapping errors and be unable
-to index {beats} events.
+Check the console and logs for errors.
 
-==== Upgrade dashboards
+In {kib}, go to *Discover* and verify that events are streaming into {es}.
 
-We recommend that you import the 7.0 {kib} dashboards after upgrading
-{kib} and {beats}. This way, you can take advantage of the new dashboards
-created for the 7.0 release.
-
-If you've <<enable-ecs-compatibility,enabled the compatibility layer>> before
-loading the index template and dashboards, 6.x dashboards can co-exist with
-7.0 dashboards and will continue working after the upgrade.
-
-:asset: 7.0 dashboards
-:option: dashboards
-
-include::upgrade-setup-commands.asciidoc[]
-
-[[migrate-filebeat-registry]]
-==== Migrate {filebeat} registry to use new format
-
-Starting with version 7.0, {filebeat} stores the registry in a directory
-structure. If Filebeat finds an old registry file at the path set by
-`filebeat.registry.path`, it will automatically migrate the registry file to the
-new format. If the registry file is at a different location, set
-`filebeat.registry.migrate_file` to point to the file.
-
-The registry changes also require you to rename the following configuration
-settings:
-
-[options="header"]
-|====
-|Old config name | New config name
-|`filebeat.registry_file`    | `filebeat.registry.path`.
-|`filebeat.registry_file_permissions` | `filebeat.registry.file_permissions`
-|`filebeat.registry_flush` | `filebeat.registry.flush`
-|====
-
-Before proceeding with the upgrade, make sure you back up the registry file.
-
-[role="xpack"]
-[[ilm-on]]
-==== Check privileges for index lifecycle management (on by default in 7.0)
-
-Starting with {beats} 7.0, index lifecycle management is on by default when
-sending data to {beats} clusters that support it. Make sure {beats} users have
-the privileges needed to use index lifecycle management, or disable index
-lifecycle management.
-
-For help troubleshooting authorization issues, see <<user-unauthorized>>.
-
-If you want to disable index lifecycle management, set
-`setup.ilm.enabled: false` in the {beats} configuration file.
-
+[discrete]
 [[troubleshooting-upgrade]]
 === Troubleshoot {beats} upgrade issues
 
 This section describes common problems you might encounter when upgrading to
-{beats} 7.x.
+{beats} 8.x.
 
-You can avoid some of these problems by reading <<upgrading-6-to-7>> before
+You can avoid some of these problems by reading <<upgrade-7-to-8>> before
 upgrading {beats}.
 
+[discrete]
+[[unable-to-update-or-delete]]
+==== {beats} is unable to send update or deletion requests to a data stream
+
+Data streams are designed for use cases where existing data is rarely, if ever,
+updated. You cannot send update or deletion requests for existing documents
+directly to a data stream.
+
+If needed, you can update or delete documents by submitting requests directly to
+the document’s backing index. To learn how, refer to the docs about
+{ref}/use-a-data-stream.html[using a data stream].
+
+[discrete]
+[[missing-timestamp-field]]
+==== Timestamp field is missing
+
+{beats} requires a timestamp field to send data to data streams. If the
+timestamp field added by {beats} is inadvertently removed by a processor, {beats}
+will be unable to index the event. To fix the problem, modify your processor
+configuration to avoid removing the timestamp field.
+
+[discrete]
 [[missing-fields]]
 ==== Missing fields or too many fields in the index
 
@@ -323,121 +232,13 @@ pattern matches only the indices you want to delete. The example shown here
 deletes all data indexed into the metricbeat-{version} indices on
 2019.04.02.
 
-. If you want the index to work with 6.x dashboards, turn on the compatibility
-layer. See <<enable-ecs-compatibility>>.
-
 . Delete the index template that was loaded earlier. For example:
 +
 ["source","sh",subs="attributes"]
 ----
-DELETE /_template/metricbeat-{version}
+DELETE /_index_template/metricbeat-{version}
 ----
-+
-Because the index template was loaded without the compatibility layer enabled,
-the required aliases were not created.
 
 . Load the correct index template. See <<upgrade-index-template>>.
 
 . Restart {beats}.
-
-[[user-unauthorized]]
-==== User is not authorized
-
-Because index lifecycle management is on by default in 7.0, you might encounter
-new errors related to user authorization when you run version 7.0 against an
-{es} cluster that supports index lifecycle management.
-
-===== `[cluster:monitor/main] is unauthorized for user`
-
-*Problem*: The {beats} user is unable to send monitoring information.
-
-*Solution:* Grant the `monitor` cluster privilege.
-
-===== `[cluster:admin/ilm/put] is unauthorized for user`
-
-*Problem:* The {beats} user is not authorized to load ILM policies.
-
-*Solution:* Grant the `manage_ilm` cluster privilege.
-
-===== `[indices:admin/template/put] is unauthorized for user`
-
-*Problem:* Automatic index template loading is required when ILM is enabled, but the user
-is not authorized to manage index templates.
-
-*Solution:* Grant the `manage_index_templates` cluster privilege.
-
-===== `[indices:admin/aliases] is unauthorized for user`
-
-*Problem:* The {beats} user is unable to set up aliases needed by the compatibility
-layer.
-
-*Solution:* Grant the `manage` privilege on the {beats} indices.
-
-===== `[indices:data/write/bulk] is unauthorized for user`
-
-*Problem:*  The {beats} user is unable to write events to {es}.
-
-*Solution:* Grant the `index` privilege on the {beats} indices.
-
-[[old-dashboards-failing]]
-==== 6.x dashboards not showing data from 7.0 shippers
-
-You might have run the Beat without turning on the compatibility layer. See
-<<enable-ecs-compatibility>> then clean up your environment as described
-under <<missing-fields>>.
-
-[[logstash-data-missing]]
-==== Data parsed by {ls} not appearing in 7.0 dashboards
-
-You might be writing to an index that doesn't match the index pattern used
-by {beats}. See <<non-es-outputs>>.
-
-
-[[dashboard-shard-failed]]
-==== "shard failed" error when viewing {beats} dashboards in {kib}
-
-After upgrading to {es} 7.0, any indices created by Beats 6.6 or older will not
-work in {kib} dashboards until the `index.query.default_field` setting is added
-to each index. Indices created in Beats 6.7 or later are unaffected.
-
-*Background:* Starting in {es} 7.0, some query types, such as Simple Query
-String, have a limit to the number of fields they will query against. Because
-Beats indices often contain more fields than this cap, the
-`index.query.default_field` index setting is used to inform {es} which fields to
-use by default when no field is specified for a query.
-
-To add the setting to the index, you can use the 7.0
-{kibana-ref}/upgrade-assistant.html[Upgrade Assistant], or add the setting
-manually.
-
-To add the setting manually, first identify the list of fields that you want to
-set as the default search fields, then specify the list of fields in the
-`default_field` setting.
-
-For example, here's a snippet that shows how to add default search fields to a
-Metricbeat 6.6 index. This example is truncated. Full examples for Metricbeat
-and Filebeat are available in
-https://github.com/elastic/beats/blob/master/libbeat/docs/troubleshooting/default_field.md[this file].
-
-[source,js]
---------------------------------------------------
-PUT /metricbeat-6.6.2-2019.04.09/_settings
-{
-  "index": {
-    "query": {
-      "default_field": [
-        "aerospike.namespace.name",
-        "aerospike.namespace.node.host",
-        "aerospike.namespace.node.name",
-        "apache.status.hostname",
-        "beat.hostname",
-        "beat.name",
-        "beat.timezone",
-        "beat.version",
-        ...
-      ]
-    }
-  }
-}
---------------------------------------------------
-// CONSOLE

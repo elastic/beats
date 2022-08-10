@@ -193,7 +193,7 @@ func TestPackageGobEncodeDecode(t *testing.T) {
 	if *flagUpdateGob {
 		// NOTE: If you are updating this file then you may have introduced a
 		// a breaking change.
-		if err := ioutil.WriteFile(gobTestFile, buf.Bytes(), 0644); err != nil {
+		if err := ioutil.WriteFile(gobTestFile, buf.Bytes(), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

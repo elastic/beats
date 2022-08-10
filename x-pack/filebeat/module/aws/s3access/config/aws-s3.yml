@@ -38,6 +38,10 @@ api_timeout: {{ .api_timeout }}
 endpoint: {{ .endpoint }}
 {{ end }}
 
+{{ if .default_region }}
+default_region: {{ .default_region }}
+{{ end }}
+
 {{ if .access_key_id }}
 access_key_id: {{ .access_key_id }}
 {{ end }}
@@ -64,6 +68,10 @@ max_number_of_messages: {{ .max_number_of_messages }}
 
 {{ if .proxy_url }}
 proxy_url: {{ .proxy_url }}
+{{ end }}
+
+{{ if .ssl }}
+ssl: {{ .ssl | tojson }}
 {{ end }}
 
 tags: {{.tags | tojson}}

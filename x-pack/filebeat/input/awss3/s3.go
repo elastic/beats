@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -37,6 +38,7 @@ type s3ObjectPayload struct {
 	s3ObjectInfo    s3ObjectInfo
 	s3ObjectEvent   s3EventV2
 }
+
 type s3Poller struct {
 	numberOfWorkers      int
 	bucket               string
@@ -44,7 +46,7 @@ type s3Poller struct {
 	region               string
 	provider             string
 	bucketPollInterval   time.Duration
-	workerSem            *sem
+	workerSem            *awscommon.Sem
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
@@ -77,7 +79,7 @@ func newS3Poller(log *logp.Logger,
 		region:               awsRegion,
 		provider:             provider,
 		bucketPollInterval:   bucketPollInterval,
-		workerSem:            newSem(numberOfWorkers),
+		workerSem:            awscommon.NewSem(numberOfWorkers),
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,
@@ -191,7 +193,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 			event.S3.Bucket.ARN = p.bucket
 			event.S3.Object.Key = filename
 
-			acker := newEventACKTracker(ctx)
+			acker := awscommon.NewEventACKTracker(ctx)
 
 			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
 			if s3Processor == nil {

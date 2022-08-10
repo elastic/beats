@@ -596,7 +596,7 @@ loop:
 			break loop
 
 		default:
-			// select wich part
+			// select which part
 			switch curChar {
 			case '@':
 				if len(host) > 0 {

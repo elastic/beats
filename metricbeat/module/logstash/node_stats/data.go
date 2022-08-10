@@ -204,7 +204,8 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.RootFields.Put("service.version", nodeStats.Version)
 
 		if clusterUUID != "" {
-			event.ModuleFields["cluster.id"] = clusterUUID
+			event.ModuleFields.Put("cluster.id", clusterUUID)
+			event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 		}
 
 		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`

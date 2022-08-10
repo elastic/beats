@@ -78,7 +78,6 @@ func TestCombine_CheckConfig(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestCombine_Create(t *testing.T) {

@@ -1,0 +1,492 @@
+---
+description: Pipeline for Windows Powershell/Operational events
+processors:
+  - kv:
+      description: Split Event 4103 event data fields.
+      field: winlog.event_data.ContextInfo
+      target_field: winlog.event_data
+      field_split: "\n"
+      trim_key: " \n\t"
+      trim_value: " \n\t"
+      value_split: "="
+      if: ctx?.winlog?.event_id == "4103"
+  - script:
+      description: Remove spaces from all event_data keys.
+      lang: painless
+      if: ctx?.winlog?.event_data != null
+      source: |-
+        def newEventData = new HashMap();
+        for (entry in ctx.winlog.event_data.entrySet()) {
+          def newKey = /\s/.matcher(entry.getKey().toString()).replaceAll("");
+          newEventData.put(newKey, entry.getValue());
+        }
+        ctx.winlog.event_data = newEventData;
+
+  ## ECS and Event fields.
+
+  - set:
+      field: ecs.version
+      value: '1.12.0'
+  - set:
+      field: log.level
+      copy_from: winlog.level
+      ignore_empty_value: true
+      ignore_failure: true
+      if: ctx?.winlog?.level != ""
+  - date:
+      field: winlog.time_created
+      formats:
+        - ISO8601
+      ignore_failure: true
+      if: ctx?.winlog?.time_created != null
+
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - set:
+      field: event.kind
+      value: event
+  - set:
+      field: event.code
+      value: '{{winlog.event_id}}'
+  - set:
+      field: event.category
+      value: process
+  - set:
+      field: event.type
+      value: start
+      if: ctx?.event.code == "4105"
+  - set:
+      field: event.type
+      value: end
+      if: ctx?.event.code == "4106"
+  - set:
+      field: event.type
+      value: info
+      if: ctx?.event?.type == null
+  - convert:
+      field: winlog.event_data.SequenceNumber
+      target_field: event.sequence
+      type: long
+      ignore_failure: true 
+      ignore_missing: true
+  - convert:
+      field: winlog.record_id
+      type: string
+      ignore_failure: true 
+      ignore_missing: true
+
+  ## Process fields.
+
+  - rename:
+      field: winlog.event_data.HostID
+      target_field: process.entity_id
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.HostID != ""
+  - rename:
+      field: winlog.event_data.HostApplication
+      target_field: process.command_line
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.HostApplication != ""
+  - rename:
+      field: winlog.event_data.HostName
+      target_field: process.title
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.HostName != ""
+
+  ## User fields.
+
+  - set:
+      field: user.id
+      copy_from: winlog.user.identifier
+      ignore_failure: true
+      ignore_empty_value: true
+  - split:
+      field: winlog.event_data.User
+      target_field: "_temp.user_parts"
+      separator: '\\'
+      if: ctx?.winlog?.event_data?.User != null
+  - set:
+      field: user.domain
+      value: "{{_temp.user_parts.0}}"
+      ignore_failure: true
+      ignore_empty_value: true
+      if: ctx?._temp?.user_parts != null && ctx._temp.user_parts.size() == 2
+  - set:
+      field: user.name
+      value: "{{_temp.user_parts.1}}"
+      ignore_failure: true
+      ignore_empty_value: true
+      if: ctx?._temp?.user_parts != null && ctx._temp.user_parts.size() == 2
+  - append:
+      field: related.user
+      value: "{{user.name}}"
+      ignore_failure: true
+      allow_duplicates: false
+      if: ctx?.user?.name != null
+  - split:
+      field: winlog.event_data.ConnectedUser
+      target_field: "_temp.connected_user_parts"
+      separator: '\\'
+      if: ctx?.winlog?.event_data?.ConnectedUser != null
+  - set:
+      field: source.user.domain
+      value: "{{_temp.connected_user_parts.0}}"
+      ignore_failure: true
+      ignore_empty_value: true
+      if: ctx?._temp?.connected_user_parts != null && ctx._temp.connected_user_parts.size() == 2
+  - set:
+      field: source.user.name
+      value: "{{_temp.connected_user_parts.1}}"
+      ignore_failure: true
+      ignore_empty_value: true
+      if: ctx?._temp?.connected_user_parts != null && ctx._temp.connected_user_parts.size() == 2
+  - append:
+      field: related.user
+      value: "{{source.user.name}}"
+      ignore_failure: true
+      allow_duplicates: false
+      if: ctx?.source?.user?.name != null
+  - rename:
+      field: user.domain
+      target_field: destination.user.domain
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.source?.user != null
+  - rename:
+      field: user.name
+      target_field: destination.user.name
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.source?.user != null
+  - set:
+      field: user.domain
+      copy_from: source.user.domain
+      ignore_failure: true
+      ignore_empty_value: true
+      if: ctx?.source?.user != null
+  - set:
+      field: user.name
+      copy_from: source.user.name
+      ignore_failure: true
+      ignore_empty_value: true
+      if: ctx?.source?.user != null
+
+  ## PowerShell fields.
+
+  - convert:
+      field: winlog.event_data.MessageNumber
+      target_field: powershell.sequence
+      type: long
+      ignore_failure: true 
+      ignore_missing: true
+  - convert:
+      field: winlog.event_data.MessageTotal
+      target_field: powershell.total
+      type: long
+      ignore_failure: true 
+      ignore_missing: true
+  - rename:
+      field: winlog.event_data.ShellID
+      target_field: powershell.id
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.ShellID != ""
+  - rename:
+      field: winlog.event_data.EngineVersion
+      target_field: powershell.engine.version
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.winlog?.event_data?.EngineVersion != ""
+  - rename:
+      field: winlog.event_data.PipelineID
+      target_field: powershell.pipeline_id
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.winlog?.event_data?.PipelineID != ""
+  - rename:
+      field: winlog.event_data.RunspaceID
+      target_field: powershell.runspace_id
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.winlog?.event_data?.RunspaceID != ""
+  - rename:
+      field: winlog.event_data.RunspaceId
+      target_field: powershell.runspace_id
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.winlog?.event_data?.RunspaceId != ""
+  - rename:
+      field: winlog.event_data.HostVersion
+      target_field: powershell.process.executable_version
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.winlog?.event_data?.HostVersion != ""
+  - rename:
+      field: winlog.event_data.CommandLine
+      target_field: powershell.command.value
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.CommandLine != ""
+  - rename:
+      field: winlog.event_data.CommandPath
+      target_field: powershell.command.path
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.CommandPath != ""
+  - rename:
+      field: winlog.event_data.CommandName
+      target_field: powershell.command.name
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.CommandName != ""
+  - rename:
+      field: winlog.event_data.CommandType
+      target_field: powershell.command.type
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.CommandType != ""
+  - rename:
+      field: winlog.event_data.ScriptBlockId
+      target_field: powershell.file.script_block_id
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.ScriptBlockId != ""
+  - rename:
+      field: winlog.event_data.ScriptBlockText
+      target_field: powershell.file.script_block_text
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.ScriptBlockText != ""
+
+  - split:
+      description: Split Event 800 command invocation details.
+      field: winlog.event_data.Payload
+      separator: "\n"
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx.event.code == "4103"
+  - script:
+      description: |-
+        Parses all command invocation detail raw lines, and converts them to an object, based on their type.
+         - for unexpectedly formatted ones: {value: "the raw line as it is"}
+         - for all:
+              * related_command: describes to what command it is related to
+              * value: the value for that detail line
+              * type: the type of the detail line, i.e.: CommandInvocation, ParameterBinding, NonTerminatingError
+         - additionally, ParameterBinding adds a `name` field with the parameter name being bound.
+      lang: painless
+      if: ctx.event.code == "4103"
+      params:
+        field: Payload
+      source: |-
+        def parseRawDetail(String raw) {
+            Pattern detailRegex = /^(.+)\((.+)\)\:\s*(.+)?$/;
+            Pattern parameterBindingRegex = /name\=(.+);\s*value\=(.+)$/;
+
+            def matcher = detailRegex.matcher(raw);
+            if (!matcher.matches()) {
+                return ["value": raw];
+            }
+            def matches = new ArrayList();
+            for (def i = 0; i <= matcher.groupCount(); i++) {
+                matches.add(matcher.group(i));
+            }
+            
+            if (matches.length != 4) {
+                return ["value": raw];
+            }                
+            
+            if (matches[1] != "ParameterBinding") {
+                return [
+                    "type": matches[1], 
+                    "related_command": matches[2], 
+                    "value": matches[3]
+                ];
+            }
+
+            matcher = parameterBindingRegex.matcher(matches[3]);
+            if (!matcher.matches()) {
+                return ["value": matches[4]];
+            }
+            def nameValMatches = new ArrayList();
+            for (def i = 0; i <= matcher.groupCount(); i++) {
+                nameValMatches.add(matcher.group(i));
+            }
+            if (nameValMatches.length !== 3) {
+                return ["value": matches[3]];
+            }
+
+            return [
+                "type": matches[1],
+                "related_command": matches[2],
+                "name": nameValMatches[1],
+                "value": nameValMatches[2]
+            ];
+        }
+
+        if (ctx?._temp == null) {
+            ctx._temp = new HashMap();
+        }
+
+        if (ctx._temp.details == null) {
+            ctx._temp.details = new ArrayList();
+        }
+
+        def values = ctx?.winlog?.event_data[params["field"]];
+        if (values != null && values.length > 0) {
+            for (v in values) {
+                ctx._temp.details.add(parseRawDetail(v));
+            }
+        }
+  - rename:
+      field: _temp.details
+      target_field: powershell.command.invocation_details
+      if: ctx?._temp?.details != null && ctx?._temp?.details.length > 0
+
+  - script:
+      description: Implements Windows-like SplitCommandLine
+      lang: painless
+      if: ctx?.process?.command_line != null && ctx.process.command_line != ""
+      source: |-
+        // appendBSBytes appends n '\\' bytes to b and returns the resulting slice.
+        def appendBSBytes(StringBuilder b, int n) {
+            for (; n > 0; n--) {
+                b.append('\\');
+            }
+            return b;
+        }
+
+        // readNextArg splits command line string cmd into next
+        // argument and command line remainder.
+        def readNextArg(String cmd) {
+            def b = new StringBuilder();
+            boolean inquote;
+            int nslash;
+            for (; cmd.length() > 0; cmd = cmd.substring(1)) {
+                def c = cmd.charAt(0);
+                if (c == (char)' ' || c == (char)0x09) {
+                    if (!inquote) {
+                        return [
+                            "arg":  appendBSBytes(b, nslash).toString(),
+                            "rest": cmd.substring(1)
+                        ];
+                    }
+                } else if (c == (char)'"') {
+                    b = appendBSBytes(b, nslash/2);
+                    if (nslash%2 == 0) {
+                        // use "Prior to 2008" rule from
+                        // http://daviddeley.com/autohotkey/parameters/parameters.htm
+                        // section 5.2 to deal with double double quotes
+                        if (inquote && cmd.length() > 1 && cmd.charAt(1) == (char)'"') {
+                            b.append(c);
+                            cmd = cmd.substring(1);
+                        }
+                        inquote = !inquote;
+                    } else {
+                        b.append(c);
+                    }
+                    nslash = 0;
+                    continue;
+                } else if (c == (char)'\\') {
+                    nslash++;
+                    continue;
+                }
+                b = appendBSBytes(b, nslash);
+                nslash = 0;
+                b.append(c);
+            }
+            return [
+                "arg":  appendBSBytes(b, nslash).toString(), 
+                "rest": ''
+            ];
+        }
+
+        // commandLineToArgv splits a command line into individual argument
+        // strings, following the Windows conventions documented
+        // at http://daviddeley.com/autohotkey/parameters/parameters.htm#WINARGV
+        // Original implementation found at: https://github.com/golang/go/commit/39c8d2b7faed06b0e91a1ad7906231f53aab45d1
+        def commandLineToArgv(String cmd) {
+            def args = new ArrayList();
+            while (cmd.length() > 0) {
+                if (cmd.charAt(0) == (char)' ' || cmd.charAt(0) == (char)0x09) {
+                    cmd = cmd.substring(1);
+                    continue;
+                }
+                def next = readNextArg(cmd);
+                cmd = next.rest;
+                args.add(next.arg);
+            }
+            return args;
+        }
+
+        ctx.process.args = commandLineToArgv(ctx.process.command_line);
+        ctx.process.args_count = ctx.process.args.length;
+ 
+  - rename:
+      field: winlog.event_data.Path
+      target_field: winlog.event_data.ScriptName
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.Path != ""
+  - script:
+      description: Adds file information.
+      lang: painless
+      if: ctx?.winlog?.event_data?.ScriptName != null && ctx.winlog.event_data.ScriptName.length() > 1
+      source: |-
+        def path = ctx.winlog.event_data.ScriptName;
+        def idx = path.lastIndexOf("\\");
+        if (idx > -1) {
+            if (ctx?.file == null) {
+                ctx.file = new HashMap();
+            }
+            ctx.file.name = path.substring(idx+1);
+            ctx.file.directory = path.substring(0, idx);
+
+            def extIdx = path.lastIndexOf(".");
+            if (extIdx > -1) {
+                ctx.file.extension = path.substring(extIdx+1);
+            }
+        }
+  - rename:
+      field: winlog.event_data.ScriptName
+      target_field: file.path
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.winlog?.event_data?.ScriptName != ""
+
+  ## Cleanup.
+
+  - remove:
+      field:
+        - _temp
+        - winlog.event_data.SequenceNumber
+        - winlog.event_data.User
+        - winlog.event_data.ConnectedUser
+        - winlog.event_data.ContextInfo
+        - winlog.event_data.Severity
+        - winlog.event_data.MessageTotal
+        - winlog.event_data.MessageNumber
+        - winlog.event_data.Payload
+        - winlog.time_created
+        - winlog.level
+      ignore_missing: true
+      ignore_failure: true
+  - script:
+      description: Remove all empty values from event_data.
+      lang: painless
+      source: ctx?.winlog?.event_data?.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue().equals(""));
+  - remove:
+      description: Remove empty event data.
+      field: winlog.event_data
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.winlog?.event_data != null && ctx.winlog.event_data.size() == 0
+
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"

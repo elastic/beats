@@ -7,19 +7,13 @@
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Select the kind of index template. From Elasticsearch 7.8, it is possible to
-# use component templates. Available options: legacy, component, index.
-# By default {{.BeatName}} uses the legacy index templates.
-#setup.template.type: legacy
-
 # Template name. By default the template name is "{{.BeatIndexPrefix}}-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "{{.BeatIndexPrefix}}-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
-# The first part is the version of the beat and then -* is used to match all daily indices.
+# Template pattern. By default the template pattern is "{{.BeatIndexPrefix}}-%{[agent.version]}" to apply to the default index settings.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "{{.BeatIndexPrefix}}-%{[agent.version]}-*"
+#setup.template.pattern: "{{.BeatIndexPrefix}}-%{[agent.version]}"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"

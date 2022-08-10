@@ -49,11 +49,11 @@ func (s SnappyCompressor) Decode(data []byte) ([]byte, error) {
 const LZ4 string = "lz4"
 
 type LZ4Compressor struct {
-	//TODO
+	// TODO
 }
 
 const Deflate string = "deflate"
 
 type DeflateCompressor struct {
-	//TODO
+	// TODO
 }

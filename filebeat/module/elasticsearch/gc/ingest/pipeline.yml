@@ -36,9 +36,9 @@ processors:
       PROCTIME: '\[Times: user=%{BASE10NUM:elasticsearch.gc.phase.cpu_time.user_sec}
         sys=%{BASE10NUM:elasticsearch.gc.phase.cpu_time.sys_sec}, real=%{BASE10NUM:elasticsearch.gc.phase.cpu_time.real_sec}
         secs\]'
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: "@timestamp"
+    field: event.created
 - date:
     field: timestamp
     target_field: '@timestamp'

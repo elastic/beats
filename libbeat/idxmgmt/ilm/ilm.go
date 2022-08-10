@@ -33,12 +33,11 @@ import (
 // SupportFactory is used to define a policy type to be used.
 type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
 
-// Supporter implements ILM support. For loading the policies and creating
-// write alias a manager instance must be generated.
+// Supporter implements ILM support. For loading the policies
+// a manager instance must be generated.
 type Supporter interface {
 	// Query settings
 	Enabled() bool
-	Alias() Alias
 	Policy() Policy
 	Overwrite() bool
 
@@ -50,8 +49,6 @@ type Supporter interface {
 // Manager uses a ClientHandler to install a policy.
 type Manager interface {
 	CheckEnabled() (bool, error)
-
-	EnsureAlias() error
 
 	// EnsurePolicy installs a policy if it does not exist. The policy is always
 	// written if overwrite is set.
@@ -65,12 +62,6 @@ type Manager interface {
 type Policy struct {
 	Name string
 	Body common.MapStr
-}
-
-// Alias describes the alias to be created in Elasticsearch.
-type Alias struct {
-	Name    string
-	Pattern string
 }
 
 // DefaultSupport configures a new default ILM support implementation.
@@ -109,16 +100,6 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		return nil, errors.Wrap(err, "failed to read ilm policy name")
 	}
 
-	rolloverAlias, err := applyStaticFmtstr(info, &cfg.RolloverAlias)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read the ilm rollover alias")
-	}
-
-	alias := Alias{
-		Name:    rolloverAlias,
-		Pattern: cfg.Pattern,
-	}
-
 	policy := Policy{
 		Name: name,
 		Body: DefaultPolicy,
@@ -137,7 +118,7 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		policy.Body = body
 	}
 
-	return NewStdSupport(log, cfg.Enabled, alias, policy, cfg.Overwrite, cfg.CheckExists), nil
+	return NewStdSupport(log, cfg.Enabled, policy, cfg.Overwrite, cfg.CheckExists), nil
 }
 
 // NoopSupport configures a new noop ILM support implementation,

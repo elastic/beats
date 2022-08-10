@@ -14,7 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
@@ -22,7 +22,7 @@ type simpleFunction struct {
 	err error
 }
 
-func (s *simpleFunction) Run(ctx context.Context, client core.Client, _ telemetry.T) error {
+func (s *simpleFunction) Run(ctx context.Context, client pipeline.ISyncClient, _ telemetry.T) error {
 	return s.err
 }
 
@@ -42,7 +42,7 @@ func TestRunnable(t *testing.T) {
 		err := errors.New("oops")
 		runnable := Runnable{
 			config:     common.NewConfig(),
-			makeClient: func(cfg *common.Config) (core.Client, error) { return nil, err },
+			makeClient: func(cfg *common.Config) (pipeline.ISyncClient, error) { return nil, err },
 			function:   &simpleFunction{err: nil},
 		}
 
@@ -54,7 +54,7 @@ func TestRunnable(t *testing.T) {
 		err := errors.New("function error")
 		runnable := Runnable{
 			config:     common.NewConfig(),
-			makeClient: func(cfg *common.Config) (core.Client, error) { return &mockClient{}, nil },
+			makeClient: func(cfg *common.Config) (pipeline.ISyncClient, error) { return &mockClient{}, nil },
 			function:   &simpleFunction{err: err},
 		}
 
@@ -65,7 +65,7 @@ func TestRunnable(t *testing.T) {
 	t.Run("when there is no error run and exit normaly", func(t *testing.T) {
 		runnable := Runnable{
 			config:     common.NewConfig(),
-			makeClient: func(cfg *common.Config) (core.Client, error) { return &mockClient{}, nil },
+			makeClient: func(cfg *common.Config) (pipeline.ISyncClient, error) { return &mockClient{}, nil },
 			function:   &simpleFunction{err: nil},
 		}
 

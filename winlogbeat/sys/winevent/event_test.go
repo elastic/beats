@@ -26,6 +26,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 const allXML = `
@@ -79,9 +81,10 @@ const allXML = `
 func TestXML(t *testing.T) {
 	allXMLTimeCreated, _ := time.Parse(time.RFC3339Nano, "2016-01-28T20:33:27.990735300Z")
 
-	var tests = []struct {
-		xml   string
-		event Event
+	tests := []struct {
+		xml    string
+		event  Event
+		mapstr common.MapStr
 	}{
 		{
 			xml: allXML,
@@ -150,6 +153,14 @@ func TestXML(t *testing.T) {
 					},
 				},
 			},
+			mapstr: common.MapStr{
+				"event_id":     "0",
+				"time_created": time.Time{},
+				"user_data": common.MapStr{
+					"Id":       "{00000000-0000-0000-0000-000000000000}",
+					"xml_name": "Operation_ClientFailure",
+				},
+			},
 		},
 	}
 
@@ -160,6 +171,9 @@ func TestXML(t *testing.T) {
 			continue
 		}
 		assert.Equal(t, test.event, event)
+		if test.mapstr != nil {
+			assert.Equal(t, test.mapstr, event.Fields())
+		}
 
 		if testing.Verbose() {
 			json, err := json.MarshalIndent(event, "", "  ")
@@ -174,7 +188,7 @@ func TestXML(t *testing.T) {
 // Tests that control characters other than CR and LF are escaped
 // when the event is decoded.
 func TestInvalidXML(t *testing.T) {
-	evXML := strings.Replace(allXML, "%1", "\t&#xD;\n\x1b", -1)
+	evXML := strings.ReplaceAll(allXML, "%1", "\t&#xD;\n\x1b")
 	ev, err := UnmarshalXML([]byte(evXML))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, "Creating WSMan shell on server with ResourceUri: \t\r\n\\u001b", ev.Message)

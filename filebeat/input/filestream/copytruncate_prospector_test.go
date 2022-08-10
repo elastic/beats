@@ -38,8 +38,8 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 	}{
 		"one new file, then rotated": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -47,19 +47,19 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 				harvesterGroupStop{},
 			},
 			expectedRotatedFiles: map[string][]string{
-				"/path/to/file": []string{
+				"/path/to/file": {
 					"/path/to/file.1",
 				},
 			},
 		},
 		"one new file, then rotated twice in order": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
-				loginp.FSEvent{Op: loginp.OpTruncate, NewPath: "/path/to/file"},
-				loginp.FSEvent{Op: loginp.OpRename, NewPath: "/path/to/file.2", OldPath: "/path/to/file.1"},
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
-				loginp.FSEvent{Op: loginp.OpTruncate, NewPath: "/path/to/file"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
+				{Op: loginp.OpTruncate, NewPath: "/path/to/file"},
+				{Op: loginp.OpRename, NewPath: "/path/to/file.2", OldPath: "/path/to/file.1"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
+				{Op: loginp.OpTruncate, NewPath: "/path/to/file"},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -72,7 +72,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 				harvesterGroupStop{},
 			},
 			expectedRotatedFiles: map[string][]string{
-				"/path/to/file": []string{
+				"/path/to/file": {
 					"/path/to/file.1",
 					"/path/to/file.2",
 				},
@@ -80,13 +80,13 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 		},
 		"one new file, then rotated twice with renaming": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file.2"},
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file"},
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
-				loginp.FSEvent{Op: loginp.OpRename, NewPath: "/path/to/file.3", OldPath: "/path/to/file.2"},
-				loginp.FSEvent{Op: loginp.OpRename, NewPath: "/path/to/file.2", OldPath: "/path/to/file.1"},
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
-				loginp.FSEvent{Op: loginp.OpTruncate, NewPath: "/path/to/file"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file.2"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
+				{Op: loginp.OpRename, NewPath: "/path/to/file.3", OldPath: "/path/to/file.2"},
+				{Op: loginp.OpRename, NewPath: "/path/to/file.2", OldPath: "/path/to/file.1"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
+				{Op: loginp.OpTruncate, NewPath: "/path/to/file"},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file.2"),
@@ -101,7 +101,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 				harvesterGroupStop{},
 			},
 			expectedRotatedFiles: map[string][]string{
-				"/path/to/file": []string{
+				"/path/to/file": {
 					"/path/to/file.1",
 					"/path/to/file.2",
 					"/path/to/file.3",
@@ -110,7 +110,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 		},
 		"first rotated file, when rotated file not exist": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file.1"},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file.1"),
@@ -167,7 +167,7 @@ func TestNumericSorter(t *testing.T) {
 	}{
 		"one fileinfo": {
 			fileinfos: []rotatedFileInfo{
-				rotatedFileInfo{path: "/path/to/apache.log.1"},
+				{path: "/path/to/apache.log.1"},
 			},
 			expectedOrder: []string{
 				"/path/to/apache.log.1",
@@ -175,9 +175,9 @@ func TestNumericSorter(t *testing.T) {
 		},
 		"ordered fileinfos": {
 			fileinfos: []rotatedFileInfo{
-				rotatedFileInfo{path: "/path/to/apache.log.1"},
-				rotatedFileInfo{path: "/path/to/apache.log.2"},
-				rotatedFileInfo{path: "/path/to/apache.log.3"},
+				{path: "/path/to/apache.log.1"},
+				{path: "/path/to/apache.log.2"},
+				{path: "/path/to/apache.log.3"},
 			},
 			expectedOrder: []string{
 				"/path/to/apache.log.1",
@@ -187,9 +187,9 @@ func TestNumericSorter(t *testing.T) {
 		},
 		"unordered fileinfos": {
 			fileinfos: []rotatedFileInfo{
-				rotatedFileInfo{path: "/path/to/apache.log.3"},
-				rotatedFileInfo{path: "/path/to/apache.log.1"},
-				rotatedFileInfo{path: "/path/to/apache.log.2"},
+				{path: "/path/to/apache.log.3"},
+				{path: "/path/to/apache.log.1"},
+				{path: "/path/to/apache.log.2"},
 			},
 			expectedOrder: []string{
 				"/path/to/apache.log.1",
@@ -199,9 +199,9 @@ func TestNumericSorter(t *testing.T) {
 		},
 		"unordered fileinfos with numbers in filename": {
 			fileinfos: []rotatedFileInfo{
-				rotatedFileInfo{path: "/path/to/apache42.log.3"},
-				rotatedFileInfo{path: "/path/to/apache43.log.1"},
-				rotatedFileInfo{path: "/path/to/apache44.log.2"},
+				{path: "/path/to/apache42.log.3"},
+				{path: "/path/to/apache43.log.1"},
+				{path: "/path/to/apache44.log.2"},
 			},
 			expectedOrder: []string{
 				"/path/to/apache43.log.1",
@@ -219,10 +219,10 @@ func TestNumericSorter(t *testing.T) {
 			for i, fi := range test.fileinfos {
 				require.Equal(t, test.expectedOrder[i], fi.path)
 			}
-
 		})
 	}
 }
+
 func TestDateSorter(t *testing.T) {
 	testCases := map[string]struct {
 		fileinfos     []rotatedFileInfo
@@ -230,7 +230,7 @@ func TestDateSorter(t *testing.T) {
 	}{
 		"one fileinfo": {
 			fileinfos: []rotatedFileInfo{
-				rotatedFileInfo{path: "/path/to/apache.log-20140506"},
+				{path: "/path/to/apache.log-20140506"},
 			},
 			expectedOrder: []string{
 				"/path/to/apache.log-20140506",
@@ -238,9 +238,9 @@ func TestDateSorter(t *testing.T) {
 		},
 		"ordered fileinfos": {
 			fileinfos: []rotatedFileInfo{
-				rotatedFileInfo{path: "/path/to/apache.log-20140506"},
-				rotatedFileInfo{path: "/path/to/apache.log-20140507"},
-				rotatedFileInfo{path: "/path/to/apache.log-20140508"},
+				{path: "/path/to/apache.log-20140506"},
+				{path: "/path/to/apache.log-20140507"},
+				{path: "/path/to/apache.log-20140508"},
 			},
 			expectedOrder: []string{
 				"/path/to/apache.log-20140508",
@@ -250,9 +250,9 @@ func TestDateSorter(t *testing.T) {
 		},
 		"unordered fileinfos": {
 			fileinfos: []rotatedFileInfo{
-				rotatedFileInfo{path: "/path/to/apache.log-20140507"},
-				rotatedFileInfo{path: "/path/to/apache.log-20140508"},
-				rotatedFileInfo{path: "/path/to/apache.log-20140506"},
+				{path: "/path/to/apache.log-20140507"},
+				{path: "/path/to/apache.log-20140508"},
+				{path: "/path/to/apache.log-20140506"},
 			},
 			expectedOrder: []string{
 				"/path/to/apache.log-20140508",
@@ -270,7 +270,6 @@ func TestDateSorter(t *testing.T) {
 			for i, fi := range test.fileinfos {
 				require.Equal(t, test.expectedOrder[i], fi.path)
 			}
-
 		})
 	}
 }

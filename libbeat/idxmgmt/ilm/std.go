@@ -30,7 +30,6 @@ type stdSupport struct {
 	overwrite   bool
 	checkExists bool
 
-	alias  Alias
 	policy Policy
 }
 
@@ -53,7 +52,6 @@ var defaultCacheDuration = 5 * time.Minute
 func NewStdSupport(
 	log *logp.Logger,
 	enabled bool,
-	alias Alias,
 	policy Policy,
 	overwrite, checkExists bool,
 ) Supporter {
@@ -62,13 +60,11 @@ func NewStdSupport(
 		enabled:     enabled,
 		overwrite:   overwrite,
 		checkExists: checkExists,
-		alias:       alias,
 		policy:      policy,
 	}
 }
 
 func (s *stdSupport) Enabled() bool   { return s.enabled }
-func (s *stdSupport) Alias() Alias    { return s.alias }
 func (s *stdSupport) Policy() Policy  { return s.policy }
 func (s *stdSupport) Overwrite() bool { return s.overwrite }
 
@@ -93,57 +89,9 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 		return ilmEnabled, err
 	}
 
-	if !ilmEnabled && m.enabled {
-		return false, errOf(ErrESILMDisabled)
-	}
-
 	m.cache.Enabled = ilmEnabled
 	m.cache.LastUpdate = time.Now()
 	return ilmEnabled, nil
-}
-
-func (m *stdManager) EnsureAlias() error {
-	log := m.log
-	if !m.checkExists {
-		log.Infof("Index alias is not checked as setup.ilm.check_exists is disabled")
-		return nil
-	}
-
-	overwrite := m.Overwrite()
-	name := m.alias.Name
-
-	var exists bool
-	if !overwrite {
-		var err error
-		exists, err = m.client.HasAlias(name)
-		if err != nil {
-			return err
-		}
-	}
-
-	switch {
-	case exists && !overwrite:
-		log.Infof("Index Alias %v exists already.", name)
-		return nil
-
-	case !exists || overwrite:
-		err := m.client.CreateAlias(m.alias)
-		if err != nil {
-			if ErrReason(err) != ErrAliasAlreadyExists {
-				log.Errorf("Index Alias %v setup failed: %v.", name, err)
-				return err
-			}
-			log.Infof("Index Alias %v exists already.", name)
-			return nil
-		}
-
-		log.Infof("Index Alias %v successfully created.", name)
-		return nil
-
-	default:
-		m.log.Infof("ILM index alias not created: exists=%v, overwrite=%v", exists, overwrite)
-		return nil
-	}
 }
 
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {

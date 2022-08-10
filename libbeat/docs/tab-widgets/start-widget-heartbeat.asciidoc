@@ -26,13 +26,6 @@
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="brew-tab-start-heartbeat"
-            id="brew-start-heartbeat"
-            tabindex="-1">
-      Brew
-    </button>
-    <button role="tab"
-            aria-selected="false"
             aria-controls="linux-tab-start-heartbeat"
             id="linux-start-heartbeat"
             tabindex="-1">
@@ -75,17 +68,6 @@ include::start.asciidoc[tag=rpm]
 ++++
 
 include::start.asciidoc[tag=mac]
-
-++++
-  </div>
-  <div tabindex="0"
-       role="tabpanel"
-       id="brew-tab-start-heartbeat"
-       aria-labelledby="brew-start-heartbeat"
-       hidden="">
-++++
-
-include::start.asciidoc[tag=brew]
 
 ++++
   </div>

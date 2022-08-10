@@ -1,0 +1,5 @@
+# Ignore everything but the README and the place-holder.
+*
+!.gitignore
+!README
+!npcap-0.00.exe

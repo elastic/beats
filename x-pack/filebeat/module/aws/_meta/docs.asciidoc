@@ -56,6 +56,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -74,6 +75,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -92,6 +94,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -110,6 +113,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -128,6 +132,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 
@@ -146,6 +151,7 @@ Example config:
     #var.visibility_timeout: 300s
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
+    #var.default_region: us-east-1
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
     #var.proxy_url: http://proxy:8080
 ----
@@ -186,6 +192,10 @@ Prefix to apply for the list request to the S3 bucket. Default empty.
 *`var.endpoint`*::
 
 Custom endpoint used to access AWS APIs.
+
+*`var.default_region`*::
+
+Default region to query if no other region is set.
 
 *`var.shared_credential_file`*::
 

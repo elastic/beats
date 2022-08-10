@@ -51,7 +51,7 @@ make update
 * Export the dashboards using Beats 6.0 version.
 
 You can export the dashboards via the Kibana API by using the
-https://github.com/elastic/beats/blob/master/dev-tools/cmd/dashboards/export_dashboards.go[export_dashboards.go]
+https://github.com/elastic/beats/blob/main/dev-tools/cmd/dashboards/export_dashboards.go[export_dashboards.go]
 application.
 
 For example, to export the Metricbeat rabbitmq dashboard:

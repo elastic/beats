@@ -20,6 +20,7 @@ package monitors
 import (
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -148,17 +149,15 @@ func TestPreProcessors(t *testing.T) {
 }
 
 func TestDuplicateMonitorIDs(t *testing.T) {
-	serverMonConf := mockPluginConf(t, "custom", "@every 1ms", "http://example.net")
+	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
 	badConf := mockBadPluginConf(t, "custom", "@every 1ms")
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
-	sched := scheduler.New(1, monitoring.NewRegistry())
-	err := sched.Start()
-	require.NoError(t, err)
+	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	f := NewFactory(binfo, sched, reg)
+	f := NewFactory(binfo, sched.Add, reg, false)
 	makeTestMon := func() (*Monitor, error) {
 		mIface, err := f.Create(pipelineConnector, serverMonConf)
 		if mIface == nil {
@@ -169,7 +168,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	}
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched, nil)
+	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched.Add, nil, false)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id
@@ -191,8 +190,9 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	m1.Stop()
 	m2.Stop()
 
-	// 3 are counted as built, even the bad config
-	require.Equal(t, 3, built.Load())
+	// Two are counted as built. The bad config is missing a stdfield so it
+	// doesn't complete construction
+	require.Equal(t, 2, built.Load())
 	// Only 2 closes, because the bad config isn't closed
 	require.Equal(t, 2, closed.Load())
 }

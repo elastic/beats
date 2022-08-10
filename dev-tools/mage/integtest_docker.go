@@ -81,7 +81,7 @@ func (d *DockerIntegrationTester) StepRequirements() IntegrationTestSteps {
 }
 
 // Test performs the tests with docker-compose.
-func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[string]string) error {
+func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[string]string) error {
 	var err error
 	d.buildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
 	if err != nil {
@@ -112,6 +112,10 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 		// Use the host machine's pkg cache to minimize external downloads.
 		"-v", goPkgCache + ":" + dockerGoPkgCache + ":ro",
 		"-e", "GOPROXY=file://" + dockerGoPkgCache + ",direct",
+		// Do not set ES_USER or ES_PATH in this file unless you intend to override
+		// values set in all individual docker-compose files
+		//		"-e", "ES_USER=admin",
+		//		"-e", "ES_PASS=testing",
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
@@ -139,6 +143,12 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 		args...,
 	)
 
+	err = saveDockerComposeLogs(dir, mageTarget, composeEnv)
+	if err != nil && testErr == nil {
+		// saving docker-compose logs failed but the test didn't.
+		return err
+	}
+
 	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
 	out := ioutil.Discard
 	if mg.Verbose() {
@@ -158,6 +168,38 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 		return err
 	}
 	return testErr
+}
+
+func saveDockerComposeLogs(rootDir string, mageTarget string, composeEnv map[string]string) error {
+	var (
+		composeLogDir      = filepath.Join(rootDir, "build", "system-tests", "docker-logs")
+		composeLogFileName = filepath.Join(composeLogDir, "TEST-docker-compose-"+mageTarget+".log")
+	)
+
+	if err := os.MkdirAll(composeLogDir, os.ModeDir|os.ModePerm); err != nil {
+		return fmt.Errorf("creating docker log dir: %w", err)
+	}
+
+	composeLogFile, err := os.Create(composeLogFileName)
+	if err != nil {
+		return fmt.Errorf("creating docker log file: %w", err)
+	}
+	defer composeLogFile.Close()
+
+	_, err = sh.Exec(
+		composeEnv,
+		composeLogFile, // stdout
+		composeLogFile, // stderr
+		"docker-compose",
+		"-p", dockerComposeProjectName(),
+		"logs",
+		"--no-color",
+	)
+	if err != nil {
+		return fmt.Errorf("executing docker-compose logs: %w", err)
+	}
+
+	return nil
 }
 
 // InsideTest performs the tests inside of environment.

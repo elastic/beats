@@ -82,9 +82,9 @@ func NewTruncateFields(c *common.Config) (processors.Processor, error) {
 }
 
 func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
-	var backup common.MapStr
+	var backup *beat.Event
 	if f.config.FailOnError {
-		backup = event.Fields.Clone()
+		backup = event.Clone()
 	}
 
 	for _, field := range f.config.Fields {
@@ -92,7 +92,7 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			f.logger.Debugf("Failed to truncate fields: %s", err)
 			if f.config.FailOnError {
-				event.Fields = backup
+				event = backup
 				return event, err
 			}
 		}

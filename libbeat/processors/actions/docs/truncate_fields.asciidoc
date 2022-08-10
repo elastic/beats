@@ -8,7 +8,7 @@
 The `truncate_fields` processor truncates a field to a given size. If the size of the field is smaller than
 the limit, the field is left as is.
 
-`fields`:: List of fields to truncate.
+`fields`:: List of fields to truncate. It's supported to use `@metadata.` prefix for the fields and truncate values in the event metadata instead of event fields.
 `max_bytes`:: Maximum number of bytes in a field. Mutually exclusive with `max_characters`.
 `max_characters`:: Maximum number of characters in a field. Mutually exclusive with `max_bytes`.
 `fail_on_error`:: (Optional) If set to true, in case of an error the changes to

@@ -19,7 +19,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -55,7 +55,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -162,7 +162,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -339,7 +339,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -373,7 +373,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -419,7 +419,7 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -457,7 +457,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            tail_files="true"
+            tail_files="true",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -501,7 +501,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="utf-8"
+            encoding="utf-8",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -613,7 +613,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            include_lines=["^ERR", "^WARN"]
+            include_lines=["^ERR", "^WARN"],
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -648,9 +648,8 @@ class Test(BaseTest):
         """
         Checks if all the log lines are exported by default
         """
-
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -688,7 +687,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            exclude_lines=["^DBG"]
+            exclude_lines=["^DBG"],
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -727,7 +726,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             exclude_lines=["^DBG"],
-            include_lines=["apache"]
+            include_lines=["apache"],
         )
         os.mkdir(self.working_dir + "/log/")
 

@@ -16,6 +16,7 @@ import (
 	"hash"
 	"reflect"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"text/template"
@@ -23,7 +24,9 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 // we define custom delimiters to prevent issues when using template values as part of other Go templates.
@@ -66,6 +69,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"sprintf":             fmt.Sprintf,
 			"hmacBase64":          hmacStringBase64,
 			"uuid":                uuidString,
+			"userAgent":           userAgentString,
+			"beatInfo":            beatInfo,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -115,21 +120,19 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 	return val, nil
 }
 
-var (
-	predefinedLayouts = map[string]string{
-		"ANSIC":       time.ANSIC,
-		"UnixDate":    time.UnixDate,
-		"RubyDate":    time.RubyDate,
-		"RFC822":      time.RFC822,
-		"RFC822Z":     time.RFC822Z,
-		"RFC850":      time.RFC850,
-		"RFC1123":     time.RFC1123,
-		"RFC1123Z":    time.RFC1123Z,
-		"RFC3339":     time.RFC3339,
-		"RFC3339Nano": time.RFC3339Nano,
-		"Kitchen":     time.Kitchen,
-	}
-)
+var predefinedLayouts = map[string]string{
+	"ANSIC":       time.ANSIC,
+	"UnixDate":    time.UnixDate,
+	"RubyDate":    time.RubyDate,
+	"RFC822":      time.RFC822,
+	"RFC822Z":     time.RFC822Z,
+	"RFC850":      time.RFC850,
+	"RFC1123":     time.RFC1123,
+	"RFC1123Z":    time.RFC1123Z,
+	"RFC3339":     time.RFC3339,
+	"RFC3339Nano": time.RFC3339Nano,
+	"Kitchen":     time.Kitchen,
+}
 
 func now(add ...time.Duration) time.Time {
 	now := timeNow().UTC()
@@ -359,4 +362,18 @@ func join(v interface{}, sep string) string {
 
 	// return the stringified single value
 	return fmt.Sprint(v)
+}
+
+func userAgentString(values ...string) string {
+	return useragent.UserAgent("Filebeat", values...)
+}
+
+func beatInfo() map[string]string {
+	return map[string]string{
+		"goos":      runtime.GOOS,
+		"goarch":    runtime.GOARCH,
+		"commit":    version.Commit(),
+		"buildtime": version.BuildTime().String(),
+		"version":   version.GetDefaultVersion(),
+	}
 }

@@ -138,38 +138,6 @@
     # var.ssl_certificate: path/to/server_ssl_cert.pem
     # var.ssl_key: path/to/ssl_key.pem
 
-  recordedfuture:
-    enabled: false
-
-    # Input used for ingesting threat intel data
-    var.input: httpjson
-
-    # The interval to poll the API for updates
-    var.interval: 5m
-
-    # How far back in time to start fetching intelligence when run for the
-    # first time. Value must be in hours. Default: 168h (1 week).
-    var.first_interval: 168h
-
-    # The URL used for Threat Intel API calls.
-    # Must include the `limit` parameter and at least `entity` and `timestamps` fields.
-    # See the Connect API Explorer for a list of possible parameters.
-    #
-    # For `ip` entities:
-    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
-
-    # For `domain` entities:
-    # var.url: "https://api.recordedfuture.com/v2/domain/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
-
-    # For `hash` entities:
-    # var.url: "https://api.recordedfuture.com/v2/hash/search?limit=200&fields=entity,fileHashes,timestamps,risk,intelCard,location&metadata=false"
-
-    # For `url` entities:
-    # var.url: "https://api.recordedfuture.com/v2/url/search?limit=200&fields=entity,timestamps,risk&metadata=false"
-
-    # Set your API Token.
-    var.api_token: "<RF_TOKEN>"
-
   threatq:
     enabled: false
 

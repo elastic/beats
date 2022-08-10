@@ -52,7 +52,7 @@ var (
 
 		"uuid":  c.Str("kibana.uuid"),
 		"name":  c.Str("kibana.name"),
-		"index": c.Str("kibana.name"),
+		"index": c.Str("kibana.index"),
 		"host": s.Object{
 			"name": c.Str("kibana.host"),
 		},

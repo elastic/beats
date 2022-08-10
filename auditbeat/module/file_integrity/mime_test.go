@@ -54,7 +54,7 @@ func TestGetMimeType(t *testing.T) {
 
 	for extension, sample := range mimeSamples {
 		samplePath := filepath.Join(dir, "sample."+extension)
-		if err := ioutil.WriteFile(samplePath, sample, 0700); err != nil {
+		if err := ioutil.WriteFile(samplePath, sample, 0o700); err != nil {
 			t.Fatal(err)
 		}
 	}

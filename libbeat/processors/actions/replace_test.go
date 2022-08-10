@@ -237,7 +237,7 @@ func TestReplaceField(t *testing.T) {
 				},
 			}
 
-			err := f.replaceField(test.Field, test.Pattern, test.Replacement, test.Input)
+			err := f.replaceField(test.Field, test.Pattern, test.Replacement, &beat.Event{Fields: test.Input})
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}
@@ -245,4 +245,33 @@ func TestReplaceField(t *testing.T) {
 			assert.True(t, reflect.DeepEqual(test.Input, test.Output))
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"f": "abc",
+			},
+		}
+
+		expectedMeta := common.MapStr{
+			"f": "bbc",
+		}
+
+		f := &replaceString{
+			config: replaceStringConfig{
+				Fields: []replaceConfig{
+					{
+						Field:       "@metadata.f",
+						Pattern:     regexp.MustCompile(`a`),
+						Replacement: "b",
+					},
+				},
+			},
+		}
+
+		newEvent, err := f.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedMeta, newEvent.Meta)
+		assert.Equal(t, event.Fields, newEvent.Fields)
+	})
 }

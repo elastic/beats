@@ -1,0 +1,14 @@
+- name: firestore
+  description: Google Cloud Firestore metrics
+  release: beta
+  type: group
+  fields:
+    - name: document.delete.count
+      type: long
+      description: The number of successful document deletes.
+    - name: document.read.count
+      type: long
+      description: The number of successful document reads from queries or lookups.
+    - name: document.write.count
+      type: long
+      description: The number of successful document writes.

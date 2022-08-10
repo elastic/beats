@@ -251,7 +251,7 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 	info, err := file.Lstat(path)
 	require.NoError(t, err)
 	require.NotEqual(t, 0, info.Mode()&os.ModeSocket)
-	require.Equal(t, os.FileMode(0740), info.Mode().Perm())
+	require.Equal(t, os.FileMode(0o740), info.Mode().Perm())
 	gid, err := info.GID()
 	require.NoError(t, err)
 	require.Equal(t, group.Gid, strconv.Itoa(gid))
@@ -310,7 +310,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	for socketType, _ := range socketTypes {
+	for socketType := range socketTypes {
 		if runtime.GOOS == "darwin" && socketType == "datagram" {
 			t.Skip("test is only supported on linux. See https://github.com/elastic/beats/issues/22775")
 			return

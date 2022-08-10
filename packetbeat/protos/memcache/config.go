@@ -32,11 +32,9 @@ type memcacheConfig struct {
 	ParseUnknown          bool
 }
 
-var (
-	defaultConfig = memcacheConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-		UDPTransactionTimeout: protos.DefaultTransactionExpiration,
-	}
-)
+var defaultConfig = memcacheConfig{
+	ProtocolCommon: config.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+	},
+	UDPTransactionTimeout: protos.DefaultTransactionExpiration,
+}

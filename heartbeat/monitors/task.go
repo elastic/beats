@@ -37,7 +37,7 @@ type configuredJob struct {
 	config   jobConfig
 	monitor  *Monitor
 	cancelFn context.CancelFunc
-	client   beat.Client
+	client   *WrappedClient
 }
 
 func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
@@ -74,17 +74,18 @@ func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 }
 
 // Start schedules this configuredJob for execution.
-func (t *configuredJob) Start() {
+func (t *configuredJob) Start(client *WrappedClient) {
 	var err error
 
-	t.client, err = t.monitor.pipelineConnector.Connect()
+	t.client = client
+
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 		return
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type)
+	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, client.wait)
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 	}
@@ -100,14 +101,14 @@ func (t *configuredJob) Stop() {
 	}
 }
 
-func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
+func runPublishJob(job jobs.Job, client *WrappedClient) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: common.MapStr{},
 	}
 
 	conts, err := job(event)
 	if err != nil {
-		logp.Err("Job %v failed with: ", err)
+		logp.Err("Job failed with: %s", err)
 	}
 
 	hasContinuations := len(conts) > 0

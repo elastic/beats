@@ -23,12 +23,12 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"syscall"
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -73,7 +73,7 @@ func TestEventReader(t *testing.T) {
 
 	// Create a new file.
 	txt1 := filepath.Join(dir, "test1.txt")
-	var fileMode os.FileMode = 0640
+	var fileMode os.FileMode = 0o640
 	mustRun(t, "created", func(t *testing.T) {
 		if err = ioutil.WriteFile(txt1, []byte("hello"), fileMode); err != nil {
 			t.Fatal(err)
@@ -103,7 +103,7 @@ func TestEventReader(t *testing.T) {
 				case e.Action == Moved:
 					assertSameFile(t, txt2, e.Path)
 				// Source file is moved and updated
-				case 0 != e.Action&Moved, 0 != e.Action&Updated:
+				case e.Action&Moved != 0, e.Action&Updated != 0:
 					assertSameFile(t, txt1, e.Path)
 				default:
 					t.Errorf("unexpected event: %+v", e)
@@ -112,9 +112,9 @@ func TestEventReader(t *testing.T) {
 		} else {
 			for _, e := range received {
 				switch {
-				case 0 != e.Action&Moved, 0 != e.Action&Updated:
+				case e.Action&Moved != 0, e.Action&Updated != 0:
 					assert.Equal(t, txt1, e.Path)
-				case 0 != e.Action&Created:
+				case e.Action&Created != 0:
 					assertSameFile(t, txt2, e.Path)
 				default:
 					t.Errorf("unexpected event: %+v", e)
@@ -129,14 +129,14 @@ func TestEventReader(t *testing.T) {
 			t.Skip()
 		}
 
-		if err = os.Chmod(txt2, 0644); err != nil {
+		if err = os.Chmod(txt2, 0o644); err != nil {
 			t.Fatal(err)
 		}
 
 		event := readTimeout(t, events)
 		assertSameFile(t, txt2, event.Path)
 		assert.EqualValues(t, AttributesModified, AttributesModified&event.Action)
-		assert.EqualValues(t, 0644, event.Info.Mode)
+		assert.EqualValues(t, 0o644, event.Info.Mode)
 	})
 
 	// Append data to the file.
@@ -153,7 +153,7 @@ func TestEventReader(t *testing.T) {
 		assertSameFile(t, txt2, event.Path)
 		assert.EqualValues(t, Updated, Updated&event.Action)
 		if runtime.GOOS != "windows" {
-			assert.EqualValues(t, 0644, event.Info.Mode)
+			assert.EqualValues(t, 0o644, event.Info.Mode)
 		}
 	})
 
@@ -182,7 +182,7 @@ func TestEventReader(t *testing.T) {
 	// Create a sub-directory.
 	subDir := filepath.Join(dir, "subdir")
 	mustRun(t, "dir created", func(t *testing.T) {
-		if err = os.Mkdir(subDir, 0755); err != nil {
+		if err = os.Mkdir(subDir, 0o755); err != nil {
 			t.Fatal(err)
 		}
 
@@ -243,13 +243,15 @@ func TestEventReader(t *testing.T) {
 func TestRaces(t *testing.T) {
 	t.Skip("Flaky test: about 1/20 of builds fails https://github.com/elastic/beats/issues/21303")
 	const (
-		fileMode os.FileMode = 0640
-		N                    = 100
+		// fileMode is the mode to use for watched files.
+		fileMode os.FileMode = 0o640
+
+		// N is the number of watched directories.
+		N = 100
 	)
 
-	var dirs []string
-
-	for i := 0; i < N; i++ {
+	dirs := make([]string, N)
+	for i := range dirs {
 		dir, err := ioutil.TempDir("", "audit")
 		if err != nil {
 			t.Fatal(err)
@@ -257,7 +259,7 @@ func TestRaces(t *testing.T) {
 		if dir, err = filepath.EvalSymlinks(dir); err != nil {
 			t.Fatal(err)
 		}
-		dirs = append(dirs, dir)
+		dirs[i] = dir
 	}
 
 	defer func() {
@@ -314,7 +316,7 @@ func TestRaces(t *testing.T) {
 func readTimeout(t testing.TB, events <-chan Event) Event {
 	select {
 	case <-time.After(time.Second):
-		t.Fatalf("%+v", errors.Errorf("timed-out waiting for event"))
+		t.Fatalf("timed-out waiting for event:\n%s", debug.Stack())
 	case e, ok := <-events:
 		if !ok {
 			t.Fatal("failed reading from event channel")
@@ -405,6 +407,7 @@ func changeGID(t testing.TB, file string) int {
 
 // mustRun runs a sub-test and stops the execution of the parent if the sub-test
 // fails.
+//lint:ignore U1000 Used in unconditionally skipped flakey tests.
 func mustRun(t *testing.T, name string, f func(t *testing.T)) {
 	if !t.Run(name, f) {
 		t.FailNow()

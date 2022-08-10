@@ -108,3 +108,18 @@ func IsEnabled(monitoringCfg *common.Config) bool {
 
 	return monitoringCfg.Enabled()
 }
+
+// IsBufferEnabled will check if the monitoring buffer is explicitly enabled.
+func IsBufferEnabled(monitoringCfg *common.Config) bool {
+	if monitoringCfg == nil {
+		return false
+	}
+	fields := monitoringCfg.GetFields()
+	for _, field := range fields {
+		if field == "enabled" {
+			// default Enabled will return true, so we only return the value if it's defined.
+			return monitoringCfg.Enabled()
+		}
+	}
+	return false
+}

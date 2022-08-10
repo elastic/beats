@@ -36,24 +36,23 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	queue     queue.Queue
-	workQueue workQueue
+	workQueue chan publisher.Batch
 
-	retryer  *retryer
 	consumer *eventConsumer
 	out      *outputGroup
 }
 
 // outputGroup configures a group of load balanced outputs with shared work queue.
 type outputGroup struct {
-	workQueue workQueue
+	// workQueue is a channel that receives event batches that
+	// are ready to send. Each output worker in outputs reads from
+	// workQueue for events to send.
+	workQueue chan publisher.Batch
 	outputs   []outputWorker
 
 	batchSize  int
 	timeToLive int // event lifetime
 }
-
-type workQueue chan publisher.Batch
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
 // instances.
@@ -67,29 +66,17 @@ func newOutputController(
 	observer outputObserver,
 	queue queue.Queue,
 ) *outputController {
-	c := &outputController{
+	return &outputController{
 		beat:      beat,
 		monitors:  monitors,
 		observer:  observer,
-		queue:     queue,
-		workQueue: makeWorkQueue(),
+		workQueue: make(chan publisher.Batch),
+		consumer:  newEventConsumer(monitors.Logger, queue, observer),
 	}
-
-	ctx := &batchContext{}
-	c.consumer = newEventConsumer(monitors.Logger, queue, ctx)
-	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue, c.consumer)
-	ctx.observer = observer
-	ctx.retryer = c.retryer
-
-	c.consumer.sigContinue()
-
-	return c
 }
 
 func (c *outputController) Close() error {
-	c.consumer.sigPause()
 	c.consumer.close()
-	c.retryer.close()
 	close(c.workQueue)
 
 	if c.out != nil {
@@ -97,11 +84,21 @@ func (c *outputController) Close() error {
 			out.Close()
 		}
 	}
-
 	return nil
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
+	// Set consumer to empty target to pause it while we reload
+	c.consumer.setTarget(consumerTarget{})
+
+	// Close old outputWorkers, so they send their remaining events
+	// back to eventConsumer's retry channel
+	if c.out != nil {
+		for _, w := range c.out.outputs {
+			w.Close()
+		}
+	}
+
 	// create new output group with the shared work queue
 	clients := outGrp.Clients
 	worker := make([]outputWorker, len(clients))
@@ -116,35 +113,15 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		batchSize:  outGrp.BatchSize,
 	}
 
-	// update consumer and retryer
-	c.consumer.sigPause()
-	if c.out != nil {
-		for range c.out.outputs {
-			c.retryer.sigOutputRemoved()
-		}
-	}
-	for range clients {
-		c.retryer.sigOutputAdded()
-	}
-	c.consumer.updOutput(grp)
-
-	// close old group, so events are send to new workQueue via retryer
-	if c.out != nil {
-		for _, w := range c.out.outputs {
-			w.Close()
-		}
-	}
-
 	c.out = grp
 
-	// restart consumer (potentially blocked by retryer)
-	c.consumer.sigContinue()
-
-	c.observer.updateOutputGroup()
-}
-
-func makeWorkQueue() workQueue {
-	return workQueue(make(chan publisher.Batch, 0))
+	// Resume consumer targeting the new work queue
+	c.consumer.setTarget(
+		consumerTarget{
+			ch:         c.workQueue,
+			batchSize:  grp.batchSize,
+			timeToLive: grp.timeToLive,
+		})
 }
 
 // Reload the output

@@ -70,9 +70,6 @@ type Pipeline struct {
 	waitCloseTimeout time.Duration
 	waitCloser       *waitCloser
 
-	// pipeline ack
-	eventSema *sema
-
 	// closeRef signal propagation support
 	guardStartSigPropagation sync.Once
 	sigNewClient             chan *client
@@ -185,7 +182,6 @@ func New(
 		maxEvents = 64000
 	}
 	p.observer.queueMaxEvents(maxEvents)
-	p.eventSema = newSema(maxEvents)
 
 	p.output = newOutputController(beat, monitors, p.observer, p.queue)
 	p.output.Set(out)

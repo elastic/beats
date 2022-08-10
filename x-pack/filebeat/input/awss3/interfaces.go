@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"time"
 
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -79,7 +81,7 @@ type s3ObjectHandlerFactory interface {
 	// Create returns a new s3ObjectHandler that can be used to process the
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
-	Create(ctx context.Context, log *logp.Logger, acker *eventACKTracker, obj s3EventV2) s3ObjectHandler
+	Create(ctx context.Context, log *logp.Logger, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {

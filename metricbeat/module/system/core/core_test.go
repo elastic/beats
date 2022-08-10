@@ -28,6 +28,7 @@ import (
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func TestFetch(t *testing.T) {

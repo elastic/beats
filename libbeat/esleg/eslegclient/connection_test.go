@@ -25,6 +25,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -63,4 +65,43 @@ func (c *mockClient) CloseIdleConnections() {}
 
 func newMockClient() *mockClient {
 	return &mockClient{}
+}
+
+func TestHeaders(t *testing.T) {
+	for _, td := range []struct {
+		input    map[string]string
+		expected map[string][]string
+	}{
+		{input: map[string]string{
+			"Accept":             "application/vnd.elasticsearch+json;compatible-with=7",
+			"Content-Type":       "application/vnd.elasticsearch+json;compatible-with=7",
+			productorigin.Header: "elastic-product",
+			"X-My-Header":        "true"},
+			expected: map[string][]string{
+				"Accept":             {"application/vnd.elasticsearch+json;compatible-with=7"},
+				"Content-Type":       {"application/vnd.elasticsearch+json;compatible-with=7"},
+				productorigin.Header: {"elastic-product"},
+				"X-My-Header":        {"true"}}},
+		{input: map[string]string{
+			"X-My-Header": "true"},
+			expected: map[string][]string{
+				"Accept":             {"application/json"},
+				productorigin.Header: {productorigin.Beats},
+				"X-My-Header":        {"true"}}},
+	} {
+		conn, err := NewConnection(ConnectionSettings{
+			Headers: td.input,
+		})
+		require.NoError(t, err)
+
+		httpClient := newMockClient()
+		conn.HTTP = httpClient
+
+		req, err := http.NewRequest("GET", "http://fakehost/some/path", nil)
+		require.NoError(t, err)
+		_, _, err = conn.execHTTPRequest(req)
+		require.NoError(t, err)
+
+		require.Equal(t, req.Header, http.Header(td.expected))
+	}
 }

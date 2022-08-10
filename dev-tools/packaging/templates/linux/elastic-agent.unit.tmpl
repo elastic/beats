@@ -9,6 +9,7 @@ After=network-online.target
 User={{ .BeatUser }}
 Group={{ .BeatUser }}
 {{- end }}
+UMask=0027
 Environment="GODEBUG='madvdontneed=1'"
 Environment="BEAT_CONFIG_OPTS=-c /etc/{{.BeatName}}/{{.BeatName}}.yml"
 ExecStart=/usr/bin/{{.BeatName}} run --environment systemd $BEAT_CONFIG_OPTS

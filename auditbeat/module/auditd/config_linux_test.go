@@ -94,7 +94,7 @@ func TestConfigValidateConnectionType(t *testing.T) {
 }
 
 func TestConfigRuleOrdering(t *testing.T) {
-	const fileMode = 0644
+	const fileMode = 0o644
 	config := defaultConfig
 	config.RulesBlob = strings.Join([]string{
 		makeRuleFlags(0, 0),

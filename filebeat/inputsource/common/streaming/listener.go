@@ -23,7 +23,10 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strings"
 	"sync"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -60,7 +63,32 @@ var (
 		"delimiter": FramingDelimiter,
 		"rfc6587":   FramingRFC6587,
 	}
+
+	availableFramingTypesErrFormat string
 )
+
+func init() {
+	framingTypeNames := make([]string, 0, len(framingTypes))
+	for t := range framingTypes {
+		framingTypeNames = append(framingTypeNames, t)
+	}
+
+	availableFramingTypesErrFormat = fmt.Sprintf("invalid framing type %%q, "+
+		"the supported types are [%v]", strings.Join(framingTypeNames, ", "))
+}
+
+// Unpack unpacks the FramingType string value.
+func (f *FramingType) Unpack(value string) error {
+	value = strings.ToLower(value)
+
+	ft, ok := framingTypes[value]
+	if !ok {
+		return fmt.Errorf(availableFramingTypesErrFormat, value)
+	}
+
+	*f = ft
+	return nil
+}
 
 // NewListener creates a new Listener
 func NewListener(family inputsource.Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig) *Listener {
@@ -73,7 +101,9 @@ func NewListener(family inputsource.Family, location string, handlerFactory Hand
 	}
 }
 
-// Start listen to the socket.
+// Start listening to the socket and accepting connections. The method is
+// non-blocking and starts a goroutine to service the socket. Stop must be
+// called to ensure proper cleanup.
 func (l *Listener) Start() error {
 	if err := l.initListen(context.Background()); err != nil {
 		return err
@@ -117,73 +147,73 @@ func (l *Listener) initListen(ctx context.Context) error {
 }
 
 func (l *Listener) run() {
-	l.log.Info("Started listening for " + l.family.String() + " connection")
+	l.log.Debug("Start accepting connections")
+	defer func() {
+		l.Listener.Close()
+		l.log.Debug("Stopped accepting connections")
+	}()
 
 	for {
 		conn, err := l.Listener.Accept()
 		if err != nil {
-			select {
-			case <-l.ctx.Done():
+			if l.ctx.Err() != nil {
+				// Shutdown.
 				return
-			default:
-				l.log.Debugw("Can not accept the connection", "error", err)
-				continue
 			}
+
+			if errors.Is(err, net.ErrClosed) {
+				return
+			}
+
+			l.log.Debugw("Cannot accept new connection", "error", err)
+			continue
 		}
 
 		l.wg.Add(1)
 		go func() {
-			defer logp.Recover("recovering from a " + l.family.String() + " client crash")
 			defer l.wg.Done()
-
-			ctx, cancel := ctxtool.WithFunc(l.ctx, func() { conn.Close() })
-			defer cancel()
-
-			l.registerHandler()
-			defer l.unregisterHandler()
-
-			if l.family == inputsource.FamilyUnix {
-				// unix sockets have an empty `RemoteAddr` value, so no need to capture it
-				l.log.Debugw("New client", "total", l.clientsCount.Load())
-			} else {
-				l.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", l.clientsCount.Load())
-			}
-
-			handler := l.handlerFactory(*l.config)
-			err := handler(ctx, conn)
-			if err != nil {
-				l.log.Debugw("client error", "error", err)
-			}
-
-			defer func() {
-				if l.family == inputsource.FamilyUnix {
-					// unix sockets have an empty `RemoteAddr` value, so no need to capture it
-					l.log.Debugw("client disconnected", "total", l.clientsCount.Load())
-				} else {
-					l.log.Debugw("client disconnected", "remote_address", conn.RemoteAddr(), "total", l.clientsCount.Load())
-				}
-			}()
+			l.handleConnection(conn)
 		}()
 	}
 }
 
-// Stop stops accepting new incoming connections and Close any active clients
+func (l *Listener) handleConnection(conn net.Conn) {
+	log := l.log
+	if remoteAddr := conn.RemoteAddr().String(); remoteAddr != "" {
+		log = log.With("remote_address", remoteAddr)
+	}
+	defer log.Recover("Panic in connection handler")
+
+	// Ensure accepted connection is closed on return and at shutdown.
+	connCtx, cancel := ctxtool.WithFunc(l.ctx, func() {
+		conn.Close()
+	})
+	defer cancel()
+
+	// Track number of clients.
+	l.clientsCount.Inc()
+	log.Debugw("New client connection.", "active_clients", l.clientsCount.Load())
+	defer func() {
+		l.clientsCount.Dec()
+		log.Debugw("Client disconnected.", "active_clients", l.clientsCount.Load())
+	}()
+
+	handler := l.handlerFactory(*l.config)
+	if err := handler(connCtx, conn); err != nil {
+		log.Debugw("Client error", "error", err)
+		return
+	}
+}
+
+// Stop stops accepting new incoming connections and closes all active clients.
 func (l *Listener) Stop() {
-	l.log.Info("Stopping" + l.family.String() + "server")
+	l.log.Debugw("Stopping socket listener. Waiting for active connections to close.", "active_clients", l.clientsCount.Load())
 	l.ctx.Cancel()
 	l.wg.Wait()
-	l.log.Info(l.family.String() + " server stopped")
+	l.log.Info("Socket listener stopped")
 }
 
-func (l *Listener) registerHandler() {
-	l.clientsCount.Inc()
-}
-
-func (l *Listener) unregisterHandler() {
-	l.clientsCount.Dec()
-}
-
-// SplitFunc allows to create a `bufio.SplitFunc` based on a framing &
+// SplitFunc allows to create a `bufio.SplitFunc` based on a framing and
 // delimiter provided.
 func SplitFunc(framing FramingType, lineDelimiter []byte) (bufio.SplitFunc, error) {
 	if len(lineDelimiter) == 0 {
@@ -202,24 +232,6 @@ func SplitFunc(framing FramingType, lineDelimiter []byte) (bufio.SplitFunc, erro
 	case FramingRFC6587:
 		return FactoryRFC6587Framing(lineDelimiter), nil
 	default:
-		return nil, fmt.Errorf("unknown SplitFunc for framing %d and line delimiter %s", framing, string(lineDelimiter))
+		return nil, fmt.Errorf("unknown SplitFunc for framing %d and line delimiter %q", framing, lineDelimiter)
 	}
-
-}
-
-// Unpack for config
-func (f *FramingType) Unpack(value string) error {
-	ft, ok := framingTypes[value]
-	if !ok {
-		availableTypes := make([]string, len(framingTypes))
-		i := 0
-		for t := range framingTypes {
-			availableTypes[i] = t
-			i++
-		}
-		return fmt.Errorf("invalid framing type '%s', supported types: %v", value, availableTypes)
-
-	}
-	*f = ft
-	return nil
 }

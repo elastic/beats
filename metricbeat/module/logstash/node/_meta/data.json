@@ -9,6 +9,11 @@
         "cluster": {
             "id": "VUwnkX_lTzCFP9VUoXT1IQ"
         },
+        "elasticsearch": {
+            "cluster": {
+                "id": "VUwnkX_lTzCFP9VUoXT1IQ"
+            }
+        },
         "node": {
             "host": "7dc1b688baf4",
             "id": "9a1f83e1-52b9-4625-a98a-6aa336f41719",

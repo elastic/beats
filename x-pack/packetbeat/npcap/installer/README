@@ -1,0 +1,19 @@
+This directory is pinned to allow placement of the Npcap OEM installer
+during x-pack Packetbeat builds.
+
+Only one additional exe file may be placed here beyond the place-holder
+and this should be the most recent available Npcap installer. As part of the
+distribution a place-holder file is put here to allow compilation.
+
+LICENSE NOTICE
+
+Restrictions on Distribution
+
+Insecure.Com LLC (“The Nmap Project”) has granted Elasticsearch BV and its
+affiliates the right to include Npcap with this distribution of Packetbeat.
+You may not distribute this version of Packetbeat or any other package from
+Elastic that includes Npcap. If you wish to distribute Npcap, or any package
+that includes Npcap, you should reach out to The Nmap Project to obtain a
+distribution license. See https://nmap.org/npcap/ for more details.
+
+See the LICENSE file in this directory.

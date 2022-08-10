@@ -18,9 +18,9 @@ processors:
     replacement: ' '
 - trim:
     field: message
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - grok:
     field: message
     patterns:
@@ -30,7 +30,7 @@ processors:
     patterns:
     - 'Process\(%{DATA:process.pid}\) User\(%{WORD:user.name}\) Program\(%{DATA:process.title}\)
       Host\(%{DATA:host.hostname}\) Installation\(%{WORD:ibmmq.errorlog.installation}\)
-      VRMF\(%{DATA:service.version}\)( QMgr\(%{DATA:ibmmq.errorlog.qmgr}\))?( Time\(%{TIMESTAMP_ISO8601:@timestamp}\))?(
+      VRMF\(%{DATA:service.version}\)( QMgr\(%{DATA:ibmmq.errorlog.qmgr}\))?( Time\(%{TIMESTAMP_ISO8601:log_timestamp}\))?(
       RemoteHost\(%{DATA:destination.address}\))?( ArithInsert1\(%{DATA:ibmmq.errorlog.arithinsert1}\))?(
       ArithInsert2\(%{DATA:ibmmq.errorlog.arithinsert2}\))?( CommentInsert1\(%{DATA:ibmmq.errorlog.commentinsert1}\))?(
       CommentInsert2\(%{DATA:ibmmq.errorlog.commentinsert2}\))?( CommentInsert3\(%{DATA:ibmmq.errorlog.commentinsert3}\))?
@@ -41,8 +41,10 @@ processors:
     field: log_timestamp
     target_field: '@timestamp'
     formats:
-    - MM/dd/yyyy hh:mm:ss aa
+    - ISO8601
+    - MM/dd/yyyy hh:mm:ss a
     - dd/MM/yyyy HH:mm:ss
+    - dd.MM.yyyy HH:mm:ss
     ignore_failure: true
 - append:
     field: ibmmq.errorlog.commentinsert

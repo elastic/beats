@@ -52,7 +52,7 @@ class TestCommandTest(BaseTest):
 
         self.render_config_template("mockbeat",
                                     os.path.join(self.working_dir, "mockbeat.yml"),
-                                    elasticsearch={"hosts": self.get_elasticsearch_url()})
+                                    elasticsearch=self.get_elasticsearch_template_config())
         exit_code = self.run_beat(
             extra_args=["test", "output"],
             config="mockbeat.yml")
@@ -62,6 +62,7 @@ class TestCommandTest(BaseTest):
         assert self.log_contains('TLS... WARN secure connection disabled')
         assert self.log_contains('talk to server... OK')
 
+    @unittest.skipIf(not INTEGRATION_TESTS, "integration test")
     def test_wrong_output(self):
         """
         Test test wrong output works
@@ -69,7 +70,11 @@ class TestCommandTest(BaseTest):
         self.render_config_template("mockbeat",
                                     os.path.join(self.working_dir,
                                                  "mockbeat.yml"),
-                                    elasticsearch={"hosts": '["badhost:9200"]'})
+                                    elasticsearch={
+                                        "host": 'badhost:9200',
+                                        "user": 'admin',
+                                        "pass": 'testing'
+                                    })
         exit_code = self.run_beat(
             extra_args=["test", "output"],
             config="mockbeat.yml")

@@ -358,7 +358,7 @@ func TestRenameField(t *testing.T) {
 				},
 			}
 
-			err := f.renameField(test.From, test.To, test.Input)
+			err := f.renameField(test.From, test.To, &beat.Event{Fields: test.Input})
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}
@@ -366,4 +366,32 @@ func TestRenameField(t *testing.T) {
 			assert.True(t, reflect.DeepEqual(test.Input, test.Output))
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"a": "c",
+			},
+		}
+
+		expMeta := common.MapStr{
+			"b": "c",
+		}
+
+		f := &renameFields{
+			config: renameFieldsConfig{
+				Fields: []fromTo{
+					{
+						From: "@metadata.a",
+						To:   "@metadata.b",
+					},
+				},
+			},
+		}
+
+		newEvent, err := f.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvent.Meta)
+		assert.Equal(t, event.Fields, newEvent.Fields)
+	})
 }

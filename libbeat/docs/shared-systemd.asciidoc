@@ -5,6 +5,8 @@ The DEB and RPM packages include a service unit for Linux systems with
 systemd. On these systems, you can manage {beatname_uc} by using the usual
 systemd commands.
 
+The service unit is configured with `UMask=0027` which means the most permissive mask allowed for files created by {beatname_uc} is `0640`. All configured file permissions higher than `0640` will be ignored. Please edit the unit file manually in case you need to change that.
+
 ifdef::apm-server[]
 We recommend that the {beatname_pkg} process is run as a non-root user.
 Therefore, that is the default setup for {beatname_uc}'s DEB package and RPM installation.

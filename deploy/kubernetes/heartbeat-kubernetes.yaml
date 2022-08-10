@@ -74,7 +74,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: heartbeat
-        image: docker.elastic.co/beats/heartbeat:8.0.0
+        image: docker.elastic.co/beats/heartbeat:8.2.0
         args: [
           "-c", "/etc/heartbeat.yml",
           "-e",
@@ -100,10 +100,14 @@ spec:
           runAsUser: 0
         resources:
           limits:
-            memory: 200Mi
+            memory: 1536mi
           requests:
-            cpu: 100m
-            memory: 100Mi
+            # for synthetics, 2 full cores is a good starting point for relatively consistent perform of a single concurrent check
+            # For lightweight checks as low as 100m is fine
+            cpu: 2000m 
+            # A high value like this is encouraged for browser based monitors. 
+            # Lightweight checks use substantially less, even 128Mi is fine for those.
+            memory: 1536Mi 
         volumeMounts:
         - name: config
           mountPath: /etc/heartbeat.yml
@@ -180,6 +184,10 @@ rules:
 - apiGroups: ["apps"]
   resources:
     - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+    - jobs
   verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

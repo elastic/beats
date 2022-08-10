@@ -60,7 +60,7 @@ var (
 	}
 )
 
-func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
+func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var connections []map[string]interface{}
 	err := json.Unmarshal(content, &connections)
 	if err != nil {
@@ -68,25 +68,14 @@ func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
 	}
 
 	for _, node := range connections {
-		evt, err := eventMapping(node)
-		if err != nil {
-			m.Logger().Errorf("error in mapping: %s", err)
-			r.Error(err)
-			continue
-		}
-
-		if !r.Event(evt) {
-			return nil
-		}
+		evt := eventMapping(node)
+		r.Event(evt)
 	}
 	return nil
 }
 
-func eventMapping(connection map[string]interface{}) (mb.Event, error) {
-	fields, err := schema.Apply(connection, s.FailOnRequired)
-	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying schema")
-	}
+func eventMapping(connection map[string]interface{}) mb.Event {
+	fields, _ := schema.Apply(connection, s.FailOnRequired)
 
 	rootFields := common.MapStr{}
 	if v, err := fields.GetValue("user"); err == nil {
@@ -110,5 +99,5 @@ func eventMapping(connection map[string]interface{}) (mb.Event, error) {
 		RootFields:      rootFields,
 		ModuleFields:    moduleFields,
 	}
-	return event, nil
+	return event
 }

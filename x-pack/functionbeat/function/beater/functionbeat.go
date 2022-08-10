@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -55,6 +56,7 @@ type Functionbeat struct {
 
 // New creates an instance of functionbeat.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+
 	c := &config.DefaultConfig
 	if err := cfg.Unpack(c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %+v", err)
@@ -82,6 +84,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 // Run starts functionbeat.
 func (bt *Functionbeat) Run(b *beat.Beat) error {
 	defer bt.cancel()
+
+	bt.log.Warn("Functionbeat is going to be removed in 8.1")
 
 	outputName := b.Config.Output.Name()
 	if !isOutputSupported(outputName) {
@@ -152,11 +156,11 @@ type fnExtraConfig struct {
 	Index fmtstr.EventFormatString `config:"index"`
 }
 
-func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline, beatInfo beat.Info) func(*common.Config) (core.Client, error) {
+func makeClientFactory(log *logp.Logger, pipe beat.Pipeline, beatInfo beat.Info) func(*common.Config) (pipeline.ISyncClient, error) {
 	// Each function has his own client to the publisher pipeline,
 	// publish operation will block the calling thread, when the method unwrap we have received the
 	// ACK for the batch.
-	return func(cfg *common.Config) (core.Client, error) {
+	return func(cfg *common.Config) (pipeline.ISyncClient, error) {
 		c := fnExtraConfig{}
 
 		if err := cfg.Unpack(&c); err != nil {
@@ -168,7 +172,7 @@ func makeClientFactory(log *logp.Logger, pipeline beat.Pipeline, beatInfo beat.I
 			return nil, err
 		}
 
-		client, err := core.NewSyncClient(log, pipeline, beat.ClientConfig{
+		client, err := pipeline.NewSyncClient(log, pipe, beat.ClientConfig{
 			PublishMode: beat.GuaranteedSend,
 			Processing: beat.ProcessingConfig{
 				Processor:     funcProcessors,

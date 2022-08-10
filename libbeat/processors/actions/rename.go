@@ -73,19 +73,19 @@ func NewRenameFields(c *common.Config) (processors.Processor, error) {
 }
 
 func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
-	var backup common.MapStr
+	var backup *beat.Event
 	// Creates a copy of the event to revert in case of failure
 	if f.config.FailOnError {
-		backup = event.Fields.Clone()
+		backup = event.Clone()
 	}
 
 	for _, field := range f.config.Fields {
-		err := f.renameField(field.From, field.To, event.Fields)
+		err := f.renameField(field.From, field.To, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to rename fields in processor: %s", err)
 			f.logger.Debug(errMsg.Error())
 			if f.config.FailOnError {
-				event.Fields = backup
+				event = backup
 				event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
@@ -95,14 +95,14 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *renameFields) renameField(from string, to string, fields common.MapStr) error {
+func (f *renameFields) renameField(from string, to string, event *beat.Event) error {
 	// Fields cannot be overwritten. Either the target field has to be dropped first or renamed first
-	exists, _ := fields.HasKey(to)
-	if exists {
+	_, err := event.GetValue(to)
+	if err == nil {
 		return fmt.Errorf("target field %s already exists, drop or rename this field first", to)
 	}
 
-	value, err := fields.GetValue(from)
+	value, err := event.GetValue(from)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
@@ -112,12 +112,12 @@ func (f *renameFields) renameField(from string, to string, fields common.MapStr)
 	}
 
 	// Deletion must happen first to support cases where a becomes a.b
-	err = fields.Delete(from)
+	err = event.Delete(from)
 	if err != nil {
 		return fmt.Errorf("could not delete key: %s,  %+v", from, err)
 	}
 
-	_, err = fields.Put(to, value)
+	_, err = event.PutValue(to, value)
 	if err != nil {
 		return fmt.Errorf("could not put value: %s: %v, %v", to, value, err)
 	}

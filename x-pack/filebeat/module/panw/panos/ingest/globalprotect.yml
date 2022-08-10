@@ -4,11 +4,11 @@ processors:
   - set:
       field: source.ip
       value: "{{_temp_.private_ipv6}}"
-      if: ctx?._temp_?.private_ipv6 != "" && ctx?._temp_?.private_ipv6 != "0.0.0.0"
+      if: (ctx.source?.ip == null || ctx.source?.ip == "0.0.0.0") && ctx._temp_?.private_ipv6 != null && ctx._temp_?.private_ipv6 != "0.0.0.0"
   - set:
       field: source.nat.ip
       value: "{{_temp_.public_ipv6}}"
-      if: ctx?._temp_?.public_ipv6 != "" && ctx?._temp_?.public_ipv6 != "0.0.0.0"
+      if: (ctx.source?.nat?.ip == null || ctx.source?.nat?.ip == "0.0.0.0") && ctx._temp_?.public_ipv6 != null && ctx._temp_?.public_ipv6 != "0.0.0.0"
   - grok:
       field: _temp_.srcuser
       ignore_missing: true
@@ -20,11 +20,11 @@ processors:
   - set:
       field: network.type
       value: 'ipv4'
-      if: 'ctx?.network?.type == null && ctx?.source?.ip.contains(".")'
+      if: 'ctx.network?.type == null && ctx.source?.ip != null && ctx.source.ip.contains(".")'
   - set:
       field: network.type
       value: 'ipv6'
-      if: 'ctx?.network?.type == null && ctx?.source?.ip.contains(":")'
+      if: 'ctx.network?.type == null && ctx.source?.ip != null && ctx.source.ip.contains(":")'
 
 on_failure:
   - append:

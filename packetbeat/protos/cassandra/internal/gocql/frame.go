@@ -182,18 +182,17 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 
 	data = make(map[string]interface{})
 
-	//Only QUERY, PREPARE and EXECUTE queries support tracing
-	//If a response frame has the tracing flag set, its body contains
-	//a tracing ID. The tracing ID is a [uuid] and is the first thing in
-	//the frame body. The rest of the body will then be the usual body
-	//corresponding to the response opcode.
+	// Only QUERY, PREPARE and EXECUTE queries support tracing
+	// If a response frame has the tracing flag set, its body contains
+	// a tracing ID. The tracing ID is a [uuid] and is the first thing in
+	// the frame body. The rest of the body will then be the usual body
+	// corresponding to the response opcode.
 	if f.Header.Flags&flagTracing == flagTracing && (f.Header.Op&opQuery == opQuery || f.Header.Op&opExecute == opExecute || f.Header.Op&opPrepare == opPrepare) {
-
 		debugf("tracing enabled")
 
-		//seems no UUID to read, protocol incorrect?
-		//uid := decoder.ReadUUID()
-		//data["trace_id"] = uid.String()
+		// seems no UUID to read, protocol incorrect?
+		// uid := decoder.ReadUUID()
+		// data["trace_id"] = uid.String()
 	}
 
 	if f.Header.Flags&flagWarning == flagWarning {
@@ -211,7 +210,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	}
 
 	if f.Header.Flags&flagCompress == flagCompress {
-		//decompress data and switch to use bytearray decoder
+		// decompress data and switch to use bytearray decoder
 		if f.compres == nil {
 			logp.Err("hit compress flag, but compressor was not set")
 			panic(errors.New("hit compress flag, but compressor was not set"))
@@ -234,13 +233,13 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	// assumes that the frame body has been read into rbuf
 	switch f.Header.Op {
 
-	//below ops are requests
+	// below ops are requests
 	case opStartup, opAuthResponse, opOptions, opPrepare, opExecute, opBatch, opRegister:
-	//ignored
+	// ignored
 	case opQuery:
 		data = f.parseQueryFrame()
 
-	//below ops are responses
+	// below ops are responses
 	case opError:
 		data["error"] = f.parseErrorFrame()
 	case opResult:
@@ -259,7 +258,7 @@ func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 		// the body should be empty
 
 	default:
-		//ignore
+		// ignore
 		debugf("unknow ops, not processed, %v", f.Header)
 
 	}
@@ -348,7 +347,7 @@ func (f *Framer) parseErrorFrame() (data map[string]interface{}) {
 
 	case errInvalid, errBootstrapping, errConfig, errCredentials, errOverloaded,
 		errProtocol, errServer, errSyntax, errTruncate, errUnauthorized:
-		//ignored
+		// ignored
 	default:
 		logp.Err("unknown error code: 0x%x", code)
 	}
@@ -375,8 +374,7 @@ func (f *Framer) parseResultMetadata(getPKinfo bool) map[string]interface{} {
 	meta["col_count"] = colCount
 
 	if getPKinfo {
-
-		//only for prepared result
+		// only for prepared result
 		if f.proto >= protoVersion4 {
 			pkeyCount := decoder.ReadInt()
 			pkeys := make([]int, pkeyCount)
@@ -450,7 +448,6 @@ func (f *Framer) parseResultPrepared() map[string]interface{} {
 	result := make(map[string]interface{})
 
 	uuid, err := UUIDFromBytes((f.decoder).ReadShortBytes())
-
 	if err != nil {
 		logp.Err("Error in parsing UUID")
 	}

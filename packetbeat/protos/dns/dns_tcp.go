@@ -107,7 +107,6 @@ func (dns *dnsPlugin) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTu
 		}
 	}
 	decodedData, err := stream.handleTCPRawData()
-
 	if err != nil {
 
 		if err == incompleteMsg {
@@ -259,8 +258,8 @@ func (dns *dnsPlugin) publishResponseError(conn *dnsConnectionData, err error) {
 	trans.notes = append(trans.notes, errDNS.responseError())
 
 	// Should we publish the length (bytes_out) of the failed Response?
-	//streamReverse.message.Length = len(streamReverse.rawData)
-	//trans.Response = streamReverse.message
+	// streamReverse.message.Length = len(streamReverse.rawData)
+	// trans.Response = streamReverse.message
 
 	dns.publishTransaction(trans)
 	dns.deleteTransaction(hashDNSTupleOrigin)
@@ -296,7 +295,6 @@ func (stream *dnsStream) handleTCPRawData() (*mkdns.Msg, error) {
 	}
 
 	decodedData, err := decodeDNSData(transportTCP, rawData[:stream.parseOffset])
-
 	if err != nil {
 		return nil, err
 	}

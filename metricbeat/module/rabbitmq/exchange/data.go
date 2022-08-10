@@ -55,7 +55,7 @@ var (
 	}
 )
 
-func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
+func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var exchanges []map[string]interface{}
 	err := json.Unmarshal(content, &exchanges)
 	if err != nil {
@@ -63,24 +63,14 @@ func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
 	}
 
 	for _, exchange := range exchanges {
-		evt, err := eventMapping(exchange)
-		if err != nil {
-			m.Logger().Errorf("error in mapping: %s", err)
-			r.Error(err)
-			continue
-		}
-		if !r.Event(evt) {
-			return nil
-		}
+		evt := eventMapping(exchange)
+		r.Event(evt)
 	}
 	return nil
 }
 
-func eventMapping(exchange map[string]interface{}) (mb.Event, error) {
-	fields, err := schema.Apply(exchange)
-	if err != nil {
-		return mb.Event{}, err
-	}
+func eventMapping(exchange map[string]interface{}) mb.Event {
+	fields, _ := schema.Apply(exchange)
 
 	rootFields := common.MapStr{}
 	if v, err := fields.GetValue("user"); err == nil {
@@ -99,6 +89,6 @@ func eventMapping(exchange map[string]interface{}) (mb.Event, error) {
 		RootFields:      rootFields,
 		ModuleFields:    moduleFields,
 	}
-	return event, nil
+	return event
 
 }

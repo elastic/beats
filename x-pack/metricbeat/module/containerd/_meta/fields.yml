@@ -1,0 +1,15 @@
+- key: containerd
+  title: "Containerd"
+  release: beta
+  description: >
+    Containerd stats collected from containerd
+  fields:
+    - name: containerd
+      type: group
+      description: >
+        Information and statistics about containerd's running containers.
+      fields:
+        - name: namespace
+          type: keyword
+          description: >
+            Containerd namespace

@@ -1,226 +1,228 @@
 [
-  {
-    "@metadata.beat": "packetbeat",
-    "@metadata.type": "_doc",
-    "client.ip": "192.168.1.35",
-    "client.port": 59455,
-    "destination.domain": "example.net",
-    "destination.ip": "93.184.216.34",
-    "destination.port": 443,
-    "event.category": [
-      "network"
-    ],
-    "event.dataset": "tls",
-    "event.duration": 364625000,
-    "event.kind": "event",
-    "event.type": [
-      "connection",
-      "protocol"
-    ],
-    "network.community_id": "1:fx1jENdlg6r3LIvBRG3wEboWbPY=",
-    "network.protocol": "tls",
-    "network.transport": "tcp",
-    "network.type": "ipv4",
-    "related.ip": [
-      "192.168.1.35",
-      "93.184.216.34"
-    ],
-    "server.domain": "example.net",
-    "server.ip": "93.184.216.34",
-    "server.port": 443,
-    "source.ip": "192.168.1.35",
-    "source.port": 59455,
-    "status": "OK",
-    "tls.cipher": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-    "tls.client.ja3": "e6573e91e6eb777c0933c5b8f97f10cd",
-    "tls.client.server_name": "example.net",
-    "tls.client.supported_ciphers": [
-      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-      "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
-      "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
-      "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-      "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
-      "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
-      "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
-      "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
-      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-      "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-      "(unknown:0xff85)",
-      "TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256",
-      "TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA",
-      "TLS_GOSTR341001_WITH_28147_CNT_IMIT",
-      "TLS_RSA_WITH_AES_256_GCM_SHA384",
-      "TLS_RSA_WITH_AES_256_CBC_SHA256",
-      "TLS_RSA_WITH_AES_256_CBC_SHA",
-      "TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256",
-      "TLS_RSA_WITH_CAMELLIA_256_CBC_SHA",
-      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-      "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-      "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
-      "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-      "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
-      "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
-      "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
-      "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
-      "TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256",
-      "TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA",
-      "TLS_RSA_WITH_AES_128_GCM_SHA256",
-      "TLS_RSA_WITH_AES_128_CBC_SHA256",
-      "TLS_RSA_WITH_AES_128_CBC_SHA",
-      "TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256",
-      "TLS_RSA_WITH_CAMELLIA_128_CBC_SHA",
-      "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
-      "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA",
-      "TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
-      "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
-      "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"
-    ],
-    "tls.detailed.client_certificate_requested": false,
-    "tls.detailed.client_hello.extensions.application_layer_protocol_negotiation": [
-      "h2",
-      "http/1.1"
-    ],
-    "tls.detailed.client_hello.extensions.ec_points_formats": [
-      "uncompressed"
-    ],
-    "tls.detailed.client_hello.extensions.server_name_indication": [
-      "example.net"
-    ],
-    "tls.detailed.client_hello.extensions.signature_algorithms": [
-      "rsa_pkcs1_sha512",
-      "ecdsa_secp521r1_sha512",
-      "(unknown:0xefef)",
-      "rsa_pkcs1_sha384",
-      "ecdsa_secp384r1_sha384",
-      "rsa_pkcs1_sha256",
-      "ecdsa_secp256r1_sha256",
-      "(unknown:0xeeee)",
-      "(unknown:0xeded)",
-      "(unknown:0x0301)",
-      "(unknown:0x0303)",
-      "rsa_pkcs1_sha1",
-      "ecdsa_sha1"
-    ],
-    "tls.detailed.client_hello.extensions.supported_groups": [
-      "x25519",
-      "secp256r1",
-      "secp384r1"
-    ],
-    "tls.detailed.client_hello.supported_compression_methods": [
-      "NULL"
-    ],
-    "tls.detailed.client_hello.version": "3.3",
-    "tls.detailed.server_certificate_chain": [
-      {
-        "issuer": {
-          "common_name": "DigiCert Global Root CA",
-          "country": "US",
-          "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
-          "organization": "DigiCert Inc",
-          "organizational_unit": "www.digicert.com"
-        },
-        "not_after": "2023-03-08T12:00:00.000Z",
-        "not_before": "2013-03-08T12:00:00.000Z",
-        "public_key_algorithm": "RSA",
-        "public_key_size": 2048,
-        "serial_number": "2646203786665923649276728595390119057",
-        "signature_algorithm": "SHA256-RSA",
-        "subject": {
-          "common_name": "DigiCert SHA2 Secure Server CA",
-          "country": "US",
-          "distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
-          "organization": "DigiCert Inc"
-        },
-        "version_number": 3
-      },
-      {
-        "issuer": {
-          "common_name": "DigiCert Global Root CA",
-          "country": "US",
-          "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
-          "organization": "DigiCert Inc",
-          "organizational_unit": "www.digicert.com"
-        },
-        "not_after": "2031-11-10T00:00:00.000Z",
-        "not_before": "2006-11-10T00:00:00.000Z",
-        "public_key_algorithm": "RSA",
-        "public_key_size": 2048,
-        "serial_number": "10944719598952040374951832963794454346",
-        "signature_algorithm": "SHA1-RSA",
-        "subject": {
-          "common_name": "DigiCert Global Root CA",
-          "country": "US",
-          "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
-          "organization": "DigiCert Inc",
-          "organizational_unit": "www.digicert.com"
-        },
-        "version_number": 3
-      }
-    ],
-    "tls.detailed.server_hello.extensions._unparsed_": [
-      "renegotiation_info",
-      "server_name_indication"
-    ],
-    "tls.detailed.server_hello.extensions.application_layer_protocol_negotiation": [
-      "h2"
-    ],
-    "tls.detailed.server_hello.extensions.ec_points_formats": [
-      "uncompressed",
-      "ansiX962_compressed_prime",
-      "ansiX962_compressed_char2"
-    ],
-    "tls.detailed.server_hello.selected_compression_method": "NULL",
-    "tls.detailed.server_hello.session_id": "23bb2aed5d215e1228220b0a51d7aa220785e9e4b83b4f430229117971e9913f",
-    "tls.detailed.server_hello.version": "3.3",
-    "tls.detailed.version": "TLS 1.2",
-    "tls.established": true,
-    "tls.next_protocol": "h2",
-    "tls.resumed": false,
-    "tls.server.certificate_chain": [
-      "-----BEGIN CERTIFICATE-----\nMIIHQDCCBiigAwIBAgIQD9B43Ujxor1NDyupa2A4/jANBgkqhkiG9w0BAQsFADBN\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMScwJQYDVQQDEx5E\naWdpQ2VydCBTSEEyIFNlY3VyZSBTZXJ2ZXIgQ0EwHhcNMTgxMTI4MDAwMDAwWhcN\nMjAxMjAyMTIwMDAwWjCBpTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3Ju\naWExFDASBgNVBAcTC0xvcyBBbmdlbGVzMTwwOgYDVQQKEzNJbnRlcm5ldCBDb3Jw\nb3JhdGlvbiBmb3IgQXNzaWduZWQgTmFtZXMgYW5kIE51bWJlcnMxEzARBgNVBAsT\nClRlY2hub2xvZ3kxGDAWBgNVBAMTD3d3dy5leGFtcGxlLm9yZzCCASIwDQYJKoZI\nhvcNAQEBBQADggEPADCCAQoCggEBANDwEnSgliByCGUZElpdStA6jGaPoCkrp9vV\nrAzPpXGSFUIVsAeSdjF11yeOTVBqddF7U14nqu3rpGA68o5FGGtFM1yFEaogEv5g\nrJ1MRY/d0w4+dw8JwoVlNMci+3QTuUKf9yH28JxEdG3J37Mfj2C3cREGkGNBnY80\neyRJRqzy8I0LSPTTkhr3okXuzOXXg38ugr1x3SgZWDNuEaE6oGpyYJIBWZ9jF3pJ\nQnucP9vTBejMh374qvyd0QVQq3WxHrogy4nUbWw3gihMxT98wRD1oKVma1NTydvt\nhcNtBfhkp8kO64/hxLHrLWgOFT/l4tz8IWQt7mkrBHjbd2XLVPkCAwEAAaOCA8Ew\nggO9MB8GA1UdIwQYMBaAFA+AYRyCMWHVLyjnjUY4tCzhxtniMB0GA1UdDgQWBBRm\nmGIC4AmRp9njNvt2xrC/oW2nvjCBgQYDVR0RBHoweIIPd3d3LmV4YW1wbGUub3Jn\nggtleGFtcGxlLmNvbYILZXhhbXBsZS5lZHWCC2V4YW1wbGUubmV0ggtleGFtcGxl\nLm9yZ4IPd3d3LmV4YW1wbGUuY29tgg93d3cuZXhhbXBsZS5lZHWCD3d3dy5leGFt\ncGxlLm5ldDAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsG\nAQUFBwMCMGsGA1UdHwRkMGIwL6AtoCuGKWh0dHA6Ly9jcmwzLmRpZ2ljZXJ0LmNv\nbS9zc2NhLXNoYTItZzYuY3JsMC+gLaArhilodHRwOi8vY3JsNC5kaWdpY2VydC5j\nb20vc3NjYS1zaGEyLWc2LmNybDBMBgNVHSAERTBDMDcGCWCGSAGG/WwBATAqMCgG\nCCsGAQUFBwIBFhxodHRwczovL3d3dy5kaWdpY2VydC5jb20vQ1BTMAgGBmeBDAEC\nAjB8BggrBgEFBQcBAQRwMG4wJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2lj\nZXJ0LmNvbTBGBggrBgEFBQcwAoY6aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29t\nL0RpZ2lDZXJ0U0hBMlNlY3VyZVNlcnZlckNBLmNydDAMBgNVHRMBAf8EAjAAMIIB\nfwYKKwYBBAHWeQIEAgSCAW8EggFrAWkAdwCkuQmQtBhYFIe7E6LMZ3AKPDWYBPkb\n37jjd80OyA3cEAAAAWdcMZVGAAAEAwBIMEYCIQCEZIG3IR36Gkj1dq5L6EaGVycX\nsHvpO7dKV0JsooTEbAIhALuTtf4wxGTkFkx8blhTV+7sf6pFT78ORo7+cP39jkJC\nAHYAh3W/51l8+IxDmV+9827/Vo1HVjb/SrVgwbTq/16ggw8AAAFnXDGWFQAABAMA\nRzBFAiBvqnfSHKeUwGMtLrOG3UGLQIoaL3+uZsGTX3MfSJNQEQIhANL5nUiGBR6g\nl0QlCzzqzvorGXyB/yd7nttYttzo8EpOAHYAb1N2rDHwMRnYmQCkURX/dxUcEdkC\nwQApBo2yCJo32RMAAAFnXDGWnAAABAMARzBFAiEA5Hn7Q4SOyqHkT+kDsHq7ku7z\nRDuM7P4UDX2ft2Mpny0CIE13WtxJAUr0aASFYZ/XjSAMMfrB0/RxClvWVss9LHKM\nMA0GCSqGSIb3DQEBCwUAA4IBAQBzcIXvQEGnakPVeJx7VUjmvGuZhrr7DQOLeP4R\n8CmgDM1pFAvGBHiyzvCH1QGdxFl6cf7wbp7BoLCRLR/qPVXFMwUMzcE1GLBqaGZM\nv1Yh2lvZSLmMNSGRXdx113pGLCInpm/TOhfrvr0TxRImc8BdozWJavsn1N2qdHQu\nN+UBO6bQMLCD0KHEdSGFsuX6ZwAworxTg02/1qiDu7zW7RyzHvFYA4IAjpzvkPIa\nX6KjBtpdvp/aXabmL95YgBjT8WJ7pqOfrqhpcmOBZa6Cg6O1l4qbIFH/Gj9hQB5I\n0Gs4+eH6F9h3SojmPTYkT+8KuZ9w84Mn+M8qBXUQoYoKgIjN\n-----END CERTIFICATE-----\n",
-      "-----BEGIN CERTIFICATE-----\nMIIElDCCA3ygAwIBAgIQAf2j627KdciIQ4tyS8+8kTANBgkqhkiG9w0BAQsFADBh\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\nQTAeFw0xMzAzMDgxMjAwMDBaFw0yMzAzMDgxMjAwMDBaME0xCzAJBgNVBAYTAlVT\nMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxJzAlBgNVBAMTHkRpZ2lDZXJ0IFNIQTIg\nU2VjdXJlIFNlcnZlciBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\nANyuWJBNwcQwFZA1W248ghX1LFy949v/cUP6ZCWA1O4Yok3wZtAKc24RmDYXZK83\nnf36QYSvx6+M/hpzTc8zl5CilodTgyu5pnVILR1WN3vaMTIa16yrBvSqXUu3R0bd\nKpPDkC55gIDvEwRqFDu1m5K+wgdlTvza/P96rtxcflUxDOg5B6TXvi/TC2rSsd9f\n/ld0Uzs1gN2ujkSYs58O09rg1/RrKatEp0tYhG2SS4HD2nOLEpdIkARFdRrdNzGX\nkujNVA075ME/OV4uuPNcfhCOhkEAjUVmR7ChZc6gqikJTvOX6+guqw9ypzAO+sf0\n/RR3w6RbKFfCs/mC/bdFWJsCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8C\nAQAwDgYDVR0PAQH/BAQDAgGGMDQGCCsGAQUFBwEBBCgwJjAkBggrBgEFBQcwAYYY\naHR0cDovL29jc3AuZGlnaWNlcnQuY29tMHsGA1UdHwR0MHIwN6A1oDOGMWh0dHA6\nLy9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RDQS5jcmwwN6A1\noDOGMWh0dHA6Ly9jcmw0LmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RD\nQS5jcmwwPQYDVR0gBDYwNDAyBgRVHSAAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8v\nd3d3LmRpZ2ljZXJ0LmNvbS9DUFMwHQYDVR0OBBYEFA+AYRyCMWHVLyjnjUY4tCzh\nxtniMB8GA1UdIwQYMBaAFAPeUDVW0Uy7ZvCj4hsbw5eyPdFVMA0GCSqGSIb3DQEB\nCwUAA4IBAQAjPt9L0jFCpbZ+QlwaRMxp0Wi0XUvgBCFsS+JtzLHgl4+mUwnNqipl\n5TlPHoOlblyYoiQm5vuh7ZPHLgLGTUq/sELfeNqzqPlt/yGFUzZgTHbO7Djc1lGA\n8MXW5dRNJ2Srm8c+cftIl7gzbckTB+6WohsYFfZcTEDts8Ls/3HB40f/1LkAtDdC\n2iDJ6m6K7hQGrn2iWZiIqBtvLfTyyRRfJs8sjX7tN8Cp1Tm5gr8ZDOo0rwAhaPit\nc+LJMto4JQtV05od8GiG7S5BNO98pVAdvzr508EIDObtHopYJeS4d60tbvVS3bR0\nj6tJLp07kzQoH3jOlOrHvdPJbRzeXDLz\n-----END CERTIFICATE-----\n",
-      "-----BEGIN CERTIFICATE-----\nMIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\nQTAeFw0wNjExMTAwMDAwMDBaFw0zMTExMTAwMDAwMDBaMGExCzAJBgNVBAYTAlVT\nMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j\nb20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMIIBIjANBgkqhkiG\n9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jvhEXLeqKTTo1eqUKKPC3eQyaKl7hLOllsB\nCSDMAZOnTjC3U/dDxGkAV53ijSLdhwZAAIEJzs4bg7/fzTtxRuLWZscFs3YnFo97\nnh6Vfe63SKMI2tavegw5BmV/Sl0fvBf4q77uKNd0f3p4mVmFaG5cIzJLv07A6Fpt\n43C/dxC//AH2hdmoRBBYMql1GNXRor5H4idq9Joz+EkIYIvUX7Q6hL+hqkpMfT7P\nT19sdl6gSzeRntwi5m3OFBqOasv+zbMUZBfHWymeMr/y7vrTC0LUq7dBMtoM1O/4\ngdW7jVg/tRvoSSiicNoxBN33shbyTApOB6jtSj1etX+jkMOvJwIDAQABo2MwYTAO\nBgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUA95QNVbR\nTLtm8KPiGxvDl7I90VUwHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUw\nDQYJKoZIhvcNAQEFBQADggEBAMucN6pIExIK+t1EnE9SsPTfrgT1eXkIoyQY/Esr\nhMAtudXH/vTBH1jLuG2cenTnmCmrEbXjcKChzUyImZOMkXDiqw8cvpOp/2PV5Adg\n06O/nVsJ8dWO41P0jmP6P6fbtGbfYmbW0W5BjfIttep3Sp+dWOIrWcBAI+0tKIJF\nPnlUkiaY4IBIqDfv8NZ5YBberOgOzW6sRBc4L0na4UU+Krk2U886UAb3LujEV0ls\nYSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\nCAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n-----END CERTIFICATE-----\n"
-    ],
-    "tls.server.hash.md5": "3510C21C66BD62010FC547D3CD3F0CE6",
-    "tls.server.hash.sha1": "7BB698386970363D2919CC5772846984FFD4A889",
-    "tls.server.hash.sha256": "9250711C54DE546F4370E0C3D3A3EC45BC96092A25A4A71A1AFA396AF7047EB8",
-    "tls.server.issuer": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
-    "tls.server.not_after": "2020-12-02T12:00:00.000Z",
-    "tls.server.not_before": "2018-11-28T00:00:00.000Z",
-    "tls.server.subject": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
-    "tls.server.x509.alternative_names": [
-      "www.example.org",
-      "example.com",
-      "example.edu",
-      "example.net",
-      "example.org",
-      "www.example.com",
-      "www.example.edu",
-      "www.example.net"
-    ],
-    "tls.server.x509.issuer.common_name": "DigiCert SHA2 Secure Server CA",
-    "tls.server.x509.issuer.country": "US",
-    "tls.server.x509.issuer.distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
-    "tls.server.x509.issuer.organization": "DigiCert Inc",
-    "tls.server.x509.not_after": "2020-12-02T12:00:00.000Z",
-    "tls.server.x509.not_before": "2018-11-28T00:00:00.000Z",
-    "tls.server.x509.public_key_algorithm": "RSA",
-    "tls.server.x509.public_key_size": 2048,
-    "tls.server.x509.serial_number": "21020869104500376438182461249190639870",
-    "tls.server.x509.signature_algorithm": "SHA256-RSA",
-    "tls.server.x509.subject.common_name": "www.example.org",
-    "tls.server.x509.subject.country": "US",
-    "tls.server.x509.subject.distinguished_name": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
-    "tls.server.x509.subject.locality": "Los Angeles",
-    "tls.server.x509.subject.organization": "Internet Corporation for Assigned Names and Numbers",
-    "tls.server.x509.subject.organizational_unit": "Technology",
-    "tls.server.x509.subject.state_or_province": "California",
-    "tls.server.x509.version_number": 3,
-    "tls.version": "1.2",
-    "tls.version_protocol": "tls",
-    "type": "tls"
-  }
+    {
+        "@metadata.beat": "packetbeat",
+        "@metadata.type": "_doc",
+        "client.ip": "192.168.1.35",
+        "client.port": 59455,
+        "destination.domain": "example.net",
+        "destination.ip": "93.184.216.34",
+        "destination.port": 443,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "tls",
+        "event.duration": 364625000,
+        "event.kind": "event",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
+        "network.community_id": "1:fx1jENdlg6r3LIvBRG3wEboWbPY=",
+        "network.protocol": "tls",
+        "network.transport": "tcp",
+        "network.type": "ipv4",
+        "related.ip": [
+            "192.168.1.35",
+            "93.184.216.34"
+        ],
+        "server.domain": "example.net",
+        "server.ip": "93.184.216.34",
+        "server.port": 443,
+        "source.ip": "192.168.1.35",
+        "source.port": 59455,
+        "status": "OK",
+        "tls.cipher": "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        "tls.client.ja3": "e6573e91e6eb777c0933c5b8f97f10cd",
+        "tls.client.server_name": "example.net",
+        "tls.client.supported_ciphers": [
+            "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+            "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
+            "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
+            "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+            "(unknown:0xff85)",
+            "TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256",
+            "TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA",
+            "TLS_GOSTR341001_WITH_28147_CNT_IMIT",
+            "TLS_RSA_WITH_AES_256_GCM_SHA384",
+            "TLS_RSA_WITH_AES_256_CBC_SHA256",
+            "TLS_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256",
+            "TLS_RSA_WITH_CAMELLIA_256_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+            "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
+            "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
+            "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256",
+            "TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA",
+            "TLS_RSA_WITH_AES_128_GCM_SHA256",
+            "TLS_RSA_WITH_AES_128_CBC_SHA256",
+            "TLS_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256",
+            "TLS_RSA_WITH_CAMELLIA_128_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
+            "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA",
+            "TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
+            "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+            "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"
+        ],
+        "tls.detailed.client_certificate_requested": false,
+        "tls.detailed.client_hello.extensions.application_layer_protocol_negotiation": [
+            "h2",
+            "http/1.1"
+        ],
+        "tls.detailed.client_hello.extensions.ec_points_formats": [
+            "uncompressed"
+        ],
+        "tls.detailed.client_hello.extensions.server_name_indication": [
+            "example.net"
+        ],
+        "tls.detailed.client_hello.extensions.signature_algorithms": [
+            "rsa_pkcs1_sha512",
+            "ecdsa_secp521r1_sha512",
+            "(unknown:0xefef)",
+            "rsa_pkcs1_sha384",
+            "ecdsa_secp384r1_sha384",
+            "rsa_pkcs1_sha256",
+            "ecdsa_secp256r1_sha256",
+            "(unknown:0xeeee)",
+            "(unknown:0xeded)",
+            "(unknown:0x0301)",
+            "(unknown:0x0303)",
+            "rsa_pkcs1_sha1",
+            "ecdsa_sha1"
+        ],
+        "tls.detailed.client_hello.extensions.supported_groups": [
+            "x25519",
+            "secp256r1",
+            "secp384r1"
+        ],
+        "tls.detailed.client_hello.random": "d7c809b4ac3a60b62f53c9d9366ca89a703d25491ff2a246a89f32f945f7b42b",
+        "tls.detailed.client_hello.supported_compression_methods": [
+            "NULL"
+        ],
+        "tls.detailed.client_hello.version": "3.3",
+        "tls.detailed.server_certificate_chain": [
+            {
+                "issuer": {
+                    "common_name": "DigiCert Global Root CA",
+                    "country": "US",
+                    "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
+                    "organization": "DigiCert Inc",
+                    "organizational_unit": "www.digicert.com"
+                },
+                "not_after": "2023-03-08T12:00:00.000Z",
+                "not_before": "2013-03-08T12:00:00.000Z",
+                "public_key_algorithm": "RSA",
+                "public_key_size": 2048,
+                "serial_number": "2646203786665923649276728595390119057",
+                "signature_algorithm": "SHA256-RSA",
+                "subject": {
+                    "common_name": "DigiCert SHA2 Secure Server CA",
+                    "country": "US",
+                    "distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
+                    "organization": "DigiCert Inc"
+                },
+                "version_number": 3
+            },
+            {
+                "issuer": {
+                    "common_name": "DigiCert Global Root CA",
+                    "country": "US",
+                    "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
+                    "organization": "DigiCert Inc",
+                    "organizational_unit": "www.digicert.com"
+                },
+                "not_after": "2031-11-10T00:00:00.000Z",
+                "not_before": "2006-11-10T00:00:00.000Z",
+                "public_key_algorithm": "RSA",
+                "public_key_size": 2048,
+                "serial_number": "10944719598952040374951832963794454346",
+                "signature_algorithm": "SHA1-RSA",
+                "subject": {
+                    "common_name": "DigiCert Global Root CA",
+                    "country": "US",
+                    "distinguished_name": "CN=DigiCert Global Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
+                    "organization": "DigiCert Inc",
+                    "organizational_unit": "www.digicert.com"
+                },
+                "version_number": 3
+            }
+        ],
+        "tls.detailed.server_hello.extensions._unparsed_": [
+            "renegotiation_info",
+            "server_name_indication"
+        ],
+        "tls.detailed.server_hello.extensions.application_layer_protocol_negotiation": [
+            "h2"
+        ],
+        "tls.detailed.server_hello.extensions.ec_points_formats": [
+            "uncompressed",
+            "ansiX962_compressed_prime",
+            "ansiX962_compressed_char2"
+        ],
+        "tls.detailed.server_hello.random": "d1fd553a5a270f08e09eda6690fb3c8f9884e9a9fe7949e9444f574e47524401",
+        "tls.detailed.server_hello.selected_compression_method": "NULL",
+        "tls.detailed.server_hello.session_id": "23bb2aed5d215e1228220b0a51d7aa220785e9e4b83b4f430229117971e9913f",
+        "tls.detailed.server_hello.version": "3.3",
+        "tls.detailed.version": "TLS 1.2",
+        "tls.established": true,
+        "tls.next_protocol": "h2",
+        "tls.resumed": false,
+        "tls.server.certificate_chain": [
+            "-----BEGIN CERTIFICATE-----\nMIIHQDCCBiigAwIBAgIQD9B43Ujxor1NDyupa2A4/jANBgkqhkiG9w0BAQsFADBN\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMScwJQYDVQQDEx5E\naWdpQ2VydCBTSEEyIFNlY3VyZSBTZXJ2ZXIgQ0EwHhcNMTgxMTI4MDAwMDAwWhcN\nMjAxMjAyMTIwMDAwWjCBpTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3Ju\naWExFDASBgNVBAcTC0xvcyBBbmdlbGVzMTwwOgYDVQQKEzNJbnRlcm5ldCBDb3Jw\nb3JhdGlvbiBmb3IgQXNzaWduZWQgTmFtZXMgYW5kIE51bWJlcnMxEzARBgNVBAsT\nClRlY2hub2xvZ3kxGDAWBgNVBAMTD3d3dy5leGFtcGxlLm9yZzCCASIwDQYJKoZI\nhvcNAQEBBQADggEPADCCAQoCggEBANDwEnSgliByCGUZElpdStA6jGaPoCkrp9vV\nrAzPpXGSFUIVsAeSdjF11yeOTVBqddF7U14nqu3rpGA68o5FGGtFM1yFEaogEv5g\nrJ1MRY/d0w4+dw8JwoVlNMci+3QTuUKf9yH28JxEdG3J37Mfj2C3cREGkGNBnY80\neyRJRqzy8I0LSPTTkhr3okXuzOXXg38ugr1x3SgZWDNuEaE6oGpyYJIBWZ9jF3pJ\nQnucP9vTBejMh374qvyd0QVQq3WxHrogy4nUbWw3gihMxT98wRD1oKVma1NTydvt\nhcNtBfhkp8kO64/hxLHrLWgOFT/l4tz8IWQt7mkrBHjbd2XLVPkCAwEAAaOCA8Ew\nggO9MB8GA1UdIwQYMBaAFA+AYRyCMWHVLyjnjUY4tCzhxtniMB0GA1UdDgQWBBRm\nmGIC4AmRp9njNvt2xrC/oW2nvjCBgQYDVR0RBHoweIIPd3d3LmV4YW1wbGUub3Jn\nggtleGFtcGxlLmNvbYILZXhhbXBsZS5lZHWCC2V4YW1wbGUubmV0ggtleGFtcGxl\nLm9yZ4IPd3d3LmV4YW1wbGUuY29tgg93d3cuZXhhbXBsZS5lZHWCD3d3dy5leGFt\ncGxlLm5ldDAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsG\nAQUFBwMCMGsGA1UdHwRkMGIwL6AtoCuGKWh0dHA6Ly9jcmwzLmRpZ2ljZXJ0LmNv\nbS9zc2NhLXNoYTItZzYuY3JsMC+gLaArhilodHRwOi8vY3JsNC5kaWdpY2VydC5j\nb20vc3NjYS1zaGEyLWc2LmNybDBMBgNVHSAERTBDMDcGCWCGSAGG/WwBATAqMCgG\nCCsGAQUFBwIBFhxodHRwczovL3d3dy5kaWdpY2VydC5jb20vQ1BTMAgGBmeBDAEC\nAjB8BggrBgEFBQcBAQRwMG4wJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2lj\nZXJ0LmNvbTBGBggrBgEFBQcwAoY6aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29t\nL0RpZ2lDZXJ0U0hBMlNlY3VyZVNlcnZlckNBLmNydDAMBgNVHRMBAf8EAjAAMIIB\nfwYKKwYBBAHWeQIEAgSCAW8EggFrAWkAdwCkuQmQtBhYFIe7E6LMZ3AKPDWYBPkb\n37jjd80OyA3cEAAAAWdcMZVGAAAEAwBIMEYCIQCEZIG3IR36Gkj1dq5L6EaGVycX\nsHvpO7dKV0JsooTEbAIhALuTtf4wxGTkFkx8blhTV+7sf6pFT78ORo7+cP39jkJC\nAHYAh3W/51l8+IxDmV+9827/Vo1HVjb/SrVgwbTq/16ggw8AAAFnXDGWFQAABAMA\nRzBFAiBvqnfSHKeUwGMtLrOG3UGLQIoaL3+uZsGTX3MfSJNQEQIhANL5nUiGBR6g\nl0QlCzzqzvorGXyB/yd7nttYttzo8EpOAHYAb1N2rDHwMRnYmQCkURX/dxUcEdkC\nwQApBo2yCJo32RMAAAFnXDGWnAAABAMARzBFAiEA5Hn7Q4SOyqHkT+kDsHq7ku7z\nRDuM7P4UDX2ft2Mpny0CIE13WtxJAUr0aASFYZ/XjSAMMfrB0/RxClvWVss9LHKM\nMA0GCSqGSIb3DQEBCwUAA4IBAQBzcIXvQEGnakPVeJx7VUjmvGuZhrr7DQOLeP4R\n8CmgDM1pFAvGBHiyzvCH1QGdxFl6cf7wbp7BoLCRLR/qPVXFMwUMzcE1GLBqaGZM\nv1Yh2lvZSLmMNSGRXdx113pGLCInpm/TOhfrvr0TxRImc8BdozWJavsn1N2qdHQu\nN+UBO6bQMLCD0KHEdSGFsuX6ZwAworxTg02/1qiDu7zW7RyzHvFYA4IAjpzvkPIa\nX6KjBtpdvp/aXabmL95YgBjT8WJ7pqOfrqhpcmOBZa6Cg6O1l4qbIFH/Gj9hQB5I\n0Gs4+eH6F9h3SojmPTYkT+8KuZ9w84Mn+M8qBXUQoYoKgIjN\n-----END CERTIFICATE-----\n",
+            "-----BEGIN CERTIFICATE-----\nMIIElDCCA3ygAwIBAgIQAf2j627KdciIQ4tyS8+8kTANBgkqhkiG9w0BAQsFADBh\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\nQTAeFw0xMzAzMDgxMjAwMDBaFw0yMzAzMDgxMjAwMDBaME0xCzAJBgNVBAYTAlVT\nMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxJzAlBgNVBAMTHkRpZ2lDZXJ0IFNIQTIg\nU2VjdXJlIFNlcnZlciBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\nANyuWJBNwcQwFZA1W248ghX1LFy949v/cUP6ZCWA1O4Yok3wZtAKc24RmDYXZK83\nnf36QYSvx6+M/hpzTc8zl5CilodTgyu5pnVILR1WN3vaMTIa16yrBvSqXUu3R0bd\nKpPDkC55gIDvEwRqFDu1m5K+wgdlTvza/P96rtxcflUxDOg5B6TXvi/TC2rSsd9f\n/ld0Uzs1gN2ujkSYs58O09rg1/RrKatEp0tYhG2SS4HD2nOLEpdIkARFdRrdNzGX\nkujNVA075ME/OV4uuPNcfhCOhkEAjUVmR7ChZc6gqikJTvOX6+guqw9ypzAO+sf0\n/RR3w6RbKFfCs/mC/bdFWJsCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8C\nAQAwDgYDVR0PAQH/BAQDAgGGMDQGCCsGAQUFBwEBBCgwJjAkBggrBgEFBQcwAYYY\naHR0cDovL29jc3AuZGlnaWNlcnQuY29tMHsGA1UdHwR0MHIwN6A1oDOGMWh0dHA6\nLy9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RDQS5jcmwwN6A1\noDOGMWh0dHA6Ly9jcmw0LmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RD\nQS5jcmwwPQYDVR0gBDYwNDAyBgRVHSAAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8v\nd3d3LmRpZ2ljZXJ0LmNvbS9DUFMwHQYDVR0OBBYEFA+AYRyCMWHVLyjnjUY4tCzh\nxtniMB8GA1UdIwQYMBaAFAPeUDVW0Uy7ZvCj4hsbw5eyPdFVMA0GCSqGSIb3DQEB\nCwUAA4IBAQAjPt9L0jFCpbZ+QlwaRMxp0Wi0XUvgBCFsS+JtzLHgl4+mUwnNqipl\n5TlPHoOlblyYoiQm5vuh7ZPHLgLGTUq/sELfeNqzqPlt/yGFUzZgTHbO7Djc1lGA\n8MXW5dRNJ2Srm8c+cftIl7gzbckTB+6WohsYFfZcTEDts8Ls/3HB40f/1LkAtDdC\n2iDJ6m6K7hQGrn2iWZiIqBtvLfTyyRRfJs8sjX7tN8Cp1Tm5gr8ZDOo0rwAhaPit\nc+LJMto4JQtV05od8GiG7S5BNO98pVAdvzr508EIDObtHopYJeS4d60tbvVS3bR0\nj6tJLp07kzQoH3jOlOrHvdPJbRzeXDLz\n-----END CERTIFICATE-----\n",
+            "-----BEGIN CERTIFICATE-----\nMIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\nQTAeFw0wNjExMTAwMDAwMDBaFw0zMTExMTAwMDAwMDBaMGExCzAJBgNVBAYTAlVT\nMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j\nb20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMIIBIjANBgkqhkiG\n9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jvhEXLeqKTTo1eqUKKPC3eQyaKl7hLOllsB\nCSDMAZOnTjC3U/dDxGkAV53ijSLdhwZAAIEJzs4bg7/fzTtxRuLWZscFs3YnFo97\nnh6Vfe63SKMI2tavegw5BmV/Sl0fvBf4q77uKNd0f3p4mVmFaG5cIzJLv07A6Fpt\n43C/dxC//AH2hdmoRBBYMql1GNXRor5H4idq9Joz+EkIYIvUX7Q6hL+hqkpMfT7P\nT19sdl6gSzeRntwi5m3OFBqOasv+zbMUZBfHWymeMr/y7vrTC0LUq7dBMtoM1O/4\ngdW7jVg/tRvoSSiicNoxBN33shbyTApOB6jtSj1etX+jkMOvJwIDAQABo2MwYTAO\nBgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUA95QNVbR\nTLtm8KPiGxvDl7I90VUwHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUw\nDQYJKoZIhvcNAQEFBQADggEBAMucN6pIExIK+t1EnE9SsPTfrgT1eXkIoyQY/Esr\nhMAtudXH/vTBH1jLuG2cenTnmCmrEbXjcKChzUyImZOMkXDiqw8cvpOp/2PV5Adg\n06O/nVsJ8dWO41P0jmP6P6fbtGbfYmbW0W5BjfIttep3Sp+dWOIrWcBAI+0tKIJF\nPnlUkiaY4IBIqDfv8NZ5YBberOgOzW6sRBc4L0na4UU+Krk2U886UAb3LujEV0ls\nYSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\nCAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n-----END CERTIFICATE-----\n"
+        ],
+        "tls.server.hash.md5": "3510C21C66BD62010FC547D3CD3F0CE6",
+        "tls.server.hash.sha1": "7BB698386970363D2919CC5772846984FFD4A889",
+        "tls.server.hash.sha256": "9250711C54DE546F4370E0C3D3A3EC45BC96092A25A4A71A1AFA396AF7047EB8",
+        "tls.server.issuer": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
+        "tls.server.not_after": "2020-12-02T12:00:00.000Z",
+        "tls.server.not_before": "2018-11-28T00:00:00.000Z",
+        "tls.server.subject": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
+        "tls.server.x509.alternative_names": [
+            "www.example.org",
+            "example.com",
+            "example.edu",
+            "example.net",
+            "example.org",
+            "www.example.com",
+            "www.example.edu",
+            "www.example.net"
+        ],
+        "tls.server.x509.issuer.common_name": "DigiCert SHA2 Secure Server CA",
+        "tls.server.x509.issuer.country": "US",
+        "tls.server.x509.issuer.distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
+        "tls.server.x509.issuer.organization": "DigiCert Inc",
+        "tls.server.x509.not_after": "2020-12-02T12:00:00.000Z",
+        "tls.server.x509.not_before": "2018-11-28T00:00:00.000Z",
+        "tls.server.x509.public_key_algorithm": "RSA",
+        "tls.server.x509.public_key_size": 2048,
+        "tls.server.x509.serial_number": "21020869104500376438182461249190639870",
+        "tls.server.x509.signature_algorithm": "SHA256-RSA",
+        "tls.server.x509.subject.common_name": "www.example.org",
+        "tls.server.x509.subject.country": "US",
+        "tls.server.x509.subject.distinguished_name": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
+        "tls.server.x509.subject.locality": "Los Angeles",
+        "tls.server.x509.subject.organization": "Internet Corporation for Assigned Names and Numbers",
+        "tls.server.x509.subject.organizational_unit": "Technology",
+        "tls.server.x509.subject.state_or_province": "California",
+        "tls.server.x509.version_number": 3,
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
+        "type": "tls"
+    }
 ]

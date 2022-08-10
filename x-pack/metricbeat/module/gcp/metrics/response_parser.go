@@ -213,6 +213,34 @@ var reMapping = map[string]string{
 	"storage.object_count.value":                     "storage.object.count",
 	"storage.total_byte_seconds.value":               "storage.total_byte_seconds.bytes",
 	"storage.total_bytes.value":                      "storage.total.bytes",
+
+	// gcp.firestore metricset
+	"document.delete_count.value": "document.delete.count",
+	"document.read_count.value":   "document.read.count",
+	"document.write_count.value":  "document.write.count",
+	// gcp.dataproc
+	"batch.spark.executors.value":                    "batch.spark.executors.count",
+	"cluster.hdfs.datanodes.value":                   "cluster.hdfs.datanodes.count",
+	"cluster.hdfs.storage_capacity.value":            "cluster.hdfs.storage_capacity.value",
+	"cluster.hdfs.storage_utilization.value":         "cluster.hdfs.storage_utilization.value",
+	"cluster.hdfs.unhealthy_blocks.value":            "cluster.hdfs.unhealthy_blocks.count",
+	"cluster.job.completion_time.value":              "cluster.job.completion_time.value",
+	"cluster.job.duration.value":                     "cluster.job.duration.value",
+	"cluster.job.failed_count.value":                 "cluster.job.failed.count",
+	"cluster.job.running_count.value":                "cluster.job.running.count",
+	"cluster.job.submitted_count.value":              "cluster.job.submitted.count",
+	"cluster.operation.completion_time.value":        "cluster.operation.completion_time.value",
+	"cluster.operation.duration.value":               "cluster.operation.duration.value",
+	"cluster.operation.failed_count.value":           "cluster.operation.failed.count",
+	"cluster.operation.running_count.value":          "cluster.operation.running.count",
+	"cluster.operation.submitted_count.value":        "cluster.operation.submitted.count",
+	"cluster.yarn.allocated_memory_percentage.value": "cluster.yarn.allocated_memory_percentage.value",
+	"cluster.yarn.apps.value":                        "cluster.yarn.apps.count",
+	"cluster.yarn.containers.value":                  "cluster.yarn.containers.count",
+	"cluster.yarn.memory_size.value":                 "cluster.yarn.memory_size.value",
+	"cluster.yarn.nodemanagers.value":                "cluster.yarn.nodemanagers.count",
+	"cluster.yarn.pending_memory_size.value":         "cluster.yarn.pending_memory_size.value",
+	"cluster.yarn.virtual_cores.value":               "cluster.yarn.virtual_cores.count",
 }
 
 func remap(l *logp.Logger, s string) string {

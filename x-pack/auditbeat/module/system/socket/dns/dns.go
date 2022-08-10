@@ -6,9 +6,8 @@ package dns
 
 import (
 	"context"
+	"fmt"
 	"net"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -52,7 +51,7 @@ func (noopSniffer) Monitor(context.Context, Consumer) error {
 func NewSniffer(base mb.BaseMetricSet, log *logp.Logger) (Sniffer, error) {
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "failed to unpack dns config")
+		return nil, fmt.Errorf("failed to unpack dns config: %w", err)
 	}
 	if !config.Enabled {
 		return noopSniffer{}, nil

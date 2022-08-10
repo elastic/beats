@@ -23,6 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -89,6 +90,8 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	if err != nil {
 		return nil, err
 	}
+
+	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
 
 	config := struct {
 		Scope        Scope `config:"scope"`

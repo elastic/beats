@@ -1,0 +1,19 @@
+description: Pipeline for parsing the Elasticsearch deprecation log file in JSON format.
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+processors:
+- json:
+    field: message
+    add_to_root: true
+- dot_expander:
+    field: '*'
+    override: true
+# Drop any non-deprecation logs that show up due to mixed log output configurations
+- drop:
+    if: '!["deprecation", "deprecation.elasticsearch"].contains(ctx.event.dataset)'
+# Normalize event.dataset value for kibana queries
+- set:
+    field: event.dataset
+    value: elasticsearch.deprecation

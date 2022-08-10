@@ -44,7 +44,6 @@ type azureInput struct {
 	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
 	hub          *eventhub.Hub           // hub will be assigned
-	ackChannel   chan int
 }
 
 const (

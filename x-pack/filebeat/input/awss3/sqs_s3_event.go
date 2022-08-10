@@ -14,6 +14,9 @@ import (
 	"sync"
 	"time"
 
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
@@ -105,7 +108,9 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 }
 
 func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
-	log := p.log.With("message_id", *msg.MessageId)
+	log := p.log.With(
+		"message_id", *msg.MessageId,
+		"message_receipt_time", time.Now().UTC())
 
 	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
 	defer keepaliveCancel()
@@ -137,7 +142,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 			if receiveCount, err := strconv.Atoi(v); err == nil && receiveCount >= p.maxReceiveCount {
 				processingErr = nonRetryableErrorWrap(fmt.Errorf(
 					"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
-					receiveCount, p.maxReceiveCount, err))
+					receiveCount, p.maxReceiveCount, processingErr))
 			}
 		}
 	}
@@ -180,6 +185,17 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 
 			// Renew visibility.
 			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
+				var awsErr awserr.Error
+				if errors.As(err, &awsErr) {
+					switch awsErr.Code() {
+					case sqs.ErrCodeReceiptHandleIsInvalid:
+						log.Warnw("Failed to extend message visibility timeout "+
+							"because SQS receipt handle is no longer valid. "+
+							"Stopping SQS message keepalive routine.", "error", err)
+						return
+					}
+				}
+
 				log.Warnw("Failed to extend message visibility timeout.", "error", err)
 			}
 		}
@@ -261,11 +277,11 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 	defer log.Debug("End processing SQS S3 event notifications.")
 
 	// Wait for all events to be ACKed before proceeding.
-	acker := newEventACKTracker(ctx)
+	acker := awscommon.NewEventACKTracker(ctx)
 	defer acker.Wait()
 
 	var errs []error
-	for _, event := range s3Events {
+	for i, event := range s3Events {
 		s3Processor := p.s3ObjectHandler.Create(ctx, log, acker, event)
 		if s3Processor == nil {
 			continue
@@ -274,8 +290,8 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 		// Process S3 object (download, parse, create events).
 		if err := s3Processor.ProcessS3Object(); err != nil {
 			errs = append(errs, errors.Wrapf(err,
-				"failed processing S3 event for object key %q in bucket %q",
-				event.S3.Object.Key, event.S3.Bucket.Name))
+				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification)",
+				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events)))
 		}
 	}
 

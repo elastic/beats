@@ -7,7 +7,7 @@ pipeline {
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     PIPELINE_LOG_LEVEL = "INFO"
-    BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/master'
+    BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/main'
   }
   options {
     timeout(time: 1, unit: 'HOURS')
@@ -50,9 +50,9 @@ pipeline {
             setEnvVar('VERSION', sh(script: "grep ':stack-version:' ${BASE_DIR}/libbeat/docs/version.asciidoc | cut -d' ' -f2", returnStdout: true).trim())
           }
         }
-        stage('Build master') {
+        stage('Build main') {
           options { skipDefaultCheckout() }
-          when { branch 'master' }
+          when { branch 'main' }
           steps {
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
@@ -78,7 +78,7 @@ pipeline {
           when {
             not {
               anyOf {
-                branch comparator: 'REGEXP', pattern: '(master|.*x)'
+                branch comparator: 'REGEXP', pattern: '(main|.*x)'
                 changeRequest()
               }
             }

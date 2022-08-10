@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -43,8 +42,7 @@ type Config struct {
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	// Needed when resource is a pod
-	HostDeprecated string `config:"host"`
-	Node           string `config:"node"`
+	Node string `config:"node"`
 	// Scope can be either node or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
@@ -66,11 +64,12 @@ var DefaultCleanupTimeout time.Duration = 0
 
 func defaultConfig() *Config {
 	return &Config{
-		SyncPeriod:     10 * time.Minute,
-		Resource:       "pod",
-		CleanupTimeout: DefaultCleanupTimeout,
-		Prefix:         "co.elastic",
-		Unique:         false,
+		SyncPeriod:          10 * time.Minute,
+		Resource:            "pod",
+		CleanupTimeout:      DefaultCleanupTimeout,
+		Prefix:              "co.elastic",
+		Unique:              false,
+		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 }
 
@@ -83,12 +82,6 @@ func (c *Config) Validate() error {
 
 	if len(c.Templates) == 0 && !c.Hints.Enabled() && len(c.Builders) == 0 {
 		return fmt.Errorf("no configs or hints defined for autodiscover provider")
-	}
-
-	// Check if host is being defined and change it to node instead.
-	if c.Node == "" && c.HostDeprecated != "" {
-		c.Node = c.HostDeprecated
-		cfgwarn.Deprecate("8.0", "`host` will be deprecated, use `node` instead")
 	}
 
 	// Check if resource is either node or pod. If yes then default the scope to "node" if not provided.

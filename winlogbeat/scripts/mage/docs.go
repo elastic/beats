@@ -91,5 +91,5 @@ func moduleDocs() error {
 	}
 
 	fmt.Printf(">> update:moduleDocs: Collecting module documentation for %v.\n", strings.Join(names, ", "))
-	return ioutil.WriteFile(mage.OSSBeatDir("docs/modules_list.asciidoc"), []byte(content), 0644)
+	return ioutil.WriteFile(mage.OSSBeatDir("docs/modules_list.asciidoc"), []byte(content), 0o644)
 }

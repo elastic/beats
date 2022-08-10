@@ -82,10 +82,10 @@ class Test(BaseTest):
         assert obj["related.ip"] == ["10.0.0.1", "10.0.0.2"]
         assert obj["path"] == "10.0.0.2"
         assert obj["status"] == "OK"
-        assert obj["icmp.request.message"] == "EchoRequest(0)"
+        assert obj["icmp.request.message"] == "EchoRequest"
         assert obj["icmp.request.type"] == 8
         assert obj["icmp.request.code"] == 0
-        assert obj["icmp.response.message"] == "EchoReply(0)"
+        assert obj["icmp.response.message"] == "EchoReply"
         assert obj["icmp.response.type"] == 0
         assert obj["icmp.response.code"] == 0
 
@@ -95,9 +95,9 @@ class Test(BaseTest):
         assert obj["client.ip"] == "::1"
         assert obj["path"] == "::2"
         assert obj["status"] == "OK"
-        assert obj["icmp.request.message"] == "EchoRequest(0)"
+        assert obj["icmp.request.message"] == "EchoRequest"
         assert obj["icmp.request.type"] == 128
         assert obj["icmp.request.code"] == 0
-        assert obj["icmp.response.message"] == "EchoReply(0)"
+        assert obj["icmp.response.message"] == "EchoReply"
         assert obj["icmp.response.type"] == 129
         assert obj["icmp.response.code"] == 0

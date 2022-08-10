@@ -32,7 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	sock "github.com/elastic/beats/v7/metricbeat/helper/socket"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -69,12 +69,13 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys := base.Module().(resolve.Resolver)
 	c := defaultConfig
 	if err := base.Module().UnpackConfig(&c); err != nil {
 		return nil, err
 	}
 
-	ptable, err := sock.NewProcTable(paths.Resolve(paths.Hostfs, "/proc"))
+	ptable, err := sock.NewProcTable(sys.ResolveHostFS("/proc"))
 	if err != nil {
 		return nil, err
 	}

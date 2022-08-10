@@ -104,6 +104,7 @@ type config struct {
 	ProjectID           string `config:"project_id" validate:"required"`
 	ExcludeLabels       bool   `config:"exclude_labels"`
 	CredentialsFilePath string `config:"credentials_file_path"`
+	CredentialsJSON     string `config:"credentials_json"`
 
 	opt    []option.ClientOption
 	period *duration.Duration
@@ -129,7 +130,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.MetricsConfig = metricsConfigs.Metrics
-	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+
+	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
+		return m, errors.New("both credentials_file_path and credentials_json specified, you must use only one of them")
+	} else if m.config.CredentialsFilePath != "" {
+		m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	} else if m.config.CredentialsJSON != "" {
+		m.config.opt = []option.ClientOption{option.WithCredentialsJSON([]byte(m.config.CredentialsJSON))}
+	} else {
+		return m, errors.New("no credentials_file_path or credentials_json specified")
+	}
+
 	m.config.period = &duration.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
@@ -165,7 +176,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
 	for _, sdc := range m.MetricsConfig {
 		m.Logger().Debugf("metrics config: %v", sdc)
-		responses, err := m.requester.Metrics(ctx, sdc, m.metricsMeta)
+		// m.metricsMeta contains all metrics to be collected, not just the one in the current MetricsConfig.
+		// this loop filters the metrics in metricsMeta so requester.Metrics can collect only the appropriate
+		// ones.
+		// See https://github.com/elastic/beats/pull/29514
+		metricsToCollect := map[string]metricMeta{}
+		for _, v := range sdc.MetricTypes {
+			metricsToCollect[sdc.AddPrefixTo(v)] = m.metricsMeta[sdc.AddPrefixTo(v)]
+		}
+		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
 			err = errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
 			m.Logger().Error(err)

@@ -30,12 +30,12 @@ const (
 	transactionTimeout   = 10 * 1e9
 )
 
-//layout used when a timestamp must be parsed
+// layout used when a timestamp must be parsed
 const (
 	amqpTimeLayout = "January _2 15:04:05 2006"
 )
 
-//Frame types and codes
+// Frame types and codes
 
 type frameType byte
 
@@ -50,7 +50,7 @@ const (
 	frameEndOctet byte = 206
 )
 
-//Codes for MethodMap
+// Codes for MethodMap
 type codeClass uint16
 
 const (
@@ -137,7 +137,7 @@ const (
 	txRollbackOk codeMethod = 31
 )
 
-//Message properties codes for byte prop1 in getMessageProperties
+// Message properties codes for byte prop1 in getMessageProperties
 const (
 	expirationProp      byte = 1
 	replyToProp         byte = 2
@@ -149,7 +149,7 @@ const (
 	contentTypeProp     byte = 128
 )
 
-//Message properties codes for byte prop2 in getMessageProperties
+// Message properties codes for byte prop2 in getMessageProperties
 
 const (
 	appIDProp     byte = 8
@@ -159,7 +159,7 @@ const (
 	messageIDProp byte = 128
 )
 
-//table types
+// table types
 const (
 	boolean        = 't'
 	shortShortInt  = 'b'
@@ -179,7 +179,7 @@ const (
 	timestamp      = 'T'
 	fieldTable     = 'F'
 	noField        = 'V'
-	byteArray      = 'x' //rabbitMQ specific field
+	byteArray      = 'x' // rabbitMQ specific field
 )
 
 type amqpPrivateData struct {
@@ -203,7 +203,7 @@ type amqpMessage struct {
 	direction      uint8
 	parseArguments bool
 
-	//mapstr containing all the options for the methods and header fields
+	// mapstr containing all the options for the methods and header fields
 	fields common.MapStr
 
 	body     []byte

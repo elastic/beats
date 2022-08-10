@@ -30,15 +30,16 @@ var warnOnce sync.Once
 
 // Config defines the user configurable options in the yaml file.
 type Config struct {
-	Enabled          *bool                   `config:"enabled" yaml:"enabled,omitempty"`
-	VerificationMode TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full'
-	Versions         []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
-	CipherSuites     []CipherSuite           `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
-	CAs              []string                `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
-	Certificate      CertificateConfig       `config:",inline" yaml:",inline"`
-	CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
-	Renegotiation    TlsRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
-	CASha256         []string                `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
+	Enabled              *bool                   `config:"enabled" yaml:"enabled,omitempty"`
+	VerificationMode     TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full'
+	Versions             []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
+	CipherSuites         []CipherSuite           `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
+	CAs                  []string                `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
+	Certificate          CertificateConfig       `config:",inline" yaml:",inline"`
+	CurveTypes           []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
+	Renegotiation        TlsRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
+	CASha256             []string                `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
+	CATrustedFingerprint string                  `config:"ca_trusted_fingerprint" yaml:"ca_trusted_fingerprint,omitempty"`
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys
@@ -82,14 +83,15 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 
 	// return config if no error occurred
 	return &TLSConfig{
-		Versions:         config.Versions,
-		Verification:     config.VerificationMode,
-		Certificates:     certs,
-		RootCAs:          cas,
-		CipherSuites:     config.CipherSuites,
-		CurvePreferences: curves,
-		Renegotiation:    tls.RenegotiationSupport(config.Renegotiation),
-		CASha256:         config.CASha256,
+		Versions:             config.Versions,
+		Verification:         config.VerificationMode,
+		Certificates:         certs,
+		RootCAs:              cas,
+		CipherSuites:         config.CipherSuites,
+		CurvePreferences:     curves,
+		Renegotiation:        tls.RenegotiationSupport(config.Renegotiation),
+		CASha256:             config.CASha256,
+		CATrustedFingerprint: config.CATrustedFingerprint,
 	}, nil
 }
 

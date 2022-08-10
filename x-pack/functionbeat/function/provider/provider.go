@@ -13,16 +13,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
 
 // Create a new pipeline client based on the function configuration.
-type clientFactory func(*common.Config) (core.Client, error)
+type clientFactory func(*common.Config) (pipeline.ISyncClient, error)
 
 // Function is temporary
 type Function interface {
-	Run(context.Context, core.Client, telemetry.T) error
+	Run(context.Context, pipeline.ISyncClient, telemetry.T) error
 	Name() string
 }
 

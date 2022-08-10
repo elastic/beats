@@ -2,7 +2,6 @@ import os
 import unittest
 
 from heartbeat import BaseTest
-from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
 from beat import common_tests
 from time import sleep
@@ -198,13 +197,13 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         """
         Test that the template can be loaded with `setup --index-management`
         """
-        es = Elasticsearch([self.get_elasticsearch_url()])
+        es = self.get_elasticsearch_instance()
         self.render_config_template(
             monitors=[{
                 "type": "http",
                 "urls": ["http://localhost:9200"],
             }],
-            elasticsearch={"host": self.get_elasticsearch_url()},
+            elasticsearch=self.get_elasticsearch_template_config()
         )
         exit_code = self.run_beat(extra_args=["setup", "--index-management"])
 

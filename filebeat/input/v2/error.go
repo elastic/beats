@@ -58,15 +58,6 @@ var ErrPluginWithoutName = errors.New("the plugin has no name")
 // error because there is no existing plugin that can create the input.
 func IsUnknownInputError(err error) bool { return errors.Is(err, ErrUnknownInput) }
 
-func failedInputName(err error) string {
-	switch e := err.(type) {
-	case *LoadError:
-		return e.Name
-	default:
-		return ""
-	}
-}
-
 // Unwrap returns the reason if present
 func (e *LoadError) Unwrap() error { return e.Reason }
 

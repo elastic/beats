@@ -47,7 +47,7 @@ func testEvent() beat.Event {
 // Test that FilterEvent detects events that do not contain the required fields
 // and returns error.
 func TestFilterEvent(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		f   func() beat.Event
 		err string
 	}{
@@ -93,7 +93,7 @@ func TestFilterEvent(t *testing.T) {
 }
 
 func TestPublish(t *testing.T) {
-	var srcIP, dstIP = "192.145.2.4", "192.145.2.5"
+	srcIP, dstIP := "192.145.2.4", "192.145.2.5"
 
 	event := func() *beat.Event {
 		return &beat.Event{

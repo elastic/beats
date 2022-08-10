@@ -161,7 +161,7 @@ func (m *Migrator) updateToVersion0(regHome, migrateFile string) error {
 func initVersion0Registry(regHome string, perm os.FileMode) error {
 	if !isDir(regHome) {
 		logp.Info("No registry home found. Create: %v", regHome)
-		if err := os.MkdirAll(regHome, 0750); err != nil {
+		if err := os.MkdirAll(regHome, 0o750); err != nil {
 			return errors.Wrapf(err, "failed to create registry dir '%v'", regHome)
 		}
 	}
@@ -247,21 +247,6 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 	}
 
 	return nil
-}
-
-func writeMeta(path string, version string, perm os.FileMode) error {
-	logp.Info("Write registry meta file with version: %v", version)
-	doc := struct{ Version string }{version}
-	body, err := json.Marshal(doc)
-	if err != nil {
-		panic(err) // must not fail
-	}
-
-	if err = safeWriteFile(path+".tmp", body, perm); err != nil {
-		return errors.Wrap(err, "failed writing registry meta.json")
-	}
-
-	return helper.SafeFileRotate(path, path+".tmp")
 }
 
 func readVersion(regHome, migrateFile string) (registryVersion, error) {

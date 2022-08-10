@@ -13,7 +13,6 @@ import (
 
 // Protocol is the interface that NetFlow protocol parsers must conform to.
 type Protocol interface {
-
 	// Version returns the NetFlow version that this protocol implements.
 	// The version number in packet headers is compared with this value to
 	// select the appropriate protocol parser.

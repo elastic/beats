@@ -23,7 +23,6 @@ package process
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -34,43 +33,19 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/opt"
 	sysinfo "github.com/elastic/go-sysinfo"
-	sigar "github.com/elastic/gosigar"
 )
 
 // ProcsMap is a map where the keys are the names of processes and the value is the Process with that name
-type ProcsMap map[int]*Process
+type ProcsMap map[int]ProcState
 
-// Process is the structure which holds the information of a process running on the host.
-// It includes pid, gid and it interacts with gosigar to fetch process data from the host.
-type Process struct {
-	Pid        int      `json:"pid"`
-	Ppid       int      `json:"ppid"`
-	Pgid       int      `json:"pgid"`
-	Name       string   `json:"name"`
-	Username   string   `json:"username"`
-	State      string   `json:"state"`
-	Args       []string `json:"args"`
-	CmdLine    string   `json:"cmdline"`
-	Cwd        string   `json:"cwd"`
-	Executable string   `json:"executable"`
-	Mem        sigar.ProcMem
-	CPU        sigar.ProcTime
-	SampleTime time.Time
-	FD         sigar.ProcFDUsage
-	Env        common.MapStr
-
-	// cpu stats
-	cpuSinceStart   float64
-	cpuTotalPct     float64
-	cpuTotalPctNorm float64
-
-	// cgroup stats
-	RawStats cgroup.CGStats
-}
+// ProcCallback is a function that FetchPid* methods can call at various points to do OS-agnostic processing
+type ProcCallback func(in ProcState) (ProcState, error)
 
 // CgroupPctStats stores rendered percent values from cgroup CPU data
 type CgroupPctStats struct {
@@ -84,6 +59,7 @@ type CgroupPctStats struct {
 
 // Stats stores the stats of processes on the host.
 type Stats struct {
+	Hostfs        resolve.Resolver
 	Procs         []string
 	ProcsMap      ProcsMap
 	CPUTicks      bool
@@ -93,345 +69,91 @@ type Stats struct {
 	CgroupOpts    cgroup.ReaderOptions
 	EnableCgroups bool
 
-	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
-	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
-	cgroups     *cgroup.Reader
-	logger      *logp.Logger
-	host        types.Host
+	skipExtended bool
+	procRegexps  []match.Matcher // List of regular expressions used to whitelist processes.
+	envRegexps   []match.Matcher // List of regular expressions used to whitelist env vars.
+	cgroups      *cgroup.Reader
+	logger       *logp.Logger
+	host         types.Host
 }
 
-// Ticks of CPU for a process
-type Ticks struct {
-	User   uint64
-	System uint64
-	Total  uint64
+//PidState are the constants for various PID states
+type PidState string
+
+var (
+	//Dead state, on linux this is both "x" and "X"
+	Dead PidState = "dead"
+	//Running state
+	Running PidState = "running"
+	//Sleeping state
+	Sleeping PidState = "sleeping"
+	//Idle state. On linux this is "D"
+	Idle PidState = "idle"
+	//Stopped state.
+	Stopped PidState = "stopped"
+	//Zombie state.
+	Zombie PidState = "zombie"
+	//WakeKill is a linux state only found on kernels 2.6.33-3.13
+	WakeKill PidState = "wakekill"
+	//Waking  is a linux state only found on kernels 2.6.33-3.13
+	Waking PidState = "waking"
+	//Parked is a linux state. On the proc man page, it says it's available on 3.9-3.13, but it appears to still be in the code.
+	Parked PidState = "parked"
+	//Unknown state
+	Unknown PidState = "unknown"
+)
+
+// PidStates is a Map of all pid states, mostly applicable to linux
+var PidStates = map[byte]PidState{
+	'S': Sleeping,
+	'R': Running,
+	'D': Idle, // Waiting in uninterruptible disk sleep, on some kernels this is marked as I below
+	'I': Idle, // in the scheduler, TASK_IDLE is defined as (TASK_UNINTERRUPTIBLE | TASK_NOLOAD)
+	'T': Stopped,
+	'Z': Zombie,
+	'X': Dead,
+	'x': Dead,
+	'K': WakeKill,
+	'W': Waking,
+	'P': Parked,
 }
 
-// newProcess creates a new Process object and initializes it with process
-// state information. If the process's command line and environment variables
-// are known they should be passed in to avoid re-fetching the information.
-func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
-	state := sigar.ProcState{}
-	err := state.Get(pid)
-	// we have to keep up that behavior somewhat, as there are numerous cases where ProcState could "normally" fail
-	// If something has failed this early, assume the PID is bad, invalid, or dead in some way, and just continue.
-	// Instead, log the error.
+// ListStates is a wrapper that returns a list of processess with only the basic PID info filled out.
+func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
+	init := Stats{
+		Hostfs:        hostfs,
+		Procs:         []string{".*"},
+		EnableCgroups: false,
+		skipExtended:  true,
+	}
+	err := init.Init()
 	if err != nil {
-		logp.L().Debugf("Could not fetch info for PID %d: %s", pid, err)
-		return nil, nil
+		return nil, errors.Wrap(err, "error initializing process collectors")
 	}
 
-	exe := sigar.ProcExe{}
-	if err := exe.Get(pid); err != nil && !sigar.IsNotImplemented(err) && !os.IsPermission(err) && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("error getting process exe for pid=%d: %v", pid, err)
-	}
-
-	proc := Process{
-		Pid:        pid,
-		Ppid:       state.Ppid,
-		Pgid:       state.Pgid,
-		Name:       state.Name,
-		Username:   state.Username,
-		State:      getProcState(byte(state.State)),
-		CmdLine:    cmdline,
-		Cwd:        exe.Cwd,
-		Executable: exe.Name,
-		Env:        env,
-	}
-
-	return &proc, nil
-}
-
-// getDetails fetches CPU, memory, FD usage, command line arguments, and
-// environment variables for the process. The envPredicate parameter is an
-// optional predicate function that should return true if an environment
-// variable should be saved with the process. If the argument is nil then all
-// environment variables are stored.
-func (proc *Process) getDetails(envPredicate func(string) bool) error {
-	proc.SampleTime = time.Now()
-
-	proc.Mem = sigar.ProcMem{}
-	if err := proc.Mem.Get(proc.Pid); err != nil {
-		return fmt.Errorf("error getting process mem for pid=%d: %v", proc.Pid, err)
-	}
-
-	proc.CPU = sigar.ProcTime{}
-	if err := proc.CPU.Get(proc.Pid); err != nil {
-		return fmt.Errorf("error getting process cpu time for pid=%d: %v", proc.Pid, err)
-	}
-
-	if len(proc.Args) == 0 {
-		args := sigar.ProcArgs{}
-		if err := args.Get(proc.Pid); err != nil && !sigar.IsNotImplemented(err) {
-			return fmt.Errorf("error getting process arguments for pid=%d: %v", proc.Pid, err)
-		}
-		proc.Args = args.List
-	}
-
-	if proc.CmdLine == "" && len(proc.Args) > 0 {
-		proc.CmdLine = strings.Join(proc.Args, " ")
-	}
-
-	if fd, err := getProcFDUsage(proc.Pid); err != nil {
-		return fmt.Errorf("error getting process file descriptor usage for pid=%d: %v", proc.Pid, err)
-	} else if fd != nil {
-		proc.FD = *fd
-	}
-
-	if proc.Env == nil {
-		proc.Env = common.MapStr{}
-		if err := getProcEnv(proc.Pid, proc.Env, envPredicate); err != nil {
-			return fmt.Errorf("error getting process environment variables for pid=%d: %v", proc.Pid, err)
-		}
-	}
-
-	return nil
-}
-
-// getProcFDUsage returns file descriptor usage information for the process
-// identified by the given PID. If the feature is not implemented then nil
-// is returned with no error. If there is a permission error while reading the
-// data then  nil is returned with no error (/proc/[pid]/fd requires root
-// permissions). Any other errors that occur are returned.
-func getProcFDUsage(pid int) (*sigar.ProcFDUsage, error) {
-	// It's not possible to collect FD usage from other processes on FreeBSD
-	// due to linprocfs not exposing the information.
-	if runtime.GOOS == "freebsd" && pid != os.Getpid() {
-		return nil, nil
-	}
-
-	fd := sigar.ProcFDUsage{}
-	if err := fd.Get(pid); err != nil {
-		switch {
-		case sigar.IsNotImplemented(err):
-			return nil, nil
-		case os.IsPermission(err):
-			return nil, nil
-		default:
-			return nil, err
-		}
-	}
-
-	return &fd, nil
-}
-
-// getProcEnv gets the process's environment variables and writes them to the
-// out parameter. It handles ErrNotImplemented and permission errors. Any other
-// errors are returned.
-//
-// The filter function should return true if a given environment variable should
-// be added to the out parameter.
-//
-// On Linux you must be root to read other processes' environment variables.
-func getProcEnv(pid int, out common.MapStr, filter func(v string) bool) error {
-	env := &sigar.ProcEnv{}
-	if err := env.Get(pid); err != nil {
-		switch {
-		case sigar.IsNotImplemented(err):
-			return nil
-		case os.IsPermission(err):
-			return nil
-		default:
-			return err
-		}
-	}
-
-	for k, v := range env.Vars {
-		if filter == nil || filter(k) {
-			out[k] = v
-		}
-	}
-	return nil
-}
-
-// GetProcMemPercentage returns process memory usage as a percent of total memory usage
-func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
-	if totalPhyMem == 0 {
-		return 0
-	}
-
-	perc := (float64(proc.Mem.Resident) / float64(totalPhyMem))
-
-	return common.Round(perc, 4)
-}
-
-// Pids returns a list of PIDs
-func Pids() ([]int, error) {
-	pids := sigar.ProcList{}
-	err := pids.Get()
+	// actually fetch the PIDs from the OS-specific code
+	_, plist, err := init.FetchPids()
 	if err != nil {
-		return nil, err
-	}
-	return pids.List, nil
-}
-
-func getProcState(b byte) string {
-	switch b {
-	case 'S':
-		return "sleeping"
-	case 'R':
-		return "running"
-	case 'D':
-		return "idle"
-	case 'T':
-		return "stopped"
-	case 'Z':
-		return "zombie"
-	}
-	return "unknown"
-}
-
-// GetOwnResourceUsageTimeInMillis return the user and system CPU usage time in milliseconds
-func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
-	r := sigar.Rusage{}
-	err := r.Get(0)
-	if err != nil {
-		return 0, 0, err
+		return nil, errors.Wrap(err, "error gathering PIDs")
 	}
 
-	uTime := int64(r.Utime / time.Millisecond)
-	sTime := int64(r.Stime / time.Millisecond)
-
-	return uTime, sTime, nil
-}
-
-func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
-	// This is a holdover until we migrate this library to metricbeat/internal
-	// At which point we'll use the memory code there.
-	var totalPhyMem uint64
-	if procStats.host != nil {
-		memStats, err := procStats.host.Memory()
-		if err != nil {
-			procStats.logger.Warnf("Getting memory details: %v", err)
-		} else {
-			totalPhyMem = memStats.Total
-		}
-
-	}
-
-	proc := common.MapStr{
-		"pid":      process.Pid,
-		"ppid":     process.Ppid,
-		"pgid":     process.Pgid,
-		"name":     process.Name,
-		"state":    process.State,
-		"username": process.Username,
-		"memory": common.MapStr{
-			"size": process.Mem.Size,
-			"rss": common.MapStr{
-				"bytes": process.Mem.Resident,
-				"pct":   GetProcMemPercentage(process, totalPhyMem),
-			},
-			"share": process.Mem.Share,
-		},
-	}
-
-	if len(process.Args) > 0 {
-		proc["args"] = process.Args
-	}
-
-	if process.CmdLine != "" {
-		proc["cmdline"] = process.CmdLine
-	}
-
-	if process.Cwd != "" {
-		proc["cwd"] = process.Cwd
-	}
-
-	if process.Executable != "" {
-		proc["exe"] = process.Executable
-	}
-
-	if len(process.Env) > 0 {
-		proc["env"] = process.Env
-	}
-
-	proc["cpu"] = common.MapStr{
-		"total": common.MapStr{
-			"value": process.cpuSinceStart,
-			"pct":   process.cpuTotalPct,
-			"norm": common.MapStr{
-				"pct": process.cpuTotalPctNorm,
-			},
-		},
-		"start_time": unixTimeMsToTime(process.CPU.StartTime),
-	}
-
-	if procStats.CPUTicks {
-		proc.Put("cpu.user.ticks", process.CPU.User)
-		proc.Put("cpu.system.ticks", process.CPU.Sys)
-		proc.Put("cpu.total.ticks", process.CPU.Total)
-	}
-
-	if process.FD != (sigar.ProcFDUsage{}) {
-		proc["fd"] = common.MapStr{
-			"open": process.FD.Open,
-			"limit": common.MapStr{
-				"soft": process.FD.SoftLimit,
-				"hard": process.FD.HardLimit,
-			},
-		}
-	}
-
-	if procStats.EnableCgroups && process.RawStats != nil {
-		statsMap, err := process.RawStats.Format()
-		if err != nil {
-			procStats.logger.Warnf("Getting memory details: %v", err)
-		} else {
-			proc["cgroup"] = statsMap
-		}
-
-	}
-
-	return proc
-}
-
-// GetProcCPUPercentage returns the percentage of total CPU time consumed by
-// the process during the period between the given samples. Two percentages are
-// returned (these must be multiplied by 100). The first is a normalized based
-// on the number of cores such that the value ranges on [0, 1]. The second is
-// not normalized and the value ranges on [0, number_of_cores].
-//
-// Implementation note: The total system CPU time (including idle) is not
-// provided so this method will resort to using the difference in wall-clock
-// time multiplied by the number of cores as the total amount of CPU time
-// available between samples. This could result in incorrect percentages if the
-// wall-clock is adjusted (prior to Go 1.9) or the machine is suspended.
-func GetProcCPUPercentage(s0, s1 *Process) (normalizedPct, pct, totalPct float64) {
-	if s0 != nil && s1 != nil {
-		timeDelta := s1.SampleTime.Sub(s0.SampleTime)
-		timeDeltaMillis := timeDelta / time.Millisecond
-		totalCPUDeltaMillis := int64(s1.CPU.Total - s0.CPU.Total)
-
-		pct := float64(totalCPUDeltaMillis) / float64(timeDeltaMillis)
-		normalizedPct := pct / float64(numcpu.NumCPU())
-		return common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
-			common.Round(pct, common.DefaultDecimalPlacesCount),
-			common.Round(float64(s1.CPU.Total), common.DefaultDecimalPlacesCount)
-	}
-	return 0, 0, 0
-}
-
-// matchProcess checks if the provided process name matches any of the process regexes
-func (procStats *Stats) matchProcess(name string) bool {
-	for _, reg := range procStats.procRegexps {
-		if reg.MatchString(name) {
-			return true
-		}
-	}
-	return false
+	return plist, nil
 }
 
 // Init initializes a Stats instance. It returns errors if the provided process regexes
 // cannot be compiled.
 func (procStats *Stats) Init() error {
 	procStats.logger = logp.NewLogger("processes")
-
 	var err error
 	procStats.host, err = sysinfo.Host()
 	if err != nil {
 		procStats.host = nil
 		procStats.logger.Warnf("Getting host details: %v", err)
+	}
+
+	//footcannon prevention
+	if procStats.Hostfs == nil {
+		procStats.Hostfs = resolve.NewTestResolver("/")
 	}
 
 	procStats.ProcsMap = make(ProcsMap)
@@ -467,124 +189,210 @@ func (procStats *Stats) Init() error {
 		}
 		procStats.cgroups = cgReader
 	}
-
 	return nil
 }
 
-// Get fetches process data which matches the provided regexes from the host.
-func (procStats *Stats) Get() ([]common.MapStr, error) {
+// Get fetches the configured processes and returns a list of formatted events and root ECS fields
+func (procStats *Stats) Get() ([]common.MapStr, []common.MapStr, error) {
+	//If the user hasn't configured any kind of process glob, return
 	if len(procStats.Procs) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 
-	pids, err := Pids()
+	// actually fetch the PIDs from the OS-specific code
+	pidMap, plist, err := procStats.FetchPids()
+
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to fetch the list of PIDs")
+		return nil, nil, errors.Wrap(err, "error gathering PIDs")
 	}
+	// We use this to track processes over time.
+	procStats.ProcsMap = pidMap
 
-	var processes []Process
-	newProcs := make(ProcsMap, len(pids))
+	// filter the process list that will be passed down to users
+	procStats.includeTopProcesses(plist)
 
-	for _, pid := range pids {
-		process := procStats.getSingleProcess(pid, newProcs)
-		if process == nil {
-			continue
+	// This is a holdover until we migrate this library to metricbeat/internal
+	// At which point we'll use the memory code there.
+	var totalPhyMem uint64
+	if procStats.host != nil {
+		memStats, err := procStats.host.Memory()
+		if err != nil {
+			procStats.logger.Warnf("Getting memory details: %v", err)
+		} else {
+			totalPhyMem = memStats.Total
 		}
-		processes = append(processes, *process)
+
 	}
-	procStats.ProcsMap = newProcs
 
-	processes = procStats.includeTopProcesses(processes)
-	procStats.logger.Debugf("Filtered top processes down to %d processes", len(processes))
+	//Format the list to the MapStr type used by the outputs
+	procs := []common.MapStr{}
+	rootEvents := []common.MapStr{}
 
-	procs := make([]common.MapStr, 0, len(processes))
-	for _, process := range processes {
-		proc := procStats.getProcessEvent(&process)
+	for _, process := range plist {
+		// Add the RSS pct memory first
+		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
+		//Create the root event
+		root := process.FormatForRoot()
+		rootMap := common.MapStr{}
+		err := typeconv.Convert(&rootMap, root)
+
+		proc, err := procStats.getProcessEvent(&process)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "error converting process for pid %d", process.Pid.ValueOr(0))
+		}
+
 		procs = append(procs, proc)
+		rootEvents = append(rootEvents, rootMap)
 	}
 
-	return procs, nil
+	return procs, rootEvents, nil
 }
 
 // GetOne fetches process data for a given PID if its name matches the regexes provided from the host.
 func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
-	if len(procStats.Procs) == 0 {
-		return nil, nil
+	pidStat, _, err := procStats.pidFill(pid, false)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error fetching PID %d", pid)
 	}
+	newMap := make(ProcsMap)
+	newMap[pid] = pidStat
+	procStats.ProcsMap = newMap
 
-	newProcs := make(ProcsMap, 1)
-	p := procStats.getSingleProcess(pid, newProcs)
-	if p == nil {
-		return common.MapStr{}, nil
-	}
-
-	e := procStats.getProcessEvent(p)
-	procStats.ProcsMap = newProcs
-
-	return e, nil
+	return procStats.getProcessEvent(&pidStat)
 }
 
-func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
-	var cmdline string
-	var env common.MapStr
-	// In the future we really should find a better way of distinguishing between serious and non-serious errors
-	// for now, just log and continue
-	logger := logp.L()
-	if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
-		if procStats.CacheCmdLine {
-			cmdline = previousProc.CmdLine
+// GetSelf gets process info for the beat itself
+func (procStats *Stats) GetSelf() (ProcState, error) {
+	self := os.Getpid()
+
+	pidStat, _, err := procStats.pidFill(self, false)
+	if err != nil {
+		return ProcState{}, errors.Wrapf(err, "error fetching PID %d", self)
+	}
+
+	return pidStat, nil
+}
+
+// pidIter wraps a few lines of generic code that all OS-specific FetchPids() functions must call.
+// this also handles the process of adding to the maps/lists in order to limit the code duplication in all the OS implementations
+func (procStats *Stats) pidIter(pid int, procMap map[int]ProcState, proclist []ProcState) (map[int]ProcState, []ProcState) {
+	status, saved, err := procStats.pidFill(pid, true)
+	if err != nil {
+		procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
+		return procMap, proclist
+	}
+	if !saved {
+		procStats.logger.Debugf("Process name does not match the provided regex; PID=%d; name=%s", pid, status.Name)
+		return procMap, proclist
+	}
+	procMap[pid] = status
+	proclist = append(proclist, status)
+
+	return procMap, proclist
+}
+
+// pidFill is an entrypoint used by OS-specific code to fill out a pid.
+// This in turn calls various OS-specific code to fill out the various bits of PID data
+// This is done to minimize the code duplication between different OS implementations
+// The second return value will only be false if an event has been filtered out
+func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
+	// Fetch proc state so we can get the name for filtering based on user's filter.
+
+	// OS-specific entrypoint, get basic info so we can at least run matchProcess
+	status, err := GetInfoForPid(procStats.Hostfs, pid)
+	if err != nil {
+		return status, true, errors.Wrap(err, "GetInfoForPid")
+	}
+	if procStats.skipExtended {
+		return status, true, nil
+	}
+	status = procStats.cacheCmdLine(status)
+
+	// Filter based on user-supplied func
+	if filter {
+		if !procStats.matchProcess(status.Name) {
+			return status, false, nil
 		}
-		env = previousProc.Env
 	}
 
-	process, err := newProcess(pid, cmdline, env)
+	//If we've passed the filter, continue to fill out the rest of the metrics
+	status, err = FillPidMetrics(procStats.Hostfs, pid, status, procStats.isWhitelistedEnvVar)
 	if err != nil {
-		logger.Debugf("Skip process pid=%d; err=%s", pid, err)
+		return status, true, errors.Wrap(err, "FillPidMetrics")
 	}
-	// The process is now gone. Skip.
-	if process == nil {
-		return nil
-	}
-
-	if !procStats.matchProcess(process.Name) {
-		logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s", pid, process.Name)
-		return nil
+	if len(status.Args) > 0 && status.Cmdline == "" {
+		status.Cmdline = strings.Join(status.Args, " ")
 	}
 
-	err = process.getDetails(procStats.isWhitelistedEnvVar)
-	if err != nil {
-		logger.Debugf("Error getting details for process %s with pid=%d; err=%s", process.Name, process.Pid, err)
-		return nil
-	}
-
+	//postprocess with cgroups and percentages
+	last, ok := procStats.ProcsMap[status.Pid.ValueOr(0)]
+	status.SampleTime = time.Now()
 	if procStats.EnableCgroups {
-		cgStats, err := procStats.cgroups.GetStatsForPid(pid)
+		cgStats, err := procStats.cgroups.GetStatsForPid(status.Pid.ValueOr(0))
 		if err != nil {
-			logger.Debugf("Error fetching cgroup data for process %s with pid=%d; err=%s", process.Name, process.Pid, err)
-		} else {
-			process.RawStats = cgStats
-			last := procStats.ProcsMap[process.Pid]
-			if last != nil {
-				process.RawStats.FillPercentages(last.RawStats, process.SampleTime, last.SampleTime)
-			}
+			return status, true, errors.Wrap(err, "cgroups.GetStatsForPid")
 		}
+		status.Cgroup = cgStats
+		if ok {
+			status.Cgroup.FillPercentages(last.Cgroup, status.SampleTime, last.SampleTime)
+		}
+	} // end cgroups processor
 
+	if ok {
+		status = GetProcCPUPercentage(last, status)
 	}
 
-	newProcs[process.Pid] = process
-	last := procStats.ProcsMap[process.Pid]
-	process.cpuTotalPctNorm, process.cpuTotalPct, process.cpuSinceStart = GetProcCPUPercentage(last, process)
-	return process
+	return status, true, nil
 }
 
-func (procStats *Stats) includeTopProcesses(processes []Process) []Process {
+// cacheCmdLine fills out Env and arg metrics from any stored previous metrics for the pid
+func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
+	if previousProc, ok := procStats.ProcsMap[in.Pid.ValueOr(0)]; ok {
+		if procStats.CacheCmdLine {
+			in.Args = previousProc.Args
+			in.Cmdline = previousProc.Cmdline
+		}
+		env := previousProc.Env
+		in.Env = env
+	}
+	return in
+}
+
+// return a formatted MapStr of the process metrics
+func (procStats *Stats) getProcessEvent(process *ProcState) (common.MapStr, error) {
+
+	// Remove CPUTicks if needed
+	if !procStats.CPUTicks {
+		process.CPU.User.Ticks = opt.NewUintNone()
+		process.CPU.System.Ticks = opt.NewUintNone()
+		process.CPU.Total.Ticks = opt.NewUintNone()
+	}
+
+	proc := common.MapStr{}
+	err := typeconv.Convert(&proc, process)
+
+	return proc, err
+}
+
+// matchProcess checks if the provided process name matches any of the process regexes
+func (procStats *Stats) matchProcess(name string) bool {
+	for _, reg := range procStats.procRegexps {
+		if reg.MatchString(name) {
+			return true
+		}
+	}
+	return false
+}
+
+// includeTopProcesses filters down the metrics based on top CPU or top Memory settings
+func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 	if !procStats.IncludeTop.Enabled ||
 		(procStats.IncludeTop.ByCPU == 0 && procStats.IncludeTop.ByMemory == 0) {
 
 		return processes
 	}
 
-	var result []Process
+	var result []ProcState
 	if procStats.IncludeTop.ByCPU > 0 {
 		numProcs := procStats.IncludeTop.ByCPU
 		if len(processes) < procStats.IncludeTop.ByCPU {
@@ -592,7 +400,7 @@ func (procStats *Stats) includeTopProcesses(processes []Process) []Process {
 		}
 
 		sort.Slice(processes, func(i, j int) bool {
-			return processes[i].cpuTotalPct > processes[j].cpuTotalPct
+			return processes[i].CPU.Total.Pct.ValueOr(0) > processes[j].CPU.Total.Pct.ValueOr(0)
 		})
 		result = append(result, processes[:numProcs]...)
 	}
@@ -604,7 +412,7 @@ func (procStats *Stats) includeTopProcesses(processes []Process) []Process {
 		}
 
 		sort.Slice(processes, func(i, j int) bool {
-			return processes[i].Mem.Resident > processes[j].Mem.Resident
+			return processes[i].Memory.Rss.Bytes.ValueOr(0) > processes[j].Memory.Rss.Bytes.ValueOr(0)
 		})
 		for _, proc := range processes[:numProcs] {
 			if !isProcessInSlice(result, &proc) {
@@ -614,17 +422,6 @@ func (procStats *Stats) includeTopProcesses(processes []Process) []Process {
 	}
 
 	return result
-}
-
-// isProcessInSlice looks up proc in the processes slice and returns if
-// found or not
-func isProcessInSlice(processes []Process, proc *Process) bool {
-	for _, p := range processes {
-		if p.Pid == proc.Pid {
-			return true
-		}
-	}
-	return false
 }
 
 // isWhitelistedEnvVar returns true if the given variable name is a match for
@@ -640,10 +437,4 @@ func (procStats Stats) isWhitelistedEnvVar(varName string) bool {
 		}
 	}
 	return false
-}
-
-// unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch
-// to a common.Time value.
-func unixTimeMsToTime(unixTimeMs uint64) common.Time {
-	return common.Time(time.Unix(0, int64(unixTimeMs*1000000)))
 }

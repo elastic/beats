@@ -182,9 +182,7 @@ file_selectors:
 [float]
 ==== `fips_enabled`
 
-Enabling this option changes the service name from `s3` to `s3-fips` for
-connecting to the correct service endpoint. For example:
-`s3-fips.us-gov-east-1.amazonaws.com`.
+Moved to <<aws-credentials-config,AWS credentials options>>.
 
 [id="input-{type}-include_s3_metadata"]
 [float]

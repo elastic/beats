@@ -43,12 +43,12 @@ class TestKeystore(KeystoreBase):
         key = "elasticsearch_host"
 
         self.render_config_template(keystore_path=self.keystore_path, elasticsearch={
-            'hosts': "${%s}:9200" % key
+            'host': "${%s}:9200" % key
         })
 
         exit_code = self.run_beat()
         assert self.log_contains(
-            "missing field accessing 'output.elasticsearch.hosts'")
+            "missing field accessing 'output.elasticsearch.hosts.0'")
         assert exit_code == 1
 
     def test_keystore_with_nested_key(self):
@@ -80,9 +80,10 @@ class TestKeystore(KeystoreBase):
         key = "asecret"
         secret = "asecretvalue"
 
-        self.render_config_template(keystore_path=self.keystore_path, elasticsearch={
-            'hosts': "${%s}" % key
-        })
+        self.render_config_template(
+            keystore_path=self.keystore_path,
+            elasticsearch=self.get_elasticsearch_template_config()
+        )
 
         exit_code = self.run_beat(extra_args=["keystore", "create"])
         assert exit_code == 0
@@ -92,4 +93,3 @@ class TestKeystore(KeystoreBase):
 
         assert exit_code == 0
         assert self.log_contains(secret) == False
-        assert self.log_contains("${%s}" % key)

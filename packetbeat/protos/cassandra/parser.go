@@ -44,14 +44,7 @@ type parserConfig struct {
 
 // check whether this ops is enabled or not
 func (p *parser) CheckFrameOpsIgnored() bool {
-	if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
-		//default map value is false
-		v := p.config.ignoredOps[p.framer.Header.Op]
-		if v {
-			return true
-		}
-	}
-	return false
+	return p.config.ignoredOps[p.framer.Header.Op]
 }
 
 type message struct {
@@ -68,8 +61,6 @@ type message struct {
 	header map[string]interface{}
 	// list element use by 'transactions' for correlation
 	next *message
-
-	transactionTimeout time.Duration
 
 	results transactions
 }
@@ -91,7 +82,6 @@ func (p *parser) init(
 	}
 
 	isDebug = logp.IsDebug("cassandra")
-
 }
 
 func (p *parser) append(data []byte) error {
@@ -153,7 +143,7 @@ func (p *parser) parserBody() (bool, error) {
 		return true, nil
 	}
 
-	//let's wait for enough buf
+	// let's wait for enough buf
 	debugf("bodyLength: %d", bdyLen)
 	if !p.buf.Avail(bdyLen) {
 		if isDebug {
@@ -162,7 +152,7 @@ func (p *parser) parserBody() (bool, error) {
 		return false, nil
 	}
 
-	//check if the ops already ignored
+	// check if the ops already ignored
 	if p.message.ignored {
 		if isDebug {
 			debugf("message marked to be ignored, let's do this")
@@ -232,7 +222,7 @@ func (p *parser) parse() (*message, error) {
 		}
 	}
 
-	//check if the ops need to be ignored
+	// check if the ops need to be ignored
 	if p.CheckFrameOpsIgnored() {
 		// as we already ignore the content, we now mark the result is ignored
 		p.message.ignored = true
@@ -248,7 +238,7 @@ func (p *parser) parse() (*message, error) {
 		return nil, err
 	}
 
-	//ignore and wait for more data
+	// ignore and wait for more data
 	if !finished {
 		return nil, nil
 	}

@@ -338,6 +338,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "ff02::1:3",
+          "locality": "internal",
           "port": 5355
         },
         "event": {
@@ -352,7 +354,7 @@
           ]
         },
         "flow": {
-          "id": "y_Vml2vPNtw",
+          "id": "iOQ1bg2JOLM",
           "locality": "internal"
         },
         "netflow": {
@@ -388,7 +390,7 @@
         },
         "network": {
           "bytes": 144,
-          "community_id": "1:Nl0K3f1AqKrkGYEhoNHcgFAr/EY=",
+          "community_id": "1:pr+rxLjqBu9/jT6yJoAEy7/fgdY=",
           "direction": "outbound",
           "iana_number": 17,
           "packets": 2,
@@ -397,8 +399,16 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::5187:5cd8:d750:cdc9",
+            "ff02::1:3"
+          ]
+        },
         "source": {
           "bytes": 144,
+          "ip": "fe80::5187:5cd8:d750:cdc9",
+          "locality": "internal",
           "packets": 2,
           "port": 61329
         }

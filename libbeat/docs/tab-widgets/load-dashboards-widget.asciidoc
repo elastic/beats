@@ -23,13 +23,6 @@
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="brew-tab-load-dashboards"
-            id="brew-load-dashboards"
-            tabindex="-1">
-      Brew
-    </button>
-    <button role="tab"
-            aria-selected="false"
             aria-controls="linux-tab-load-dashboards"
             id="linux-load-dashboards"
             tabindex="-1">
@@ -79,17 +72,6 @@ include::load-dashboards.asciidoc[tag=rpm]
 ++++
 
 include::load-dashboards.asciidoc[tag=mac]
-
-++++
-  </div>
-  <div tabindex="0"
-       role="tabpanel"
-       id="brew-tab-load-dashboards"
-       aria-labelledby="brew-load-dashboards"
-       hidden="">
-++++
-
-include::load-dashboards.asciidoc[tag=brew]
 
 ++++
   </div>

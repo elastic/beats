@@ -66,7 +66,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(lambda: self.log_contains(
-            "Started listening for TCP connection"))
+            "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
@@ -118,7 +118,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(lambda: self.log_contains(
-            "Started listening for TCP connection"))
+            "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
@@ -159,7 +159,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(lambda: self.log_contains(
-            "Started listening for TCP connection"))
+            "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
@@ -206,7 +206,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(lambda: self.log_contains(
-            "Started listening for TCP connection"))
+            "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -264,7 +264,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(lambda: self.log_contains(
-            "Started listening for TCP connection"))
+            "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         sock.connect((config.get('host'), config.get('port')))
@@ -317,7 +317,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(lambda: self.log_contains(
-            "Started listening for TCP connection"))
+            "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

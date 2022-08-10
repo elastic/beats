@@ -30,8 +30,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 )
 
-var systemTest *bool
-var fbCommand *cmd.BeatsRootCmd
+var (
+	systemTest *bool
+	fbCommand  *cmd.BeatsRootCmd
+)
 
 func init() {
 	testing.Init()

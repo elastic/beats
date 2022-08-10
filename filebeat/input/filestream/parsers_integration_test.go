@@ -33,7 +33,7 @@ func TestParsersAgentLogs(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"ndjson": map[string]interface{}{
 					"message_key":    "log",
 					"overwrite_keys": true,
@@ -68,7 +68,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"ndjson": map[string]interface{}{
 					"message_key": "log",
 					"target":      "",
@@ -106,7 +106,7 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"ndjson": map[string]interface{}{
 					"message_key":    "message",
 					"target":         "",
@@ -141,7 +141,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"ndjson": map[string]interface{}{
 					"target":         "",
 					"overwrite_keys": true,
@@ -181,7 +181,7 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
@@ -215,7 +215,7 @@ func TestParsersCStyleLog(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "\\\\$",
@@ -248,8 +248,6 @@ The total should be 4 lines covered
 
 // test_rabbitmq_multiline_log from test_multiline.py
 func TestParsersRabbitMQMultilineLog(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/27893")
-
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -257,13 +255,13 @@ func TestParsersRabbitMQMultilineLog(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^=[A-Z]+",
 					"negate":  true,
 					"match":   "after",
-					"timeout": "100ms", // set to lower value to speed up test
+					"timeout": "3s", // set to lower value to speed up test
 				},
 			},
 		},
@@ -294,8 +292,6 @@ connection <0.23893.109>, channel 3 - soft error:
 
 // test_max_lines from test_multiline.py
 func TestParsersMultilineMaxLines(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/27894")
-
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -303,14 +299,14 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":      "pattern",
 					"pattern":   "^\\[",
 					"negate":    true,
 					"match":     "after",
 					"max_lines": 3,
-					"timeout":   "100ms", // set to lower value to speed up test
+					"timeout":   "3s", // set to lower value to speed up test
 				},
 			},
 		},
@@ -346,7 +342,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":      "pattern",
 					"pattern":   "^\\[",
@@ -387,7 +383,8 @@ func TestParsersMultilineTimeout(t *testing.T) {
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreLines))
-	env.requireEventsReceived([]string{`[2015] hello world
+	env.requireEventsReceived([]string{
+		`[2015] hello world
   First Line
   Second Line`,
 		`  This should not be third
@@ -402,7 +399,6 @@ func TestParsersMultilineTimeout(t *testing.T) {
 
 // test_max_bytes from test_multiline.py
 func TestParsersMultilineMaxBytes(t *testing.T) {
-	t.Skip("Flaky test https://github.com/elastic/beats/issues/28088")
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -411,13 +407,13 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 		"prospector.scanner.check_interval": "1ms",
 		"message_max_bytes":                 50,
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
 					"negate":  true,
 					"match":   "after",
-					"timeout": "100ms", // set to lower value to speed up test
+					"timeout": "3s", // set to lower value to speed up test
 				},
 			},
 		},
@@ -450,9 +446,9 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
-		"close.reader.after_interval":       "100ms",
+		"close.reader.after_interval":       "1s",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
@@ -492,7 +488,8 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreLines))
-	env.requireEventsReceived([]string{`[2015] hello world
+	env.requireEventsReceived([]string{
+		`[2015] hello world
   First Line
   Second Line`,
 		`  This should not be third
@@ -507,22 +504,21 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 // test_consecutive_newline from test_multiline.py
 func TestParsersConsecutiveNewline(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/27085")
-
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
+		"close.reader.after_interval":       "1s",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
 					"negate":  true,
 					"match":   "after",
-					"timeout": "100ms", // set to lower value to speed up test
+					"timeout": "3s", // set to lower value to speed up test
 				},
 			},
 		},

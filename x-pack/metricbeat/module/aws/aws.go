@@ -7,6 +7,7 @@ package aws
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -105,9 +106,12 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		awsConfig.Region = config.Regions[0]
 	}
 
+	stsServiceName := awscommon.CreateServiceName("sts", config.AWSConfig.FIPSEnabled, awsConfig.Region)
+	iamServiceName := awscommon.CreateServiceName("iam", config.AWSConfig.FIPSEnabled, awsConfig.Region)
+
 	// Get IAM account id
 	svcSts := sts.New(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, "sts", "", awsConfig))
+		config.AWSConfig.Endpoint, stsServiceName, "", awsConfig))
 	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
 	outputIdentity, err := reqIdentity.Send(context.TODO())
 	if err != nil {
@@ -116,16 +120,20 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		metricSet.AccountID = *outputIdentity.Account
 		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.AccountID)
 	}
-
+	iamRegion := ""
+	if strings.HasPrefix(awsConfig.Region, "us-gov-") {
+		iamRegion = "us-gov"
+	}
 	// Get account name/alias
 	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, "iam", "", awsConfig))
+		config.AWSConfig.Endpoint, iamServiceName, iamRegion, awsConfig))
 	metricSet.AccountName = getAccountName(svcIam, base, metricSet)
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
+		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsConfig.Region)
 		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, "ec2", "", awsConfig))
+			config.AWSConfig.Endpoint, ec2ServiceName, "", awsConfig))
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
 			return nil, err
