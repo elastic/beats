@@ -170,18 +170,18 @@ func setupFlows(pipeline beat.Pipeline, watcher procs.ProcessesWatcher, cfg conf
 		return nil, err
 	}
 
-	clientConfig := beat.ClientConfig{
+	var meta mapstr.M
+	if cfg.Flows.Index != "" {
+		meta = mapstr.M{"raw_index": cfg.Flows.Index}
+	}
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			EventMetadata: cfg.Flows.EventMetadata,
 			Processor:     processors,
 			KeepNull:      cfg.Flows.KeepNull,
+			Meta:          meta,
 		},
-	}
-	if cfg.Flows.Index != "" {
-		clientConfig.Processing.Meta = mapstr.M{"raw_index": cfg.Flows.Index}
-	}
-
-	client, err := pipeline.ConnectWith(clientConfig)
+	})
 	if err != nil {
 		return nil, err
 	}
