@@ -192,8 +192,7 @@ func (udp6RowOwnerPIDExtractor) Size() int {
 }
 
 func addressIPv6(s [16]byte) net.IP {
-	// FIXME: This can be rewritten as s[:]
-	return net.IP(s[:])
+	return s[:]
 }
 
 func addressIPv4(value uint32) net.IP {
