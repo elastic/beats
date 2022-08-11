@@ -465,13 +465,7 @@ func (f *rawFlowID) extractID(off, sz uint8) []byte {
 	if off == offUnset {
 		return nil
 	}
-
-	{
-		// FIXME: Calculate these offsets inline; they generate the same code that way more simply.
-		off := int(off)
-		sz := int(sz)
-		return f.flowID[off : off+sz]
-	}
+	return f.flowID[off : int(off)+int(sz)]
 }
 
 func (f *rawFlowID) sortAddrRead(off, sz uint8) ([]byte, []byte, bool) {
