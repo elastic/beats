@@ -16,7 +16,7 @@ import (
 )
 
 func TestS3(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"name": "foobar",
 		"triggers": []map[string]interface{}{
 			map[string]interface{}{

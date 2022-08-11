@@ -248,7 +248,7 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 		unescaped_key, err := url.QueryUnescape(record.S3.Object.Key)
 
 		if err != nil {
-			fmt.Println("Got error unescaping key: %s", record.S3.Object.Key)
+			fmt.Println("Got error unescaping key: ", record.S3.Object.Key)
 			fmt.Println(err.Error())
 			return nil, err
 		}
