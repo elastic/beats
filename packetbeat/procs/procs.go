@@ -31,7 +31,7 @@ import (
 // This controls how often process info for a running process is reloaded
 // A big value means less unnecessary refreshes at a higher risk of missing
 // a PID being recycled by the OS
-const processCacheExpiration = time.Second * 30
+const processCacheExpiration = 30 * time.Second
 
 var (
 	anyIPv4 = net.IPv4zero.String()
@@ -44,11 +44,11 @@ type ProcessesWatcher struct {
 	localAddrs   []net.IP         // localAddrs lists IP addresses that are to be treated as local.
 	processCache map[int]*process // processCache is a time-expiration cache of process details keyed on PID.
 
-	enabled    bool         // enabled specifier whether the ProcessWatcher will be active.
-	procConfig []ProcConfig // procConfig is the set of processes that are monitored by the ProcessWatcher.
+	enabled   bool         // enabled specifier whether the ProcessWatcher will be active.
+	monitored []ProcConfig // monitored is the set of processes that are monitored by the ProcessWatcher.
 
-	// impl is the OS-dependent engine for the ProcessWatcher.
-	impl processWatcherImpl
+	// watcher is the OS-dependent engine for the ProcessWatcher.
+	watcher processWatcher
 }
 
 // endpoint is a network address/port number complex.
@@ -71,18 +71,18 @@ type process struct {
 	args           []string
 	startTime      time.Time
 
-	// expiration is the time at which the process will be dropped
+	// expires is the time at which the process will be dropped
 	// from the cache during enrichment queries.
-	expiration time.Time
+	expires time.Time
 }
 
 // Init initializes the ProcessWatcher with the provided configuration.
 func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
-	return proc.initWithImpl(config, proc)
+	return proc.init(config, proc)
 }
 
-// processWatcherImpl allows the OS-dependent implementation to be replaced by a mock for testing
-type processWatcherImpl interface {
+// processWatcher allows the OS-dependent implementation to be replaced by a mock for testing
+type processWatcher interface {
 	// GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 	// that owns them.
 	GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error)
@@ -94,9 +94,9 @@ type processWatcherImpl interface {
 	GetLocalIPs() ([]net.IP, error)
 }
 
-// initWithImpl sets up the necessary data structures for the ProcessWatcher.
-func (proc *ProcessesWatcher) initWithImpl(config ProcsConfig, impl processWatcherImpl) error {
-	proc.impl = impl
+// init sets up the necessary data structures for the ProcessWatcher.
+func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher) error {
+	proc.watcher = watcher
 	proc.portProcMap = map[applayer.Transport]map[endpoint]portProcMapping{
 		applayer.TransportUDP: make(map[endpoint]portProcMapping),
 		applayer.TransportTCP: make(map[endpoint]portProcMapping),
@@ -113,7 +113,7 @@ func (proc *ProcessesWatcher) initWithImpl(config ProcsConfig, impl processWatch
 
 	// Read the local IP addresses.
 	var err error
-	proc.localAddrs, err = impl.GetLocalIPs()
+	proc.localAddrs, err = watcher.GetLocalIPs()
 	if err != nil {
 		logp.Err("Error getting local IP addresses: %s", err)
 
@@ -122,7 +122,7 @@ func (proc *ProcessesWatcher) initWithImpl(config ProcsConfig, impl processWatch
 		proc.localAddrs = []net.IP{}
 	}
 
-	proc.procConfig = config.Monitored
+	proc.monitored = config.Monitored
 
 	return nil
 }
@@ -235,7 +235,7 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 		}()
 	}
 
-	endpoints, err := proc.impl.GetLocalPortToPIDMapping(transport)
+	endpoints, err := proc.watcher.GetLocalPortToPIDMapping(transport)
 	if err != nil {
 		logp.Err("unable to list local ports: %v", err)
 	}
@@ -250,7 +250,7 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 func (proc *ProcessesWatcher) expireProcessCache() {
 	now := time.Now()
 	for pid, info := range proc.processCache {
-		if now.After(info.expiration) {
+		if now.After(info.expires) {
 			delete(proc.processCache, pid)
 		}
 	}
@@ -292,14 +292,14 @@ func (proc *ProcessesWatcher) getProcessInfo(pid int) *process {
 		return p
 	}
 	// Not in cache, resolve process info
-	p := proc.impl.GetProcess(pid)
+	p := proc.watcher.GetProcess(pid)
 	if p == nil {
 		return nil
 	}
 
 	// The packetbeat.procs.monitored*.cmdline_grep allows you to overwrite
 	// the process name with an alias.
-	for _, match := range proc.procConfig {
+	for _, match := range proc.monitored {
 		if strings.Contains(strings.Join(p.args, " "), match.CmdlineGrep) {
 			p.name = match.Process
 			break
@@ -328,14 +328,14 @@ func (proc *ProcessesWatcher) GetProcess(pid int) *process {
 	}
 
 	return &process{
-		pid:        info.PID,
-		ppid:       info.PPID,
-		name:       procName(info),
-		exe:        info.Exe,
-		cwd:        info.CWD,
-		args:       info.Args,
-		startTime:  info.StartTime,
-		expiration: time.Now().Add(processCacheExpiration),
+		pid:       info.PID,
+		ppid:      info.PPID,
+		name:      procName(info),
+		exe:       info.Exe,
+		cwd:       info.CWD,
+		args:      info.Args,
+		startTime: info.StartTime,
+		expires:   time.Now().Add(processCacheExpiration),
 	}
 }
 

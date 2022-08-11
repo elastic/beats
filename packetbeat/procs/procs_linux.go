@@ -161,9 +161,9 @@ type socketInfo struct {
 }
 
 // socketsFromProc returns the socket information held in the the /proc/net file
-// at filename.
-func socketsFromProc(filename string, ipv6 bool) ([]*socketInfo, error) {
-	file, err := os.Open(filename)
+// at path.
+func socketsFromProc(path string, ipv6 bool) ([]*socketInfo, error) {
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
