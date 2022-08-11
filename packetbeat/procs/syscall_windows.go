@@ -26,17 +26,28 @@ package procs
 
 import (
 	"syscall"
+	"unsafe"
 )
 
 const (
 	UDP_TABLE_OWNER_PID     = 1
 	TCP_TABLE_OWNER_PID_ALL = 5
 
-	// FIXME: Use unsafe and compile time checks for these sizes.
-	sizeOfDWORD           = 4
-	sizeOfTCPRowOwnerPID  = 24
-	sizeOfTCP6RowOwnerPID = 56
+	sizeOfDWORD           = int(unsafe.Sizeof(uint32(0)))
+	sizeOfTCPRowOwnerPID  = int(unsafe.Sizeof(TCPRowOwnerPID{}))
+	sizeOfTCP6RowOwnerPID = int(unsafe.Sizeof(TCP6RowOwnerPID{}))
 )
+
+func _() {
+	// Make sure the structs in Go have the expected size.
+
+	// An invalid array index indicates that the size of the Go struct does not match
+	// the expected size according to the Microsoft documentation.
+	var x [1]struct{}
+	_ = x[sizeOfDWORD-4]
+	_ = x[sizeOfTCPRowOwnerPID-24]
+	_ = x[sizeOfTCP6RowOwnerPID-56]
+}
 
 // https://docs.microsoft.com/en-us/windows/win32/api/tcpmib/ns-tcpmib-mib_tcprow_owner_pid
 type TCPRowOwnerPID struct {

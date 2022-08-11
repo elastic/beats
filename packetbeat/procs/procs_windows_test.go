@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"net"
 	"testing"
-	"unsafe"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -108,12 +107,4 @@ func TestParseTableRaw(t *testing.T) {
 			assert.Equal(t, testCase.expected, result, msg)
 		}
 	}
-}
-
-func TestParseTableSizes(t *testing.T) {
-	// FIXME: Use compile time checks for these sizes.
-
-	// Make sure the structs in Golang have the expected size
-	assert.Equal(t, uintptr(sizeOfTCPRowOwnerPID), unsafe.Sizeof(TCPRowOwnerPID{}))
-	assert.Equal(t, uintptr(sizeOfTCP6RowOwnerPID), unsafe.Sizeof(TCP6RowOwnerPID{}))
 }
