@@ -8,6 +8,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -74,6 +75,11 @@ func TestPackages() error {
 // Update updates the generated files (aka make update).
 func Update() {
 	mg.SerialDeps(Fields, FieldDocs, Config)
+}
+
+func HintegTest() error {
+	fmt.Println("Running heartbeat go integ tests")
+	return devtools.GoIntegTestFromHost(context.Background(), devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
 func Fields() error {
