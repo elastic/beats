@@ -14,6 +14,7 @@ import (
 	"io"
 	"io/ioutil"
 	"time"
+	"net/url"
 	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -298,11 +299,11 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 		for obj_line.Scan() {
 			s3evt := beat.Event{
 				Timestamp: time.Now(),
-				Fields: common.MapStr{
-					"event": common.MapStr{
+				Fields: mapstr.M{
+					"event": mapstr.M{
 						"kind": "event",
 					},
-					"cloud": common.MapStr{
+					"cloud": mapstr.M{
 						"provider": "aws",
 						"region":   record.AWSRegion,
 					},

@@ -15,10 +15,8 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
 
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
@@ -54,7 +52,7 @@ type S3 struct {
 }
 
 // NewS3 creates a new function to receives events from a S3 queue.
-func NewS3(provider provider.Provider, cfg *common.Config) (provider.Function, error) {
+func NewS3(provider provider.Provider, cfg *conf.C) (provider.Function, error) {
 	config := &S3Config{LambdaConfig: DefaultLambdaConfig}
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err
@@ -68,14 +66,14 @@ func S3Details() feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (s *S3) Run(_ context.Context, client core.Client, t telemetry.T) error {
+func (s *S3) Run(_ context.Context, client pipeline.ISyncClient, t telemetry.T) error {
 	t.AddTriggeredFunction()
 
 	lambdarunner.Start(s.createHandler(client))
 	return nil
 }
 
-func (s *S3) createHandler(client core.Client) func(request events.S3Event) error {
+func (s *S3) createHandler(client pipeline.ISyncClient) func(request events.S3Event) error {
 	return func(request events.S3Event) error {
 		s.log.Debugf("The handler receives %d events", len(request.Records))
 		events, err := transformer.S3GetEvents(request)
@@ -85,18 +83,9 @@ func (s *S3) createHandler(client core.Client) func(request events.S3Event) erro
 			return err
 		}
 
-		for i := 0; i < len(events); i += 5120 {
-			j := i + 5120
-			if j > len(events) {
-				j = len(events)
-			}
-
-			s.log.Infof("publishing", j, "events, remaining ", int(len(events) - i), "events")
-
-			if err := client.PublishAll(events[i:j]); err != nil {
-				s.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
-				return err
-			}
+		if err := client.PublishAll(events); err != nil {
+			s.log.Errorf("Could not publish events to the pipeline, error: %+v", err)
+			return err
 		}
 		client.Wait()
 		return nil
