@@ -100,6 +100,9 @@ const (
 		SizeTCPFlowID +
 		SizeUDPFlowID +
 		SizeConnectionID
+
+	// Ensure that SizeFlowIDMax is not greater than 255.
+	_ = uint8(SizeFlowIDMax)
 )
 
 const offUnset uint8 = 0xff
@@ -132,13 +135,6 @@ const (
 	flowDirForward
 	flowDirReversed
 )
-
-func init() {
-	// FIXME: Make this a compile time check.
-	if SizeFlowIDMax > 255 {
-		panic("SizeFlowIDMax exceeds size limit")
-	}
-}
 
 func newFlowID() *FlowID {
 	f := &FlowID{}
