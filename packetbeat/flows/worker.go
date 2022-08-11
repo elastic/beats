@@ -128,38 +128,36 @@ func (w *worker) periodically(tick time.Duration, fn func() error) {
 // Flows are published via the pub Reporter after being enriched with process information
 // by watcher.
 func newFlowsWorker(pub Reporter, watcher procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration) (*worker, error) {
-	oneSecond := 1 * time.Second
-
-	if timeout < oneSecond {
+	if timeout < time.Second {
 		return nil, ErrInvalidTimeout
 	}
 
-	if 0 < period && period < oneSecond {
+	if 0 < period && period < time.Second {
 		return nil, ErrInvalidPeriod
 	}
 
-	tickDuration := timeout
+	tick := timeout
 	ticksTimeout := 1
 	ticksPeriod := -1
 	if period > 0 {
-		tickDuration = time.Duration(gcd(int64(timeout), int64(period)))
-		if tickDuration < oneSecond {
-			tickDuration = oneSecond
+		tick = gcd(timeout, period)
+		if tick < time.Second {
+			tick = time.Second
 		}
 
-		ticksTimeout = int(timeout / tickDuration)
+		ticksTimeout = int(timeout / tick)
 		if ticksTimeout == 0 {
 			ticksTimeout = 1
 		}
 
-		ticksPeriod = int(period / tickDuration)
+		ticksPeriod = int(period / tick)
 		if ticksPeriod == 0 {
 			ticksPeriod = 1
 		}
 	}
 
 	debugf("new flows worker. timeout=%v, period=%v, tick=%v, ticksTO=%v, ticksP=%v",
-		timeout, period, tickDuration, ticksTimeout, ticksPeriod)
+		timeout, period, tick, ticksTimeout, ticksPeriod)
 
 	defaultBatchSize := 1024
 	processor := &flowsProcessor{
@@ -170,11 +168,11 @@ func newFlowsWorker(pub Reporter, watcher procs.ProcessesWatcher, table *flowMet
 	}
 	processor.spool.init(pub, defaultBatchSize)
 
-	return makeWorker(processor, tickDuration, ticksTimeout, ticksPeriod, 10)
+	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, 10)
 }
 
 // gcd returns the greatest common divisor of a and b.
-func gcd(a, b int64) int64 {
+func gcd(a, b time.Duration) time.Duration {
 	// FIXME: This can be rewritten as:
 	//
 	//   func gcd(a, b time.Duration) time.Duration {
@@ -234,7 +232,7 @@ func gcd(a, b int64) int64 {
 // makeWorker returns a worker that runs processor.execute each tick. Each timeout'th tick,
 // the worker will check flow timeouts and each period'th tick, the worker will report flow
 // events to be published.
-func makeWorker(processor *flowsProcessor, tickDuration time.Duration, ticksTimeout, ticksPeriod int, align int64) (*worker, error) {
+func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period int, align int64) (*worker, error) {
 	return newWorker(func(w *worker) {
 		defer processor.execute(w, false, true, true)
 
@@ -248,22 +246,22 @@ func makeWorker(processor *flowsProcessor, tickDuration time.Duration, ticksTime
 			}
 		}
 
-		nTimeout := ticksTimeout
-		nPeriod := ticksPeriod
-		reportPeriodically := ticksPeriod > 0
+		nTimeout := timeout
+		nPeriod := period
+		reportPeriodically := period > 0
 		debugf("start flows worker loop")
-		w.periodically(tickDuration, func() error {
+		w.periodically(tick, func() error {
 			nTimeout--
 			nPeriod--
 			debugf("worker tick, nTimeout=%v, nPeriod=%v", nTimeout, nPeriod)
 
 			handleTimeout := nTimeout == 0
-			handleReports := reportPeriodically && nPeriod == 0
 			if handleTimeout {
-				nTimeout = ticksTimeout
+				nTimeout = timeout
 			}
+			handleReports := reportPeriodically && nPeriod == 0
 			if nPeriod <= 0 {
-				nPeriod = ticksPeriod
+				nPeriod = period
 			}
 
 			processor.execute(w, handleTimeout, handleReports, false)
