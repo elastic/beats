@@ -18,6 +18,7 @@
 //go:build windows
 // +build windows
 
+//nolint:structcheck // Struct fields reflect Windows layout.
 package procs
 
 // Add -trace to enable debug prints around syscalls.
@@ -31,7 +32,7 @@ const (
 	UDP_TABLE_OWNER_PID     = 1
 	TCP_TABLE_OWNER_PID_ALL = 5
 
-	//FIXME: Use unsafe and compile time checks for these sizes.
+	// FIXME: Use unsafe and compile time checks for these sizes.
 	sizeOfDWORD           = 4
 	sizeOfTCPRowOwnerPID  = 24
 	sizeOfTCP6RowOwnerPID = 56

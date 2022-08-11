@@ -30,7 +30,7 @@ import (
 )
 
 func TestFindSocketsOfPid(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	proc := []testProcFile{
 		{path: "/proc/766/fd/0", isLink: true, contents: "/dev/null"},
@@ -131,23 +131,6 @@ func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
 	}
 
 	return nil
-}
-
-func assertIntArraysAreEqual(t *testing.T, expected []int, result []int) bool {
-	for _, ex := range expected {
-		found := false
-		for _, res := range result {
-			if ex == res {
-				found = true
-				break
-			}
-		}
-		if !found {
-			t.Errorf("Expected array %v but got %v", expected, result)
-			return false
-		}
-	}
-	return true
 }
 
 func assertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64) bool {

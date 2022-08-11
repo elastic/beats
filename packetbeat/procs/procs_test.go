@@ -79,7 +79,7 @@ func (impl *testingImpl) GetLocalIPs() ([]net.IP, error) {
 }
 
 func TestFindProcessTuple(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	config := ProcsConfig{
 		Enabled: true,
 		Monitored: []ProcConfig{
