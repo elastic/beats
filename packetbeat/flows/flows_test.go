@@ -87,8 +87,8 @@ func TestFlowsCounting(t *testing.T) {
 		t.Fatalf("Failed to create flow worker: %v", err)
 	}
 
-	worker.Start()
-	defer worker.Stop()
+	worker.start()
+	defer worker.stop()
 
 	idForward := newFlowID()
 	addrForward := addAll(

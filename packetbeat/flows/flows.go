@@ -104,11 +104,11 @@ func (f *Flows) Get(id *FlowID) *Flow {
 }
 
 func (f *Flows) Start() {
-	f.worker.Start()
+	f.worker.start()
 }
 
 func (f *Flows) Stop() {
-	f.worker.Stop()
+	f.worker.stop()
 }
 
 func (f *Flows) NewInt(name string) (*Int, error) {

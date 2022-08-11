@@ -39,7 +39,6 @@ var (
 )
 
 // worker is a generic asynchronous function processor.
-// FIXME: Unexport methods on worker.
 type worker struct {
 	wg   sync.WaitGroup
 	done chan struct{}
@@ -55,7 +54,7 @@ func newWorker(fn func(w *worker)) *worker {
 }
 
 // start starts execution of the worker function.
-func (w *worker) Start() {
+func (w *worker) start() {
 	debugf("start flows worker")
 	w.wg.Add(1)
 	go func() {
@@ -74,7 +73,7 @@ func (w *worker) finished() {
 
 // stop terminates the function and waits until processing is complete.
 // stop may only be called once.
-func (w *worker) Stop() {
+func (w *worker) stop() {
 	debugf("stop flows worker")
 	close(w.done)
 	w.wg.Wait()
