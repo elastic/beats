@@ -15,15 +15,28 @@ import (
 )
 
 func TestStates(t *testing.T) {
-	tc := newESTestContext(t)
+	etc := newESTestContext(t)
 
-	m1idUUID, _ := uuid.NewV4()
-	m1ID := m1idUUID.String()
-	m1Typ := "testtyp"
-	initState := newMonitorState(m1ID, StatusUp)
-	tc.setInitialState(t, m1Typ, initState)
-	ms := tc.tracker.RecordStatus(m1ID, StatusUp)
-	require.Equal(t, 2, ms.Checks)
+	// Create three monitors in ES, load their states, and make sure we track them correctly
+	// We create 3 to make sure the query isolates the monitors correctly
+	for i := 0; i < 3; i++ {
+		monID := etc.createTestMonitorStateInES(t, StatusUp)
+		// Since we've continued this state it should register the initial state
+		ms := etc.tracker.getCurrentState(monID)
+		requireMSCounts(t, ms, 1, 0)
+
+		_ = etc.tracker.RecordStatus(monID, StatusUp)
+		ms = etc.tracker.RecordStatus(monID, StatusUp)
+		requireMSCounts(t, ms, 3, 0)
+	}
+
+	// Let's test a final one with a down state for completeness
+	monID := etc.createTestMonitorStateInES(t, StatusDown)
+	_ = etc.tracker.RecordStatus(monID, StatusDown)
+	_ = etc.tracker.RecordStatus(monID, StatusDown)
+	_ = etc.tracker.RecordStatus(monID, StatusDown)
+	ms := etc.tracker.RecordStatus(monID, StatusDown)
+	requireMSCounts(t, ms, 0, 3)
 }
 
 type esTestContext struct {
@@ -45,6 +58,15 @@ func newESTestContext(t *testing.T) *esTestContext {
 	etc.tracker = NewMonitorStateTracker(etc.loader)
 
 	return etc
+}
+
+func (etc *esTestContext) createTestMonitorStateInES(t *testing.T, s StateStatus) (id string) {
+	mUUID, _ := uuid.NewV4()
+	mID := mUUID.String()
+	mType := "testtyp"
+	initState := newMonitorState(mID, s)
+	etc.setInitialState(t, mType, initState)
+	return mID
 }
 
 func (etc *esTestContext) setInitialState(t *testing.T, typ string, ms *MonitorState) {
