@@ -1,19 +1,12 @@
 package monitorstate
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"math/rand"
 	"sync"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/esapi"
-
-	"github.com/elastic/beats/v7/heartbeat/esutil"
 )
 
 var esClient *elasticsearch.Client
@@ -22,14 +15,22 @@ func SetEsClient(c *elasticsearch.Client) {
 	esClient = c
 }
 
-func NewMonitorStateTracker() *MonitorStateTracker {
+// NewMonitorStateTracker tracks state across job runs. It takes an optional
+// state loader, which will try to fetch the last known state for a never
+// before seen monitor, which usually means using ES. If set to nil
+// it will use ES if configured, otherwise it will only track state from
+// memory.
+func NewMonitorStateTracker(sl StateLoader) *MonitorStateTracker {
 	mst := &MonitorStateTracker{
 		states:      map[string]*MonitorState{},
 		mtx:         sync.Mutex{},
-		stateLoader: NilStateLoader,
+		stateLoader: sl,
 	}
 	if esClient != nil {
-		mst.stateLoader = LoadLastESState
+		mst.stateLoader = MakeESLoader(esClient, "")
+	}
+	if mst.stateLoader == nil {
+		mst.stateLoader = NilStateLoader
 	}
 	return mst
 }
@@ -66,11 +67,6 @@ func (mst *MonitorStateTracker) getCurrentState(monitorId string) (state *Monito
 		return state
 	}
 
-	// If there's no ES client then we just work off memory
-	if esClient == nil {
-		return nil
-	}
-
 	tries := 3
 	var loadedState *MonitorState
 	var err error
@@ -94,62 +90,4 @@ func (mst *MonitorStateTracker) getCurrentState(monitorId string) (state *Monito
 // or during testing
 func NilStateLoader(_ string) (*MonitorState, error) {
 	return nil, nil
-}
-
-// LoadLastESState attempts to find a matching prior state in Elasticsearch. If none, returns nil, nil
-func LoadLastESState(monitorId string) (*MonitorState, error) {
-	reqBody, err := json.Marshal(mapstr.M{
-		"sort": mapstr.M{"@timestamp": "desc"},
-		"query": mapstr.M{
-			"bool": mapstr.M{
-				"must": []mapstr.M{
-					{
-						"match": mapstr.M{"monitor.id": monitorId},
-					},
-					{
-						"exists": mapstr.M{"field": "summary"},
-					},
-				},
-			},
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("could not serialize query for state save: %w", err)
-	}
-
-	r, err := esClient.Search(func(sr *esapi.SearchRequest) {
-		sr.Index = []string{"synthetics-*"}
-		size := 1
-		sr.Size = &size
-		sr.Body = bytes.NewReader(reqBody)
-	})
-
-	type stateHits struct {
-		Hits struct {
-			Hits []struct {
-				DocId  string `json:"string"`
-				Source struct {
-					State MonitorState `json:"state"`
-				} `json:"_source"`
-			} `json:"hits"`
-		} `json:"hits"`
-	}
-
-	respBody, err := esutil.CheckRetResp(r, err)
-	if err != nil {
-		return nil, fmt.Errorf("error executing state search for %s: %w", monitorId, err)
-	}
-
-	sh := stateHits{}
-	err = json.Unmarshal(respBody, &sh)
-	if err != nil {
-		return nil, fmt.Errorf("could not unmarshal state hits for %s: %w", monitorId, err)
-	}
-
-	if len(sh.Hits.Hits) == 0 {
-		logp.L().Infof("no previous state found for monitor %s", monitorId)
-		return nil, nil
-	}
-
-	return &sh.Hits.Hits[0].Source.State, nil
 }

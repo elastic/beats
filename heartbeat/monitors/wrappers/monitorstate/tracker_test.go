@@ -7,7 +7,7 @@ import (
 
 func TestTrackerRecord(t *testing.T) {
 	monId := "mymonitor"
-	mst := NewMonitorStateTracker()
+	mst := NewMonitorStateTracker(NilStateLoader)
 	ms := mst.RecordStatus(monId, StatusUp)
 	require.Equal(t, StatusUp, ms.Status)
 	require.Equal(t, 1, ms.Checks)

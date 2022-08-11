@@ -16,11 +16,11 @@ const (
 )
 
 func newMonitorState(monitorId string, status StateStatus) *MonitorState {
-	startedAtMs := float64(time.Now().UnixMilli())
+	nowMillis := time.Now().UnixMilli()
 	ms := &MonitorState{
-		Id:          fmt.Sprintf("%s-%x", monitorId, startedAtMs),
+		Id:          fmt.Sprintf("%s-%x", monitorId, nowMillis),
 		MonitorId:   monitorId,
-		StartedAtMs: startedAtMs,
+		StartedAtMs: float64(nowMillis),
 		Status:      status,
 	}
 	ms.recordCheck(status)
