@@ -42,7 +42,7 @@ type Sniffer struct {
 
 	state atomic.Int32 // store snifferState
 
-	// bpf filter
+	// filter is the bpf filter program used by the sniffer.
 	filter string
 
 	factory WorkerFactory
@@ -73,12 +73,7 @@ const (
 // New create a new Sniffer instance. Settings are validated in a best effort
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method.
-func New(
-	testMode bool,
-	filter string,
-	factory WorkerFactory,
-	interfaces config.InterfacesConfig,
-) (*Sniffer, error) {
+func New(testMode bool, filter string, factory WorkerFactory, interfaces config.InterfacesConfig) (*Sniffer, error) {
 	s := &Sniffer{
 		filter:  filter,
 		config:  interfaces,
