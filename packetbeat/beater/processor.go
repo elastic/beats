@@ -24,8 +24,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
@@ -90,6 +92,7 @@ func (p *processor) Stop() {
 	p.publisher.Stop()
 }
 
+// processorFactory controls construction of modules runners.
 type processorFactory struct {
 	name         string
 	err          chan error
@@ -106,6 +109,7 @@ func newProcessorFactory(name string, err chan error, beat *beat.Beat, configura
 	}
 }
 
+// Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
 func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
 	config, err := p.configurator(cfg)
 	if err != nil {
@@ -152,6 +156,51 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	}
 
 	return newProcessor(config.ShutdownTimeout, publisher, flows, sniffer, p.err), nil
+}
+
+// setupFlows returns a *flows.Flows that will publish to the provided pipeline,
+// configured with cfg and process enrichment via the provided watcher.
+func setupFlows(pipeline beat.Pipeline, watcher procs.ProcessesWatcher, cfg config.Config) (*flows.Flows, error) {
+	if !cfg.Flows.IsEnabled() {
+		return nil, nil
+	}
+
+	processors, err := processors.New(cfg.Flows.Processors)
+	if err != nil {
+		return nil, err
+	}
+
+	clientConfig := beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			EventMetadata: cfg.Flows.EventMetadata,
+			Processor:     processors,
+			KeepNull:      cfg.Flows.KeepNull,
+		},
+	}
+	if cfg.Flows.Index != "" {
+		clientConfig.Processing.Meta = mapstr.M{"raw_index": cfg.Flows.Index}
+	}
+
+	client, err := pipeline.ConnectWith(clientConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return flows.NewFlows(client.PublishAll, watcher, cfg.Flows)
+}
+
+func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, workerFactory sniffer.WorkerFactory) (*sniffer.Sniffer, error) {
+	icmp, err := cfg.ICMP()
+	if err != nil {
+		return nil, err
+	}
+
+	filter := cfg.Interfaces.BpfFilter
+	if filter == "" && !cfg.Flows.IsEnabled() {
+		filter = protocols.BpfFilter(cfg.Interfaces.WithVlans, icmp.Enabled())
+	}
+
+	return sniffer.New(false, filter, workerFactory, cfg.Interfaces)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
