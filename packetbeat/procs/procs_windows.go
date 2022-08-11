@@ -74,9 +74,6 @@ type extractor interface {
 
 type callbackFn func(net.IP, uint16, int)
 
-// FIXME: This is not needed. Use a literal in the test type definition.
-type extractorFactory func(fn callbackFn) extractor
-
 var tablesByTransport = map[applayer.Transport][]struct {
 	family    uint32
 	function  GetExtendedTableFn

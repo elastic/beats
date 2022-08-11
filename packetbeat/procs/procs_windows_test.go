@@ -37,7 +37,7 @@ func TestParseTableRaw(t *testing.T) {
 	pid := uint32(0xCCCCCCCC)
 	for idx, testCase := range []struct {
 		name     string
-		factory  extractorFactory
+		factory  func(fn callbackFn) extractor
 		raw      string
 		expected []portProcMapping
 		mustErr  bool
