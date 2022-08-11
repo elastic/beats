@@ -5,17 +5,24 @@
 package transformer
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"time"
+	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -231,4 +238,83 @@ func SQS(request events.SQSEvent) []beat.Event {
 		}
 	}
 	return beatEvents
+}
+
+func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
+	var evts []beat.Event
+	svc := s3.New(session.New())
+	for _, record := range request.Records {
+		unescaped_key, err := url.QueryUnescape(record.S3.Object.Key)
+
+		if err != nil {
+			fmt.Println("Got error unescaping key: %s", record.S3.Object.Key)
+			fmt.Println(err.Error())
+			return nil, err
+		}
+
+		result, err := svc.GetObject(&s3.GetObjectInput{
+			Bucket: aws.String(record.S3.Bucket.Name),
+			Key:    aws.String(unescaped_key),
+		})
+
+		if err != nil {
+			fmt.Println("Got error calling GetObject:")
+			fmt.Println(err.Error())
+			return nil, err
+		}
+
+		defer result.Body.Close()
+		obj, err := ioutil.ReadAll(result.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+
+		if obj[0] == 31 && obj[1] == 139 {
+			inBuf := bytes.NewBuffer(obj)
+			r, err := gzip.NewReader(inBuf)
+			if err != nil {
+				return nil, err
+			}
+
+			var outBuf bytes.Buffer
+			_, err = io.Copy(&outBuf, r)
+			if err != nil {
+				r.Close()
+				return nil, err
+			}
+
+			err = r.Close()
+			if err != nil {
+				return nil, err
+			}
+			obj = outBuf.Bytes()
+		}
+
+		obj_r := bytes.NewReader(obj)
+		obj_line := bufio.NewScanner(obj_r)
+
+		for obj_line.Scan() {
+			s3evt := beat.Event{
+				Timestamp: time.Now(),
+				Fields: common.MapStr{
+					"event": common.MapStr{
+						"kind": "event",
+					},
+					"cloud": common.MapStr{
+						"provider": "aws",
+						"region":   record.AWSRegion,
+					},
+					"message":      obj_line.Text(),
+					"event_source": record.EventSource,
+					"bucket_name":  record.S3.Bucket.Name,
+					"bucket_key":   unescaped_key,
+					"aws_region":   record.AWSRegion,
+				},
+			}
+			evts = append(evts, s3evt)
+		}
+	}
+	return evts, nil
 }
