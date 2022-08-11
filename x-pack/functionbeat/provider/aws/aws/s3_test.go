@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/stretchr/testify/assert"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestS3(t *testing.T) {
@@ -25,7 +25,7 @@ func TestS3(t *testing.T) {
 		},
 	})
 
-	t.Run("when publish is succesful", func(t *testing.T) {
+	t.Run("when publish is successful", func(t *testing.T) {
 		t.SkipNow()
 		client := &arrayBackedClient{}
 		s, err := NewS3(&provider.DefaultProvider{}, cfg)
@@ -39,7 +39,7 @@ func TestS3(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("when publish is not succesful", func(t *testing.T) {
+	t.Run("when publish is not successful", func(t *testing.T) {
 		t.SkipNow()
 		e := errors.New("something bad")
 		client := &arrayBackedClient{err: e}

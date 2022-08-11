@@ -11,11 +11,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
-	"time"
+	"log"
 	"net/url"
-	"fmt"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
@@ -243,13 +244,19 @@ func SQS(request events.SQSEvent) []beat.Event {
 
 func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 	var evts []beat.Event
-	svc := s3.New(session.New())
+	sess, err := session.NewSession()
+	if err != nil {
+		log.Println("Got error creating session")
+		log.Println(err.Error())
+		return nil, err
+	}
+	svc := s3.New(sess)
 	for _, record := range request.Records {
 		unescaped_key, err := url.QueryUnescape(record.S3.Object.Key)
 
 		if err != nil {
-			fmt.Println("Got error unescaping key: ", record.S3.Object.Key)
-			fmt.Println(err.Error())
+			log.Println("Got error unescaping key: ", record.S3.Object.Key)
+			log.Println(err.Error())
 			return nil, err
 		}
 
@@ -259,8 +266,8 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 		})
 
 		if err != nil {
-			fmt.Println("Got error calling GetObject:")
-			fmt.Println(err.Error())
+			log.Println("Got error calling GetObject:")
+			log.Println(err.Error())
 			return nil, err
 		}
 
@@ -280,7 +287,7 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 			}
 
 			var outBuf bytes.Buffer
-			_, err = io.Copy(&outBuf, r)
+			_, err = io.CopyN(&outBuf, r)
 			if err != nil {
 				r.Close()
 				return nil, err
