@@ -92,6 +92,107 @@ func TestEventMapping(t *testing.T) {
 	}
 }
 
+func TestEventMappingWithZeroNodeMetrics(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.pod")
+
+	f, err := os.Open(testFile)
+	assert.NoError(t, err, "cannot open test file "+testFile)
+
+	body, err := ioutil.ReadAll(f)
+	assert.NoError(t, err, "cannot read test file "+testFile)
+
+	metricsRepo := util.NewMetricsRepo()
+
+	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
+
+	nodeMetrics := util.NewNodeMetrics()
+	addNodeMetric(metricsRepo, nodeName, nodeMetrics)
+
+	namespace := "default"
+	podName := "nginx-deployment-2303442956-pcqfc"
+	podId := util.NewPodId(namespace, podName)
+	containerName := "nginx"
+
+	containerMetrics := util.NewContainerMetrics()
+	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
+
+	events, err := eventMapping(body, metricsRepo, logger)
+	assert.NoError(t, err, "error mapping "+testFile)
+
+	assert.Len(t, events, 1, "got wrong number of events")
+
+	testCases := map[string]interface{}{
+		"name": "nginx-deployment-2303442956-pcqfc",
+		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
+
+		"network.rx.bytes":  107056,
+		"network.rx.errors": 0,
+		"network.tx.bytes":  72447,
+		"network.tx.errors": 0,
+
+		// calculated pct fields:
+		"cpu.usage.nanocores": 11263994,
+
+		"memory.usage.bytes":           1462272,
+		"memory.working_set.limit.pct": 0.09943977591036414,
+	}
+
+	for k, v := range testCases {
+		testValue(t, events[0], k, v)
+	}
+}
+
+
+func TestEventMappingWithNoNodeMetrics(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.pod")
+
+	f, err := os.Open(testFile)
+	assert.NoError(t, err, "cannot open test file "+testFile)
+
+	body, err := ioutil.ReadAll(f)
+	assert.NoError(t, err, "cannot read test file "+testFile)
+
+	metricsRepo := util.NewMetricsRepo()
+
+	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
+
+	namespace := "default"
+	podName := "nginx-deployment-2303442956-pcqfc"
+	podId := util.NewPodId(namespace, podName)
+	containerName := "nginx"
+
+	containerMetrics := util.NewContainerMetrics()
+	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
+
+	events, err := eventMapping(body, metricsRepo, logger)
+	assert.NoError(t, err, "error mapping "+testFile)
+
+	assert.Len(t, events, 1, "got wrong number of events")
+
+	testCases := map[string]interface{}{
+		"name": "nginx-deployment-2303442956-pcqfc",
+		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
+
+		"network.rx.bytes":  107056,
+		"network.rx.errors": 0,
+		"network.tx.bytes":  72447,
+		"network.tx.errors": 0,
+
+		// calculated pct fields:
+		"cpu.usage.nanocores": 11263994,
+
+		"memory.usage.bytes":           1462272,
+		"memory.usage.limit.pct":       0.1,
+		"memory.working_set.limit.pct": 0.09943977591036414,
+	}
+
+	for k, v := range testCases {
+		testValue(t, events[0], k, v)
+	}
+}
+
 func TestEventMappingWithMultipleContainers(t *testing.T) {
 	logger := logp.NewLogger("kubernetes.pod")
 
