@@ -24,6 +24,7 @@ import (
 	"net"
 )
 
+// FlowID records flow details and statistics.
 type FlowID struct {
 	rawFlowID
 	flow Flow // remember associated flow for faster lookup
@@ -35,6 +36,8 @@ type rawFlowID struct {
 	dir flowDirection
 }
 
+// flowIDMeta holds meta data describing the contents and layout
+// of a rawFlowID's flowID buffer.
 type flowIDMeta struct {
 	flags FlowIDFlag
 
@@ -131,6 +134,7 @@ const (
 )
 
 func init() {
+	// FIXME: Make this a compile time check.
 	if SizeFlowIDMax > 255 {
 		panic("SizeFlowIDMax exceeds size limit")
 	}
@@ -240,12 +244,7 @@ func (f *FlowID) AddConnectionID(id uint64) {
 	f.addID(&f.offID, ConnectionID, tmp[:], nil, flowDirUnset)
 }
 
-func (f *FlowID) addMultLayerID(
-	off, outerOff *uint8,
-	flag, outerFlag FlowIDFlag,
-	a, b []byte,
-	hint flowDirection,
-) {
+func (f *FlowID) addMultLayerID(off, outerOff *uint8, flag, outerFlag FlowIDFlag, a, b []byte, hint flowDirection) {
 	a, b = f.sortAddrWrite(a, b, hint)
 
 	flags := f.flags & (flag | outerFlag)
@@ -269,12 +268,7 @@ func (f *FlowID) addMultLayerID(
 	}
 }
 
-func (f *FlowID) addID(
-	off *uint8,
-	flag FlowIDFlag,
-	a, b []byte,
-	hint flowDirection,
-) {
+func (f *FlowID) addID(off *uint8, flag FlowIDFlag, a, b []byte, hint flowDirection) {
 	a, b = f.sortAddrWrite(a, b, hint)
 
 	if *off == offUnset {
@@ -287,11 +281,7 @@ func (f *FlowID) addID(
 	}
 }
 
-func (f *FlowID) addWithPorts(
-	off *uint8,
-	flag FlowIDFlag,
-	src, dst uint16,
-) {
+func (f *FlowID) addWithPorts(off *uint8, flag FlowIDFlag, src, dst uint16) {
 	var a, b [2]byte
 	binary.LittleEndian.PutUint16(a[:], src)
 	binary.LittleEndian.PutUint16(b[:], dst)
@@ -480,6 +470,7 @@ func (f *rawFlowID) extractID(off, sz uint8) []byte {
 	}
 
 	{
+		// FIXME: Calculate these offsets inline; they generate the same code that way more simply.
 		off := int(off)
 		sz := int(sz)
 		return f.flowID[off : off+sz]
