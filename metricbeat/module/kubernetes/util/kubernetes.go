@@ -265,6 +265,7 @@ func NewContainerMetadataEnricher(
 						kubernetes2.ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
+
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
 			}
