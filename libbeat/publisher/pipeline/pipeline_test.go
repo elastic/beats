@@ -32,7 +32,7 @@ type testQueue struct {
 }
 
 type testProducer struct {
-	publish func(try bool, event interface{}) bool
+	publish func(try bool, event interface{}) (queue.EntryID, bool)
 	cancel  func() int
 }
 
@@ -68,18 +68,18 @@ func (q *testQueue) Get(sz int) (queue.Batch, error) {
 	return nil, nil
 }
 
-func (p *testProducer) Publish(event interface{}) bool {
+func (p *testProducer) Publish(event interface{}) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(false, event)
 	}
-	return false
+	return 0, false
 }
 
-func (p *testProducer) TryPublish(event interface{}) bool {
+func (p *testProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(true, event)
 	}
-	return false
+	return 0, false
 }
 
 func (p *testProducer) Cancel() int {
@@ -114,7 +114,7 @@ func makeTestQueue() queue.Queue {
 			var producer *testProducer
 			p := blockingProducer(cfg)
 			producer = &testProducer{
-				publish: func(try bool, event interface{}) bool {
+				publish: func(try bool, event interface{}) (queue.EntryID, bool) {
 					if try {
 						return p.TryPublish(event)
 					}
@@ -146,10 +146,10 @@ func blockingProducer(_ queue.ProducerConfig) queue.Producer {
 	waiting := atomic.MakeInt(0)
 
 	return &testProducer{
-		publish: func(_ bool, _ interface{}) bool {
+		publish: func(_ bool, _ interface{}) (queue.EntryID, bool) {
 			waiting.Inc()
 			<-sig
-			return false
+			return 0, false
 		},
 
 		cancel: func() int {

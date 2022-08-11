@@ -67,16 +67,12 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
-        image: filebeat-debug-image
-        imagePullPolicy: Never
+        image: filebeat-run-image
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
+          "-system.hostfs=/hostfs",
         ]
-        ports:
-        - containerPort: 56268
-          hostPort: 56268
-          protocol: TCP
         env:
         - name: ELASTICSEARCH_HOST
           value: elasticsearch
