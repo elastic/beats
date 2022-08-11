@@ -50,6 +50,7 @@ func Check() error {
 
 // Fmt formats code and adds license headers.
 func Fmt() {
+	mg.Deps(devtools.GoImports.Run)
 	mg.Deps(AddLicenseHeaders)
 }
 
