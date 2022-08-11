@@ -136,7 +136,7 @@ func New(testMode bool, filter string, factory WorkerFactory, interfaces config.
 func (s *Sniffer) Run() error {
 	handle, err := s.open()
 	if err != nil {
-		return fmt.Errorf("Error starting sniffer: %s", err)
+		return fmt.Errorf("failed to start sniffer: %w", err)
 	}
 	defer handle.Close()
 
@@ -149,7 +149,10 @@ func (s *Sniffer) Run() error {
 		defer f.Close()
 
 		w = pcapgo.NewWriterNanos(f)
-		w.WriteFileHeader(65535, handle.LinkType())
+		err = w.WriteFileHeader(65535, handle.LinkType())
+		if err != nil {
+			return fmt.Errorf("failed to write dump file header to %s: %w", s.config.Dumpfile, err)
+		}
 	}
 
 	worker, err := s.factory(handle.LinkType())
@@ -168,28 +171,28 @@ func (s *Sniffer) Run() error {
 	var packets int
 	for s.state.Load() == snifferActive {
 		if s.config.OneAtATime {
-			fmt.Println("Press enter to read packet")
+			fmt.Fprintln(os.Stdout, "Press enter to read packet")
 			fmt.Scanln()
 		}
 
 		data, ci, err := handle.ReadPacketData()
-		if err == pcap.NextErrorTimeoutExpired || isAfpacketErrTimeout(err) {
+		if err == pcap.NextErrorTimeoutExpired || isAfpacketErrTimeout(err) { //nolint:errorlint // pcap.NextErrorTimeoutExpired is not wrapped.
 			logp.Debug("sniffer", "timedout")
 			continue
 		}
 
 		if err != nil {
 			// ignore EOF, if sniffer was driven from file
-			if err == io.EOF && s.config.File != "" {
+			if err == io.EOF && s.config.File != "" { //nolint:errorlint // io.EOF should never be wrapped.
 				return nil
 			}
 
 			s.state.Store(snifferInactive)
-			return fmt.Errorf("Sniffing error: %w", err)
+			return fmt.Errorf("sniffing error: %w", err)
 		}
 
 		if len(data) == 0 {
-			// Empty packet, probably timeout from afpacket
+			// Empty packet, probably timeout from afpacket.
 			continue
 		}
 
@@ -220,7 +223,7 @@ func (s *Sniffer) open() (snifferHandle, error) {
 	case "af_packet":
 		return openAFPacket(s.filter, &s.config)
 	default:
-		return nil, fmt.Errorf("Unknown sniffer type: %s", s.config.Type)
+		return nil, fmt.Errorf("unknown sniffer type: %s", s.config.Type)
 	}
 }
 
@@ -246,7 +249,7 @@ func validateConfig(filter string, cfg *config.InterfacesConfig) error {
 	case "af_packet":
 		return validateAfPacketConfig(cfg)
 	default:
-		return fmt.Errorf("Unknown sniffer type: %s", cfg.Type)
+		return fmt.Errorf("unknown sniffer type: %s", cfg.Type)
 	}
 }
 
