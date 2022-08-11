@@ -143,7 +143,6 @@ func TestEventMappingWithZeroNodeMetrics(t *testing.T) {
 	}
 }
 
-
 func TestEventMappingWithNoNodeMetrics(t *testing.T) {
 	logger := logp.NewLogger("kubernetes.pod")
 
