@@ -642,7 +642,7 @@ func putOrAppendUint64(m mapstr.M, key string, value uint64) {
 		case uint32:
 			m[key] = []uint64{uint64(v), value}
 		case uint64:
-			m[key] = []uint64{uint64(v), value}
+			m[key] = []uint64{v, value}
 		case []uint64:
 			m[key] = append(v, value)
 		}

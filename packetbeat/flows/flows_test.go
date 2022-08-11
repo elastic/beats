@@ -43,7 +43,7 @@ func (f *flowsChan) PublishFlows(events []beat.Event) {
 }
 
 func TestFlowsCounting(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	mac1 := []byte{1, 2, 3, 4, 5, 6}
 	mac2 := []byte{6, 5, 4, 3, 2, 1}

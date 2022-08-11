@@ -362,7 +362,7 @@ func (f *rawFlowID) Get(i FlowIDFlag) []byte {
 func (f *rawFlowID) Serialize() []byte {
 	buf := bytes.NewBuffer(nil)
 	enc := base64.NewEncoder(base64.RawStdEncoding, buf)
-
+	//nolint:errcheck // bytes.Buffer never returns a non-nil error on Write.
 	enc.Write([]byte{
 		byte(f.flags & 0xff),
 		byte(f.flags >> 8),
@@ -382,6 +382,7 @@ func (f *rawFlowID) Serialize() []byte {
 		f.cntVlan,
 		f.cntIP,
 	})
+	//nolint:errcheck // bytes.Buffer never returns a non-nil error on Write.
 	enc.Write(f.flowID)
 	enc.Close()
 
