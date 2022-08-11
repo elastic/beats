@@ -132,7 +132,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			kubernetes2.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
-	  // NOTE:
+		// NOTE:
 		// - `podCoreLimit > `nodeCores` is possible if a pod has more than one container
 		// and at least one of them doesn't have a limit set. The container without limits
 		// inherit a limit = `nodeCores` and the sum of all limits for all the
@@ -145,7 +145,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			podCoreLimit = nodeCores
 		}
 
-	  // NOTE:
+		// NOTE:
 		// - `podMemLimit > `nodeMem` is possible if a pod has more than one container
 		// and at least one of them doesn't have a limit set. The container without limits
 		// inherit a limit = `nodeMem` and the sum of all limits for all the
