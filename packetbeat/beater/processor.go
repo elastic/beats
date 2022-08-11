@@ -71,7 +71,7 @@ func (p *processor) Start() {
 
 		err := p.sniffer.Run()
 		if err != nil {
-			p.err <- fmt.Errorf("sniffer loop failed: %v", err)
+			p.err <- fmt.Errorf("sniffer loop failed: %w", err)
 			return
 		}
 		p.err <- nil
@@ -79,7 +79,7 @@ func (p *processor) Start() {
 }
 
 func (p *processor) Stop() {
-	p.sniffer.Stop()
+	p.sniffer.Stop() //nolint:errcheck // *sniffer.Sniffer.Stop() never returns a non-nil error.
 	if p.flows != nil {
 		p.flows.Stop()
 	}
@@ -144,7 +144,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	protocols := protos.NewProtocols()
 	err = protocols.Init(false, publisher, watcher, config.Protocols, config.ProtocolsList)
 	if err != nil {
-		return nil, fmt.Errorf("Initializing protocol analyzers failed: %v", err)
+		return nil, fmt.Errorf("failed to initialize protocol analyzers: %w", err)
 	}
 	flows, err := setupFlows(pipeline, watcher, config)
 	if err != nil {
