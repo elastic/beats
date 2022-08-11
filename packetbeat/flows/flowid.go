@@ -360,7 +360,7 @@ func (f *rawFlowID) Serialize() []byte {
 	enc := base64.NewEncoder(base64.RawStdEncoding, buf)
 	//nolint:errcheck // bytes.Buffer never returns a non-nil error on Write.
 	enc.Write([]byte{
-		byte(f.flags & 0xff),
+		byte(f.flags),
 		byte(f.flags >> 8),
 		f.offEth,
 		f.offOutterVlan,
