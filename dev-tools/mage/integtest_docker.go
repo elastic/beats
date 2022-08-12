@@ -231,7 +231,6 @@ func GoIntegTestFromHost(ctx context.Context, params GoTestArgs) error {
 	}
 
 	// Run Go test from the host machine. Do not immediately exit on error to allow cleanup to occur.
-	params.ExtraFlags = append(params.ExtraFlags, "-v")
 	testErr := GoTest(ctx, params)
 
 	err = saveDockerComposeLogs(cwd, "goIntegTest")
