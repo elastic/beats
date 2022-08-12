@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *logp.Logger) ([]mapstr.M, error) {
+func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]mapstr.M, error) {
 	events := []mapstr.M{}
 	var summary kubernetes.Summary
 
@@ -39,9 +39,23 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *lo
 	}
 
 	node := summary.Node
-	nodeCores := perfMetrics.NodeCoresAllocatable.Get(node.NodeName)
-	nodeMem := perfMetrics.NodeMemAllocatable.Get(node.NodeName)
+
+	nodeCores := 0.0
+	nodeMem := 0.0
+
+	nodeStore := metricsRepo.GetNodeStore(node.NodeName)
+	nodeMetrics := nodeStore.GetNodeMetrics()
+	if nodeMetrics.CoresAllocatable != nil {
+		nodeCores = nodeMetrics.CoresAllocatable.Value
+	}
+	if nodeMetrics.MemoryAllocatable != nil {
+		nodeMem = nodeMetrics.MemoryAllocatable.Value
+	}
+
 	for _, pod := range summary.Pods {
+		podId := util.NewPodId(pod.PodRef.Namespace, pod.PodRef.Name)
+		podStore := nodeStore.GetPodStore(podId)
+
 		for _, container := range pod.Containers {
 			containerEvent := mapstr.M{
 				mb.ModuleDataKey: mapstr.M{
@@ -127,17 +141,31 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache, logger *lo
 				kubernetes2.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
 			}
 
-			cuid := util.ContainerUID(pod.PodRef.Namespace, pod.PodRef.Name, container.Name)
-			coresLimit := perfMetrics.ContainerCoresLimit.GetWithDefault(cuid, nodeCores)
-			memLimit := perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
+			containerStore := podStore.GetContainerStore(container.Name)
+			containerMetrics := containerStore.GetContainerMetrics()
 
-			if coresLimit > 0 {
-				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit, logger)
+			containerCoresLimit := nodeCores
+			if containerMetrics.CoresLimit != nil {
+				containerCoresLimit = containerMetrics.CoresLimit.Value
 			}
 
-			if memLimit > 0 {
-				kubernetes2.ShouldPut(containerEvent, "memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit, logger)
-				kubernetes2.ShouldPut(containerEvent, "memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/memLimit, logger)
+			containerMemLimit := nodeMem
+			if containerMetrics.MemoryLimit != nil {
+				containerMemLimit = containerMetrics.MemoryLimit.Value
+			}
+
+			// NOTE:
+			// we don't currently check if `containerMemLimit` > `nodeMem` as we do in `kubernetes/pod/data.go`.
+			// There we do check, since if a container doesn't have a limit set, it will inherit the node limits and the sum of all
+			// the container limits can be greater than the node limits. We assume here the user can set correct limits on containers.
+
+			if containerCoresLimit > 0 {
+				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresLimit, logger)
+			}
+
+			if containerMemLimit > 0 {
+				kubernetes2.ShouldPut(containerEvent, "memory.usage.limit.pct", float64(container.Memory.UsageBytes)/containerMemLimit, logger)
+				kubernetes2.ShouldPut(containerEvent, "memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/containerMemLimit, logger)
 			}
 
 			events = append(events, containerEvent)
