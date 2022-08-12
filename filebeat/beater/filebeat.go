@@ -287,7 +287,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	var inputTaskGroup unison.TaskGroup
-	defer inputTaskGroup.Stop()
+	defer func() {
+		_ = inputTaskGroup.Stop()
+	}()
 	if err := v2InputLoader.Init(&inputTaskGroup, v2.ModeRun); err != nil {
 		logp.Err("Failed to initialize the input managers: %v", err)
 		return err

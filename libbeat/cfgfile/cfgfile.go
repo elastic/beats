@@ -102,7 +102,7 @@ func HandleFlags() error {
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		if *homePath == "" {
-			return fmt.Errorf("The absolute path to %s could not be obtained. %v",
+			return fmt.Errorf("The absolute path to %s could not be obtained. %w",
 				os.Args[0], err)
 		}
 		home = *homePath
@@ -202,7 +202,7 @@ func LoadList(file string) ([]*config.C, error) {
 	logp.Debug("cfgfile", "Load config from file: %s", file)
 	rawConfig, err := common.LoadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("invalid config: %s", err)
+		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
 	var c []*config.C
