@@ -10,21 +10,15 @@ func TestTrackerRecord(t *testing.T) {
 	mst := NewMonitorStateTracker(NilStateLoader)
 	ms := mst.RecordStatus(monId, StatusUp)
 	require.Equal(t, StatusUp, ms.Status)
-	require.Equal(t, 1, ms.Checks)
-	require.Equal(t, 1, ms.Up)
-	require.Equal(t, 0, ms.Down)
+	requireMSCounts(t, ms, 1, 0)
 
 	for i := 0; i < FlappingThreshold; i++ {
 		ms = mst.RecordStatus(monId, StatusUp)
 	}
 	require.Equal(t, StatusUp, ms.Status)
-	require.Equal(t, 4, ms.Checks)
-	require.Equal(t, 4, ms.Up)
-	require.Equal(t, 0, ms.Down)
+	requireMSCounts(t, ms, 4, 0)
 
 	ms = mst.RecordStatus(monId, StatusDown)
 	require.Equal(t, StatusDown, ms.Status)
-	require.Equal(t, 1, ms.Checks)
-	require.Equal(t, 0, ms.Up)
-	require.Equal(t, 1, ms.Down)
+	requireMSCounts(t, ms, 0, 1)
 }
