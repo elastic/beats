@@ -116,9 +116,9 @@ func (s *State) transitionTo(monitorID string, newStatus StateStatus) {
 	oldState := *s
 	*s = *newMonitorState(monitorID, newStatus)
 	// We don't need to retain extra data when transitioning
-	s.Ends.FlapHistory = nil
+	oldState.FlapHistory = nil
 	// W edon't want an infinite linked list!
-	s.Ends.Ends = nil
+	oldState.Ends = nil
 	s.Ends = &oldState
 }
 
