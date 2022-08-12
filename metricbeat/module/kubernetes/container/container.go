@@ -77,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewContainerMetadataEnricher(base, mod.GetPerfMetricsCache(), true),
+		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), true),
 		mod:           mod,
 	}, nil
 }
@@ -95,7 +95,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
+<<<<<<< HEAD
 	events, err := eventMapping(body, m.mod.GetPerfMetricsCache())
+=======
+	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger())
+>>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
