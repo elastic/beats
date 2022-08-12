@@ -122,6 +122,7 @@ func TestSimpleJob(t *testing.T) {
 					},
 				}),
 				hbtestllext.MonitorTimespanValidator,
+				stateValidator(),
 				summaryValidator(1, 0),
 			)},
 		nil,
@@ -194,6 +195,7 @@ func TestAdditionalStdFields(t *testing.T) {
 								"check_group": isdef.IsString,
 							},
 						}),
+						stateValidator(),
 						hbtestllext.MonitorTimespanValidator,
 						summaryValidator(1, 0),
 					)},
@@ -211,6 +213,7 @@ func TestErrorJob(t *testing.T) {
 	}
 
 	errorJobValidator := lookslike.Compose(
+		stateValidator(),
 		lookslike.MustCompile(map[string]interface{}{"error": map[string]interface{}{"message": "myerror", "type": "io"}}),
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
@@ -255,6 +258,7 @@ func TestMultiJobNoConts(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo("check_group"),
 				},
 			}),
+			stateValidator(),
 			hbtestllext.MonitorTimespanValidator,
 			summaryValidator(1, 0),
 		)
@@ -302,6 +306,7 @@ func TestMultiJobConts(t *testing.T) {
 					"status":      "up",
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
+				"state": isdef.Optional(hbtestllext.IsMonitorState),
 			}),
 			hbtestllext.MonitorTimespanValidator,
 		)
@@ -361,6 +366,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 					"status":      "up",
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
+				"state": isdef.Optional(hbtestllext.IsMonitorState),
 			}),
 			hbtestllext.MonitorTimespanValidator,
 		)
@@ -410,6 +416,12 @@ func urlValidator(t *testing.T, u string) validator.Validator {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return lookslike.MustCompile(map[string]interface{}{"url": map[string]interface{}(URLFields(parsed))})
+}
+
+func stateValidator() validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"state": hbtestllext.IsMonitorState,
+	})
 }
 
 // This duplicates hbtest.SummaryChecks to avoid an import cycle.
@@ -596,21 +608,24 @@ func TestProjectBrowserJob(t *testing.T) {
 	urlStr := "http://foo.com"
 	urlU, _ := url.Parse(urlStr)
 
-	expectedMonFields := lookslike.MustCompile(map[string]interface{}{
-		"monitor": map[string]interface{}{
-			"type":        "browser",
-			"id":          projectMonitorValues.id,
-			"name":        projectMonitorValues.name,
-			"duration":    mapstr.M{"us": time.Second.Microseconds()},
-			"origin":      "my-origin",
-			"check_group": projectMonitorValues.checkGroup,
-			"timespan": mapstr.M{
-				"gte": hbtestllext.IsTime,
-				"lt":  hbtestllext.IsTime,
+	expectedMonFields := lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"state": isdef.Optional(hbtestllext.IsMonitorState),
+			"monitor": map[string]interface{}{
+				"type":        "browser",
+				"id":          projectMonitorValues.id,
+				"name":        projectMonitorValues.name,
+				"duration":    mapstr.M{"us": time.Second.Microseconds()},
+				"origin":      "my-origin",
+				"check_group": projectMonitorValues.checkGroup,
+				"timespan": mapstr.M{
+					"gte": hbtestllext.IsTime,
+					"lt":  hbtestllext.IsTime,
+				},
 			},
-		},
-		"url": URLFields(urlU),
-	})
+			"url": URLFields(urlU),
+		}),
+	)
 
 	testCommonWrap(t, testDef{
 		"simple", // has no summary fields!

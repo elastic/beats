@@ -23,6 +23,8 @@ import (
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/llpath"
 	"github.com/elastic/go-lookslike/llresult"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 )
 
 // IsTime checks that the value is a time.Time instance.
@@ -46,6 +48,14 @@ var IsUint16 = isdef.Is("positiveUInt16", func(path llpath.Path, v interface{}) 
 	_, ok := v.(uint16)
 	if !ok {
 		return llresult.SimpleResult(path, false, "expected a uint16")
+	}
+	return llresult.ValidResult(path)
+})
+
+var IsMonitorState = isdef.Is("isState", func(path llpath.Path, v interface{}) *llresult.Results {
+	_, ok := v.(monitorstate.State)
+	if !ok {
+		return llresult.SimpleResult(path, false, "expected a monitorstate.State")
 	}
 	return llresult.ValidResult(path)
 })

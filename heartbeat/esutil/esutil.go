@@ -57,7 +57,7 @@ func CheckRetResp(r *esapi.Response, argErr error) (body []byte, err error) {
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(r.Body)
 	if err != nil {
-		return nil, fmt.Errorf("<error reading body string: %s>", err)
+		return nil, fmt.Errorf("<error reading body string: %w>", err)
 	}
 
 	if r.StatusCode >= 300 {

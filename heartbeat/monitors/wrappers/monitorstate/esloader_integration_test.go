@@ -132,6 +132,7 @@ func (etc *esTestContext) setInitialState(t *testing.T, typ string, monitorID st
 		Monitor: Mon{Id: monitorID, Type: typ},
 		State:   ms,
 	})
+	require.NoError(t, err)
 
 	_, err = esutil.CheckRetResp(etc.esc.Index(idx, reqBodyRdr, func(request *esapi.IndexRequest) {
 		// Refresh the index since we tend to re-query immediately, otherwise this would miss
