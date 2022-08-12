@@ -19,13 +19,17 @@ const (
 	StatusFlapping StateStatus = "flap"
 )
 
-func newMonitorState(monitorId string, status StateStatus) *State {
+func newMonitorState(monitorId string, status StateStatus, ctr int) *State {
 	now := time.Now()
 	ms := &State{
-		ID:         fmt.Sprintf("%s-%x", monitorId, now.UnixMilli()),
+		// ID is unique and sortable by time for easier aggregations
+		// Note that we add an incrementing counter to help with the fact that
+		// millisecond res isn't quite enough for uniqueness (esp. in tests)
+		ID:         fmt.Sprintf("%s-%x-%x", monitorId, now.UnixMilli(), ctr),
 		StartedAt:  now,
 		DurationMs: 0,
 		Status:     status,
+		ctr:        ctr + 1,
 	}
 	ms.recordCheck(monitorId, status)
 
@@ -46,6 +50,7 @@ type State struct {
 	FlapHistory []StateStatus `json:"flap_history"`
 	// Ends is a pointer to the prior state if this is the start of a new state
 	Ends *State `json:"ends"`
+	ctr  int
 }
 
 func (s *State) incrementCounters(status StateStatus) {
@@ -114,7 +119,7 @@ func (s *State) transitionTo(monitorID string, newStatus StateStatus) {
 	// state has changed, but we aren't flapping (yet), since we've been stable past the
 	// flapping threshold
 	oldState := *s
-	*s = *newMonitorState(monitorID, newStatus)
+	*s = *newMonitorState(monitorID, newStatus, s.ctr)
 	// We don't need to retain extra data when transitioning
 	oldState.FlapHistory = nil
 	// W edon't want an infinite linked list!

@@ -91,7 +91,7 @@ func (etc *esTestContext) createTestMonitorStateInES(t *testing.T, s StateStatus
 	mUUID, _ := uuid.NewV4()
 	mID := mUUID.String()
 	mType := "testtyp"
-	initState := newMonitorState(mID, s)
+	initState := newMonitorState(mID, s, 0)
 	etc.setInitialState(t, mType, mID, initState)
 	return mID
 }

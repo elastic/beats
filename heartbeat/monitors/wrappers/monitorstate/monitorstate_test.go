@@ -7,7 +7,7 @@ import (
 
 func TestRecordingAndFlapping(t *testing.T) {
 	monitorID := "test"
-	ms := newMonitorState(monitorID, StatusUp)
+	ms := newMonitorState(monitorID, StatusUp, 0)
 	recordFlappingSeries(monitorID, ms)
 	require.Equal(t, StatusFlapping, ms.Status)
 	require.Equal(t, FlappingThreshold+1, ms.Checks)
@@ -47,4 +47,20 @@ func recordStableSeries(monitorID string, ms *State, count int, s StateStatus) {
 	for i := 0; i < count; i++ {
 		ms.recordCheck(monitorID, s)
 	}
+}
+
+func TestTransitionTo(t *testing.T) {
+	id := "mymonitor"
+	s := newMonitorState(id, StatusUp, 0)
+	first := *s
+	s.transitionTo(id, StatusDown)
+	second := *s
+	s.transitionTo(id, StatusUp)
+
+	require.NotEqual(t, s.ID, second.ID)
+	require.NotEqual(t, s.ID, first)
+
+	require.Equal(t, second.ID, s.Ends.ID)
+	// Ensure No infinite storage of states
+	require.Nil(t, s.Ends.Ends)
 }

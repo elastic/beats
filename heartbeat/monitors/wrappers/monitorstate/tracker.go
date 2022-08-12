@@ -42,7 +42,7 @@ func (t *Tracker) RecordStatus(monitorID string, newStatus StateStatus) (ms *Sta
 
 	state := t.getCurrentState(monitorID)
 	if state == nil {
-		state = newMonitorState(monitorID, newStatus)
+		state = newMonitorState(monitorID, newStatus, 0)
 		t.states[monitorID] = state
 	} else {
 		state.recordCheck(monitorID, newStatus)
