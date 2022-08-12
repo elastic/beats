@@ -22,6 +22,8 @@ func TestRecordingAndFlapping(t *testing.T) {
 	// flipped us out of the threshold, which goes toward the new state.
 	requireMSCounts(t, ms, 0, FlappingThreshold+1)
 	require.Equal(t, priorChecksCount+FlappingThreshold-1, ms.Ends.Checks)
+	// We don't want to store the entire state history!
+	require.Empty(t, ms.Ends.FlapHistory)
 
 	// Since we're now in a stable state a single up check should create a new state from a stable one
 	ms.recordCheck(monitorID, StatusUp)

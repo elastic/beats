@@ -9,7 +9,7 @@ import (
 // must occur for us to end a flapping state. FlappingThreshold-1 is the number
 // of consecutive checks that is insufficient to start a new state, but rather to
 // keep the current state and turn it into a flapping state.
-const FlappingThreshold = 3
+const FlappingThreshold = 7
 
 type StateStatus string
 
@@ -96,6 +96,9 @@ func (s *State) recordCheck(monitorId string, newStatus StateStatus) {
 			s.incrementCounters(newStatus)
 		} else { // flap has ended
 			oldState := *s
+			// Remove the flap history, or we'll create a linked list
+			// of our full history!
+			oldState.FlapHistory = nil
 			*s = *newMonitorState(monitorId, newStatus)
 			s.Ends = &oldState
 		}
