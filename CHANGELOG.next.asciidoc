@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Check for nil metadata in GCP. {pull}32281[32281]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
+- Fix an infinite loop in AWS billing metricset. {pull}32626[32626]
 - Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
 
 *Packetbeat*
