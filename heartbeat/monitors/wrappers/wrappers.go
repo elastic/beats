@@ -18,7 +18,6 @@
 package wrappers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
@@ -93,7 +92,6 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) j
 			if !hasSummary {
 				return cont, err
 			}
-			logp.Warn("TERMINAL DOC FOR %s", sf.ID)
 
 			status, err := event.GetValue("monitor.status")
 			if err != nil {
@@ -102,11 +100,7 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) j
 
 			ms := mst.RecordStatus(sf.ID, monitorstate.StateStatus(status.(string)))
 
-			logp.Warn("CHECKS: %s - s:%s u:%d d:%d", sf.ID, ms.Status, ms.Up, ms.Down)
-
 			eventext.MergeEventFields(event, mapstr.M{"state": ms})
-			f, _ := json.Marshal(event.Fields)
-			logp.Info("SUMMARY %s", f)
 
 			return cont, nil
 		}
@@ -365,7 +359,6 @@ func makeAddSummary() jobs.JobWrapper {
 				resetState()
 			}
 
-			logp.Warn("RET CONT %s %d / %s", state.checkGroup, len(cont), jobErr)
 			return cont, jobErr
 		}
 	}
