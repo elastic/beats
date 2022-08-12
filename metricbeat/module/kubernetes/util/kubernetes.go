@@ -246,22 +246,10 @@ func NewContainerMetadataEnricher(
 			pod := r.(*kubernetes.Pod)
 			meta := metaGen.Generate(pod)
 
-<<<<<<< HEAD
-=======
-			statuses := make(map[string]*kubernetes.PodContainerStatus)
-			mapStatuses := func(s []kubernetes.PodContainerStatus) {
-				for i := range s {
-					statuses[s[i].Name] = &s[i]
-				}
-			}
-			mapStatuses(pod.Status.ContainerStatuses)
-			mapStatuses(pod.Status.InitContainerStatuses)
-
 			nodeStore, _ := metricsRepo.AddNodeStore(pod.Spec.NodeName)
 			podId := NewPodId(pod.Namespace, pod.Name)
 			podStore, _ := nodeStore.AddPodStore(podId)
 
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				metrics := NewContainerMetrics()
 
@@ -276,33 +264,15 @@ func NewContainerMetadataEnricher(
 					}
 				}
 
-<<<<<<< HEAD
-=======
 				containerStore, _ := podStore.AddContainerStore(container.Name)
 				containerStore.SetContainerMetrics(metrics)
 
-				if s, ok := statuses[container.Name]; ok {
-					// Extracting id and runtime ECS fields from ContainerID
-					// which is in the form of <container.runtime>://<container.id>
-					split := strings.Index(s.ContainerID, "://")
-					if split != -1 {
-						kubernetes2.ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
-
-						kubernetes2.ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
-					}
-				}
-
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
 			}
 		},
 		// delete
-<<<<<<< HEAD
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
-=======
-		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			pod, ok := r.(*kubernetes.Pod)
 			if !ok {
 				base.Logger().Debugf("Error while casting event: %s", ok)
@@ -311,7 +281,6 @@ func NewContainerMetadataEnricher(
 			nodeStore := metricsRepo.GetNodeStore(pod.Spec.NodeName)
 			nodeStore.DeletePodStore(podId)
 
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)

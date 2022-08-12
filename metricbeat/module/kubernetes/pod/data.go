@@ -27,13 +27,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-<<<<<<< HEAD
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
+func eventMapping(content []byte, metricsRepo *util.MetricsRepo) ([]common.MapStr, error) {
 	events := []common.MapStr{}
-=======
-func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]mapstr.M, error) {
-	events := []mapstr.M{}
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
@@ -165,27 +160,16 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
 		}
 
-<<<<<<< HEAD
-		if coresLimit > 0 {
-			podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
-=======
 		if podCoreLimit > 0 {
-			kubernetes2.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/podCoreLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+			podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/podCoreLimit)
 		}
 
 		if usageMem > 0 {
 			if nodeMem > 0 {
 				podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
 			}
-<<<<<<< HEAD
-			if memLimit > 0 {
-				podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
-=======
 			if podMemLimit > 0 {
-				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/podMemLimit, logger)
-				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+				podEvent.Put("memory.usage.limit.pct", float64(usageMem)/podMemLimit)
 			}
 		}
 
@@ -193,15 +177,8 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			if nodeMem > 0 {
 				podEvent.Put("memory.usage.node.pct", float64(workingSet)/nodeMem)
 			}
-<<<<<<< HEAD
-			if memLimit > 0 {
-				podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
-=======
 			if podMemLimit > 0 {
-				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/podMemLimit, logger)
-
-				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+				podEvent.Put("memory.usage.limit.pct", float64(workingSet)/podMemLimit)
 			}
 		}
 

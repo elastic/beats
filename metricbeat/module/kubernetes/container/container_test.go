@@ -42,9 +42,6 @@ func TestEventMapping(t *testing.T) {
 
 	metricsRepo := util.NewMetricsRepo()
 
-<<<<<<< HEAD
-	events, err := eventMapping(body, cache)
-=======
 	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
 
 	nodeMetrics := util.NewNodeMetrics()
@@ -61,8 +58,7 @@ func TestEventMapping(t *testing.T) {
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
 	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
 
-	events, err := eventMapping(body, metricsRepo, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+	events, err := eventMapping(body, metricsRepo)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
