@@ -86,7 +86,7 @@ func NewServiceMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"hostname":         p.Label("ingress_hostname"),
 			},
 		},
-		enricher: util.NewResourceMetadataEnricher(base, &kubernetes.Service{}, mod.GetPerfMetricsCache(), false),
+		enricher: util.NewResourceMetadataEnricher(base, &kubernetes.Service{}, mod.GetMetricsRepo(), false),
 	}, nil
 }
 
