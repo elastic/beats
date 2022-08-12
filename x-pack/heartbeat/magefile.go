@@ -16,6 +16,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
 
 	// mage:import
@@ -26,13 +27,14 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	test.RegisterDeps(IntegTest)
 
 	devtools.BeatLicense = "Elastic License"
 }
@@ -77,9 +79,12 @@ func Update() {
 	mg.SerialDeps(Fields, FieldDocs, Config)
 }
 
-func HintegTest() error {
-	fmt.Println("Running heartbeat go integ tests")
-	return devtools.GoIntegTestFromHost(context.Background(), devtools.DefaultGoTestIntegrationFromHostArgs())
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest)
+}
+
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
 func Fields() error {
