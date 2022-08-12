@@ -22,9 +22,10 @@ const (
 func newMonitorState(monitorId string, status StateStatus) *State {
 	now := time.Now()
 	ms := &State{
-		ID:        fmt.Sprintf("%s-%x", monitorId, now.UnixMilli()),
-		StartedAt: now,
-		Status:    status,
+		ID:         fmt.Sprintf("%s-%x", monitorId, now.UnixMilli()),
+		StartedAt:  now,
+		DurationMs: 0,
+		Status:     status,
 	}
 	ms.recordCheck(monitorId, status)
 
@@ -34,11 +35,12 @@ func newMonitorState(monitorId string, status StateStatus) *State {
 type State struct {
 	ID string `json:"id"`
 	// StartedAt is the start time of the state, should be the same for a given state ID
-	StartedAt time.Time   `json:"started_at"`
-	Status    StateStatus `json:"status"`
-	Checks    int         `json:"checks"`
-	Up        int         `json:"up"`
-	Down      int         `json:"down"`
+	StartedAt  time.Time   `json:"started_at"`
+	DurationMs int64       `json:"duration_ms"`
+	Status     StateStatus `json:"status"`
+	Checks     int         `json:"checks"`
+	Up         int         `json:"up"`
+	Down       int         `json:"down"`
 	// FlapHistory retains enough info so we can resume our flap
 	// computation if loading from ES or another source
 	FlapHistory []StateStatus `json:"flap_history"`
@@ -47,6 +49,7 @@ type State struct {
 }
 
 func (s *State) incrementCounters(status StateStatus) {
+	s.DurationMs = time.Until(s.StartedAt).Milliseconds()
 	s.Checks++
 	if status == StatusUp {
 		s.Up++

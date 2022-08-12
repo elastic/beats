@@ -16332,6 +16332,16 @@ type: date
 
 --
 
+*`state.duration_ms`*::
++
+--
+Length of time this state has existed in millis
+
+
+type: date
+
+--
+
 *`state.status`*::
 +
 --
@@ -16396,6 +16406,16 @@ type: integer
 +
 --
 First time state with this ID was seen
+
+
+type: date
+
+--
+
+*`ends.duration_ms`*::
++
+--
+Length of time this state has existed in millis
 
 
 type: date

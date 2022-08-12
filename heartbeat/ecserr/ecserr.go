@@ -89,3 +89,11 @@ func NewSyntheticsCmdCouldNotStartErr(reason error) *ECSErr {
 		fmt.Sprintf("could not start command not found: %s", reason),
 	)
 }
+
+func NewBadHTTPStatusErr(code int, statusText string) *ECSErr {
+	return NewECSErr(
+		ETYPE_IO,
+		"BAD_HTTP_STATUS",
+		fmt.Sprintf("Bad HTTP status %s encountered", statusText),
+	)
+}

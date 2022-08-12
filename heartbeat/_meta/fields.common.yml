@@ -108,6 +108,10 @@
           type: date
           description: >
             First time state with this ID was seen
+        - name: duration_ms
+          type: date
+          description: >
+            Length of time this state has existed in millis
         - name: status
           type: keyword
           description: >
@@ -136,6 +140,10 @@
            type: date
            description: >
               First time state with this ID was seen
+         - name: duration_ms
+           type: date
+           description: >
+             Length of time this state has existed in millis
          - name: status
            type: keyword
            description: >
