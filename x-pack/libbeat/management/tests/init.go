@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package tests
 
 import (
@@ -7,6 +11,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/feature"
@@ -14,8 +21,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/gofrs/uuid"
-	"github.com/stretchr/testify/require"
 )
 
 var defaultFleetName = "x-pack-fleet"
@@ -43,8 +48,7 @@ func ResetFleetManager(handler MockV2Handler) error {
 		return fmt.Errorf("Error finding management plugin:")
 	}
 	if managers != nil && managers[0].Name() == defaultFleetName {
-		fmt.Printf("Removing existing global management plugin\n")
-		feature.GlobalRegistry().Unregister(lbmanagement.Namespace, defaultFleetName)
+		_ = feature.GlobalRegistry().Unregister(lbmanagement.Namespace, defaultFleetName)
 	}
 	lbmanagement.Register("fleet-test", fleetClientFactory(handler), feature.Beta)
 	return nil
@@ -58,7 +62,6 @@ func fleetClientFactory(srv MockV2Handler) lbmanagement.PluginFunc {
 				return nil
 			}
 			return func(_ *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
-				fmt.Printf("setting up V2 client manager\n")
 				return management.NewV2AgentManagerWithClient(c, registry, srv.Client)
 			}
 		}
@@ -68,7 +71,7 @@ func fleetClientFactory(srv MockV2Handler) lbmanagement.PluginFunc {
 
 // SetupTestEnv is a helper to initialize the common files and handlers for metricbeat.
 // This returns a string to the tmpdir location
-func SetupTestEnv(t *testing.T, config proto.UnitExpectedConfig, runtime time.Duration) (string, MockV2Handler) {
+func SetupTestEnv(t *testing.T, config *proto.UnitExpectedConfig, runtime time.Duration) (string, MockV2Handler) {
 	tmpdir := os.TempDir()
 	filename := fmt.Sprintf("test-%d", time.Now().Unix())
 	outPath := filepath.Join(tmpdir, filename)
@@ -76,7 +79,7 @@ func SetupTestEnv(t *testing.T, config proto.UnitExpectedConfig, runtime time.Du
 	err := os.Mkdir(outPath, 0775)
 	require.NoError(t, err)
 
-	server := NewMockServer(runtime, config, outPath)
+	server := NewMockServer(t, runtime, config, outPath)
 	t.Logf("Resetting fleet manager...")
 	err = ResetFleetManager(server)
 	require.NoError(t, err)

@@ -1,13 +1,20 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package tests
 
 import (
 	"fmt"
 	"sync"
+	"testing"
 	"time"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -20,7 +27,7 @@ type MockV2Handler struct {
 }
 
 // NewMockServer returns a mocked elastic-agent V2 controller
-func NewMockServer(runtime time.Duration, inputConfig proto.UnitExpectedConfig, outPath string) MockV2Handler {
+func NewMockServer(t *testing.T, runtime time.Duration, inputConfig *proto.UnitExpectedConfig, outPath string) MockV2Handler {
 	unitOneID := mock.NewID()
 	unitOutID := mock.NewID()
 
@@ -29,7 +36,7 @@ func NewMockServer(runtime time.Duration, inputConfig proto.UnitExpectedConfig, 
 
 	var mut sync.Mutex
 
-	var logOutputStream = proto.UnitExpectedConfig{
+	var logOutputStream = &proto.UnitExpectedConfig{
 		DataStream: &proto.DataStream{
 			Namespace: "default",
 		},
@@ -64,7 +71,7 @@ func NewMockServer(runtime time.Duration, inputConfig proto.UnitExpectedConfig, 
 					return sendUnitsWithState(proto.State_HEALTHY, inputConfig, logOutputStream, unitOneID, unitOutID, stateIndex)
 				} else if checkUnitStateHealthy(observed.Units) {
 
-					if time.Now().Sub(start) > runtime {
+					if time.Since(start) > runtime {
 						//remove the units once they've been healthy for a given period of time
 						return sendUnitsWithState(proto.State_STOPPED, inputConfig, logOutputStream, unitOneID, unitOutID, stateIndex+1)
 					}
@@ -91,7 +98,8 @@ func NewMockServer(runtime time.Duration, inputConfig proto.UnitExpectedConfig, 
 	} // end of srv declaration
 
 	// The start() needs to happen here, since the client needs the assigned server port
-	srv.Start()
+	err := srv.Start()
+	require.NoError(t, err)
 
 	client := client.NewV2(fmt.Sprintf(":%d", srv.Port), token, client.VersionInfo{
 		Name:    "program",
@@ -105,7 +113,7 @@ func NewMockServer(runtime time.Duration, inputConfig proto.UnitExpectedConfig, 
 }
 
 // helper to wrap the CheckinExpected config we need with every refresh of the mock server
-func sendUnitsWithState(state proto.State, input, output proto.UnitExpectedConfig, inId, outId string, stateIndex uint64) *proto.CheckinExpected {
+func sendUnitsWithState(state proto.State, input, output *proto.UnitExpectedConfig, inId, outId string, stateIndex uint64) *proto.CheckinExpected {
 	return &proto.CheckinExpected{
 		AgentInfo: &proto.CheckinAgentInfo{
 			Id:       "test-agent",
@@ -117,7 +125,7 @@ func sendUnitsWithState(state proto.State, input, output proto.UnitExpectedConfi
 				Id:             inId,
 				Type:           proto.UnitType_INPUT,
 				ConfigStateIdx: stateIndex,
-				Config:         &input,
+				Config:         input,
 				State:          state,
 				LogLevel:       proto.UnitLogLevel_DEBUG,
 			},
@@ -125,7 +133,7 @@ func sendUnitsWithState(state proto.State, input, output proto.UnitExpectedConfi
 				Id:             outId,
 				Type:           proto.UnitType_OUTPUT,
 				ConfigStateIdx: stateIndex,
-				Config:         &output,
+				Config:         output,
 				State:          state,
 			},
 		},

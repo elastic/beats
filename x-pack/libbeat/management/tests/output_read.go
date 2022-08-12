@@ -1,14 +1,20 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package tests
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type findFieldsMode string
@@ -49,7 +55,7 @@ func ValuesExist(t *testing.T, values map[string]interface{}, events []mapstr.M,
 		var foundCount = 0
 		for eventIter, event := range events {
 			evt, err := event.GetValue(searchKey)
-			if err == mapstr.ErrKeyNotFound {
+			if errors.Is(err, mapstr.ErrKeyNotFound) {
 				continue
 			}
 			if val == nil {

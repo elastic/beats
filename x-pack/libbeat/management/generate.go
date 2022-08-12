@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package management
 
 import (
@@ -36,7 +40,7 @@ func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *
 	if r.transformFunc == nil {
 		streamList, err := CreateInputsFromStreams(cfg, "log", agentInfo)
 		if err != nil {
-			return nil, fmt.Errorf("error creating input list from fallback function: %s", err)
+			return nil, fmt.Errorf("error creating input list from fallback function: %w", err)
 		}
 		// format for the reloadable list needed bythe cm.Reload() method
 		configList, err := CreateReloadConfigFromInputs(streamList)
@@ -64,11 +68,11 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 		streamSource = injectIndexStream(raw, inputType, iter, streamSource)
 		streamSource, err := injectStreamProcessors(raw, inputType, iter, streamSource)
 		if err != nil {
-			return nil, fmt.Errorf("Error injecting stream processors: %s", err)
+			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
 		}
 		streamSource, err = injectAgentInfoRule(streamSource, agentInfo)
 		if err != nil {
-			return nil, fmt.Errorf("Error injecting agent processors: %s", err)
+			return nil, fmt.Errorf("Error injecting agent processors: %w", err)
 		}
 		inputs[iter] = streamSource
 	}
@@ -84,7 +88,7 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 	for iter := range raw {
 		uconfig, err := conf.NewConfigFrom(raw[iter])
 		if err != nil {
-			return nil, fmt.Errorf("error in conversion to conf.C:")
+			return nil, fmt.Errorf("error in conversion to conf.C: %w", err)
 		}
 		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
 	}
@@ -198,20 +202,6 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string
 	return stream, nil
 }
 
-// A little debug helper to print everything in a config once its been rendered
-func printConfigDebug(cfg []*reload.ConfigWithMeta) string {
-	stringAcc := ""
-	for _, cfgItem := range cfg {
-		cfgMap := mapstr.M{}
-		err := cfgItem.Config.Unpack(&cfgMap)
-		if err != nil {
-			stringAcc = fmt.Sprintf("%s\n%s\n", stringAcc, err)
-		}
-		stringAcc = fmt.Sprintf("%s\n%s\n", stringAcc, cfgMap.StringToPrint())
-	}
-	return stringAcc
-}
-
 // ===========
 // Config Processors
 // ===========
@@ -239,7 +229,7 @@ func generateBeatConfig(unitRaw *proto.UnitExpectedConfig, agentInfo *client.Age
 	// Generate the config that's unique to a beat
 	metaConfig, err := ConfigTransform.Transform(unitRaw, agentInfo)
 	if err != nil {
-		return nil, fmt.Errorf("error transforming config for beats: %s", err)
+		return nil, fmt.Errorf("error transforming config for beats: %w", err)
 	}
 	return metaConfig, nil
 }

@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package mbtest
 
 import (
@@ -5,16 +9,16 @@ import (
 	"testing"
 	"time"
 
-	// intialize the plugin system before libbeat does, so we can overwrite it properly
+	// initialize the plugin system before libbeat does, so we can overwrite it properly
+	"github.com/stretchr/testify/require"
+
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
-	mbroot "github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/stretchr/testify/require"
 )
 
-var expectedMBStreams = proto.UnitExpectedConfig{
+var expectedMBStreams = &proto.UnitExpectedConfig{
 	DataStream: &proto.DataStream{
 		Namespace: "default",
 	},
@@ -31,7 +35,7 @@ var expectedMBStreams = proto.UnitExpectedConfig{
 }
 
 func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
-	tests.InitBeatsForTest(t, mbroot.RootCmd)
+	tests.InitBeatsForTest(t, cmd.RootCmd)
 	var mbStreams = []*proto.Stream{
 		{
 			Id: "system/metrics-system.cpu-default-system",
@@ -104,7 +108,7 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 }
 
 func TestMultipleMetricsets(t *testing.T) {
-	tests.InitBeatsForTest(t, mbroot.RootCmd)
+	tests.InitBeatsForTest(t, cmd.RootCmd)
 	var mbStreams = []*proto.Stream{
 		{
 			Id: "system/metrics-system.cpu-default-system",

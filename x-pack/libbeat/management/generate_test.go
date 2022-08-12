@@ -1,14 +1,19 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package management
 
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMBGenerate(t *testing.T) {
@@ -186,7 +191,8 @@ func TestOutputGen(t *testing.T) {
 	cfg, err := groupByOutputs(&testExpected)
 	require.NoError(t, err)
 	testStruct := mapstr.M{}
-	cfg.Config.Unpack(&testStruct)
+	err = cfg.Config.Unpack(&testStruct)
+	require.Error(t, err)
 	innerCfg, exists := testStruct["elasticsearch"]
 	assert.True(t, exists, "elasticsearch key does not exist")
 	_, pwExists := innerCfg.(map[string]interface{})["password"]
