@@ -449,16 +449,6 @@ type: keyword
 
 --
 
-*`monitor.status_block`*::
-+
---
-A date representing the start time of a logically contiguous segment of statuses typically either all up or all down. In the case of a rapidly flapping endpoint this may be a mix.
-
-
-type: date
-
---
-
 *`monitor.timespan`*::
 +
 --
