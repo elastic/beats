@@ -67,7 +67,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	}
 	var stateLoader monitorstate.StateLoader
 	if esc != nil {
-		stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*")
+		stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*")
 	} else {
 		stateLoader = monitorstate.NilStateLoader
 	}
