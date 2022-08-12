@@ -77,7 +77,7 @@ func (s *State) truncateFlapHistory() {
 // If the current state is continued it just updates counters and other record keeping,
 // if the state ends it actually swaps out the full value the state points to
 // and sets state.Ends.
-func (s *State) recordCheck(monitorId string, newStatus StateStatus) {
+func (s *State) recordCheck(monitorID string, newStatus StateStatus) {
 	if s.Status == StatusFlapping {
 		s.truncateFlapHistory()
 
@@ -95,12 +95,7 @@ func (s *State) recordCheck(monitorId string, newStatus StateStatus) {
 			s.FlapHistory = append(s.FlapHistory, newStatus)
 			s.incrementCounters(newStatus)
 		} else { // flap has ended
-			oldState := *s
-			// Remove the flap history, or we'll create a linked list
-			// of our full history!
-			oldState.FlapHistory = nil
-			*s = *newMonitorState(monitorId, newStatus)
-			s.Ends = &oldState
+			s.transitionTo(monitorID, newStatus)
 		}
 	} else if s.Status == newStatus { // stable state, status has not changed
 		// The state is stable, no changes needed
@@ -111,12 +106,20 @@ func (s *State) recordCheck(monitorId string, newStatus StateStatus) {
 		s.Status = StatusFlapping
 		s.FlapHistory = append(s.FlapHistory, newStatus)
 	} else {
-		// state has changed, but we aren't flapping (yet), since we've been stable past the
-		// flapping threshold
-		oldState := *s
-		*s = *newMonitorState(monitorId, newStatus)
-		s.Ends = &oldState
+		s.transitionTo(monitorID, newStatus)
 	}
+}
+
+func (s *State) transitionTo(monitorID string, newStatus StateStatus) {
+	// state has changed, but we aren't flapping (yet), since we've been stable past the
+	// flapping threshold
+	oldState := *s
+	*s = *newMonitorState(monitorID, newStatus)
+	// We don't need to retain extra data when transitioning
+	s.Ends.FlapHistory = nil
+	// W edon't want an infinite linked list!
+	s.Ends.Ends = nil
+	s.Ends = &oldState
 }
 
 // copy returns a threadsafe copy since the instance used in the tracker is frequently mutated
