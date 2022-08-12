@@ -14,16 +14,14 @@ import (
 // it will use ES if configured, otherwise it will only track state from
 // memory.
 func NewMonitorStateTracker(sl StateLoader) *Tracker {
-	t := &Tracker{
+	if sl == nil {
+		sl = NilStateLoader
+	}
+	return &Tracker{
 		states:      map[string]*State{},
 		mtx:         sync.Mutex{},
 		stateLoader: sl,
 	}
-	if t.stateLoader == nil {
-		t.stateLoader = NilStateLoader
-	}
-
-	return t
 }
 
 type Tracker struct {
@@ -34,27 +32,27 @@ type Tracker struct {
 
 // StateLoader has signature as loadLastESState, useful for test mocking, and maybe for a future impl
 // other than ES if necessary
-type StateLoader func(monitorId string) (*State, error)
+type StateLoader func(monitorID string) (*State, error)
 
-func (t *Tracker) RecordStatus(monitorId string, newStatus StateStatus) (ms *State) {
+func (t *Tracker) RecordStatus(monitorID string, newStatus StateStatus) (ms *State) {
 	//note: the return values have no concurrency controls, they may be unsafely read unless
 	//copied to the stack, copying the structs before  returning
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	state := t.getCurrentState(monitorId)
+	state := t.getCurrentState(monitorID)
 	if state == nil {
-		state = newMonitorState(monitorId, newStatus)
-		t.states[monitorId] = state
+		state = newMonitorState(monitorID, newStatus)
+		t.states[monitorID] = state
 	} else {
-		state.recordCheck(monitorId, newStatus)
+		state.recordCheck(monitorID, newStatus)
 	}
 	// return a copy since the state itself is a pointer that is frequently mutated
 	return state.copy()
 }
 
-func (t *Tracker) getCurrentState(monitorId string) (state *State) {
-	if state, ok := t.states[monitorId]; ok {
+func (t *Tracker) getCurrentState(monitorID string) (state *State) {
+	if state, ok := t.states[monitorID]; ok {
 		return state
 	}
 
@@ -62,7 +60,7 @@ func (t *Tracker) getCurrentState(monitorId string) (state *State) {
 	var loadedState *State
 	var err error
 	for i := 0; i < tries; i++ {
-		loadedState, err = t.stateLoader(monitorId)
+		loadedState, err = t.stateLoader(monitorID)
 		if err != nil {
 			sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
 			logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
@@ -70,11 +68,11 @@ func (t *Tracker) getCurrentState(monitorId string) (state *State) {
 		}
 	}
 	if err != nil {
-		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor %s", tries, monitorId)
+		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor %s", tries, monitorID)
 	}
 
 	if loadedState != nil {
-		t.states[monitorId] = loadedState
+		t.states[monitorID] = loadedState
 	}
 
 	// Return what we found, even if nil
