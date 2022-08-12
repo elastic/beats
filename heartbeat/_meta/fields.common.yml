@@ -81,68 +81,6 @@
           description: >
             Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
 
-- key: state
-  title: "Monitor state"
-  description: state related fields
-  fields:
-    - name: state
-      type: group
-      description: "Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`."
-      fields:
-        - name: id
-          type: long
-          description: >
-            ID of this state
-        - name: status
-          type: keyword
-          description: >
-            The current status of this state at the time of this event, can changed from up->flapping or down->flapping at any time
-    - name: starting
-      type: group
-      fields:
-        - name: id
-          type: long
-          description: >
-            ID of this state
-        - name: started_at
-          type: date
-          description: >
-            Time this state started at
-        - name: status
-          type: keyword
-          description: >
-            Time this state started at
-    - name: ending
-      type: group
-      fields:
-        - name: id
-          type: long
-          description: >
-            ID of this state
-        - name: started_at
-          type: date
-          description: >
-            Time this state started at
-        - name: ended_at
-          type: date
-          description: >
-            Time this state started at
-        - name: status
-          type: keyword
-          description: >
-            Time this state started at
-        - name: checks
-          type: long
-          description:
-            total checks within this state
-        - name: up
-          type: long
-          description: >
-            total number of up checks
-        - name: down
-          type: long
-          description: >
-            total number of up checks
         - name: origin
           type: keyword
           description: >
@@ -156,10 +94,70 @@
             - name: id
               type: keyword
               description: Project ID
-          fields:
             - name: name
               type: keyword
               description: Project name
+
+- key: state
+  title: "Monitor state"
+  description: state related fields
+  fields:
+    - name: state
+      type: group
+      description: "Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`."
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            ID of this state
+        - name: started_at
+          type: date
+          description: >
+            First time state with this ID was seen
+        - name: status
+          type: keyword
+          description: >
+            The current status, "up", "down", or "flapping"
+            any state can change into flapping.
+        - name: checks
+          type: integer
+          description: total checks run
+        - name: up
+          type: integer
+          description: total up checks run
+        - name: down
+          type: integer
+          description: total down checks run
+        - name: flap_history
+          enabled: false
+    - name: ends
+      type: group
+      description: the state that was ended by this state
+      fields:
+         - name: id
+           type: integer
+           description: >
+              ID of this state
+         - name: started_at
+           type: date
+           description: >
+              First time state with this ID was seen
+         - name: status
+           type: keyword
+           description: >
+             The current status, "up", "down", or "flapping"
+             any state can change into flapping.
+         - name: checks
+           type: integer
+           description: total checks run
+         - name: up
+           type: integer
+           description: total up checks run
+         - name: down
+           type: integer
+           description: total down checks run
+         - name: flap_history
+           enabled: false
 
 - key: summary
   title: "Monitor summary"

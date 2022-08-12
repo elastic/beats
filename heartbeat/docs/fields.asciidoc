@@ -469,6 +469,41 @@ type: date_range
 
 --
 
+*`monitor.origin`*::
++
+--
+The origin of this monitor configuration, usually either "ui", or "project"
+
+
+type: keyword
+
+--
+
+[float]
+=== project
+
+Project info for this monitor
+
+
+
+*`monitor.project.id`*::
++
+--
+Project ID
+
+type: keyword
+
+--
+
+*`monitor.project.name`*::
++
+--
+Project name
+
+type: keyword
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 
@@ -16293,144 +16328,131 @@ Present in the last event emitted during a check. If a monitor checks multiple e
 ID of this state
 
 
-type: long
+type: keyword
+
+--
+
+*`state.started_at`*::
++
+--
+First time state with this ID was seen
+
+
+type: date
 
 --
 
 *`state.status`*::
 +
 --
-The current status of this state at the time of this event, can changed from up->flapping or down->flapping at any time
+The current status, "up", "down", or "flapping" any state can change into flapping.
 
 
 type: keyword
 
 --
 
-
-*`starting.id`*::
+*`state.checks`*::
 +
 --
-ID of this state
+total checks run
 
-
-type: long
+type: integer
 
 --
 
-*`starting.started_at`*::
+*`state.up`*::
 +
 --
-Time this state started at
+total up checks run
 
-
-type: date
+type: integer
 
 --
 
-*`starting.status`*::
+*`state.down`*::
 +
 --
-Time this state started at
+total down checks run
 
-
-type: keyword
+type: integer
 
 --
 
-
-*`ending.id`*::
+*`state.flap_history`*::
 +
 --
-ID of this state
-
-
-type: long
-
---
-
-*`ending.started_at`*::
-+
---
-Time this state started at
-
-
-type: date
-
---
-
-*`ending.ended_at`*::
-+
---
-Time this state started at
-
-
-type: date
-
---
-
-*`ending.status`*::
-+
---
-Time this state started at
-
-
-type: keyword
-
---
-
-*`ending.checks`*::
-+
---
-total checks within this state
-
-type: long
-
---
-
-*`ending.up`*::
-+
---
-total number of up checks
-
-
-type: long
-
---
-
-*`ending.down`*::
-+
---
-total number of up checks
-
-
-type: long
-
---
-
-*`ending.origin`*::
-+
---
-The origin of this monitor configuration, usually either "ui", or "project"
-
-
-type: keyword
+Object is not enabled.
 
 --
 
 [float]
-=== project
+=== ends
 
-Project info for this monitor
+the state that was ended by this state
 
 
-
-*`ending.project.name`*::
+*`ends.id`*::
 +
 --
-Project name
+ID of this state
+
+
+type: integer
+
+--
+
+*`ends.started_at`*::
++
+--
+First time state with this ID was seen
+
+
+type: date
+
+--
+
+*`ends.status`*::
++
+--
+The current status, "up", "down", or "flapping" any state can change into flapping.
+
 
 type: keyword
+
+--
+
+*`ends.checks`*::
++
+--
+total checks run
+
+type: integer
+
+--
+
+*`ends.up`*::
++
+--
+total up checks run
+
+type: integer
+
+--
+
+*`ends.down`*::
++
+--
+total down checks run
+
+type: integer
+
+--
+
+*`ends.flap_history`*::
++
+--
+Object is not enabled.
 
 --
 

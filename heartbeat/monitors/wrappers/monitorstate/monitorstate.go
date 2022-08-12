@@ -22,7 +22,7 @@ const (
 func newMonitorState(monitorId string, status StateStatus) *State {
 	now := time.Now()
 	ms := &State{
-		Id:        fmt.Sprintf("%s-%x", monitorId, now.UnixMilli()),
+		ID:        fmt.Sprintf("%s-%x", monitorId, now.UnixMilli()),
 		StartedAt: now,
 		Status:    status,
 	}
@@ -32,7 +32,7 @@ func newMonitorState(monitorId string, status StateStatus) *State {
 }
 
 type State struct {
-	Id string `json:"id"`
+	ID string `json:"id"`
 	// StartedAt is the start time of the state, should be the same for a given state ID
 	StartedAt time.Time   `json:"started_at"`
 	Status    StateStatus `json:"status"`

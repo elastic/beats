@@ -39,9 +39,9 @@ func TestStatesESLoader(t *testing.T) {
 		for i := 0; i < count; i++ {
 			ms = etc.tracker.RecordStatus(monID, testStatus)
 			if i == 0 {
-				lastId = ms.Id
+				lastId = ms.ID
 			}
-			require.Equal(t, lastId, ms.Id, "state ID should not change within state")
+			require.Equal(t, lastId, ms.ID, "state ID should not change within state")
 		}
 		// The initial state adds 1 to count
 		requireMSStatusCount(t, ms, testStatus, count+1)
@@ -53,15 +53,15 @@ func TestStatesESLoader(t *testing.T) {
 			testStatus = StatusUp
 		}
 
-		origMsId := ms.Id
+		origMsId := ms.ID
 		for i := 0; i < count; i++ {
 			ms = etc.tracker.RecordStatus(monID, testStatus)
-			require.NotEqual(t, origMsId, ms.Id)
+			require.NotEqual(t, origMsId, ms.ID)
 			if i == 0 {
-				lastId = ms.Id
-				require.Equal(t, origMsId, ms.Ends.Id, "transition should point to the prior state")
+				lastId = ms.ID
+				require.Equal(t, origMsId, ms.Ends.ID, "transition should point to the prior state")
 			}
-			require.Equal(t, lastId, ms.Id, "state ID should not change within state")
+			require.Equal(t, lastId, ms.ID, "state ID should not change within state")
 		}
 		requireMSStatusCount(t, ms, testStatus, count)
 	}
