@@ -200,7 +200,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	}
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, mockPipeline.ConnectSync(), sched.Add, nil)
+	_, m0Err := newMonitor(badConf, reg, mockPipeline.ConnectSync(), sched.Add, nil, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

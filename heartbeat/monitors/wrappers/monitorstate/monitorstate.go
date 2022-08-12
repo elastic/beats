@@ -15,9 +15,9 @@ const (
 	StatusFlapping StateStatus = "flap"
 )
 
-func newMonitorState(monitorId string, status StateStatus) *MonitorState {
+func newMonitorState(monitorId string, status StateStatus) *State {
 	nowMillis := time.Now().UnixMilli()
-	ms := &MonitorState{
+	ms := &State{
 		Id:          fmt.Sprintf("%s-%x", monitorId, nowMillis),
 		MonitorId:   monitorId,
 		StartedAtMs: float64(nowMillis),
@@ -33,7 +33,7 @@ type HistoricalStatus struct {
 	Status StateStatus `json:"status"`
 }
 
-type MonitorState struct {
+type State struct {
 	MonitorId   string        `json:"monitorId"`
 	Id          string        `json:"id"`
 	StartedAtMs float64       `json:"started_at_ms"`
@@ -42,21 +42,21 @@ type MonitorState struct {
 	Up          int           `json:"up"`
 	Down        int           `json:"down"`
 	FlapHistory []StateStatus `json:"flap_history"`
-	Ends        *MonitorState `json:"ends"`
+	Ends        *State        `json:"ends"`
 }
 
-func (ms *MonitorState) incrementCounters(status StateStatus) {
-	ms.Checks++
+func (s *State) incrementCounters(status StateStatus) {
+	s.Checks++
 	if status == StatusUp {
-		ms.Up++
+		s.Up++
 	} else {
-		ms.Down++
+		s.Down++
 	}
 }
 
 // truncate flap history to be at most as many items as the threshold indicates, minus one
-func (ms *MonitorState) truncateFlapHistory() {
-	endIdx := len(ms.FlapHistory)
+func (s *State) truncateFlapHistory() {
+	endIdx := len(s.FlapHistory)
 	if endIdx < 0 {
 		return // flap history is empty
 	}
@@ -66,20 +66,20 @@ func (ms *MonitorState) truncateFlapHistory() {
 	if startIdx <= 0 {
 		return
 	}
-	ms.FlapHistory = ms.FlapHistory[startIdx:endIdx]
+	s.FlapHistory = s.FlapHistory[startIdx:endIdx]
 }
 
 // recordCheck updates the current state pointer to what the new state should be.
 // If the current state is continued it just updates counters and other record keeping,
 // if the state ends it actually swaps out the full value the state points to
 // and sets state.Ends.
-func (ms *MonitorState) recordCheck(newStatus StateStatus) {
-	if ms.Status == StatusFlapping {
-		ms.truncateFlapHistory()
+func (s *State) recordCheck(newStatus StateStatus) {
+	if s.Status == StatusFlapping {
+		s.truncateFlapHistory()
 
 		// Check if all statuses in flap history are identical, including the new status
 		hasStabilized := true
-		for _, histStatus := range ms.FlapHistory {
+		for _, histStatus := range s.FlapHistory {
 			if newStatus != histStatus {
 				hasStabilized = false
 				break
@@ -88,34 +88,34 @@ func (ms *MonitorState) recordCheck(newStatus StateStatus) {
 
 		if !hasStabilized { // continue flapping
 			// Use the new flap history as part of the state
-			ms.FlapHistory = append(ms.FlapHistory, newStatus)
-			ms.incrementCounters(newStatus)
+			s.FlapHistory = append(s.FlapHistory, newStatus)
+			s.incrementCounters(newStatus)
 		} else { // flap has ended
-			oldState := *ms
-			*ms = *newMonitorState(ms.MonitorId, newStatus)
-			ms.Ends = &oldState
+			oldState := *s
+			*s = *newMonitorState(s.MonitorId, newStatus)
+			s.Ends = &oldState
 		}
-	} else if ms.Status == newStatus { // stable state, status has not changed
+	} else if s.Status == newStatus { // stable state, status has not changed
 		// The state is stable, no changes needed
-		ms.incrementCounters(newStatus)
-	} else if ms.Checks < FlappingThreshold {
+		s.incrementCounters(newStatus)
+	} else if s.Checks < FlappingThreshold {
 		// The state changed too quickly, we're now flapping
-		ms.incrementCounters(newStatus)
-		ms.Status = StatusFlapping
-		ms.FlapHistory = append(ms.FlapHistory, newStatus)
+		s.incrementCounters(newStatus)
+		s.Status = StatusFlapping
+		s.FlapHistory = append(s.FlapHistory, newStatus)
 	} else {
 		// state has changed, but we aren't flapping (yet), since we've been stable past the
 		// flapping threshold
-		oldState := *ms
-		*ms = *newMonitorState(ms.MonitorId, newStatus)
-		ms.Ends = &oldState
+		oldState := *s
+		*s = *newMonitorState(s.MonitorId, newStatus)
+		s.Ends = &oldState
 	}
 }
 
 // copy returns a threadsafe copy since the instance used in the tracker is frequently mutated
-func (ms *MonitorState) copy() *MonitorState {
-	copied := *ms
-	copied.FlapHistory = make([]StateStatus, len(ms.FlapHistory))
-	copy(copied.FlapHistory, ms.FlapHistory)
+func (s *State) copy() *State {
+	copied := *s
+	copied.FlapHistory = make([]StateStatus, len(s.FlapHistory))
+	copy(copied.FlapHistory, s.FlapHistory)
 	return &copied
 }

@@ -230,11 +230,9 @@ func GoIntegTestFromHost(ctx context.Context, params GoTestArgs) error {
 		return fmt.Errorf("starting containers: %w", err)
 	}
 
-	fmt.Println("RUN THE THING")
 	// Run Go test from the host machine. Do not immediately exit on error to allow cleanup to occur.
 	params.ExtraFlags = append(params.ExtraFlags, "-v")
 	testErr := GoTest(ctx, params)
-	fmt.Println("RUNDONE")
 
 	err = saveDockerComposeLogs(cwd, "goIntegTest")
 	if err != nil {
@@ -242,7 +240,6 @@ func GoIntegTestFromHost(ctx context.Context, params GoTestArgs) error {
 		fmt.Printf("Failed to save docker-compose logs: %s\n", err)
 	}
 
-	fmt.Println("STOPITALL")
 	err = StopIntegTestContainers()
 	if err != nil && testErr == nil {
 		// Stopping containers failed but the test didn't

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -14,9 +15,11 @@ import (
 
 func MakeESLoader(esc *elasticsearch.Client, indexPattern string) StateLoader {
 	if indexPattern == "" {
-		indexPattern = "synthetics-*"
+		// Should never happen, but if we ever make a coding error...
+		logp.L().Warn("ES state loader initialized with no index pattern, will not load states from ES")
+		return NilStateLoader
 	}
-	return func(monitorId string) (*MonitorState, error) {
+	return func(monitorId string) (*State, error) {
 		reqBody, err := json.Marshal(mapstr.M{
 			"sort": mapstr.M{"@timestamp": "desc"},
 			"query": mapstr.M{
@@ -53,7 +56,7 @@ func MakeESLoader(esc *elasticsearch.Client, indexPattern string) StateLoader {
 				Hits []struct {
 					DocId  string `json:"string"`
 					Source struct {
-						State MonitorState `json:"state"`
+						State State `json:"state"`
 					} `json:"_source"`
 				} `json:"hits"`
 			} `json:"hits"`

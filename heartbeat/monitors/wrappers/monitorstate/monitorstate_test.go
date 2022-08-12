@@ -33,7 +33,7 @@ func TestRecordingAndFlapping(t *testing.T) {
 }
 
 // recordFlappingSeries is a helper that should always put the monitor into a flapping state.
-func recordFlappingSeries(ms *MonitorState) {
+func recordFlappingSeries(ms *State) {
 	for i := 0; i < FlappingThreshold; i++ {
 		if i%2 == 0 {
 			ms.recordCheck(StatusUp)
@@ -44,7 +44,7 @@ func recordFlappingSeries(ms *MonitorState) {
 }
 
 // recordStableSeries is a test helper for repeatedly recording one status
-func recordStableSeries(ms *MonitorState, count int, s StateStatus) {
+func recordStableSeries(ms *State, count int, s StateStatus) {
 	for i := 0; i < count; i++ {
 		ms.recordCheck(s)
 	}

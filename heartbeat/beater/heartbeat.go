@@ -49,7 +49,7 @@ type Heartbeat struct {
 	config          config.Config
 	scheduler       *scheduler.Scheduler
 	monitorReloader *cfgfile.Reloader
-	dynamicFactory  *monitors.RunnerFactory
+	monitorFactory  *monitors.RunnerFactory
 	autodiscover    *autodiscover.Autodiscover
 }
 
@@ -65,7 +65,12 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
-	monitorstate.SetEsClient(esc)
+	var stateLoader monitorstate.StateLoader
+	if esc != nil {
+		stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*")
+	} else {
+		stateLoader = monitorstate.NilStateLoader
+	}
 
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
@@ -101,8 +106,9 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		done:      make(chan struct{}),
 		config:    parsedConfig,
 		scheduler: sched,
-		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(b.Info, sched.Add, plugin.GlobalPluginsReg, pipelineClientFactory),
+		// monitorFactory is the factory used for creating all monitor instances,
+		// wiring them up to everything needed to actually execute.
+		monitorFactory: monitors.NewFactory(b.Info, sched.Add, stateLoader, plugin.GlobalPluginsReg, pipelineClientFactory),
 	}
 	return bt, nil
 }
@@ -170,7 +176,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
 	for _, cfg := range bt.config.Monitors {
-		created, err := bt.dynamicFactory.Create(b.Publisher, cfg)
+		created, err := bt.monitorFactory.Create(b.Publisher, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
 				logp.L().Info("skipping disabled monitor: %s", err)
@@ -194,21 +200,21 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
-	mons := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	mons := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".monitors", mons)
-	inputs := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
 	reload.Register.MustRegisterList("inputs", inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 	// Check monitor configs
-	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
+	if err := bt.monitorReloader.Check(bt.monitorFactory); err != nil {
 		logp.Error(fmt.Errorf("error loading reloadable monitors: %w", err))
 	}
 
 	// Execute the monitor
-	go bt.monitorReloader.Run(bt.dynamicFactory)
+	go bt.monitorReloader.Run(bt.monitorFactory)
 
 	return nil
 }
@@ -218,7 +224,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 	ad, err := autodiscover.NewAutodiscover(
 		"heartbeat",
 		b.Publisher,
-		bt.dynamicFactory,
+		bt.monitorFactory,
 		autodiscover.QueryConfig(),
 		bt.config.Autodiscover,
 		b.Keystore,

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
@@ -171,7 +172,7 @@ func setupFactoryAndSched() (factory *monitors.RunnerFactory, sched *scheduler.S
 		true,
 	)
 
-	return monitors.NewFactory(info, sched.Add, plugin.GlobalPluginsReg, func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
+	return monitors.NewFactory(info, sched.Add, monitorstate.NilStateLoader, plugin.GlobalPluginsReg, func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
 			c, _ := pipeline.Connect()
 			return monitors.SyncPipelineClientAdaptor{C: c}, nil
 		}),

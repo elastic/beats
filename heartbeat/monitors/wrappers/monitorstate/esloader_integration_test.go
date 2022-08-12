@@ -18,32 +18,58 @@ func TestStates(t *testing.T) {
 	etc := newESTestContext(t)
 
 	// Create three monitors in ES, load their states, and make sure we track them correctly
-	// We create 3 to make sure the query isolates the monitors correctly
-	for i := 0; i < 3; i++ {
-		monID := etc.createTestMonitorStateInES(t, StatusUp)
+	// We create a few to make sure the query isolates the monitors correctly
+	// and alternate between testing monitors that start up or down
+	for i := 0; i < 10; i++ {
+		testStatus := StatusUp
+		if i%2 == 1 {
+			testStatus = StatusDown
+		}
+
+		monID := etc.createTestMonitorStateInES(t, testStatus)
 		// Since we've continued this state it should register the initial state
 		ms := etc.tracker.getCurrentState(monID)
-		requireMSCounts(t, ms, 1, 0)
+		requireMSStatusCount(t, ms, testStatus, 1)
 
-		_ = etc.tracker.RecordStatus(monID, StatusUp)
-		ms = etc.tracker.RecordStatus(monID, StatusUp)
-		requireMSCounts(t, ms, 3, 0)
+		// Write the state a few times, enough to guarantee a stable state
+		count := FlappingThreshold * 2
+		var lastId string
+		for i := 0; i < count; i++ {
+			ms = etc.tracker.RecordStatus(monID, testStatus)
+			if i == 0 {
+				lastId = ms.Id
+			}
+			require.Equal(t, lastId, ms.Id, "state ID should not change within state")
+		}
+		// The initial state adds 1 to count
+		requireMSStatusCount(t, ms, testStatus, count+1)
+
+		// now change the state
+		if testStatus == StatusUp {
+			testStatus = StatusDown
+		} else {
+			testStatus = StatusUp
+		}
+
+		origMsId := ms.Id
+		for i := 0; i < count; i++ {
+			ms = etc.tracker.RecordStatus(monID, testStatus)
+			require.NotEqual(t, origMsId, ms.Id)
+			if i == 0 {
+				lastId = ms.Id
+				require.Equal(t, origMsId, ms.Ends.Id, "transition should point to the prior state")
+			}
+			require.Equal(t, lastId, ms.Id, "state ID should not change within state")
+		}
+		requireMSStatusCount(t, ms, testStatus, count)
 	}
-
-	// Let's test a final one with a down state for completeness
-	monID := etc.createTestMonitorStateInES(t, StatusDown)
-	_ = etc.tracker.RecordStatus(monID, StatusDown)
-	_ = etc.tracker.RecordStatus(monID, StatusDown)
-	_ = etc.tracker.RecordStatus(monID, StatusDown)
-	ms := etc.tracker.RecordStatus(monID, StatusDown)
-	requireMSCounts(t, ms, 0, 3)
 }
 
 type esTestContext struct {
 	namespace string
 	esc       *elasticsearch.Client
 	loader    StateLoader
-	tracker   *MonitorStateTracker
+	tracker   *Tracker
 }
 
 func newESTestContext(t *testing.T) *esTestContext {
@@ -69,7 +95,7 @@ func (etc *esTestContext) createTestMonitorStateInES(t *testing.T, s StateStatus
 	return mID
 }
 
-func (etc *esTestContext) setInitialState(t *testing.T, typ string, ms *MonitorState) {
+func (etc *esTestContext) setInitialState(t *testing.T, typ string, ms *State) {
 	idx := fmt.Sprintf("synthetics-%s-%s", typ, etc.namespace)
 
 	type Mon struct {
@@ -78,9 +104,9 @@ func (etc *esTestContext) setInitialState(t *testing.T, typ string, ms *MonitorS
 	}
 
 	reqBodyRdr, err := esutil.ToJsonRdr(struct {
-		Ts      time.Time     `json:"@timestamp"`
-		Monitor Mon           `json:"monitor"`
-		State   *MonitorState `json:"state"`
+		Ts      time.Time `json:"@timestamp"`
+		Monitor Mon       `json:"monitor"`
+		State   *State    `json:"state"`
 	}{
 		Ts:      time.Now(),
 		Monitor: Mon{Id: ms.MonitorId, Type: typ},
