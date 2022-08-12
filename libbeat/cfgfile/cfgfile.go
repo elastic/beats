@@ -108,7 +108,7 @@ func HandleFlags() error {
 		home = *homePath
 	}
 
-	defaults.SetString("path.home", -1, home)
+	_ = defaults.SetString("path.home", -1, home)
 
 	if len(overwrites.GetFields()) > 0 {
 		common.PrintConfigDebugf(overwrites, "CLI setting overwrites (-E flag):")
@@ -188,6 +188,9 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 			c,
 			overwrites,
 		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	common.PrintConfigDebugf(c, "Complete configuration loaded:")

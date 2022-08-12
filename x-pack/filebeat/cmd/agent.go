@@ -12,7 +12,7 @@ import (
 func filebeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	modules, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
 	if err != nil {
-		return nil, fmt.Errorf("error creating input list from raw expected config: %s", err)
+		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
 	for iter := range modules {
 		modules[iter]["type"] = translateFilebeatType(rawIn)
