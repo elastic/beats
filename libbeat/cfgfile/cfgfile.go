@@ -208,7 +208,7 @@ func LoadList(file string) ([]*config.C, error) {
 	var c []*config.C
 	err = rawConfig.Unpack(&c)
 	if err != nil {
-		return nil, fmt.Errorf("error reading configuration from file %s: %s", file, err)
+		return nil, fmt.Errorf("error reading configuration from file %s: %w", file, err)
 	}
 
 	return c, nil

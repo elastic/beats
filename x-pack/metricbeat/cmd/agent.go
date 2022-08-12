@@ -13,7 +13,7 @@ import (
 func metricbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	modules, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
 	if err != nil {
-		return nil, fmt.Errorf("error creating input list from raw expected config: %s", err)
+		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
 
 	// Extract the module name from the type, usually in the form system/metric
