@@ -714,7 +714,6 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return err
 	}
-	logp.Info("Starting up V2 controller: %v", b.Manager.Enabled())
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err

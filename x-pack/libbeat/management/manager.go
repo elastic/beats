@@ -50,7 +50,7 @@ type Manager struct {
 
 // NewFleetManager returns a X-Pack Beats Fleet Management manager.
 func NewFleetManager(config *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
-	c := defaultConfig()
+	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, errors.Wrap(err, "parsing fleet management settings")

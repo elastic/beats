@@ -2,14 +2,12 @@ package management
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"gopkg.in/yaml.v2"
 )
 
 // ===========
@@ -21,128 +19,197 @@ var ConfigTransform = TransformRegister{}
 // TransformRegister is a hack that allows an individual beat to set a transform function
 // so the V2 controller can perform beat-specific config transformations.
 // This is mostly done this way so we can avoid mixing up code with different licenses,
-// as this is entirely xpack/Elastic License code, and the entire beats setup process happens in libbeat.
+// as this is entirely xpack/Elastic License code, and the normal beat init process happens in libbeat.
 // This is fairly simple, as only one beat will ever register a callback.
 type TransformRegister struct {
-	transformFunc func(*proto.UnitExpectedConfig) ([]*reload.ConfigWithMeta, error)
+	transformFunc func(*proto.UnitExpectedConfig, *client.AgentInfo) ([]*reload.ConfigWithMeta, error)
 }
 
 // SetTransform sets a transform function callback
-func (r *TransformRegister) SetTransform(transform func(*proto.UnitExpectedConfig) ([]*reload.ConfigWithMeta, error)) {
+func (r *TransformRegister) SetTransform(transform func(*proto.UnitExpectedConfig, *client.AgentInfo) ([]*reload.ConfigWithMeta, error)) {
 	r.transformFunc = transform
 }
 
 // SetTransform sets a transform function callback
-func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig) ([]*reload.ConfigWithMeta, error) {
+func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	// If no transform is registered, fallback to a basic setup
 	if r.transformFunc == nil {
-		InjectStreamProcessor(&cfg, "logs")
-		InjectIndexProcessor(&cfg, "logs")
+		streamList, err := CreateInputsFromStreams(cfg, "log", agentInfo)
+		if err != nil {
+			return nil, fmt.Errorf("error creating input list from fallback function: %s", err)
+		}
 		// format for the reloadable list needed bythe cm.Reload() method
-		configList, err := CreateReloadConfigFromStreams(cfg)
+		configList, err := CreateReloadConfigFromInputs(streamList)
 		if err != nil {
 			return nil, fmt.Errorf("error creating reloader config: %w", err)
 		}
 		return configList, nil
 	}
 
-	return r.transformFunc(cfg)
-}
-
-// StreamConfig is a wrapper type so we can correct the behavior of yaml.Unmarshal, see UnmarshalYAML() below
-type StreamConfig map[string]interface{}
-
-// Figure out what beat we're running as.
-// There's almost certainly a better way to do this,
-// but for now it works
-var exeName = os.Args[0]
-
-// UnitsConfig is an attempt at standardizing the config that beats will get via the V2
-// See the related gdoc proposal for more information. For now, this is a tad sketchy,
-// as the whole fleet stack is distributed enough that we can't be 100% sure this
-// struct will be valid for long, or if we should expect unexpected data.
-type UnitsConfig struct {
-	Name       string     `yaml:"name"`
-	ID         string     `yaml:"id"`
-	UnitType   string     `yaml:"type"`
-	Revision   int        `yaml:"revision"`
-	UseOutput  string     `yaml:"use_output"`
-	Meta       Meta       `yaml:"meta"`
-	DataStream DataStream `yaml:"data_stream"`
-	// For now, Streams has to stay in raw form, since the unit-level and agent-level fields aren't really namespaced
-	Streams []StreamConfig `yaml:"streams"`
-}
-
-// Meta is for fleet input metadata
-type Meta struct {
-	Package Package `yaml:"package"`
-}
-
-// Package is for package-related input metadata
-type Package struct {
-	Name    string `yaml:"name"`
-	Version string `yaml:"version"`
-}
-
-type DataStream struct {
-	Dataset    string `yaml:"dataset" struct:"dataset"`
-	StreamType string `yaml:"type" struct:"type"`
-	Namespace  string `yaml:"namespace" struct:"namespace"`
-}
-
-// StreamMetadata is a helper for unmarshalling stream-level config
-// while we do transformations to generate processors
-type StreamMetadata struct {
-	DataStream DataStream `yaml:"data_stream" struct:"data_stream"`
-	Processors []mapstr.M `yaml:"processors" struct:"processors"`
+	return r.transformFunc(cfg, agentInfo)
 }
 
 // ===========
-// StreamConfig YAML implementation
+// Stream and Input processors
 // ===========
 
-// UnmarshalYAML is a little helper to deal with the fact that the yaml unmarshaler will create
-// hashmaps of type map[interface{}]interface{}, which breaks a bunch of stuff.
-// This code was actually taken from an old version of libbeat circa 2015, which was removed for reasons I don't understand.
-func (st *StreamConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var result map[interface{}]interface{}
-	err := unmarshal(&result)
-	if err != nil {
-		return fmt.Errorf("Error in custom unmarshalYAML: %w", err)
+// CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
+// that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
+// This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
+func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo) ([]map[string]interface{}, error) {
+	inputs := make([]map[string]interface{}, len(raw.Streams))
+
+	for iter := range raw.Streams {
+		streamSource := raw.Streams[iter].Source.AsMap()
+		streamSource = injectIndexStream(raw, inputType, iter, streamSource)
+		streamSource, err := injectStreamProcessors(raw, inputType, iter, streamSource)
+		if err != nil {
+			return nil, fmt.Errorf("Error injecting stream processors: %s", err)
+		}
+		streamSource, err = injectAgentInfoRule(streamSource, agentInfo)
+		if err != nil {
+			return nil, fmt.Errorf("Error injecting agent processors: %s", err)
+		}
+		inputs[iter] = streamSource
 	}
-	*st = cleanUpInterfaceMap(result)
-	return nil
+
+	return inputs, nil
 }
 
-func cleanUpInterfaceMap(in map[interface{}]interface{}) StreamConfig {
-	result := make(StreamConfig)
-	for k, v := range in {
-		result[fmt.Sprintf("%v", k)] = cleanUpMapValue(v)
+// CreateReloadConfigFromInputs turns a raw input/module list into the ConfigWithMeta type used by the reloader interface
+func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.ConfigWithMeta, error) {
+	// format for the reloadable list needed bythe cm.Reload() method
+	configList := make([]*reload.ConfigWithMeta, len(raw))
+
+	for iter := range raw {
+		uconfig, err := conf.NewConfigFrom(raw[iter])
+		if err != nil {
+			return nil, fmt.Errorf("error in conversion to conf.C:")
+		}
+		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
 	}
-	return result
+	return configList, nil
 }
 
-func cleanUpMapValue(v interface{}) interface{} {
-	switch v := v.(type) {
-	case []interface{}:
-		return cleanUpInterfaceArray(v)
-	case map[interface{}]interface{}:
-		return cleanUpInterfaceMap(v)
-	case string:
-		return v
-	case nil:
-		return nil
-	default:
-		return fmt.Sprintf("%v", v)
+// Emulates the InjectAgentInfoRule and InjectHeadersRule ast rules
+func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentInfo) (map[string]interface{}, error) {
+	// upstream API can sometimes return a nil agent info
+	if agentInfo == nil {
+		return inputs, nil
 	}
+	var processors = []interface{}{}
+
+	processors = append(processors, generateAddFieldsProcessor(
+		mapstr.M{"id": agentInfo.ID, "snapshot": agentInfo.Snapshot, "version": agentInfo.Version},
+		"elastic_agent"))
+	processors = append(processors, generateAddFieldsProcessor(
+		mapstr.M{"id": agentInfo.ID},
+		"agent"))
+
+	currentProcs, ok := inputs["processors"]
+	if !ok {
+		inputs["processors"] = processors
+	} else {
+		currentProcsList, ok := currentProcs.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("error creating list of existing processors, got: %#v", currentProcs)
+		}
+		inputs["processors"] = append(processors, currentProcsList...)
+
+	}
+
+	return inputs, nil
 }
 
-func cleanUpInterfaceArray(in []interface{}) []interface{} {
-	result := make([]interface{}, len(in))
-	for i, v := range in {
-		result[i] = cleanUpMapValue(v)
+// injectIndexStream is an emulation of the InjectIndexProcessor AST code
+// TODO: not sure the logic for grabbing fields from the input-level vs. stream-level DataStream fields is correct?
+func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, streamIter int, stream map[string]interface{}) map[string]interface{} {
+	streamType := expected.DataStream.Type
+	if streamType == "" {
+		streamType = inputType
 	}
-	return result
+	dataset := expected.Streams[streamIter].DataStream.Dataset
+	if dataset == "" {
+		dataset = "generic"
+	}
+	namespace := expected.DataStream.Namespace
+	if namespace == "" {
+		namespace = "default"
+	}
+	index := fmt.Sprintf("%s-%s-%s", streamType, dataset, namespace)
+	stream["index"] = index
+	return stream
+}
+
+//injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
+func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string, streamIter int, stream map[string]interface{}) (map[string]interface{}, error) {
+	// logic from datastreamTypeFromInputNode
+	procInputType := inputType
+	if expected.DataStream.Type != "" {
+		procInputType = expected.DataStream.Type
+	}
+
+	procInputNamespace := "default"
+	if expected.DataStream.Namespace != "" {
+		procInputNamespace = expected.DataStream.Namespace
+	}
+
+	var processors = []interface{}{}
+	// the AST injects input_id at the input level and not the stream level,
+	// for reasons I can't understand, as it just ends up shuffling it around
+	// to individual metricsets anyway, at least on metricbeat
+	if expected.Id != "" {
+		inputId := generateAddFieldsProcessor(mapstr.M{"input_id": expected.Id}, "@metadata")
+		processors = append(processors, inputId)
+	}
+
+	procInputDataset := "generic"
+	if expected.Streams[streamIter].DataStream.Dataset != "" {
+		procInputDataset = expected.Streams[streamIter].DataStream.Dataset
+	}
+
+	// namespace
+	datastream := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset,
+		"namespace": procInputNamespace, "type": procInputType}, "data_stream")
+	processors = append(processors, datastream)
+
+	// dataset
+	event := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset}, "event")
+	processors = append(processors, event)
+
+	// source stream
+	streamID := expected.Streams[streamIter].Id
+	sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
+	processors = append(processors, sourceStream)
+
+	// figure out if we have any existing processors
+	currentProcs, ok := stream["processors"]
+	if !ok {
+		stream["processors"] = processors
+	} else {
+		currentProcsList, ok := currentProcs.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("error creating list of existing processors, got: %#v", currentProcs)
+		}
+		stream["processors"] = append(processors, currentProcsList...)
+
+	}
+
+	return stream, nil
+}
+
+// A little debug helper to print everything in a config once its been rendered
+func printConfigDebug(cfg []*reload.ConfigWithMeta) string {
+	stringAcc := ""
+	for _, cfgItem := range cfg {
+		cfgMap := mapstr.M{}
+		err := cfgItem.Config.Unpack(&cfgMap)
+		if err != nil {
+			stringAcc = fmt.Sprintf("%s\n%s\n", stringAcc, err)
+		}
+		stringAcc = fmt.Sprintf("%s\n%s\n", stringAcc, cfgMap.StringToPrint())
+	}
+	return stringAcc
 }
 
 // ===========
@@ -161,14 +228,7 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 // This generates an opaque config blob used by all the beats
 // This has to handle both universal config changes and changes specific to the beats
 // This is a replacement for the AST code that lived in V1
-func generateBeatConfig(unitRaw *proto.UnitExpectedConfig) ([]*reload.ConfigWithMeta, error) {
-	// rawIn := UnitsConfig{}
-
-	// err := yaml.Unmarshal([]byte(unitRaw), &rawIn)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error unmarshalling unit config: %w", err)
-	// }
-	//FixStreamRule
+func generateBeatConfig(unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	if unitRaw.DataStream.Namespace == "" {
 		unitRaw.DataStream.Namespace = "default"
 	}
@@ -176,181 +236,28 @@ func generateBeatConfig(unitRaw *proto.UnitExpectedConfig) ([]*reload.ConfigWith
 		unitRaw.DataStream.Dataset = "generic"
 	}
 
-	// InjectAgentInfoRule
-
-	// In the AST, this rule will try to do something like this:
-	/*
-		"add_fields": {
-			"fields": {
-			"id": "521542dc-2369-4cd0-9f04-4c89e2603238",
-			"snapshot": false,
-			"version": "8.4.0"
-			},
-			"target": "elastic_agent"
-		}
-		"add_fields": {
-				"fields": {
-					"id": "521542dc-2369-4cd0-9f04-4c89e2603238"
-				},
-				"target": "agent"
-		}
-	*/
-	// This requires an AgentInfo Struct that I don't seem to have access to.
-	// Ditto for InjectHeadersRule
-
 	// Generate the config that's unique to a beat
-	metaConfig, err := ConfigTransform.Transform(unitRaw)
-	// if strings.Contains(exeName, "metricbeat") {
-	// 	metaConfig, err = metricbeatCfg(rawIn)
-	// } else if strings.Contains(exeName, "filebeat") {
-	// 	metaConfig, err = filebeatCfg(rawIn)
-	// }
-
-	return metaConfig, err
+	metaConfig, err := ConfigTransform.Transform(unitRaw, agentInfo)
+	if err != nil {
+		return nil, fmt.Errorf("error transforming config for beats: %s", err)
+	}
+	return metaConfig, nil
 }
 
 // generate the output config, including shuffling around the `type` key
 // In V1, this was done by the groupByOutputs function buried in the AST init
-func groupByOutputs(outCfg string) (*reload.ConfigWithMeta, error) {
-	outMap := mapstr.M{}
-	err := yaml.Unmarshal([]byte(outCfg), &outMap)
-	if err != nil {
-		return nil, err
-	}
-
-	outputType := ""
-	for cfgk, val := range outMap {
-		if cfgk == "type" {
-			outputType = val.(string)
-		}
-	}
+func groupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, error) {
+	// We still need to emulate the InjectHeadersRule AST code,
+	// I don't think we can get the `Headers()` data reported by the AgentInfo()
+	sourceMap := outCfg.Source.AsMap()
+	outputType := outCfg.Type
 	formattedOut := mapstr.M{
-		outputType: outMap,
+		outputType: sourceMap,
 	}
-
 	uconfig, err := conf.NewConfigFrom(formattedOut)
 	if err != nil {
 		return nil, fmt.Errorf("error creating reloader config for output: %w", err)
 	}
+
 	return &reload.ConfigWithMeta{Config: uconfig}, nil
-}
-
-// InjectIndexProcessor is an emulation of the InjectIndexProcessor AST code
-func InjectIndexProcessor(rawIn *UnitsConfig, inputType string) {
-
-	for iter := range rawIn.Streams {
-		var streamDS StreamMetadata
-		streamCfg := rawIn.Streams[iter]
-
-		err := typeconv.Convert(&streamDS, streamCfg)
-		if err != nil {
-			fmt.Printf("Error fetching stream-level datastream: %s\n", err)
-		}
-
-		streamType := streamDS.DataStream.StreamType
-		if streamType == "" {
-			streamType = inputType
-		}
-		dataset := streamDS.DataStream.Dataset
-		if dataset == "" {
-			dataset = "generic"
-		}
-		namespace := rawIn.DataStream.Namespace
-		if namespace == "" {
-			namespace = "default"
-		}
-		index := fmt.Sprintf("%s-%s-%s", streamType, dataset, namespace)
-		rawIn.Streams[iter]["index"] = index
-
-	}
-}
-
-//InjectStreamProcessor is an emulation of the InjectStreamProcessorRule AST code
-func InjectStreamProcessor(rawIn *proto.UnitExpectedConfig, inputType string) {
-	// logic from datastreamTypeFromInputNode
-	procInputType := inputType
-	if rawIn.DataStream.Type != "" {
-		procInputType = rawIn.DataStream.Type
-	}
-
-	procInputNamespace := "default"
-	if rawIn.DataStream.Namespace != "" {
-		procInputNamespace = rawIn.DataStream.Namespace
-	}
-
-	for iter := range rawIn.Streams {
-		var streamDS StreamMetadata
-		streamCfg := rawIn.Streams[iter]
-
-		err := typeconv.Convert(&streamDS, streamCfg)
-		// TODO: set up some kind of logging here
-		if err != nil {
-			fmt.Printf("Error fetching stream-level datastream: %s\n", err)
-		}
-
-		var processors = []mapstr.M{}
-		// the AST injects input_id at the input level and not the stream level,
-		// for reasons I can't understand, as it just ends up shuffling it around
-		// to individual metricsets anyway, at least on metricbeat
-		inputId := generateAddFieldsProcessor(mapstr.M{"input_id": rawIn.ID}, "@metadata")
-		processors = append(processors, inputId)
-
-		procInputDataset := "generic"
-		if streamDS.DataStream.Dataset != "" {
-			procInputDataset = streamDS.DataStream.Dataset
-		}
-
-		// namespace
-		datastream := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset,
-			"namespace": procInputNamespace, "type": procInputType}, "data_stream")
-		processors = append(processors, datastream)
-
-		// dataset
-		event := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset}, "event")
-		processors = append(processors, event)
-
-		// source stream
-		streamID := streamCfg.Id
-		sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
-		processors = append(processors, sourceStream)
-
-		var updatedProcs = []mapstr.M{}
-		// append to the existing processor list, if it exists
-		if len(streamDS.Processors) == 0 {
-			updatedProcs = processors
-		} else {
-			updatedProcs = append(streamDS.Processors, processors...)
-		}
-		rawIn.Streams[iter]["processors"] = updatedProcs
-	} // end of stream loop
-
-}
-
-func CreateReloadConfigFromStreams(raw UnitsConfig) ([]*reload.ConfigWithMeta, error) {
-	// format for the reloadable list needed bythe cm.Reload() method
-	configList := make([]*reload.ConfigWithMeta, len(raw.Streams))
-
-	for iter := range raw.Streams {
-		uconfig, err := conf.NewConfigFrom(raw.Streams[iter])
-		if err != nil {
-			return nil, fmt.Errorf("error in conversion to conf.C:")
-		}
-		configList[iter] = &reload.ConfigWithMeta{Config: uconfig}
-	}
-	return configList, nil
-}
-
-// A little debug helper to print everything in a config once its been rendered
-// TODO: turn this into a debug flag or something?
-func printConfigDebug(cfg []*reload.ConfigWithMeta) string {
-	stringAcc := ""
-	for _, cfgItem := range cfg {
-		cfgMap := mapstr.M{}
-		err := cfgItem.Config.Unpack(&cfgMap)
-		if err != nil {
-			stringAcc = fmt.Sprintf("%s\n%s\n", stringAcc, err)
-		}
-		stringAcc = fmt.Sprintf("%s\n%s\n", stringAcc, cfgMap.StringToPrint())
-	}
-	return stringAcc
 }

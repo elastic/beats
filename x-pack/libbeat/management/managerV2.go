@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
@@ -15,49 +14,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 )
-
-// BeatInput represents the "root" of a single input config
-type BeatInput struct {
-	Enabled   bool
-	Id        ComponentID
-	Name      string
-	UseOutput string
-	Streams   []MetricbeatStream
-	Meta      InputMetadata
-}
-
-// InputMetadata wraps the metadata for an input
-type InputMetadata struct {
-	Package PackageData
-}
-
-// PackageData carries metadata for an assoicated package
-type PackageData struct {
-	Name    string
-	Version string
-}
-
-// ComponentID covers the `id` field found in streams and inputs,
-// which currently requires regex and string format statements to manipulate
-type ComponentID struct {
-	Type      string
-	Namespace string
-	Dataset   string
-}
-
-// MetricbeatStream covers the config for an indvidual stream found in an input config,
-// which maps to a metricbeat module/metricset within metricbeat.
-// Normally metricbeat has a one-to-many relationship between modules and metricsets,
-// But fleet will give us one stream per metricset, translating to one module per metricset.
-type MetricbeatStream struct {
-	Hosts   []string
-	Period  time.Duration
-	Module  string
-	Dataset string
-	Enabled bool
-	// The one remaining "quarantined" string blob.
-	DatasetConfig string
-}
 
 // BeatV2Manager is the main type for tracing V2-related config updates
 type BeatV2Manager struct {
@@ -78,14 +34,15 @@ type BeatV2Manager struct {
 
 	// stop callback must be registered by libbeat, as with the V1 callback
 	stopFunc func()
+	beatStop sync.Once
 
 	isRunning bool
 }
 
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
-// This is mainly meant to be used by the management plugin system, which will register this as a callback.
+// This is meant to be used by the management plugin system, which will register this as a callback.
 func NewV2AgentManager(config *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
-	c := defaultConfig()
+	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, errors.Wrap(err, "parsing fleet management settings")
@@ -104,7 +61,7 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 	log := logp.NewLogger(lbmanagement.DebugK)
 	m := &BeatV2Manager{
 		config:   config,
-		logger:   log.Named("fleet"),
+		logger:   log.Named("V2-manager"),
 		registry: registry,
 		units:    make(map[string]*client.Unit),
 	}
@@ -112,12 +69,11 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 	if config.Enabled {
 		m.client = agentClient
 	}
-
 	return m, nil
 }
 
 // ================================
-// Manager interface implementation
+// Beats central management interface implementation
 // ================================
 
 // UpdateStatus updates the manager with the current status for the beat.
@@ -210,26 +166,35 @@ func (c *BeatV2Manager) deleteUnit(unit *client.Unit) {
 }
 
 // ================================
-// Private V3 implementation
+// Private V2 implementation
 // ================================
 
 func (cm *BeatV2Manager) unitListen() {
 	cm.logger.Debugf("Listening for agent unit changes")
-	fmt.Printf("ARGV: %s\n", os.Args[0])
 	for {
 		select {
-
 		case change := <-cm.client.UnitChanges():
-
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure there is a difference between
-			// A unit add and a unit change, since either way we need to fetch the reloader and hand over the config
+			// A unit add and a unit change, since either way we can't do much more than call the reloader
 			case client.UnitChangedAdded:
+				// At this point we also get a log level, however I'm not sure the beats core logger provides a
+				// clean way to "just" change the log level, without resetting the whole log config
+				cm.logger.Debugf("Got unit added: %s", change.Unit.ID())
 				go cm.handleUnitReload(change.Unit)
+
 			case client.UnitChangedModified:
+				// For now, I'm assuming that a state STOPPED just tells us to shut down the entire beat.
+				state, _, _ := change.Unit.Expected()
+				cm.logger.Debugf("Got unit modified: %s, expected state is %s", change.Unit.ID(), state)
+				if state == client.UnitStateStopped {
+					cm.stopBeat(change.Unit)
+				}
 				go cm.handleUnitReload(change.Unit)
+
 			case client.UnitChangedRemoved:
-				cm.stopBeat(change.Unit)
+				cm.logger.Debugf("Got unit removed: %s", change.Unit.ID())
+				cm.deleteUnit(change.Unit)
 			}
 		}
 	}
@@ -244,7 +209,6 @@ func (cm *BeatV2Manager) setMainUnitValue(unit *client.Unit) {
 }
 
 func (cm *BeatV2Manager) stopBeat(unit *client.Unit) {
-
 	// will we ever get a Unit removed for anything other than the main beat?
 	// Individual reloaders don't have a "stop" function, so the most we can do
 	// is just shut down a beat, I think.
@@ -255,31 +219,36 @@ func (cm *BeatV2Manager) stopBeat(unit *client.Unit) {
 	cm.isRunning = false
 	unit.UpdateState(client.UnitStateStopping, "stopping beat", nil)
 	if cm.stopFunc != nil {
-		cm.stopFunc()
+		// I'm not 100% sure the once here is needed,
+		// but various tend to handle this in a not-quite-safe way
+		cm.beatStop.Do(cm.stopFunc)
 	}
 	cm.client.Stop()
 	unit.UpdateState(client.UnitStateStopped, "stopped beat", nil)
-	cm.deleteUnit(unit)
+
 }
 
 func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
-	cm.logger.Debugf("Starting unit reload for ID %s", unit.ID())
 	cm.addUnit(unit)
 	unitType := unit.Type()
 
-	if unitType == client.UnitTypeOutput { // unit for the beat's configured output
+	if unitType == client.UnitTypeOutput {
 		cm.handleOutputReload(unit)
 	} else if unitType == client.UnitTypeInput {
 		cm.handleInputReload(unit)
 	}
 }
 
+// Handle the updated config for an output unit
 func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
+	cm.logger.Debugf("Got Output unit config: %s", rawConfig.Type)
+
 	reloadConfig, err := groupByOutputs(rawConfig)
 	if err != nil {
 		errString := fmt.Errorf("Failed to generate config for output: %w", err)
 		unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
+		return
 	}
 	// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
 	output := cm.registry.GetReloadable("output")
@@ -293,16 +262,18 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 	if err != nil {
 		errString := fmt.Errorf("Failed to reload component: %w", err)
 		unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
+		return
 	}
 	unit.UpdateState(client.UnitStateHealthy, "reloaded output component", nil)
 }
 
+// handle the updated config for an input unit
 func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
 	cm.setMainUnitValue(unit)
+	cm.logger.Debugf("Got Input unit config: %s", rawConfig.Type)
 
 	// Find the V2 inputs we need to reload
-
 	// The reloader provides list and non-list types, but all the beats register as lists,
 	// so just go with that for V2
 	obj := cm.registry.GetReloadableList("input")
@@ -312,18 +283,18 @@ func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 	}
 	unit.UpdateState(client.UnitStateConfiguring, "found reloader for 'input'", nil)
 
-	beatCfg, err := generateBeatConfig(rawConfig)
+	beatCfg, err := generateBeatConfig(rawConfig, cm.client.AgentInfo())
 	if err != nil {
 		errString := fmt.Errorf("Failed to create Unit config: %w", err)
 		unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
+		return
 	}
-
-	fmt.Printf("raw config: %s\n", printConfigDebug(beatCfg))
 
 	err = obj.Reload(beatCfg)
 	if err != nil {
 		errString := fmt.Errorf("Error reloading input: %w", err)
 		unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
+		return
 	}
 	unit.UpdateState(client.UnitStateHealthy, "beat reloaded", nil)
 }

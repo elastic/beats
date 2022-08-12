@@ -6,27 +6,25 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
-//fFormatMetricbeatModules is a combination of the map and rename rules in the metricbeat spec file,
-// and formats various key values needed by metricbeat
-func formatMetricbeatModules(rawIn *management.UnitsConfig) {
-	// Extract the module name from the type, usually in the form system/metric
-	module := strings.Split(rawIn.UnitType, "/")[0]
-
-	for iter := range rawIn.Streams {
-		rawIn.Streams[iter]["module"] = module
+func metricbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
+	modules, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
+	if err != nil {
+		return nil, fmt.Errorf("error creating input list from raw expected config: %s", err)
 	}
 
-}
+	// Extract the module name from the type, usually in the form system/metric
+	module := strings.Split(rawIn.Type, "/")[0]
 
-func metricbeatCfg(rawIn management.UnitsConfig) ([]*reload.ConfigWithMeta, error) {
-	management.InjectStreamProcessor(&rawIn, "metrics")
-	management.InjectIndexProcessor(&rawIn, "metrics")
-	formatMetricbeatModules(&rawIn)
+	for iter := range modules {
+		modules[iter]["module"] = module
+	}
 
 	// format for the reloadable list needed bythe cm.Reload() method
-	configList, err := management.CreateReloadConfigFromStreams(rawIn)
+	configList, err := management.CreateReloadConfigFromInputs(modules)
 	if err != nil {
 		return nil, fmt.Errorf("error creating reloader config: %w", err)
 	}

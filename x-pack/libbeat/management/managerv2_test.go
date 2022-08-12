@@ -17,11 +17,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// func TestV2InputTranspile(t *testing.T) {
-// 	testConfig := Config{}
-// 	NewV2AgentManagerWithClient(&testConfig, reload.RegisterV2)
-// }
-
 var raw = `
     id: system/metrics-system-default-system
     name: system-1
@@ -133,10 +128,44 @@ var raw = `
 `
 
 func TestAgentControl(t *testing.T) {
+	rawExpected := proto.UnitExpectedConfig{
+		DataStream: &proto.DataStream{
+			Namespace: "default",
+		},
+		Id:       "system/metrics-system-default-system",
+		Type:     "system/metrics",
+		Name:     "system-1",
+		Revision: 1,
+		Meta: &proto.Meta{
+			Package: &proto.Package{
+				Name:    "system",
+				Version: "1.17.0",
+			},
+		},
+		Streams: []*proto.Stream{
+			{
+				Id: "system/metrics-system.filesystem-default-system",
+				DataStream: &proto.DataStream{
+					Dataset: "system.filesystem",
+					Type:    "metrics",
+					Source: requireNewStruct(t, map[string]interface{}{
+						"metricsets": []interface{}{"filesystem"},
+						"period":     "1m",
+						"processors": []interface{}{
+							map[string]interface{}{
+								"drop_event.when.regexp": map[string]interface{}{
+									"system.filesystem.mount_point": "^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)",
+								},
+							},
+						},
+					}),
+				},
+			},
+		},
+	}
 	unitOneID := mock.NewID()
 
 	token := mock.NewID()
-	//var gotConfig bool
 
 	var mut sync.Mutex
 
@@ -146,10 +175,6 @@ func TestAgentControl(t *testing.T) {
 			mut.Lock()
 			defer mut.Unlock()
 			if observed.Token == token {
-				// if len(observed.Units) > 0 {
-				// 	t.Logf("Current unit state is: %v", observed.Units[0].State)
-				// }
-
 				// initial checkin
 				if len(observed.Units) == 0 || observed.Units[0].State == proto.State_STARTING {
 					//gotConfig = true
@@ -160,7 +185,7 @@ func TestAgentControl(t *testing.T) {
 								Id:             unitOneID,
 								Type:           proto.UnitType_INPUT,
 								ConfigStateIdx: 1,
-								Config:         raw,
+								Config:         &rawExpected,
 								State:          proto.State_HEALTHY,
 							},
 						},
@@ -221,9 +246,6 @@ func TestAgentControl(t *testing.T) {
 		}
 	}
 
-	//assert.True(t, gotConfig, "config state")
-	// assert.True(t, gotHealthy, "healthy state")
-	// assert.True(t, gotStopped, "stopped state")
 }
 
 // TestReloader is a little test interface so we can register a reloader for the V2 config

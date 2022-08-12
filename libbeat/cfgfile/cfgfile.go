@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -139,24 +140,28 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 
 	cfgpath := GetPathConfig()
 
-	if path == "" {
-		list := []string{}
-		for _, cfg := range configfiles.List() {
-			if !filepath.IsAbs(cfg) {
-				list = append(list, filepath.Join(cfgpath, cfg))
-			} else {
-				list = append(list, cfg)
+	if !fleetmode.Enabled() {
+		if path == "" {
+			list := []string{}
+			for _, cfg := range configfiles.List() {
+				if !filepath.IsAbs(cfg) {
+					list = append(list, filepath.Join(cfgpath, cfg))
+				} else {
+					list = append(list, cfg)
+				}
 			}
+			c, err = common.LoadFiles(list...)
+		} else {
+			if !filepath.IsAbs(path) {
+				path = filepath.Join(cfgpath, path)
+			}
+			c, err = common.LoadFile(path)
 		}
-		c, err = common.LoadFiles(list...)
+		if err != nil {
+			return nil, err
+		}
 	} else {
-		if !filepath.IsAbs(path) {
-			path = filepath.Join(cfgpath, path)
-		}
-		c, err = common.LoadFile(path)
-	}
-	if err != nil {
-		return nil, err
+		c = config.NewConfig()
 	}
 
 	if beatOverrides != nil {
