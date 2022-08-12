@@ -182,10 +182,8 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
-	mons := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".monitors", mons)
 	inputs := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
-	reload.Register.MustRegisterList("inputs", inputs)
+	reload.RegisterV2.MustRegisterList("inputs", inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.

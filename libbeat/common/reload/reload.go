@@ -26,9 +26,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// Register holds a registry of reloadable objects
-var Register = NewRegistry()
-
 // RegisterV2 is the special registry used for the V2 controller
 var RegisterV2 = NewRegistry()
 
