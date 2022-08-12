@@ -20,17 +20,13 @@ func TestRecordingAndFlapping(t *testing.T) {
 	// The count should be FlappingThreshold+1 since we used double the threshold before
 	// This is because we have one full threshold of stable checks, as well as the final check that
 	// flipped us out of the threshold, which goes toward the new state.
-	require.Equal(t, FlappingThreshold+1, ms.Checks)
-	require.Equal(t, 0, ms.Up)
-	require.Equal(t, FlappingThreshold+1, ms.Down)
+	requireMSCounts(t, ms, 0, FlappingThreshold+1)
 	require.Equal(t, priorChecksCount+FlappingThreshold-1, ms.Ends.Checks)
 
 	// Since we're now in a stable state a single up check should create a new state from a stable one
 	ms.recordCheck(monitorID, StatusUp)
 	require.Equal(t, StatusUp, ms.Status)
-	require.Equal(t, 1, ms.Checks)
-	require.Equal(t, 1, ms.Up)
-	require.Equal(t, 0, ms.Down)
+	requireMSCounts(t, ms, 1, 0)
 }
 
 // recordFlappingSeries is a helper that should always put the monitor into a flapping state.
