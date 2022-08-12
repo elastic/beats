@@ -8,12 +8,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// NewMonitorStateTracker tracks state across job runs. It takes an optional
+// NewTracker tracks state across job runs. It takes an optional
 // state loader, which will try to fetch the last known state for a never
 // before seen monitor, which usually means using ES. If set to nil
 // it will use ES if configured, otherwise it will only track state from
 // memory.
-func NewMonitorStateTracker(sl StateLoader) *Tracker {
+func NewTracker(sl StateLoader) *Tracker {
 	if sl == nil {
 		sl = NilStateLoader
 	}

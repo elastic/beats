@@ -83,7 +83,7 @@ func newESTestContext(t *testing.T) *esTestContext {
 		loader:    MakeESLoader(esc, fmt.Sprintf("synthetics-*-%s", namespace.String())),
 	}
 
-	etc.tracker = NewMonitorStateTracker(etc.loader)
+	etc.tracker = NewTracker(etc.loader)
 
 	return etc
 }

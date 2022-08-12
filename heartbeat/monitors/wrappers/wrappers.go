@@ -43,7 +43,7 @@ import (
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader) []jobs.Job {
-	mst := monitorstate.NewMonitorStateTracker(stateLoader)
+	mst := monitorstate.NewTracker(stateLoader)
 	if stdMonFields.Type == "browser" {
 		return WrapBrowser(js, stdMonFields, mst)
 	} else {
