@@ -81,7 +81,7 @@ const selector = "kubernetes"
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	res kubernetes.Resource,
-	perfMetrics *PerfMetricsCache,
+	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
@@ -120,18 +120,20 @@ func NewResourceMetadataEnricher(
 				m[id] = podMetaGen.Generate(r)
 
 			case *kubernetes.Node:
-				// Report node allocatable resources to PerfMetrics cache
-				name := r.GetObjectMeta().GetName()
+				nodeName := r.GetObjectMeta().GetName()
+				metrics := NewNodeMetrics()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						perfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
+						metrics.CoresAllocatable = NewFloat64Metric(float64(q.MilliValue()) / 1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						perfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
+						metrics.MemoryAllocatable = NewFloat64Metric(float64(q.Value()))
 					}
 				}
+				nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+				nodeStore.SetNodeMetrics(metrics)
 
 				m[id] = metaGen.Generate("node", r)
 
@@ -162,6 +164,13 @@ func NewResourceMetadataEnricher(
 		// delete
 		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			accessor, _ := meta.Accessor(r)
+
+			switch r := r.(type) {
+			case *kubernetes.Node:
+				nodeName := r.GetObjectMeta().GetName()
+				metricsRepo.DeleteNodeStore(nodeName)
+			}
+
 			id := join(accessor.GetNamespace(), accessor.GetName())
 			delete(m, id)
 		},
@@ -183,7 +192,7 @@ func NewResourceMetadataEnricher(
 // NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
-	perfMetrics *PerfMetricsCache,
+	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
@@ -223,20 +232,27 @@ func NewContainerMetadataEnricher(
 			}
 			mapStatuses(pod.Status.ContainerStatuses)
 			mapStatuses(pod.Status.InitContainerStatuses)
-			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 
-				// Report container limits to PerfMetrics cache
+			nodeStore, _ := metricsRepo.AddNodeStore(pod.Spec.NodeName)
+			podId := NewPodId(pod.Namespace, pod.Name)
+			podStore, _ := nodeStore.AddPodStore(podId)
+
+			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
+				metrics := NewContainerMetrics()
+
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						perfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+						metrics.CoresLimit = NewFloat64Metric(float64(q.MilliValue()) / 1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						perfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
+						metrics.MemoryLimit = NewFloat64Metric(float64(q.Value()))
 					}
 				}
+
+				containerStore, _ := podStore.AddContainerStore(container.Name)
+				containerStore.SetContainerMetrics(metrics)
 
 				if s, ok := statuses[container.Name]; ok {
 					// Extracting id and runtime ECS fields from ContainerID
@@ -248,6 +264,7 @@ func NewContainerMetadataEnricher(
 						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
+
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
 			}
@@ -258,6 +275,10 @@ func NewContainerMetadataEnricher(
 			if !ok {
 				base.Logger().Debugf("Error while casting event: %s", ok)
 			}
+			podId := NewPodId(pod.Namespace, pod.Name)
+			nodeStore := metricsRepo.GetNodeStore(pod.Spec.NodeName)
+			nodeStore.DeletePodStore(podId)
+
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
