@@ -12,7 +12,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"time"
@@ -271,7 +270,7 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 		}
 
 		defer result.Body.Close()
-		obj, err := ioutil.ReadAll(result.Body)
+		obj, err := io.ReadAll(result.Body)
 
 		if err != nil {
 			log.Println(err)
@@ -289,7 +288,7 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 			for {
 				_, err := io.CopyN(&outBuf, r, 1024)
 				if err != nil {
-					if err == io.EOF {
+					if errors.Is(err, io.EOF) {
 						break
 					}
 					r.Close()
