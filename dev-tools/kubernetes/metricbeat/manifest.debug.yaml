@@ -160,10 +160,10 @@ spec:
       containers:
       - name: metricbeat
         image: metricbeat-debug-image
-        imagePullPolicy: Never
         args: [
           "-c", "/etc/metricbeat.yml",
-          "-e"
+          "-e",
+          "-system.hostfs=/hostfs",
         ]
         ports:
         - containerPort: 56268
@@ -189,8 +189,9 @@ spec:
         securityContext:
           runAsUser: 0
         resources:
-          limits:
-            memory: 200Mi
+          ## on debugger image cause pod to crash since we use > 350MB of memory
+          # limits:
+          #   memory: 200Mi
           requests:
             cpu: 100m
             memory: 100Mi

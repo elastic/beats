@@ -44,7 +44,7 @@ func TestSimpleCases(t *testing.T) {
 			mapstr.M{
 				"folder":           "/",
 				"retries":          3,
-				"target_directory": "/tmp/synthetics/blah",
+				"target_directory": filepath.Join(os.TempDir(), "synthetics", "blah"),
 			},
 			false,
 			false,
