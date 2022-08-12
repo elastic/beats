@@ -373,7 +373,7 @@ func (s *MetricsRepoTestSuite) TestGetContainerMetricsNotFound() {
 	s.Nil(ans.MemoryLimit)
 }
 
-func TestExampleTestSuite(t *testing.T) {
+func TestMetricsRepoTestSuite(t *testing.T) {
 	suite.Run(t, new(MetricsRepoTestSuite))
 }
 
