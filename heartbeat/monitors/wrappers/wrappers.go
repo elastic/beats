@@ -60,11 +60,15 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 			addMonitorMeta(stdMonFields, len(js) > 1),
 			addMonitorStatus(false),
 			addMonitorDuration,
-			addMonitorState(stdMonFields, mst),
 		),
 		func() jobs.JobWrapper {
 			return makeAddSummary()
-		})
+		},
+		func() jobs.JobWrapper {
+			return addMonitorState(stdMonFields, mst)
+		},
+	)
+
 }
 
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
