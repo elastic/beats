@@ -47,7 +47,7 @@ func (t *Tracker) RecordStatus(monitorId string, newStatus StateStatus) (ms *Sta
 		state = newMonitorState(monitorId, newStatus)
 		t.states[monitorId] = state
 	} else {
-		state.recordCheck(newStatus)
+		state.recordCheck(monitorId, newStatus)
 	}
 	// return a copy since the state itself is a pointer that is frequently mutated
 	return state.copy()

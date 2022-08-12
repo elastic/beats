@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+// FlappingThreshold defines how many consecutive checks with the same status
+// must occur for us to end a flapping state. FlappingThreshold-1 is the number
+// of consecutive checks that is insufficient to start a new state, but rather to
+// keep the current state and turn it into a flapping state.
 const FlappingThreshold = 3
 
 type StateStatus string
@@ -16,33 +20,30 @@ const (
 )
 
 func newMonitorState(monitorId string, status StateStatus) *State {
-	nowMillis := time.Now().UnixMilli()
+	now := time.Now()
 	ms := &State{
-		Id:          fmt.Sprintf("%s-%x", monitorId, nowMillis),
-		MonitorId:   monitorId,
-		StartedAtMs: float64(nowMillis),
-		Status:      status,
+		Id:        fmt.Sprintf("%s-%x", monitorId, now.UnixMilli()),
+		StartedAt: now,
+		Status:    status,
 	}
-	ms.recordCheck(status)
+	ms.recordCheck(monitorId, status)
 
 	return ms
 }
 
-type HistoricalStatus struct {
-	TsMs   float64     `json:"ts_ms"`
-	Status StateStatus `json:"status"`
-}
-
 type State struct {
-	MonitorId   string        `json:"monitorId"`
-	Id          string        `json:"id"`
-	StartedAtMs float64       `json:"started_at_ms"`
-	Status      StateStatus   `json:"status"`
-	Checks      int           `json:"checks"`
-	Up          int           `json:"up"`
-	Down        int           `json:"down"`
+	Id string `json:"id"`
+	// StartedAt is the start time of the state, should be the same for a given state ID
+	StartedAt time.Time   `json:"started_at"`
+	Status    StateStatus `json:"status"`
+	Checks    int         `json:"checks"`
+	Up        int         `json:"up"`
+	Down      int         `json:"down"`
+	// FlapHistory retains enough info so we can resume our flap
+	// computation if loading from ES or another source
 	FlapHistory []StateStatus `json:"flap_history"`
-	Ends        *State        `json:"ends"`
+	// Ends is a pointer to the prior state if this is the start of a new state
+	Ends *State `json:"ends"`
 }
 
 func (s *State) incrementCounters(status StateStatus) {
@@ -73,7 +74,7 @@ func (s *State) truncateFlapHistory() {
 // If the current state is continued it just updates counters and other record keeping,
 // if the state ends it actually swaps out the full value the state points to
 // and sets state.Ends.
-func (s *State) recordCheck(newStatus StateStatus) {
+func (s *State) recordCheck(monitorId string, newStatus StateStatus) {
 	if s.Status == StatusFlapping {
 		s.truncateFlapHistory()
 
@@ -92,7 +93,7 @@ func (s *State) recordCheck(newStatus StateStatus) {
 			s.incrementCounters(newStatus)
 		} else { // flap has ended
 			oldState := *s
-			*s = *newMonitorState(s.MonitorId, newStatus)
+			*s = *newMonitorState(monitorId, newStatus)
 			s.Ends = &oldState
 		}
 	} else if s.Status == newStatus { // stable state, status has not changed
@@ -107,7 +108,7 @@ func (s *State) recordCheck(newStatus StateStatus) {
 		// state has changed, but we aren't flapping (yet), since we've been stable past the
 		// flapping threshold
 		oldState := *s
-		*s = *newMonitorState(s.MonitorId, newStatus)
+		*s = *newMonitorState(monitorId, newStatus)
 		s.Ends = &oldState
 	}
 }

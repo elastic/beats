@@ -78,6 +78,8 @@ func MakeESLoader(esc *elasticsearch.Client, indexPattern string) StateLoader {
 			return nil, nil
 		}
 
-		return &sh.Hits.Hits[0].Source.State, nil
+		state := &sh.Hits.Hits[0].Source.State
+
+		return state, nil
 	}
 }

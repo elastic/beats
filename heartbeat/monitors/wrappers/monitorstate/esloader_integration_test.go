@@ -8,14 +8,14 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
-	"sync"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/esutil"
 )
 
-func TestStates(t *testing.T) {
+func TestStatesESLoader(t *testing.T) {
+	testStart := time.Now()
 	etc := newESTestContext(t)
 
 	// Create three monitors in ES, load their states, and make sure we track them correctly
@@ -30,6 +30,7 @@ func TestStates(t *testing.T) {
 		monID := etc.createTestMonitorStateInES(t, testStatus)
 		// Since we've continued this state it should register the initial state
 		ms := etc.tracker.getCurrentState(monID)
+		require.True(t, ms.StartedAt.After(testStart.Add(-time.Nanosecond)), "timestamp for new state is off")
 		requireMSStatusCount(t, ms, testStatus, 1)
 
 		// Write the state a few times, enough to guarantee a stable state
@@ -92,11 +93,11 @@ func (etc *esTestContext) createTestMonitorStateInES(t *testing.T, s StateStatus
 	mID := mUUID.String()
 	mType := "testtyp"
 	initState := newMonitorState(mID, s)
-	etc.setInitialState(t, mType, initState)
+	etc.setInitialState(t, mType, mID, initState)
 	return mID
 }
 
-func (etc *esTestContext) setInitialState(t *testing.T, typ string, ms *State) {
+func (etc *esTestContext) setInitialState(t *testing.T, typ string, monitorID string, ms *State) {
 	idx := fmt.Sprintf("synthetics-%s-%s", typ, etc.namespace)
 
 	type Mon struct {
@@ -110,7 +111,7 @@ func (etc *esTestContext) setInitialState(t *testing.T, typ string, ms *State) {
 		State   *State    `json:"state"`
 	}{
 		Ts:      time.Now(),
-		Monitor: Mon{Id: ms.MonitorId, Type: typ},
+		Monitor: Mon{Id: monitorID, Type: typ},
 		State:   ms,
 	})
 
@@ -122,28 +123,23 @@ func (etc *esTestContext) setInitialState(t *testing.T, typ string, ms *State) {
 	require.NoError(t, err)
 }
 
-var connOnce = &sync.Once{}
-
 func integES(t *testing.T) (esc *elasticsearch.Client) {
-	connOnce.Do(func() {
-		var err error
-		esc, err = elasticsearch.NewClient(elasticsearch.Config{
-			Addresses: []string{"http://127.0.0.1:9200"},
-			Username:  "admin",
-			Password:  "testing",
-		})
-		require.NoError(t, err)
-		respBody, err := esc.Cluster.Health()
-		healthRaw, err := esutil.CheckRetResp(respBody, err)
-		require.NoError(t, err)
-
-		healthResp := struct {
-			Status string `json:"status"`
-		}{}
-		err = json.Unmarshal(healthRaw, &healthResp)
-		require.NoError(t, err)
-		require.Contains(t, []string{"green", "yellow"}, healthResp.Status)
+	esc, err := elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: []string{"http://127.0.0.1:9200"},
+		Username:  "admin",
+		Password:  "testing",
 	})
+	require.NoError(t, err)
+	respBody, err := esc.Cluster.Health()
+	healthRaw, err := esutil.CheckRetResp(respBody, err)
+	require.NoError(t, err)
+
+	healthResp := struct {
+		Status string `json:"status"`
+	}{}
+	err = json.Unmarshal(healthRaw, &healthResp)
+	require.NoError(t, err)
+	require.Contains(t, []string{"green", "yellow"}, healthResp.Status)
 
 	return esc
 }
