@@ -86,6 +86,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Functionbeat*
 
+- Add support for AWS S3 notifications
 
 
 *Elastic Logging Plugin*
