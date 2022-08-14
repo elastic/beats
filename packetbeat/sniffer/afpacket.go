@@ -23,9 +23,7 @@ import "fmt"
 // allocated mmap buffer is close to but smaller than target_size_mb.
 // The restriction is that the block_size must be divisible by both the
 // frame size and page size.
-func afpacketComputeSize(targetSizeMb int, snaplen int, pageSize int) (
-	frameSize int, blockSize int, numBlocks int, err error,
-) {
+func afpacketComputeSize(targetSizeMb, snaplen, pageSize int) (frameSize, blockSize, numBlocks int, err error) {
 	if snaplen < pageSize {
 		frameSize = pageSize / (pageSize / snaplen)
 	} else {
