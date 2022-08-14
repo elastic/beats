@@ -21,9 +21,9 @@
 package procs
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
+	"math/bits"
 	"net"
 	"syscall"
 	"unsafe"
@@ -196,21 +196,7 @@ func addressIPv6(s [16]byte) net.IP {
 }
 
 func addressIPv4(value uint32) net.IP {
-	// FIXME: This can be rewritten as net.IP((*[4]byte)(unsafe.Pointer(&be))[:])
-	address := make([]byte, 4)
-	machineEndiannes.PutUint32(address, value)
-	return net.IP(address)
-}
-
-var machineEndiannes = getMachineEndiannes()
-
-func getMachineEndiannes() binary.ByteOrder {
-	var buf [2]byte
-	*(*uint16)(unsafe.Pointer(&buf[0])) = 1
-	if buf[0] == 1 {
-		return binary.LittleEndian
-	}
-	return binary.BigEndian
+	return net.IP((*[4]byte)(unsafe.Pointer(&value))[:])
 }
 
 // The MIB_(TCP|UDP)_ROW_xxx structures use a 32-bit field to store ports:
@@ -218,6 +204,5 @@ func getMachineEndiannes() binary.ByteOrder {
 // The last 16 bits are unused.
 // See links on the corresponding types in syscall_windows.go.
 func uint32FieldToPort(be uint32) uint16 {
-	// FIXME: This can be rewritten as bits.ReverseBytes16(uint16(be)))
-	return binary.BigEndian.Uint16((*[2]byte)(unsafe.Pointer(&be))[:])
+	return bits.ReverseBytes16(uint16(be))
 }
