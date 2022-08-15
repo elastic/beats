@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -35,6 +36,8 @@ const testFile = "../_meta/test/stats_summary.json"
 const testFileWithMultipleContainers = "../_meta/test/stats_summary_multiple_containers.json"
 
 func TestEventMapping(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.pod")
+
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
@@ -43,9 +46,6 @@ func TestEventMapping(t *testing.T) {
 
 	metricsRepo := util.NewMetricsRepo()
 
-<<<<<<< HEAD
-	events, err := eventMapping(body, cache)
-=======
 	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
 
 	nodeMetrics := util.NewNodeMetrics()
@@ -63,7 +63,6 @@ func TestEventMapping(t *testing.T) {
 	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
 
 	events, err := eventMapping(body, metricsRepo, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
@@ -93,9 +92,6 @@ func TestEventMapping(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-func testValue(t *testing.T, event common.MapStr, field string, expected interface{}) {
-=======
 func TestEventMappingWithZeroNodeMetrics(t *testing.T) {
 	logger := logp.NewLogger("kubernetes.pod")
 
@@ -318,8 +314,7 @@ func TestEventMappingWithMultipleContainersWithAllMemLimits(t *testing.T) {
 	}
 }
 
-func testValue(t *testing.T, event mapstr.M, field string, expected interface{}) {
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+func testValue(t *testing.T, event common.MapStr, field string, expected interface{}) {
 	data, err := event.GetValue(field)
 	assert.NoError(t, err, "Could not read field "+field)
 	assert.EqualValues(t, expected, data, "Wrong value for field "+field)

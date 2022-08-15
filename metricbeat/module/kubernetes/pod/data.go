@@ -22,18 +22,14 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-<<<<<<< HEAD
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
+func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]common.MapStr, error) {
 	events := []common.MapStr{}
-=======
-func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]mapstr.M, error) {
-	events := []mapstr.M{}
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
@@ -132,7 +128,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 		}
 
 		if pod.StartTime != "" {
-			_, _ = podEvent.Put("start_time", pod.StartTime)
+			util.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
 		// NOTE:
@@ -162,49 +158,31 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 		}
 
 		if nodeCores > 0 {
-			_, _ = podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
+			util.ShouldPut(podEvent, "cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores, logger)
 		}
 
-<<<<<<< HEAD
-		if coresLimit > 0 {
-			_, _ = podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
-=======
 		if podCoreLimit > 0 {
-			kubernetes2.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/podCoreLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+			util.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/podCoreLimit, logger)
 		}
 
 		if usageMem > 0 {
 			if nodeMem > 0 {
-				_, _ = podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
+				util.ShouldPut(podEvent, "memory.usage.node.pct", float64(usageMem)/nodeMem, logger)
 			}
-<<<<<<< HEAD
-			if memLimit > 0 {
-				_, _ = podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
-				_, _ = podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
-
-=======
 			if podMemLimit > 0 {
-				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/podMemLimit, logger)
-				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+				util.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/podMemLimit, logger)
+				util.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
 			}
 		}
 
 		if workingSet > 0 && usageMem == 0 {
 			if nodeMem > 0 {
-				_, _ = podEvent.Put("memory.usage.node.pct", float64(workingSet)/nodeMem)
+				util.ShouldPut(podEvent, "memory.usage.node.pct", float64(workingSet)/nodeMem, logger)
 			}
-<<<<<<< HEAD
-			if memLimit > 0 {
-				_, _ = podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
-				_, _ = podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
-=======
 			if podMemLimit > 0 {
-				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/podMemLimit, logger)
+				util.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/podMemLimit, logger)
 
-				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+				util.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
 			}
 		}
 
@@ -214,19 +192,17 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 }
 
 // ecsfields maps pod events fields to container ecs fields
-func ecsfields(podEvent common.MapStr) common.MapStr {
+func ecsfields(podEvent common.MapStr, logger *logp.Logger) common.MapStr {
 	ecsfields := common.MapStr{}
 
 	egressBytes, err := podEvent.GetValue("network.tx.bytes")
 	if err == nil {
-		_, _ = ecsfields.Put("network.egress.bytes", egressBytes)
-
+		util.ShouldPut(ecsfields, "network.egress.bytes", egressBytes, logger)
 	}
 
 	ingressBytes, err := podEvent.GetValue("network.rx.bytes")
 	if err == nil {
-		_, _ = ecsfields.Put("network.ingress.bytes", ingressBytes)
-
+		util.ShouldPut(ecsfields, "network.ingress.bytes", ingressBytes, logger)
 	}
 
 	return ecsfields

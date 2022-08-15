@@ -94,11 +94,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-<<<<<<< HEAD
-	events, err := eventMapping(body, m.mod.GetPerfMetricsCache())
-=======
 	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger())
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -115,7 +111,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 
 		// Enrich event with container ECS fields
-		containerEcsFields := ecsfields(event)
+		containerEcsFields := ecsfields(event, m.Logger())
 		if len(containerEcsFields) != 0 {
 			if e.RootFields != nil {
 				e.RootFields.DeepUpdate(common.MapStr{
