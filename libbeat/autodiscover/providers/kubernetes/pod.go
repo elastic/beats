@@ -28,6 +28,7 @@ import (
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
@@ -359,7 +360,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 	var events []bus.Event
 	portsMap := mapstr.M{}
 
-	ShouldPut(meta, "container", cmeta, p.logger)
+	util.ShouldPut(meta, "container", cmeta, p.logger)
 
 	for _, port := range ports {
 		event := bus.Event{

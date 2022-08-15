@@ -33,8 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 )
 
 var (
@@ -135,9 +133,9 @@ func (f *mockFuncs) update(m map[string]mapstr.M, obj kubernetes.Resource) {
 		},
 	}
 	for k, v := range accessor.GetLabels() {
-		kubernetes2.ShouldPut(meta, fmt.Sprintf("kubernetes.%v", k), v, logger)
+		ShouldPut(meta, fmt.Sprintf("kubernetes.%v", k), v, logger)
 	}
-	kubernetes2.ShouldPut(meta, "orchestrator.cluster.name", "gke-4242", logger)
+	ShouldPut(meta, "orchestrator.cluster.name", "gke-4242", logger)
 	m[accessor.GetName()] = meta
 }
 

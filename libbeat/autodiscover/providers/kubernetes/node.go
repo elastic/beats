@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 
 	"github.com/gofrs/uuid"
@@ -197,7 +198,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := mapstr.M{}
 	for k, v := range node.GetObjectMeta().GetAnnotations() {
-		ShouldPut(annotations, k, v, n.logger)
+		util.ShouldPut(annotations, k, v, n.logger)
 	}
 	kubemeta["annotations"] = annotations
 	event := bus.Event{

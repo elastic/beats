@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
@@ -181,7 +180,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, log
 		for k, v := range eve.ObjectMeta.Labels {
 			if dedotConfig.LabelsDedot {
 				label := common.DeDot(k)
-				kubernetes2.ShouldPut(labels, label, v, logger)
+				util.ShouldPut(labels, label, v, logger)
 
 			} else {
 				err := safemapstr.Put(labels, k, v)
@@ -199,7 +198,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, log
 		for k, v := range eve.ObjectMeta.Annotations {
 			if dedotConfig.AnnotationsDedot {
 				annotation := common.DeDot(k)
-				kubernetes2.ShouldPut(annotations, annotation, v, logger)
+				util.ShouldPut(annotations, annotation, v, logger)
 			} else {
 				err := safemapstr.Put(annotations, k, v)
 				if err != nil {
