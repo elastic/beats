@@ -21,12 +21,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 func eventMapping(content []byte, logger *logp.Logger) ([]common.MapStr, error) {
@@ -72,7 +71,7 @@ func eventMapping(content []byte, logger *logp.Logger) ([]common.MapStr, error) 
 		}
 
 		if syscontainer.StartTime != "" {
-			kubernetes2.ShouldPut(containerEvent, "start_time", syscontainer.StartTime, logger)
+			util.ShouldPut(containerEvent, "start_time", syscontainer.StartTime, logger)
 		}
 
 		events = append(events, containerEvent)

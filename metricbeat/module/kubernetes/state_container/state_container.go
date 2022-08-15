@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -151,15 +149,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			cID := (containerID).(string)
 			split := strings.Index(cID, "://")
 			if split != -1 {
-				kubernetes2.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
-				kubernetes2.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
+				util.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
+				util.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
 			}
 		}
 		if containerImage, ok := event["image"]; ok {
 			cImage := (containerImage).(string)
-			kubernetes2.ShouldPut(containerFields, "image.name", cImage, m.Logger())
+			util.ShouldPut(containerFields, "image.name", cImage, m.Logger())
 			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
-			kubernetes2.ShouldDelete(event, "image", m.Logger())
+			util.ShouldDelete(event, "image", m.Logger())
 		}
 
 		e, err := util.CreateEvent(event, "kubernetes.container")

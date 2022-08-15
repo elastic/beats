@@ -20,10 +20,9 @@ package apiserver
 import (
 	"fmt"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 // Metricset for apiserver is a prometheus based metricset
@@ -74,15 +73,15 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				if bothInformed, _ := event.HasKey("request.count"); !bothInformed {
 					continue
 				}
-				kubernetes2.ShouldDelete(event, "request.beforev14", m.Logger())
+				util.ShouldDelete(event, "request.beforev14", m.Logger())
 			} else {
 				v, err := event.GetValue("request.beforev14.count")
 				if err != nil {
 					reporter.Error(err)
 					continue
 				}
-				kubernetes2.ShouldPut(event, "request.count", v, m.Logger())
-				kubernetes2.ShouldDelete(event, "request.beforev14", m.Logger())
+				util.ShouldPut(event, "request.count", v, m.Logger())
+				util.ShouldDelete(event, "request.beforev14", m.Logger())
 			}
 		}
 

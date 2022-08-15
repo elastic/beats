@@ -24,7 +24,6 @@ import (
 	"sync"
 	"time"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -251,8 +250,8 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						kubernetes2.ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
-						kubernetes2.ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
+						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 
@@ -497,7 +496,7 @@ func (m *enricher) Enrich(events []common.MapStr) {
 				delete(k8sMeta, "pod")
 			}
 			ecsMeta := meta.Clone()
-			kubernetes2.ShouldDelete(ecsMeta, "kubernetes", nil)
+			ShouldDelete(ecsMeta, "kubernetes", nil)
 			event.DeepUpdate(common.MapStr{
 				mb.ModuleDataKey: k8sMeta,
 				"meta":           ecsMeta,
@@ -544,4 +543,18 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 		}
 	}
 	return e, err
+}
+
+func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event common.MapStr, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
+	}
 }
