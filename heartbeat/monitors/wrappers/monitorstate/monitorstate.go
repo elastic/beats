@@ -26,7 +26,7 @@ import (
 // must occur for us to end a flapping state. FlappingThreshold-1 is the number
 // of consecutive checks that is insufficient to start a new state, but rather to
 // keep the current state and turn it into a flapping state.
-const FlappingThreshold = 7
+const FlappingThreshold = 3
 
 type StateStatus string
 

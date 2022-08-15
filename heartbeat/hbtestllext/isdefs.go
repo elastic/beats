@@ -78,7 +78,7 @@ var IsECSErr = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
 		}
 
 		if expectedErr.Type != givenErr.Type {
-			return llresult.SimpleResult(path, false, "ECS error code does not match, expected %s, got %s", expectedErr.Type, givenErr.Type)
+			return llresult.SimpleResult(path, false, "ECS error message does not match, expected %s, got %s", expectedErr.Type, givenErr.Type)
 		}
 
 		if expectedErr.Message != givenErr.Message {

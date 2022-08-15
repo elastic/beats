@@ -32,8 +32,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
+
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
@@ -42,8 +47,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type requestFactory func() (*http.Request, error)
@@ -227,7 +230,7 @@ func execPing(
 	timeout time.Duration,
 	validator multiValidator,
 	responseConfig responseConfig,
-) (end time.Time, err reason.Reason) {
+) (end time.Time, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -240,8 +243,11 @@ func execPing(
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways
 	if resp == nil || errReason != nil {
+		var ecsErr *ecserr.ECSErr
 		var urlError *url.Error
-		if errors.As(errReason.Unwrap(), &urlError) {
+		if errors.As(errReason.Unwrap(), &ecsErr) {
+			return time.Now(), ecsErr
+		} else if errors.As(errReason.Unwrap(), &urlError) {
 			var certErr x509.CertificateInvalidError
 			if errors.As(urlError, &certErr) {
 				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
