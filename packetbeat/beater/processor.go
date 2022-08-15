@@ -79,7 +79,7 @@ func (p *processor) Start() {
 }
 
 func (p *processor) Stop() {
-	p.sniffer.Stop() //nolint:errcheck // *sniffer.Sniffer.Stop() never returns a non-nil error.
+	p.sniffer.Stop()
 	if p.flows != nil {
 		p.flows.Stop()
 	}
