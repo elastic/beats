@@ -37,14 +37,17 @@ const testFileWithMultipleContainers = "../_meta/test/stats_summary_multiple_con
 
 type PodTestSuite struct {
 	suite.Suite
-	MetricsRepo          *util.MetricsRepo
-	NodeName             string
-	Namespace            string
-	PodName              string
-	ContainerName        string
-	AnotherContainerName string
-	PodId                util.PodId
-	Logger               *logp.Logger
+	MetricsRepo             *util.MetricsRepo
+	NodeName                string
+	Namespace               string
+	PodName                 string
+	ContainerName           string
+	AnotherContainerName    string
+	PodId                   util.PodId
+	Logger                  *logp.Logger
+	NodeMetrics             *util.NodeMetrics
+	ContainerMetrics        *util.ContainerMetrics
+	AnotherContainerMetrics *util.ContainerMetrics
 }
 
 func (s *PodTestSuite) SetupTest() {
@@ -58,6 +61,16 @@ func (s *PodTestSuite) SetupTest() {
 	s.PodId = util.NewPodId(s.Namespace, s.PodName)
 
 	s.Logger = logp.NewLogger("kubernetes.pod")
+
+	s.NodeMetrics = util.NewNodeMetrics()
+	s.NodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
+	s.NodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
+
+	s.ContainerMetrics = util.NewContainerMetrics()
+	s.ContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+
+	s.AnotherContainerMetrics = util.NewContainerMetrics()
+	s.AnotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
 }
 
 func (s *PodTestSuite) ReadTestFile(testFile string) []byte {
@@ -73,14 +86,8 @@ func (s *PodTestSuite) ReadTestFile(testFile string) []byte {
 func (s *PodTestSuite) TestEventMapping() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
-	nodeMetrics := util.NewNodeMetrics()
-	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
-	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	s.addNodeMetric(nodeMetrics)
-
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	s.addContainerMetric(s.ContainerName, containerMetrics)
+	s.addNodeMetric(s.NodeMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
 	body := s.ReadTestFile(testFile)
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -108,9 +115,7 @@ func (s *PodTestSuite) TestEventMappingWithZeroNodeMetrics() {
 	nodeMetrics := util.NewNodeMetrics()
 	s.addNodeMetric(nodeMetrics)
 
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	s.addContainerMetric(s.ContainerName, containerMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
 	body := s.ReadTestFile(testFile)
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -130,9 +135,7 @@ func (s *PodTestSuite) TestEventMappingWithZeroNodeMetrics() {
 func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	s.addContainerMetric(s.ContainerName, containerMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
 	body := s.ReadTestFile(testFile)
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -153,14 +156,8 @@ func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
 func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
-	nodeMetrics := util.NewNodeMetrics()
-	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
-	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	s.addNodeMetric(nodeMetrics)
-
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	s.addContainerMetric(s.ContainerName, containerMetrics)
+	s.addNodeMetric(s.NodeMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
 	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -185,18 +182,9 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 func (s *PodTestSuite) TestEventMappingWithMultipleContainersWithAllMemLimits() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
-	nodeMetrics := util.NewNodeMetrics()
-	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
-	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	s.addNodeMetric(nodeMetrics)
-
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	s.addContainerMetric(s.ContainerName, containerMetrics)
-
-	anotherContainerMetrics := util.NewContainerMetrics()
-	anotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	s.addContainerMetric(s.AnotherContainerName, containerMetrics)
+	s.addNodeMetric(s.NodeMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
+	s.addContainerMetric(s.AnotherContainerName, s.AnotherContainerMetrics)
 
 	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)

@@ -338,10 +338,6 @@ func (s *MetricsRepoTestSuite) TestSetContainerMetricsMultiplePods() {
 	addContainerMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName, s.ContainerMetric)
 	addContainerMetric(s.MetricsRepo, s.NodeName, s.AnotherPodId, s.ContainerName, s.AnotherContainerMetric)
 
-	s.Equal(1, len(s.MetricsRepo.NodeNames()))
-	s.Equal(s.ContainerMetric, GetMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName))
-	s.Equal(s.AnotherContainerMetric, GetMetric(s.MetricsRepo, s.NodeName, s.AnotherPodId, s.ContainerName))
-
 	nodeStore := s.MetricsRepo.GetNodeStore(s.NodeName)
 	s.Equal(2, len(nodeStore.PodIds()))
 }
