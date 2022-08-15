@@ -162,7 +162,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
 	s.addContainerMetric(s.ContainerName, containerMetrics)
 
-	body := s.ReadTestFile(testFileWithMultipleContainers)  // NOTE: different test file
+	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
 	s.basicTests(events, err)
