@@ -173,60 +173,10 @@ func newFlowsWorker(pub Reporter, watcher procs.ProcessesWatcher, table *flowMet
 
 // gcd returns the greatest common divisor of a and b.
 func gcd(a, b time.Duration) time.Duration {
-	// FIXME: This can be rewritten as:
-	//
-	//   func gcd(a, b time.Duration) time.Duration {
-	//   	for b != 0 {
-	//   		a, b = b, a%b
-	//   	}
-	//   	return a
-	//   }
-	//
-	// with improved performance for all cases except a == b where costs are <10ns/op.
-	// This function is only called once on flow worker creation.
-	if a < 0 || b < 0 {
-		return 0
+	for b != 0 {
+		a, b = b, a%b
 	}
-
-	switch {
-	case a == b:
-		return a
-	case a == 0:
-		return b
-	case b == 0:
-		return a
-	}
-
-	shift := uint(0)
-	for (a&1) == 0 && (b&1) == 0 {
-		shift++
-		a /= 2
-		b /= 2
-	}
-
-	for (a & 1) == 0 {
-		a = a / 2
-	}
-
-	// a is always odd
-	for {
-		for (b & 1) == 0 {
-			b = b / 2
-		}
-
-		// both a and b are odd. guaranteed b >= a
-		if a > b {
-			a, b = b, a
-		}
-		b -= a
-
-		if b == 0 {
-			break
-		}
-	}
-
-	// restore common factors of 2
-	return a << shift
+	return a
 }
 
 // makeWorker returns a worker that runs processor.execute each tick. Each timeout'th tick,
