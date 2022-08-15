@@ -77,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, mod.GetPerfMetricsCache(), true),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, mod.GetMetricsRepo(), true),
 		mod:           mod,
 	}, nil
 }
@@ -95,7 +95,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, m.mod.GetPerfMetricsCache(), m.Logger())
+	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
