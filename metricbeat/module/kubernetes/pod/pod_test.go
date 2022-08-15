@@ -76,11 +76,11 @@ func (s *PodTestSuite) TestEventMapping() {
 	nodeMetrics := util.NewNodeMetrics()
 	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
 	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	addNodeMetric(s.MetricsRepo, s.NodeName, nodeMetrics)
+	s.addNodeMetric(nodeMetrics)
 
 	containerMetrics := util.NewContainerMetrics()
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName, containerMetrics)
+	s.addContainerMetric(s.ContainerName, containerMetrics)
 
 	body := s.ReadTestFile(testFile)
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -106,11 +106,11 @@ func (s *PodTestSuite) TestEventMappingWithZeroNodeMetrics() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
 	nodeMetrics := util.NewNodeMetrics()
-	addNodeMetric(s.MetricsRepo, s.NodeName, nodeMetrics)
+	s.addNodeMetric(nodeMetrics)
 
 	containerMetrics := util.NewContainerMetrics()
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName, containerMetrics)
+	s.addContainerMetric(s.ContainerName, containerMetrics)
 
 	body := s.ReadTestFile(testFile)
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -132,7 +132,7 @@ func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
 
 	containerMetrics := util.NewContainerMetrics()
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName, containerMetrics)
+	s.addContainerMetric(s.ContainerName, containerMetrics)
 
 	body := s.ReadTestFile(testFile)
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -156,11 +156,11 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 	nodeMetrics := util.NewNodeMetrics()
 	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
 	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	addNodeMetric(s.MetricsRepo, s.NodeName, nodeMetrics)
+	s.addNodeMetric(nodeMetrics)
 
 	containerMetrics := util.NewContainerMetrics()
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName, containerMetrics)
+	s.addContainerMetric(s.ContainerName, containerMetrics)
 
 	body := s.ReadTestFile(testFileWithMultipleContainers)  // NOTE: different test file
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -188,15 +188,15 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainersWithAllMemLimits() 
 	nodeMetrics := util.NewNodeMetrics()
 	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
 	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	addNodeMetric(s.MetricsRepo, s.NodeName, nodeMetrics)
+	s.addNodeMetric(nodeMetrics)
 
 	containerMetrics := util.NewContainerMetrics()
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName, containerMetrics)
+	s.addContainerMetric(s.ContainerName, containerMetrics)
 
 	anotherContainerMetrics := util.NewContainerMetrics()
 	anotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(s.MetricsRepo, s.NodeName, s.PodId, s.AnotherContainerName, containerMetrics)
+	s.addContainerMetric(s.AnotherContainerName, containerMetrics)
 
 	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
@@ -224,15 +224,15 @@ func (s *PodTestSuite) testValue(event mapstr.M, field string, expected interfac
 	s.EqualValues(expected, data, "Wrong value for field "+field)
 }
 
-func addContainerMetric(metricsRepo *util.MetricsRepo, nodeName string, podId util.PodId, containerName string, containerMetric *util.ContainerMetrics) {
-	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
-	podStore, _ := nodeStore.AddPodStore(podId)
+func (s *PodTestSuite) addContainerMetric(containerName string, containerMetric *util.ContainerMetrics) {
+	nodeStore, _ := s.MetricsRepo.AddNodeStore(s.NodeName)
+	podStore, _ := nodeStore.AddPodStore(s.PodId)
 	containerStore, _ := podStore.AddContainerStore(containerName)
 	containerStore.SetContainerMetrics(containerMetric)
 }
 
-func addNodeMetric(metricsRepo *util.MetricsRepo, nodeName string, nodeMetrics *util.NodeMetrics) {
-	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+func (s *PodTestSuite) addNodeMetric(nodeMetrics *util.NodeMetrics) {
+	nodeStore, _ := s.MetricsRepo.AddNodeStore(s.NodeName)
 	nodeStore.SetNodeMetrics(nodeMetrics)
 }
 
