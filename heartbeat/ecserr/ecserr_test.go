@@ -40,8 +40,8 @@ func TestEcsErrNewWithStack(t *testing.T) {
 	require.Equal(t, message, eErr.Error())
 	require.Equal(t, message, e.Message)
 
-	require.Equal(t, typ, e.Type)
-	require.Equal(t, code, e.Code)
+	require.Equal(t, EType(typ), e.Type)
+	require.Equal(t, ECode(code), e.Code)
 	require.Equal(t, stackTrace, *e.StackTrace)
 }
 
@@ -49,6 +49,6 @@ func TestEcsErrNew(t *testing.T) {
 	e := NewECSErr(typ, code, message)
 
 	require.Equal(t, message, e.Message)
-	require.Equal(t, typ, e.Type)
-	require.Equal(t, code, e.Code)
+	require.Equal(t, EType(typ), e.Type)
+	require.Equal(t, ECode(code), e.Code)
 }
