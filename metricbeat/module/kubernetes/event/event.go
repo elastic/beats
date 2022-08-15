@@ -95,21 +95,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Run method provides the Kubernetes event watcher with a reporter with which events can be reported.
-func (m *MetricSet) Run(reporter mb.PushReporter) {
+func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	now := time.Now()
 	handler := kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger()))
+			m.reportEvent(obj, reporter)
 		},
 		UpdateFunc: func(obj interface{}) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger()))
+			m.reportEvent(obj, reporter)
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
 	}
 	m.watcher.AddEventHandler(kubernetes.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
-			eve := obj.(*kubernetes.Event)
+			eve, ok := obj.(*kubernetes.Event)
+			if !ok {
+				m.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			// if fields are null they are decoded to `0001-01-01 00:00:00 +0000 UTC`
 			// so we need to check if they are valid first
 			lastTimestampValid := !kubernetes.Time(&eve.LastTimestamp).IsZero()
@@ -133,6 +136,12 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 	}
 	<-reporter.Done()
 	m.watcher.Stop()
+}
+
+func (m *MetricSet) reportEvent(obj interface{}, reporter mb.PushReporterV2) {
+	mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
+	event := mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil)
+	reporter.Event(event)
 }
 
 func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig, logger *logp.Logger) common.MapStr {

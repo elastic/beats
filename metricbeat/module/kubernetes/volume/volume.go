@@ -87,7 +87,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	events, err := eventMapping(body, m.Logger())
 	if err != nil {
-		return fmt.Errorf("Error while eventMapping: %w", err)
+		return fmt.Errorf("error while eventMapping: %w", err)
 	}
 	for _, e := range events {
 		isOpen := reporter.Event(mb.TransformMapStrToEvent("kubernetes", e, nil))
