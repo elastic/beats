@@ -229,11 +229,8 @@ func (s *Sniffer) open() (snifferHandle, error) {
 
 // Stop marks a sniffer as stopped. The Run method will return once the stop
 // signal has been given.
-func (s *Sniffer) Stop() error {
-	// FIXME: Remove error from signature it is never used
-	// and *Sniffer does not need it to satisfy an interface.
+func (s *Sniffer) Stop() {
 	s.state.Store(snifferClosing)
-	return nil
 }
 
 func validateConfig(filter string, cfg *config.InterfacesConfig) error {
