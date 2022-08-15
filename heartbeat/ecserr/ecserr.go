@@ -95,12 +95,28 @@ func NewSyntheticsCmdCouldNotStartErr(reason error) *ECSErr {
 	)
 }
 
-const CODE_BAD_HTTP_STATUS = "BAD_HTTP_STATUS"
-
 func NewBadHTTPStatusErr(httpCode int) *ECSErr {
 	return NewECSErr(
 		TYPE_IO,
-		CODE_BAD_HTTP_STATUS,
+		"BAD_HTTP_STATUS",
 		fmt.Sprintf("Bad HTTP status %s encountered", http.StatusText(httpCode)),
+	)
+}
+
+func NewDNSLookupFailedErr(host string, err error) *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		"DNS_LOOKUP_FAILED",
+		fmt.Sprintf(`DNS lookup failure "%s": %s`, host, err.Error()),
+	)
+}
+
+const CODE_NET_COULD_NOT_CONNECT = "NET_COULD_NOT_CONNECT"
+
+func NewCouldNotConnectErr(host, port string, err error) *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		CODE_NET_COULD_NOT_CONNECT,
+		fmt.Sprintf("Could not connect to '%s:%s' with error: %s", host, port, err),
 	)
 }

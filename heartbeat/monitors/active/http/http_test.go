@@ -617,7 +617,6 @@ func TestConnRefusedJob(t *testing.T) {
 	require.NoError(t, err)
 
 	url := fmt.Sprintf("http://%s:%d", ip, port)
-
 	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
@@ -625,7 +624,7 @@ func TestConnRefusedJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
-			hbtest.ErrorChecks(url, "io"),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, fmt.Sprintf("%s:%d", ip, port)),
 			urlChecks(url),
 		)),
 		event.Fields,
@@ -647,7 +646,7 @@ func TestUnreachableJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
-			hbtest.ErrorChecks(url, "io"),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, url),
 			urlChecks(url),
 		)),
 		event.Fields,

@@ -239,9 +239,15 @@ func URLChecks(t *testing.T, u *url.URL) validator.Validator {
 	})
 }
 
+func ECSErrCodeChecks(ecode ecserr.ECode, messageContains string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"error": hbtestllext.IsECSErrMatchingCode(ecode, messageContains),
+	})
+}
+
 func ECSErrChecks(eErr *ecserr.ECSErr) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
-		"error": hbtestllext.IsECSErrExact(eErr),
+		"error": hbtestllext.IsECSErr(eErr),
 	})
 }
 

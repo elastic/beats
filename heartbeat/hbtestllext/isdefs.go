@@ -18,6 +18,7 @@
 package hbtestllext
 
 import (
+	"strings"
 	"time"
 
 	"github.com/elastic/go-lookslike/isdef"
@@ -61,7 +62,7 @@ var IsMonitorState = isdef.Is("isState", func(path llpath.Path, v interface{}) *
 	return llresult.ValidResult(path)
 })
 
-var IsECSErrExact = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
+var IsECSErr = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
 	return isdef.Is("matches ECS ERR", func(path llpath.Path, v interface{}) *llresult.Results {
 		// This conditional is a bit awkward, apparently there's a bug in lookslike where a pointer
 		// value is de-referenced, so a given *ecserr.ECSErr turns into an ecserr.ECSErr
@@ -73,7 +74,7 @@ var IsECSErrExact = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
 		givenErr = &givenErrNoPtr
 
 		if expectedErr.Code != givenErr.Code {
-			return llresult.SimpleResult(path, false, "ECS error type does not match, expected %s, got %s", expectedErr.Code, expectedErr.Code)
+			return llresult.SimpleResult(path, false, "ECS error type does not match, expected %s, got %s", expectedErr.Code, givenErr.Code)
 		}
 
 		if expectedErr.Type != givenErr.Type {
@@ -82,6 +83,29 @@ var IsECSErrExact = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
 
 		if expectedErr.Message != givenErr.Message {
 			return llresult.SimpleResult(path, false, "ECS error message does not match, expected %s, got %s", expectedErr.Message, givenErr.Message)
+		}
+
+		return llresult.ValidResult(path)
+	})
+}
+
+var IsECSErrMatchingCode = func(ecode ecserr.ECode, messageContains string) isdef.IsDef {
+	return isdef.Is("matches ECS ERR", func(path llpath.Path, v interface{}) *llresult.Results {
+		// This conditional is a bit awkward, apparently there's a bug in lookslike where a pointer
+		// value is de-referenced, so a given *ecserr.ECSErr turns into an ecserr.ECSErr
+		var givenErr *ecserr.ECSErr
+		givenErrNoPtr, ok := v.(ecserr.ECSErr)
+		if !ok {
+			return llresult.SimpleResult(path, false, "ecserr.ECSErr expected, got %v", v)
+		}
+		givenErr = &givenErrNoPtr
+
+		if ecode != givenErr.Code {
+			return llresult.SimpleResult(path, false, "ECS error type does not match, expected %s, got %s", ecode, givenErr.Code)
+		}
+
+		if !strings.Contains(givenErr.Message, messageContains) {
+			return llresult.SimpleResult(path, false, "ECS error type does not match, expected '%s' to contain '%s'", givenErr.Message, messageContains)
 		}
 
 		return llresult.ValidResult(path)

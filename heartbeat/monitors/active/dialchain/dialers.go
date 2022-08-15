@@ -23,12 +23,13 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 // TCPDialer creates a new NetDialer with constant event fields and default
@@ -92,8 +93,7 @@ func CreateNetDialer(timeout time.Duration) NetDialer {
 
 			addresses, err := net.LookupHost(host)
 			if err != nil {
-				logp.Warn(`DNS lookup failure "%s": %v`, host, err)
-				return nil, err
+				return nil, ecserr.NewDNSLookupFailedErr(host, err)
 			}
 
 			// dial via host IP by randomized iteration of known IPs
@@ -102,7 +102,7 @@ func CreateNetDialer(timeout time.Duration) NetDialer {
 			start := time.Now()
 			conn, err := transport.DialWith(dialer, network, host, addresses, port)
 			if err != nil {
-				return nil, err
+				return nil, ecserr.NewCouldNotConnectErr(host, port, err)
 			}
 
 			end := time.Now()
