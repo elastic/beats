@@ -29,7 +29,7 @@ import (
 )
 
 func TestGenerateMapStrFromEvent(t *testing.T) {
-	logger := logp.NewLogger("kubernetes.pod")
+	logger := logp.NewLogger("kubernetes.event")
 
 	labels := map[string]string{
 		"app.kubernetes.io/name":      "mysql",

@@ -106,7 +106,7 @@ func (s *PodTestSuite) TestEventMapping() {
 		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
-	s.RunMetricsTests(events, cpuMemoryTestCases)
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
 func (s *PodTestSuite) TestEventMappingWithZeroNodeMetrics() {
@@ -129,7 +129,7 @@ func (s *PodTestSuite) TestEventMappingWithZeroNodeMetrics() {
 		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
-	s.RunMetricsTests(events, cpuMemoryTestCases)
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
 func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
@@ -150,7 +150,7 @@ func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
 		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
-	s.RunMetricsTests(events, cpuMemoryTestCases)
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
 func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
@@ -176,7 +176,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 		"memory.working_set.limit.pct": 0.019887955182072828, // similar concept to `memory.usage.limit.pct`. 2x usage but denominator 10x since nodeLimit = 10x containerMemLimit
 	}
 
-	s.RunMetricsTests(events, cpuMemoryTestCases)
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
 func (s *PodTestSuite) TestEventMappingWithMultipleContainersWithAllMemLimits() {
@@ -203,7 +203,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainersWithAllMemLimits() 
 		"memory.working_set.limit.pct": 0.09943977591036414, // 2x usage / 2x limit = same value
 	}
 
-	s.RunMetricsTests(events, cpuMemoryTestCases)
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
 func (s *PodTestSuite) testValue(event common.MapStr, field string, expected interface{}) {
@@ -239,12 +239,12 @@ func (s *PodTestSuite) basicTests(events []common.MapStr, err error) {
 		"network.tx.errors": 0,
 	}
 
-	s.RunMetricsTests(events, basicTestCases)
+	s.RunMetricsTests(events[0], basicTestCases)
 }
 
-func (s *PodTestSuite) RunMetricsTests(events []common.MapStr, testCases map[string]interface{}) {
+func (s *PodTestSuite) RunMetricsTests(events common.MapStr, testCases map[string]interface{}) {
 	for k, v := range testCases {
-		s.testValue(events[0], k, v)
+		s.testValue(events, k, v)
 	}
 }
 
