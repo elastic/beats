@@ -351,3 +351,17 @@ func (p *leaderElectionManager) startLeaderElector(ctx context.Context, lec lead
 	p.logger.Debugf("Starting Leader Elector")
 	go le.Run(ctx)
 }
+
+func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event common.MapStr, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
+	}
+}

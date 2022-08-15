@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"testing"
 
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
@@ -128,9 +130,9 @@ func (f *mockFuncs) update(m map[string]common.MapStr, obj kubernetes.Resource) 
 		},
 	}
 	for k, v := range accessor.GetLabels() {
-		meta.Put(fmt.Sprintf("kubernetes.%v", k), v)
+		kubernetes2.ShouldPut(meta, fmt.Sprintf("kubernetes.%v", k), v, nil)
 	}
-	meta.Put("orchestrator.cluster.name", "gke-4242")
+	kubernetes2.ShouldPut(meta, "orchestrator.cluster.name", "gke-4242", nil)
 	m[accessor.GetName()] = meta
 }
 

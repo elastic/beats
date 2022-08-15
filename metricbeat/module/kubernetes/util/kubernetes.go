@@ -24,6 +24,7 @@ import (
 	"sync"
 	"time"
 
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -250,8 +251,8 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						meta.Put("container.id", s.ContainerID[split+3:])
-						meta.Put("container.runtime", s.ContainerID[:split])
+						kubernetes2.ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+						kubernetes2.ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 
@@ -260,11 +261,7 @@ func NewContainerMetadataEnricher(
 			}
 		},
 		// delete
-<<<<<<< HEAD
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
-=======
-		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			pod, ok := r.(*kubernetes.Pod)
 			if !ok {
 				base.Logger().Debugf("Error while casting event: %s", ok)
@@ -273,7 +270,6 @@ func NewContainerMetadataEnricher(
 			nodeStore := metricsRepo.GetNodeStore(pod.Spec.NodeName)
 			nodeStore.DeletePodStore(podId)
 
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
@@ -501,7 +497,7 @@ func (m *enricher) Enrich(events []common.MapStr) {
 				delete(k8sMeta, "pod")
 			}
 			ecsMeta := meta.Clone()
-			ecsMeta.Delete("kubernetes")
+			kubernetes2.ShouldDelete(ecsMeta, "kubernetes", nil)
 			event.DeepUpdate(common.MapStr{
 				mb.ModuleDataKey: k8sMeta,
 				"meta":           ecsMeta,

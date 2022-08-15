@@ -20,7 +20,6 @@ package container
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -38,8 +37,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("kubernetes.container")
 )
 
 // init registers the MetricSet with the central registry.
@@ -95,11 +92,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-<<<<<<< HEAD
-	events, err := eventMapping(body, m.mod.GetPerfMetricsCache())
-=======
 	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger())
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -120,8 +113,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-
-	return
 }
 
 // Close stops this metricset

@@ -155,7 +155,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
-			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig)
+			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig, nil)
 			assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(common.MapStr)["labels"])
 			assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(common.MapStr)["annotations"])
 			assert.Equal(t, source.Host, mapStrOutput["source"].(common.MapStr)["host"])

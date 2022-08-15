@@ -21,24 +21,22 @@ import (
 	"encoding/json"
 	"fmt"
 
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-<<<<<<< HEAD
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
+func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]common.MapStr, error) {
 	events := []common.MapStr{}
-=======
-func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]mapstr.M, error) {
-	events := []mapstr.M{}
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
@@ -132,7 +130,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 		}
 
 		if pod.StartTime != "" {
-			podEvent.Put("start_time", pod.StartTime)
+			kubernetes2.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
 		// NOTE:
@@ -162,49 +160,31 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 		}
 
 		if nodeCores > 0 {
-			podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
+			kubernetes2.ShouldPut(podEvent, "cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores, logger)
 		}
 
-<<<<<<< HEAD
-		if coresLimit > 0 {
-			podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
-=======
 		if podCoreLimit > 0 {
 			kubernetes2.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/podCoreLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 		}
 
 		if usageMem > 0 {
 			if nodeMem > 0 {
-				podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
+				kubernetes2.ShouldPut(podEvent, "memory.usage.node.pct", float64(usageMem)/nodeMem, logger)
 			}
-<<<<<<< HEAD
-			if memLimit > 0 {
-				podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
-				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
-
-=======
 			if podMemLimit > 0 {
 				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/podMemLimit, logger)
 				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 			}
 		}
 
 		if workingSet > 0 && usageMem == 0 {
 			if nodeMem > 0 {
-				podEvent.Put("memory.usage.node.pct", float64(workingSet)/nodeMem)
+				kubernetes2.ShouldPut(podEvent, "memory.usage.node.pct", float64(workingSet)/nodeMem, logger)
 			}
-<<<<<<< HEAD
-			if memLimit > 0 {
-				podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
-				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
-=======
 			if podMemLimit > 0 {
 				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/podMemLimit, logger)
 
 				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 			}
 		}
 

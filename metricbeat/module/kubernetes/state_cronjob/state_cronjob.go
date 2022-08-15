@@ -68,10 +68,6 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-<<<<<<< HEAD
-=======
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.CronJob{}, mod.GetMetricsRepo(), false),
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_cronjob_info":                           p.InfoMetric(),
@@ -92,7 +88,7 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	if config.AddMetadata {
 		ms.enricher = util.NewResourceMetadataEnricher(
-			base, &kubernetes.CronJob{}, mod.GetPerfMetricsCache(), false)
+			base, &kubernetes.CronJob{}, mod.GetMetricsRepo(), false)
 	}
 	return &ms, nil
 }

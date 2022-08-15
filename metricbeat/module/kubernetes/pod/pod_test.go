@@ -21,62 +21,80 @@
 package pod
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+
+	"github.com/stretchr/testify/suite"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
 const testFileWithMultipleContainers = "../_meta/test/stats_summary_multiple_containers.json"
 
-func TestEventMapping(t *testing.T) {
+type PodTestSuite struct {
+	suite.Suite
+	MetricsRepo             *util.MetricsRepo
+	NodeName                string
+	Namespace               string
+	PodName                 string
+	ContainerName           string
+	AnotherContainerName    string
+	PodId                   util.PodId
+	Logger                  *logp.Logger
+	NodeMetrics             *util.NodeMetrics
+	ContainerMetrics        *util.ContainerMetrics
+	AnotherContainerMetrics *util.ContainerMetrics
+}
+
+func (s *PodTestSuite) SetupTest() {
+	s.MetricsRepo = util.NewMetricsRepo()
+	s.NodeName = "gke-beats-default-pool-a5b33e2e-hdww"
+	s.Namespace = "default"
+	s.PodName = "nginx-deployment-2303442956-pcqfc"
+	s.ContainerName = "nginx"
+	s.AnotherContainerName = "sidecar"
+
+	s.PodId = util.NewPodId(s.Namespace, s.PodName)
+
+	s.Logger = logp.NewLogger("kubernetes.pod")
+
+	s.NodeMetrics = util.NewNodeMetrics()
+	s.NodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
+	s.NodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
+
+	s.ContainerMetrics = util.NewContainerMetrics()
+	s.ContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+
+	s.AnotherContainerMetrics = util.NewContainerMetrics()
+	s.AnotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+}
+
+func (s *PodTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
-	assert.NoError(t, err, "cannot open test file "+testFile)
+	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
-	assert.NoError(t, err, "cannot read test file "+testFile)
+	body, err := io.ReadAll(f)
+	s.NoError(err, "cannot read test file "+testFile)
 
-	metricsRepo := util.NewMetricsRepo()
+	return body
+}
 
-<<<<<<< HEAD
-	events, err := eventMapping(body, cache)
-=======
-	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
+func (s *PodTestSuite) TestEventMapping() {
+	s.MetricsRepo.DeleteAllNodeStore()
 
-	nodeMetrics := util.NewNodeMetrics()
-	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
-	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	addNodeMetric(metricsRepo, nodeName, nodeMetrics)
+	s.addNodeMetric(s.NodeMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
-	namespace := "default"
-	podName := "nginx-deployment-2303442956-pcqfc"
-	podId := util.NewPodId(namespace, podName)
-	containerName := "nginx"
+	body := s.ReadTestFile(testFile)
+	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
+	s.basicTests(events, err)
 
-	events, err := eventMapping(body, metricsRepo, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
-	assert.NoError(t, err, "error mapping "+testFile)
-
-	assert.Len(t, events, 1, "got wrong number of events")
-
-	testCases := map[string]interface{}{
-		"name": "nginx-deployment-2303442956-pcqfc",
-		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
-
-		"network.rx.bytes":  107056,
-		"network.rx.errors": 0,
-		"network.tx.bytes":  72447,
-		"network.tx.errors": 0,
-
+	cpuMemoryTestCases := map[string]interface{}{
 		// calculated pct fields:
 		"cpu.usage.nanocores": 11263994,
 		"cpu.usage.node.pct":  0.005631997,
@@ -88,102 +106,43 @@ func TestEventMapping(t *testing.T) {
 		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
-	for k, v := range testCases {
-		testValue(t, events[0], k, v)
-	}
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
-<<<<<<< HEAD
-func testValue(t *testing.T, event common.MapStr, field string, expected interface{}) {
-=======
-func TestEventMappingWithZeroNodeMetrics(t *testing.T) {
-	logger := logp.NewLogger("kubernetes.pod")
-
-	f, err := os.Open(testFile)
-	assert.NoError(t, err, "cannot open test file "+testFile)
-
-	body, err := ioutil.ReadAll(f)
-	assert.NoError(t, err, "cannot read test file "+testFile)
-
-	metricsRepo := util.NewMetricsRepo()
-
-	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
+func (s *PodTestSuite) TestEventMappingWithZeroNodeMetrics() {
+	s.MetricsRepo.DeleteAllNodeStore()
 
 	nodeMetrics := util.NewNodeMetrics()
-	addNodeMetric(metricsRepo, nodeName, nodeMetrics)
+	s.addNodeMetric(nodeMetrics)
 
-	namespace := "default"
-	podName := "nginx-deployment-2303442956-pcqfc"
-	podId := util.NewPodId(namespace, podName)
-	containerName := "nginx"
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
+	body := s.ReadTestFile(testFile)
+	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
-	events, err := eventMapping(body, metricsRepo, logger)
-	assert.NoError(t, err, "error mapping "+testFile)
+	s.basicTests(events, err)
 
-	assert.Len(t, events, 1, "got wrong number of events")
-
-	testCases := map[string]interface{}{
-		"name": "nginx-deployment-2303442956-pcqfc",
-		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
-
-		"network.rx.bytes":  107056,
-		"network.rx.errors": 0,
-		"network.tx.bytes":  72447,
-		"network.tx.errors": 0,
-
-		// calculated pct fields:
+	cpuMemoryTestCases := map[string]interface{}{
 		"cpu.usage.nanocores": 11263994,
 
 		"memory.usage.bytes":           1462272,
 		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
-	for k, v := range testCases {
-		testValue(t, events[0], k, v)
-	}
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
-func TestEventMappingWithNoNodeMetrics(t *testing.T) {
-	logger := logp.NewLogger("kubernetes.pod")
+func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
+	s.MetricsRepo.DeleteAllNodeStore()
 
-	f, err := os.Open(testFile)
-	assert.NoError(t, err, "cannot open test file "+testFile)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
-	body, err := ioutil.ReadAll(f)
-	assert.NoError(t, err, "cannot read test file "+testFile)
+	body := s.ReadTestFile(testFile)
+	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
-	metricsRepo := util.NewMetricsRepo()
+	s.basicTests(events, err)
 
-	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
-
-	namespace := "default"
-	podName := "nginx-deployment-2303442956-pcqfc"
-	podId := util.NewPodId(namespace, podName)
-	containerName := "nginx"
-
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
-
-	events, err := eventMapping(body, metricsRepo, logger)
-	assert.NoError(t, err, "error mapping "+testFile)
-
-	assert.Len(t, events, 1, "got wrong number of events")
-
-	testCases := map[string]interface{}{
-		"name": "nginx-deployment-2303442956-pcqfc",
-		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
-
-		"network.rx.bytes":  107056,
-		"network.rx.errors": 0,
-		"network.tx.bytes":  72447,
-		"network.tx.errors": 0,
-
-		// calculated pct fields:
+	cpuMemoryTestCases := map[string]interface{}{
 		"cpu.usage.nanocores": 11263994,
 
 		"memory.usage.bytes":           1462272,
@@ -191,53 +150,21 @@ func TestEventMappingWithNoNodeMetrics(t *testing.T) {
 		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
-	for k, v := range testCases {
-		testValue(t, events[0], k, v)
-	}
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
-func TestEventMappingWithMultipleContainers(t *testing.T) {
-	logger := logp.NewLogger("kubernetes.pod")
+func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
+	s.MetricsRepo.DeleteAllNodeStore()
 
-	f, err := os.Open(testFileWithMultipleContainers)
-	assert.NoError(t, err, "cannot open test file "+testFile)
+	s.addNodeMetric(s.NodeMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
-	body, err := ioutil.ReadAll(f)
-	assert.NoError(t, err, "cannot read test file "+testFile)
+	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
+	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
-	metricsRepo := util.NewMetricsRepo()
+	s.basicTests(events, err)
 
-	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
-
-	nodeMetrics := util.NewNodeMetrics()
-	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
-	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	addNodeMetric(metricsRepo, nodeName, nodeMetrics)
-
-	namespace := "default"
-	podName := "nginx-deployment-2303442956-pcqfc"
-	podId := util.NewPodId(namespace, podName)
-	containerName := "nginx"
-
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
-
-	events, err := eventMapping(body, metricsRepo, logger)
-	assert.NoError(t, err, "error mapping "+testFile)
-
-	assert.Len(t, events, 1, "got wrong number of events")
-
-	testCases := map[string]interface{}{
-		"name": "nginx-deployment-2303442956-pcqfc",
-		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
-
-		"network.rx.bytes":  107056,
-		"network.rx.errors": 0,
-		"network.tx.bytes":  72447,
-		"network.tx.errors": 0,
-
-		// calculated pct fields:
+	cpuMemoryTestCases := map[string]interface{}{
 		// Following comments explain what is the difference with the test `TestEventMapping`
 		"cpu.usage.nanocores": 22527988,    // 2x usage since 2 container
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
@@ -249,59 +176,22 @@ func TestEventMappingWithMultipleContainers(t *testing.T) {
 		"memory.working_set.limit.pct": 0.019887955182072828, // similar concept to `memory.usage.limit.pct`. 2x usage but denominator 10x since nodeLimit = 10x containerMemLimit
 	}
 
-	for k, v := range testCases {
-		testValue(t, events[0], k, v)
-	}
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
-func TestEventMappingWithMultipleContainersWithAllMemLimits(t *testing.T) {
-	logger := logp.NewLogger("kubernetes.pod")
+func (s *PodTestSuite) TestEventMappingWithMultipleContainersWithAllMemLimits() {
+	s.MetricsRepo.DeleteAllNodeStore()
 
-	f, err := os.Open(testFileWithMultipleContainers)
-	assert.NoError(t, err, "cannot open test file "+testFile)
+	s.addNodeMetric(s.NodeMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
+	s.addContainerMetric(s.AnotherContainerName, s.AnotherContainerMetrics)
 
-	body, err := ioutil.ReadAll(f)
-	assert.NoError(t, err, "cannot read test file "+testFile)
+	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
+	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
-	metricsRepo := util.NewMetricsRepo()
+	s.basicTests(events, err)
 
-	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
-
-	nodeMetrics := util.NewNodeMetrics()
-	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
-	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	addNodeMetric(metricsRepo, nodeName, nodeMetrics)
-
-	namespace := "default"
-	podName := "nginx-deployment-2303442956-pcqfc"
-	podId := util.NewPodId(namespace, podName)
-	containerName := "nginx"
-
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
-
-	anotherContainerName := "sidecar"
-
-	anotherContainerMetrics := util.NewContainerMetrics()
-	anotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(metricsRepo, nodeName, podId, anotherContainerName, anotherContainerMetrics)
-
-	events, err := eventMapping(body, metricsRepo, logger)
-	assert.NoError(t, err, "error mapping "+testFile)
-
-	assert.Len(t, events, 1, "got wrong number of events")
-
-	testCases := map[string]interface{}{
-		"name": "nginx-deployment-2303442956-pcqfc",
-		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
-
-		"network.rx.bytes":  107056,
-		"network.rx.errors": 0,
-		"network.tx.bytes":  72447,
-		"network.tx.errors": 0,
-
-		// calculated pct fields:
+	cpuMemoryTestCases := map[string]interface{}{
 		// Following comments explain what is the difference with the test `TestEventMapping
 		"cpu.usage.nanocores": 22527988,    // 2x usage since 2 container
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
@@ -313,26 +203,51 @@ func TestEventMappingWithMultipleContainersWithAllMemLimits(t *testing.T) {
 		"memory.working_set.limit.pct": 0.09943977591036414, // 2x usage / 2x limit = same value
 	}
 
-	for k, v := range testCases {
-		testValue(t, events[0], k, v)
-	}
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
-func testValue(t *testing.T, event mapstr.M, field string, expected interface{}) {
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+func (s *PodTestSuite) testValue(event common.MapStr, field string, expected interface{}) {
 	data, err := event.GetValue(field)
-	assert.NoError(t, err, "Could not read field "+field)
-	assert.EqualValues(t, expected, data, "Wrong value for field "+field)
+	s.NoError(err, "Could not read field "+field)
+	s.EqualValues(expected, data, "Wrong value for field "+field)
 }
 
-func addContainerMetric(metricsRepo *util.MetricsRepo, nodeName string, podId util.PodId, containerName string, containerMetric *util.ContainerMetrics) {
-	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
-	podStore, _ := nodeStore.AddPodStore(podId)
+func (s *PodTestSuite) addContainerMetric(containerName string, containerMetric *util.ContainerMetrics) {
+	nodeStore, _ := s.MetricsRepo.AddNodeStore(s.NodeName)
+	podStore, _ := nodeStore.AddPodStore(s.PodId)
 	containerStore, _ := podStore.AddContainerStore(containerName)
 	containerStore.SetContainerMetrics(containerMetric)
 }
 
-func addNodeMetric(metricsRepo *util.MetricsRepo, nodeName string, nodeMetrics *util.NodeMetrics) {
-	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+func (s *PodTestSuite) addNodeMetric(nodeMetrics *util.NodeMetrics) {
+	nodeStore, _ := s.MetricsRepo.AddNodeStore(s.NodeName)
 	nodeStore.SetNodeMetrics(nodeMetrics)
+}
+
+func (s *PodTestSuite) basicTests(events []common.MapStr, err error) {
+	s.NoError(err, "error mapping "+testFile)
+
+	s.Len(events, 1, "got wrong number of events")
+
+	basicTestCases := map[string]interface{}{
+		"name": "nginx-deployment-2303442956-pcqfc",
+		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
+
+		"network.rx.bytes":  107056,
+		"network.rx.errors": 0,
+		"network.tx.bytes":  72447,
+		"network.tx.errors": 0,
+	}
+
+	s.RunMetricsTests(events[0], basicTestCases)
+}
+
+func (s *PodTestSuite) RunMetricsTests(events common.MapStr, testCases map[string]interface{}) {
+	for k, v := range testCases {
+		s.testValue(events, k, v)
+	}
+}
+
+func TestPodTestSuite(t *testing.T) {
+	suite.Run(t, new(PodTestSuite))
 }

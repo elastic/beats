@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -34,8 +34,6 @@ import (
 const (
 	defaultScheme = "http"
 	defaultPath   = "/metrics"
-	// Nanocores conversion 10^9
-	nanocores = 1000000000
 )
 
 var (
@@ -134,11 +132,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
-		return errors.Wrap(err, "error getting families")
+		return fmt.Errorf("error getting families: %w", err)
 	}
 	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting event")
+		return fmt.Errorf("error getting event: %w", err)
 	}
 
 	m.enricher.Enrich(events)
@@ -153,15 +151,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			cID := (containerID).(string)
 			split := strings.Index(cID, "://")
 			if split != -1 {
-				containerFields.Put("runtime", cID[:split])
-				containerFields.Put("id", cID[split+3:])
+				kubernetes2.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
+				kubernetes2.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
 			}
 		}
 		if containerImage, ok := event["image"]; ok {
 			cImage := (containerImage).(string)
-			containerFields.Put("image.name", cImage)
+			kubernetes2.ShouldPut(containerFields, "image.name", cImage, m.Logger())
 			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
-			event.Delete("image")
+			kubernetes2.ShouldDelete(event, "image", m.Logger())
 		}
 
 		e, err := util.CreateEvent(event, "kubernetes.container")

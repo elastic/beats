@@ -29,8 +29,6 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
-const testFile = "_meta/test/metrics"
-
 func TestEventMappingV1_14(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "apiserver",
 		ptest.TestCases{
