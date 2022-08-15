@@ -90,7 +90,8 @@ type processWatcher interface {
 	// GetProcess returns the process metadata.
 	GetProcess(pid int) *process
 
-	// GetLocalIPs returns the list of local addresses.
+	// GetLocalIPs returns the list of local addresses. If the returned error
+	// is non-nil, the IP slice is nil.
 	GetLocalIPs() ([]net.IP, error)
 }
 
@@ -116,10 +117,6 @@ func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher) e
 	proc.localAddrs, err = watcher.GetLocalIPs()
 	if err != nil {
 		logp.Err("Error getting local IP addresses: %s", err)
-
-		// FIXME: This can be removed: the only read use is a range
-		// and all processWatcher implementations return a nil on error.
-		proc.localAddrs = []net.IP{}
 	}
 
 	proc.monitored = config.Monitored
