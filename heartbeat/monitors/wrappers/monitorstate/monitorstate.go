@@ -71,7 +71,7 @@ type State struct {
 }
 
 func (s *State) incrementCounters(status StateStatus) {
-	s.DurationMs = time.Until(s.StartedAt).Milliseconds()
+	s.DurationMs = time.Now().Sub(s.StartedAt).Milliseconds()
 	s.Checks++
 	if status == StatusUp {
 		s.Up++
@@ -129,6 +129,12 @@ func (s *State) recordCheck(monitorID string, newStatus StateStatus) {
 		s.FlapHistory = append(s.FlapHistory, newStatus)
 	} else {
 		s.transitionTo(monitorID, newStatus)
+	}
+
+	// Ensure that the ends field is set to nil
+	// It's only needed on transitions
+	if s.Checks > 1 {
+		s.Ends = nil
 	}
 }
 

@@ -19,6 +19,7 @@ package monitorstate
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -31,22 +32,28 @@ func TestRecordingAndFlapping(t *testing.T) {
 	require.Equal(t, FlappingThreshold+1, ms.Checks)
 	require.Equal(t, ms.Up+ms.Down, ms.Checks)
 
-	// Use double the flapping threshold so any transitions after this are stable
-	priorChecksCount := ms.Checks
 	recordStableSeries(monitorID, ms, FlappingThreshold*2, StatusDown)
 	require.Equal(t, StatusDown, ms.Status)
 	// The count should be FlappingThreshold+1 since we used double the threshold before
 	// This is because we have one full threshold of stable checks, as well as the final check that
 	// flipped us out of the threshold, which goes toward the new state.
 	requireMSCounts(t, ms, 0, FlappingThreshold+1)
-	require.Equal(t, priorChecksCount+FlappingThreshold-1, ms.Ends.Checks)
-	// We don't want to store the entire state history!
-	require.Empty(t, ms.Ends.FlapHistory)
+	require.Nil(t, ms.Ends, "expected nil ends after a stable series")
 
 	// Since we're now in a stable state a single up check should create a new state from a stable one
 	ms.recordCheck(monitorID, StatusUp)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSCounts(t, ms, 1, 0)
+}
+
+func TestDuration(t *testing.T) {
+	monitorID := "test"
+	ms := newMonitorState(monitorID, StatusUp, 0)
+	ms.recordCheck(monitorID, StatusUp)
+	time.Sleep(time.Millisecond * 10)
+	ms.recordCheck(monitorID, StatusUp)
+	// Pretty forgiving upper bound to account for flaky CI
+	require.True(t, ms.DurationMs > 9 && ms.DurationMs < 300, "Expected duration to be ~10ms, got %d", ms.DurationMs)
 }
 
 // recordFlappingSeries is a helper that should always put the monitor into a flapping state.
@@ -78,7 +85,13 @@ func TestTransitionTo(t *testing.T) {
 	require.NotEqual(t, s.ID, second.ID)
 	require.NotEqual(t, s.ID, first)
 
+	// Ensure ends is set
 	require.Equal(t, second.ID, s.Ends.ID)
+	require.Equal(t, second.DurationMs, s.Ends.DurationMs)
+	require.Equal(t, second.StartedAt, s.Ends.StartedAt)
+	require.Equal(t, second.Checks, s.Ends.Checks)
+	require.Equal(t, second.Up, s.Ends.Up)
+	require.Equal(t, second.Down, s.Ends.Down)
 	// Ensure No infinite storage of states
 	require.Nil(t, s.Ends.Ends)
 }
