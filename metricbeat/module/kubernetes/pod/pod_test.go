@@ -21,7 +21,7 @@
 package pod
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -64,7 +64,7 @@ func (s *PodTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
 	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	s.NoError(err, "cannot read test file "+testFile)
 
 	return body
@@ -162,7 +162,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
 	s.addContainerMetric(s.ContainerName, containerMetrics)
 
-	body := s.ReadTestFile(testFileWithMultipleContainers)  // NOTE: different test file
+	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
 	s.basicTests(events, err)

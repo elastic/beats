@@ -21,7 +21,7 @@
 package volume
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -39,7 +39,7 @@ func TestEventMapping(t *testing.T) {
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
 	events, err := eventMapping(body, logger)
