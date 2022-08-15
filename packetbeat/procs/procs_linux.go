@@ -53,21 +53,6 @@ func procName(info types.ProcessInfo) string {
 	return filepath.Base(info.Args[0])
 }
 
-type socketInfo struct {
-	srcIP, dstIP     net.IP
-	srcPort, dstPort uint16
-
-	uid   uint32
-	inode uint64
-}
-
-var procFiles = map[applayer.Transport]struct {
-	ipv4, ipv6 string
-}{
-	applayer.TransportUDP: {"/proc/net/udp", "/proc/net/udp6"},
-	applayer.TransportTCP: {"/proc/net/tcp", "/proc/net/tcp6"},
-}
-
 var warnIPv6Once sync.Once
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
@@ -126,6 +111,13 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	return ports, nil
 }
 
+var procFiles = map[applayer.Transport]struct {
+	ipv4, ipv6 string
+}{
+	applayer.TransportUDP: {"/proc/net/udp", "/proc/net/udp6"},
+	applayer.TransportTCP: {"/proc/net/tcp", "/proc/net/tcp6"},
+}
+
 func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 	dirname := filepath.Join(prefix, "/proc", strconv.Itoa(pid), "fd")
 	procfs, err := os.Open(dirname)
@@ -159,8 +151,19 @@ func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 	return inodes, nil
 }
 
-func socketsFromProc(filename string, ipv6 bool) ([]*socketInfo, error) {
-	file, err := os.Open(filename)
+// socketInfo hold details for network sockets obtained from /proc/net.
+type socketInfo struct {
+	srcIP, dstIP     net.IP
+	srcPort, dstPort uint16
+
+	uid   uint32 // uid is the effective UID of the process that created the socket.
+	inode uint64 // inode is the inode of the file corresponding to the socket.
+}
+
+// socketsFromProc returns the socket information held in the the /proc/net file
+// at path.
+func socketsFromProc(path string, ipv6 bool) ([]*socketInfo, error) {
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
