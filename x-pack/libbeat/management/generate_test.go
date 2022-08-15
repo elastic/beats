@@ -192,7 +192,7 @@ func TestOutputGen(t *testing.T) {
 	require.NoError(t, err)
 	testStruct := mapstr.M{}
 	err = cfg.Config.Unpack(&testStruct)
-	require.Error(t, err)
+	require.NoError(t, err)
 	innerCfg, exists := testStruct["elasticsearch"]
 	assert.True(t, exists, "elasticsearch key does not exist")
 	_, pwExists := innerCfg.(map[string]interface{})["password"]
