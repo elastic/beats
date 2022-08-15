@@ -20,8 +20,6 @@ package state_cronjob
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -62,10 +60,6 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-<<<<<<< HEAD
-=======
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.CronJob{}, mod.GetMetricsRepo(), false),
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_cronjob_info":                           p.InfoMetric(),
@@ -93,11 +87,11 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) error {
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
-		return errors.Wrap(err, "error getting family metrics")
+		return fmt.Errorf("error getting family metrics: %w", err)
 	}
 	events, err := m.prometheus.ProcessMetrics(families, m.mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting metrics")
+		return fmt.Errorf("error getting metrics: %w", err)
 	}
 
 	for _, event := range events {

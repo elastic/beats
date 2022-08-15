@@ -22,23 +22,19 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-<<<<<<< HEAD
-func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.MapStr, error) {
+func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]common.MapStr, error) {
 	events := []common.MapStr{}
-=======
-func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Logger) ([]mapstr.M, error) {
-	events := []mapstr.M{}
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 	var summary kubernetes.Summary
 
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("Cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
@@ -133,15 +129,15 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			}
 
 			if container.StartTime != "" {
-				containerEvent.Put("start_time", container.StartTime)
+				util.ShouldPut(containerEvent, "start_time", container.StartTime, logger)
 			}
 
 			if nodeCores > 0 {
-				containerEvent.Put("cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores)
+				util.ShouldPut(containerEvent, "cpu.usage.node.pct", float64(container.CPU.UsageNanoCores)/1e9/nodeCores, logger)
 			}
 
 			if nodeMem > 0 {
-				containerEvent.Put("memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem)
+				util.ShouldPut(containerEvent, "memory.usage.node.pct", float64(container.Memory.UsageBytes)/nodeMem, logger)
 			}
 
 			containerStore := podStore.GetContainerStore(container.Name)
@@ -162,22 +158,13 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			// There we do check, since if a container doesn't have a limit set, it will inherit the node limits and the sum of all
 			// the container limits can be greater than the node limits. We assume here the user can set correct limits on containers.
 
-<<<<<<< HEAD
-			if coresLimit > 0 {
-				containerEvent.Put("cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit)
-			}
-
-			if memLimit > 0 {
-				containerEvent.Put("memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit)
-=======
 			if containerCoresLimit > 0 {
-				kubernetes2.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresLimit, logger)
+				util.ShouldPut(containerEvent, "cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresLimit, logger)
 			}
 
 			if containerMemLimit > 0 {
-				kubernetes2.ShouldPut(containerEvent, "memory.usage.limit.pct", float64(container.Memory.UsageBytes)/containerMemLimit, logger)
-				kubernetes2.ShouldPut(containerEvent, "memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/containerMemLimit, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
+				util.ShouldPut(containerEvent, "memory.usage.limit.pct", float64(container.Memory.UsageBytes)/containerMemLimit, logger)
+				util.ShouldPut(containerEvent, "memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/containerMemLimit, logger)
 			}
 
 			events = append(events, containerEvent)

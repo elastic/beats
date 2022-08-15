@@ -54,10 +54,6 @@ func NewPersistentVolumeMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-<<<<<<< HEAD
-=======
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.PersistentVolume{}, mod.GetMetricsRepo(), false),
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_persistentvolume_capacity_bytes": p.Metric("capacity.bytes"),
@@ -102,5 +98,4 @@ func (m *PersistentVolumeMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-	return
 }

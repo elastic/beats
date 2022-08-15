@@ -21,62 +21,74 @@
 package container
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
 
-func TestEventMapping(t *testing.T) {
+type ContainerTestSuite struct {
+	suite.Suite
+	MetricsRepo          *util.MetricsRepo
+	NodeName             string
+	Namespace            string
+	PodName              string
+	ContainerName        string
+	AnotherContainerName string
+	PodId                util.PodId
+	Logger               *logp.Logger
+}
+
+func (s *ContainerTestSuite) SetupTest() {
+	s.MetricsRepo = util.NewMetricsRepo()
+	s.NodeName = "gke-beats-default-pool-a5b33e2e-hdww"
+	s.Namespace = "default"
+	s.PodName = "nginx-deployment-2303442956-pcqfc"
+	s.ContainerName = "nginx"
+	s.AnotherContainerName = "sidecar"
+
+	s.PodId = util.NewPodId(s.Namespace, s.PodName)
+
+	s.Logger = logp.NewLogger("kubernetes.container")
+}
+
+func (s *ContainerTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
-	assert.NoError(t, err, "cannot open test file "+testFile)
+	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
-	assert.NoError(t, err, "cannot read test file "+testFile)
+	body, err := io.ReadAll(f)
+	s.NoError(err, "cannot read test file "+testFile)
 
-	metricsRepo := util.NewMetricsRepo()
+	return body
+}
 
-<<<<<<< HEAD
-	events, err := eventMapping(body, cache)
-=======
-	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
+func (s *ContainerTestSuite) TestEventMapping() {
+	s.MetricsRepo.DeleteAllNodeStore()
 
 	nodeMetrics := util.NewNodeMetrics()
 	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
 	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	addNodeMetric(metricsRepo, nodeName, nodeMetrics)
-
-	namespace := "default"
-	podName := "nginx-deployment-2303442956-pcqfc"
-	podId := util.NewPodId(namespace, podName)
-	containerName := "nginx"
+	s.addNodeMetric(nodeMetrics)
 
 	containerMetrics := util.NewContainerMetrics()
 	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
+	s.addContainerMetric(s.ContainerName, containerMetrics)
 
-	events, err := eventMapping(body, metricsRepo, logger)
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
-	assert.NoError(t, err, "error mapping "+testFile)
+	body := s.ReadTestFile(testFile)
+	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
-	assert.Len(t, events, 1, "got wrong number of events")
+	s.basicTests(events, err)
 
-	testCases := map[string]interface{}{
+	cpuMemoryTestCases := map[string]interface{}{
 		"cpu.usage.core.ns":   43959424,
 		"cpu.usage.nanocores": 11263994,
-
-		"logs.available.bytes": int64(98727014400),
-		"logs.capacity.bytes":  int64(101258067968),
-		"logs.used.bytes":      28672,
-		"logs.inodes.count":    6258720,
-		"logs.inodes.free":     6120096,
-		"logs.inodes.used":     138624,
 
 		"memory.available.bytes":  0,
 		"memory.usage.bytes":      1462272,
@@ -86,10 +98,46 @@ func TestEventMapping(t *testing.T) {
 		"memory.majorpagefaults":  0,
 
 		// calculated pct fields:
-		"cpu.usage.node.pct":     0.005631997,
-		"cpu.usage.limit.pct":    0.005631997,
-		"memory.usage.node.pct":  0.01,
-		"memory.usage.limit.pct": 0.1,
+		"cpu.usage.node.pct":          0.005631997,
+		"cpu.usage.limit.pct":         0.005631997,
+		"memory.usage.node.pct":       0.01,
+		"memory.usage.limit.pct":      0.1,
+		"memory.workingset.limit.pct": 0.09943977591036414,
+	}
+
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
+}
+
+func (s *ContainerTestSuite) testValue(event common.MapStr, field string, expected interface{}) {
+	data, err := event.GetValue(field)
+	s.NoError(err, "Could not read field "+field)
+	s.EqualValues(expected, data, "Wrong value for field "+field)
+}
+
+func (s *ContainerTestSuite) addContainerMetric(containerName string, containerMetric *util.ContainerMetrics) {
+	nodeStore, _ := s.MetricsRepo.AddNodeStore(s.NodeName)
+	podStore, _ := nodeStore.AddPodStore(s.PodId)
+	containerStore, _ := podStore.AddContainerStore(containerName)
+	containerStore.SetContainerMetrics(containerMetric)
+}
+
+func (s *ContainerTestSuite) addNodeMetric(nodeMetrics *util.NodeMetrics) {
+	nodeStore, _ := s.MetricsRepo.AddNodeStore(s.NodeName)
+	nodeStore.SetNodeMetrics(nodeMetrics)
+}
+
+func (s *ContainerTestSuite) basicTests(events []common.MapStr, err error) {
+	s.NoError(err, "error mapping "+testFile)
+
+	s.Len(events, 1, "got wrong number of events")
+
+	basicTestCases := map[string]interface{}{
+		"logs.available.bytes": int64(98727014400),
+		"logs.capacity.bytes":  int64(101258067968),
+		"logs.used.bytes":      28672,
+		"logs.inodes.count":    6258720,
+		"logs.inodes.free":     6120096,
+		"logs.inodes.used":     138624,
 
 		"name": "nginx",
 
@@ -99,25 +147,15 @@ func TestEventMapping(t *testing.T) {
 		"rootfs.inodes.used":     21,
 	}
 
+	s.RunMetricsTests(events[0], basicTestCases)
+}
+
+func (s *ContainerTestSuite) RunMetricsTests(event common.MapStr, testCases map[string]interface{}) {
 	for k, v := range testCases {
-		testValue(t, events[0], k, v)
+		s.testValue(event, k, v)
 	}
 }
 
-func testValue(t *testing.T, event common.MapStr, field string, value interface{}) {
-	data, err := event.GetValue(field)
-	assert.NoError(t, err, "Could not read field "+field)
-	assert.EqualValues(t, data, value, "Wrong value for field "+field)
-}
-
-func addContainerMetric(metricsRepo *util.MetricsRepo, nodeName string, podId util.PodId, containerName string, metrics *util.ContainerMetrics) {
-	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
-	podStore, _ := nodeStore.AddPodStore(podId)
-	containerStore, _ := podStore.AddContainerStore(containerName)
-	containerStore.SetContainerMetrics(metrics)
-}
-
-func addNodeMetric(metricsRepo *util.MetricsRepo, nodeName string, nodeMetrics *util.NodeMetrics) {
-	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
-	nodeStore.SetNodeMetrics(nodeMetrics)
+func TestContainerTestSuite(t *testing.T) {
+	suite.Run(t, new(ContainerTestSuite))
 }

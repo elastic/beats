@@ -54,10 +54,6 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-<<<<<<< HEAD
-=======
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.PersistentVolumeClaim{}, mod.GetMetricsRepo(), false),
->>>>>>> 5503761995 (Feature/remove k8s cache (#32539))
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 
