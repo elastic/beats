@@ -27,6 +27,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -319,6 +320,14 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 func execRequest(client *http.Client, req *http.Request) (start time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
+
+	// Since the HTTP client is very old we can't use errors.Is, but must
+	// use this ancient bit of cruft to determine if we couldn't connect
+	// The nomenclature about this being a timeout is actually wrong
+	// this happens on all sorts of connection errors, so it's double lame
+	if os.IsTimeout(err) {
+		err = ecserr.NewCouldNotConnectErr(req.URL.Hostname(), req.URL.Port(), err)
+	}
 
 	if err != nil {
 		return start, nil, reason.IOFailed(err)
