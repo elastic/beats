@@ -98,5 +98,4 @@ func (m *PersistentVolumeMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-	return
 }

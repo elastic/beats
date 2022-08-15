@@ -21,7 +21,7 @@
 package pod
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -64,7 +64,7 @@ func (s *PodTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
 	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	s.NoError(err, "cannot read test file "+testFile)
 
 	return body
