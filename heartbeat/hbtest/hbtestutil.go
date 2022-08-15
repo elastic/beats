@@ -37,6 +37,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
@@ -65,7 +66,7 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 			w.WriteHeader(status)
 			//nolint:errcheck // There are no new changes to this line but
 			// linter has been activated in the meantime. We'll cleanup separately.
-			io.WriteString(w, HelloWorldBody)
+			_, _ = io.WriteString(w, HelloWorldBody)
 		},
 	)
 }
@@ -84,7 +85,7 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 			w.WriteHeader(200)
 			//nolint:errcheck // There are no new changes to this line but
 			// linter has been activated in the meantime. We'll cleanup separately.
-			io.WriteString(w, body.String())
+			_, _ = io.WriteString(w, body.String())
 		},
 	)
 }
@@ -98,7 +99,7 @@ func CustomResponseHandler(body []byte, status int, extraHeaders map[string]stri
 			w.WriteHeader(status)
 			//nolint:errcheck // There are no new changes to this line but
 			// linter has been activated in the meantime. We'll cleanup separately.
-			w.Write(body)
+			_, _ = w.Write(body)
 		},
 	)
 }
@@ -238,6 +239,12 @@ func URLChecks(t *testing.T, u *url.URL) validator.Validator {
 	})
 }
 
+func ECSErrChecks(eErr *ecserr.ECSErr) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"error": hbtestllext.IsECSErrExact(eErr),
+	})
+}
+
 // ErrorChecks checks the standard heartbeat error hierarchy, which should
 // consist of a message (or a lookslike isdef that can match the message) and a type under the error key.
 // The message is checked only as a substring since exact string matches can be fragile due to platform differences.
@@ -276,7 +283,7 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	require.NoError(t, err)
 	//nolint:errcheck // There are no new changes to this line but
 	// linter has been activated in the meantime. We'll cleanup separately.
-	certFile.WriteString(x509util.CertToPEMString(cert))
+	_, _ = certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
 }
 

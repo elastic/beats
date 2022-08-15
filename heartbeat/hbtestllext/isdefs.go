@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/go-lookslike/llpath"
 	"github.com/elastic/go-lookslike/llresult"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 )
 
@@ -59,3 +60,30 @@ var IsMonitorState = isdef.Is("isState", func(path llpath.Path, v interface{}) *
 	}
 	return llresult.ValidResult(path)
 })
+
+var IsECSErrExact = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
+	return isdef.Is("matches ECS ERR", func(path llpath.Path, v interface{}) *llresult.Results {
+		// This conditional is a bit awkward, apparently there's a bug in lookslike where a pointer
+		// value is de-referenced, so a given *ecserr.ECSErr turns into an ecserr.ECSErr
+		var givenErr *ecserr.ECSErr
+		givenErrNoPtr, ok := v.(ecserr.ECSErr)
+		if !ok {
+			return llresult.SimpleResult(path, false, "ecserr.ECSErr expected, got %v", v)
+		}
+		givenErr = &givenErrNoPtr
+
+		if expectedErr.Code != givenErr.Code {
+			return llresult.SimpleResult(path, false, "ECS error type does not match, expected %s, got %s", expectedErr.Code, expectedErr.Code)
+		}
+
+		if expectedErr.Type != givenErr.Type {
+			return llresult.SimpleResult(path, false, "ECS error code does not match, expected %s, got %s", expectedErr.Type, givenErr.Type)
+		}
+
+		if expectedErr.Message != givenErr.Message {
+			return llresult.SimpleResult(path, false, "ECS error message does not match, expected %s, got %s", expectedErr.Message, givenErr.Message)
+		}
+
+		return llresult.ValidResult(path)
+	})
+}

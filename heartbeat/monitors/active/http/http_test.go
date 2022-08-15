@@ -48,6 +48,7 @@ import (
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -300,7 +301,7 @@ func TestDownStatuses(t *testing.T) {
 					hbtest.RespondingTCPChecks(),
 					hbtest.SummaryChecks(0, 1),
 					respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
-					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
+					hbtest.ECSErrChecks(ecserr.NewBadHTTPStatusErr(status)),
 					respondingHTTPBodyChecks("hello, world!"),
 				)),
 				event.Fields,

@@ -121,7 +121,7 @@ func checkStatus(status []uint16) respValidator {
 
 func checkStatusOK(r *http.Response) error {
 	if r.StatusCode >= 400 {
-		return ecserr.NewBadHTTPStatusErr(r.StatusCode, r.Status)
+		return ecserr.NewBadHTTPStatusErr(r.StatusCode)
 	}
 	return nil
 }
