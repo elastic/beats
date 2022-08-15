@@ -81,7 +81,8 @@ func TestImmutable(t *testing.T) {
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
 		// With one extra for SetImmutable
-		returnACK().returnACK().returnACK().returnACK().returnACK().returnACK().
+		returnACK().returnStatus().returnACK().returnACK().
+		returnACK().returnACK().returnACK().returnACK().
 		// Send one auditd message.
 		returnMessage(userLoginFailMsg)
 
@@ -114,7 +115,8 @@ func TestData(t *testing.T) {
 		// Get Status response for initClient
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
-		returnACK().returnACK().returnACK().returnACK().returnACK().
+		returnACK().returnStatus().returnACK().returnACK().
+		returnACK().returnACK().returnACK().
 		// Send three auditd messages.
 		returnMessage(userLoginFailMsg).
 		returnMessage(execveMsgs...).
@@ -127,10 +129,10 @@ func TestData(t *testing.T) {
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	assertNoErrors(t, events)
 	if len(events) != 3 {
 		t.Fatalf("expected 3 events, but received %d", len(events))
 	}
-	assertNoErrors(t, events)
 
 	assertFieldsAreDocumented(t, events)
 
@@ -146,7 +148,8 @@ func TestLoginType(t *testing.T) {
 		// Get Status response for initClient
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
-		returnACK().returnACK().returnACK().returnACK().returnACK().
+		returnACK().returnStatus().returnACK().returnACK().
+		returnACK().returnACK().returnACK().
 		// Send an authentication failure and a success.
 		returnMessage(userLoginFailMsg).
 		returnMessage(userLoginSuccessMsg).

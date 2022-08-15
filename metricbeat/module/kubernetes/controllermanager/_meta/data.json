@@ -7,31 +7,24 @@
     },
     "kubernetes": {
         "controllermanager": {
-            "client": {
-                "request": {
-                    "duration": {
-                        "sec": {
-                            "bucket": {
-                                "+Inf": 1,
-                                "0.001": 0,
-                                "0.002": 0,
-                                "0.004": 0,
-                                "0.008": 0,
-                                "0.016": 1,
-                                "0.032": 1,
-                                "0.064": 1,
-                                "0.128": 1,
-                                "0.256": 1,
-                                "0.512": 1
-                            },
-                            "count": 1,
-                            "sum": 0.008447322
-                        }
-                    }
+            "name": "serviceaccount",
+            "workqueue": {
+                "adds": {
+                    "count": 5
+                },
+                "depth": {
+                    "count": 0
+                },
+                "longestrunning": {
+                    "sec": 0
+                },
+                "retries": {
+                    "count": 0
+                },
+                "unfinished": {
+                    "sec": 0
                 }
-            },
-            "url": "https://172.18.0.2:6443/api/v1/configmaps?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-            "verb": "GET"
+            }
         }
     },
     "metricset": {

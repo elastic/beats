@@ -559,7 +559,6 @@ func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out 
 	}
 
 	if int(bufferUsed) > len(renderBuf) {
-		//nolint:stylecheck // These are proper nouns.
 		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
 			"to the buffer, but the buffer can only hold %d bytes",
 			bufferUsed, len(renderBuf))

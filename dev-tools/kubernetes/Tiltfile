@@ -1,0 +1,199 @@
+
+load('ext://restart_process', 'docker_build_with_restart')
+
+
+def compile(
+    beat="metricbeat",
+    mode="debug",
+    arch="arm64",
+):
+    flags = ""
+    suffix = ""
+    if mode == "debug":
+        flags = '-gcflags=all="-N -l"'
+        suffix = "-debugger"
+    build_cmd = "CGO_ENABLED=0 GOOS=linux GOARCH={} go build {} -o build/{}{} ../../{}".format(
+        arch, flags, beat, suffix, beat)
+    print("Build cmd: {}".format(build_cmd))
+
+    resource_name = '{}-compile{}'.format(beat, suffix)
+    print("Resource name: {}".format(resource_name))
+
+    local_resource(
+        resource_name,
+        build_cmd,
+        deps=['.'],
+        ignore=[
+            "build",
+            "Tiltfile"
+        ])
+
+
+def build(
+    beat="metricbeat",
+    mode="run",
+    k8s_env="kind",
+):
+    docker_image = '{}-{}-image'.format(beat, mode)
+    if k8s_env == "gcp":
+        # In order to push to GCR you need
+        #   gcloud auth login
+        #   gcloud auth configure-docker
+        #
+        # More info at https://cloud.google.com/container-registry/docs/advanced-authentication#gcloud-helper
+        docker_registry = "us.gcr.io/elastic-observability".format(
+            docker_image)
+
+        default_registry(docker_registry)
+        print("Docker registry: {}".format(docker_registry))
+
+    print("Docker image: {}".format(docker_image))
+
+    docker_file = '{}/Dockerfile.{}'.format(beat, mode)
+    print("Docker file: {}".format(docker_file))
+
+    suffix = ""
+    if mode == "run":
+        docker_entrypoint = [
+            '/usr/share/{}/{}{}'.format(beat, beat, suffix),
+        ]
+    else:
+        suffix = "-debugger"
+        docker_entrypoint = [
+            "dlv",
+            "--headless",
+            "--listen=:56268",
+            "--api-version=2",
+            "--log",
+            "--log-output",
+            "debugger",
+            "exec",
+            "/usr/share/{}/{}{}".format(beat, beat, suffix),
+            "--"
+        ]
+    print("Docker entrypoint: {}".format(docker_entrypoint))
+
+    docker_build_with_restart(
+        docker_image,
+        '.',
+        entrypoint=docker_entrypoint,
+        dockerfile=docker_file,
+        only=["build"],
+        live_update=[
+            sync('./build/{}{}', '/usr/share/{}'.format(beat, suffix, beat)),
+        ],
+    )
+
+
+def k8s_deploy(
+    beat="metricbeat",
+    mode="run",
+    k8s_cluster="single",
+):
+
+    if k8s_cluster == "multi":
+        k8s_manifest = '{}/manifest.{}.{}.yaml'.format(beat, mode, k8s_cluster)
+    else:
+        k8s_manifest = '{}/manifest.{}.yaml'.format(beat, mode)
+    print("K8s manifest: {}".format(k8s_manifest))
+
+    k8s_yaml(k8s_manifest)
+
+
+def k8s_expose(
+    beat="metricbeat",
+    mode="run",
+    k8s_cluster="single",
+):
+    if mode == "run":
+        k8s_resource(beat)
+    elif mode == "debug" and k8s_cluster == "multi":
+        runner_resource = "{}-runner".format(beat)
+        k8s_resource(runner_resource)
+
+        debugger_resource = "{}-debugger".format(beat)
+        k8s_resource(debugger_resource, port_forwards=56268)
+    else:
+        k8s_resource(beat, port_forwards=56268)
+
+    allow_k8s_contexts(k8s_context())
+
+
+# Beat() is used to test beats in k8s cluster
+
+# Parameters:
+# `beat`: `metricbeat` to test Metricbeat, `filebeat` to test Filebeat
+# `mode`: `debug` to start a remote debugger that you can connect to from your IDE with hot reloading enabled, `run` to just run Metricbeat without a debugger but still with hot reloading enabled
+# `arch`: `amd64` to build go binary for amd64 architecture, `arm64` to build go binary for arm64 (aka M1 Apple chip) architecture
+# `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP
+# `k8s_cluster`: `single` to use a single node k8s cluster, `multi` to use a k8s with more than 1 node.
+#       if running on a multi-node cluster we expect to have at least 2 workers and a control plane node. One of the workers (eg. worker1)
+#       should have a taint and a label (for node affinity) to make sure that only the debugger runs on that node. You need to run the following commands:
+#         kubectl taint nodes worker1 debugger=ok:NoSchedule
+#         kubectl label nodes worker1 debugger=ok
+#       More info on Taints and Tolerations at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/.
+#       More on node affinity at https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity.
+def beat(
+        beat="metricbeat",
+        mode="run",
+        arch="arm64",
+        k8s_env="kind",
+        k8s_cluster="single",
+        **kwargs):
+    if beat not in ["metricbeat", "filebeat"]:
+        print("Invalid beat: {}".format(beat))
+        exit(-1)
+    if mode not in ["run", "debug"]:
+        print("Invalid mode: {}".format(mode))
+        exit(-1)
+    if arch not in ["arm64", "amd64"]:
+        print("Invalid arch: {}".format(arch))
+        exit(-1)
+    if k8s_env not in ["kind", "gcp"]:
+        print("Invalid k8s_env: {}".format(k8s_env))
+        exit(-1)
+    if k8s_cluster not in ["single", "multi"]:
+        print("Invalid k8s_cluster: {}".format(k8s_cluster))
+        exit(-1)
+
+    print("Mode: {}".format(mode))
+    print("Beat: {}".format(beat))
+    print("Arch: {}".format(arch))
+    print("K8s_env: {}".format(k8s_env))
+    print("K8s_cluster: {}".format(k8s_cluster))
+
+    if k8s_cluster == "multi" and mode == "run":
+        print("K8s_cluter=multi and mode=run is not supported yet")
+        exit(-1)
+
+    if beat == "filebeat" and k8s_cluster == "multi":
+        print("K8s_cluter=multi and beat=filebeat is not supported yet")
+        exit(-1)
+
+    # Compile
+    if k8s_cluster == "multi":
+        compile(beat=beat, mode="debug", arch=arch)
+        compile(beat=beat, mode="run", arch=arch)
+    else:
+        compile(beat=beat, mode=mode, arch=arch)
+
+    # Docker Build
+    if k8s_cluster == "multi":
+        build(beat=beat, mode="debug", k8s_env=k8s_env)
+        build(beat=beat, mode="run", k8s_env=k8s_env)
+    else:
+        build(beat=beat, mode=mode, k8s_env=k8s_env)
+
+    # Deploy to k8s
+    k8s_deploy(beat=beat, mode=mode, k8s_cluster=k8s_cluster)
+
+    # ## Expose resource
+    k8s_expose(beat=beat, mode=mode, k8s_cluster=k8s_cluster)
+
+
+beat(beat="metricbeat",
+     mode="debug",
+     arch="arm64",
+     k8s_env="kind",
+     k8s_cluster="multi",
+     )
