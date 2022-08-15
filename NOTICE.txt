@@ -10828,9 +10828,19 @@ Mozilla Public License, version 2.0
         1.1 or earlier of the License, but not also under the terms of a
         Secondary License.
 
+<<<<<<< HEAD
 1.6. “Executable Form”
 
      means any form of the work other than Source Code Form.
+=======
+--------------------------------------------------------------------------------
+Dependency : github.com/elastic/elastic-agent-libs
+Version: v0.2.11
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.2.11/LICENSE:
+>>>>>>> 56ca6f5c4d ([automation] Update go release version 1.18.5 (#32574))
 
 1.7. “Larger Work”
 

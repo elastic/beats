@@ -196,7 +196,32 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	cloud.google.com/go v0.97.0 // indirect
+=======
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
+	github.com/aws/smithy-go v1.12.0
+	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
+	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/elastic-agent-autodiscover v0.2.1
+	github.com/elastic/elastic-agent-libs v0.2.11
+	github.com/elastic/elastic-agent-shipper-client v0.2.0
+	github.com/elastic/elastic-agent-system-metrics v0.4.4
+	github.com/elastic/go-elasticsearch/v8 v8.2.0
+	github.com/pierrec/lz4/v4 v4.1.15
+	github.com/shirou/gopsutil/v3 v3.21.12
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
+	go.elastic.co/apm/v2 v2.0.0
+	go.mongodb.org/mongo-driver v1.5.1
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+)
+
+require (
+	cloud.google.com/go v0.99.0 // indirect
+>>>>>>> 56ca6f5c4d ([automation] Update go release version 1.18.5 (#32574))
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
