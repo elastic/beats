@@ -21,7 +21,7 @@
 package pod
 
 import (
-	"io"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -77,7 +77,7 @@ func (s *PodTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
 	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := io.ReadAll(f)
+	body, err := ioutil.ReadAll(f)
 	s.NoError(err, "cannot read test file "+testFile)
 
 	return body
@@ -159,7 +159,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 	s.addNodeMetric(s.NodeMetrics)
 	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
-	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
+	body := s.ReadTestFile(testFileWithMultipleContainers)  // NOTE: different test file
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
 	s.basicTests(events, err)

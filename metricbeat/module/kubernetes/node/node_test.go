@@ -21,7 +21,7 @@
 package node
 
 import (
-	"io"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -46,7 +46,7 @@ func (s *NodeTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
 	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := io.ReadAll(f)
+	body, err := ioutil.ReadAll(f)
 	s.NoError(err, "cannot read test file "+testFile)
 
 	return body
