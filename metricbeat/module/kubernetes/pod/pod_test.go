@@ -159,7 +159,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 	s.addNodeMetric(s.NodeMetrics)
 	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
-	body := s.ReadTestFile(testFileWithMultipleContainers)  // NOTE: different test file
+	body := s.ReadTestFile(testFileWithMultipleContainers) // NOTE: different test file
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
 
 	s.basicTests(events, err)
