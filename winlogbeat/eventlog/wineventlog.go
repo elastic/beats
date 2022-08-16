@@ -332,7 +332,8 @@ func (l *winEventLog) Read() ([]Record, error) {
 		if r.Message == "" {
 			r.Message, err = l.message(h)
 			if err != nil {
-				logp.Err("%s error salvaging message: %v", l.logPrefix, err)
+				logp.Warn("%s error salvaging message (event id=%d qualifier=%d provider=%q created at %s will be included without a message): %v",
+					l.logPrefix, r.EventIdentifier.ID, r.EventIdentifier.Qualifiers, r.Provider.Name, r.TimeCreated.SystemTime, err)
 			}
 		}
 		records = append(records, r)
