@@ -296,7 +296,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		// iterate over collected ids from last response
 		if i == 0 {
 			// perform and store regular call responses
-			httpResp, err = rf.collectResponse(stdCtx, trCtx, r) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+			httpResp, err = rf.collectResponse(stdCtx, trCtx, r)
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
@@ -633,7 +633,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 }
 
 func cloneResponse(source *http.Response) (*http.Response, error) {
-	var resp http.Response //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+	var resp http.Response
 
 	body, err := io.ReadAll(source.Body)
 	if err != nil {
