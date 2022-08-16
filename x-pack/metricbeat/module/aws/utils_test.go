@@ -160,7 +160,7 @@ func TestGetListMetricsOutputWithWildcard(t *testing.T) {
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
-	startTime, endTime := GetStartTimeEndTime(10*time.Minute, 0)
+	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0)
 
 	mockSvc := &MockCloudWatchClient{}
 	var metricDataQueries []cloudwatchtypes.MetricDataQuery
@@ -194,7 +194,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 }
 
 func TestGetMetricDataResults(t *testing.T) {
-	startTime, endTime := GetStartTimeEndTime(10*time.Minute, 0)
+	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0)
 
 	mockSvc := &MockCloudWatchClient{}
 	metricInfo := cloudwatchtypes.Metric{
@@ -433,4 +433,55 @@ func TestGetResourcesTags(t *testing.T) {
 		},
 	}
 	assert.Equal(t, expectedResourceTagMap, resourceTagMap)
+}
+
+func TestGetStartTimeEndTime(t *testing.T) {
+	var cases = []struct {
+		title         string
+		start         string
+		period        time.Duration
+		latency       time.Duration
+		expectedStart string
+		expectedEnd   string
+	}{
+		// window should align with period e.g. requesting a 5 minute period at 10:27 gives 10:20->10:25
+		{"1 minute", "2022-08-15T13:38:45Z", time.Second * 60, 0, "2022-08-15T13:37:00Z", "2022-08-15T13:38:00Z"},
+		{"2 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 2, 0, "2022-08-15T13:36:00Z", "2022-08-15T13:38:00Z"},
+		{"3 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 3, 0, "2022-08-15T13:33:00Z", "2022-08-15T13:36:00Z"},
+		{"5 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 5, 0, "2022-08-15T13:30:00Z", "2022-08-15T13:35:00Z"},
+		{"30 minutes", "2022-08-15T13:38:45Z", time.Second * 60 * 30, 0, "2022-08-15T13:00:00Z", "2022-08-15T13:30:00Z"},
+
+		// latency should shift the time *before* period alignment
+		// e.g. requesting a 5 minute period at 10:27 with 1 minutes latency still gives 10:20->10:25,
+		//      but with 3 minutes latency gives 10:15->10:20
+		{"1 minute, 10 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60, time.Second * 60 * 10, "2022-08-15T13:27:00Z", "2022-08-15T13:28:00Z"},
+		{"2 minutes, 1 minute latency", "2022-08-15T13:38:45Z", time.Second * 60 * 2, time.Second * 60, "2022-08-15T13:34:00Z", "2022-08-15T13:36:00Z"},
+		{"5 minutes, 4 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 5, time.Second * 60 * 4, "2022-08-15T13:25:00Z", "2022-08-15T13:30:00Z"},
+		{"30 minutes, 30 minutes latency", "2022-08-15T13:38:45Z", time.Second * 60 * 30, time.Second * 60 * 30, "2022-08-15T12:30:00Z", "2022-08-15T13:00:00Z"},
+
+		// non-whole-minute periods should be rounded up to the nearest minute; latency is applied as-is before period adjustment
+		{"20 seconds, 45 second latency", "2022-08-15T13:38:45Z", time.Second * 20, time.Second * 45, "2022-08-15T13:37:00Z", "2022-08-15T13:38:00Z"},
+		{"1.5 minutes, 60 second latency", "2022-08-15T13:38:45Z", time.Second * 90, time.Second * 60, "2022-08-15T13:34:00Z", "2022-08-15T13:36:00Z"},
+		{"just less than 5 minutes, 3 minute latency", "2022-08-15T13:38:45Z", time.Second * 59 * 5, time.Second * 90, "2022-08-15T13:30:00Z", "2022-08-15T13:35:00Z"},
+	}
+
+	parseTime := func(in string) time.Time {
+		time, err := time.Parse(time.RFC3339, in)
+		if err != nil {
+			t.Errorf("test setup failed - could not parse time with time.RFC3339: %s", in)
+		}
+		return time
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.title, func(t *testing.T) {
+			startTime, expectedStartTime, expectedEndTime := parseTime(tt.start), parseTime(tt.expectedStart), parseTime(tt.expectedEnd)
+
+			start, end := GetStartTimeEndTime(startTime, tt.period, tt.latency)
+
+			if expectedStartTime != start || expectedEndTime != end {
+				t.Errorf("got (%s, %s), want (%s, %s)", start, end, tt.expectedStart, tt.expectedEnd)
+			}
+		})
+	}
 }
