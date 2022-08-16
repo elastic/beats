@@ -182,6 +182,9 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 		defer d.flows.Unlock()
 	}
 
+	d.stD1Q.i = 0
+	d.stIP4.i = 0
+	d.stIP6.i = 0
 	for len(data) > 0 {
 		err := current.DecodeFromBytes(data, d)
 		if err != nil {
