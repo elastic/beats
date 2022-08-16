@@ -90,7 +90,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.StatefulSet{}, mod.GetPerfMetricsCache(), false),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.StatefulSet{}, mod.GetMetricsRepo(), false),
 		mod:           mod,
 	}, nil
 }
