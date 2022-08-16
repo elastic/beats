@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/check-xpack-packetbeat.yml'
       - 'x-pack/packetbeat/**'
+      - 'packetbeat/**'
 
 env:
   BEAT_MODULE: 'x-pack/packetbeat'
