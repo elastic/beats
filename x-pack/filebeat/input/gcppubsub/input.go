@@ -215,7 +215,7 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 	event.SetID(id)
 
 	if len(msg.Attributes) > 0 {
-		event.PutValue("labels", msg.Attributes)
+		event.Fields["labels"] = msg.Attributes
 	}
 
 	return event
