@@ -143,6 +143,7 @@ pull_request_rules:
           For such, you'll need to label your PR with:
           * The upcoming major version of the Elastic Stack
           * The upcoming minor version of the Elastic Stack (if you're not pushing a breaking change)
+
           To fixup this pull request, you need to add the backport labels for the needed
           branches, such as:
           * `backport-v8./d.0` is the label to automatically backport to the `8./d` branch. `/d` is the digit
