@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-func eventMapping(content []byte, metricsRepo *util.MetricsRepo,) ([]common.MapStr, error) {
+func eventMapping(content []byte, metricsRepo *util.MetricsRepo) ([]common.MapStr, error) {
 	events := []common.MapStr{}
 	var summary kubernetes.Summary
 
