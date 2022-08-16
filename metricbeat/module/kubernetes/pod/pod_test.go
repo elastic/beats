@@ -129,7 +129,6 @@ func TestEventMappingWithZeroNodeMetrics(t *testing.T) {
 		"cpu.usage.nanocores": 11263994,
 
 		"memory.usage.bytes":           1462272,
-		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
 	for k, v := range testCases {
@@ -176,7 +175,6 @@ func TestEventMappingWithNoNodeMetrics(t *testing.T) {
 
 		"memory.usage.bytes":           1462272,
 		"memory.usage.limit.pct":       0.1,
-		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
 	for k, v := range testCases {
@@ -232,7 +230,6 @@ func TestEventMappingWithMultipleContainers(t *testing.T) {
 		"memory.usage.bytes":           2924544,              // 2x since 2 containers
 		"memory.usage.node.pct":        0.02,                 // 2x usage since 2 containers
 		"memory.usage.limit.pct":       0.02,                 // same value as `cpu.usage.node.pct` since 2 containers but only 1 with limit, podMemLimit = containerMemLimit + nodeLimit > nodeLimit = nodeLimit (capped value)
-		"memory.working_set.limit.pct": 0.019887955182072828, // similar concept to `memory.usage.limit.pct`. 2x usage but denominator 10x since nodeLimit = 10x containerMemLimit
 	}
 
 	for k, v := range testCases {
@@ -294,7 +291,6 @@ func TestEventMappingWithMultipleContainersWithAllMemLimits(t *testing.T) {
 		"memory.usage.bytes":           2924544,             // 2x since 2 containers
 		"memory.usage.node.pct":        0.02,                // 2x usage since 2 containers
 		"memory.usage.limit.pct":       0.1,                 // 2x usage / 2x limit = same value
-		"memory.working_set.limit.pct": 0.09943977591036414, // 2x usage / 2x limit = same value
 	}
 
 	for k, v := range testCases {
