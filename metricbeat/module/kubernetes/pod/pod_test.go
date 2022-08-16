@@ -128,7 +128,7 @@ func TestEventMappingWithZeroNodeMetrics(t *testing.T) {
 		// calculated pct fields:
 		"cpu.usage.nanocores": 11263994,
 
-		"memory.usage.bytes":           1462272,
+		"memory.usage.bytes": 1462272,
 	}
 
 	for k, v := range testCases {
@@ -173,8 +173,8 @@ func TestEventMappingWithNoNodeMetrics(t *testing.T) {
 		// calculated pct fields:
 		"cpu.usage.nanocores": 11263994,
 
-		"memory.usage.bytes":           1462272,
-		"memory.usage.limit.pct":       0.1,
+		"memory.usage.bytes":     1462272,
+		"memory.usage.limit.pct": 0.1,
 	}
 
 	for k, v := range testCases {
@@ -227,9 +227,9 @@ func TestEventMappingWithMultipleContainers(t *testing.T) {
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
 		"cpu.usage.limit.pct": 0.011263994, // same value as `cpu.usage.node.pct` since `podCoreLimit` = 2x nodeCores = `nodeCores` (capped value)
 
-		"memory.usage.bytes":           2924544,              // 2x since 2 containers
-		"memory.usage.node.pct":        0.02,                 // 2x usage since 2 containers
-		"memory.usage.limit.pct":       0.02,                 // same value as `cpu.usage.node.pct` since 2 containers but only 1 with limit, podMemLimit = containerMemLimit + nodeLimit > nodeLimit = nodeLimit (capped value)
+		"memory.usage.bytes":     2924544, // 2x since 2 containers
+		"memory.usage.node.pct":  0.02,    // 2x usage since 2 containers
+		"memory.usage.limit.pct": 0.02,    // same value as `cpu.usage.node.pct` since 2 containers but only 1 with limit, podMemLimit = containerMemLimit + nodeLimit > nodeLimit = nodeLimit (capped value)
 	}
 
 	for k, v := range testCases {
@@ -288,9 +288,9 @@ func TestEventMappingWithMultipleContainersWithAllMemLimits(t *testing.T) {
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
 		"cpu.usage.limit.pct": 0.011263994, // same value as `cpu.usage.node.pct` since `podCoreLimit` = 2x nodeCores = `nodeCores` (capped value)
 
-		"memory.usage.bytes":           2924544,             // 2x since 2 containers
-		"memory.usage.node.pct":        0.02,                // 2x usage since 2 containers
-		"memory.usage.limit.pct":       0.1,                 // 2x usage / 2x limit = same value
+		"memory.usage.bytes":     2924544, // 2x since 2 containers
+		"memory.usage.node.pct":  0.02,    // 2x usage since 2 containers
+		"memory.usage.limit.pct": 0.1,     // 2x usage / 2x limit = same value
 	}
 
 	for k, v := range testCases {
