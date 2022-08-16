@@ -45,7 +45,7 @@ func InitBeatsForTest(t *testing.T, beatRoot *cmd.BeatsRootCmd) {
 func ResetFleetManager(handler MockV2Handler) error {
 	managers, err := feature.GlobalRegistry().LookupAll(lbmanagement.Namespace)
 	if err != nil {
-		return fmt.Errorf("Error finding management plugin:")
+		return fmt.Errorf("error finding management plugin: %w", err)
 	}
 	if managers != nil && managers[0].Name() == defaultFleetName {
 		_ = feature.GlobalRegistry().Unregister(lbmanagement.Namespace, defaultFleetName)

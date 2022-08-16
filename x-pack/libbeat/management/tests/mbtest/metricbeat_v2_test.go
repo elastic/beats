@@ -9,9 +9,8 @@ import (
 	"testing"
 	"time"
 
-	// initialize the plugin system before libbeat does, so we can overwrite it properly
 	"github.com/stretchr/testify/require"
-
+	// initialize the plugin system before libbeat does, so we can overwrite it properly
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
@@ -56,6 +55,17 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 				},
 			}),
 		},
+		{
+			Id: "system/metrics-system.memory-default-system",
+			DataStream: &proto.DataStream{
+				Dataset: "system.memory",
+				Type:    "metrics",
+			},
+			Source: tests.RequireNewStruct(map[string]interface{}{
+				"metricsets": []interface{}{"memory"},
+				"period":     "2s",
+			}),
+		},
 	}
 
 	expectedMBStreams.Streams = mbStreams
@@ -73,7 +83,7 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 	t.Logf("Got %d events", len(events))
 
 	// Look for processors
-	expectedMetaValues := map[string]interface{}{
+	expectedCPUMetaValues := map[string]interface{}{
 		// Processors created by
 		"@metadata.input_id":    "system/metrics-system-default-system",
 		"@metadata.stream_id":   "system/metrics-system.cpu-default-system",
@@ -84,84 +94,27 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 		// make sure the V2 shim isn't overwriting any custom processors
 		"@metadata.testfield": true,
 	}
-	tests.ValuesExist(t, expectedMetaValues, events, tests.ALL)
+	tests.ValuesExist(t, expectedCPUMetaValues, events, tests.ONCE)
 
-	// Look for proper CPU config
-	expectedCPU := map[string]interface{}{
-		"system.cpu.cores": nil,
-		"system.cpu.total": nil,
+	expectedMemoryMetaValues := map[string]interface{}{
+		"@metadata.stream_id": "system/metrics-system.memory-default-system",
+		"data_stream.dataset": "system.memory",
 	}
-	tests.ValuesExist(t, expectedCPU, events, tests.ALL)
+	tests.ValuesExist(t, expectedMemoryMetaValues, events, tests.ONCE)
+
+	// Look for proper CPU/memory config
+	expectedCPU := map[string]interface{}{
+		"system.cpu.cores":          nil,
+		"system.cpu.total":          nil,
+		"system.memory.actual.free": nil,
+	}
+	tests.ValuesExist(t, expectedCPU, events, tests.ONCE)
 
 	// If there's a config issue, metricbeat will fallback to default metricsets. Make sure they don't exist.
 	disabledMetricsets := []string{
 		"system.process",
 		"system.load",
 		"system.process_summary",
-		"system.memory",
-	}
-	tests.ValuesDoNotExist(t, disabledMetricsets, events)
-
-	// remove tempdir
-	err = os.RemoveAll(outPath)
-	require.NoError(t, err)
-}
-
-func TestMultipleMetricsets(t *testing.T) {
-	tests.InitBeatsForTest(t, cmd.RootCmd)
-	var mbStreams = []*proto.Stream{
-		{
-			Id: "system/metrics-system.cpu-default-system",
-			DataStream: &proto.DataStream{
-				Dataset: "system.cpu",
-				Type:    "metrics",
-			},
-			Source: tests.RequireNewStruct(map[string]interface{}{
-				"metricsets": []interface{}{"cpu"},
-				"period":     "2s",
-				"cpu.metrics": []interface{}{
-					// test other metricset-level config
-					"percentages",
-					"ticks",
-				},
-			}),
-		},
-		{
-			Id: "system/metrics-system.load-default-system",
-			DataStream: &proto.DataStream{
-				Dataset: "system.load",
-				Type:    "metrics",
-			},
-			Source: tests.RequireNewStruct(map[string]interface{}{
-				"metricsets": []interface{}{"load"},
-				"period":     "2s",
-			}),
-		},
-	}
-
-	expectedMBStreams.Streams = mbStreams
-	outPath, server := tests.SetupTestEnv(t, expectedMBStreams, time.Second*6)
-	defer server.Srv.Stop()
-
-	t.Logf("Running beats...")
-	err := cmd.RootCmd.Execute()
-	require.NoError(t, err)
-
-	t.Logf("Reading events...")
-	events := tests.ReadEvents(t, outPath)
-	t.Logf("Got %d events", len(events))
-
-	expectedMSValues := map[string]interface{}{
-		"system.cpu.cores":      nil,
-		"system.cpu.total":      nil,
-		"system.cpu.idle.ticks": nil,
-		"system.load.5":         nil,
-	}
-	tests.ValuesExist(t, expectedMSValues, events, tests.ONCE)
-	disabledMetricsets := []string{
-		"system.process",
-		"system.process_summary",
-		"system.memory",
 	}
 	tests.ValuesDoNotExist(t, disabledMetricsets, events)
 

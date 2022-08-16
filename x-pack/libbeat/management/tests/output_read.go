@@ -63,7 +63,7 @@ func ValuesExist(t *testing.T, values map[string]interface{}, events []mapstr.M,
 			} else {
 				if val == evt {
 					foundCount++
-				} else {
+				} else if val != evt && mode == ALL {
 					t.Errorf("Key %s was found in event %d, but value was unexpected. Expected %#v, got %#v", searchKey, eventIter, val, evt)
 				}
 			}

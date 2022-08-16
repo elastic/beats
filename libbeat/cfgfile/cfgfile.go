@@ -134,6 +134,8 @@ func Read(out interface{}, path string) error {
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
+// This function cares about the underlying fleet setting, and if beats is running with
+// the management.enabled flag, Load() will bypass reading a config file, and merely merge any overrides.
 func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 	var c *config.C
 	var err error

@@ -51,7 +51,7 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	for field, pattern := range cfg.Patterns {
 		exp, err := match.Compile(pattern)
 		if err != nil {
-			return nil, fmt.Errorf("Given expression is not a valid regexp: %s", pattern)
+			return nil, fmt.Errorf("given expression is not a valid regexp: %s", pattern)
 		}
 
 		list.patterns[field] = exp

@@ -101,7 +101,7 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 	if agentInfo == nil {
 		return inputs, nil
 	}
-	var processors = []interface{}{}
+	var processors []interface{}
 
 	processors = append(processors, generateAddFieldsProcessor(
 		mapstr.M{"id": agentInfo.ID, "snapshot": agentInfo.Snapshot, "version": agentInfo.Version},

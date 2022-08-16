@@ -38,7 +38,12 @@ type BeatV2Manager struct {
 
 	// stop callback must be registered by libbeat, as with the V1 callback
 	stopFunc func()
+	stopMut  sync.Mutex
 	beatStop sync.Once
+
+	// sync channel for shutting down the manager after we get a stop from
+	// either the agent or the beat
+	stopChan chan struct{}
 
 	isRunning bool
 }
@@ -68,6 +73,7 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		logger:   log.Named("V2-manager"),
 		registry: registry,
 		units:    make(map[string]*client.Unit),
+		stopChan: make(chan struct{}, 1),
 	}
 
 	if config.Enabled {
@@ -83,7 +89,10 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // UpdateStatus updates the manager with the current status for the beat.
 func (cm *BeatV2Manager) UpdateStatus(status lbmanagement.Status, msg string) {
 	updateState := client.UnitState(status)
-	_ = cm.getUnit(cm.mainUnit).UpdateState(updateState, msg, cm.payload)
+	stateUnit, exists := cm.getMainUnit()
+	if exists {
+		_ = stateUnit.UpdateState(updateState, msg, cm.payload)
+	}
 }
 
 // Enabled returns true if config management is enabled.
@@ -93,6 +102,8 @@ func (cm *BeatV2Manager) Enabled() bool {
 
 // SetStopCallback sets the callback to run when the manager want to shutdown the beats gracefully.
 func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
+	cm.stopMut.Lock()
+	defer cm.stopMut.Unlock()
 	cm.stopFunc = stopFunc
 }
 
@@ -113,12 +124,7 @@ func (cm *BeatV2Manager) Start() error {
 
 // Stop stops the current Manager and close the connection to Elastic Agent.
 func (cm *BeatV2Manager) Stop() {
-	cm.unitsMut.Lock()
-	defer cm.unitsMut.Unlock()
-	main, ok := cm.units[cm.mainUnit]
-	if ok {
-		cm.stopBeat(main)
-	}
+	cm.stopChan <- struct{}{}
 }
 
 // CheckRawConfig is currently not implemented for V1.
@@ -160,6 +166,25 @@ func (cm *BeatV2Manager) getUnit(ID string) *client.Unit {
 
 }
 
+func (cm *BeatV2Manager) getMainUnit() (*client.Unit, bool) {
+	cm.unitsMut.Lock()
+	defer cm.unitsMut.Unlock()
+	if cm.mainUnit == "" {
+		return nil, false
+	}
+	return cm.units[cm.mainUnit], true
+}
+
+// We need a "main" unit that we can send updates to for the StatusReporter interface
+// the purpose of this is to just grab the first input-type unit we get and set it as the "main" unit
+func (cm *BeatV2Manager) setMainUnitValue(unit *client.Unit) {
+	cm.unitsMut.Lock()
+	defer cm.unitsMut.Unlock()
+	if cm.mainUnit == "" {
+		cm.mainUnit = unit.ID()
+	}
+}
+
 func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
 	cm.unitsMut.Lock()
 	delete(cm.units, unit.ID())
@@ -173,58 +198,69 @@ func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
 func (cm *BeatV2Manager) unitListen() {
 	cm.logger.Debugf("Listening for agent unit changes")
 	for {
-		change := <-cm.client.UnitChanges()
-		switch change.Type {
-		// Within the context of how we send config to beats, I'm not sure there is a difference between
-		// A unit add and a unit change, since either way we can't do much more than call the reloader
-		case client.UnitChangedAdded:
-			// At this point we also get a log level, however I'm not sure the beats core logger provides a
-			// clean way to "just" change the log level, without resetting the whole log config
-			cm.logger.Debugf("Got unit added: %s", change.Unit.ID())
-			go cm.handleUnitReload(change.Unit)
+		select {
+		// The stopChan channel comes from the Manager interface Stop() method
+		case <-cm.stopChan:
+			cm.stopBeat()
+		case change := <-cm.client.UnitChanges():
+			switch change.Type {
+			// Within the context of how we send config to beats, I'm not sure there is a difference between
+			// A unit add and a unit change, since either way we can't do much more than call the reloader
+			case client.UnitChangedAdded:
+				// At this point we also get a log level, however I'm not sure the beats core logger provides a
+				// clean way to "just" change the log level, without resetting the whole log config
+				cm.logger.Debugf("Got unit added: %s", change.Unit.ID())
+				go cm.handleUnitReload(change.Unit)
 
-		case client.UnitChangedModified:
-			// For now, I'm assuming that a state STOPPED just tells us to shut down the entire beat.
-			state, _, _ := change.Unit.Expected()
-			cm.logger.Debugf("Got unit modified: %s, expected state is %s", change.Unit.ID(), state)
-			if state == client.UnitStateStopped {
-				cm.stopBeat(change.Unit)
+			case client.UnitChangedModified:
+				state, _, _ := change.Unit.Expected()
+				cm.logger.Debugf("Got unit modified: %s, expected state is %s", change.Unit.ID(), state)
+				// I'm assuming that a state STOPPED just tells us to shut down the entire beat,
+				// as such we don't really care about updating via a particular unit
+				if state == client.UnitStateStopped {
+					cm.stopBeat()
+				} else {
+					go cm.handleUnitReload(change.Unit)
+				}
+
+			case client.UnitChangedRemoved:
+				cm.logger.Debugf("Got unit removed: %s", change.Unit.ID())
+				cm.deleteUnit(change.Unit)
 			}
-			go cm.handleUnitReload(change.Unit)
-
-		case client.UnitChangedRemoved:
-			cm.logger.Debugf("Got unit removed: %s", change.Unit.ID())
-			cm.deleteUnit(change.Unit)
 		}
 
 	}
 }
 
-// We need a "main" unit that we can send updates to for the StatusReporter interface
-// the purpose of this is to just grab the first input-type unit we get and set it as the "main" unit
-func (cm *BeatV2Manager) setMainUnitValue(unit *client.Unit) {
-	if cm.mainUnit == "" {
-		cm.mainUnit = unit.ID()
-	}
-}
-
-func (cm *BeatV2Manager) stopBeat(unit *client.Unit) {
-	// will we ever get a Unit removed for anything other than the main beat?
-	// Individual reloaders don't have a "stop" function, so the most we can do
-	// is just shut down a beat, I think.
+func (cm *BeatV2Manager) stopBeat() {
 	if !cm.isRunning {
 		return
 	}
 
+	// will we ever get a Unit removed for anything other than the main beat?
+	// Individual reloaders don't have a "stop" function, so the most we can do
+	// is just shut down a beat, I think.
+	cm.logger.Debugf("Stopping beat")
+	// stop the "main" beat runtime
+	unit, mainExists := cm.getMainUnit()
+	if mainExists {
+		_ = unit.UpdateState(client.UnitStateStopping, "stopping beat", nil)
+	}
+
 	cm.isRunning = false
-	_ = unit.UpdateState(client.UnitStateStopping, "stopping beat", nil)
+	cm.stopMut.Lock()
+	defer cm.stopMut.Unlock()
 	if cm.stopFunc != nil {
 		// I'm not 100% sure the once here is needed,
-		// but various tend to handle this in a not-quite-safe way
+		// but various beats tend to handle this in a not-quite-safe way
 		cm.beatStop.Do(cm.stopFunc)
 	}
 	cm.client.Stop()
-	_ = unit.UpdateState(client.UnitStateStopped, "stopped beat", nil)
+
+	if mainExists {
+		_ = unit.UpdateState(client.UnitStateStopped, "stopped beat", nil)
+	}
+	return
 
 }
 
