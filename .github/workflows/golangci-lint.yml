@@ -26,24 +26,24 @@ jobs:
           GOOS: ${{ matrix.GOOS }}
         run: echo Go GOOS=$GOOS
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Uses Go version from the repository.
       - name: Read .go-version file
         id: goversion
         run: echo "::set-output name=version::$(cat .go-version)"
 
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: "${{ steps.goversion.outputs.version }}"
 
       - name: golangci-lint
         env:
           GOOS: ${{ matrix.GOOS }}
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-          version: v1.44.2
+          version: v1.47.2
 
           # Give the job more time to execute.
           # Regarding `--whole-files`, the linter is supposed to support linting of changed a patch only but,

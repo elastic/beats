@@ -256,7 +256,7 @@ func makeProducer(
 				total := 0
 				ackCB = func(N int) {
 					total += N
-					log.Debugf("producer ACK: N=%v, total=%v\n", N, total)
+					log.Debugf("producer ACK: N=%v, total=%v/%v\n", N, total, maxEvents)
 
 					for i := 0; i < N; i++ {
 						ackWG.Done()

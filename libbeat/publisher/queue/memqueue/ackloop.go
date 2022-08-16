@@ -29,41 +29,27 @@ type ackLoop struct {
 	// used to maintain sequencing of event acknowledgements.
 	ackChans chanList
 
-	totalACK uint64
-
 	processACK func(chanList, int)
 }
 
 func (l *ackLoop) run() {
-	var (
-		// Buffer up event counter in ackCount. If ackCount > 0, acks will be set to
-		// the broker.acks channel for sending the ACKs while potentially receiving
-		// new batches from the broker event loop.
-		// This concurrent bidirectionally communication pattern requiring 'select'
-		// ensures we can not have any deadlock between the event loop and the ack
-		// loop, as the ack loop will not block on any channel
-		ackCount int
-		ackChan  chan int
-	)
-
 	for {
 		nextBatchChan := l.ackChans.nextBatchChannel()
 
 		select {
 		case <-l.broker.done:
+			// The queue is shutting down.
 			return
 
-		case ackChan <- ackCount:
-			ackChan, ackCount = nil, 0
-
 		case chanList := <-l.broker.scheduledACKs:
+			// A new batch has been generated, add its ACK channel to the end of
+			// the pending list.
 			l.ackChans.concat(&chanList)
 
 		case <-nextBatchChan:
-			ackCount += l.handleBatchSig()
-			if ackCount > 0 {
-				ackChan = l.broker.ackChan
-			}
+			// The oldest outstanding batch has been acknowledged, advance our
+			// position as much as we can.
+			l.handleBatchSig()
 		}
 	}
 }
@@ -94,7 +80,6 @@ func (l *ackLoop) handleBatchSig() int {
 	// return final ACK to EventLoop, in order to clean up internal buffer
 	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)
 
-	l.totalACK += uint64(count)
 	l.broker.logger.Debug("ackloop:  done send ack")
 	return count
 }

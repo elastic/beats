@@ -20,7 +20,7 @@ package flows
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -37,7 +37,7 @@ import (
 var dataFlag = flag.Bool("data", false, "Write updated data.json files")
 
 func TestCreateEvent(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	// Build biflow event.
 	start := time.Unix(1542292881, 0)
@@ -116,13 +116,13 @@ func TestCreateEvent(t *testing.T) {
 
 	// Write the event to disk if -data is used.
 	if *dataFlag {
-		event.Fields.Put("@timestamp", common.Time(end))
+		_, _ = event.Fields.Put("@timestamp", common.Time(end))
 		output, err := json.MarshalIndent(&event.Fields, "", "  ")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if err := ioutil.WriteFile("../_meta/sample_outputs/flow.json", output, 0o644); err != nil {
+		if err := os.WriteFile("../_meta/sample_outputs/flow.json", output, 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

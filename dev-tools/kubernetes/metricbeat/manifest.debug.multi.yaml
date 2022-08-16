@@ -140,7 +140,7 @@ data:
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: metricbeat
+  name: metricbeat-runner
   namespace: kube-system
   labels:
     k8s-app: metricbeat
@@ -160,7 +160,6 @@ spec:
       containers:
       - name: metricbeat
         image: metricbeat-run-image
-        imagePullPolicy: Never
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -188,6 +187,116 @@ spec:
         resources:
           limits:
             memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/metricbeat.yml
+          readOnly: true
+          subPath: metricbeat.yml
+        - name: data
+          mountPath: /usr/share/metricbeat/data
+        - name: modules
+          mountPath: /usr/share/metricbeat/modules.d
+          readOnly: true
+        - name: proc
+          mountPath: /hostfs/proc
+          readOnly: true
+        - name: cgroup
+          mountPath: /hostfs/sys/fs/cgroup
+          readOnly: true
+      volumes:
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: cgroup
+        hostPath:
+          path: /sys/fs/cgroup
+      - name: config
+        configMap:
+          defaultMode: 0640
+          name: metricbeat-daemonset-config
+      - name: modules
+        configMap:
+          defaultMode: 0640
+          name: metricbeat-daemonset-modules
+      - name: data
+        hostPath:
+          # When metricbeat runs as non-root user, this directory needs to be writable by group (g+w)
+          path: /var/lib/metricbeat-data
+          type: DirectoryOrCreate
+---
+# Deploy a single Metricbeat instance for debugging
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metricbeat-debugger
+  namespace: kube-system
+  labels:
+    k8s-app: metricbeat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metricbeat-debugger
+  template:
+    metadata:
+      labels:
+        app: metricbeat-debugger
+    spec:
+      serviceAccountName: metricbeat
+      terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: debugger
+                operator: In
+                values:
+                - ok
+      tolerations:
+        - key: "debugger"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+      - name: metricbeat
+        image: metricbeat-debug-image
+        args: [
+          "-c", "/etc/metricbeat.yml",
+          "-e",
+          "-system.hostfs=/hostfs",
+        ]
+        ports:
+        - containerPort: 56268
+          hostPort: 56268
+          protocol: TCP
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: elasticsearch
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          value: changeme
+        - name: ELASTIC_CLOUD_ID
+          value:
+        - name: ELASTIC_CLOUD_AUTH
+          value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        securityContext:
+          runAsUser: 0
+        resources:
+          ## on debugger image cause pod to crash since we use > 350MB of memory
+          # limits:
+          #   memory: 200Mi
           requests:
             cpu: 100m
             memory: 100Mi
