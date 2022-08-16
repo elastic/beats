@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -57,7 +58,14 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry, beatUUID uuid.
 			return nil, fmt.Errorf("parsing fleet management settings: %w", err)
 		}
 	}
-	agentClient, _, err := client.NewV2FromReader(os.Stdin, client.VersionInfo{Name: "elastic-agent-shipper", Version: "v2"})
+	agentClient, _, err := client.NewV2FromReader(os.Stdin, client.VersionInfo{
+		Name:    "beat-v2-client",
+		Version: version.GetDefaultVersion(),
+		Meta: map[string]string{
+			"commit":     version.Commit(),
+			"build_time": version.BuildTime().String(),
+		},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("error reading control config from agent: %w", err)
 	}
