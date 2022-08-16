@@ -16,6 +16,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -251,8 +252,8 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()))}
 
 	if in.AlternativeHost != "" {
-		// this will be typically set because we want to point the input to a testing pubsub emulator
-		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithInsecure())
+		// This will be typically set because we want to point the input to a testing pubsub emulator.
+		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			return nil, fmt.Errorf("cannot connect to alternative host %q: %w", in.AlternativeHost, err)
 		}
