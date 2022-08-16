@@ -44,6 +44,9 @@ type ContainerTestSuite struct {
 	AnotherContainerName string
 	PodId                util.PodId
 	Logger               *logp.Logger
+	NodeMetrics             *util.NodeMetrics
+	ContainerMetrics        *util.ContainerMetrics
+	AnotherContainerMetrics *util.ContainerMetrics
 }
 
 func (s *ContainerTestSuite) SetupTest() {
@@ -57,6 +60,16 @@ func (s *ContainerTestSuite) SetupTest() {
 	s.PodId = util.NewPodId(s.Namespace, s.PodName)
 
 	s.Logger = logp.NewLogger("kubernetes.container")
+
+	s.NodeMetrics = util.NewNodeMetrics()
+	s.NodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
+	s.NodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
+
+	s.ContainerMetrics = util.NewContainerMetrics()
+	s.ContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+
+	s.AnotherContainerMetrics = util.NewContainerMetrics()
+	s.AnotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
 }
 
 func (s *ContainerTestSuite) ReadTestFile(testFile string) []byte {
@@ -72,14 +85,8 @@ func (s *ContainerTestSuite) ReadTestFile(testFile string) []byte {
 func (s *ContainerTestSuite) TestEventMapping() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
-	nodeMetrics := util.NewNodeMetrics()
-	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
-	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
-	s.addNodeMetric(nodeMetrics)
-
-	containerMetrics := util.NewContainerMetrics()
-	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-	s.addContainerMetric(s.ContainerName, containerMetrics)
+	s.addNodeMetric(s.NodeMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
 
 	body := s.ReadTestFile(testFile)
 	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
