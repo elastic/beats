@@ -100,8 +100,8 @@ func (s *MetricsRepoTestSuite) TestNodeNames() {
 
 	nodeNames := s.MetricsRepo.NodeNames()
 	s.Equal(2, len(nodeNames))
-	s.Equal(s.NodeName, nodeNames[0])
-	s.Equal(s.AnotherNodeName, nodeNames[1])
+	s.Contains(nodeNames, s.NodeName)
+	s.Contains(nodeNames, s.AnotherNodeName)
 }
 
 func (s *MetricsRepoTestSuite) TestPodNames() {
@@ -116,13 +116,13 @@ func (s *MetricsRepoTestSuite) TestPodNames() {
 	nodeStore := s.MetricsRepo.GetNodeStore(s.NodeName)
 	podNames := nodeStore.PodIds()
 	s.Equal(1, len(podNames))
-	s.Equal(s.PodId, podNames[0])
+	s.Contains(podNames, s.PodId)
 
 	anotherNodeStore := s.MetricsRepo.GetNodeStore(s.AnotherNodeName)
 	anotherPodNames := anotherNodeStore.PodIds()
 	s.Equal(2, len(anotherPodNames))
-	s.Equal(s.PodId, anotherPodNames[0])
-	s.Equal(s.AnotherPodId, anotherPodNames[1])
+	s.Contains(anotherPodNames, s.PodId)
+	s.Contains(anotherPodNames, s.AnotherPodId)
 }
 
 func (s *MetricsRepoTestSuite) TestContainerNames() {
@@ -140,8 +140,8 @@ func (s *MetricsRepoTestSuite) TestContainerNames() {
 	podStore := nodeStore.GetPodStore(s.PodId)
 	containerNames := podStore.ContainerNames()
 	s.Equal(2, len(containerNames))
-	s.Equal(s.ContainerName, containerNames[0])
-	s.Equal(s.AnotherContainerName, containerNames[1])
+	s.Contains(containerNames, s.ContainerName)
+	s.Contains(containerNames, s.AnotherContainerName)
 }
 
 func (s *MetricsRepoTestSuite) TestAddNodeStore() {
