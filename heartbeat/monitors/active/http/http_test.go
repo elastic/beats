@@ -594,7 +594,6 @@ func TestHTTPSx509Auth(t *testing.T) {
 		ClientCAs:  clientCerts,
 		MinVersion: tls.VersionTLS12,
 	}
-	tlsConf.BuildNameToCertificate()
 
 	server := httptest.NewUnstartedServer(hbtest.HelloWorldHandler(http.StatusOK))
 	server.TLS = tlsConf

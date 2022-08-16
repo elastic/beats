@@ -64,8 +64,6 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 				w.Header().Set("Location", "/somewhere")
 			}
 			w.WriteHeader(status)
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
 			_, _ = io.WriteString(w, HelloWorldBody)
 		},
 	)
@@ -83,8 +81,6 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
 			_, _ = io.WriteString(w, body.String())
 		},
 	)
@@ -97,8 +93,6 @@ func CustomResponseHandler(body []byte, status int, extraHeaders map[string]stri
 				w.Header().Add(key, val)
 			}
 			w.WriteHeader(status)
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
 			_, _ = w.Write(body)
 		},
 	)
@@ -287,8 +281,6 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	// disk, not memory, so this little bit of extra work is worthwhile
 	certFile, err := ioutil.TempFile("", "sslcert")
 	require.NoError(t, err)
-	//nolint:errcheck // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
 	_, _ = certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
 }
@@ -307,9 +299,7 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 
 	srv := &http.Server{Handler: HelloWorldHandler(200)}
 	go func() {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		srv.Serve(l)
+		_ = srv.Serve(l)
 	}()
 
 	host, port, err = net.SplitHostPort(l.Addr().String())

@@ -71,7 +71,7 @@ type State struct {
 }
 
 func (s *State) incrementCounters(status StateStatus) {
-	s.DurationMs = time.Now().Sub(s.StartedAt).Milliseconds()
+	s.DurationMs = time.Since(s.StartedAt).Milliseconds()
 	s.Checks++
 	if status == StatusUp {
 		s.Up++
