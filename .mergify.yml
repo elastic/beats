@@ -141,15 +141,6 @@ pull_request_rules:
       comment:
         message: |
           This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
-  - name: remove-backport label
-    conditions:
-      - label~=backport-v
-      - -merged
-      - -closed
-    actions:
-      label:
-        remove:
-          - backport-skip
   - name: backport patches to 7.17 branch
     conditions:
       - merged
