@@ -167,13 +167,6 @@ func (cm *BeatV2Manager) addUnit(unit *client.Unit) {
 	cm.unitsMut.Unlock()
 }
 
-func (cm *BeatV2Manager) getUnit(ID string) *client.Unit {
-	cm.unitsMut.Lock()
-	defer cm.unitsMut.Unlock()
-	return cm.units[ID]
-
-}
-
 func (cm *BeatV2Manager) getMainUnit() (*client.Unit, bool) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
@@ -268,7 +261,6 @@ func (cm *BeatV2Manager) stopBeat() {
 	if mainExists {
 		_ = unit.UpdateState(client.UnitStateStopped, "stopped beat", nil)
 	}
-	return
 
 }
 
