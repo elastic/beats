@@ -44,9 +44,8 @@ type ContainerTestSuite struct {
 	AnotherContainerName string
 	PodId                util.PodId
 	Logger               *logp.Logger
-	NodeMetrics             *util.NodeMetrics
-	ContainerMetrics        *util.ContainerMetrics
-	AnotherContainerMetrics *util.ContainerMetrics
+	NodeMetrics          *util.NodeMetrics
+	ContainerMetrics     *util.ContainerMetrics
 }
 
 func (s *ContainerTestSuite) SetupTest() {
@@ -67,9 +66,6 @@ func (s *ContainerTestSuite) SetupTest() {
 
 	s.ContainerMetrics = util.NewContainerMetrics()
 	s.ContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
-
-	s.AnotherContainerMetrics = util.NewContainerMetrics()
-	s.AnotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
 }
 
 func (s *ContainerTestSuite) ReadTestFile(testFile string) []byte {

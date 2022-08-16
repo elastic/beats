@@ -68,8 +68,6 @@ func (s *NodeTestSuite) testValue(event mapstr.M, field string, expected interfa
 func (s *NodeTestSuite) basicTests(event mapstr.M, err error) {
 	s.NoError(err, "error mapping "+testFile)
 
-	// s.Len(event, 1, "got wrong number of events")
-
 	basicTestCases := map[string]interface{}{
 		"cpu.usage.core.ns":   int64(4189523881380),
 		"cpu.usage.nanocores": 18691146,
