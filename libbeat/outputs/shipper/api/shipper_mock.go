@@ -22,17 +22,22 @@ import (
 
 	pb "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
+
+	"github.com/gofrs/uuid"
 )
 
 func NewProducerMock(cap int) *ProducerMock {
+	id, _ := uuid.NewV4()
 	return &ProducerMock{
-		Q: make([]*messages.Event, 0, cap),
+		UUID: id.String(),
+		Q:    make([]*messages.Event, 0, cap),
 	}
 }
 
 type ProducerMock struct {
 	pb.UnimplementedProducerServer
 	Q     []*messages.Event
+	UUID  string
 	Error error
 }
 
@@ -52,5 +57,17 @@ func (p *ProducerMock) PublishEvents(ctx context.Context, r *messages.PublishReq
 		resp.AcceptedCount++
 	}
 
+	resp.AcceptedIndex = uint64(len(p.Q))
+	if resp.AcceptedIndex > 0 {
+		resp.PersistedIndex = resp.AcceptedIndex - 1 // so we trigger the use of `PersistedIndex`
+	}
+
 	return resp, nil
+}
+
+func (p *ProducerMock) PersistedIndex(req *messages.PersistedIndexRequest, producer pb.Producer_PersistedIndexServer) error {
+	return producer.Send(&messages.PersistedIndexReply{
+		Uuid:           p.UUID,
+		PersistedIndex: uint64(len(p.Q)),
+	})
 }

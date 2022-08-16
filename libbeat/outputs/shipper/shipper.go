@@ -39,6 +39,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -49,6 +50,7 @@ type shipper struct {
 	client   sc.ProducerClient
 	timeout  time.Duration
 	config   Config
+	serverID string
 }
 
 func init() {
@@ -109,10 +111,27 @@ func (c *shipper) Connect() error {
 	if err != nil {
 		return fmt.Errorf("shipper connection failed with: %w", err)
 	}
-	c.log.Debugf("connect to %s established.", c.config.Server)
 
 	c.conn = conn
 	c.client = sc.NewProducerClient(conn)
+
+	indexClient, err := c.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
+		PollingInterval: durationpb.New(0), // no need to subscribe, we need it only once
+	})
+	if err != nil {
+		return fmt.Errorf("failed to connect to the server: %w", err)
+	}
+	serverInfo, err := indexClient.Recv()
+	if err != nil {
+		return fmt.Errorf("failed to fetch server information: %w", err)
+	}
+	c.serverID = serverInfo.GetUuid()
+	err = indexClient.CloseSend()
+	if err != nil {
+		c.log.Warnf("failed to close send stream when fetching server info: %s", err)
+	}
+
+	c.log.Debugf("connection to %s (%s) established.", c.config.Server, c.serverID)
 
 	return nil
 }
@@ -153,29 +172,59 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
-	resp, err := c.client.PublishEvents(ctx, &messages.PublishRequest{
+	publishReply, err := c.client.PublishEvents(ctx, &messages.PublishRequest{
+		Uuid:   c.serverID,
 		Events: convertedEvents,
 	})
 
-	if status.Code(err) != codes.OK || resp == nil {
+	if status.Code(err) != codes.OK || publishReply == nil {
 		batch.Cancelled()         // does not decrease the TTL
 		st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
 		return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
 	}
 
 	// with a correct server implementation should never happen, this error is not recoverable
-	if int(resp.AcceptedCount) > len(nonDroppedEvents) {
+	if int(publishReply.AcceptedCount) > len(nonDroppedEvents) {
 		return fmt.Errorf(
 			"server returned unexpected results, expected maximum accepted items %d, got %d",
 			len(nonDroppedEvents),
-			resp.AcceptedCount,
+			publishReply.AcceptedCount,
 		)
 	}
 
-	// the server is supposed to retain the order of the initial events in the response
-	// judging by the size of the result list we can determine what part of the initial
-	// list was accepted and we can send the rest of the list for a retry
-	retries := nonDroppedEvents[resp.AcceptedCount:]
+	if publishReply.PersistedIndex < publishReply.AcceptedIndex {
+		ackClient, err := c.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
+			PollingInterval: durationpb.New(c.config.AckPollingInterval),
+		})
+		if err != nil {
+			return fmt.Errorf("acknowledgement failed due to the connectivity error: %w", err)
+		}
+
+		for {
+			indexReply, err := ackClient.Recv()
+			if err != nil {
+				return fmt.Errorf("acknowledgement failed due to the connectivity error: %w", err)
+			}
+
+			if indexReply.GetUuid() != c.serverID {
+				batch.Cancelled()
+				st.Cancelled(len(events))
+				err := fmt.Errorf("acknowledgement failed due to a connection to a different server %s, expected %s", indexReply.Uuid, c.serverID)
+				c.serverID = indexReply.GetUuid()
+				return err
+			}
+
+			if indexReply.PersistedIndex >= publishReply.AcceptedIndex {
+				err = ackClient.CloseSend()
+				if err != nil {
+					c.log.Debugf("failed to close send stream after receiving acknowledgement: %s", err)
+				}
+				break
+			}
+		}
+	}
+
+	retries := nonDroppedEvents[publishReply.AcceptedCount:]
 	if len(retries) == 0 {
 		batch.ACK()
 		st.Acked(len(nonDroppedEvents))
@@ -183,7 +232,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	} else {
 		batch.RetryEvents(retries) // decreases TTL unless guaranteed delivery
 		st.Failed(len(retries))
-		c.log.Debugf("%d events have been accepted, %d sent for retry, %d dropped", resp.AcceptedCount, len(retries), droppedCount)
+		c.log.Debugf("%d events have been accepted, %d sent for retry, %d dropped", publishReply.AcceptedCount, len(retries), droppedCount)
 	}
 
 	return nil
