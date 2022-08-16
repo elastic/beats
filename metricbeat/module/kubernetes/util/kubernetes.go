@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
@@ -259,9 +260,9 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+						kubernetes2.ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
 
-						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
+						kubernetes2.ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 
@@ -566,24 +567,10 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 	}
 	ecsClusterMeta := mapstr.M{}
 	if clusterInfo.URL != "" {
-		ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.URL, logger)
+		kubernetes2.ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.URL, logger)
 	}
 	if clusterInfo.Name != "" {
-		ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
+		kubernetes2.ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
 	}
 	return ecsClusterMeta, nil
-}
-
-func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
-	_, err := event.Put(field, value)
-	if err != nil {
-		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
-	}
-}
-
-func ShouldDelete(event mapstr.M, field string, logger *logp.Logger) {
-	err := event.Delete(field)
-	if err != nil {
-		logger.Debugf("Failed to delete field '%s': %s", field, err)
-	}
 }

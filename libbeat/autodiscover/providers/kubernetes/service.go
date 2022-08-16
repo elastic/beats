@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 
 	"github.com/gofrs/uuid"
@@ -205,7 +204,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := mapstr.M{}
 	for k, v := range svc.GetObjectMeta().GetAnnotations() {
-		util.ShouldPut(annotations, k, v, s.logger)
+		ShouldPut(annotations, k, v, s.logger)
 	}
 	kubemeta["annotations"] = annotations
 
@@ -215,7 +214,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 				nsAnns := mapstr.M{}
 
 				for k, v := range namespace.GetAnnotations() {
-					util.ShouldPut(nsAnns, k, v, s.logger)
+					ShouldPut(nsAnns, k, v, s.logger)
 				}
 				kubemeta["namespace_annotations"] = nsAnns
 			}
