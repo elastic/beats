@@ -13,8 +13,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func Test_httpReadJSON(t *testing.T) {
