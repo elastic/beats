@@ -31,14 +31,14 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/publish"
 )
 
-// Workers functions return a Worker able to process the provided network
+// Decoders functions return a Decoder able to process the provided network
 // link type for use with a Sniffer.
-type Workers func(layers.LinkType) (Worker, error)
+type Decoders func(layers.LinkType) (*decoder.Decoder, error)
 
-// WorkersFor returns a source of Workers using the provided configuration
+// DecodersFor returns a source of Decoders using the provided configuration
 // components.
-func WorkersFor(publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Workers {
-	return func(dl layers.LinkType) (Worker, error) {
+func DecodersFor(publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
+	return func(dl layers.LinkType) (*decoder.Decoder, error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
 		config, err := cfg.ICMP()
