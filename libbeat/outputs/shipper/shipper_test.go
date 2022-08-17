@@ -419,9 +419,12 @@ func TestPublish(t *testing.T) {
 		batch = outest.NewBatch(events...)
 		err = client.Publish(ctx, batch)
 		require.Error(t, err)
-		// the mock server does not validate incoming IDs on `Publish`, so the error should come from
-		// the acknowledgement request
-		require.Contains(t, err.Error(), "acknowledgement failed due to a connection to a different server")
+
+		require.Eventually(t, func() bool {
+			// the mock server does not validate incoming IDs on `Publish`, so the error should come from
+			// the acknowledgement request
+			return strings.Contains(err.Error(), "acknowledgement failed due to a connection to a different server")
+		}, 100*time.Millisecond, 10*time.Millisecond)
 	})
 
 }
