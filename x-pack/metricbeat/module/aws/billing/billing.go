@@ -444,8 +444,8 @@ func (m *MetricSet) getAccountName(svc *organizations.Client) map[string]string 
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.Background())
 		if err != nil {
-			//TODO continue or return with error? Probably is return but...
-			continue
+			m.Logger().Warnf("an error occurred while listing account: %s", err.Error())
+			return accounts
 		}
 		for _, a := range page.Accounts {
 			accounts[*a.Id] = *a.Name
