@@ -45,8 +45,23 @@ func TestFilebeat(t *testing.T) {
 				Type:    "logs",
 			},
 			Source: tests.RequireNewStruct(map[string]interface{}{
-				"paths":              []interface{}{"./testdata/messages"},
-				"exclude_processors": []interface{}{".gz$"},
+				"paths":         []interface{}{"./testdata/messages"},
+				"exclude_files": []interface{}{".gz$"},
+				"multiline": map[string]interface{}{
+					"pattern": `^\s`,
+					"match":   "after",
+				},
+			}),
+		},
+		{
+			Id: "logfile-system.auth-default-system",
+			DataStream: &proto.DataStream{
+				Dataset: "system.auth",
+				Type:    "logs",
+			},
+			Source: tests.RequireNewStruct(map[string]interface{}{
+				"paths":         []interface{}{"./testdata/secure*"},
+				"exclude_files": []interface{}{".gz$"},
 				"multiline": map[string]interface{}{
 					"pattern": `^\s`,
 					"match":   "after",
@@ -66,8 +81,14 @@ func TestFilebeat(t *testing.T) {
 	t.Logf("Reading events...")
 	events := tests.ReadEvents(t, outPath)
 	t.Logf("Got %d events", len(events))
+	for _, evt := range events {
+		if val, err := evt.GetValue("data_stream.dataset"); val != "system.auth" || err != nil {
+			continue
+		}
+		t.Logf("Event: %s", evt.StringToPrint())
+	}
 	// Look for processors
-	expectedMetaValues := map[string]interface{}{
+	expectedMetaValuesSyslog := map[string]interface{}{
 		// Processors created by
 		"@metadata.input_id":    "logfile-system-default-system",
 		"@metadata.stream_id":   "logfile-system.syslog-default-system",
@@ -76,7 +97,16 @@ func TestFilebeat(t *testing.T) {
 		"data_stream.namespace": "default",
 		"data_stream.type":      "logs",
 	}
-	tests.ValuesExist(t, expectedMetaValues, events, tests.ALL)
+	tests.ValuesExist(t, expectedMetaValuesSyslog, events, tests.ONCE)
+
+	expectedMetaValuesAuth := map[string]interface{}{
+		// Processors created by
+		"@metadata.input_id":  "logfile-system-default-system",
+		"@metadata.stream_id": "logfile-system.auth-default-system",
+		"agent.id":            "test-agent",
+		"data_stream.dataset": "system.auth",
+	}
+	tests.ValuesExist(t, expectedMetaValuesAuth, events, tests.ONCE)
 
 	expectedLogValues := map[string]interface{}{
 		"log.file.path": nil,
