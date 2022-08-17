@@ -27,6 +27,7 @@ stages:
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
+        withNodejs: true
         stage: mandatory
     macos:
         mage: "mage build unitTest"
