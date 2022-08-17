@@ -232,7 +232,8 @@ func newRequester(
 	client *httpClient,
 	requestFactory []*requestFactory,
 	responseProcessor []*responseProcessor,
-	log *logp.Logger) *requester {
+	log *logp.Logger,
+) *requester {
 	return &requester{
 		log:                log,
 		client:             client,
@@ -305,7 +306,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				n = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true, i)
 				continue
 			}
-			if r.requestFactories[i+1].isChain {
+
+			// if flow of control reaches here , that means there are more than 1 request factories
+			// if a pagination request factory at the root level and a chain step exists , only then we will initialize flags & variables
+			// which are required for chaining with pagination
+			if r.requestFactories[i+1].isChain && r.responseProcessors[i].pagination.requestFactory != nil {
 				isChainExpected = true
 				chainIndex = i + 1
 				resp, err := cloneResponse(httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
@@ -402,12 +407,11 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 				return nil, fmt.Errorf("error while reading response body: %w", err)
 			}
 		}
-		// gracefully close response and retain response data
+		// gracefully close response
 		err = resp.Body.Close()
 		if err != nil {
 			return nil, fmt.Errorf("error closing response body : %w", err)
 		}
-		// resp.Body = io.NopCloser(bytes.NewBuffer(b))
 
 		// get replace values from collected json
 		var v interface{}
@@ -473,7 +477,8 @@ func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *trans
 	return n
 }
 
-// processAndPublishEvents processes and publishes chain events based on response type
+// processAndPublishChainEvents processes and publishes chain events based on response type,
+// this separate func has been introduced , since each chain step now has its own response processor and paginator
 func processAndPublishChainEvents(stdCtx context.Context, trCtx *transformContext, chainRsp *responseProcessor, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool, log *logp.Logger) int {
 	events := chainRsp.startProcessing(stdCtx, trCtx, finalResps)
 
@@ -507,7 +512,9 @@ func processAndPublishChainEvents(stdCtx context.Context, trCtx *transformContex
 	return n
 }
 
+// processRemainingChainEvents , processes the remaining pagination events for chain blocks
 func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
+	// we start from 0, and skip the 1st event since we have already processed it
 	events := r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp)
 
 	var n int
@@ -522,7 +529,7 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 			var response http.Response
 			response.StatusCode = 200
 			body := new(bytes.Buffer)
-
+			// we construct a new response here from each of the pagination events
 			err := json.NewEncoder(body).Encode(maybeMsg.msg)
 			if err != nil {
 				r.log.Errorf("error processing chain event: %w", err)
@@ -530,18 +537,13 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 			}
 			response.Body = io.NopCloser(body)
 
+			// for each pagination response , we repeat all the chain steps / blocks
 			count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)
 			if err != nil {
 				r.log.Errorf("error processing chain event: %w", err)
 				continue
 			}
 			eventCount += count
-
-			if len(*trCtx.firstEventClone()) == 0 {
-				trCtx.updateFirstEvent(maybeMsg.msg)
-			}
-			trCtx.updateLastEvent(maybeMsg.msg)
-			trCtx.updateCursor()
 
 			err = response.Body.Close()
 			if err != nil {
@@ -554,6 +556,7 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 	return eventCount
 }
 
+// processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
 func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
 	var (
 		n                 int
@@ -632,6 +635,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 	return n, nil
 }
 
+// cloneResponse clones required http response attributes
 func cloneResponse(source *http.Response) (*http.Response, error) {
 	var resp http.Response
 
@@ -640,7 +644,6 @@ func cloneResponse(source *http.Response) (*http.Response, error) {
 		return nil, fmt.Errorf("failed ro read http response body: %w", err)
 	}
 
-	// clones response
 	source.Body = io.NopCloser(bytes.NewReader(body))
 	resp.Body = io.NopCloser(bytes.NewReader(body))
 	resp.ContentLength = source.ContentLength
