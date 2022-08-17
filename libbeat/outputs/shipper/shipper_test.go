@@ -386,7 +386,7 @@ func TestPublish(t *testing.T) {
 		require.Equal(t, expSignals, batch.Signals)
 	})
 
-	t.Run("cancel the batch when a differnet server responds", func(t *testing.T) {
+	t.Run("cancel the batch when a different server responds", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 

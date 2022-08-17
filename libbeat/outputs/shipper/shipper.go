@@ -192,35 +192,33 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		)
 	}
 
-	if publishReply.PersistedIndex < publishReply.AcceptedIndex {
-		ackClient, err := c.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
-			PollingInterval: durationpb.New(c.config.AckPollingInterval),
-		})
+	ackClient, err := c.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
+		PollingInterval: durationpb.New(c.config.AckPollingInterval),
+	})
+	if err != nil {
+		return fmt.Errorf("acknowledgement failed due to the connectivity error: %w", err)
+	}
+
+	for {
+		indexReply, err := ackClient.Recv()
 		if err != nil {
 			return fmt.Errorf("acknowledgement failed due to the connectivity error: %w", err)
 		}
 
-		for {
-			indexReply, err := ackClient.Recv()
+		if indexReply.GetUuid() != c.serverID {
+			batch.Cancelled()
+			st.Cancelled(len(events))
+			err := fmt.Errorf("acknowledgement failed due to a connection to a different server %s, expected %s", indexReply.Uuid, c.serverID)
+			c.serverID = indexReply.GetUuid()
+			return err
+		}
+
+		if indexReply.PersistedIndex >= publishReply.AcceptedIndex {
+			err = ackClient.CloseSend()
 			if err != nil {
-				return fmt.Errorf("acknowledgement failed due to the connectivity error: %w", err)
+				c.log.Debugf("failed to close send stream after receiving acknowledgement: %s", err)
 			}
-
-			if indexReply.GetUuid() != c.serverID {
-				batch.Cancelled()
-				st.Cancelled(len(events))
-				err := fmt.Errorf("acknowledgement failed due to a connection to a different server %s, expected %s", indexReply.Uuid, c.serverID)
-				c.serverID = indexReply.GetUuid()
-				return err
-			}
-
-			if indexReply.PersistedIndex >= publishReply.AcceptedIndex {
-				err = ackClient.CloseSend()
-				if err != nil {
-					c.log.Debugf("failed to close send stream after receiving acknowledgement: %s", err)
-				}
-				break
-			}
+			break
 		}
 	}
 

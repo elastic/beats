@@ -58,9 +58,6 @@ func (p *ProducerMock) PublishEvents(ctx context.Context, r *messages.PublishReq
 	}
 
 	resp.AcceptedIndex = uint64(len(p.Q))
-	if resp.AcceptedIndex > 0 {
-		resp.PersistedIndex = resp.AcceptedIndex - 1 // so we trigger the use of `PersistedIndex`
-	}
 
 	return resp, nil
 }
