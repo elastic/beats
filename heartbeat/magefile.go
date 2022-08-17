@@ -94,6 +94,10 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
+func PythonIntegTest() {
+	// intentionally blank, CI runs this for every beat
+}
+
 func FieldDocs() error {
 	return devtools.Docs.FieldDocs("fields.yml")
 }

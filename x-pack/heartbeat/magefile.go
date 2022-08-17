@@ -83,6 +83,10 @@ func IntegTest() {
 	mg.SerialDeps(GoIntegTest)
 }
 
+func PythonIntegTest() {
+	// intentionally blank, CI runs this for every beat
+}
+
 func GoIntegTest(ctx context.Context) error {
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
