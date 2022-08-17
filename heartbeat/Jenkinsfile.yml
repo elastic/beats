@@ -37,7 +37,6 @@ stages:
         stage: extended
     unitTest:
         mage: "mage build unitTest"
-        withNodejs: true
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
