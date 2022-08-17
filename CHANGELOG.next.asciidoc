@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
+- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
 
 *Heartbeat*
 
