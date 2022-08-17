@@ -81,12 +81,6 @@ func TestFilebeat(t *testing.T) {
 	t.Logf("Reading events...")
 	events := tests.ReadEvents(t, outPath)
 	t.Logf("Got %d events", len(events))
-	for _, evt := range events {
-		if val, err := evt.GetValue("data_stream.dataset"); val != "system.auth" || err != nil {
-			continue
-		}
-		t.Logf("Event: %s", evt.StringToPrint())
-	}
 	// Look for processors
 	expectedMetaValuesSyslog := map[string]interface{}{
 		// Processors created by
