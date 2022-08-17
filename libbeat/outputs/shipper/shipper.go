@@ -177,7 +177,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		Events: convertedEvents,
 	})
 
-	if status.Code(err) != codes.OK || publishReply == nil {
+	if status.Code(err) != codes.OK {
 		batch.Cancelled()         // does not decrease the TTL
 		st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
 		return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
