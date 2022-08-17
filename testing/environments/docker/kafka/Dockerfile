@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:buster
 
 ENV KAFKA_HOME /kafka
 # Controls the hostname advertised within the Docker network, should generally match the container
@@ -10,7 +10,7 @@ ENV KAFKA_VERSION 2.2.2
 ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true"
 ENV TERM=linux
 
-RUN apt-get update && apt-get install -y curl openjdk-8-jre-headless netcat
+RUN apt-get update && apt-get install -y curl openjdk-11-jre-headless netcat
 
 RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
     curl -J -L -s -f -o - https://github.com/kadwanev/retry/releases/download/1.0.1/retry-1.0.1.tar.gz | tar xfz - -C /usr/local/bin && \

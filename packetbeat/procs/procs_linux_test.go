@@ -29,74 +29,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type testProcFile struct {
-	path     string
-	contents string
-	isLink   bool
-}
-
-func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
-	var err error
-	for _, file := range files {
-		dir := filepath.Dir(file.path)
-		err = os.MkdirAll(filepath.Join(prefix, dir), 0o755)
-		if err != nil {
-			return err
-		}
-
-		if !file.isLink {
-			err = ioutil.WriteFile(filepath.Join(prefix, file.path),
-				[]byte(file.contents), 0o644)
-			if err != nil {
-				return err
-			}
-		} else {
-			err = os.Symlink(file.contents, filepath.Join(prefix, file.path))
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
-func assertIntArraysAreEqual(t *testing.T, expected []int, result []int) bool {
-	for _, ex := range expected {
-		found := false
-		for _, res := range result {
-			if ex == res {
-				found = true
-				break
-			}
-		}
-		if !found {
-			t.Errorf("Expected array %v but got %v", expected, result)
-			return false
-		}
-	}
-	return true
-}
-
-func assertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64) bool {
-	for _, ex := range expected {
-		found := false
-		for _, res := range result {
-			if ex == res {
-				found = true
-				break
-			}
-		}
-		if !found {
-			t.Errorf("Expected array %v but got %v", expected, result)
-			return false
-		}
-	}
-	return true
-}
-
 func TestFindSocketsOfPid(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	proc := []testProcFile{
 		{path: "/proc/766/fd/0", isLink: true, contents: "/dev/null"},
@@ -165,4 +99,53 @@ func TestParse_Proc_Net_Tcp6(t *testing.T) {
 	if socketInfo[4].srcIP.String() != "2001:db8::123:ffff:89ab:cdef" {
 		t.Error("Failed to parse source IP address 2001:db8::123:ffff:89ab:cdef, got instead", socketInfo[4].srcIP.String())
 	}
+}
+
+type testProcFile struct {
+	path     string
+	contents string
+	isLink   bool
+}
+
+func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
+	var err error
+	for _, file := range files {
+		dir := filepath.Dir(file.path)
+		err = os.MkdirAll(filepath.Join(prefix, dir), 0o755)
+		if err != nil {
+			return err
+		}
+
+		if !file.isLink {
+			err = ioutil.WriteFile(filepath.Join(prefix, file.path),
+				[]byte(file.contents), 0o644)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = os.Symlink(file.contents, filepath.Join(prefix, file.path))
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func assertUint64ArraysAreEqual(t *testing.T, expected []uint64, result []uint64) bool {
+	for _, ex := range expected {
+		found := false
+		for _, res := range result {
+			if ex == res {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected array %v but got %v", expected, result)
+			return false
+		}
+	}
+	return true
 }
