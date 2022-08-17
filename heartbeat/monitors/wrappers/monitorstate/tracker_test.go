@@ -28,7 +28,7 @@ func TestTrackerRecord(t *testing.T) {
 	mst := NewTracker(NilStateLoader)
 	ms := mst.RecordStatus(monId, StatusUp)
 	require.Equal(t, StatusUp, ms.Status)
-	requireMSCounts(t, ms, 1, 0)
+	requireMSStatusCount(t, ms, StatusUp, 1)
 
 	for i := 0; i < FlappingThreshold; i++ {
 		ms = mst.RecordStatus(monId, StatusUp)
@@ -38,5 +38,5 @@ func TestTrackerRecord(t *testing.T) {
 
 	ms = mst.RecordStatus(monId, StatusDown)
 	require.Equal(t, StatusDown, ms.Status)
-	requireMSCounts(t, ms, 0, 1)
+	requireMSStatusCount(t, ms, StatusDown, 1)
 }
