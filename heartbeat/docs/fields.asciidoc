@@ -16386,83 +16386,12 @@ Object is not enabled.
 
 --
 
-[float]
-=== ends
-
+*`state.ends`*::
++
+--
 the state that was ended by this state
 
-
-*`ends.id`*::
-+
---
-ID of this state
-
-
-type: integer
-
---
-
-*`ends.started_at`*::
-+
---
-First time state with this ID was seen
-
-
-type: date
-
---
-
-*`ends.duration_ms`*::
-+
---
-Length of time this state has existed in millis
-
-
-type: date
-
---
-
-*`ends.status`*::
-+
---
-The current status, "up", "down", or "flapping" any state can change into flapping.
-
-
-type: keyword
-
---
-
-*`ends.checks`*::
-+
---
-total checks run
-
-type: integer
-
---
-
-*`ends.up`*::
-+
---
-total up checks run
-
-type: integer
-
---
-
-*`ends.down`*::
-+
---
-total down checks run
-
-type: integer
-
---
-
-*`ends.flap_history`*::
-+
---
-Object is not enabled.
+type: object
 
 --
 
