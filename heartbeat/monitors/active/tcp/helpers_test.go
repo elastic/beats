@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -80,7 +81,7 @@ func newHostTestServer(handler http.Handler, host string) (*httptest.Server, err
 
 	server := &httptest.Server{
 		Listener: listener,
-		Config:   &http.Server{Handler: handler},
+		Config:   &http.Server{Handler: handler, ReadHeaderTimeout: time.Second},
 	}
 	server.Start()
 
