@@ -297,8 +297,8 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 	})
 	require.NoError(t, err)
 
-	//nolint:gosec // we don't care about a slowloris attack on a test srv
-	srv := &http.Server{Handler: HelloWorldHandler(200)}
+	// We set ReadHeaderTimeout to make the gosec lint happy
+	srv := &http.Server{Handler: HelloWorldHandler(200), ReadHeaderTimeout: time.Second}
 	go func() {
 		_ = srv.Serve(l)
 	}()
