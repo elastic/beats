@@ -158,8 +158,6 @@
          - name: down
            type: integer
            description: total down checks run
-         - name: flap_history
-           enabled: false
 
 - key: summary
   title: "Monitor summary"
