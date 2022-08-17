@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beater
+package sniffer
 
 import (
 	"github.com/google/gopacket/layers"
@@ -29,11 +29,16 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
 	"github.com/elastic/beats/v7/packetbeat/publish"
-	"github.com/elastic/beats/v7/packetbeat/sniffer"
 )
 
-func workerFactory(publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) func(dl layers.LinkType) (sniffer.Worker, error) {
-	return func(dl layers.LinkType) (sniffer.Worker, error) {
+// Workers functions return a Worker able to process the provided network
+// link type for use with a Sniffer.
+type Workers func(layers.LinkType) (Worker, error)
+
+// WorkersFor returns a source of Workers using the provided configuration
+// components.
+func WorkersFor(publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Workers {
+	return func(dl layers.LinkType) (Worker, error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
 		config, err := cfg.ICMP()

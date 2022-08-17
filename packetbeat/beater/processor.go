@@ -150,7 +150,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	if err != nil {
 		return nil, err
 	}
-	sniffer, err := setupSniffer(config, protocols, workerFactory(publisher, protocols, watcher, flows, config))
+	sniffer, err := setupSniffer(config, protocols, sniffer.WorkersFor(publisher, protocols, watcher, flows, config))
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func setupFlows(pipeline beat.Pipeline, watcher procs.ProcessesWatcher, cfg conf
 	return flows.NewFlows(client.PublishAll, watcher, cfg.Flows)
 }
 
-func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, workerFactory sniffer.WorkerFactory) (*sniffer.Sniffer, error) {
+func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, workers sniffer.Workers) (*sniffer.Sniffer, error) {
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -200,7 +200,7 @@ func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, workerFa
 		filter = protocols.BpfFilter(cfg.Interfaces.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(false, filter, workerFactory, cfg.Interfaces)
+	return sniffer.New(false, filter, workers, cfg.Interfaces)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
