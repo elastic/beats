@@ -60,6 +60,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 			addServiceName(stdMonFields),
 			addMonitorMeta(stdMonFields, len(js) > 1),
 			addMonitorStatus(false),
+			addMonitorErr,
 			addMonitorDuration,
 		),
 		func() jobs.JobWrapper {
@@ -82,6 +83,7 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, false),
 		addMonitorStatus(true),
+		addMonitorErr,
 		addMonitorState(stdMonFields, mst),
 		logJourneySummaries,
 	)
@@ -231,24 +233,35 @@ func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 				}
 			}
 
-			fields := mapstr.M{
+			eventext.MergeEventFields(event, mapstr.M{
 				"monitor": mapstr.M{
 					"status": look.Status(err),
 				},
-			}
-			if err != nil {
-				var asECS *ecserr.ECSErr
-				if errors.As(err, &asECS) {
-					// Override the message of the error in the event it was wrapped
-					asECS.Message = err.Error()
-					fields["error"] = asECS
-				} else {
-					fields["error"] = look.Reason(err)
-				}
-			}
-			eventext.MergeEventFields(event, fields)
-			return cont, nil
+			})
+
+			return cont, err
 		}
+	}
+}
+
+func addMonitorErr(origJob jobs.Job) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
+		cont, err := origJob(event)
+
+		if err != nil {
+			var errVal interface{}
+			var asECS *ecserr.ECSErr
+			if errors.As(err, &asECS) {
+				// Override the message of the error in the event it was wrapped
+				asECS.Message = err.Error()
+				errVal = asECS
+			} else {
+				errVal = look.Reason(err)
+			}
+			eventext.MergeEventFields(event, mapstr.M{"error": errVal})
+		}
+
+		return cont, nil
 	}
 }
 
