@@ -28,7 +28,8 @@ import (
 )
 
 type Config struct {
-	Interfaces      InterfacesConfig   `config:"interfaces"`
+	Interface       *InterfacesConfig  `config:"interfaces"`
+	Interfaces      []InterfacesConfig `config:"interfaces"`
 	Flows           *Flows             `config:"flows"`
 	Protocols       map[string]*conf.C `config:"protocols"`
 	ProtocolsList   []*conf.C          `config:"protocols"`
@@ -43,8 +44,17 @@ func (c Config) FromStatic(cfg *conf.C) (Config, error) {
 	if err != nil {
 		return c, err
 	}
-	if 0 < c.Interfaces.PollDefaultRoute && c.Interfaces.PollDefaultRoute < time.Second {
-		c.Interfaces.PollDefaultRoute = time.Second
+	iface, err := cfg.Child("interfaces", -1)
+	if err == nil {
+		if !iface.IsArray() {
+			c.Interfaces = []InterfacesConfig{*c.Interface}
+		}
+	}
+	c.Interface = nil
+	for i := range c.Interfaces {
+		if 0 < c.Interfaces[i].PollDefaultRoute && c.Interfaces[i].PollDefaultRoute < time.Second {
+			c.Interfaces[i].PollDefaultRoute = time.Second
+		}
 	}
 	return c, nil
 }
