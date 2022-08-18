@@ -139,8 +139,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				rf.user = ch.Step.Auth.Basic.User
 				rf.password = ch.Step.Auth.Basic.Password
 			}
-			pagination := newChainPagination(ch, httpClient, log)
-			responseProcessor := newChainResponseProcessor(ch, pagination, log)
+			responseProcessor := newChainResponseProcessor(ch, httpClient, log)
 			rf = &requestFactory{
 				url:                    *ch.Step.Request.URL.URL,
 				method:                 ch.Step.Request.Method,
@@ -165,8 +164,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				rf.user = ch.While.Auth.Basic.User
 				rf.password = ch.While.Auth.Basic.Password
 			}
-			pagination := newChainPagination(ch, httpClient, log)
-			responseProcessor := newChainResponseProcessor(ch, pagination, log)
+			responseProcessor := newChainResponseProcessor(ch, httpClient, log)
 			rf = &requestFactory{
 				url:                    *ch.While.Request.URL.URL,
 				method:                 ch.While.Request.Method,
@@ -276,6 +274,7 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 	return *newUrl, nil
 }
 
+//nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
 	var (
 		n                 int
@@ -302,30 +301,31 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			if len(r.requestFactories) == 1 {
-				finalResps = append(finalResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
-				n = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true, i)
+				finalResps = append(finalResps, httpResp)
+				n = processAndPublishEvents(trCtx, publisher, true, r.log, r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps))
 				continue
 			}
 
-			// if flow of control reaches here , that means there are more than 1 request factories
-			// if a pagination request factory at the root level and a chain step exists , only then we will initialize flags & variables
+			// if flow of control reaches here, that means there are more than 1 request factories
+			// if a pagination request factory at the root level and a chain step exists, only then we will initialize flags & variables
 			// which are required for chaining with pagination
 			if r.requestFactories[i+1].isChain && r.responseProcessors[i].pagination.requestFactory != nil {
 				isChainExpected = true
 				chainIndex = i + 1
-				resp, err := cloneResponse(httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+				resp, err := cloneResponse(httpResp)
 				if err != nil {
 					return err
 				}
-				initialResponse = append(initialResponse, resp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+				initialResponse = append(initialResponse, resp)
 			}
-			intermediateResps = append(intermediateResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+			intermediateResps = append(intermediateResps, httpResp)
 			ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
 			if err != nil {
 				return err
 			}
+			// we will only processAndPublishEvents here if chains do not exist, inorder to avoid unnecessary pagination
 			if !isChainExpected {
-				n = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false, i)
+				n = processAndPublishEvents(trCtx, publisher, false, r.log, r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps))
 			}
 		} else {
 			if len(ids) == 0 {
@@ -351,15 +351,15 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 
 				// collect data from new urls
-				httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+				httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
 				if err != nil {
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
 				// store data according to response type
 				if i == len(r.requestFactories)-1 && len(ids) != 0 {
-					finalResps = append(finalResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+					finalResps = append(finalResps, httpResp)
 				} else {
-					intermediateResps = append(intermediateResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+					intermediateResps = append(intermediateResps, httpResp)
 				}
 			}
 			rf.url = urlCopy
@@ -376,10 +376,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 				resps = intermediateResps
 			}
+
 			if rf.isChain {
-				n += processAndPublishChainEvents(stdCtx, chainTrCtx, rf.chainResponseProcessor, publisher, resps, i < len(r.requestFactories), r.log)
+				n += processAndPublishEvents(trCtx, publisher, i < len(r.requestFactories), r.log, rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps))
 			} else {
-				n += r.processAndPublishEvents(stdCtx, trCtx, publisher, resps, i < len(r.requestFactories), i)
+				n += processAndPublishEvents(trCtx, publisher, i < len(r.requestFactories), r.log, r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps))
 			}
 		}
 	}
@@ -410,7 +411,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		// gracefully close response
 		err = resp.Body.Close()
 		if err != nil {
-			return nil, fmt.Errorf("error closing response body : %w", err)
+			return nil, fmt.Errorf("error closing response body: %w", err)
 		}
 
 		// get replace values from collected json
@@ -443,45 +444,8 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 	return ids, nil
 }
 
-// processAndPublishEvents process and publish events based on response type
-func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool, i int) int {
-	events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
-
-	var n int
-	for maybeMsg := range events {
-		if maybeMsg.failed() {
-			r.log.Errorf("error processing response: %v", maybeMsg)
-			continue
-		}
-
-		if publish {
-			event, err := makeEvent(maybeMsg.msg)
-			if err != nil {
-				r.log.Errorf("error creating event: %v", maybeMsg)
-				continue
-			}
-
-			if err := publisher.Publish(event, trCtx.cursorMap()); err != nil {
-				r.log.Errorf("error publishing event: %v", err)
-				continue
-			}
-		}
-		if len(*trCtx.firstEventClone()) == 0 {
-			trCtx.updateFirstEvent(maybeMsg.msg)
-		}
-		trCtx.updateLastEvent(maybeMsg.msg)
-		trCtx.updateCursor()
-
-		n++
-	}
-	return n
-}
-
-// processAndPublishChainEvents processes and publishes chain events based on response type,
-// this separate func has been introduced , since each chain step now has its own response processor and paginator
-func processAndPublishChainEvents(stdCtx context.Context, trCtx *transformContext, chainRsp *responseProcessor, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool, log *logp.Logger) int {
-	events := chainRsp.startProcessing(stdCtx, trCtx, finalResps)
-
+// processAndPublishEvents process and publish events based on event type
+func processAndPublishEvents(trCtx *transformContext, publisher inputcursor.Publisher, publish bool, log *logp.Logger, events <-chan maybeMsg) int {
 	var n int
 	for maybeMsg := range events {
 		if maybeMsg.failed() {
@@ -557,6 +521,7 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 }
 
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
+//nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
 	var (
 		n                 int
@@ -569,7 +534,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 		finalResps        []*http.Response
 	)
 
-	intermediateResps = append(intermediateResps, response) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+	intermediateResps = append(intermediateResps, response)
 	ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[chainIndex].replace)
 	if err != nil {
 		return -1, err
@@ -603,15 +568,15 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 
 			// collect data from new urls
-			httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+			httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
 			if err != nil {
 				return -1, fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			// store data according to response type
 			if i == len(r.requestFactories)-1 && len(ids) != 0 {
-				finalResps = append(finalResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+				finalResps = append(finalResps, httpResp)
 			} else {
-				intermediateResps = append(intermediateResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+				intermediateResps = append(intermediateResps, httpResp)
 			}
 		}
 		rf.url = urlCopy
@@ -628,7 +593,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 			resps = intermediateResps
 		}
-		n += processAndPublishChainEvents(stdCtx, chainTrCtx, rf.chainResponseProcessor, publisher, resps, i < len(r.requestFactories), r.log)
+		n += processAndPublishEvents(trCtx, publisher, i < len(r.requestFactories), r.log, rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps))
 	}
 
 	defer httpResp.Body.Close()
