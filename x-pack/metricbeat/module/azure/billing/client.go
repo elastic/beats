@@ -78,9 +78,8 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 		scope,
 		"properties/meterDetails",
 		filter,
-		"", // skipToken
-		//&pageSize,
-		nil,
+		"",  // skipToken, used for paging, not required on the first call.
+		nil, // result page size, defaults to ?
 		consumption.MetrictypeActualCostMetricType,
 		timeOpts.usageStart.Format("2006-01-02"), // startDate
 		timeOpts.usageEnd.Format("2006-01-02"),   // endDate

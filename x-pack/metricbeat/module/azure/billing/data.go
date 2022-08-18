@@ -15,12 +15,13 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // EventsMapping maps the usage details and forecast data to a list of metricbeat events to
 // send to Elasticsearch.
-func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOptions) ([]mb.Event, error) {
+func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOptions, logger *logp.Logger) ([]mb.Event, error) {
 	events := make([]mb.Event, 0, len(results.UsageDetails))
 
 	//
@@ -122,7 +123,7 @@ func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOp
 	// Forecasts
 	//
 
-	forecastsEvents, err := getEventsFromQueryResult(results.Forecasts, subscriptionId)
+	forecastsEvents, err := getEventsFromQueryResult(results.Forecasts, subscriptionId, logger)
 	if err != nil {
 		return events, err
 	}
@@ -159,18 +160,23 @@ func getResourceNameFromPath(path string) string {
 // 0: []interface {}{0.11, 2.0200807e+07, "Actual", "USD"}
 // 1: []interface {}{0.11, 2.0200808e+07, "Forecast", "USD"}
 //
-func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID string) ([]mb.Event, error) {
+func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID string, logger *logp.Logger) ([]mb.Event, error) {
 	// The number of columns expected in the QueryResult supported by this input.
 	// The structure of the QueryResult is determined by the value we set in
 	// the `costmanagement.ForecastDefinition` struct at query time.
 	const expectedNumberOfColumns = 4
 
-	if result.Columns == nil || len(*result.Columns) != expectedNumberOfColumns {
-		return []mb.Event{}, fmt.Errorf("unsupported forecasts QueryResult format: %d instead of %d", len(*result.Columns), expectedNumberOfColumns)
+	if result.QueryProperties == nil || result.Columns == nil {
+		return []mb.Event{}, errors.New("unsupported forecasts QueryResult format: no columns")
+	}
+
+	if len(*result.Columns) != expectedNumberOfColumns {
+		return []mb.Event{}, fmt.Errorf("unsupported forecasts QueryResult format: got %d columns instead of %d", len(*result.Columns), expectedNumberOfColumns)
 	}
 
 	if result.Rows == nil {
-		return []mb.Event{}, errors.New("unsupported forecasts QueryResult format: no rows")
+		logger.Warn("no rows in forecasts QueryResult")
+		return []mb.Event{}, nil
 	}
 
 	events := make([]mb.Event, 0, len(*result.Rows))
@@ -181,19 +187,22 @@ func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID 
 		var usageDate time.Time
 
 		if len(row) != expectedNumberOfColumns {
-			return events, fmt.Errorf("unsupported forecasts QueryResult.Rows format: %d instead of %d", len(row), expectedNumberOfColumns)
+			logger.Errorf("unsupported forecasts QueryResult.Rows format: %d instead of %d", len(row), expectedNumberOfColumns)
+			continue
 		}
 
 		// Cost
 		if value, ok := row[0].(float64); !ok {
-			return events, errors.New("unsupported cost format: not float64")
+			logger.Errorf("unsupported cost format: not float64")
+			continue
 		} else {
 			cost = value
 		}
 
 		// Usage date
 		if value, ok := row[1].(float64); !ok {
-			return events, errors.New("unsupported usage date format: not float64")
+			logger.Errorf("unsupported usage date format: not float64")
+			continue
 		} else {
 			var err error
 			// The API returns the usage date as a float64 number representing the "YYYYMMDD" value. For example,
@@ -210,20 +219,23 @@ func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID 
 			// 20170401 (float64) --> "2017-04-01T00:00:00Z" (time.Time)
 			usageDate, err = time.Parse("20060102", strconv.FormatInt(int64(value), 10))
 			if err != nil {
-				return events, errors.New("unsupported usage date format: not valid date")
+				logger.Errorf("unsupported usage date format: not valid date: %w", err)
+				continue
 			}
 		}
 
 		// Cost status (can be "Actual" or "Forecast")
 		if value, ok := row[2].(string); !ok {
-			return events, errors.New("unsupported cost status format: not string")
+			logger.Errorf("unsupported cost status format: not string")
+			continue
 		} else {
 			costStatus = value
 		}
 
 		// Currency code (can be "USD", "EUR", or other currency codes)
 		if value, ok := row[3].(string); !ok {
-			return events, errors.New("unsupported currency format: not string")
+			logger.Errorf("unsupported currency code format: not string")
+			continue
 		} else {
 			currency = value
 		}
@@ -235,7 +247,8 @@ func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID 
 		case "Forecast":
 			costFieldName = "forecast_cost"
 		default:
-			return events, errors.New("unsupported cost status: not 'Actual' or 'Forecast'")
+			logger.Errorf("unsupported cost status: not 'Actual' or 'Forecast'")
+			continue
 		}
 
 		event := mb.Event{

@@ -93,7 +93,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return fmt.Errorf("error retrieving usage information: %w", err)
 	}
 
-	events, err := EventsMapping(m.client.Config.SubscriptionId, results, timeIntervalOptions)
+	events, err := EventsMapping(m.client.Config.SubscriptionId, results, timeIntervalOptions, m.log)
 	if err != nil {
 		return fmt.Errorf("error mapping events: %w", err)
 	}
