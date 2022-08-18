@@ -35,7 +35,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sql_txn_begin_count",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "positive_rate",
                                 "unit": "1s"
@@ -66,7 +66,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sql_txn_commit_count",
                                 "id": "1c074fc1-ccf0-11ea-8da4-c95c019bd9d5",
                                 "type": "positive_rate",
                                 "unit": "1s"
@@ -96,7 +96,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sql_txn_rollback_count",
                                 "id": "84ac4081-ccf0-11ea-8da4-c95c019bd9d5",
                                 "type": "positive_rate",
                                 "unit": "1s"
@@ -126,7 +126,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sql_txn_abort_count",
                                 "id": "9701db01-ccf0-11ea-8da4-c95c019bd9d5",
                                 "type": "positive_rate",
                                 "unit": "1s"

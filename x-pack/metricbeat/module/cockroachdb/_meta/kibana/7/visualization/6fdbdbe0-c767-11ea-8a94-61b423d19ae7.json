@@ -35,7 +35,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sql_schema_changer_successes",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "positive_rate",
                                 "unit": ""

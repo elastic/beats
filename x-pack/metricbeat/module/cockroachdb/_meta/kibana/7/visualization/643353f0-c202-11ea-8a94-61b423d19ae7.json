@@ -53,7 +53,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.liveness_livenodes",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "max"
                             }
