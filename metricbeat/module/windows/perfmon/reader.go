@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"unicode"
 	"time"
+	"unicode"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
@@ -132,7 +132,7 @@ func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Collect the displayable value.
 	val, err = re.query.GetFormattedCounterValues()
 	if err != nil {
