@@ -8,7 +8,9 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/gofrs/uuid"
 
@@ -202,12 +204,35 @@ func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
 // ================================
 
 func (cm *BeatV2Manager) unitListen() {
+
+	// register signal handler
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
 	cm.logger.Debugf("Listening for agent unit changes")
 	for {
 		select {
 		// The stopChan channel comes from the Manager interface Stop() method
 		case <-cm.stopChan:
 			cm.stopBeat()
+		case sig := <-sigc:
+			// we can't duplicate the same logic used by stopChan here.
+			// A beat will also watch for sigint and shut down, if we call the stopFunc
+			// callback, either the V2 client or the beat will get a panic,
+			// as the stopFunc sent by the beats is usually unsafe.
+			switch sig {
+			case syscall.SIGINT, syscall.SIGTERM:
+				cm.logger.Debug("Received sigterm/sigint, stopping")
+			case syscall.SIGHUP:
+				cm.logger.Debug("Received sighup, stopping")
+			}
+			cm.isRunning = false
+			unit, mainExists := cm.getMainUnit()
+			if mainExists {
+				_ = unit.UpdateState(client.UnitStateStopping, "stopping beat", nil)
+			}
+			cm.client.Stop()
+			return
 		case change := <-cm.client.UnitChanges():
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure there is a difference between
@@ -242,7 +267,6 @@ func (cm *BeatV2Manager) stopBeat() {
 	if !cm.isRunning {
 		return
 	}
-
 	// will we ever get a Unit removed for anything other than the main beat?
 	// Individual reloaders don't have a "stop" function, so the most we can do
 	// is just shut down a beat, I think.
