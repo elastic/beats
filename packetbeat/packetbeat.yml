@@ -97,6 +97,12 @@ packetbeat.protocols:
   # the MongoDB protocol by commenting out the list of ports.
   ports: [27017]
 
+- type: tds
+  ports: [1433]
+
+- type: oracle
+  ports: [1521]
+
 # - type: nfs
 #   # Configure the ports where to listen for NFS traffic. You can disable
 #   # the NFS protocol by commenting out the list of ports.

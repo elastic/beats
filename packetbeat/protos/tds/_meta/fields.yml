@@ -1,0 +1,12 @@
+- key: tds
+  title: "TDS"
+  description: >
+    TDS(MSSQL) event fields.
+  fields:
+    - name: tds
+      type: group
+      fields:
+        - name: requestType
+          description: >
+            The type of SQL Request.
+
