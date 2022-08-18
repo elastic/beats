@@ -90,10 +90,10 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Request Latency in Seconds",
+                                                    "label": "Request Latency in Milliseconds",
                                                     "operationType": "formula",
                                                     "params": {
-                                                        "formula": "(sum(kubernetes.controllermanager.client.request.duration.sec.sum)/ sum(kubernetes.controllermanager.client.request.duration.sec.count))",
+                                                        "formula": "(sum(kubernetes.controllermanager.client.request.duration.us.sum)/ sum(kubernetes.controllermanager.client.request.duration.us.count))/1000",
                                                         "isFormulaBroken": false
                                                     },
                                                     "references": [
@@ -105,44 +105,56 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of Client Request Latency in Seconds",
+                                                    "label": "Part of Request Latency in Milliseconds",
                                                     "operationType": "sum",
                                                     "params": {
                                                         "emptyAsNull": false
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "kubernetes.controllermanager.client.request.duration.sec.sum"
+                                                    "sourceField": "kubernetes.controllermanager.client.request.duration.us.sum"
                                                 },
                                                 "43097f7a-e478-47bc-81c1-7541bd899d46X1": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of Client Request Latency in Seconds",
+                                                    "label": "Part of Request Latency in Milliseconds",
                                                     "operationType": "sum",
                                                     "params": {
                                                         "emptyAsNull": false
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "kubernetes.controllermanager.client.request.duration.sec.count"
+                                                    "sourceField": "kubernetes.controllermanager.client.request.duration.us.count"
                                                 },
                                                 "43097f7a-e478-47bc-81c1-7541bd899d46X2": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of Client Request Latency in Seconds",
+                                                    "label": "Part of Request Latency in Milliseconds",
                                                     "operationType": "math",
                                                     "params": {
                                                         "tinymathAst": {
                                                             "args": [
-                                                                "43097f7a-e478-47bc-81c1-7541bd899d46X0",
-                                                                "43097f7a-e478-47bc-81c1-7541bd899d46X1"
+                                                                {
+                                                                    "args": [
+                                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X0",
+                                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X1"
+                                                                    ],
+                                                                    "location": {
+                                                                        "max": 133,
+                                                                        "min": 1
+                                                                    },
+                                                                    "name": "divide",
+                                                                    "text": "sum(kubernetes.controllermanager.client.request.duration.us.sum)/ sum(kubernetes.controllermanager.client.request.duration.us.count)",
+                                                                    "type": "function"
+                                                                },
+                                                                1000
                                                             ],
                                                             "location": {
-                                                                "max": 136,
+                                                                "max": 139,
                                                                 "min": 0
                                                             },
                                                             "name": "divide",
-                                                            "text": "(sum(kubernetes.controllermanager.client.request.duration.sec.sum)/ sum(kubernetes.controllermanager.client.request.duration.sec.count))",
+                                                            "text": "(sum(kubernetes.controllermanager.client.request.duration.us.sum)/ sum(kubernetes.controllermanager.client.request.duration.us.count))/1000",
                                                             "type": "function"
                                                         }
                                                     },
@@ -174,7 +186,7 @@
                             "filters": [],
                             "query": {
                                 "language": "kuery",
-                                "query": "NOT (kubernetes.apiserver.request.verb: WATCH or kubernetes.apiserver.request.verb: CONNECT)"
+                                "query": ""
                             },
                             "visualization": {
                                 "layers": [
@@ -219,7 +231,7 @@
                 "panelIndex": "1bd24fa1-319e-4cae-9d45-d821b06a8034",
                 "title": "Average Request Latency per Url [Metricbeat Kubernetes]",
                 "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             },
             {
                 "embeddableConfig": {
@@ -333,7 +345,7 @@
                 "panelIndex": "1604f0de-edd6-456e-8670-ab9b33988abb",
                 "title": "Controller CPU [Metricbeat Kubernetes]",
                 "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             },
             {
                 "embeddableConfig": {
@@ -465,7 +477,7 @@
                 "panelIndex": "303702e1-ba33-49f2-b337-4cc7d7305606",
                 "title": "Controller Memory in Bytes [Metricbeat Kubernetes]",
                 "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             },
             {
                 "embeddableConfig": {
@@ -606,7 +618,7 @@
                 "panelIndex": "74dcc137-b625-44d5-ae91-072040ef4b0a",
                 "title": "Controller Workqueue adds [Metricbeat Kubernetes]",
                 "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             },
             {
                 "embeddableConfig": {
@@ -747,7 +759,7 @@
                 "panelIndex": "d680bbc4-b3dd-4237-9825-5394ff9d402c",
                 "title": "Controller Workqueue retries [Metricbeat Kubernetes] ",
                 "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             },
             {
                 "embeddableConfig": {
@@ -874,12 +886,12 @@
                     "i": "0be041d4-096a-4131-ab5b-f9ae02eb685a",
                     "w": 24,
                     "x": 0,
-                    "y": 59
+                    "y": 44
                 },
                 "panelIndex": "0be041d4-096a-4131-ab5b-f9ae02eb685a",
                 "title": "Controller Longest running processor [Metricbeat Kubernetes]",
                 "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             },
             {
                 "embeddableConfig": {
@@ -1011,194 +1023,7 @@
                 "panelIndex": "a015a089-006e-4eb8-ad45-7f9d5f16eecb",
                 "title": "Controller Unfinished jobs sec [Metricbeat Kubernetes]",
                 "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
-            },
-            {
-                "embeddableConfig": {
-                    "attributes": {
-                        "references": [
-                            {
-                                "id": "metricbeat-*",
-                                "name": "indexpattern-datasource-layer-f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
-                                "type": "index-pattern"
-                            }
-                        ],
-                        "state": {
-                            "datasourceStates": {
-                                "indexpattern": {
-                                    "layers": {
-                                        "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9": {
-                                            "columnOrder": [
-                                                "35a11916-4ca3-421b-9df2-521f52f21fbb",
-                                                "ed3c7efa-0467-4a57-8d06-0f4775906cc5",
-                                                "43097f7a-e478-47bc-81c1-7541bd899d46",
-                                                "43097f7a-e478-47bc-81c1-7541bd899d46X0",
-                                                "43097f7a-e478-47bc-81c1-7541bd899d46X1",
-                                                "43097f7a-e478-47bc-81c1-7541bd899d46X2"
-                                            ],
-                                            "columns": {
-                                                "35a11916-4ca3-421b-9df2-521f52f21fbb": {
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "Top 50 values of kubernetes.controllermanager.name",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "fallback": true,
-                                                            "type": "alphabetical"
-                                                        },
-                                                        "orderDirection": "asc",
-                                                        "otherBucket": true,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "secondaryFields": [],
-                                                        "size": 50
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "kubernetes.controllermanager.name"
-                                                },
-                                                "43097f7a-e478-47bc-81c1-7541bd899d46": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Workqueue Duration in Seconds",
-                                                    "operationType": "formula",
-                                                    "params": {
-                                                        "formula": "(sum(kubernetes.controllermanager.workqueue.work.duration.sec.sum)/ sum(kubernetes.controllermanager.workqueue.work.duration.sec.count))",
-                                                        "isFormulaBroken": false
-                                                    },
-                                                    "references": [
-                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X2"
-                                                    ],
-                                                    "scale": "ratio"
-                                                },
-                                                "43097f7a-e478-47bc-81c1-7541bd899d46X0": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Part of Request Latency in Seconds",
-                                                    "operationType": "sum",
-                                                    "params": {
-                                                        "emptyAsNull": false
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "kubernetes.controllermanager.workqueue.work.duration.sec.sum"
-                                                },
-                                                "43097f7a-e478-47bc-81c1-7541bd899d46X1": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Part of Request Latency in Seconds",
-                                                    "operationType": "sum",
-                                                    "params": {
-                                                        "emptyAsNull": false
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "kubernetes.controllermanager.workqueue.work.duration.sec.count"
-                                                },
-                                                "43097f7a-e478-47bc-81c1-7541bd899d46X2": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Part of Request Latency in Seconds",
-                                                    "operationType": "math",
-                                                    "params": {
-                                                        "tinymathAst": {
-                                                            "args": [
-                                                                "43097f7a-e478-47bc-81c1-7541bd899d46X0",
-                                                                "43097f7a-e478-47bc-81c1-7541bd899d46X1"
-                                                            ],
-                                                            "location": {
-                                                                "max": 136,
-                                                                "min": 0
-                                                            },
-                                                            "name": "divide",
-                                                            "text": "(sum(kubernetes.controllermanager.workqueue.work.duration.sec.sum)/ sum(kubernetes.controllermanager.workqueue.work.duration.sec.count))",
-                                                            "type": "function"
-                                                        }
-                                                    },
-                                                    "references": [
-                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X0",
-                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X1"
-                                                    ],
-                                                    "scale": "ratio"
-                                                },
-                                                "ed3c7efa-0467-4a57-8d06-0f4775906cc5": {
-                                                    "dataType": "date",
-                                                    "isBucketed": true,
-                                                    "label": "@timestamp",
-                                                    "operationType": "date_histogram",
-                                                    "params": {
-                                                        "dropPartials": false,
-                                                        "includeEmptyRows": true,
-                                                        "interval": "auto"
-                                                    },
-                                                    "scale": "interval",
-                                                    "sourceField": "@timestamp"
-                                                }
-                                            },
-                                            "incompleteColumns": {}
-                                        }
-                                    }
-                                }
-                            },
-                            "filters": [],
-                            "query": {
-                                "language": "kuery",
-                                "query": "NOT (kubernetes.apiserver.request.verb: WATCH or kubernetes.apiserver.request.verb: CONNECT)"
-                            },
-                            "visualization": {
-                                "axisTitlesVisibilitySettings": {
-                                    "x": true,
-                                    "yLeft": false,
-                                    "yRight": true
-                                },
-                                "layers": [
-                                    {
-                                        "accessors": [
-                                            "43097f7a-e478-47bc-81c1-7541bd899d46"
-                                        ],
-                                        "layerId": "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
-                                        "layerType": "data",
-                                        "position": "top",
-                                        "seriesType": "area",
-                                        "showGridlines": false,
-                                        "splitAccessor": "35a11916-4ca3-421b-9df2-521f52f21fbb",
-                                        "xAccessor": "ed3c7efa-0467-4a57-8d06-0f4775906cc5"
-                                    }
-                                ],
-                                "legend": {
-                                    "isVisible": true,
-                                    "legendSize": "large",
-                                    "position": "right"
-                                },
-                                "preferredSeriesType": "area",
-                                "title": "Empty XY chart",
-                                "valueLabels": "hide",
-                                "valuesInLegend": true,
-                                "yTitle": ""
-                            }
-                        },
-                        "title": "",
-                        "type": "lens",
-                        "visualizationType": "lnsXY"
-                    },
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 15,
-                    "i": "3e8953f2-7543-4a5d-ac80-f495869c8b2b",
-                    "w": 24,
-                    "x": 0,
-                    "y": 44
-                },
-                "panelIndex": "3e8953f2-7543-4a5d-ac80-f495869c8b2b",
-                "title": "Average Duration of Item in Workqueue in sec [Metricbeat Kubernetes]",
-                "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             },
             {
                 "embeddableConfig": {
@@ -1375,13 +1200,13 @@
                     "h": 15,
                     "i": "bf28ccd1-0c7a-4672-9c32-0576e8b0c67f",
                     "w": 24,
-                    "x": 24,
+                    "x": 0,
                     "y": 59
                 },
                 "panelIndex": "bf28ccd1-0c7a-4672-9c32-0576e8b0c67f",
                 "title": "NodeController Informations [Metricbeat Kubernetes]",
                 "type": "lens",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             },
             {
                 "embeddableConfig": {
@@ -1389,15 +1214,15 @@
                 },
                 "gridData": {
                     "h": 14,
-                    "i": "77d1de0c-5afd-436c-a875-f4d2ed01dccb",
+                    "i": "b5aa99d0-ac4d-4706-af16-057fa5260467",
                     "w": 16,
                     "x": 0,
                     "y": 0
                 },
-                "panelIndex": "77d1de0c-5afd-436c-a875-f4d2ed01dccb",
-                "panelRefName": "panel_77d1de0c-5afd-436c-a875-f4d2ed01dccb",
+                "panelIndex": "b5aa99d0-ac4d-4706-af16-057fa5260467",
+                "panelRefName": "panel_b5aa99d0-ac4d-4706-af16-057fa5260467",
                 "type": "visualization",
-                "version": "8.4.0-SNAPSHOT"
+                "version": "8.4.0"
             }
         ],
         "timeRestore": false,
@@ -1452,21 +1277,16 @@
         },
         {
             "id": "metricbeat-*",
-            "name": "3e8953f2-7543-4a5d-ac80-f495869c8b2b:indexpattern-datasource-layer-f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
-            "type": "index-pattern"
-        },
-        {
-            "id": "metricbeat-*",
             "name": "bf28ccd1-0c7a-4672-9c32-0576e8b0c67f:indexpattern-datasource-layer-c46cb227-5f12-45ee-a3f0-58f837655aeb",
             "type": "index-pattern"
         },
         {
-            "id": "e6f265b0-f5f9-11ec-8853-8b596bddf5f9",
-            "name": "77d1de0c-5afd-436c-a875-f4d2ed01dccb:panel_77d1de0c-5afd-436c-a875-f4d2ed01dccb",
+            "id": "2d866300-0cb1-11ed-b5e5-a774dc3eeaba",
+            "name": "b5aa99d0-ac4d-4706-af16-057fa5260467:panel_b5aa99d0-ac4d-4706-af16-057fa5260467",
             "type": "visualization"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-06-27T09:17:35.737Z",
-    "version": "WzU1MDQsM10="
+    "updated_at": "2022-07-26T07:04:32.144Z",
+    "version": "WzEzODcsMV0="
 }

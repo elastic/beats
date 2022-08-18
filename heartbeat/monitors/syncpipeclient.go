@@ -15,38 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package util
+package monitors
 
-import (
-	"testing"
-	"time"
+import "github.com/elastic/beats/v7/libbeat/beat"
 
-	"github.com/stretchr/testify/assert"
-)
-
-func TestValueMap(t *testing.T) {
-	test := newValueMap(120 * time.Second)
-
-	// no value
-	assert.Equal(t, 0.0, test.Get("foo"))
-
-	// Set and test
-	test.Set("foo", 3.14)
-	assert.Equal(t, 3.14, test.Get("foo"))
+type SyncPipelineClientAdaptor struct {
+	C beat.Client
 }
 
-func TestGetWithDefault(t *testing.T) {
-	test := newValueMap(120 * time.Second)
-
-	// Empty + default
-	assert.Equal(t, 0.0, test.Get("foo"))
-	assert.Equal(t, 3.14, test.GetWithDefault("foo", 3.14))
-
-	// Defined value
-	test.Set("foo", 38.2)
-	assert.Equal(t, 38.2, test.GetWithDefault("foo", 3.14))
+func (s SyncPipelineClientAdaptor) Publish(event beat.Event) error {
+	s.C.Publish(event)
+	return nil
 }
 
-func TestContainerUID(t *testing.T) {
-	assert.Equal(t, "a/b/c", ContainerUID("a", "b", "c"))
+func (s SyncPipelineClientAdaptor) PublishAll(events []beat.Event) error {
+	s.C.PublishAll(events)
+	return nil
+}
+
+func (s SyncPipelineClientAdaptor) Close() error {
+	return s.C.Close()
+}
+
+func (s SyncPipelineClientAdaptor) Wait() {
+	// intentionally blank, async pipelines should be empty
 }

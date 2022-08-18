@@ -72,6 +72,11 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
         stage: extended_win
+    windows-11:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-11"
+        stage: extended_win
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
