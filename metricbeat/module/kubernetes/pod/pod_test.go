@@ -32,6 +32,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+// both these two files are used for tests
 const testFile = "../_meta/test/stats_summary.json"
 const testFileWithMultipleContainers = "../_meta/test/stats_summary_multiple_containers.json"
 

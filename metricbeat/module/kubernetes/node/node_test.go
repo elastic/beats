@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// this file is used for the tests
 const testFile = "../_meta/test/stats_summary.json"
 
 type NodeTestSuite struct {
