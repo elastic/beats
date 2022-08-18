@@ -42,7 +42,6 @@ type ContainerTestSuite struct {
 	Namespace            string
 	PodName              string
 	ContainerName        string
-	AnotherContainerName string
 	PodId                util.PodId
 	Logger               *logp.Logger
 	NodeMetrics          *util.NodeMetrics
@@ -55,7 +54,6 @@ func (s *ContainerTestSuite) SetupTest() {
 	s.Namespace = "default"
 	s.PodName = "nginx-deployment-2303442956-pcqfc"
 	s.ContainerName = "nginx"
-	s.AnotherContainerName = "sidecar"
 
 	s.PodId = util.NewPodId(s.Namespace, s.PodName)
 
