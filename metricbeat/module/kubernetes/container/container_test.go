@@ -37,15 +37,15 @@ const testFile = "../_meta/test/stats_summary.json"
 
 type ContainerTestSuite struct {
 	suite.Suite
-	MetricsRepo          *util.MetricsRepo
-	NodeName             string
-	Namespace            string
-	PodName              string
-	ContainerName        string
-	PodId                util.PodId
-	Logger               *logp.Logger
-	NodeMetrics          *util.NodeMetrics
-	ContainerMetrics     *util.ContainerMetrics
+	MetricsRepo      *util.MetricsRepo
+	NodeName         string
+	Namespace        string
+	PodName          string
+	ContainerName    string
+	PodId            util.PodId
+	Logger           *logp.Logger
+	NodeMetrics      *util.NodeMetrics
+	ContainerMetrics *util.ContainerMetrics
 }
 
 func (s *ContainerTestSuite) SetupTest() {
