@@ -74,6 +74,11 @@ func TestFilebeat(t *testing.T) {
 	outPath, server := tests.SetupTestEnv(t, expectedFBStreams, time.Second*6)
 	defer server.Srv.Stop()
 
+	defer func() {
+		err := os.RemoveAll(outPath)
+		require.NoError(t, err)
+	}()
+
 	t.Logf("Running beats...")
 	err := filebeatCmd.Execute()
 	require.NoError(t, err)
@@ -108,8 +113,4 @@ func TestFilebeat(t *testing.T) {
 		"message":       nil,
 	}
 	tests.ValuesExist(t, expectedLogValues, events, tests.ONCE)
-
-	// remove tempdir
-	err = os.RemoveAll(outPath)
-	require.NoError(t, err)
 }

@@ -72,6 +72,10 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 	outPath, server := tests.SetupTestEnv(t, expectedMBStreams, time.Second*6)
 
 	defer server.Srv.Stop()
+	defer func() {
+		err := os.RemoveAll(outPath)
+		require.NoError(t, err)
+	}()
 
 	// After runfor seconds, this should shut down, allowing us to check the output
 	t.Logf("Running beats...")
@@ -117,8 +121,4 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 		"system.process_summary",
 	}
 	tests.ValuesDoNotExist(t, disabledMetricsets, events)
-
-	// remove tempdir
-	err = os.RemoveAll(outPath)
-	require.NoError(t, err)
 }

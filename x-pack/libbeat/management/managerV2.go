@@ -98,8 +98,11 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 func (cm *BeatV2Manager) UpdateStatus(status lbmanagement.Status, msg string) {
 	updateState := client.UnitState(status)
 	stateUnit, exists := cm.getMainUnit()
+	cm.logger.Debugf("Updating beat status: %s", msg)
 	if exists {
 		_ = stateUnit.UpdateState(updateState, msg, cm.payload)
+	} else {
+		cm.logger.Warnf("Cannot update state to %s, no main unit is set. Msg: %s", status, msg)
 	}
 }
 
@@ -144,12 +147,14 @@ func (cm *BeatV2Manager) CheckRawConfig(cfg *conf.C) error {
 func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
+	cm.UpdateStatus(lbmanagement.Running, fmt.Sprintf("Unregistering action %s for main unit with ID %s", cm.mainUnit, action.Name()))
 	cm.units[cm.mainUnit].RegisterAction(action)
 }
 
 func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
+	cm.UpdateStatus(lbmanagement.Running, fmt.Sprintf("Unregistering action %s for main unit with ID %s", cm.mainUnit, action.Name()))
 	cm.units[cm.mainUnit].UnregisterAction(action)
 }
 

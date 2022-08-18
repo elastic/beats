@@ -126,7 +126,6 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 }
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
-// TODO: not sure the logic for grabbing fields from the input-level vs. stream-level DataStream fields is correct?
 func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, streamIter int, stream map[string]interface{}) map[string]interface{} {
 	streamType := expected.DataStream.Type
 	if streamType == "" {

@@ -57,12 +57,40 @@ func TestMBGenerate(t *testing.T) {
 
 	reloadCfg, err := generateBeatConfig(&rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
 	require.NoError(t, err, "error in generateBeatConfig")
-	//unpack, again, so we can read it
-	for _, stream := range reloadCfg {
-		cfgMap := mapstr.M{}
-		err = stream.Config.Unpack(&cfgMap)
-		require.NoError(t, err, "error in unpack for config %#v", stream.Config)
-		t.Logf("Config: %s", cfgMap.StringToPrint())
+	cfgMap := mapstr.M{}
+	err = reloadCfg[0].Config.Unpack(&cfgMap)
+	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+
+	configFields := map[string]interface{}{
+		"drop_event":                  nil,
+		"add_fields.fields.stream_id": "system/metrics-system.filesystem-default-system",
+		"add_fields.fields.dataset":   "system.filesystem",
+		"add_fields.fields.input_id":  "system/metrics-system-default-system",
+		"add_fields.fields.id":        "beat-ID",
+	}
+
+	for key, val := range configFields {
+		gotKey := false
+		gotVal := false
+		errStr := ""
+		for _, proc := range cfgMap["processors"].([]interface{}) {
+			processor := mapstr.M(proc.(map[string]interface{}))
+			found, ok := processor.GetValue(key)
+			if ok == nil {
+				gotKey = true
+				if val == nil {
+					gotVal = true
+				} else {
+					if val == found {
+						gotVal = true
+					} else {
+						errStr = found.(string)
+					}
+				}
+			}
+		}
+		assert.True(t, gotKey, "did not find key for %s", key)
+		assert.True(t, gotVal, "got incorrect key for %s, expected %s, got %s", key, val, errStr)
 	}
 
 }
