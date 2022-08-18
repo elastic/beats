@@ -26,6 +26,8 @@ jobs:
       run: sudo apt-get install -y libpcap-dev
     - name: Install libsystemd-dev
       run: sudo apt-get install -y libsystemd-dev
+    - name: Install librpm-dev
+      run: sudo apt-get install -y librpm-dev
     - name: Run check
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
