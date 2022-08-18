@@ -2,6 +2,11 @@ name: check-default
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
+      - 7.1*
+      - 8.*
 
 permissions:
   contents: read
