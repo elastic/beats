@@ -88,7 +88,7 @@ func (s *server) Run() error {
 
 		for _, ljEvent := range batch.Events {
 			acker.Add()
-			s.publish(makeEvent(ljEvent, acker))
+			s.publish(makeEvent(batch.RemoteAddr, batch.TLS, ljEvent, acker))
 		}
 
 		// Mark the batch as "ready" after Beat events are generated for each
@@ -99,14 +99,27 @@ func (s *server) Run() error {
 	return nil
 }
 
-func makeEvent(lumberjackEvent interface{}, acker *batchACKTracker) beat.Event {
-	return beat.Event{
+func makeEvent(remoteAddr string, tlsState *tls.ConnectionState, lumberjackEvent interface{}, acker *batchACKTracker) beat.Event {
+	event := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: map[string]interface{}{
+			"source": map[string]interface{}{
+				"address": remoteAddr,
+			},
 			"lumberjack": lumberjackEvent,
 		},
 		Private: acker,
 	}
+
+	if tlsState != nil && len(tlsState.PeerCertificates) > 0 {
+		event.Fields["tls"] = map[string]interface{}{
+			"client": map[string]interface{}{
+				"subject": tlsState.PeerCertificates[0].Subject.CommonName,
+			},
+		}
+	}
+
+	return event
 }
 
 func newLumberjack(c config) (lj lumber.Server, bindAddress string, err error) {
