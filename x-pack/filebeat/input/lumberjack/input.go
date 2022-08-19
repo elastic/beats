@@ -71,6 +71,8 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 	}
 	defer client.Close()
 
+	setGoLumberLogger(inputCtx.Logger.Named("go-lumber"))
+
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	metrics := newInputMetrics(metricRegistry, inputCtx.ID)
 	defer metrics.Close()
