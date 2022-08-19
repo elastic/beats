@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -125,16 +126,18 @@ func (p *Project) extraArgs() []string {
 func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
 	isScript := p.projectCfg.Source.Inline != nil
+	ctx := context.WithValue(context.Background(), synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
+
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(context.TODO(), src, p.Params(), p.StdFields(), p.extraArgs()...)
+		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), p.StdFields(), p.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(context.TODO(), p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
+			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
