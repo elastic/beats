@@ -580,7 +580,7 @@ func TestValueTpl(t *testing.T) {
 			paramCtx: &transformContext{
 				firstEvent:   &mapstr.M{},
 				lastEvent:    &mapstr.M{},
-				lastResponse: newTestResponse(mapstr.M{"paginationParams": mapstr.M{"id": 1234}}, nil, ""),
+				lastResponse: newTestResponse(mapstr.M{"paginationParams": map[string]interface{}{"id": 1234}}, nil, ""),
 			},
 			paramTr:     transformable{},
 			expectedVal: `{"id":1234}`,
