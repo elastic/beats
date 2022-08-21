@@ -11,6 +11,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
@@ -64,6 +65,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmac":                hmacStringHex,
 			"hmacBase64":          hmacStringBase64,
 			"join":                join,
+			"toJSON":              toJSON,
 			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
@@ -438,4 +440,13 @@ func urlEncode(value string) string {
 //   [[ "some value" | replaceAll "some" "my" ]]  // == "my value"
 func replaceAll(old, new, s string) string {
 	return strings.ReplaceAll(s, old, new)
+}
+
+// toJSON converts the given structure into a JSON string.
+func toJSON(i interface{}) (string, error) {
+	result, err := json.Marshal(i)
+	if err != nil {
+		return "", fmt.Errorf("toJSON failed: %w", err)
+	}
+	return string(bytes.TrimSpace(result)), nil
 }
