@@ -9,33 +9,10 @@ https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
 *Heartbeat*
-- Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
+- Browser monitors (beta) now write to the `synthetics-*` index prefix. {pull}32064[32064]
 - Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
 - Browserc monitors now default to a max concurrency of two. {pull}32564[32564]
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 
 ==== Bugfixes
 
@@ -43,7 +20,6 @@ https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
 - Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
-- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 
 *Auditbeat*
 
@@ -75,22 +51,12 @@ https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 - Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
 - Replace internal expiring cache used by the Kubernetes module with in-memory dictionary {pull}32539[32539]
 
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Powershell: Fix processing of parameter details. {pull}31833[31833]
 - Security: Fix processing of sidlist, access list and access mask. {pull}31833[31833]
 - Fix fatal invalid memory write on Windows 11. {issue}32469[32469] {pull}32519[32519]
 - Fix handling of event formatting when no metadata is available on Windows 11. {issue}32468[32468] {pull}32519[32519]
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -115,21 +81,11 @@ https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 - Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
 - add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
 *Metricbeat*
 
 - Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
 - Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
 - Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
-* Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
 - AWS Fargate: Added support for DesiredStatus and KnownStatus {issue}32077[32077] {pull}32342[#32342]
 - Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}32394[32394]
 - Add distribution type metrics for GCP {pull}32170[32170]
@@ -138,56 +94,6 @@ https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
 - Add support for specifying default route interface sniffing. {issue}31905[31905] {pull}31950[31950]
 - Add support for TCP transport to the SIP protocol. {issue}28166[28166] {pull}32346[32346]
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 [[release-notes-8.3.3]]
 === Beats version 8.3.3
