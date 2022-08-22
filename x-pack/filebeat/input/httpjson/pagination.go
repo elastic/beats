@@ -65,12 +65,6 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 	return pagination
 }
 
-func newChainPagination(config chainConfig, httpClient *httpClient, log *logp.Logger) *pagination {
-	pagination := &pagination{httpClient: httpClient, log: log}
-
-	return pagination
-}
-
 func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{

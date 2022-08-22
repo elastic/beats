@@ -302,7 +302,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
-				n = processAndPublishEvents(trCtx, publisher, true, r.log, r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps))
+				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
+				n = processAndPublishEvents(trCtx, events, publisher, true, r.log)
 				continue
 			}
 
@@ -325,7 +326,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			// we will only processAndPublishEvents here if chains do not exist, inorder to avoid unnecessary pagination
 			if !isChainExpected {
-				n = processAndPublishEvents(trCtx, publisher, false, r.log, r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps))
+				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
+				n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
 			}
 		} else {
 			if len(ids) == 0 {
@@ -377,11 +379,13 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				resps = intermediateResps
 			}
 
+			var events <-chan maybeMsg
 			if rf.isChain {
-				n += processAndPublishEvents(trCtx, publisher, i < len(r.requestFactories), r.log, rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps))
+				events = rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps)
 			} else {
-				n += processAndPublishEvents(trCtx, publisher, i < len(r.requestFactories), r.log, r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps))
+				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps)
 			}
+			n += processAndPublishEvents(trCtx, events, publisher, i < len(r.requestFactories), r.log)
 		}
 	}
 
@@ -445,7 +449,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 }
 
 // processAndPublishEvents process and publish events based on event type
-func processAndPublishEvents(trCtx *transformContext, publisher inputcursor.Publisher, publish bool, log *logp.Logger, events <-chan maybeMsg) int {
+func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, publisher inputcursor.Publisher, publish bool, log *logp.Logger) int {
 	var n int
 	for maybeMsg := range events {
 		if maybeMsg.failed() {
@@ -593,7 +597,8 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 			resps = intermediateResps
 		}
-		n += processAndPublishEvents(trCtx, publisher, i < len(r.requestFactories), r.log, rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps))
+		events := rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps)
+		n += processAndPublishEvents(trCtx, events, publisher, i < len(r.requestFactories), r.log)
 	}
 
 	defer httpResp.Body.Close()

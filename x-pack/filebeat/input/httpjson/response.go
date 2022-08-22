@@ -96,7 +96,7 @@ func newResponseProcessor(config config, pagination *pagination, log *logp.Logge
 }
 
 func newChainResponseProcessor(config chainConfig, httpClient *httpClient, log *logp.Logger) *responseProcessor {
-	pagination := newChainPagination(config, httpClient, log)
+	pagination := &pagination{httpClient: httpClient, log: log}
 
 	rp := &responseProcessor{
 		pagination: pagination,
