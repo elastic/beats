@@ -1,14 +1,14 @@
-name: check-devtools
+name: check-dev-tools
 
 on:
   pull_request:
     paths:
-      - '.github/workflows/check-devtools.yml'
-      - 'devtools/**'
+      - '.github/workflows/check-dev-tools.yml'
+      - 'dev-tools/**'
       - 'libbeat/scripts/Makefile'
 
 env:
-  BEAT_MODULE: 'devtools'
+  BEAT_MODULE: 'dev-tools'
 
 jobs:
   check:
