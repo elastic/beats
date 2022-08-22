@@ -89,9 +89,6 @@ pipeline {
           stageStatusCache(id: 'Lint'){
             withBeatsEnv(archive: false, id: "lint") {
               dumpVariables()
-              whenTrue(env.ONLY_DOCS == 'true') {
-                cmd(label: "make check", script: "make check")
-              }
               whenTrue(env.ONLY_DOCS == 'false') {
                 runLinting()
               }
@@ -224,11 +221,17 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
+<<<<<<< HEAD
   mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
 
   parallel(mapParallelTasks)
 }
 
+=======
+  parallel(mapParallelTasks)
+}
+
+>>>>>>> 1fa3f3d0aa (action: run check, check-default and pre-commit (#32723))
 def runBuildAndTest(Map args = [:]) {
   def filterStage = args.get('filterStage', 'mandatory')
   deleteDir()
