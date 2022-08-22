@@ -3,6 +3,144 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.6]]
+=== Beats version 7.17.6
+https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
+- Fix race condition when reloading runners {pull}32309[32309]
+- Fix race condition when stopping runners {pull}32433[32433]
+
+*Auditbeat*
+
+- auditd module: Fix parsing of audit rules where arguments are quoted (like file paths containing spaces). {pull}32421[32421]
+- auditd module: Fix minimum AuditStatus length so that library can support kernels from 2.6.32. {pull}32421[32421]
+- system/socket: Reduce memory usage of the dataset. {issue}32191[32191] {pull}32192[32192]
+- libbeat/processors/add_process_metadata: Fix memory leak in process cache. {issue}24890[24890] {pull}29717[29717]
+
+*Filebeat*
+
+- Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]
+- Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
+- Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
+- Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
+- Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
+- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
+- Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
+- Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
+- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32445[32445]
+- Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
+- Replace internal expiring cache used by the Kubernetes module with in-memory dictionary {pull}32539[32539]
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+
+*Functionbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-7.17.5]]
 === Beats version 7.17.5
 https://github.com/elastic/beats/compare/v7.17.4\...v7.17.5[View commits]
