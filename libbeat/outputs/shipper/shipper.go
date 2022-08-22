@@ -208,9 +208,7 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		if indexReply.GetUuid() != c.serverID {
 			batch.Cancelled()
 			st.Cancelled(len(events))
-			err := fmt.Errorf("acknowledgement failed due to a connection to a different server %s, expected %s", indexReply.Uuid, c.serverID)
-			c.serverID = indexReply.GetUuid()
-			return err
+			return fmt.Errorf("acknowledgement failed due to a connection to a different server %s, expected %s", indexReply.Uuid, c.serverID)
 		}
 
 		if indexReply.PersistedIndex >= publishReply.AcceptedIndex {
