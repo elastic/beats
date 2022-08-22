@@ -636,7 +636,7 @@ func TestInput(t *testing.T) {
 				return input.Run(ctx, chanClient)
 			})
 
-			timeout := time.NewTimer(5 * time.Hour)
+			timeout := time.NewTimer(5 * time.Second)
 			t.Cleanup(func() { _ = timeout.Stop() })
 
 			if len(tc.expected) == 0 {
