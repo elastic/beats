@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
 - Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 - Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
+- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
 
 *Heartbeat*
 
@@ -79,6 +80,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix formatting of debug logs. {pull}32698[32698]
 
 *Winlogbeat*
 
@@ -122,6 +124,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
 - Add references for CRI-O configuration in input-container and in our kubernetes manifests {issue}32149[32149] {pull}32151[32151]
 - httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
+- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
 - Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
 - Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
 - add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
