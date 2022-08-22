@@ -102,7 +102,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 		if err == pdh.PDH_NO_COUNTERS { //nolint:errorlint // Bad linter! This is always errno or nil.
 			re.log.Warnf("%s %v", collectFailedMsg, err)
 		} else {
-			return nil, fmt.Errorf("%v, %w", collectFailedMsg, err)
+			return nil, fmt.Errorf("%v: %w", collectFailedMsg, err)
 		}
 	}
 
