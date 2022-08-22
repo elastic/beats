@@ -21,13 +21,17 @@ import (
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
+
+const base64Protocol = "base64://"
 
 // LoadCertificate will load a certificate from disk and return a tls.Certificate or error
 func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
@@ -68,15 +72,30 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 	return &cert, nil
 }
 
+func DecodeBase64(s string) ([]byte, error) {
+	s = s[len(base64Protocol):]
+	return base64.StdEncoding.DecodeString(s)
+}
+
 // ReadPEMFile reads a PEM format file on disk and decrypt it with the privided password and
 // return the raw content.
 func ReadPEMFile(path, passphrase string) ([]byte, error) {
 	pass := []byte(passphrase)
 	var blocks []*pem.Block
 
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
+	var content []byte
+	var err error
+
+	if strings.HasPrefix(path, base64Protocol) {
+		content, err = DecodeBase64(path)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		content, err = ioutil.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	for len(content) > 0 {
@@ -138,13 +157,25 @@ func LoadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
 		return nil, nil
 	}
 
+	var err error
+
 	roots := x509.NewCertPool()
 	for _, path := range CAs {
-		pemData, err := ioutil.ReadFile(path)
-		if err != nil {
-			logp.Critical("Failed reading CA certificate: %v", err)
-			errors = append(errors, fmt.Errorf("%v reading %v", err, path))
-			continue
+		var pemData []byte
+		if strings.HasPrefix(path, base64Protocol) {
+			pemData, err = DecodeBase64(path)
+			if err != nil {
+				logp.Critical("Failed reading base64 CA certificate: %v", err)
+				errors = append(errors, fmt.Errorf("%v reading %v", err, path))
+				continue
+			}
+		} else {
+			pemData, err = ioutil.ReadFile(path)
+			if err != nil {
+				logp.Critical("Failed reading CA certificate: %v", err)
+				errors = append(errors, fmt.Errorf("%v reading %v", err, path))
+				continue
+			}
 		}
 
 		if ok := roots.AppendCertsFromPEM(pemData); !ok {
