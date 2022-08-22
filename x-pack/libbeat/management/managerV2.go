@@ -149,15 +149,25 @@ func (cm *BeatV2Manager) CheckRawConfig(cfg *conf.C) error {
 func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
-	cm.UpdateStatus(lbmanagement.Running, fmt.Sprintf("Unregistering action %s for main unit with ID %s", cm.mainUnit, action.Name()))
-	cm.units[cm.mainUnit].RegisterAction(action)
+	stateUnit, exists := cm.units[cm.mainUnit]
+	if exists {
+		_ = stateUnit.UpdateState(client.UnitStateHealthy, fmt.Sprintf("Registering action %s for main unit with ID %s", cm.mainUnit, action.Name()), nil)
+		cm.units[cm.mainUnit].RegisterAction(action)
+	} else {
+		cm.logger.Warnf("Cannot register action %s, no main unit found", action.Name())
+	}
 }
 
 func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
-	cm.UpdateStatus(lbmanagement.Running, fmt.Sprintf("Unregistering action %s for main unit with ID %s", cm.mainUnit, action.Name()))
-	cm.units[cm.mainUnit].UnregisterAction(action)
+	stateUnit, exists := cm.units[cm.mainUnit]
+	if exists {
+		_ = stateUnit.UpdateState(client.UnitStateHealthy, fmt.Sprintf("Unregistering action %s for main unit with ID %s", cm.mainUnit, action.Name()), nil)
+		cm.units[cm.mainUnit].UnregisterAction(action)
+	} else {
+		cm.logger.Warnf("Cannot Unregister action %s, no main unit found", action.Name())
+	}
 }
 
 func (cm *BeatV2Manager) SetPayload(payload map[string]interface{}) {
