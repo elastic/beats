@@ -221,17 +221,10 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-<<<<<<< HEAD
-  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
 
   parallel(mapParallelTasks)
 }
 
-=======
-  parallel(mapParallelTasks)
-}
-
->>>>>>> 1fa3f3d0aa (action: run check, check-default and pre-commit (#32723))
 def runBuildAndTest(Map args = [:]) {
   def filterStage = args.get('filterStage', 'mandatory')
   deleteDir()
