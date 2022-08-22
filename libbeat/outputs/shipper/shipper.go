@@ -126,10 +126,6 @@ func (c *shipper) Connect() error {
 		return fmt.Errorf("failed to fetch server information: %w", err)
 	}
 	c.serverID = serverInfo.GetUuid()
-	err = indexClient.CloseSend()
-	if err != nil {
-		c.log.Warnf("failed to close send stream when fetching server info: %s", err)
-	}
 
 	c.log.Debugf("connection to %s (%s) established.", c.config.Server, c.serverID)
 
@@ -192,31 +188,31 @@ func (c *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		)
 	}
 
-	ackClient, err := c.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
+	// so we explicitly close the stream
+	ackCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	ackClient, err := c.client.PersistedIndex(ackCtx, &messages.PersistedIndexRequest{
 		PollingInterval: durationpb.New(c.config.AckPollingInterval),
 	})
 	if err != nil {
 		return fmt.Errorf("acknowledgement failed due to the connectivity error: %w", err)
 	}
 
-	for {
-		indexReply, err := ackClient.Recv()
+	indexReply, err := ackClient.Recv()
+	if err != nil {
+		return fmt.Errorf("acknowledgement failed due to the connectivity error: %w", err)
+	}
+
+	if indexReply.GetUuid() != c.serverID {
+		batch.Cancelled()
+		st.Cancelled(len(events))
+		return fmt.Errorf("acknowledgement failed due to a connection to a different server %s, expected %s", indexReply.Uuid, c.serverID)
+	}
+
+	for indexReply.PersistedIndex < publishReply.AcceptedIndex {
+		indexReply, err = ackClient.Recv()
 		if err != nil {
 			return fmt.Errorf("acknowledgement failed due to the connectivity error: %w", err)
-		}
-
-		if indexReply.GetUuid() != c.serverID {
-			batch.Cancelled()
-			st.Cancelled(len(events))
-			return fmt.Errorf("acknowledgement failed due to a connection to a different server %s, expected %s", indexReply.Uuid, c.serverID)
-		}
-
-		if indexReply.PersistedIndex >= publishReply.AcceptedIndex {
-			err = ackClient.CloseSend()
-			if err != nil {
-				c.log.Debugf("failed to close send stream after receiving acknowledgement: %s", err)
-			}
-			break
 		}
 	}
 
