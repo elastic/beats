@@ -33,7 +33,7 @@
                 "gauge_width": 10,
                 "hide_last_value_indicator": true,
                 "id": "94161c6c-4f48-4beb-9d78-f79f29c02a34",
-                "index_pattern": "logs-*",
+                "index_pattern": "filebeat-*",
                 "interval": "auto",
                 "series": [
                     {

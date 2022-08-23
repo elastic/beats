@@ -25,7 +25,7 @@
                 },
                 "hide_last_value_indicator": true,
                 "id": "c39a76e5-f613-41a9-8335-c442747791e0",
-                "index_pattern": "logs-*",
+                "index_pattern": "filebeat-*",
                 "interval": "auto",
                 "series": [
                     {

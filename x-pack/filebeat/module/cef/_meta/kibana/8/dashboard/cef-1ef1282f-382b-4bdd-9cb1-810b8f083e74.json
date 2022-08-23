@@ -417,7 +417,7 @@
             "type": "visualization"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "c9fd3ece-2bef-4cdc-9f83-ed689b35a17a:layer_1_source_index_pattern",
             "type": "index-pattern"
         }

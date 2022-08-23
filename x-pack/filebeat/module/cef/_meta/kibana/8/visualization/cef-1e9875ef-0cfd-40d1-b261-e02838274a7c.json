@@ -19,7 +19,7 @@
                     "query": "cef.device.product:\"DNS Trace Log\""
                 },
                 "id": "db54ebce-9dd2-4a1e-b476-b3ddb9a9024e",
-                "index_pattern": "logs-*",
+                "index_pattern": "filebeat-*",
                 "interval": "auto",
                 "series": [
                     {

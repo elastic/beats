@@ -19,7 +19,7 @@
                     "query": "data_stream.dataset:\"cef.log\""
                 },
                 "id": "fd1ffeb6-678e-4163-9421-6a164fd59048",
-                "index_pattern": "logs-*",
+                "index_pattern": "filebeat-*",
                 "interval": "auto",
                 "series": [
                     {

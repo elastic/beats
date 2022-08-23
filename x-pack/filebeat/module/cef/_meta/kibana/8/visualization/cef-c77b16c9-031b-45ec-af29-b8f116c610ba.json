@@ -19,7 +19,7 @@
                     "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\""
                 },
                 "id": "74716d29-91c6-4095-bc7d-7f6700f12b1f",
-                "index_pattern": "logs-*",
+                "index_pattern": "filebeat-*",
                 "interval": "auto",
                 "series": [
                     {

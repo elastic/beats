@@ -422,12 +422,12 @@
             "type": "visualization"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "49de47fb-1382-4009-89d2-b96a4161e12d:layer_1_source_index_pattern",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "9d097034-9ebb-4f53-ad39-e42e625b541c:layer_1_source_index_pattern",
             "type": "index-pattern"
         }

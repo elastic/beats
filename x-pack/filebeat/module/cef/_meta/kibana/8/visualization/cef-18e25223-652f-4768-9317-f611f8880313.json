@@ -25,7 +25,7 @@
                     "query": ""
                 },
                 "id": "ec53a1d3-213c-4b0f-a074-5005a84cdb83",
-                "index_pattern": "logs-*",
+                "index_pattern": "filebeat-*",
                 "interval": "auto",
                 "series": [
                     {
@@ -48,7 +48,7 @@
                         "point_size": 1,
                         "seperate_axis": 0,
                         "series_drop_last_bucket": 1,
-                        "series_index_pattern": "logs-*",
+                        "series_index_pattern": "filebeat-*",
                         "series_time_field": "@timestamp",
                         "split_color_mode": "gradient",
                         "split_mode": "everything",
@@ -88,7 +88,7 @@
                         "point_size": 1,
                         "seperate_axis": 0,
                         "series_drop_last_bucket": 1,
-                        "series_index_pattern": "logs-*",
+                        "series_index_pattern": "filebeat-*",
                         "series_time_field": "@timestamp",
                         "split_color_mode": "gradient",
                         "split_mode": "everything",

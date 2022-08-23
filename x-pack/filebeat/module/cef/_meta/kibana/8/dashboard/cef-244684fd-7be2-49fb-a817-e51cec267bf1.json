@@ -376,12 +376,12 @@
             "type": "visualization"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "3cf2118b-5231-49f5-b685-0ff0e1f52c32:layer_1_source_index_pattern",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "07f92eca-2078-4aa6-8373-d27ca33595d6:layer_1_source_index_pattern",
             "type": "index-pattern"
         }
