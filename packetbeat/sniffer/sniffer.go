@@ -245,7 +245,7 @@ func (s *Sniffer) sniffDynamic(defaultRoute <-chan string, refresh chan<- struct
 }
 
 // sniffOneDynamic handles sniffing a single device that may change link type.
-// If the the link type associated with the device differs from the last link
+// If the link type associated with the device differs from the last link
 // type or dec is nil, a new decoder is returned. The link type associated
 // with the device is returned.
 func (s *Sniffer) sniffOneDynamic(device string, last layers.LinkType, dec *decoder.Decoder, refresh chan<- struct{}) (layers.LinkType, *decoder.Decoder, error) {
