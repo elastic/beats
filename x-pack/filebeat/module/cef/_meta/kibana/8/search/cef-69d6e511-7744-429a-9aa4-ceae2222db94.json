@@ -1,0 +1,55 @@
+{
+    "attributes": {
+        "columns": [
+            "cef.device.vendor",
+            "cef.device.product",
+            "message",
+            "cef.device.event_class_id",
+            "cef.extensions.deviceEventCategory",
+            "source.user.name",
+            "destination.user.name",
+            "destination.domain",
+            "cef.extensions.categoryBehavior",
+            "cef.extensions.categoryOutcome",
+            "cef.extensions.sourceNtDomain",
+            "cef.extensions.destinationNtDomain"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\""
+                    }
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Endpoint - OS Events [Logs CEF ArcSight]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "cef-69d6e511-7744-429a-9aa4-ceae2222db94",
+    "migrationVersion": {
+        "search": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "logs-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search"
+}

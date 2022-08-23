@@ -1,0 +1,51 @@
+{
+    "attributes": {
+        "columns": [
+            "cef.extensions.categoryDeviceGroup",
+            "cef.extensions.categoryTechnique",
+            "event.outcome",
+            "event.category",
+            "event.type",
+            "cef.extensions.categoryObject",
+            "event.action",
+            "cef.extensions.categoryDeviceType"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "data_stream.dataset:\"cef.log\""
+                    }
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Endpoint Event Explorer [Logs CEF]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "cef-8eaeaa88-771f-4721-8f35-f94da4ea6009",
+    "migrationVersion": {
+        "search": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "logs-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search"
+}
