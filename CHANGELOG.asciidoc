@@ -42,7 +42,7 @@ https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
 
 *Metricbeat*
 
-- Fix to ARN parsing for Cloudwatch resource names with leading slashes. {pull}32445[32445]
+- Fix ARN parsing for Cloudwatch resource names with leading slashes. {pull}32445[32445]
 - Add missing metrics in AWS Transit Gateway module. {pull}32617[32617]
 - Replace internal expiring cache used by the Kubernetes module with in-memory dictionary. {pull}32539[32539]
 
