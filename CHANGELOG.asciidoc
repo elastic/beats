@@ -34,8 +34,8 @@ https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
 *Affecting all Beats*
 
 - Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
-- Fix race condition when reloading runners {pull}32309[32309]
-- Fix race condition when stopping runners {pull}32433[32433]
+- Fix race condition when reloading runners. {pull}32309[32309]
+- Fix race condition when stopping runners. {pull}32433[32433]
 
 *Auditbeat*
 
@@ -51,7 +51,7 @@ https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
 - Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
 - Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
 - Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
-- Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
+- Fix race conditions when reloading input V2 and filestream input. {pull}32309[32309]
 - Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
@@ -65,9 +65,9 @@ https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
 
 *Metricbeat*
 
-- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32445[32445]
-- Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
-- Replace internal expiring cache used by the Kubernetes module with in-memory dictionary {pull}32539[32539]
+- Fix to ARN parsing for Cloudwatch resource names with leading slashes. {pull}32445[32445]
+- Add missing metrics in AWS Transit Gateway module. {pull}32617[32617]
+- Replace internal expiring cache used by the Kubernetes module with in-memory dictionary. {pull}32539[32539]
 
 *Packetbeat*
 
