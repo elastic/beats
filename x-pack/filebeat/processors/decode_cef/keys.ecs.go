@@ -12,7 +12,15 @@ import (
 )
 
 type mappedField struct {
-	Target    string
+	// Target is the ECS target field for the mapped field.
+	Target string
+
+	// Translate is the mapping function required to translate
+	// the CEF field data into an ECS-conformant format.
+	// If Translate is nil, no translation is done.
+	// Translate should not mutate the input and should
+	// return an error if the input data cannot be correctly
+	// mapped to ECS-formatted data for the target field.
 	Translate func(in *cef.Field) (interface{}, error)
 }
 
@@ -131,6 +139,5 @@ var ecsExtensionMapping = map[string]mappedField{
 }
 
 func ecsMAC(in *cef.Field) (interface{}, error) {
-	in.String = strings.ToUpper(strings.ReplaceAll(in.String, ":", "-"))
-	return in.String, nil
+	return strings.ToUpper(strings.ReplaceAll(in.String, ":", "-")), nil
 }
