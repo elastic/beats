@@ -5,19 +5,19 @@
 package billing
 
 import (
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/libbeat/logp"
-
-	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-=======
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
-	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> 1f232dc343 ([Azure Billing] Upgrade Usage Details API to version 2019-10-01 (#31970))
+	// <<<<<<< HEAD
+	// 	"github.com/elastic/beats/v7/libbeat/logp"
+	// 	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	// 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
+	// =======
+	// 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	// 	"github.com/elastic/elastic-agent-libs/logp"
+	// >>>>>>> 1f232dc343 ([Azure Billing] Upgrade Usage Details API to version 2019-10-01 (#31970))
 )
 
 // MockService mock for the azure monitor services

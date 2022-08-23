@@ -11,11 +11,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-<<<<<<< HEAD
-=======
+
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
-	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> 1f232dc343 ([Azure Billing] Upgrade Usage Details API to version 2019-10-01 (#31970))
 )
 
 // init registers the MetricSet with the central registry as soon as the program

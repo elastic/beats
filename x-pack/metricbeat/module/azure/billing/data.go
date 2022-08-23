@@ -21,40 +21,40 @@ import (
 func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) ([]mb.Event, error) {
 	var events []mb.Event
 	if len(results.UsageDetails) > 0 {
-<<<<<<< HEAD
-		for _, usageDetail := range results.UsageDetails {
-			event := mb.Event{
-				ModuleFields: common.MapStr{
-					"resource": common.MapStr{
-						"type":  usageDetail.ConsumedService,
-						"group": getResourceGroupFromId(*usageDetail.InstanceID),
-						"name":  usageDetail.InstanceName,
-					},
-					"subscription_id": usageDetail.SubscriptionGUID,
-				},
-				MetricSetFields: common.MapStr{
-					"pretax_cost":       usageDetail.PretaxCost,
-					"department_name":   usageDetail.DepartmentName,
-					"product":           usageDetail.Product,
-					"usage_start":       usageDetail.UsageStart.ToTime(),
-					"usage_end":         usageDetail.UsageEnd.ToTime(),
-					"currency":          usageDetail.Currency,
-					"billing_period_id": usageDetail.BillingPeriodID,
-					"account_name":      usageDetail.AccountName,
-				},
-				Timestamp: time.Now().UTC(),
-			}
-			event.RootFields = common.MapStr{}
-			event.RootFields.Put("cloud.provider", "azure")
-			event.RootFields.Put("cloud.region", usageDetail.InstanceLocation)
-			event.RootFields.Put("cloud.instance.name", usageDetail.InstanceName)
-			event.RootFields.Put("cloud.instance.id", usageDetail.InstanceID)
-=======
+		// <<<<<<< HEAD
+		// 		for _, usageDetail := range results.UsageDetails {
+		// 			event := mb.Event{
+		// 				ModuleFields: common.MapStr{
+		// 					"resource": common.MapStr{
+		// 						"type":  usageDetail.ConsumedService,
+		// 						"group": getResourceGroupFromId(*usageDetail.InstanceID),
+		// 						"name":  usageDetail.InstanceName,
+		// 					},
+		// 					"subscription_id": usageDetail.SubscriptionGUID,
+		// 				},
+		// 				MetricSetFields: common.MapStr{
+		// 					"pretax_cost":       usageDetail.PretaxCost,
+		// 					"department_name":   usageDetail.DepartmentName,
+		// 					"product":           usageDetail.Product,
+		// 					"usage_start":       usageDetail.UsageStart.ToTime(),
+		// 					"usage_end":         usageDetail.UsageEnd.ToTime(),
+		// 					"currency":          usageDetail.Currency,
+		// 					"billing_period_id": usageDetail.BillingPeriodID,
+		// 					"account_name":      usageDetail.AccountName,
+		// 				},
+		// 				Timestamp: time.Now().UTC(),
+		// 			}
+		// 			event.RootFields = common.MapStr{}
+		// 			event.RootFields.Put("cloud.provider", "azure")
+		// 			event.RootFields.Put("cloud.region", usageDetail.InstanceLocation)
+		// 			event.RootFields.Put("cloud.instance.name", usageDetail.InstanceName)
+		// 			event.RootFields.Put("cloud.instance.id", usageDetail.InstanceID)
+		// =======
 		for _, ud := range results.UsageDetails {
 			event := mb.Event{Timestamp: time.Now().UTC()}
 
 			// shared fields
-			event.RootFields = mapstr.M{
+			event.RootFields = common.MapStr{
 				"cloud.provider": "azure",
 			}
 
@@ -64,16 +64,16 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 				// legacy data format
 				//
 
-				event.ModuleFields = mapstr.M{
+				event.ModuleFields = common.MapStr{
 					"subscription_id":   legacy.SubscriptionID,
 					"subscription_name": legacy.SubscriptionName,
-					"resource": mapstr.M{
+					"resource": common.MapStr{
 						"name":  legacy.ResourceName,
 						"type":  legacy.ConsumedService,
 						"group": legacy.ResourceGroup,
 					},
 				}
-				event.MetricSetFields = mapstr.M{
+				event.MetricSetFields = common.MapStr{
 					// original fields
 					"billing_period_id": legacy.ID,
 					"product":           legacy.Product,
@@ -100,16 +100,16 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 				// modern data format
 				//
 
-				event.ModuleFields = mapstr.M{
+				event.ModuleFields = common.MapStr{
 					"subscription_id":   modern.SubscriptionGUID,
 					"subscription_name": modern.SubscriptionName,
-					"resource": mapstr.M{
+					"resource": common.MapStr{
 						"name":  getResourceNameFromPath(*modern.InstanceName),
 						"type":  modern.ConsumedService,
 						"group": modern.ResourceGroup,
 					},
 				}
-				event.MetricSetFields = mapstr.M{
+				event.MetricSetFields = common.MapStr{
 					// original fields
 					"billing_period_id": modern.ID,
 					"product":           modern.Product,
@@ -136,7 +136,6 @@ func EventsMapping(subscriptionId string, results Usage, startTime time.Time, en
 				return events, errors.New("unsupported usage details format: not legacy nor modern")
 			}
 
->>>>>>> 1f232dc343 ([Azure Billing] Upgrade Usage Details API to version 2019-10-01 (#31970))
 			events = append(events, event)
 		}
 	}
