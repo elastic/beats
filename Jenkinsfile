@@ -84,6 +84,9 @@ pipeline {
       environment {
         GOFLAGS = '-mod=readonly'
       }
+      when {
+        expression { return false }
+      }
       steps {
         withGithubNotify(context: "Checks") {
           stageStatusCache(id: 'Checks'){
@@ -108,6 +111,7 @@ pipeline {
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
+            expression { return false }
           }
           expression { return params.runAllStages }         // If UI forced
         }
