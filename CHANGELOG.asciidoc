@@ -43,7 +43,7 @@ https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
 *Metricbeat*
 
-- update kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard {pull}31973[31973]
+- Update Kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard. {pull}31973[31973]
 - Check for nil metadata in GCP. {pull}32281[32281]
 - Update Kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard. {pull}32037[32037]
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
