@@ -83,12 +83,12 @@ https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
 *Metricbeat*
 
-- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
-- Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
-- Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
-- AWS Fargate: Added support for DesiredStatus and KnownStatus {issue}32077[32077] {pull}32342[#32342]
-- Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}32394[32394]
-- Add distribution type metrics for GCP {pull}32170[32170]
+- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts. {issue}31611[31611] {pull}31692[#31692]
+- Enhance Oracle Module: Connection string for Oracle does not handle special characters properly. {issue}24609[24609] {pull}31368[#31368]
+- Enhance Oracle Module: New sysmetric metricset. {issue}30946[30946] {pull}31462[#31462]
+- AWS Fargate: Added support for DesiredStatus and KnownStatus. {issue}32077[32077] {pull}32342[#32342]
+- Enable Generic SQL merge metrics to a single event for sql_queries using new flag. {pull}32394[32394]
+- Add distribution type metrics for GCP. {pull}32170[32170]
 
 *Packetbeat*
 
