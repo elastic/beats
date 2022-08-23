@@ -578,6 +578,36 @@ func TestInput(t *testing.T) {
 				`{"space":{"cake":"pumpkin"}}`,
 			},
 		},
+		{
+			name:        "Test pagination when used with chaining",
+			setupServer: newChainPaginationTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.records[:].id",
+						},
+					},
+				},
+			},
+			handler: defaultHandler(http.MethodGet, ""),
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -665,6 +695,34 @@ func newChainTestServer(
 		config["request.url"] = server.URL
 		config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
 		t.Cleanup(server.Close)
+	}
+}
+
+func newChainPaginationTestServer(
+	newServer func(http.Handler) *httptest.Server,
+) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		registerPaginationTransforms()
+		var serverURL string
+		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.URL.Path {
+			case "/":
+				link := serverURL + "/link2"
+				value := fmt.Sprintf(`{"records":[{"id":1}], "nextLink":"%s"}`, link)
+				fmt.Fprintln(w, value)
+			case "/1":
+				fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+			case "/link2":
+				fmt.Fprintln(w, `{"records":[{"id":2}]}`)
+			case "/2":
+				fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+			}
+		})
+		server := httptest.NewServer(r)
+		config["request.url"] = server.URL
+		serverURL = server.URL
+		config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+		t.Cleanup(func() { registeredTransforms = newRegistry() })
 	}
 }
 

@@ -16,7 +16,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
-
+ - [Httpjson]- Fix for pagination at root level not working when used with chaining.
 
 *Heartbeat*
 - Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
