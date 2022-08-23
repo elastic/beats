@@ -43390,7 +43390,7 @@ format: percent
 *`kubernetes.container.memory.usage.limit.pct`*::
 +
 --
-Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited). If the container Memory limits are missing and the `node` and `state_node` metricsets are both disabled or not configured on that node, this metric might will be missing entirely.
+Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited). If the container Memory limits are missing and the `node` and `state_node` metricsets are both disabled or not configured on that node, this metric will be missing entirely.
 
 
 type: scaled_float
