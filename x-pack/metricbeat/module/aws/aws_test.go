@@ -78,6 +78,7 @@ var (
 	tagValue2 = "foobar"
 	tagKey3   = "Organization"
 	tagValue3 = "Engineering"
+	tagValue4 = "Product"
 )
 
 func TestCheckTagFiltersExist(t *testing.T) {
@@ -92,11 +93,11 @@ func TestCheckTagFiltersExist(t *testing.T) {
 			[]Tag{
 				{
 					Key:   "Name",
-					Value: "ECS Instance",
+					Value: []string{"ECS Instance"},
 				},
 				{
 					Key:   "Organization",
-					Value: "Engineering",
+					Value: []string{"Engineering"},
 				},
 			},
 			[]ec2types.Tag{
@@ -120,11 +121,11 @@ func TestCheckTagFiltersExist(t *testing.T) {
 			[]Tag{
 				{
 					Key:   "Name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 				{
 					Key:   "Organization",
-					Value: "Engineering",
+					Value: []string{"Engineering"},
 				},
 			},
 			[]resourcegroupstaggingapitypes.Tag{
@@ -148,7 +149,7 @@ func TestCheckTagFiltersExist(t *testing.T) {
 			[]Tag{
 				{
 					Key:   "Name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 			[]resourcegroupstaggingapitypes.Tag{
@@ -166,6 +167,26 @@ func TestCheckTagFiltersExist(t *testing.T) {
 				},
 			},
 			false,
+		},
+		{
+			"more than one value per key of tagFilters is included in resourcegroupstaggingapi tags",
+			[]Tag{
+				{
+					Key:   "Organization",
+					Value: []string{"Product", "Engineering"},
+				},
+			},
+			[]resourcegroupstaggingapitypes.Tag{
+				{
+					Key:   awssdk.String(tagKey3),
+					Value: awssdk.String(tagValue3),
+				},
+				{
+					Key:   awssdk.String(tagKey3),
+					Value: awssdk.String(tagValue4),
+				},
+			},
+			true,
 		},
 	}
 	for _, c := range cases {
