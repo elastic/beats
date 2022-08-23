@@ -14,14 +14,14 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Fetch Go version from .go-version
       run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GO_VERSION }}
     - name: Run check/update
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
-        go install github.com/magefile/mage@latest
+        go install github.com/magefile/mage
         make -C ${{ env.BEAT_MODULE }} check
