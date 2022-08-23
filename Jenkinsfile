@@ -221,7 +221,6 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-
   parallel(mapParallelTasks)
 }
 
