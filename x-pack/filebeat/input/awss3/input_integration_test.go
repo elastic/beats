@@ -327,9 +327,9 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 
 		contentType := ""
 		if strings.HasSuffix(filename, "ndjson") || strings.HasSuffix(filename, "ndjson.gz") {
-			contentType = "let-CI-fail-" + contentTypeNDJSON + "; charset=UTF-8"
+			contentType = contentTypeNDJSON + "; charset=UTF-8"
 		} else if strings.HasSuffix(filename, "json") || strings.HasSuffix(filename, "json.gz") {
-			contentType = "let-CI-fail-" + contentTypeJSON + "; charset=UTF-8"
+			contentType = contentTypeJSON + "; charset=UTF-8"
 		}
 
 		// Upload the file to S3.
