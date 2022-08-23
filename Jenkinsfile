@@ -573,16 +573,9 @@ def targetWithoutNode(Map args = [:]) {
   def withGCP = args.get('withGCP', false)
   def isCloud = args.get('isCloud', false)
   withGithubNotify(context: "${context}") {
-    withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
+    withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id, isCloud: isCloud) {
       dumpVariables()
       withTools(k8s: installK8s, gcp: withGCP) {
-        // Cloud specific requires to unstash the terraform within the node context
-        if (isCloud) {
-          cmd(label: "debug list files before unstash", script: "ls -l x-pack/filebeat/input/awss3/_meta/terraform")
-          String name = normalise(directory)
-          unstash("terraform-${name}")
-          cmd(label: "debug list files after unstash", script: "ls -l x-pack/filebeat/input/awss3/_meta/terraform")
-        }
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
@@ -617,7 +610,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def archive = args.get('archive', true)
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
-
+  def isCloud = args.get('isCloud', false)
   def path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
 
   if(isUnix()) {
@@ -646,7 +639,17 @@ def withBeatsEnv(Map args = [:], Closure body) {
     deleteDir()
   }
 
-  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  // Cloud specific requires to unstash the terraform within the node context
+  if (isCloud) {
+    cmd(label: "debug list files before unstash", script: "ls -l x-pack/filebeat/input/awss3/_meta/terraform")
+    String name = normalise(directory)
+    unstash("terraform-${name}")
+    unstashV2(name: "terraform-${name}", bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+    cmd(label: "debug list files after unstash", script: "ls -l x-pack/filebeat/input/awss3/_meta/terraform")
+  } else {
+   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  }
+
   // NOTE: This is required to run after the unstash
   def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
   withEnv([
@@ -925,6 +928,7 @@ def startCloudTestEnv(Map args = [:]) {
         archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
       }
       stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+      stashV2(name: "terraform-${name}", bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     }
   }
 }
