@@ -5,9 +5,8 @@
 package decode_cef
 
 import (
+	"errors"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
 )
@@ -63,7 +62,7 @@ var ecsExtensionMapping = map[string]mappedField{
 			case "1":
 				return "outbound", nil
 			default:
-				return nil, errors.Errorf("deviceDirection must be 0 or 1")
+				return nil, errors.New("deviceDirection must be 0 or 1")
 			}
 		},
 	},
