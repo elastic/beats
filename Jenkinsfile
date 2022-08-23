@@ -642,7 +642,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
   // Cloud specific requires to unstash the terraform within the node context
   if (isCloud) {
     String name = normalise(directory)
-    unstash("terraform-${name}")
     unstashV2(name: "terraform-${name}", bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
     cmd(label: "debug list files after unstash", script: "ls -l x-pack/filebeat/input/awss3/_meta/terraform")
   } else {
