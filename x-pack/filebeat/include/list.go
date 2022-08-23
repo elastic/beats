@@ -13,6 +13,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/cometd"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/lumberjack"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/activemq"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/aws"
