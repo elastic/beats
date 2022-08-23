@@ -19,7 +19,7 @@ stages:
           make -C x-pack/filebeat update;
           make -C filebeat check;
           make -C filebeat update;
-          make check-no-changes;
+          make check-no-changes
         stage: checks
     arm:
         mage: "mage build unitTest"
