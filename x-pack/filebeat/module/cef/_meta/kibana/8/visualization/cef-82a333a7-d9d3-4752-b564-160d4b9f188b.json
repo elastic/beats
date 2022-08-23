@@ -1,0 +1,81 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Sources by Destinations [Logs CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Source Host",
+                        "field": "source.domain",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Destination Host",
+                        "field": "destination.domain",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": true,
+                "legendDisplay": "show",
+                "legendPosition": "bottom",
+                "legendSize": "auto",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                }
+            },
+            "title": "Top 10 Sources by Destinations [Logs CEF]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-82a333a7-d9d3-4752-b564-160d4b9f188b",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-46204a7b-ca56-4ad7-bf60-5ef9c6b83042",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-22T10:24:36.112Z",
+    "version": "WzcyMiwxXQ=="
+}

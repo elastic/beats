@@ -1,0 +1,68 @@
+{
+    "attributes": {
+        "columns": [
+            "cef.device.vendor",
+            "cef.device.product",
+            "cef.extensions.categoryBehavior",
+            "cef.extensions.categoryOutcome",
+            "destination.ip",
+            "destination.port",
+            "destination.domain",
+            "cef.device.event_class_id",
+            "cef.extensions.deviceCustomString1Label",
+            "cef.extensions.deviceCustomString1",
+            "cef.extensions.deviceCustomString2Label",
+            "cef.extensions.deviceCustomString2",
+            "cef.extension.deviceCustomString3Label",
+            "cef.extension.deviceCustomString3",
+            "cef.extension.deviceCustomString4Label",
+            "cef.extension.deviceCustomString4",
+            "cef.extensions.deviceEventCategory",
+            "event.severity",
+            "source.ip",
+            "source.port",
+            "network.transport",
+            "source.bytes",
+            "url.original"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "cef.device.product:\"DNS Trace Log\""
+                    }
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Microsoft DNS Events [Logs CEF ArcSight]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-f85a3444-8a43-4e46-b872-4e44bc25d0f3",
+    "migrationVersion": {
+        "search": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "logs-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2022-08-22T10:24:36.112Z",
+    "version": "Wzc4NCwxXQ=="
+}

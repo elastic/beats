@@ -1,0 +1,81 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 20 Behaviors by Outcome [Logs CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Event Behavior",
+                        "field": "event.action",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 20
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Event Outcome",
+                        "field": "event.outcome",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 3
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": true,
+                "legendDisplay": "show",
+                "legendPosition": "right",
+                "legendSize": "auto",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                }
+            },
+            "title": "Top 20 Behaviors by Outcome [Logs CEF]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-2b96deab-dbf1-4be3-ae70-1bfb6c3fbd2a",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-46204a7b-ca56-4ad7-bf60-5ef9c6b83042",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-22T10:24:36.112Z",
+    "version": "WzY4OCwxXQ=="
+}

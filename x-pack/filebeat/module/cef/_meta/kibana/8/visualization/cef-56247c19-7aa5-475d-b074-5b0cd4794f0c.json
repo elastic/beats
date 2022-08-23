@@ -1,0 +1,66 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Source Users [Logs CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Source Users",
+                        "field": "source.user.name",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "maxFontSize": 60,
+                "minFontSize": 10,
+                "orientation": "single",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "scale": "linear"
+            },
+            "title": "Top 10 Source Users [Logs CEF]",
+            "type": "tagcloud"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-56247c19-7aa5-475d-b074-5b0cd4794f0c",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-46204a7b-ca56-4ad7-bf60-5ef9c6b83042",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-22T10:24:36.112Z",
+    "version": "WzcwMywxXQ=="
+}
