@@ -187,7 +187,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Lo
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
-		return fmt.Errorf("could not parse node stats response: %s", err)
+		return fmt.Errorf("could not parse node stats response: %w", err)
 	}
 
 	timestamp := common.Time(time.Now())
