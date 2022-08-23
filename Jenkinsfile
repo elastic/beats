@@ -574,8 +574,10 @@ def targetWithoutNode(Map args = [:]) {
       withTools(k8s: installK8s, gcp: withGCP) {
         // Cloud specific requires to unstash the terraform within the node context
         if (isCloud) {
+          cmd(label: "debug list files before unstash", script: "ls -l x-pack/filebeat/input/awss3/_meta/terraform")
           String name = normalise(directory)
           unstash("terraform-${name}")
+          cmd(label: "debug list files after unstash", script: "ls -l x-pack/filebeat/input/awss3/_meta/terraform")
         }
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
@@ -935,6 +937,7 @@ def terraformApply(String directory) {
              "TF_VAR_ENVIRONMENT=ci",
              "TF_VAR_REPO=${env.REPO}"]) {
       sh(label: "Terraform Apply on ${directory}", script: "terraform apply -auto-approve")
+      sh(label: "debug find outputs.yml", script: "find . -name outputs.yml -ls || true")
     }
   }
 }
