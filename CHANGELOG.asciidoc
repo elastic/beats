@@ -9,26 +9,6 @@ https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -60,90 +40,17 @@ https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
 - Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
 - gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
 
-*Heartbeat*
-
-
 *Metricbeat*
 
 - Fix to ARN parsing for Cloudwatch resource names with leading slashes. {pull}32445[32445]
 - Add missing metrics in AWS Transit Gateway module. {pull}32617[32617]
 - Replace internal expiring cache used by the Kubernetes module with in-memory dictionary. {pull}32539[32539]
 
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
 
 [[release-notes-7.17.5]]
 === Beats version 7.17.5
