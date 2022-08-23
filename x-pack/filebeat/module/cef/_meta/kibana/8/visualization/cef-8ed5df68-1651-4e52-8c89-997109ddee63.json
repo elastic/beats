@@ -11,7 +11,7 @@
                 }
             }
         },
-        "title": " Dashboard Navigation [Logs CEF ArcSight]",
+        "title": " Dashboard Navigation — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -20,7 +20,7 @@
             "params": {
                 "markdown": "[Network Overview](#/dashboard/cef-346ac50b-0900-464d-aad6-007756a4e215) | [Network Suspicious Activity](#/dashboard/cef-6d77b0a1-7b83-4c32-bbc5-cb1f6a4ee634) | [Endpoint Overview](#dashboard/cef-1ef1282f-382b-4bdd-9cb1-810b8f083e74) | [Endpoint OS Activity](#/dashboard/cef-110da36b-6544-4507-9ae5-591d44bd2333) | [Microsoft DNS Overview](#/dashboard/cef-b16c980c-21ad-47ca-8103-7ce949ddc87a)"
             },
-            "title": " Dashboard Navigation [Logs CEF ArcSight]",
+            "title": " Dashboard Navigation — ArcSight [Filebeat CEF]",
             "type": "markdown"
         }
     },

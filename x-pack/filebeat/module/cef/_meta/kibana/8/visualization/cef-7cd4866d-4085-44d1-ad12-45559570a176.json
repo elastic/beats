@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top Destinations by Traffic Size [Logs CEF]",
+        "title": "Top Destinations by Traffic Size [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "defaultColors": {
@@ -109,7 +109,7 @@
                     }
                 ]
             },
-            "title": "Top Destinations by Traffic Size [Logs CEF]",
+            "title": "Top Destinations by Traffic Size [Filebeat CEF]",
             "type": "heatmap"
         }
     },

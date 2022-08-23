@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Source Users [Logs CEF]",
+        "title": "Top 10 Source Users [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -44,7 +44,7 @@
                 },
                 "scale": "linear"
             },
-            "title": "Top 10 Source Users [Logs CEF]",
+            "title": "Top 10 Source Users [Filebeat CEF]",
             "type": "tagcloud"
         }
     },

@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Event Types [Logs CEF ArcSight]",
+        "title": "Top 10 Event Types — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -43,7 +43,7 @@
                 },
                 "scale": "square root"
             },
-            "title": "Top 10 Event Types [Logs CEF ArcSight]",
+            "title": "Top 10 Event Types — ArcSight [Filebeat CEF]",
             "type": "tagcloud"
         }
     },

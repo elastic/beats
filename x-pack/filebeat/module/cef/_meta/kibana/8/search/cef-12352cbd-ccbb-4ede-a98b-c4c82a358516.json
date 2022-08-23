@@ -36,7 +36,7 @@
                 "desc"
             ]
         ],
-        "title": "Endpoint - Events [Logs CEF]",
+        "title": "Endpoint - Events [Filebeat CEF]",
         "version": 1
     },
     "coreMigrationVersion": "8.0.0",

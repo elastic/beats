@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Source Countries by Events [Logs CEF ArcSight]",
+        "title": "Top 10 Source Countries by Events — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "params": {
@@ -87,7 +87,7 @@
                 },
                 "totalFunc": "sum"
             },
-            "title": "Top 10 Source Countries by Events [Logs CEF ArcSight]",
+            "title": "Top 10 Source Countries by Events — ArcSight [Filebeat CEF]",
             "type": "table"
         }
     },

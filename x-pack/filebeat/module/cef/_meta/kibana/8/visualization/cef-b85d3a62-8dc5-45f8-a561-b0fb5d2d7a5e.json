@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Destination Ports by Outcomes [Logs CEF ArcSight]",
+        "title": "Destination Ports by Outcomes — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -121,7 +121,7 @@
                     }
                 ]
             },
-            "title": "Destination Ports by Outcomes [Logs CEF ArcSight]",
+            "title": "Destination Ports by Outcomes — ArcSight [Filebeat CEF]",
             "type": "histogram"
         }
     },

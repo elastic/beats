@@ -239,7 +239,7 @@
         "timeFrom": "now-24h",
         "timeRestore": true,
         "timeTo": "now",
-        "title": "[Logs CEF] Network Suspicious Activity Dashboard",
+        "title": "[Filebeat CEF] Network Suspicious Activity Dashboard",
         "version": 1
     },
     "coreMigrationVersion": "8.0.0",

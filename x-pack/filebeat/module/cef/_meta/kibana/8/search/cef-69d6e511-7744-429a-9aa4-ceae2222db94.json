@@ -36,7 +36,7 @@
                 "desc"
             ]
         ],
-        "title": "Endpoint - OS Events [Logs CEF ArcSight]",
+        "title": "Endpoint - OS Events — ArcSight [Filebeat CEF]",
         "version": 1
     },
     "coreMigrationVersion": "8.0.0",

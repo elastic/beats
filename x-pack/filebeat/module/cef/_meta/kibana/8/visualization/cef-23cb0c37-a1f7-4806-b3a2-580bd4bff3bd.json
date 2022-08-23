@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Destination Ports [Logs CEF ArcSight]",
+        "title": "Top 10 Destination Ports — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -44,7 +44,7 @@
                 },
                 "scale": "linear"
             },
-            "title": "Top 10 Destination Ports [Logs CEF ArcSight]",
+            "title": "Top 10 Destination Ports — ArcSight [Filebeat CEF]",
             "type": "tagcloud"
         }
     },

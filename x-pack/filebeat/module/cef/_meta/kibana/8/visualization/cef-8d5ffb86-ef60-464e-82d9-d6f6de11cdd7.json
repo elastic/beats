@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Events by Outcomes [Logs CEF]",
+        "title": "Events by Outcomes [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -102,7 +102,7 @@
                 "type": "timeseries",
                 "use_kibana_indexes": false
             },
-            "title": "Events by Outcomes [Logs CEF]",
+            "title": "Events by Outcomes [Filebeat CEF]",
             "type": "metrics"
         }
     },

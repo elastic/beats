@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Outcomes Breakdown [Logs CEF ArcSight]",
+        "title": "Outcomes Breakdown — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "colors": {
@@ -129,7 +129,7 @@
                     }
                 ]
             },
-            "title": "Outcomes Breakdown [Logs CEF ArcSight]",
+            "title": "Outcomes Breakdown — ArcSight [Filebeat CEF]",
             "type": "area"
         }
     },

@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Events by Severity [Logs CEF ArcSight]",
+        "title": "Events by Severity — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -99,7 +99,7 @@
                 "type": "top_n",
                 "use_kibana_indexes": false
             },
-            "title": "Events by Severity [Logs CEF ArcSight]",
+            "title": "Events by Severity — ArcSight [Filebeat CEF]",
             "type": "metrics"
         }
     },

@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Sources by Size [Logs CEF ArcSight]",
+        "title": "Top 10 Sources by Size — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "P-11": {
                 "vis": {
@@ -135,7 +135,7 @@
                 },
                 "totalFunc": "sum"
             },
-            "title": "Top 10 Sources by Size [Logs CEF ArcSight]",
+            "title": "Top 10 Sources by Size — ArcSight [Filebeat CEF]",
             "type": "table"
         }
     },

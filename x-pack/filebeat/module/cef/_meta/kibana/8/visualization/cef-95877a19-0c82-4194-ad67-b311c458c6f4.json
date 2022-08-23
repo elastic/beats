@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Destinations by Size [Logs CEF]",
+        "title": "Top 10 Destinations by Size [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "params": {
@@ -77,7 +77,7 @@
                 },
                 "totalFunc": "sum"
             },
-            "title": "Top 10 Destinations by Size [Logs CEF]",
+            "title": "Top 10 Destinations by Size [Filebeat CEF]",
             "type": "table"
         }
     },

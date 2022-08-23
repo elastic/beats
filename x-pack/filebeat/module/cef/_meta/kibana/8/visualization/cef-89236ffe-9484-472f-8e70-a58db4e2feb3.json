@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Unique Destinations and Ports by Source [Logs CEF ArcSight]",
+        "title": "Unique Destinations and Ports by Source — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -158,7 +158,7 @@
                     }
                 ]
             },
-            "title": "Unique Destinations and Ports by Source [Logs CEF ArcSight]",
+            "title": "Unique Destinations and Ports by Source — ArcSight [Filebeat CEF]",
             "type": "histogram"
         }
     },

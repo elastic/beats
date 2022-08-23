@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Event Types by Size [Logs CEF]",
+        "title": "Event Types by Size [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "colors": {
@@ -158,7 +158,7 @@
                     }
                 ]
             },
-            "title": "Event Types by Size [Logs CEF]",
+            "title": "Event Types by Size [Filebeat CEF]",
             "type": "histogram"
         }
     },

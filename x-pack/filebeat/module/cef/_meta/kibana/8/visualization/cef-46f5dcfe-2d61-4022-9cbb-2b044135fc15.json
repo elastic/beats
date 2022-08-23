@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Outcomes by User Names [Logs CEF ArcSight]",
+        "title": "Outcomes by User Names — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "colors": {
@@ -84,7 +84,7 @@
                     "type": "palette"
                 }
             },
-            "title": "Outcomes by User Names [Logs CEF ArcSight]",
+            "title": "Outcomes by User Names — ArcSight [Filebeat CEF]",
             "type": "pie"
         }
     },

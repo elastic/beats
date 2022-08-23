@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Device Type Breakdown [Logs CEF ArcSight]",
+        "title": "Device Type Breakdown — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -45,7 +45,7 @@
                     "type": "palette"
                 }
             },
-            "title": "Device Type Breakdown [Logs CEF ArcSight]",
+            "title": "Device Type Breakdown — ArcSight [Filebeat CEF]",
             "type": "pie"
         }
     },

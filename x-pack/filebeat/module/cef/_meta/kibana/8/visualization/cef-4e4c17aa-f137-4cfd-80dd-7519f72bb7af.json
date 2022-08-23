@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Network - Event Throughput [Logs CEF]",
+        "title": "Network - Event Throughput [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -95,7 +95,7 @@
                 "type": "gauge",
                 "use_kibana_indexes": false
             },
-            "title": "Network - Event Throughput [Logs CEF]",
+            "title": "Network - Event Throughput [Filebeat CEF]",
             "type": "metrics"
         }
     },

@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Devices by Outcome [Logs CEF ArcSight]",
+        "title": "Top 10 Devices by Outcome — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "defaultColors": {
@@ -87,7 +87,7 @@
                     }
                 ]
             },
-            "title": "Top 10 Devices by Outcome [Logs CEF ArcSight]",
+            "title": "Top 10 Devices by Outcome — ArcSight [Filebeat CEF]",
             "type": "heatmap"
         }
     },

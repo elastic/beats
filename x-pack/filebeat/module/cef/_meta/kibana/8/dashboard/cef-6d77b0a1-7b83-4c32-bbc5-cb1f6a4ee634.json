@@ -262,7 +262,7 @@
         "timeFrom": "now-24h",
         "timeRestore": true,
         "timeTo": "now",
-        "title": "[Logs CEF ArcSight] Network Suspicious Activity Dashboard",
+        "title": "[Filebeat CEF] ArcSight — Network Suspicious Activity Dashboard",
         "version": 1
     },
     "coreMigrationVersion": "8.0.0",

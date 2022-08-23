@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Destination Ports by Outcomes [Logs CEF]",
+        "title": "Destination Ports by Outcomes [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -121,7 +121,7 @@
                     }
                 ]
             },
-            "title": "Destination Ports by Outcomes [Logs CEF]",
+            "title": "Destination Ports by Outcomes [Filebeat CEF]",
             "type": "histogram"
         }
     },

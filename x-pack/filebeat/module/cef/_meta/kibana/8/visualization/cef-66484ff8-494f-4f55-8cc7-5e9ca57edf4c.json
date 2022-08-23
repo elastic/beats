@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Events by Source and Destination Users [Logs CEF]",
+        "title": "Events by Source and Destination Users [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -181,7 +181,7 @@
                     }
                 ]
             },
-            "title": "Events by Source and Destination Users [Logs CEF]",
+            "title": "Events by Source and Destination Users [Filebeat CEF]",
             "type": "histogram"
         }
     },

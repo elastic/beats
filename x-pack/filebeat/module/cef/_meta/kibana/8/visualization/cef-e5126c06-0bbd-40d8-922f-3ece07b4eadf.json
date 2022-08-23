@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Bandwidth Utilization [Logs CEF]",
+        "title": "Bandwidth Utilization [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -101,7 +101,7 @@
                 "type": "timeseries",
                 "use_kibana_indexes": false
             },
-            "title": "Bandwidth Utilization [Logs CEF]",
+            "title": "Bandwidth Utilization [Filebeat CEF]",
             "type": "metrics"
         }
     },

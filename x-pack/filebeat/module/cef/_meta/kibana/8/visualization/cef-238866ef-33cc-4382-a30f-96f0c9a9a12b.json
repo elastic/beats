@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Application Protocols [Logs CEF]",
+        "title": "Top 10 Application Protocols [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -43,7 +43,7 @@
                 },
                 "scale": "square root"
             },
-            "title": "Top 10 Application Protocols [Logs CEF]",
+            "title": "Top 10 Application Protocols [Filebeat CEF]",
             "type": "tagcloud"
         }
     },

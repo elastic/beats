@@ -47,7 +47,7 @@
                 "desc"
             ]
         ],
-        "title": "Microsoft DNS Events [Logs CEF ArcSight]",
+        "title": "Microsoft DNS Events — ArcSight [Filebeat CEF]",
         "version": 1
     },
     "coreMigrationVersion": "8.0.0",

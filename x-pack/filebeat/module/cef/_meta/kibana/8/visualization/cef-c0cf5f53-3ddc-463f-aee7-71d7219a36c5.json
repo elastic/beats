@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Outcomes by Device Type [Logs CEF ArcSight]",
+        "title": "Outcomes by Device Type — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "colors": {
@@ -128,7 +128,7 @@
                     }
                 ]
             },
-            "title": "Outcomes by Device Type [Logs CEF ArcSight]",
+            "title": "Outcomes by Device Type — ArcSight [Filebeat CEF]",
             "type": "histogram"
         }
     },

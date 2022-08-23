@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Source Users by Destination Users [Logs CEF]",
+        "title": "Top 10 Source Users by Destination Users [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -58,7 +58,7 @@
                     "type": "palette"
                 }
             },
-            "title": "Top 10 Source Users by Destination Users [Logs CEF]",
+            "title": "Top 10 Source Users by Destination Users [Filebeat CEF]",
             "type": "pie"
         }
     },

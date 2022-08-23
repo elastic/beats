@@ -32,7 +32,7 @@
                 "desc"
             ]
         ],
-        "title": "Endpoint Event Explorer [Logs CEF]",
+        "title": "Endpoint Event Explorer [Filebeat CEF]",
         "version": 1
     },
     "coreMigrationVersion": "8.0.0",

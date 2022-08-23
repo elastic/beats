@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Events by Outcome [Logs CEF ArcSight]",
+        "title": "Events by Outcome — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -153,7 +153,7 @@
                 "type": "timeseries",
                 "use_kibana_indexes": false
             },
-            "title": "Events by Outcome [Logs CEF ArcSight]",
+            "title": "Events by Outcome — ArcSight [Filebeat CEF]",
             "type": "metrics"
         }
     },

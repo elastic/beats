@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 5 Vendors by Product [Logs CEF ArcSight]",
+        "title": "Top 5 Vendors by Product — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -58,7 +58,7 @@
                     "type": "palette"
                 }
             },
-            "title": "Top 5 Vendors by Product [Logs CEF ArcSight]",
+            "title": "Top 5 Vendors by Product — ArcSight [Filebeat CEF]",
             "type": "pie"
         }
     },

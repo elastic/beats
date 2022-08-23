@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 20 Behaviors by Outcome [Logs CEF ArcSight]",
+        "title": "Top 20 Behaviors by Outcome — ArcSight [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -58,7 +58,7 @@
                     "type": "palette"
                 }
             },
-            "title": "Top 20 Behaviors by Outcome [Logs CEF ArcSight]",
+            "title": "Top 20 Behaviors by Outcome — ArcSight [Filebeat CEF]",
             "type": "pie"
         }
     },

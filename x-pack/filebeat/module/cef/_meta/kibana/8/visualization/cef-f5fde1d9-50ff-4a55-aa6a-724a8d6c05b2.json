@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Endpoint OS Metrics Overview [Logs CEF ArcSight]",
+        "title": "Endpoint OS Metrics Overview — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "defaultColors": {
@@ -103,7 +103,7 @@
                 "handleNoResults": true,
                 "type": "gauge"
             },
-            "title": "Endpoint OS Metrics Overview [Logs CEF ArcSight]",
+            "title": "Endpoint OS Metrics Overview — ArcSight [Filebeat CEF]",
             "type": "metric"
         }
     },

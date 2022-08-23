@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Device Metrics Overview [Logs CEF ArcSight]",
+        "title": "Device Metrics Overview — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "defaultColors": {
@@ -113,7 +113,7 @@
                 "handleNoResults": true,
                 "type": "gauge"
             },
-            "title": "Device Metrics Overview [Logs CEF ArcSight]",
+            "title": "Device Metrics Overview — ArcSight [Filebeat CEF]",
             "type": "metric"
         }
     },

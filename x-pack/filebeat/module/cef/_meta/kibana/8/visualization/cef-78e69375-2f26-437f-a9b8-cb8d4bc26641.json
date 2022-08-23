@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Endpoint - Average EPS [Logs CEF]",
+        "title": "Endpoint - Average EPS [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -88,7 +88,7 @@
                 "type": "gauge",
                 "use_kibana_indexes": false
             },
-            "title": "Endpoint - Average EPS [Logs CEF]",
+            "title": "Endpoint - Average EPS [Filebeat CEF]",
             "type": "metrics"
         }
     },

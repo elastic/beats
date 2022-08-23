@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Destination Ports by Outcome [Logs CEF]",
+        "title": "Destination Ports by Outcome [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "colors": {
@@ -130,7 +130,7 @@
                     }
                 ]
             },
-            "title": "Destination Ports by Outcome [Logs CEF]",
+            "title": "Destination Ports by Outcome [Filebeat CEF]",
             "type": "histogram"
         }
     },

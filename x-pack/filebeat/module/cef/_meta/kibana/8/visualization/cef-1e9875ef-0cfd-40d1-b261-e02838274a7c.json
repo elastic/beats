@@ -4,7 +4,7 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {}
         },
-        "title": "Events Types by Severity [Logs CEF]",
+        "title": "Events Types by Severity [Filebeat CEF]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -102,7 +102,7 @@
                 "type": "timeseries",
                 "use_kibana_indexes": false
             },
-            "title": "Events Types by Severity [Logs CEF]",
+            "title": "Events Types by Severity [Filebeat CEF]",
             "type": "metrics"
         }
     },

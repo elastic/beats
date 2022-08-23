@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "DNS Metrics Overview [Logs CEF ArcSight]",
+        "title": "DNS Metrics Overview — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "defaultColors": {
@@ -101,7 +101,7 @@
                 },
                 "type": "gauge"
             },
-            "title": "DNS Metrics Overview [Logs CEF ArcSight]",
+            "title": "DNS Metrics Overview — ArcSight [Filebeat CEF]",
             "type": "metric"
         }
     },

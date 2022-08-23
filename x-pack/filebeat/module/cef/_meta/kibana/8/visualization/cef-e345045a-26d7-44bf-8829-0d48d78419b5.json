@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 10 Source Countries by Event [Logs CEF]",
+        "title": "Top 10 Source Countries by Event [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "params": {
@@ -86,7 +86,7 @@
                 },
                 "totalFunc": "sum"
             },
-            "title": "Top 10 Source Countries by Event [Logs CEF]",
+            "title": "Top 10 Source Countries by Event [Filebeat CEF]",
             "type": "table"
         }
     },

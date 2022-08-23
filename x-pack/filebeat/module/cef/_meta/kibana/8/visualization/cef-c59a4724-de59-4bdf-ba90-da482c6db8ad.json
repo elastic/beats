@@ -7,7 +7,7 @@
             }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top 5 Sources by Destination Addresses [Logs CEF ArcSight]",
+        "title": "Top 5 Sources by Destination Addresses — ArcSight [Filebeat CEF]",
         "uiStateJSON": {
             "vis": {
                 "params": {
@@ -67,7 +67,7 @@
                 },
                 "totalFunc": "sum"
             },
-            "title": "Top 5 Sources by Destination Addresses [Logs CEF ArcSight]",
+            "title": "Top 5 Sources by Destination Addresses — ArcSight [Filebeat CEF]",
             "type": "table"
         }
     },
