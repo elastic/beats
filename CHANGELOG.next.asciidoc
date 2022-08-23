@@ -23,9 +23,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
  - [Httpjson]- Fix for pagination at root level not working when used with chaining.
 
 *Heartbeat*
-- Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
-- Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
-- Browserc monitors now default to a max concurrency of two. {pull}32564[32564]
 
 *Metricbeat*
 
@@ -66,23 +63,17 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 - Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
 
+*Auditbeat*
+
+
+*Filebeat*
+
+
 *Heartbeat*
 
-- Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
-- Reduced memory usage slightly for browser monitors. {pull}32317[32317]
-- Automatically kill zombie-ish node processes. {pull}32393[32393]
-- Added timeout for browser monitors. {pull}32434[32434]
-- Fix bug browser jobs would sometimes be missing check groups or send empty events. {pull}32542[32542]
 
 *Metricbeat*
 
-- update kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard {pull}31973[31973]
-- Check for nil metadata in GCP. {pull}32281[32281]
-- update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
-- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32358[32358]
-- Fix an infinite loop in AWS billing metricset. {pull}32626[32626]
-- Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
-- Replace internal expiring cache used by the Kubernetes module with in-memory dictionary {pull}32539[32539]
 
 *Packetbeat*
 
@@ -113,24 +104,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-- Add `immutable` option to the auditd module. {issue}8352[8352] {pull}32381[32381]
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
-- Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
-- Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
-- Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
-- Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
-- Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
-- Add references for CRI-O configuration in input-container and in our kubernetes manifests {issue}32149[32149] {pull}32151[32151]
-- httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
 - httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
 - Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
 - Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
@@ -149,21 +125,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
-- Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
-- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
-- Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
-- Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
-- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
-* Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
-- AWS Fargate: Added support for DesiredStatus and KnownStatus {issue}32077[32077] {pull}32342[#32342]
-- Enable Generic SQL merge metrics to a single event for sql_queries using new flag {pull}32394[32394]
-- Add distribution type metrics for GCP {pull}32170[32170]
 
 *Packetbeat*
 
-- Add support for specifying default route interface sniffing. {issue}31905[31905] {pull}31950[31950]
-- Add support for TCP transport to the SIP protocol. {issue}28166[28166] {pull}32346[32346]
 
 *Functionbeat*
 
@@ -196,6 +160,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
