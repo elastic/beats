@@ -49,6 +49,10 @@ type Sniffer struct {
 	// It is not updated by default route polling.
 	device string
 
+	// followDefault indicates that the sniffer has
+	// been configured to follow the default route.
+	followDefault bool
+
 	// filter is the bpf filter program used by the sniffer.
 	filter string
 
@@ -73,10 +77,11 @@ const (
 // is done by the Run method.
 func New(testMode bool, filter string, decoders Decoders, interfaces config.InterfacesConfig) (*Sniffer, error) {
 	s := &Sniffer{
-		filter:   filter,
-		config:   interfaces,
-		decoders: decoders,
-		state:    atomic.MakeInt32(snifferInactive),
+		filter:        filter,
+		config:        interfaces,
+		decoders:      decoders,
+		state:         atomic.MakeInt32(snifferInactive),
+		followDefault: interfaces.PollDefaultRoute > 0 && strings.HasPrefix(interfaces.Device, "default_route"),
 	}
 
 	logp.Debug("sniffer", "BPF filter: '%s'", filter)
@@ -132,16 +137,20 @@ func New(testMode bool, filter string, decoders Decoders, interfaces config.Inte
 // Run opens the sniffing device and processes packets being read from that device.
 // Worker instances are instantiated as needed.
 func (s *Sniffer) Run() error {
-	var defaultRoute chan string
-	if s.config.PollDefaultRoute > 0 && strings.HasPrefix(s.config.Device, "default_route") {
+	var (
+		defaultRoute chan string
+		refresh      chan struct{}
+	)
+	if s.followDefault {
 		s.done = make(chan struct{})
 		defaultRoute = make(chan string)
-		go s.pollDefaultRoute(defaultRoute)
+		refresh = make(chan struct{}, 1)
+		go s.pollDefaultRoute(defaultRoute, refresh)
 	}
 	if defaultRoute == nil {
 		return s.sniffStatic(s.device)
 	}
-	return s.sniffDynamic(defaultRoute)
+	return s.sniffDynamic(defaultRoute, refresh)
 }
 
 // pollDefaultRoute repeatedly polls the default route's device at intervals
@@ -150,7 +159,7 @@ func (s *Sniffer) Run() error {
 // Changes in default route will put the Sniffer into the inactive state to
 // trigger a new sniffer connection. Termination of the sniffer is not under
 // the control of the poller.
-func (s *Sniffer) pollDefaultRoute(device chan string) {
+func (s *Sniffer) pollDefaultRoute(device chan<- string, refresh <-chan struct{}) {
 	go func() {
 		logp.Info("starting default route poller")
 
@@ -163,25 +172,42 @@ func (s *Sniffer) pollDefaultRoute(device chan string) {
 			select {
 			case <-tick.C:
 				logp.Debug("sniffer", "polling default route")
-				dev, err := resolveDeviceName(s.config.Device)
-				if err != nil {
-					logp.Warn("sniffer failed to poll default route device: %v", err)
-					continue
-				}
-				if dev != current {
-					logp.Info("sniffer changing default route device: %s -> %s", current, dev)
-					current = dev
-					s.state.Store(snifferInactive) // Mark current device as stale. ¯\_(ツ)_/¯
-					device <- current              // Pass the new device name.
-				}
+				current = s.poll(current, device)
+			case <-refresh:
+				logp.Debug("sniffer", "requested new default route")
+				current = s.poll(current, device)
 			case <-s.done:
 				logp.Info("closing default route poller")
 				close(device)
 				tick.Stop()
 				return
 			}
+			// Purge any unused refresh request. The chan has a cap
+			// of one and the send is conditional so we don't need
+			// to do this in a loop.
+			select {
+			case <-refresh:
+			default:
+			}
 		}
 	}()
+}
+
+// poll returns the current default route interface and sends it on device
+// if it has change from the old default route interface. If device resolution
+// fails, the default route interface is left unchanged.
+func (s *Sniffer) poll(old string, device chan<- string) (current string) {
+	current, err := resolveDeviceName(s.config.Device)
+	if err != nil {
+		logp.Warn("sniffer failed to poll default route device: %v", err)
+		return old
+	}
+	if current != old {
+		logp.Info("sniffer changing default route device: %s -> %s", old, current)
+		s.state.Store(snifferInactive) // Mark current device as stale. ¯\_(ツ)_/¯
+		device <- current              // Pass the new device name.
+	}
+	return current
 }
 
 // sniffStatic performs the sniffing work on a single static interface.
@@ -197,20 +223,20 @@ func (s *Sniffer) sniffStatic(device string) error {
 		return err
 	}
 
-	return s.sniffHandle(handle, dec)
+	return s.sniffHandle(handle, dec, nil)
 }
 
 // sniffDynamic performs sniffing work on a stream of dynamic interfaces from
 // defaultRoute decoders are retained between successive interfaces if they are
 // the same link type.
-func (s *Sniffer) sniffDynamic(defaultRoute <-chan string) error {
+func (s *Sniffer) sniffDynamic(defaultRoute <-chan string, refresh chan<- struct{}) error {
 	var (
-		last    layers.LinkType
-		decoder *decoder.Decoder
+		last layers.LinkType
+		dec  *decoder.Decoder
 	)
 	for device := range defaultRoute {
 		var err error
-		last, decoder, err = s.sniffOneDynamic(device, last, decoder)
+		last, dec, err = s.sniffOneDynamic(device, last, dec, refresh)
 		if err != nil {
 			return err
 		}
@@ -222,7 +248,7 @@ func (s *Sniffer) sniffDynamic(defaultRoute <-chan string) error {
 // If the the link type associated with the device differs from the last link
 // type or dec is nil, a new decoder is returned. The link type associated
 // with the device is returned.
-func (s *Sniffer) sniffOneDynamic(device string, last layers.LinkType, dec *decoder.Decoder) (layers.LinkType, *decoder.Decoder, error) {
+func (s *Sniffer) sniffOneDynamic(device string, last layers.LinkType, dec *decoder.Decoder, refresh chan<- struct{}) (layers.LinkType, *decoder.Decoder, error) {
 	handle, err := s.open(device)
 	if err != nil {
 		return last, dec, fmt.Errorf("failed to start sniffer: %w", err)
@@ -238,12 +264,12 @@ func (s *Sniffer) sniffOneDynamic(device string, last layers.LinkType, dec *deco
 		}
 	}
 
-	err = s.sniffHandle(handle, dec)
+	err = s.sniffHandle(handle, dec, refresh)
 	return linkType, dec, err
 }
 
 // sniff performs the sniffing work and writing dump files if requested.
-func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder) error {
+func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder, refresh chan<- struct{}) error {
 	var w *pcapgo.Writer
 	if s.config.Dumpfile != "" {
 		const timeSuffixFormat = "20060102150405"
@@ -270,7 +296,10 @@ func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder) error 
 	}
 	defer s.state.Store(snifferInactive)
 
-	var packets int
+	var (
+		packets  int
+		timeouts int
+	)
 	for s.state.Load() == snifferActive {
 		if s.config.OneAtATime {
 			fmt.Fprintln(os.Stdout, "Press enter to read packet")
@@ -281,17 +310,38 @@ func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder) error 
 		if err == pcap.NextErrorTimeoutExpired || isAfpacketErrTimeout(err) { //nolint:errorlint // pcap.NextErrorTimeoutExpired is not wrapped.
 			logp.Debug("sniffer", "timed out")
 
-			// TODO: Consider a communication back to the default route
-			// poller to request a new device in this case, probably
-			// after a number of timeouts rather than on the first
-			// occasion.
+			// If we have timed out too many times and we are following
+			// a default route, request a new default route interface.
+			const maxTimeouts = 10 // Place-holder until we have a sensible notion of how big this should be.
+			timeouts++
+			if s.followDefault && timeouts > maxTimeouts {
+				select {
+				case refresh <- struct{}{}:
+				default:
+					// Don't request to refresh if already requested.
+				}
+				timeouts = 0
+			}
 			continue
 		}
+		timeouts = 0
 
 		if err != nil {
 			// ignore EOF, if sniffer was driven from file
 			if err == io.EOF && s.config.File != "" { //nolint:errorlint // io.EOF should never be wrapped.
 				return nil
+			}
+
+			// If we are following a default route, request an interface
+			// refresh and log the error.
+			if s.followDefault {
+				select {
+				case refresh <- struct{}{}:
+				default:
+					// Don't request to refresh if already requested.
+				}
+				logp.Warn("error during packet capture: %v", err)
+				continue
 			}
 
 			s.state.Store(snifferInactive)
