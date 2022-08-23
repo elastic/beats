@@ -3,6 +3,98 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.4.0]]
+=== Beats version 8.4.0
+https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
+
+==== Breaking changes
+
+*Heartbeat*
+- Browser monitors (beta) now write to the `synthetics-*` index prefix. {pull}32064[32064]
+- Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
+- Browser monitors now default to a max concurrency of two. {pull}32564[32564]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
+- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
+
+*Auditbeat*
+
+- auditd module: Fix parsing of audit rules where arguments are quoted (like file paths containing spaces). {pull}32421[32421]
+- auditd module: Fix minimum AuditStatus length so that library can support kernels from 2.6.32. {pull}32421[32421]
+- system/socket: Reduce memory usage of the dataset. {issue}32191[32191] {pull}32192[32192]
+
+*Filebeat*
+
+- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
+- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
+- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
+
+*Heartbeat*
+
+- Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
+- Reduced memory usage slightly for browser monitors. {pull}32317[32317]
+- Automatically kill zombie-ish node processes. {pull}32393[32393]
+- Added timeout for browser monitors. {pull}32434[32434]
+- Fix bug with browser jobs that had missing check groups or sent empty events. {pull}32542[32542]
+
+*Metricbeat*
+
+- Update Kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard. {pull}31973[31973]
+- Check for nil metadata in GCP. {pull}32281[32281]
+- Update Kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard. {pull}32037[32037]
+- Fix ARN parsing for Cloudwatch resource names with leading slashes. {pull}32358[32358]
+- Fix an infinite loop in AWS billing metricset. {pull}32626[32626]
+- Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
+- Replace internal expiring cache used by the Kubernetes module with in-memory dictionary. {pull}32539[32539]
+- Oracle Module: Refactor module to use existing host parsers instead of doing its own parsing of hosts. {issue}31611[31611] {pull}31692[#31692]
+- Oracle Module: Correctly handle special characters in the connection string. {issue}24609[24609] {pull}31368[#31368]
+
+*Winlogbeat*
+
+- Powershell: Fix processing of parameter details. {pull}31833[31833]
+- Security: Fix processing of sidlist, access list and access mask. {pull}31833[31833]
+- Fix fatal invalid memory write on Windows 11. {issue}32469[32469] {pull}32519[32519]
+- Fix handling of event formatting when no metadata is available on Windows 11. {issue}32468[32468] {pull}32519[32519]
+
+==== Added
+
+*Affecting all Beats*
+
+- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
+
+*Auditbeat*
+
+- Add `immutable` option to the auditd module. {issue}8352[8352] {pull}32381[32381]
+
+*Filebeat*
+
+- Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
+- Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
+- Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
+- Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
+- Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
+- Add references for CRI-O configuration in input-container and in our Kubernetes manifests. {issue}32149[32149] {pull}32151[32151]
+- httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
+- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
+- Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
+- Add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
+
+*Metricbeat*
+
+- Oracle Module: New sysmetric metricset. {issue}30946[30946] {pull}31462[#31462]
+- AWS Fargate: Added support for DesiredStatus and KnownStatus. {issue}32077[32077] {pull}32342[#32342]
+- Enable Generic SQL merge metrics to a single event for sql_queries using new flag. {pull}32394[32394]
+- Add distribution type metrics for GCP. {pull}32170[32170]
+
+*Packetbeat*
+
+- Add support for specifying default route interface sniffing. {issue}31905[31905] {pull}31950[31950]
+- Add support for TCP transport to the SIP protocol. {issue}28166[28166] {pull}32346[32346]
+
 [[release-notes-8.3.3]]
 === Beats version 8.3.3
 https://github.com/elastic/beats/compare/v8.3.2\...v8.3.3[View commits]
