@@ -89,9 +89,6 @@ pipeline {
           stageStatusCache(id: 'Lint'){
             withBeatsEnv(archive: false, id: "lint") {
               dumpVariables()
-              whenTrue(env.ONLY_DOCS == 'true') {
-                cmd(label: "make check", script: "make check")
-              }
               whenTrue(env.ONLY_DOCS == 'false') {
                 runLinting()
               }
@@ -224,8 +221,6 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
-
   parallel(mapParallelTasks)
 }
 
