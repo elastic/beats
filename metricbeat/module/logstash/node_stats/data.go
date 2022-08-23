@@ -20,6 +20,7 @@ package node_stats
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -139,13 +140,49 @@ type LogstashStats struct {
 
 // PipelineStats represents the stats of a Logstash pipeline
 type PipelineStats struct {
-	ID          string                   `json:"id"`
-	Hash        string                   `json:"hash"`
-	EphemeralID string                   `json:"ephemeral_id"`
-	Events      map[string]interface{}   `json:"events"`
-	Reloads     reloads                  `json:"reloads"`
-	Queue       map[string]interface{}   `json:"queue"`
-	Vertices    []map[string]interface{} `json:"vertices"`
+	ID          string        `json:"id"`
+	Hash        string        `json:"hash"`
+	EphemeralID string        `json:"ephemeral_id"`
+	Events      LongEnforce   `json:"events"`
+	Reloads     reloads       `json:"reloads"`
+	Queue       LongEnforce   `json:"queue"`
+	Vertices    []LongEnforce `json:"vertices"`
+}
+
+// the default JSON encoder will attempt to unmarshall interface{}-typed
+// digits as a float. None of these values are actually floats,
+// and we get mapping errors when the JSON encoder on the other end
+// will sometimes format floats over a certain size with scientific notation.
+// Hard-defining these fields as a struct seems to be a bit touchy, as they're
+// not documented in any one place on the logstash side, but they're still in the critical path for a number of
+// O11y apps, dashboards, etc. So, force the JSON marshaller to treat digit values as floats; this is the most cautious solution.
+type LongEnforce map[string]interface{}
+
+func (le *LongEnforce) UnmarshalJSON(b []byte) error {
+	base := make(map[string]interface{})
+	if err := json.Unmarshal(b, &base); err != nil {
+		return err
+	}
+	*le = make(LongEnforce)
+
+	for key, item := range base {
+		switch underlying := item.(type) {
+		case float64:
+			ival, fval := math.Modf(underlying)
+			// based on the docs/code I've seen,
+			// none of these are actual floats,
+			// but check just to be sure
+			if fval == 0 {
+				(*le)[key] = int64(ival)
+			} else {
+				(*le)[key] = underlying
+			}
+		default:
+			(*le)[key] = item
+
+		}
+	}
+	return nil
 }
 
 func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger) error {

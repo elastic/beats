@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/require"
 
@@ -66,6 +67,39 @@ func EventMappingForFiles(t *testing.T, fixtureVersions []string, expectedEvents
 		require.NoError(t, err, f)
 		require.True(t, len(reporter.GetEvents()) >= expectedEvents, f)
 		require.Equal(t, expectedErrors, len(reporter.GetErrors()), f)
+	}
+}
+
+func TestNumberTyping(t *testing.T) {
+	logger := logp.NewLogger("logstash.node_stats")
+	path := "./_meta/test/node_stats.840.json"
+	input, err := ioutil.ReadFile(path)
+	require.NoError(t, err)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventMapping(reporter, input, true, logger)
+	require.NoError(t, err, path)
+	for _, event := range reporter.GetEvents() {
+		mapData := event.ModuleFields["node"].(mapstr.M)["stats"].(LogstashStats).Pipelines
+		for _, pipeline := range mapData {
+			testIntsInMap(t, pipeline.Events)
+			testIntsInMap(t, pipeline.Queue)
+			for _, ver := range pipeline.Vertices {
+				testIntsInMap(t, ver)
+			}
+		}
+
+	}
+
+}
+
+func testIntsInMap(t *testing.T, testMap map[string]interface{}) {
+	for key, evt := range testMap {
+		switch evt.(type) {
+		case float64:
+			t.Logf("Error: Expected map key %s to have type int, found float", key)
+			t.Fail()
+		}
 	}
 }
 
@@ -113,7 +147,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline",
-					Vertices: []map[string]interface{}{
+					Vertices: []LongEnforce{
 						{
 							"id": "vertex_1",
 						},
@@ -131,7 +165,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline",
-						Vertices: []map[string]interface{}{
+						Vertices: []LongEnforce{
 							{
 								"id": "vertex_1",
 							},
@@ -150,7 +184,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline",
-					Vertices: []map[string]interface{}{
+					Vertices: []LongEnforce{
 						{
 							"id":           "vertex_1",
 							"cluster_uuid": "es_1",
@@ -169,7 +203,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline",
-						Vertices: []map[string]interface{}{
+						Vertices: []LongEnforce{
 							{
 								"id":           "vertex_1",
 								"cluster_uuid": "es_1",
@@ -189,7 +223,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline_1",
-					Vertices: []map[string]interface{}{
+					Vertices: []LongEnforce{
 						{
 							"id":           "vertex_1_1",
 							"cluster_uuid": "es_1",
@@ -204,7 +238,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				},
 				{
 					ID: "test_pipeline_2",
-					Vertices: []map[string]interface{}{
+					Vertices: []LongEnforce{
 						{
 							"id": "vertex_2_1",
 						},
@@ -222,7 +256,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"prod_cluster_id": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []LongEnforce{
 							{
 								"id":           "vertex_1_1",
 								"cluster_uuid": "es_1",
@@ -237,7 +271,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 					},
 					{
 						ID: "test_pipeline_2",
-						Vertices: []map[string]interface{}{
+						Vertices: []LongEnforce{
 							{
 								"id": "vertex_2_1",
 							},
@@ -256,7 +290,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 			pipelines: []PipelineStats{
 				{
 					ID: "test_pipeline_1",
-					Vertices: []map[string]interface{}{
+					Vertices: []LongEnforce{
 						{
 							"id":           "vertex_1_1",
 							"cluster_uuid": "es_1",
@@ -272,7 +306,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				},
 				{
 					ID: "test_pipeline_2",
-					Vertices: []map[string]interface{}{
+					Vertices: []LongEnforce{
 						{
 							"id": "vertex_2_1",
 						},
@@ -289,7 +323,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"es_1": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []LongEnforce{
 							{
 								"id":           "vertex_1_1",
 								"cluster_uuid": "es_1",
@@ -307,7 +341,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"es_2": {
 					{
 						ID: "test_pipeline_1",
-						Vertices: []map[string]interface{}{
+						Vertices: []LongEnforce{
 							{
 								"id":           "vertex_1_1",
 								"cluster_uuid": "es_1",
@@ -325,7 +359,7 @@ func TestMakeClusterToPipelinesMap(t *testing.T) {
 				"": {
 					{
 						ID: "test_pipeline_2",
-						Vertices: []map[string]interface{}{
+						Vertices: []LongEnforce{
 							{
 								"id": "vertex_2_1",
 							},
