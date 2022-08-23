@@ -13,12 +13,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 * Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
 
 
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix formatting of hardware addresses populated by the add-host-metadata processor. {issue}32264[32264] {pull}32265[32265]
 
 *Auditbeat*
 
 
 *Filebeat*
-
+ - [Httpjson]- Fix for pagination at root level not working when used with chaining.
 
 *Heartbeat*
 - Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
@@ -60,6 +62,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
 - gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
 - Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
+- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 
 *Heartbeat*
 

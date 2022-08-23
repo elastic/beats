@@ -608,7 +608,7 @@ processors:
       target_field: "cloud.account.id"
       ignore_failure: true
   - rename:
-      field: "json.previousDigestS3Object"
+      field: "json.digestS3Object"
       target_field: "file.path"
       ignore_failure: true
   - rename:
