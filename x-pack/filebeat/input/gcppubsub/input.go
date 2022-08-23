@@ -8,15 +8,16 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/pkg/errors"
 	"golang.org/x/time/rate"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -41,12 +42,12 @@ const (
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
 	}
 
 	err = input.Register(oldInputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", oldInputName))
+		panic(fmt.Errorf("failed to register %v input: %w", oldInputName, err))
 	}
 }
 
@@ -183,7 +184,7 @@ func (in *pubsubInput) run() error {
 	// Setup our subscription to the topic.
 	sub, err := in.getOrCreateSubscription(ctx, client)
 	if err != nil {
-		return errors.Wrap(err, "failed to subscribe to pub/sub topic")
+		return fmt.Errorf("failed to subscribe to pub/sub topic: %w", err)
 	}
 	sub.ReceiveSettings.NumGoroutines = in.Subscription.NumGoroutines
 	sub.ReceiveSettings.MaxOutstandingMessages = in.Subscription.MaxOutstandingMessages
@@ -238,7 +239,7 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 	event.SetID(id)
 
 	if len(msg.Attributes) > 0 {
-		event.PutValue("labels", msg.Attributes)
+		event.Fields["labels"] = msg.Attributes
 	}
 
 	return event
@@ -249,7 +250,7 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 
 	exists, err := sub.Exists(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to check if subscription exists")
+		return nil, fmt.Errorf("failed to check if subscription exists: %w", err)
 	}
 	if exists {
 		return sub, nil
@@ -261,7 +262,7 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 			Topic: client.Topic(in.Topic),
 		})
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to create subscription")
+			return nil, fmt.Errorf("failed to create subscription: %w", err)
 		}
 		in.log.Debug("Created new subscription.")
 		return sub, nil
@@ -274,8 +275,8 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()))}
 
 	if in.AlternativeHost != "" {
-		// this will be typically set because we want to point the input to a testing pubsub emulator
-		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithInsecure())
+		// This will be typically set because we want to point the input to a testing pubsub emulator.
+		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			return nil, fmt.Errorf("cannot connect to alternative host %q: %w", in.AlternativeHost, err)
 		}
