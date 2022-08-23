@@ -292,7 +292,7 @@ def cloud(Map args = [:]) {
       withCloudTestEnv(args) {
         startCloudTestEnv(name: args.directory, dirs: args.dirs, withAWS: args.withAWS)
         try {
-          targetWithoutNode(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
+          targetWithoutNode(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id, isCloud: true)
         } finally {
           terraformCleanup(name: args.directory, dir: args.directory, withAWS: args.withAWS)
         }
@@ -567,10 +567,16 @@ def targetWithoutNode(Map args = [:]) {
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
+  def isCloud = args.get('isCloud', false)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
       dumpVariables()
       withTools(k8s: installK8s, gcp: withGCP) {
+        // Cloud specific requires to unstash the terraform within the node context
+        if (isCloud) {
+          String name = normalise(directory)
+          unstash("terraform-${name}")
+        }
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
