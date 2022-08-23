@@ -56,6 +56,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
 - Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 - gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
+- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
+- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 
 *Heartbeat*
 
