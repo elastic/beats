@@ -20,6 +20,7 @@ func TestGetProviderFromDomain(t *testing.T) {
 	assert.Equal(t, "aws", getProviderFromDomain("c2s.ic.gov", ""))
 	assert.Equal(t, "aws", getProviderFromDomain("amazonaws.com.cn", ""))
 	assert.Equal(t, "backblaze", getProviderFromDomain("https://backblazeb2.com", ""))
+	assert.Equal(t, "cloudflare", getProviderFromDomain("https://1234567890.r2.cloudflarestorage.com", ""))
 	assert.Equal(t, "wasabi", getProviderFromDomain("https://wasabisys.com", ""))
 	assert.Equal(t, "digitalocean", getProviderFromDomain("https://digitaloceanspaces.com", ""))
 	assert.Equal(t, "dreamhost", getProviderFromDomain("https://dream.io", ""))
