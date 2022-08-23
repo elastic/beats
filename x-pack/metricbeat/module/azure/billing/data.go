@@ -21,35 +21,6 @@ import (
 func EventsMapping(subscriptionId string, results Usage, startTime time.Time, endTime time.Time) ([]mb.Event, error) {
 	var events []mb.Event
 	if len(results.UsageDetails) > 0 {
-		// <<<<<<< HEAD
-		// 		for _, usageDetail := range results.UsageDetails {
-		// 			event := mb.Event{
-		// 				ModuleFields: common.MapStr{
-		// 					"resource": common.MapStr{
-		// 						"type":  usageDetail.ConsumedService,
-		// 						"group": getResourceGroupFromId(*usageDetail.InstanceID),
-		// 						"name":  usageDetail.InstanceName,
-		// 					},
-		// 					"subscription_id": usageDetail.SubscriptionGUID,
-		// 				},
-		// 				MetricSetFields: common.MapStr{
-		// 					"pretax_cost":       usageDetail.PretaxCost,
-		// 					"department_name":   usageDetail.DepartmentName,
-		// 					"product":           usageDetail.Product,
-		// 					"usage_start":       usageDetail.UsageStart.ToTime(),
-		// 					"usage_end":         usageDetail.UsageEnd.ToTime(),
-		// 					"currency":          usageDetail.Currency,
-		// 					"billing_period_id": usageDetail.BillingPeriodID,
-		// 					"account_name":      usageDetail.AccountName,
-		// 				},
-		// 				Timestamp: time.Now().UTC(),
-		// 			}
-		// 			event.RootFields = common.MapStr{}
-		// 			event.RootFields.Put("cloud.provider", "azure")
-		// 			event.RootFields.Put("cloud.region", usageDetail.InstanceLocation)
-		// 			event.RootFields.Put("cloud.instance.name", usageDetail.InstanceName)
-		// 			event.RootFields.Put("cloud.instance.id", usageDetail.InstanceID)
-		// =======
 		for _, ud := range results.UsageDetails {
 			event := mb.Event{Timestamp: time.Now().UTC()}
 
