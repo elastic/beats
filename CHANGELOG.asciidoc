@@ -12,7 +12,7 @@ https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 *Heartbeat*
 - Browser monitors (beta) now write to the `synthetics-*` index prefix. {pull}32064[32064]
 - Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
-- Browserc monitors now default to a max concurrency of two. {pull}32564[32564]
+- Browser monitors now default to a max concurrency of two. {pull}32564[32564]
 
 ==== Bugfixes
 
