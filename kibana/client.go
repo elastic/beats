@@ -304,9 +304,13 @@ func (client *Client) readVersion() error {
 	}
 
 	code, result, err := client.Connection.Request("GET", statusAPI, nil, nil, nil)
-	if err != nil || code >= 400 {
-		return fmt.Errorf("HTTP GET request to %s/api/status fails: %w. Response: %s",
-			client.Connection.URL, err, truncateString(result))
+	if err != nil {
+		return fmt.Errorf("HTTP GET request to %s/api/status fails: %w (status=%d). Response: %s",
+			client.Connection.URL, err, code, truncateString(result))
+	}
+	if code >= 400 {
+		return fmt.Errorf("HTTP GET request to %s/api/status fails: status=%d. Response: %s",
+			client.Connection.URL, code, truncateString(result))
 	}
 
 	var versionString string
@@ -359,8 +363,11 @@ func (client *Client) ImportMultiPartFormFile(url string, params url.Values, fil
 	headers := http.Header{}
 	headers.Add("Content-Type", w.FormDataContentType())
 	statusCode, response, err := client.Connection.Request("POST", url, params, headers, buf)
-	if err != nil || statusCode >= 300 {
+	if err != nil {
 		return fmt.Errorf("returned %d to import file: %w. Response: %s", statusCode, err, response)
+	}
+	if statusCode >= 300 {
+		return fmt.Errorf("returned %d to import file. Response: %s", statusCode, response)
 	}
 
 	client.log.Debugf("Imported multipart file to %s with params %v", url, params)
