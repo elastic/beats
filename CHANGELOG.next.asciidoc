@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
 - Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 
 *Heartbeat*

@@ -3,16 +3,11 @@ name: OpenTelemetry Export Trace
 on:
   workflow_run:
     workflows:
-<<<<<<< HEAD
-=======
       - check-dev-tools
       - check-packetbeat
-      - check-winlogbeat
       - check-x-pack-functionbeat
       - check-x-pack-osquerybeat
->>>>>>> e695525463 (action: checks for x-pack/functionbeat (#32752))
       - check-x-pack-packetbeat
-      - check-packetbeat
       - golangci-lint
       - auditbeat
       - filebeat
