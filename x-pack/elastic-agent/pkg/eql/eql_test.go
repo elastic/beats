@@ -42,6 +42,9 @@ func TestEql(t *testing.T) {
 		{expression: "${env.MISSING|host.MISSING|true} == true", result: true},
 		{expression: "${env.MISSING|host.MISSING|false} == false", result: true},
 		{expression: "${'constant'} == 'constant'", result: true},
+		{expression: "${data.with-dash} == 'dash-value'", result: true},
+		{expression: "${'dash-value'} == 'dash-value'", result: true},
+		{expression: "${data.with/slash} == 'some/path'", result: true},
 
 		// boolean
 		{expression: "true", result: true},
@@ -306,9 +309,11 @@ func TestEql(t *testing.T) {
 
 	store := &testVarStore{
 		vars: map[string]interface{}{
-			"env.HOSTNAME": "my-hostname",
-			"host.name":    "host-name",
-			"data.array":   []interface{}{"array1", "array2", "array3"},
+			"env.HOSTNAME":    "my-hostname",
+			"host.name":       "host-name",
+			"data.array":      []interface{}{"array1", "array2", "array3"},
+			"data.with-dash":  "dash-value",
+			"data.with/slash": "some/path",
 			"data.dict": map[string]interface{}{
 				"key1": "dict1",
 				"key2": "dict2",
@@ -327,7 +332,7 @@ func TestEql(t *testing.T) {
 		}
 		t.Run(title, func(t *testing.T) {
 			if showDebug == "1" {
-				debug(test.expression)
+				debug(t, test.expression)
 			}
 
 			r, err := Eval(test.expression, store)
@@ -343,17 +348,17 @@ func TestEql(t *testing.T) {
 	}
 }
 
-func debug(expression string) {
+func debug(t *testing.T, expression string) {
 	raw := antlr.NewInputStream(expression)
 
 	lexer := parser.NewEqlLexer(raw)
 	for {
-		t := lexer.NextToken()
-		if t.GetTokenType() == antlr.TokenEOF {
+		token := lexer.NextToken()
+		if token.GetTokenType() == antlr.TokenEOF {
 			break
 		}
-		fmt.Printf("%s (%q)\n",
-			lexer.SymbolicNames[t.GetTokenType()], t.GetText())
+		t.Logf("%s (%q)\n",
+			lexer.SymbolicNames[token.GetTokenType()], token.GetText())
 	}
 }
 

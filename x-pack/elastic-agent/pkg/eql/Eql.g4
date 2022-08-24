@@ -22,7 +22,7 @@ NUMBER: [\-]? [0-9]+;
 WHITESPACE: [ \r\n\t]+ -> skip;
 NOT: 'NOT' | 'not';
 NAME: [a-zA-Z_] [a-zA-Z0-9_]*;
-VNAME: [a-zA-Z0-9_.]+('.'[a-zA-Z0-9_]+)*;
+VNAME: [a-zA-Z0-9_.\-/]+('.'[a-zA-Z0-9_\-/]+)*;
 STEXT: '\'' ~[\r\n']* '\'';
 DTEXT: '"' ~[\r\n"]* '"';
 LPAR: '(';
