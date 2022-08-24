@@ -206,7 +206,7 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK",
 		},
 		{
-			name:  "func getRFC5988Link multiple rel as seperate strings matches",
+			name:  "func getRFC5988Link multiple rel as separate strings matches",
 			value: `[[ getRFC5988Link "previous" .last_response.header.Link ]]`,
 			paramCtx: &transformContext{
 				firstEvent: &mapstr.M{},
@@ -224,7 +224,7 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK",
 		},
 		{
-			name:  "func getRFC5988Link multiple rel as seperate strings in random order matches",
+			name:  "func getRFC5988Link multiple rel as separate strings in random order matches",
 			value: `[[ getRFC5988Link "previous" .last_response.header.Link ]]`,
 			paramCtx: &transformContext{
 				firstEvent: &mapstr.M{},
