@@ -78,7 +78,7 @@ require (
 	github.com/elastic/go-libaudit/v2 v2.3.2-0.20220729123722-f8f7d5c19e6b
 	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-lookslike v0.3.0
-	github.com/elastic/go-lumber v0.1.0
+	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.2.0
 	github.com/elastic/go-structform v0.0.10
@@ -203,7 +203,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.2.1
 	github.com/elastic/elastic-agent-libs v0.2.11
-	github.com/elastic/elastic-agent-shipper-client v0.2.0
+	github.com/elastic/elastic-agent-shipper-client v0.4.0
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/pierrec/lz4/v4 v4.1.15
@@ -294,7 +294,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
