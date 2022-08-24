@@ -5,7 +5,9 @@ on:
     workflows:
       - check-metricbeat
       - check-packetbeat
+      - check-dev-tools
       - check-x-pack-metricbeat
+      - check-x-pack-osquerybeat
       - check-x-pack-packetbeat
       - golangci-lint
       - auditbeat
