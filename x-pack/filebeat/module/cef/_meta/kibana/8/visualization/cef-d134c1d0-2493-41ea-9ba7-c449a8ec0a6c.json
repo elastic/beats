@@ -139,10 +139,10 @@
             "type": "table"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.3.3",
     "id": "cef-d134c1d0-2493-41ea-9ba7-c449a8ec0a6c",
     "migrationVersion": {
-        "visualization": "8.0.0"
+        "visualization": "8.3.0"
     },
     "references": [
         {
@@ -151,5 +151,7 @@
             "type": "search"
         }
     ],
-    "type": "visualization"
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NDksMV0="
 }

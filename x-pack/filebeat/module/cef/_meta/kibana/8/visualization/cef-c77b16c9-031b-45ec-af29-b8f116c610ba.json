@@ -106,11 +106,13 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.3.3",
     "id": "cef-c77b16c9-031b-45ec-af29-b8f116c610ba",
     "migrationVersion": {
-        "visualization": "8.0.0"
+        "visualization": "8.3.0"
     },
     "references": [],
-    "type": "visualization"
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NDcsMV0="
 }

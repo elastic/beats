@@ -242,10 +242,10 @@
         "title": "[Filebeat CEF] Network Suspicious Activity Dashboard",
         "version": 1
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.3.3",
     "id": "cef-2745d8ff-e261-428b-a406-15ee77c8a3dd",
     "migrationVersion": {
-        "dashboard": "8.0.0"
+        "dashboard": "8.3.0"
     },
     "references": [
         {
@@ -304,5 +304,7 @@
             "type": "visualization"
         }
     ],
-    "type": "dashboard"
+    "type": "dashboard",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzIzNDYsMV0="
 }

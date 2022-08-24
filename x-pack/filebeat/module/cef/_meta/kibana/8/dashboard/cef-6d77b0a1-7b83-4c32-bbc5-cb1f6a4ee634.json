@@ -265,10 +265,10 @@
         "title": "[Filebeat CEF] ArcSight — Network Suspicious Activity Dashboard",
         "version": 1
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.3.3",
     "id": "cef-6d77b0a1-7b83-4c32-bbc5-cb1f6a4ee634",
     "migrationVersion": {
-        "dashboard": "8.0.0"
+        "dashboard": "8.3.0"
     },
     "references": [
         {
@@ -332,5 +332,7 @@
             "type": "visualization"
         }
     ],
-    "type": "dashboard"
+    "type": "dashboard",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzIzNDgsMV0="
 }

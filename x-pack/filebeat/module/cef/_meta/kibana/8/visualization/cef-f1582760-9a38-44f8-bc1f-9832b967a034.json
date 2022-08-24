@@ -78,6 +78,7 @@
                 },
                 "interpolate": "linear",
                 "legendPosition": "right",
+                "legendSize": "auto",
                 "radiusRatio": 9,
                 "scale": "linear",
                 "seriesParams": [
@@ -125,10 +126,10 @@
             "type": "histogram"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.3.3",
     "id": "cef-f1582760-9a38-44f8-bc1f-9832b967a034",
     "migrationVersion": {
-        "visualization": "8.0.0"
+        "visualization": "8.3.0"
     },
     "references": [
         {
@@ -137,5 +138,7 @@
             "type": "search"
         }
     ],
-    "type": "visualization"
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NjQsMV0="
 }

@@ -35,7 +35,7 @@
         "title": "Endpoint Event Explorer [Filebeat CEF]",
         "version": 1
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.3.3",
     "id": "cef-8eaeaa88-771f-4721-8f35-f94da4ea6009",
     "migrationVersion": {
         "search": "8.0.0"
@@ -47,5 +47,7 @@
             "type": "index-pattern"
         }
     ],
-    "type": "search"
+    "type": "search",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NzcsMV0="
 }
