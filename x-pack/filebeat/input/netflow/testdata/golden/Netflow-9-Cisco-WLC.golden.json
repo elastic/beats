@@ -6,7 +6,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -37,10 +37,10 @@
           "packet_delta_count": 83,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 3320,
@@ -56,7 +56,7 @@
           "bytes": 3320,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 83
         }
       },
@@ -70,7 +70,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -101,10 +101,10 @@
           "packet_delta_count": 83,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 3320,
@@ -118,7 +118,7 @@
         },
         "source": {
           "bytes": 3320,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 83
         }
       },
@@ -130,7 +130,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -161,10 +161,10 @@
           "packet_delta_count": 69,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 7760,
@@ -180,7 +180,7 @@
           "bytes": 7760,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 69
         }
       },
@@ -194,7 +194,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -225,10 +225,10 @@
           "packet_delta_count": 69,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 10229,
@@ -242,7 +242,7 @@
         },
         "source": {
           "bytes": 10229,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 69
         }
       },
@@ -254,7 +254,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -285,10 +285,10 @@
           "packet_delta_count": 1,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 215,
@@ -304,7 +304,7 @@
           "bytes": 215,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 1
         }
       },
@@ -316,7 +316,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -347,10 +347,10 @@
           "packet_delta_count": 225,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 40854,
@@ -366,7 +366,7 @@
           "bytes": 40854,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 225
         }
       },
@@ -380,7 +380,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -411,10 +411,10 @@
           "packet_delta_count": 154,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 35866,
@@ -428,7 +428,7 @@
         },
         "source": {
           "bytes": 35866,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 154
         }
       },
@@ -440,7 +440,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -471,10 +471,10 @@
           "packet_delta_count": 63,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 12279,
@@ -490,7 +490,7 @@
           "bytes": 12279,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 63
         }
       },
@@ -504,7 +504,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -535,10 +535,10 @@
           "packet_delta_count": 61,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 27287,
@@ -552,7 +552,7 @@
         },
         "source": {
           "bytes": 27287,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 61
         }
       },
@@ -564,7 +564,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -595,10 +595,10 @@
           "packet_delta_count": 773,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 147145,
@@ -614,7 +614,7 @@
           "bytes": 147145,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 773
         }
       },
@@ -628,7 +628,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -659,10 +659,10 @@
           "packet_delta_count": 1379,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 1182695,
@@ -676,7 +676,7 @@
         },
         "source": {
           "bytes": 1182695,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 1379
         }
       },
@@ -688,7 +688,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -719,10 +719,10 @@
           "packet_delta_count": 26,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 6777,
@@ -738,7 +738,7 @@
           "bytes": 6777,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 26
         }
       },
@@ -752,7 +752,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -783,10 +783,10 @@
           "packet_delta_count": 26,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 8625,
@@ -800,7 +800,7 @@
         },
         "source": {
           "bytes": 8625,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 26
         }
       },
@@ -812,7 +812,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -843,10 +843,10 @@
           "packet_delta_count": 20434,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 2433001,
@@ -862,7 +862,7 @@
           "bytes": 2433001,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 20434
         }
       },
@@ -876,7 +876,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -907,10 +907,10 @@
           "packet_delta_count": 40726,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 56599680,
@@ -924,7 +924,7 @@
         },
         "source": {
           "bytes": 56599680,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 40726
         }
       },
@@ -936,7 +936,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -967,10 +967,10 @@
           "packet_delta_count": 15,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 1658,
@@ -986,7 +986,7 @@
           "bytes": 1658,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 15
         }
       },
@@ -1000,7 +1000,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -1031,10 +1031,10 @@
           "packet_delta_count": 14,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 950,
@@ -1048,7 +1048,7 @@
         },
         "source": {
           "bytes": 950,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 14
         }
       },
@@ -1060,7 +1060,7 @@
       "Meta": null,
       "Fields": {
         "destination": {
-          "mac": "00:f6:63:cc:80:60"
+          "mac": "00-F6-63-CC-80-60"
         },
         "event": {
           "action": "netflow_flow",
@@ -1091,10 +1091,10 @@
           "packet_delta_count": 16145,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 1495567,
@@ -1110,7 +1110,7 @@
           "bytes": 1495567,
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51",
+          "mac": "34-02-86-75-C0-51",
           "packets": 16145
         }
       },
@@ -1124,7 +1124,7 @@
         "destination": {
           "ip": "192.168.20.121",
           "locality": "internal",
-          "mac": "34:02:86:75:c0:51"
+          "mac": "34-02-86-75-C0-51"
         },
         "event": {
           "action": "netflow_flow",
@@ -1155,10 +1155,10 @@
           "packet_delta_count": 53362,
           "post_ip_diff_serv_code_point": 0,
           "sta_ipv4_address": "192.168.20.121",
-          "sta_mac_address": "34:02:86:75:c0:51",
+          "sta_mac_address": "34-02-86-75-C0-51",
           "type": "netflow_flow",
           "wlan_ssid": "Test-env",
-          "wtp_mac_address": "00:f6:63:cc:80:60"
+          "wtp_mac_address": "00-F6-63-CC-80-60"
         },
         "network": {
           "bytes": 80973880,
@@ -1172,7 +1172,7 @@
         },
         "source": {
           "bytes": 80973880,
-          "mac": "00:f6:63:cc:80:60",
+          "mac": "00-F6-63-CC-80-60",
           "packets": 53362
         }
       },
