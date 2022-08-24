@@ -4,7 +4,9 @@ on:
   workflow_run:
     workflows:
       - check-x-pack-functionbeat
+      - check-x-pack-osquerybeat
       - check-x-pack-packetbeat
+      - check-dev-tools
       - check-packetbeat
       - golangci-lint
       - auditbeat
