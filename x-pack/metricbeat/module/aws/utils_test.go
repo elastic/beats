@@ -435,6 +435,14 @@ func TestGetResourcesTags(t *testing.T) {
 	assert.Equal(t, expectedResourceTagMap, resourceTagMap)
 }
 
+func parseTime(t *testing.T, in string) time.Time {
+	time, err := time.Parse(time.RFC3339, in)
+	if err != nil {
+		t.Errorf("test setup failed - could not parse time with time.RFC3339: %s", in)
+	}
+	return time
+}
+
 func TestGetStartTimeEndTime(t *testing.T) {
 	var cases = []struct {
 		title         string
@@ -465,22 +473,95 @@ func TestGetStartTimeEndTime(t *testing.T) {
 		{"just less than 5 minutes, 3 minute latency", "2022-08-15T13:38:45Z", time.Second * 59 * 5, time.Second * 90, "2022-08-15T13:30:00Z", "2022-08-15T13:35:00Z"},
 	}
 
-	parseTime := func(in string) time.Time {
-		time, err := time.Parse(time.RFC3339, in)
-		if err != nil {
-			t.Errorf("test setup failed - could not parse time with time.RFC3339: %s", in)
-		}
-		return time
-	}
-
 	for _, tt := range cases {
 		t.Run(tt.title, func(t *testing.T) {
-			startTime, expectedStartTime, expectedEndTime := parseTime(tt.start), parseTime(tt.expectedStart), parseTime(tt.expectedEnd)
+			startTime, expectedStartTime, expectedEndTime := parseTime(t, tt.start), parseTime(t, tt.expectedStart), parseTime(t, tt.expectedEnd)
 
 			start, end := GetStartTimeEndTime(startTime, tt.period, tt.latency)
 
 			if expectedStartTime != start || expectedEndTime != end {
 				t.Errorf("got (%s, %s), want (%s, %s)", start, end, tt.expectedStart, tt.expectedEnd)
+			}
+		})
+	}
+}
+
+func TestGetStartTimeEndTime_AlwaysCreatesContinuousIntervals(t *testing.T) {
+	type interval struct {
+		start, end string
+	}
+
+	startTime := parseTime(t, "2022-08-24T11:01:00Z")
+	numCalls := 5
+
+	var cases = []struct {
+		title             string
+		period            time.Duration
+		latency           time.Duration
+		expectedIntervals []interval
+	}{
+		// with no latency
+		{"1 minute", time.Second * 60, 0, []interval{
+			{"2022-08-24T11:00:00Z", "2022-08-24T11:01:00Z"},
+			{"2022-08-24T11:01:00Z", "2022-08-24T11:02:00Z"},
+			{"2022-08-24T11:02:00Z", "2022-08-24T11:03:00Z"},
+			{"2022-08-24T11:03:00Z", "2022-08-24T11:04:00Z"},
+			{"2022-08-24T11:04:00Z", "2022-08-24T11:05:00Z"},
+		}},
+		{"2 minutes", time.Second * 60 * 2, 0, []interval{
+			{"2022-08-24T10:58:00Z", "2022-08-24T11:00:00Z"},
+			{"2022-08-24T11:00:00Z", "2022-08-24T11:02:00Z"},
+			{"2022-08-24T11:02:00Z", "2022-08-24T11:04:00Z"},
+			{"2022-08-24T11:04:00Z", "2022-08-24T11:06:00Z"},
+			{"2022-08-24T11:06:00Z", "2022-08-24T11:08:00Z"},
+		}},
+		{"3 minutes", time.Second * 60 * 3, 0, []interval{
+			{"2022-08-24T10:57:00Z", "2022-08-24T11:00:00Z"},
+			{"2022-08-24T11:00:00Z", "2022-08-24T11:03:00Z"},
+			{"2022-08-24T11:03:00Z", "2022-08-24T11:06:00Z"},
+			{"2022-08-24T11:06:00Z", "2022-08-24T11:09:00Z"},
+			{"2022-08-24T11:09:00Z", "2022-08-24T11:12:00Z"},
+		}},
+		{"5 minutes", time.Second * 60 * 5, 0, []interval{
+			{"2022-08-24T10:55:00Z", "2022-08-24T11:00:00Z"},
+			{"2022-08-24T11:00:00Z", "2022-08-24T11:05:00Z"},
+			{"2022-08-24T11:05:00Z", "2022-08-24T11:10:00Z"},
+			{"2022-08-24T11:10:00Z", "2022-08-24T11:15:00Z"},
+			{"2022-08-24T11:15:00Z", "2022-08-24T11:20:00Z"},
+		}},
+		{"30 minutes", time.Second * 60 * 30, 0, []interval{
+			{"2022-08-24T10:30:00Z", "2022-08-24T11:00:00Z"},
+			{"2022-08-24T11:00:00Z", "2022-08-24T11:30:00Z"},
+			{"2022-08-24T11:30:00Z", "2022-08-24T12:00:00Z"},
+			{"2022-08-24T12:00:00Z", "2022-08-24T12:30:00Z"},
+			{"2022-08-24T12:30:00Z", "2022-08-24T13:00:00Z"},
+		}},
+
+		// with 90s latency (sanity check)
+		{"1 minute with 2 minute latency", time.Second * 60, time.Second * 90, []interval{
+			{"2022-08-24T10:58:00Z", "2022-08-24T10:59:00Z"},
+			{"2022-08-24T10:59:00Z", "2022-08-24T11:00:00Z"},
+			{"2022-08-24T11:00:00Z", "2022-08-24T11:01:00Z"},
+			{"2022-08-24T11:01:00Z", "2022-08-24T11:02:00Z"},
+			{"2022-08-24T11:02:00Z", "2022-08-24T11:03:00Z"},
+		}},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.title, func(t *testing.T) {
+			// get a few repeated intervals
+			intervals := make([]interval, numCalls)
+			for i := range intervals {
+				adjustedStartTime := startTime.Add(tt.period * time.Duration(i))
+				start, end := GetStartTimeEndTime(adjustedStartTime, tt.period, tt.latency)
+				intervals[i] = interval{start.Format(time.RFC3339), end.Format(time.RFC3339)}
+			}
+
+			for i, val := range intervals {
+				if val != tt.expectedIntervals[i] {
+					t.Errorf("got %v, want %v", intervals, tt.expectedIntervals)
+					break
+				}
 			}
 		})
 	}
