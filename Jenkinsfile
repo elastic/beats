@@ -335,6 +335,13 @@ def withTools(Map args = [:], Closure body) {
     withGCP() {
       body()
     }
+  } else if (args.get('nodejs', false)) {
+    withNodeJSEnv() {
+      withEnv(["ELASTIC_SYNTHETICS_CAPABLE=true"]) {
+        cmd(label: "Install @elastic/synthetics", script: "npm i -g @elastic/synthetics")
+        body()
+      }
+    }
   } else {
     body()
   }
@@ -567,10 +574,11 @@ def targetWithoutNode(Map args = [:]) {
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
+  def withNodejs = args.get('withNodejs', false)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
       dumpVariables()
-      withTools(k8s: installK8s, gcp: withGCP) {
+      withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
@@ -1067,6 +1075,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       def installK8s = args.content.get('installK8s', false)
       def withAWS = args.content.get('withAWS', false)
       def withGCP = args.content.get('withGCP', false)
+      def withNodejs = args.content.get('withNodejs', false)
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
@@ -1097,6 +1106,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      withModule: withModule,
                      isMage: true,
                      withGCP: withGCP,
+                     withNodejs: withNodejs,
                      id: args.id,
                      enableRetry: enableRetry)
       }
