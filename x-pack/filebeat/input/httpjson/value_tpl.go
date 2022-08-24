@@ -211,8 +211,8 @@ func parseTimestampNano(ns int64) time.Time {
 
 var regexpLinkRel = regexp.MustCompile(`<(.*)>;.*\srel\="?([^;"]*)`)
 
-func getRFC5988Link(rel string, links []string) string {
-	for _, link := range links {
+func getMatchLink(rel string, linksSplit []string) string {
+	for _, link := range linksSplit {
 		if !regexpLinkRel.MatchString(link) {
 			continue
 		}
@@ -228,8 +228,15 @@ func getRFC5988Link(rel string, links []string) string {
 
 		return matches[1]
 	}
-
 	return ""
+}
+
+func getRFC5988Link(rel string, links []string) string {
+	if len(links) == 1 && strings.Count(links[0], "rel=") > 1 {
+		linksSplit := strings.Split(links[0], ",")
+		return getMatchLink(rel, linksSplit)
+	}
+	return getMatchLink(rel, links)
 }
 
 func toInt(v interface{}) int64 {
