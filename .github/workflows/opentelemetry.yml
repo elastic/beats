@@ -5,6 +5,7 @@ on:
     workflows:
       - check-x-pack-osquerybeat
       - check-x-pack-packetbeat
+      - check-dev-tools
       - check-packetbeat
       - golangci-lint
       - auditbeat
