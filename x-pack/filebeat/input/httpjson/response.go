@@ -81,10 +81,10 @@ func newResponseProcessor(config config, pagination *pagination, log *logp.Logge
 			log:        log,
 		}
 		// chain calls responseProcessor object
-		if ch.Step != nil {
+		if ch.Step != nil && ch.Step.Response != nil {
 			split, _ := newSplitResponse(ch.Step.Response.Split, log)
 			rp.split = split
-		} else if ch.While != nil {
+		} else if ch.While != nil && ch.While.Response != nil {
 			split, _ := newSplitResponse(ch.While.Response.Split, log)
 			rp.split = split
 		}
@@ -93,6 +93,40 @@ func newResponseProcessor(config config, pagination *pagination, log *logp.Logge
 	}
 
 	return rps
+}
+
+func newChainResponseProcessor(config chainConfig, httpClient *httpClient, log *logp.Logger) *responseProcessor {
+	pagination := &pagination{httpClient: httpClient, log: log}
+
+	rp := &responseProcessor{
+		pagination: pagination,
+		log:        log,
+	}
+	if config.Step != nil {
+		if config.Step.Response == nil {
+			return rp
+		}
+
+		ts, _ := newBasicTransformsFromConfig(config.Step.Response.Transforms, responseNamespace, log)
+		rp.transforms = ts
+
+		split, _ := newSplitResponse(config.Step.Response.Split, log)
+
+		rp.split = split
+	} else if config.While != nil {
+		if config.While.Response == nil {
+			return rp
+		}
+
+		ts, _ := newBasicTransformsFromConfig(config.While.Response.Transforms, responseNamespace, log)
+		rp.transforms = ts
+
+		split, _ := newSplitResponse(config.While.Response.Split, log)
+
+		rp.split = split
+	}
+
+	return rp
 }
 
 func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response) <-chan maybeMsg {
