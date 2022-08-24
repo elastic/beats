@@ -89,9 +89,6 @@ pipeline {
           stageStatusCache(id: 'Checks'){
             withBeatsEnv(archive: false, id: "checks") {
               dumpVariables()
-              whenTrue(env.ONLY_DOCS == 'true') {
-                cmd(label: "make check", script: "make check")
-              }
               whenTrue(env.ONLY_DOCS == 'false') {
                 runChecks()
               }
@@ -224,25 +221,7 @@ def runChecks() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = {
-    cmd(label: 'make check-default', script: 'make check-default')
-  }
-  mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
-}
-
-def runPreCommit() {
-  return {
-    withNode(labels: 'ubuntu-18 && immutable', forceWorkspace: true){
-      withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
-        deleteDir()
-        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-        dir("${BASE_DIR}"){
-          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
-        }
-      }
-    }
-  }
 }
 
 def runBuildAndTest(Map args = [:]) {
@@ -523,7 +502,7 @@ def e2e(Map args = [:]) {
   if (args.e2e.get('entrypoint', '')?.trim()) {
     e2e_with_entrypoint(args)
   } else {
-    runE2E(testMatrixFile: args.e2e?.get('testMatrixFile', ''),
+    runE2E(testMatrixFile: '.ci/.e2e-tests-beats.yaml',
            beatVersion: "${env.VERSION}-SNAPSHOT",
            gitHubCheckName: "e2e-${args.context}",
            gitHubCheckRepo: env.REPO,

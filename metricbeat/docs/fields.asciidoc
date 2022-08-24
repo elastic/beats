@@ -4799,6 +4799,24 @@ type: long
 
 --
 
+*`aws.transitgateway.metrics.BytesDropCountNoRoute.sum`*::
++
+--
+The number of bytes dropped because they did not match a route.
+
+type: long
+
+--
+
+*`aws.transitgateway.metrics.BytesDropCountBlackhole.sum`*::
++
+--
+The number of bytes dropped because they matched a blackhole route.
+
+type: long
+
+--
+
 [float]
 === usage
 
