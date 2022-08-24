@@ -1,16 +1,14 @@
-name: check-default
+name: check-x-pack-osquerybeat
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
-      - 7.1*
-      - 8.*
+    paths:
+      - '.github/workflows/check-xpack-osquerybeat.yml'
+      - 'x-pack/osquerybeat/**'
+      - 'osquerybeat/**'
 
-permissions:
-  contents: read
-  pull-requests: read
+env:
+  BEAT_MODULE: 'x-pack/osquerybeat'
 
 jobs:
   check:
@@ -22,7 +20,8 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GO_VERSION }}
-    - name: Run check-default
+    - name: Run check/update
       run: |
         go install github.com/magefile/mage
-        make check-default
+        make -C ${{ env.BEAT_MODULE }} check update
+        make check-no-changes
