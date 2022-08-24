@@ -1,0 +1,83 @@
+{
+    "attributes": {
+        "columns": [
+            "priority",
+            "message",
+            "source.ip",
+            "source.port",
+            "destination.ip",
+            "destination.port",
+            "network.application",
+            "message",
+            "event.action",
+            "event.outcome",
+            "cef.extensions.deviceAddress",
+            "cef.device.product",
+            "cef.device.vendor",
+            "cef.extensions.categoryDeviceGroup",
+            "cef.extensions.categoryDeviceType"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "query",
+                            "negate": false,
+                            "type": "custom",
+                            "value": "{\"term\":{\"event.category\":\"network\"}}"
+                        },
+                        "query": {
+                            "term": {
+                                "event.category": "network"
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "lucene",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Network Events [Filebeat CEF]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-d687d631-96df-4c49-99ee-9e51c7053084",
+    "migrationVersion": {
+        "search": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NzgsMV0="
+}

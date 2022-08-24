@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
 - Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 - Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+- Import dashboards from CEF integration. {pull}32766[32766]
 
 *Auditbeat*
 

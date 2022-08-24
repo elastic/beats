@@ -1,0 +1,89 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 5 Sources by Destination Ports — ArcSight [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Destination Ports",
+                        "field": "destination.port"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Event Count"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Source Address",
+                        "field": "source.ip",
+                        "order": "desc",
+                        "orderBy": "2",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "perPage": 10,
+                "showMeticsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Top 5 Sources by Destination Ports — ArcSight [Filebeat CEF]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-9b0b7c11-1eaf-466c-8dab-4e3299d7091f",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-1da6dac6-7c41-47c5-bcba-567b5e83c7e1",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0MjksMV0="
+}
