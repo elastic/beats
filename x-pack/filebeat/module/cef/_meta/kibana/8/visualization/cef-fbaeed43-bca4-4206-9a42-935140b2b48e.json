@@ -21,7 +21,7 @@
                 "drop_last_bucket": 1,
                 "filter": {
                     "language": "lucene",
-                    "query": "data_stream.dataset:\"cef.log\""
+                    "query": "event.dataset:\"cef.log\""
                 },
                 "gauge_color_rules": [
                     {

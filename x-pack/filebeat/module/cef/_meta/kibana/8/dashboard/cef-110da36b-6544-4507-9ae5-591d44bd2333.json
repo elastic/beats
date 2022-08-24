@@ -8,7 +8,7 @@
                 "highlightAll": true,
                 "query": {
                     "language": "kuery",
-                    "query": "data_stream.dataset:cef.log"
+                    "query": "event.dataset:cef.log"
                 },
                 "version": true
             }

@@ -16,7 +16,7 @@
                 "drop_last_bucket": 1,
                 "filter": {
                     "language": "lucene",
-                    "query": "data_stream.dataset:\"cef.log\""
+                    "query": "event.dataset:\"cef.log\""
                 },
                 "id": "fd1ffeb6-678e-4163-9421-6a164fd59048",
                 "index_pattern": "filebeat-*",
