@@ -638,6 +638,24 @@ func TestValueTpl(t *testing.T) {
 			paramTr:     transformable{},
 			expectedVal: "2022-02-17T04%3A37%3A10.406%2B0000",
 		},
+		{
+			name:        "func replaceAll",
+			value:       `[[ "some value" | replaceAll "some" "my" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "my value",
+		},
+		{
+			name:  "func toJSON",
+			value: "[[ toJSON .first_event.events ]]",
+			paramCtx: &transformContext{
+				firstEvent:   &mapstr.M{"events": []interface{}{map[string]interface{}{"id": 1234}}},
+				lastEvent:    &mapstr.M{},
+				lastResponse: newTestResponse(nil, nil, ""),
+			},
+			paramTr:     transformable{},
+			expectedVal: `[{"id":1234}]`,
+		},
 	}
 
 	for _, tc := range cases {

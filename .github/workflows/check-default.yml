@@ -1,0 +1,28 @@
+name: check-default
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 7.1*
+      - 8.*
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Fetch Go version from .go-version
+      run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: Run check-default
+      run: |
+        go install github.com/magefile/mage
+        make check-default

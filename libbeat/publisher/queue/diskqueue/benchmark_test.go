@@ -17,7 +17,7 @@
 
 // Usage:
 //
-// go test -bench=1M -benchtime 1x -count 10 -timeout 600m -benchmem > results.txt
+// go test -bench=100k -benchtime 1x -count 10 -timeout 10m -benchmem | tee results.txt && benchstat results.txt
 //
 // then
 //
@@ -35,11 +35,14 @@ import (
 	"testing"
 	"time"
 
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
 var (
@@ -58,8 +61,8 @@ var (
 	}
 )
 
-//makeEvent creates a sample event, using a random message from msg above
-func makeEvent() publisher.Event {
+//makePublisherEvent creates a sample publisher.Event, using a random message from msgs list
+func makePublisherEvent() publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{
 			Timestamp: eventTime,
@@ -70,11 +73,27 @@ func makeEvent() publisher.Event {
 	}
 }
 
+//makeMessagesEvent creates a sample *messages.Event, using a random message from msgs list
+func makeMessagesEvent() *messages.Event {
+	return &messages.Event{
+		Timestamp: timestamppb.New(eventTime),
+		Fields: &messages.Struct{
+			Data: map[string]*messages.Value{
+				"message": &messages.Value{
+					Kind: &messages.Value_StringValue{
+						StringValue: msgs[rand.Intn(len(msgs))],
+					},
+				},
+			},
+		},
+	}
+}
+
 //setup creates the disk queue, including a temporary directory to
 // hold the queue.  Location of the temporary directory is stored in
 // the queue settings.  Call `cleanup` when done with the queue to
 // close the queue and remove the temp dir.
-func setup(encrypt bool, compress bool) (*diskQueue, queue.Producer) {
+func setup(encrypt bool, compress bool, protobuf bool) (*diskQueue, queue.Producer) {
 	dir, err := os.MkdirTemp("", "benchmark")
 	if err != nil {
 		panic(err)
@@ -85,6 +104,7 @@ func setup(encrypt bool, compress bool) (*diskQueue, queue.Producer) {
 		s.EncryptionKey = []byte("testtesttesttest")
 	}
 	s.UseCompression = compress
+	s.UseProtobuf = protobuf
 	q, err := NewQueue(logp.L(), s)
 	if err != nil {
 		os.RemoveAll(dir)
@@ -104,9 +124,15 @@ func cleanup(q *diskQueue) {
 	}
 }
 
-func publishEvents(p queue.Producer, num int) {
+func publishEvents(p queue.Producer, num int, protobuf bool) {
 	for i := 0; i < num; i++ {
-		ok := p.Publish(makeEvent())
+		var e interface{}
+		if protobuf {
+			e = makeMessagesEvent()
+		} else {
+			e = makePublisherEvent()
+		}
+		_, ok := p.Publish(e)
 		if !ok {
 			panic("didn't publish")
 		}
@@ -131,36 +157,36 @@ func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 //produceAndConsume generates and publishes events in a go routine, in
 // the main go routine it consumes and acks them.  This interleaves
 // publish and consume.
-func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
-	go publishEvents(p, num_events)
+func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, protobuf bool) error {
+	go publishEvents(p, num_events, protobuf)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
 //produceThenConsume generates and publishes events, when all events
 // are published it consumes and acks them.
-func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
-	publishEvents(p, num_events)
+func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, protobuf bool) error {
+	publishEvents(p, num_events, protobuf)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
 //benchmarkQueue is a wrapper for produceAndConsume, it tries to limit
 // timers to just produceAndConsume
-func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool, async bool, b *testing.B) {
+func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool, async bool, protobuf bool, b *testing.B) {
 	b.ResetTimer()
 	var err error
 
 	for n := 0; n < b.N; n++ {
 		b.StopTimer()
 		rand.Seed(1)
-		q, p := setup(encrypt, compress)
+		q, p := setup(encrypt, compress, protobuf)
 		b.StartTimer()
 		if async {
-			if err = produceAndConsume(p, q, num_events, batch_size); err != nil {
+			if err = produceAndConsume(p, q, num_events, batch_size, protobuf); err != nil {
 				cleanup(q)
 				break
 			}
 		} else {
-			if err = produceThenConsume(p, q, num_events, batch_size); err != nil {
+			if err = produceThenConsume(p, q, num_events, batch_size, protobuf); err != nil {
 				cleanup(q)
 				break
 			}
@@ -172,25 +198,78 @@ func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool,
 	}
 }
 
-// Actual benchmark calls follow
-func BenchmarkAsync1k(b *testing.B)                { benchmarkQueue(1000, 10, false, false, true, b) }
-func BenchmarkAsync1M(b *testing.B)                { benchmarkQueue(1000000, 1000, false, false, true, b) }
-func BenchmarkEncryptAsync1k(b *testing.B)         { benchmarkQueue(1000, 10, true, false, true, b) }
-func BenchmarkEncryptAsync1M(b *testing.B)         { benchmarkQueue(1000000, 1000, true, false, true, b) }
-func BenchmarkCompressAsync1k(b *testing.B)        { benchmarkQueue(1000, 10, false, true, true, b) }
-func BenchmarkCompressAsync1M(b *testing.B)        { benchmarkQueue(1000000, 1000, false, true, true, b) }
-func BenchmarkEncryptCompressAsync1k(b *testing.B) { benchmarkQueue(1000, 10, true, true, true, b) }
-func BenchmarkEncryptCompressAsync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, true, true, true, b)
+// Async benchmarks
+func BenchmarkAsync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, false, false, true, false, b)
+}
+func BenchmarkAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, false, true, false, b)
+}
+func BenchmarkEncryptAsync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, true, false, true, false, b)
+}
+func BenchmarkEncryptAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, false, true, false, b)
+}
+func BenchmarkCompressAsync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, false, true, true, false, b)
+}
+func BenchmarkCompressAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, true, true, false, b)
+}
+func BenchmarkEncryptCompressAsync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, true, true, true, false, b)
+}
+func BenchmarkEncryptCompressAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, true, true, false, b)
+}
+func BenchmarkProtoAsync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, false, false, true, true, b)
+}
+func BenchmarkProtoAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, false, true, true, b)
+}
+func BenchmarkEncCompProtoAsync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, true, true, true, true, b)
+}
+func BenchmarkEncCompProtoAsync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, true, true, true, b)
 }
 
-func BenchmarkSync1k(b *testing.B)                { benchmarkQueue(1000, 10, false, false, false, b) }
-func BenchmarkSync1M(b *testing.B)                { benchmarkQueue(1000000, 1000, false, false, false, b) }
-func BenchmarkEncryptSync1k(b *testing.B)         { benchmarkQueue(1000, 10, true, false, false, b) }
-func BenchmarkEncryptSync1M(b *testing.B)         { benchmarkQueue(1000000, 1000, true, false, false, b) }
-func BenchmarkCompressSync1k(b *testing.B)        { benchmarkQueue(1000, 10, false, true, false, b) }
-func BenchmarkCompressSync1M(b *testing.B)        { benchmarkQueue(1000000, 1000, false, true, false, b) }
-func BenchmarkEncryptCompressSync1k(b *testing.B) { benchmarkQueue(1000, 10, true, true, false, b) }
-func BenchmarkEncryptCompressSync1M(b *testing.B) {
-	benchmarkQueue(1000000, 1000, true, true, false, b)
+// Sync Benchmarks
+func BenchmarkSync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, false, false, false, false, b)
+}
+func BenchmarkSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, false, false, false, b)
+}
+func BenchmarkEncryptSync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, true, false, false, false, b)
+}
+func BenchmarkEncryptSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, false, false, false, b)
+}
+func BenchmarkCompressSync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, false, true, false, false, b)
+}
+func BenchmarkCompressSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, true, false, false, b)
+}
+func BenchmarkEncryptCompressSync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, true, true, false, false, b)
+}
+func BenchmarkEncryptCompressSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, true, false, false, b)
+}
+func BenchmarkProtoSync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, false, false, false, true, b)
+}
+func BenchmarkProtoSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, false, false, false, true, b)
+}
+func BenchmarkEncCompProtoSync1k(b *testing.B) {
+	benchmarkQueue(1000, 10, true, true, false, true, b)
+}
+func BenchmarkEncCompProtoSync100k(b *testing.B) {
+	benchmarkQueue(100000, 1000, true, true, false, true, b)
 }

@@ -6,16 +6,16 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
-	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
-	"github.com/pkg/errors"
+	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
@@ -36,36 +36,37 @@ func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time
 	return startTime.Round(d), endTime.Round(d)
 }
 
-// GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
+// GetListMetricsOutput function gets listMetrics results from cloudwatch ~~per namespace~~ for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
-func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.ClientAPI) ([]cloudwatch.Metric, error) {
-	var metricsTotal []cloudwatch.Metric
+func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]types.Metric, error) {
+	var metricsTotal []types.Metric
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
 		NextToken: nextToken,
 	}
+
 	if namespace != "*" {
 		listMetricsInput.Namespace = &namespace
 	}
 
-	// List metrics of a given namespace for each region
-	req := svcCloudwatch.ListMetricsRequest(listMetricsInput)
-	paginator := cloudwatch.NewListMetricsPaginator(req)
-	for paginator.Next(context.TODO()) {
-		page := paginator.CurrentPage()
-		metricsTotal = append(metricsTotal, page.Metrics...)
-	}
+	paginator := cloudwatch.NewListMetricsPaginator(svcCloudwatch, listMetricsInput)
 
-	if err := paginator.Err(); err != nil {
-		return metricsTotal, errors.Wrap(err, "error ListMetrics with Paginator, skipping region "+regionName)
+	// List metrics of a given namespace for each region
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.TODO())
+		if err != nil {
+			return metricsTotal, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
+		}
+
+		metricsTotal = append(metricsTotal, page.Metrics...)
 	}
 	return metricsTotal, nil
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
-func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
+func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwatch.GetMetricDataAPIClient, startTime time.Time, endTime time.Time) ([]types.MetricDataResult, error) {
 	maxQuerySize := 100
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 
@@ -84,17 +85,17 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 			MetricDataQueries: metricDataQueriesPartial,
 		}
 
-		req := svc.GetMetricDataRequest(getMetricDataInput)
-		paginator := cloudwatch.NewGetMetricDataPaginator(req)
-		for paginator.Next(context.TODO()) {
-			page := paginator.CurrentPage()
+		paginator := cloudwatch.NewGetMetricDataPaginator(svc, getMetricDataInput)
+		var err error
+		var page *cloudwatch.GetMetricDataOutput
+		for paginator.HasMorePages() {
+			if page, err = paginator.NextPage(context.TODO()); err != nil {
+				return getMetricDataOutput.MetricDataResults, fmt.Errorf("error GetMetricData with Paginator: %w", err)
+			}
 			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, page.MetricDataResults...)
 		}
-
-		if err := paginator.Err(); err != nil {
-			return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "error GetMetricData with Paginator")
-		}
 	}
+
 	return getMetricDataOutput.MetricDataResults, nil
 }
 
@@ -124,7 +125,7 @@ func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (boo
 //	 Values: [0.5,0]
 // }]
 // This case, we are collecting values for both metrics from timestamp 2019-03-11 17:45:00 +0000 UTC.
-func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time {
+func FindTimestamp(getMetricDataResults []types.MetricDataResult) time.Time {
 	timestamp := time.Time{}
 	for _, output := range getMetricDataResults {
 		// When there are outputs with one timestamp, use this timestamp.
@@ -152,27 +153,32 @@ func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time
 
 // GetResourcesTags function queries AWS resource groupings tagging API
 // to get a resource tag mapping with specific resource type filters
-func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeFilters []string) (map[string][]resourcegroupstaggingapi.Tag, error) {
+func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resourceTypeFilters []string) (map[string][]resourcegroupstaggingapitypes.Tag, error) {
 	if resourceTypeFilters == nil {
-		return map[string][]resourcegroupstaggingapi.Tag{}, nil
+		return map[string][]resourcegroupstaggingapitypes.Tag{}, nil
 	}
 
-	resourceTagMap := make(map[string][]resourcegroupstaggingapi.Tag)
+	resourceTagMap := make(map[string][]resourcegroupstaggingapitypes.Tag)
 	getResourcesInput := &resourcegroupstaggingapi.GetResourcesInput{
 		PaginationToken:     nil,
 		ResourceTypeFilters: resourceTypeFilters,
 	}
 
-	getResourcesRequest := svc.GetResourcesRequest(getResourcesInput)
-	paginator := resourcegroupstaggingapi.NewGetResourcesPaginator(getResourcesRequest)
-	for paginator.Next(context.TODO()) {
-		page := paginator.CurrentPage()
+	paginator := resourcegroupstaggingapi.NewGetResourcesPaginator(svc, getResourcesInput)
+	var err error
+	var page *resourcegroupstaggingapi.GetResourcesOutput
+	for paginator.HasMorePages() {
+		if page, err = paginator.NextPage(context.TODO()); err != nil {
+			err = fmt.Errorf("error GetResources with Paginator: %w", err)
+			return nil, err
+		}
+
 		for _, resourceTag := range page.ResourceTagMappingList {
 			shortIdentifier, err := FindShortIdentifierFromARN(*resourceTag.ResourceARN)
 			if err == nil {
 				resourceTagMap[shortIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when processing shortIdentifier")
+				err = fmt.Errorf("error occurs when processing shortIdentifier: %w", err)
 				return nil, err
 			}
 
@@ -180,16 +186,12 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 			if err == nil {
 				resourceTagMap[wholeIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when processing longIdentifier")
+				err = fmt.Errorf("error occurs when processing longIdentifier: %w", err)
 				return nil, err
 			}
 		}
 	}
 
-	if err := paginator.Err(); err != nil {
-		err = errors.Wrap(err, "error GetResources with Paginator")
-		return nil, err
-	}
 	return resourceTagMap, nil
 }
 
@@ -197,15 +199,15 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
+		err = fmt.Errorf("error Parse arn: %w", err)
 		return "", err
 	}
 
 	resourceARNSplit := []string{arnParsed.Resource}
 	if strings.Contains(arnParsed.Resource, ":") {
-		resourceARNSplit = strings.Split(arnParsed.Resource, ":")
+		resourceARNSplit = strings.Split(strings.Trim(arnParsed.Resource, ":"), ":")
 	} else if strings.Contains(arnParsed.Resource, "/") {
-		resourceARNSplit = strings.Split(arnParsed.Resource, "/")
+		resourceARNSplit = strings.Split(strings.Trim(arnParsed.Resource, "/"), "/")
 	}
 
 	if len(resourceARNSplit) <= 1 {
@@ -214,11 +216,11 @@ func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	return strings.Join(resourceARNSplit[1:], "/"), nil
 }
 
-// FindWholeIdentifierFromARN funtion extracts whole resource filed of ARN
+// FindWholeIdentifierFromARN function extracts whole resource filed of ARN
 func FindWholeIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
+		err = fmt.Errorf("error Parse arn: %w", err)
 		return "", err
 	}
 	return arnParsed.Resource, nil

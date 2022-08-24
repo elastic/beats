@@ -23,14 +23,16 @@ stages:
         stage: checks
     unitTest:
         mage: "mage build unitTest"
+        withNodejs: true
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
+        withNodejs: true
         stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "orka && darwin && poc"
+          - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/heartbeat for macos"

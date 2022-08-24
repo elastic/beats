@@ -20,17 +20,16 @@ package monitors
 import (
 	"regexp"
 	"testing"
-	"time"
+
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var binfo = beat.Info{
@@ -160,18 +159,39 @@ func TestPreProcessors(t *testing.T) {
 	}
 }
 
+func TestDisabledMonitor(t *testing.T) {
+	confMap := map[string]interface{}{
+		"type":    "test",
+		"enabled": "false",
+	}
+
+	conf, err := config.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	reg, built, closed := mockPluginsReg()
+	f, sched, fClose := makeMockFactory(reg)
+	defer fClose()
+	defer sched.Stop()
+	runner, err := f.Create(&MockPipeline{}, conf)
+	require.NoError(t, err)
+	require.IsType(t, runner, NoopRunner{})
+
+	require.Equal(t, 0, built.Load())
+	require.Equal(t, 0, closed.Load())
+}
+
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
 	badConf := mockBadPluginConf(t, "custom")
 	reg, built, closed := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
+	mockPipeline := &MockPipeline{}
 
-	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
+	f, sched, fClose := makeMockFactory(reg)
+	defer fClose()
 	defer sched.Stop()
 
-	f := NewFactory(binfo, sched.Add, reg, false)
 	makeTestMon := func() (*Monitor, error) {
-		mIface, err := f.Create(pipelineConnector, serverMonConf)
+		mIface, err := f.Create(mockPipeline, serverMonConf)
 		if mIface == nil {
 			return nil, err
 		} else {
@@ -180,7 +200,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	}
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched.Add, nil, false)
+	_, m0Err := newMonitor(badConf, reg, mockPipeline.ConnectSync(), sched.Add, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

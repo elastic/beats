@@ -48,6 +48,8 @@ Example configuration:
     - /var/log/*.log
 ----
 
+WARNING: Each filestream input must have a unique ID. Omitting or changing the filestream ID may cause
+data duplication. Without a unique ID, filestream is unable to correctly track the state of files.
 
 You can apply additional
 <<{beatname_lc}-input-{type}-options,configuration settings>> (such as `fields`,
@@ -67,7 +69,7 @@ multiple input sections:
     - /var/log/system.log
     - /var/log/wifi.log
 - type: filestream <2>
-  id: bar
+  id: apache-filestream-id
   paths:
     - "/var/log/apache2/*"
   fields:

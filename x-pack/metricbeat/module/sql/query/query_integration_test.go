@@ -158,9 +158,13 @@ func TestPostgreSQL(t *testing.T) {
 				Assertion: func(t *testing.T, event beat.Event) {
 					value, err := event.GetValue("sql.query")
 					assert.NoError(t, err)
-					require.NotEmpty(t, value.(map[string]interface{}))
+					require.NotEmpty(t, value)
 				},
 			}
+
+			t.Run("fetch with URL", func(t *testing.T) {
+				testFetch(t, cfg)
+			})
 
 		})
 
@@ -178,9 +182,45 @@ func TestPostgreSQL(t *testing.T) {
 				Assertion: func(t *testing.T, event beat.Event) {
 					value, err := event.GetValue("sql.query")
 					assert.NoError(t, err)
-					require.NotEmpty(t, value.(map[string]interface{}))
+					require.NotEmpty(t, value)
 				},
 			}
+
+			t.Run("fetch with URL", func(t *testing.T) {
+				testFetch(t, cfg)
+			})
+
+		})
+
+		t.Run("merged mode", func(t *testing.T) {
+			cfg = testFetchConfig{
+				config: config{
+					Driver: "postgres",
+					Queries: []query{
+						query{Query: "SELECT blks_hit FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+						query{Query: "SELECT blks_read FROM pg_stat_database limit 1;", ResponseFormat: "table"},
+					},
+					ResponseFormat: tableResponseFormat,
+					RawData: rawData{
+						Enabled: true,
+					},
+					MergeResults: true,
+				},
+				Host: fmt.Sprintf("postgres://%s:%s@%s:%s/?sslmode=disable", user, password, host, port),
+				Assertion: func(t *testing.T, event beat.Event) {
+					// Ensure both merged fields are there in a single event.
+					value1, err1 := event.GetValue("sql.metrics.blks_hit")
+					assert.NoError(t, err1)
+					require.NotEmpty(t, value1)
+					value2, err2 := event.GetValue("sql.metrics.blks_read")
+					assert.NoError(t, err2)
+					require.NotEmpty(t, value2)
+				},
+			}
+
+			t.Run("fetch with URL", func(t *testing.T) {
+				testFetch(t, cfg)
+			})
 
 		})
 	})
@@ -212,7 +252,9 @@ func getConfig(cfg testFetchConfig) map[string]interface{} {
 		"hosts":            []string{cfg.Host},
 		"driver":           cfg.config.Driver,
 		"sql_query":        cfg.config.Query,
+		"sql_queries":      cfg.config.Queries,
 		"raw_data.enabled": cfg.config.RawData.Enabled,
+		"merge_results":    cfg.config.MergeResults,
 	}
 
 	if cfg.config.ResponseFormat != "" {

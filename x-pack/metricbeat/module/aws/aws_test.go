@@ -8,51 +8,40 @@
 package aws
 
 import (
-	"fmt"
-	"net/http"
+	"context"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/stretchr/testify/assert"
 )
 
 // MockEC2Client struct is used for unit tests.
 type MockEC2Client struct {
-	ec2iface.ClientAPI
+	*ec2.Client
 }
 
-var regionName = "us-west-1"
-
-func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
-	httpReq, _ := http.NewRequest("", "", nil)
-	return ec2.DescribeRegionsRequest{
-		Request: &awssdk.Request{
-			Data: &ec2.DescribeRegionsOutput{
-				Regions: []ec2.Region{
-					{
-						RegionName: &regionName,
-					},
-				},
+func (m *MockEC2Client) DescribeRegions(ctx context.Context, params *ec2.DescribeRegionsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeRegionsOutput, error) {
+	return &ec2.DescribeRegionsOutput{
+		Regions: []ec2types.Region{
+			{
+				RegionName: awssdk.String("us-west-1"),
 			},
-			HTTPRequest: httpReq,
-			Retryer:     awssdk.NoOpRetryer{},
 		},
-	}
+	}, nil
 }
 
 func TestGetRegions(t *testing.T) {
 	mockSvc := &MockEC2Client{}
 	regionsList, err := getRegions(mockSvc)
 	if err != nil {
-		fmt.Println("failed getRegions: ", err)
-		t.FailNow()
+		t.Fatalf("failed getRegions: %s", err)
 	}
 	assert.Equal(t, 1, len(regionsList))
-	assert.Equal(t, regionName, regionsList[0])
+	assert.Equal(t, "us-west-1", regionsList[0])
 }
 
 func TestStringInSlice(t *testing.T) {
@@ -110,7 +99,7 @@ func TestCheckTagFiltersExist(t *testing.T) {
 					Value: "Engineering",
 				},
 			},
-			[]ec2.Tag{
+			[]ec2types.Tag{
 				{
 					Key:   awssdk.String(tagKey1),
 					Value: awssdk.String(tagValue1),
@@ -138,7 +127,7 @@ func TestCheckTagFiltersExist(t *testing.T) {
 					Value: "Engineering",
 				},
 			},
-			[]resourcegroupstaggingapi.Tag{
+			[]resourcegroupstaggingapitypes.Tag{
 				{
 					Key:   awssdk.String(tagKey1),
 					Value: awssdk.String(tagValue1),
@@ -162,7 +151,7 @@ func TestCheckTagFiltersExist(t *testing.T) {
 					Value: "test",
 				},
 			},
-			[]resourcegroupstaggingapi.Tag{
+			[]resourcegroupstaggingapitypes.Tag{
 				{
 					Key:   awssdk.String(tagKey1),
 					Value: awssdk.String(tagValue1),

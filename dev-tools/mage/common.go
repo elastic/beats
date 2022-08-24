@@ -374,8 +374,9 @@ func unzip(sourceFile, destinationDir string) error {
 	return nil
 }
 
-// Tar compress a directory using tar + gzip algorithms
-func Tar(src string, targetFile string) error {
+// Tar compress a directory using tar + gzip algorithms but without adding
+// the directory
+func TarWithOptions(src string, targetFile string, trimSource bool) error {
 	fmt.Printf(">> creating TAR file from directory: %s, target: %s\n", src, targetFile)
 
 	f, err := os.Create(targetFile)
@@ -409,6 +410,15 @@ func Tar(src string, targetFile string) error {
 		// must provide real name
 		// (see https://golang.org/src/archive/tar/common.go?#L626)
 		header.Name = filepath.ToSlash(file)
+		// Replace the source folder in the files to be compressed
+		if trimSource {
+			header.Name = strings.ReplaceAll(filepath.ToSlash(file), filepath.ToSlash(src), "")
+			header.Name = strings.TrimPrefix(header.Name, "/")
+			if header.Name == "" {
+				fmt.Print(">> skipping root directory\n")
+				return nil
+			}
+		}
 
 		// write header
 		if err := tw.WriteHeader(header); err != nil {
@@ -439,6 +449,11 @@ func Tar(src string, targetFile string) error {
 	}
 
 	return nil
+}
+
+// Tar compress a directory using tar + gzip algorithms
+func Tar(src string, targetFile string) error {
+	return TarWithOptions(src, targetFile, false)
 }
 
 func untar(sourceFile, destinationDir string) error {

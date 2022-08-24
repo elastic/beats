@@ -108,3 +108,58 @@ Will produce the following output:
 -------------------------------------------------------------------------------
 
 See <<conditions>> for a list of supported conditions.
+
+The field mappings are as follows:
+
+[cols="<m,<m,<d",options="header",]
+|========================================================
+| Event Field | Source XML Element | Notes
+| winlog.channel | <Event><System><Channel> |
+| winlog.event_id | <Event><System><EventID> |
+| winlog.provider_name | <Event><System><Provider> | `Name` attribute
+| winlog.record_id | <Event><System><EventRecordID> |
+| winlog.task | <Event><System><Task> |
+| winlog.computer_name | <Event><System><Computer> |
+| winlog.keywords | <Event><RenderingInfo><Keywords> | list of each `Keyword`
+| winlog.opcodes | <Event><RenderingInfo><Opcode> |
+| winlog.provider_guid | <Event><System><Provider> | `Guid` attribute
+| winlog.version | <Event><System><Version> |
+| winlog.time_created | <Event><System><TimeCreated> | `SystemTime` attribute
+| winlog.outcome | <Event><System><Keywords> | "success" if bit 0x20000000000000 is set, "failure" if 0x10000000000000 is set
+| winlog.level | <Event><System><Level> | converted to lowercase
+| winlog.message | <Event><RenderingInfo><Message> | line endings removed
+| winlog.user.identifier | <Event><System><Security><UserID> |
+| winlog.user.domain | <Event><System><Security><Domain> |
+| winlog.user.name | <Event><System><Security><Name> |
+| winlog.user.type | <Event><System><Security><Type> | converted from integer to String
+| winlog.event_data | <Event><EventData> | map where `Name` attribute in Data element is key, and value is the value of the Data element
+| winlog.user_data | <Event><UserData> | map where `Name` attribute in Data element is key, and value is the value of the Data element
+| winlog.activity_id | <Event><System><Correlation><ActivityID> |
+| winlog.related_activity_id | <Event><System><Correlation><RelatedActivityID> |
+| winlog.kernel_time | <Event><System><Execution><KernelTime> |
+| winlog.process.pid | <Event><System><Execution><ProcessID> |
+| winlog.process.thread.id | <Event><System><Execution><ThreadID> |
+| winlog.processor_id | <Event><System><Execution><ProcessorID> |
+| winlog.processor_time | <Event><System><Execution><ProcessorTime> |
+| winlog.session_id | <Event><System><Execution><SessionID> |
+| winlog.user_time | <Event><System><Execution><UserTime> |
+| winlog.error.code | <Event><ProcessingErrorData><ErrorCode> |
+|========================================================
+
+
+If `map_ecs_fields` is enabled then the following field mappings are also performed:
+
+[cols="<m,<m,<d",options="header",]
+|========================================================
+| Event Field | Source XML or other field | Notes
+| event.code | winlog.event_id |
+| event.kind | "event" |
+| event.provider | <Event><System><Provider> | `Name` attribute
+| event.action | <Event><RenderingInfo><Task> |
+| event.host.name | <Event><System><Computer> |
+| event.outcome | winlog.outcome |
+| log.level | winlog.level |
+| message | winlog.message |
+| error.code | winlog.error.code |
+| error.message | winlog.error.message |
+|========================================================

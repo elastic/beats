@@ -13,3 +13,5 @@ input:
           - PacketsOut
           - PacketDropCountBlackhole
           - PacketDropCountNoRoute
+          - BytesDropCountNoRoute
+          - BytesDropCountBlackhole

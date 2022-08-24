@@ -8,6 +8,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
@@ -19,9 +21,13 @@ import (
 // 	type: logs
 //   query: select * from usb_devices
 
-const DefaultNamespace = "default"
+const (
+	DefaultNamespace = "default"
+	DefaultDataset   = "osquery_manager.result"
+	DefaultType      = "logs"
+)
 
-const datastreamPrefix = "logs-osquery_manager.result-"
+var datastreamPrefix = fmt.Sprintf("%s-%s-", DefaultType, DefaultDataset)
 
 type StreamConfig struct {
 	ID         string                 `config:"id"`
@@ -34,6 +40,8 @@ type StreamConfig struct {
 
 type DatastreamConfig struct {
 	Namespace string `config:"namespace"`
+	Dataset   string `config:"dataset"`
+	Type      string `config:"type"`
 }
 
 type InputConfig struct {
