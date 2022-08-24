@@ -15,6 +15,11 @@
 # to sniff on the device carrying the default route.
 packetbeat.interfaces.device: any
 
+# Specify the amount of time between polling for changes in the default
+# route. This option is only used when one of the default route devices
+# is specified.
+packetbeat.interfaces.poll_default_route: 1m
+
 # The network CIDR blocks that are considered "internal" networks for
 # the purpose of network perimeter boundary classification. The valid
 # values for internal_networks are the same as those that can be used
