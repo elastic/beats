@@ -56,7 +56,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Check for nil metadata in GCP. {pull}32281[32281]
 - update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
 - update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
-- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32446[32446]
 
 *Packetbeat*
 
