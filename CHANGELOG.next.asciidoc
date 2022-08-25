@@ -52,7 +52,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix to ARN parsing for Cloudwatch resource names with leading slashes {pull}32446[32446]
+- Check for nil metadata in GCP. {pull}32281[32281]
 
 *Packetbeat*
 
