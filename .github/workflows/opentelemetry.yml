@@ -8,6 +8,7 @@ on:
       - check-filebeat
       - check-packetbeat
       - check-x-pack-auditbeat
+      - check-x-pack-filebeat
       - check-x-pack-functionbeat
       - check-x-pack-packetbeat
       - golangci-lint
