@@ -53,10 +53,21 @@ import (
 //    go_stripped
 type exeObjParser map[string]bool
 
-func (fields exeObjParser) Parse(dst mapstr.M, path string) error {
+func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 	if dst == nil {
 		return errors.New("cannot use nil dst for file parser")
 	}
+	defer func() {
+		switch r := recover().(type) {
+		case nil:
+		case error:
+			// This will catch runtime.Error panics differentially.
+			// These are the most likely panics during the analysis.
+			err = fmt.Errorf("error panic during executable parser analysis of %s: %w", path, r)
+		default:
+			err = fmt.Errorf("panic during executable parser analysis of %s: %v", path, r)
+		}
+	}()
 
 	f, err := toutoumomoma.Open(path)
 	if err != nil {
