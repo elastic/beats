@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 
 *Packetbeat*
 
