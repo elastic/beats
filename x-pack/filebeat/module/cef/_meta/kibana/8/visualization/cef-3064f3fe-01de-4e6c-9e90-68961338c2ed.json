@@ -1,0 +1,68 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Device Type Breakdown — ArcSight [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Firewall Types",
+                        "field": "cef.extensions.categoryDeviceType",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": false,
+                "legendDisplay": "show",
+                "legendPosition": "right",
+                "legendSize": "auto",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                }
+            },
+            "title": "Device Type Breakdown — ArcSight [Filebeat CEF]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-3064f3fe-01de-4e6c-9e90-68961338c2ed",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-1da6dac6-7c41-47c5-bcba-567b5e83c7e1",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzIzODUsMV0="
+}

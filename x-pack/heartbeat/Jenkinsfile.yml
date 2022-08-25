@@ -15,9 +15,11 @@ platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     unitTest:
         mage: "mage build unitTest"
+        withNodejs: true
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
+        withNodejs: true
         stage: mandatory
     macos:
         mage: "mage build unitTest"

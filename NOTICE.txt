@@ -10069,11 +10069,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-l
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-shipper-client
-Version: v0.2.0
+Version: v0.4.0
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-shipper-client@v0.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-shipper-client@v0.4.0/LICENSE.txt:
 
 Elastic License 2.0
 
@@ -10805,11 +10805,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-elasticsearc
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-libaudit/v2
-Version: v2.3.2-0.20220729123722-f8f7d5c19e6b
+Version: v2.3.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.3.2-0.20220729123722-f8f7d5c19e6b/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.3.2/LICENSE.txt:
 
 
                                  Apache License
