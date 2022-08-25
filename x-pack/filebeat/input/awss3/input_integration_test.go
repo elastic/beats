@@ -16,6 +16,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+<<<<<<< HEAD
+=======
+	"runtime"
+	"strings"
+>>>>>>> b40349ce5a (allow for json/ndjson content type with charset (#32767))
 	"testing"
 	"time"
 
@@ -86,7 +91,6 @@ file_selectors:
 -
   regex: 'events-array.json$'
   expand_event_list_from_field: Events
-  content_type: application/json
   include_s3_metadata:
     - last-modified
     - x-amz-version-id
@@ -95,7 +99,6 @@ file_selectors:
     - Content-Type
 -
   regex: '\.(?:nd)?json(\.gz)?$'
-  content_type: application/json
 -
   regex: 'multiline.txt$'
   parsers:
@@ -115,7 +118,6 @@ file_selectors:
 -
   regex: 'events-array.json$'
   expand_event_list_from_field: Events
-  content_type: application/json
   include_s3_metadata:
     - last-modified
     - x-amz-version-id
@@ -124,7 +126,6 @@ file_selectors:
     - Content-Type
 -
   regex: '\.(?:nd)?json(\.gz)?$'
-  content_type: application/json
 -
   regex: 'multiline.txt$'
   parsers:
@@ -324,11 +325,26 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 			t.Fatalf("Failed to open file %q, %v", filename, err)
 		}
 
+		contentType := ""
+		if strings.HasSuffix(filename, "ndjson") || strings.HasSuffix(filename, "ndjson.gz") {
+			contentType = contentTypeNDJSON + "; charset=UTF-8"
+		} else if strings.HasSuffix(filename, "json") || strings.HasSuffix(filename, "json.gz") {
+			contentType = contentTypeJSON + "; charset=UTF-8"
+		}
+
 		// Upload the file to S3.
+<<<<<<< HEAD
 		result, err := uploader.Upload(&s3manager.UploadInput{
 			Bucket: aws.String(bucket),
 			Key:    aws.String(filepath.Base(filename)),
 			Body:   bytes.NewReader(data),
+=======
+		result, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
+			Bucket:      aws.String(bucket),
+			Key:         aws.String(filepath.Base(filename)),
+			Body:        bytes.NewReader(data),
+			ContentType: aws.String(contentType),
+>>>>>>> b40349ce5a (allow for json/ndjson content type with charset (#32767))
 		})
 		if err != nil {
 			t.Fatalf("Failed to upload file %q: %v", filename, err)

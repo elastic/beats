@@ -38,6 +38,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
+- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
+- Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
+- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
+- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
+- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
 - Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 
 *Heartbeat*
