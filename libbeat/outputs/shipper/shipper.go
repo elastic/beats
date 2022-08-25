@@ -137,25 +137,37 @@ func (s *shipper) Connect() error {
 
 	s.client = sc.NewProducerClient(conn)
 
-	indexClient, err := s.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
-		PollingInterval: durationpb.New(0), // no need to subscribe, we need it only once
+	// we don't need a timeout context here anymore, we use the
+	// `s.backgroundCtx` instead, it's going to be a long running client
+	ackCtx, ackCanel := context.WithCancel(s.backgroundCtx)
+	defer func() {
+		// in case we return an error before we start the `ackLoop`
+		// then we don't need this client anymore and must close the stream
+		if err != nil {
+			ackCanel()
+		}
+	}()
+
+	indexClient, err := s.client.PersistedIndex(ackCtx, &messages.PersistedIndexRequest{
+		PollingInterval: durationpb.New(s.config.AckPollingInterval),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to connect to the server: %w", err)
 	}
-	serverInfo, err := indexClient.Recv()
+	indexReply, err := indexClient.Recv()
 	if err != nil {
 		return fmt.Errorf("failed to fetch server information: %w", err)
 	}
-	s.serverID = serverInfo.GetUuid()
+	s.serverID = indexReply.GetUuid()
 
 	s.log.Debugf("connection to %s (%s) established.", s.config.Server, s.serverID)
 
 	go func() {
-		err := s.ackLoop(s.backgroundCtx)
-		if err != nil {
-			s.log.Errorf("acknowledgment loop stopped: %s", err)
-		}
+		defer ackCanel()
+		s.log.Debugf("starting acknowledgment loop with server %s", s.serverID)
+		// the loop returns only in case of error
+		err := s.ackLoop(s.backgroundCtx, indexClient)
+		s.log.Errorf("acknowledgment loop stopped: %s", err)
 	}()
 
 	return nil
@@ -258,21 +270,8 @@ func (s *shipper) String() string {
 	return "shipper"
 }
 
-func (s *shipper) ackLoop(ctx context.Context) error {
+func (s *shipper) ackLoop(ctx context.Context, ackClient sc.Producer_PersistedIndexClient) error {
 	st := s.observer
-
-	// so we explicitly close the stream when exit the function
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	s.clientMutex.Lock()
-	ackClient, err := s.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
-		PollingInterval: durationpb.New(s.config.AckPollingInterval),
-	})
-	s.clientMutex.Unlock()
-	if err != nil {
-		return fmt.Errorf("acknowledgment failed due to the connectivity error: %w", err)
-	}
 
 	for {
 		select {
