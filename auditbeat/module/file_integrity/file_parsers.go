@@ -30,7 +30,6 @@ type FileParser interface {
 
 // FileParsers returns the set of file parsers required to satisfy the config.
 func FileParsers(c Config) []FileParser {
-	//nolint:godox // Bad linter!
 	// TODO: Consider whether to allow specification by fileparser name in
 	// addition to target field.
 
