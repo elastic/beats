@@ -6,7 +6,6 @@ on:
       - check-dev-tools
       - check-packetbeat
       - check-winlogbeat
-      - check-x-pack-osquerybeat
       - check-x-pack-packetbeat
       - check-x-pack-winlogbeat
       - golangci-lint
