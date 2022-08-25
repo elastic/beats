@@ -15,7 +15,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
- - [Httpjson]- Fix for pagination at root level not working when used with chaining.
+- [Httpjson]- Fix for pagination at root level not working when used with chaining.
 
 *Heartbeat*
 
@@ -39,13 +39,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-- Fixes a bug with the auditd module where data is corrupted because it was not copied before the byte slice was reused. {issue}32818[32818] {pull}32823[32823]
 
 *Filebeat*
 
-- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
-- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
-- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
 
 *Heartbeat*
 
@@ -76,7 +72,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
 
 *Auditbeat*
 
@@ -124,6 +119,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
