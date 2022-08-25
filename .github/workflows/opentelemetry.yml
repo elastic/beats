@@ -7,6 +7,7 @@ on:
       - check-dev-tools
       - check-packetbeat
       - check-x-pack-auditbeat
+      - check-x-pack-functionbeat
       - check-x-pack-packetbeat
       - golangci-lint
       - auditbeat
