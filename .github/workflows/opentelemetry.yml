@@ -4,7 +4,6 @@ on:
   workflow_run:
     workflows:
       - check-dev-tools
-      - check-packetbeat
       - check-x-pack-functionbeat
       - check-x-pack-packetbeat
       - check-packetbeat
