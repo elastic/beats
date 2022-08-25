@@ -13,15 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v3
-    - uses: pre-commit/action@646c83fcd040023954eafda54b4db0192ce70507
-      with: ## let's skip to run for all the files
-        extra_args: --help
-    - id: files
-      uses: jitterbit/get-changed-files@b17fbb00bdc0c0f63fcf166580804b4d2cdc2a42
     - name: Configure PATH
       run: echo "${GITHUB_WORKSPACE}/.ci/scripts" >> $GITHUB_PATH
-    - name: Precommit changes
-      run: |
-        for changed_file in ${{ steps.files.outputs.all }}; do
-          pre-commit run --files "${changed_file}"
-        done
+    - uses: pre-commit/action@646c83fcd040023954eafda54b4db0192ce70507
