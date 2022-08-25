@@ -166,6 +166,7 @@ func (s *Sniffer) pollDefaultRoute(device chan<- string, refresh <-chan struct{}
 		// Prime the channel.
 		current := s.device
 		device <- current
+		defaultRouteMetric.Set(current)
 
 		tick := time.NewTicker(s.config.PollDefaultRoute)
 		for {
@@ -206,6 +207,7 @@ func (s *Sniffer) poll(old string, device chan<- string) (current string) {
 		logp.Info("sniffer changing default route device: %s -> %s", old, current)
 		s.state.Store(snifferInactive) // Mark current device as stale. ¯\_(ツ)_/¯
 		device <- current              // Pass the new device name.
+		defaultRouteMetric.Set(current)
 	}
 	return current
 }

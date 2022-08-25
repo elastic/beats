@@ -22,12 +22,14 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 
 	"github.com/google/gopacket/pcap"
 
 	"github.com/elastic/beats/v7/packetbeat/route"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var deviceAnySupported = runtime.GOOS == "linux"
@@ -93,6 +95,7 @@ func resolveDeviceName(name string) (string, error) {
 			iface string
 			err   error
 		)
+		registerDefaultRouteMetricOnce()
 		switch name {
 		case "default_route":
 			for _, inet := range []int{syscall.AF_INET, syscall.AF_INET6} {
@@ -114,6 +117,7 @@ func resolveDeviceName(name string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("failed to get default route device: %w", err)
 		}
+		defaultRouteMetric.Set(iface)
 
 		devices, err := ListDeviceNames(false, false)
 		if err != nil {
@@ -146,6 +150,17 @@ func resolveDeviceName(name string) (string, error) {
 
 	logp.Info("Resolved device index %d to device: %s", index, name)
 	return name, nil
+}
+
+var (
+	registerRoute      sync.Once
+	defaultRouteMetric *monitoring.String
+)
+
+func registerDefaultRouteMetricOnce() {
+	registerRoute.Do(func() {
+		defaultRouteMetric = monitoring.NewString(nil, "packetbeat.default_route")
+	})
 }
 
 func sameDevice(route, pcap string) bool {
