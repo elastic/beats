@@ -16,11 +16,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-<<<<<<< HEAD
-=======
-	"runtime"
 	"strings"
->>>>>>> b40349ce5a (allow for json/ndjson content type with charset (#32767))
 	"testing"
 	"time"
 
@@ -333,18 +329,11 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 		}
 
 		// Upload the file to S3.
-<<<<<<< HEAD
 		result, err := uploader.Upload(&s3manager.UploadInput{
-			Bucket: aws.String(bucket),
-			Key:    aws.String(filepath.Base(filename)),
-			Body:   bytes.NewReader(data),
-=======
-		result, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
 			Bucket:      aws.String(bucket),
 			Key:         aws.String(filepath.Base(filename)),
 			Body:        bytes.NewReader(data),
 			ContentType: aws.String(contentType),
->>>>>>> b40349ce5a (allow for json/ndjson content type with charset (#32767))
 		})
 		if err != nil {
 			t.Fatalf("Failed to upload file %q: %v", filename, err)
