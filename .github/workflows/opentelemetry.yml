@@ -4,7 +4,14 @@ on:
   workflow_run:
     workflows:
       - check-dev-tools
+      - check-filebeat
       - check-packetbeat
+<<<<<<< HEAD
+=======
+      - check-winlogbeat
+      - check-x-pack-auditbeat
+      - check-x-pack-filebeat
+>>>>>>> da20ec779b (action: checks for filebeat and x-pack/filebeat (#32746))
       - check-x-pack-functionbeat
       - check-x-pack-osquerybeat
       - check-x-pack-packetbeat
