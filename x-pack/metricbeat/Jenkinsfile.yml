@@ -14,6 +14,7 @@ when:
     tags: true                       ## for all the tags
 platform: "immutable && ubuntu-18"   ## default label for all the stages
 stages:
+<<<<<<< HEAD
     lint:
         make: |
           make -C x-pack/metricbeat check;
@@ -22,6 +23,8 @@ stages:
           make -C metricbeat update;
           make check-no-changes;
         stage: lint
+=======
+>>>>>>> 44fbc57ed3 (action: checks for metricbeat and x-pack/metricbeat (#32748))
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
