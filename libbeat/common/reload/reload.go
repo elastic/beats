@@ -121,7 +121,7 @@ func (r *Registry) MustRegisterOutput(obj Reloadable) {
 }
 
 // MustRegisterInput is a V2-specific registration function
-// that delcares a reloadable object list for a beat input
+// that declares a reloadable object list for a beat input
 func (r *Registry) MustRegisterInput(list ReloadableList) {
 	if err := r.RegisterList(InputRegName, list); err != nil {
 		panic(err)
