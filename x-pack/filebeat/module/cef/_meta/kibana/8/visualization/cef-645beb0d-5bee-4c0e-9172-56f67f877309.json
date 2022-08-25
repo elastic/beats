@@ -1,0 +1,110 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Devices by Outcome [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0% - 17%": "rgb(255,255,204)",
+                    "17% - 34%": "rgb(255,230,146)",
+                    "34% - 50%": "rgb(254,191,90)",
+                    "50% - 67%": "rgb(253,141,60)",
+                    "67% - 84%": "rgb(244,61,37)",
+                    "84% - 100%": "rgb(202,8,35)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Device Host Names",
+                        "field": "observer.hostname",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Event Outcome",
+                        "field": "event.outcome",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "colorSchema": "Yellow to Red",
+                "colorsNumber": 6,
+                "colorsRange": [],
+                "enableHover": true,
+                "invertColors": false,
+                "legendPosition": "right",
+                "legendSize": "auto",
+                "percentageMode": true,
+                "setColorRange": false,
+                "times": [],
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "color": "#555",
+                            "rotate": 0,
+                            "show": false
+                        },
+                        "scale": {
+                            "defaultYExtents": false,
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Top 10 Devices by Outcome [Filebeat CEF]",
+            "type": "heatmap"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-645beb0d-5bee-4c0e-9172-56f67f877309",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-d687d631-96df-4c49-99ee-9e51c7053084",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0MDQsMV0="
+}
