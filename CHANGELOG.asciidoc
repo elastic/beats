@@ -7,35 +7,7 @@
 === Beats version 8.4.1
 https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
 
 *Auditbeat*
 
@@ -47,104 +19,11 @@ https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 - Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 - Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
 
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 [[release-notes-8.4.0]]
 === Beats version 8.4.0
