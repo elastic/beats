@@ -46,7 +46,7 @@ spec:
           runAsUser: 0
         resources:
           limits:
-            memory: 1536mi
+            memory: 1536Mi
           requests:
             # for synthetics, 2 full cores is a good starting point for relatively consistent perform of a single concurrent check
             # For lightweight checks as low as 100m is fine
