@@ -5,6 +5,7 @@ on:
     workflows:
       - check-auditbeat
       - check-dev-tools
+      - check-filebeat
       - check-packetbeat
       - check-x-pack-auditbeat
       - check-x-pack-functionbeat
