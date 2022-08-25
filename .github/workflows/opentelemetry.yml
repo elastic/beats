@@ -4,10 +4,11 @@ on:
   workflow_run:
     workflows:
       - check-dev-tools
+      - check-filebeat
+      - check-packetbeat
+      - check-x-pack-filebeat
       - check-x-pack-functionbeat
       - check-x-pack-packetbeat
-      - check-dev-tools
-      - check-packetbeat
       - golangci-lint
       - auditbeat
       - filebeat
