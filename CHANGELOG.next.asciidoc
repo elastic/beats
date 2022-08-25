@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Fixes a bug with the auditd module where data is corrupted because it was not copied before the byte slice was reused. {issue}32818[32818] {pull}32823[32823]
 
 *Filebeat*
 
