@@ -13,15 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-<<<<<<< HEAD
-    lint:
-        make: |
-          make -C x-pack/osquerybeat check;
-          make -C x-pack/osquerybeat update;
-          make check-no-changes;
-        stage: lint
-=======
->>>>>>> 690783fc53 (action: checks for x-pack/osquerybeat (#32753))
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
