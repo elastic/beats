@@ -1,16 +1,14 @@
-name: check-docs
+name: check-x-pack-filebeat
 
 on:
   pull_request:
     paths:
-      - '.github/workflows/check-docs.yml'
-      - '**/*.asciidoc'
-      - '**/*.md'
-      - 'deploy/kubernetes/*-kubernetes.yaml'
+      - '.github/workflows/check-xpack-filebeat.yml'
+      - 'x-pack/filebeat/**'
+      - 'filebeat/**'
 
-permissions:
-  contents: read
-  pull-requests: read
+env:
+  BEAT_MODULE: 'x-pack/filebeat'
 
 jobs:
   check:
@@ -24,11 +22,8 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
     - name: Install libpcap-dev
       run: sudo apt-get install -y libpcap-dev
-    - name: Install libsystemd-dev
-      run: sudo apt-get install -y libsystemd-dev
-    - name: Install librpm-dev
-      run: sudo apt-get install -y librpm-dev
-    - name: Run check
+    - name: Run check/update
       run: |
         go install github.com/magefile/mage
-        make check
+        make -C ${{ env.BEAT_MODULE }} check update
+        make check-no-changes

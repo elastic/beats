@@ -1,14 +1,14 @@
-name: check-x-pack-packetbeat
+name: check-x-pack-auditbeat
 
 on:
   pull_request:
     paths:
-      - '.github/workflows/check-xpack-packetbeat.yml'
-      - 'x-pack/packetbeat/**'
-      - 'packetbeat/**'
+      - '.github/workflows/check-xpack-auditbeat.yml'
+      - 'x-pack/auditbeat/**'
+      - 'auditbeat/**'
 
 env:
-  BEAT_MODULE: 'x-pack/packetbeat'
+  BEAT_MODULE: 'x-pack/auditbeat'
 
 jobs:
   check:
@@ -20,8 +20,8 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GO_VERSION }}
-    - name: Install libpcap-dev
-      run: sudo apt-get install -y libpcap-dev
+    - name: Install librpm-dev
+      run: sudo apt-get install -y librpm-dev
     - name: Run check/update
       uses: magefile/mage-action@v2
       with:
