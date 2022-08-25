@@ -3,6 +3,8 @@ name: OpenTelemetry Export Trace
 on:
   workflow_run:
     workflows:
+      - check-dev-tools
+      - check-x-pack-functionbeat
       - check-x-pack-packetbeat
       - check-dev-tools
       - check-packetbeat
