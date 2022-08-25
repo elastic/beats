@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kortschak/toutoumomoma"
+	"github.com/elastic/toutoumomoma"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

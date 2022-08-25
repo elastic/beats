@@ -667,6 +667,8 @@ github.com/elastic/ristretto v0.1.1-0.20220602190459-83b0895ca5b3 h1:ChPwRVv1RR4
 github.com/elastic/ristretto v0.1.1-0.20220602190459-83b0895ca5b3/go.mod h1:RAy2GVV4sTWVlNMavv3xhLsk18rxhfhDnombTe6EF5c=
 github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3 h1:FzA0/n4iMt8ojGDGRoiFPSHFvvdVIvxOxyLtiFnrLBM=
 github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3/go.mod h1:mdtqvCSg8JOxk8PmpTNGyo6wzd4BMm4QXSfDnTXmgkE=
+github.com/elastic/toutoumomoma v0.0.0-20220824212313-806aa932168a h1:+/UK6cq17T2ZJotMz2n189oyZwk+RsdHWu8WQJ7LoOA=
+github.com/elastic/toutoumomoma v0.0.0-20220824212313-806aa932168a/go.mod h1:C26fjgblYUZyl9aRc0D4piK8WqQzeCwUdIvjN5OsTnY=
 github.com/elazarl/goproxy v0.0.0-20170405201442-c4fc26588b6e/go.mod h1:/Zj4wYkgs4iZTTu3o/KG3Itv/qCCa8VVMlb3i9OVuzc=
 github.com/elazarl/goproxy v0.0.0-20180725130230-947c36da3153 h1:yUdfgN0XgIJw7foRItutHYUIhlcKzcSf5vDpdhQAKTc=
 github.com/elazarl/goproxy v0.0.0-20180725130230-947c36da3153/go.mod h1:/Zj4wYkgs4iZTTu3o/KG3Itv/qCCa8VVMlb3i9OVuzc=
@@ -1254,9 +1256,7 @@ github.com/klauspost/pgzip v1.0.2-0.20170402124221-0bf5dcad4ada/go.mod h1:Ch1tH6
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
-github.com/kortschak/toutoumomoma v0.0.0-20220212064956-c13235c1f719 h1:GcHJqzrkYlLMCJ4agzif0DVS9URhYfleFeAy78jYMpU=
-github.com/kortschak/toutoumomoma v0.0.0-20220212064956-c13235c1f719/go.mod h1:1ZIuFgBcmnvEiYcc2dkapTooGjG4hj5IR6n17bh0QSc=
-github.com/kortschak/utter v1.4.2 h1:rI43H7aaPReID1BjR7K5DaI/Wvbc7mbHqvhkuqzEtFk=
+github.com/kortschak/utter v1.5.0 h1:1vHGHPZmJ6zU5XbfllIAG3eQBoHT97ePrZJ+pT3RoiQ=
 github.com/kr/fs v0.1.0/go.mod h1:FFnZGqtBN9Gxj7eW1uZ42v5BccTP0vu6NEaFoC2HwRg=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
