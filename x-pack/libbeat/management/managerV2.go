@@ -199,6 +199,7 @@ func (cm *BeatV2Manager) setMainUnitValue(unit *client.Unit) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
 	if cm.mainUnit == "" {
+		cm.logger.Debugf("Set main input unit to ID %s", unit.ID)
 		cm.mainUnit = unit.ID()
 	}
 }
@@ -250,12 +251,13 @@ func (cm *BeatV2Manager) unitListen() {
 			case client.UnitChangedAdded:
 				// At this point we also get a log level, however I'm not sure the beats core logger provides a
 				// clean way to "just" change the log level, without resetting the whole log config
-				cm.logger.Debugf("Got unit added: %s", change.Unit.ID())
+				state, _, _ := change.Unit.Expected()
+				cm.logger.Debugf("Got unit added: %s, type: %s expected state: %s", change.Unit.ID(), change.Unit.Type(), state.String())
 				go cm.handleUnitReload(change.Unit)
 
 			case client.UnitChangedModified:
 				state, _, _ := change.Unit.Expected()
-				cm.logger.Debugf("Got unit modified: %s, expected state is %s", change.Unit.ID(), state)
+				cm.logger.Debugf("Got unit modified: %s, type: %s expected state: %s", change.Unit.ID(), change.Unit.Type(), state.String())
 				// I'm assuming that a state STOPPED just tells us to shut down the entire beat,
 				// as such we don't really care about updating via a particular unit
 				if state == client.UnitStateStopped {
@@ -317,7 +319,7 @@ func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 // Handle the updated config for an output unit
 func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
-	cm.logger.Debugf("Got Output unit config: %s", rawConfig.Type)
+	cm.logger.Debugf("Got Output unit config: %s, ID: %s", rawConfig.Type, rawConfig.Id)
 
 	reloadConfig, err := groupByOutputs(rawConfig)
 	if err != nil {
@@ -326,7 +328,7 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 		return
 	}
 	// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
-	output := cm.registry.GetReloadable("output")
+	output := cm.registry.GetReloadableOutput()
 	if output == nil {
 		_ = unit.UpdateState(client.UnitStateFailed, "failed to find beat reloadable type 'output'", nil)
 		return
@@ -346,12 +348,12 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
 	cm.setMainUnitValue(unit)
-	cm.logger.Debugf("Got Input unit config: %s", rawConfig.Type)
+	cm.logger.Debugf("Got Input unit config: %s, ID: %s", rawConfig.Type, rawConfig.Id)
 
 	// Find the V2 inputs we need to reload
 	// The reloader provides list and non-list types, but all the beats register as lists,
 	// so just go with that for V2
-	obj := cm.registry.GetReloadableList("input")
+	obj := cm.registry.GetInputList()
 	if obj == nil {
 		_ = unit.UpdateState(client.UnitStateFailed, "failed to find beat reloadable type 'input'", nil)
 		return

@@ -353,7 +353,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Register reloadable list of inputs and modules
 	inputs := cfgfile.NewRunnerList(management.DebugK, inputLoader, fb.pipeline)
-	reload.RegisterV2.MustRegisterList("input", inputs)
+	reload.RegisterV2.MustRegisterInput(inputs)
 
 	modules := cfgfile.NewRunnerList(management.DebugK, moduleLoader, fb.pipeline)
 

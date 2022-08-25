@@ -28,6 +28,12 @@ import (
 // RegisterV2 is the special registry used for the V2 controller
 var RegisterV2 = NewRegistry()
 
+// InputRegName is the registation name for V2 inputs
+const InputRegName = "input"
+
+// OutputRegName is the registation name for V2 Outputs
+const OutputRegName = "output"
+
 // ConfigWithMeta holds a pair of config.C and optional metadata for it
 type ConfigWithMeta struct {
 	// Config to store
@@ -106,11 +112,36 @@ func (r *Registry) MustRegister(name string, obj Reloadable) {
 	}
 }
 
-// MustRegisterList declares a reloadable object list
-func (r *Registry) MustRegisterList(name string, list ReloadableList) {
-	if err := r.RegisterList(name, list); err != nil {
+// MustRegisterOutput is a V2-specific registration function
+// That declares a reloadable output
+func (r *Registry) MustRegisterOutput(obj Reloadable) {
+	if err := r.Register(OutputRegName, obj); err != nil {
 		panic(err)
 	}
+}
+
+// MustRegisterInput is a V2-specific registration function
+// that delcares a reloadable object list for a beat input
+func (r *Registry) MustRegisterInput(list ReloadableList) {
+	if err := r.RegisterList(InputRegName, list); err != nil {
+		panic(err)
+	}
+}
+
+// GetInputList is a V2-specific function
+// That returns the reloadable list created for an input
+func (r *Registry) GetInputList() ReloadableList {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confsLists[InputRegName]
+}
+
+// GetReloadableOutput is a V2-specific function
+// That returns the reloader for the registered output
+func (r *Registry) GetReloadableOutput() Reloadable {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confs[OutputRegName]
 }
 
 // GetRegisteredNames returns the list of names registered

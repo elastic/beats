@@ -27,10 +27,10 @@ There are two components, one of which is optional, that must be registered with
 The reloader component is not unique to V2, and remains largely unchanged from it's V1 state. Currently, all beats have a line like this (the following example is from metricbeat), in their early startup state:
 
 ```
-reload.RegisterV2.MustRegisterList("input", modules)
+reload.RegisterV2.MustRegisterInput(modules)
 ```
 
-The `MustRegisterList` method takes two arguments. A name (this will always be `"input"` in V2), and a component that satisfies a `ReloadableList` interface.
+The `MustRegisterInput` method takes a single argument: component that satisfies a `ReloadableList` interface.
 For most beats, this component will be a wrapper around an array of individual modules/inputs that maps to each individual input in the upstream fleet config.
 In this example agent YAML config, each item under the `streams` key will become an individual input config in the array sent to the `ReloadableList` interface:
 ```

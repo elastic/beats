@@ -146,7 +146,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
-	reload.RegisterV2.MustRegisterList("input", runner)
+	reload.RegisterV2.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
 
 	// Start the manager after all the hooks are registered and terminates when
