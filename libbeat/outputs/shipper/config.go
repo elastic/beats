@@ -39,10 +39,11 @@ type Config struct {
 	MaxRetries int `config:"max_retries" validate:"min=-1,nonzero"`
 	// BulkMaxSize max amount of events in a single batch
 	BulkMaxSize int `config:"bulk_max_size"`
-	// AckPollingInterval is an interval for polling the shipper server for persistence acknowledgement.
-	// The default/minimum 5 ms polling interval means we could publish at most 1000 ms / 5 ms = 200 batches/sec.
-	// With the default `bulk_max_size` of 50 events this would limit
-	// the default throughput per worker to 200 * 50 = 10000 events/sec.
+	// AckPollingInterval is a minimal interval for getting persisted index updates from the shipper server.
+	// Batches of events are acknowledged asynchronously in the background.
+	// If after the `AckPollingInterval` duration the persisted index value changed
+	// all batches pending acknowledgment will be checked against the new value
+	// and acknowledged if `persisted_index` >= `accepted_index`.
 	AckPollingInterval time.Duration `config:"ack_polling_interval" validate:"min=5ms"`
 	// Backoff strategy for the shipper output
 	Backoff backoffConfig `config:"backoff"`
