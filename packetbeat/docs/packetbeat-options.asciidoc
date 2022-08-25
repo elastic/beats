@@ -340,7 +340,7 @@ Here’s an example of a flow information sent by Packetbeat. See
   "destination": {
     "bytes": 460,
     "ip": "198.51.100.2",
-    "mac": "06:05:04:03:02:01",
+    "mac": "06-05-04-03-02-01",
     "packets": 2,
     "port": 80
   },
@@ -365,7 +365,7 @@ Here’s an example of a flow information sent by Packetbeat. See
   "source": {
     "bytes": 10,
     "ip": "203.0.113.3",
-    "mac": "01:02:03:04:05:06",
+    "mac": "01-02-03-04-05-06",
     "packets": 1,
     "port": 38901
   }

@@ -22,6 +22,9 @@ jsonschema==3.2.0
 kafka-python==1.4.3
 MarkupSafe==1.1.1
 more-itertools==8.4.0
+opentelemetry-api==1.11.0
+opentelemetry-exporter-otlp==1.11.0
+opentelemetry-sdk==1.11.0
 ordered-set==3.1.1
 packaging==20.4
 parameterized==0.7.0
