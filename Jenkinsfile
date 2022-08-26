@@ -221,7 +221,19 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
+  // Run pre-commit within the current node and in Jenkins
+  // hence there is no need to use docker login in the GitHub actions
+  // some docker images are hosted in an internal docker registry.
+  mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
+}
+
+def runPreCommit() {
+  return {
+    withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
+      preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+    }
+  }
 }
 
 def runBuildAndTest(Map args = [:]) {
