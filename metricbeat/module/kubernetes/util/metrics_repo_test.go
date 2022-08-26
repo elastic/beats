@@ -100,8 +100,8 @@ func (s *MetricsRepoTestSuite) TestNodeNames() {
 
 	nodeNames := s.MetricsRepo.NodeNames()
 	s.Equal(2, len(nodeNames))
-	s.Equal(s.NodeName, nodeNames[0])
-	s.Equal(s.AnotherNodeName, nodeNames[1])
+	s.Contains(nodeNames, s.NodeName)
+	s.Contains(nodeNames, s.AnotherNodeName)
 }
 
 func (s *MetricsRepoTestSuite) TestPodNames() {
@@ -116,13 +116,13 @@ func (s *MetricsRepoTestSuite) TestPodNames() {
 	nodeStore := s.MetricsRepo.GetNodeStore(s.NodeName)
 	podNames := nodeStore.PodIds()
 	s.Equal(1, len(podNames))
-	s.Equal(s.PodId, podNames[0])
+	s.Contains(podNames, s.PodId)
 
 	anotherNodeStore := s.MetricsRepo.GetNodeStore(s.AnotherNodeName)
 	anotherPodNames := anotherNodeStore.PodIds()
 	s.Equal(2, len(anotherPodNames))
-	s.Equal(s.PodId, anotherPodNames[0])
-	s.Equal(s.AnotherPodId, anotherPodNames[1])
+	s.Contains(anotherPodNames, s.PodId)
+	s.Contains(anotherPodNames, s.AnotherPodId)
 }
 
 func (s *MetricsRepoTestSuite) TestContainerNames() {
@@ -140,8 +140,8 @@ func (s *MetricsRepoTestSuite) TestContainerNames() {
 	podStore := nodeStore.GetPodStore(s.PodId)
 	containerNames := podStore.ContainerNames()
 	s.Equal(2, len(containerNames))
-	s.Equal(s.ContainerName, containerNames[0])
-	s.Equal(s.AnotherContainerName, containerNames[1])
+	s.Contains(containerNames, s.ContainerName)
+	s.Contains(containerNames, s.AnotherContainerName)
 }
 
 func (s *MetricsRepoTestSuite) TestAddNodeStore() {
@@ -338,10 +338,6 @@ func (s *MetricsRepoTestSuite) TestSetContainerMetricsMultiplePods() {
 	addContainerMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName, s.ContainerMetric)
 	addContainerMetric(s.MetricsRepo, s.NodeName, s.AnotherPodId, s.ContainerName, s.AnotherContainerMetric)
 
-	s.Equal(1, len(s.MetricsRepo.NodeNames()))
-	s.Equal(s.ContainerMetric, GetMetric(s.MetricsRepo, s.NodeName, s.PodId, s.ContainerName))
-	s.Equal(s.AnotherContainerMetric, GetMetric(s.MetricsRepo, s.NodeName, s.AnotherPodId, s.ContainerName))
-
 	nodeStore := s.MetricsRepo.GetNodeStore(s.NodeName)
 	s.Equal(2, len(nodeStore.PodIds()))
 }
@@ -373,7 +369,7 @@ func (s *MetricsRepoTestSuite) TestGetContainerMetricsNotFound() {
 	s.Nil(ans.MemoryLimit)
 }
 
-func TestExampleTestSuite(t *testing.T) {
+func TestMetricsRepoTestSuite(t *testing.T) {
 	suite.Run(t, new(MetricsRepoTestSuite))
 }
 

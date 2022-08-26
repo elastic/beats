@@ -323,8 +323,8 @@ func createEvent(watcher procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver
 
 	// add ethernet layer meta data
 	if src, dst, ok := f.id.EthAddr(); ok {
-		source["mac"] = net.HardwareAddr(src).String()
-		dest["mac"] = net.HardwareAddr(dst).String()
+		source["mac"] = formatHardwareAddr(net.HardwareAddr(src))
+		dest["mac"] = formatHardwareAddr(net.HardwareAddr(dst))
 	}
 
 	// add vlan
@@ -518,6 +518,19 @@ func createEvent(watcher procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver
 		Timestamp: timestamp,
 		Fields:    fields,
 	}
+}
+
+// formatHardwareAddr formats hardware addresses according to the ECS spec.
+func formatHardwareAddr(addr net.HardwareAddr) string {
+	buf := make([]byte, 0, len(addr)*3-1)
+	for _, b := range addr {
+		if len(buf) != 0 {
+			buf = append(buf, '-')
+		}
+		const hexDigit = "0123456789ABCDEF"
+		buf = append(buf, hexDigit[b>>4], hexDigit[b&0xf])
+	}
+	return string(buf)
 }
 
 func encodeStats(stats *flowStats, ints, uints, floats []string) map[string]interface{} {

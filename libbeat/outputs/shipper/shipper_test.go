@@ -305,21 +305,11 @@ func TestPublish(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			group, err := makeShipper(
-				nil,
-				beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"},
-				outputs.NewNilObserver(),
-				cfg,
-			)
-			require.NoError(t, err)
-			require.Len(t, group.Clients, 1)
+			client := createShipperClient(t, cfg)
 
 			batch := outest.NewBatch(tc.events...)
 
-			err = group.Clients[0].(outputs.Connectable).Connect()
-			require.NoError(t, err)
-
-			err = group.Clients[0].Publish(ctx, batch)
+			err = client.Publish(ctx, batch)
 			if tc.expError != "" {
 				require.Error(t, err)
 				require.Contains(t, err.Error(), tc.expError)
@@ -348,19 +338,7 @@ func TestPublish(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		group, err := makeShipper(
-			nil,
-			beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"},
-			outputs.NewNilObserver(),
-			cfg,
-		)
-		require.NoError(t, err)
-		require.Len(t, group.Clients, 1)
-
-		client := group.Clients[0].(outputs.NetworkClient)
-
-		err = client.Connect()
-		require.NoError(t, err)
+		client := createShipperClient(t, cfg)
 
 		// Should successfully publish with the server running
 		batch := outest.NewBatch(events...)
@@ -407,6 +385,48 @@ func TestPublish(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, expSignals, batch.Signals)
 	})
+
+	t.Run("cancel the batch when a different server responds", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		addr, stop := runServer(t, 5, nil, "localhost:0")
+		defer stop()
+
+		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"server":  addr,
+			"timeout": 5, // 5 sec
+			"backoff": map[string]interface{}{
+				"init": "10ms",
+				"max":  "5s",
+			},
+		})
+		require.NoError(t, err)
+
+		client := createShipperClient(t, cfg)
+
+		// Should successfully publish without an ID change
+		batch := outest.NewBatch(events...)
+		err = client.Publish(ctx, batch)
+		require.NoError(t, err)
+
+		// Replace the server (would change the ID)
+		stop()
+
+		_, stop = runServer(t, 5, nil, addr)
+		defer stop()
+
+		batch = outest.NewBatch(events...)
+		err = client.Publish(ctx, batch)
+		require.Error(t, err)
+
+		require.Eventually(t, func() bool {
+			// the mock server does not validate incoming IDs on `Publish`, so the error should come from
+			// the acknowledgement request
+			return strings.Contains(err.Error(), "acknowledgement failed due to a connection to a different server")
+		}, 100*time.Millisecond, 10*time.Millisecond)
+	})
+
 }
 
 // BenchmarkToShipperEvent is used to detect performance regression when the conversion function is changed.
@@ -483,6 +503,24 @@ func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAdd
 	}
 
 	return actualAddr, stop
+}
+
+func createShipperClient(t *testing.T, cfg *config.C) outputs.NetworkClient {
+	group, err := makeShipper(
+		nil,
+		beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"},
+		outputs.NewNilObserver(),
+		cfg,
+	)
+	require.NoError(t, err)
+	require.Len(t, group.Clients, 1)
+
+	client := group.Clients[0].(outputs.NetworkClient)
+
+	err = client.Connect()
+	require.NoError(t, err)
+
+	return client
 }
 
 func protoStruct(t *testing.T, values map[string]interface{}) *messages.Struct {
