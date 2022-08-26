@@ -26,4 +26,4 @@ processors:
       type: string
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.crowdstrike?.event?.UserIp != null && ctx?.crowdstrike?.event?.UserIp != ""
+      if: ctx?.crowdstrike?.event?.UserIp != null && ctx?.crowdstrike?.event?.UserIp != "" && ctx?.crowdstrike?.event?.UserIp != "N/A"

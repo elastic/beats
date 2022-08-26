@@ -23,7 +23,7 @@ processors:
       type: string
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.crowdstrike?.event?.UserIp != null && ctx?.crowdstrike?.event?.UserIp != ""
+      if: ctx?.crowdstrike?.event?.UserIp != null && ctx?.crowdstrike?.event?.UserIp != "" && ctx?.crowdstrike?.event?.UserIp != "N/A"
   - script:
       lang: painless
       source: |
