@@ -29,7 +29,6 @@ on:
       - x-pack-metricbeat
       - x-pack-osquerybeat
       - x-pack-packetbeat
-      - pre-commit
       - check-default
       - check-docs
     types: [completed]
