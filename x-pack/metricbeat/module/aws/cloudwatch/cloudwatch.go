@@ -141,7 +141,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
 	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 
 	// Check statistic method in config
