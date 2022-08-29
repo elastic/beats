@@ -184,30 +184,29 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
 	st.NewBatch(len(events))
 
-	nonDroppedEvents := make([]publisher.Event, 0, len(events))
-	convertedEvents := make([]*messages.Event, 0, len(events))
+	toSend := make([]*messages.Event, 0, len(events))
 
 	s.log.Debugf("converting %d events to protobuf...", len(events))
 
-	for i, e := range events {
+	droppedCount := 0
 
+	for i, e := range events {
 		converted, err := toShipperEvent(e)
 		if err != nil {
 			// conversion errors are not recoverable, so we have to drop the event completely
 			s.log.Errorf("%d/%d: %q, dropped", i+1, len(events), err)
+			droppedCount++
 			continue
 		}
 
-		convertedEvents = append(convertedEvents, converted)
-		nonDroppedEvents = append(nonDroppedEvents, e)
+		toSend = append(toSend, converted)
 	}
 
-	droppedCount := len(events) - len(nonDroppedEvents)
+	convertedCount := len(toSend)
 
 	st.Dropped(droppedCount)
-	s.log.Debugf("%d events converted to protobuf, %d dropped", len(nonDroppedEvents), droppedCount)
+	s.log.Debugf("%d events converted to protobuf, %d dropped", convertedCount, droppedCount)
 
-	toSend := convertedEvents
 	var lastAcceptedIndex uint64
 
 	ctx, cancel := context.WithTimeout(ctx, s.config.Timeout)
@@ -222,22 +221,23 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		if status.Code(err) != codes.OK {
 			batch.Cancelled()         // does not decrease the TTL
 			st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
-			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(convertedEvents), err)
+			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(toSend), err)
 		}
 
 		// with a correct server implementation should never happen, this error is not recoverable
-		if int(publishReply.AcceptedCount) > len(nonDroppedEvents) {
+		if int(publishReply.AcceptedCount) > len(toSend) {
 			return fmt.Errorf(
 				"server returned unexpected results, expected maximum accepted items %d, got %d",
-				len(nonDroppedEvents),
+				len(toSend),
 				publishReply.AcceptedCount,
 			)
 		}
 		toSend = toSend[publishReply.AcceptedCount:]
 		lastAcceptedIndex = publishReply.AcceptedIndex
+		s.log.Debugf("%d events have been accepted during a publish request", len(toSend))
 	}
 
-	s.log.Debugf("%d events have been accepted, %d dropped", len(nonDroppedEvents), droppedCount)
+	s.log.Debugf("total of %d events have been accepted from batch, %d dropped", convertedCount, droppedCount)
 
 	s.pendingMutex.Lock()
 	s.pending = append(s.pending, pendingBatch{
