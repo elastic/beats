@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
@@ -51,6 +52,7 @@ type RunnerFactory struct {
 	pluginsReg            *plugin.PluginsReg
 	logger                *logp.Logger
 	pipelineClientFactory PipelineClientFactory
+	location              config.LocationWithID
 }
 
 type PipelineClientFactory func(pipeline beat.Pipeline) (pipeline.ISyncClient, error)
@@ -74,16 +76,26 @@ type publishSettings struct {
 	DataSet    string                      `config:"dataset"`
 }
 
+type FactoryParams struct {
+	BeatInfo              beat.Info
+	AddTask               scheduler.AddTask
+	StateLoader           monitorstate.StateLoader
+	PluginsReg            *plugin.PluginsReg
+	PipelineClientFactory PipelineClientFactory
+	Location              config.LocationWithID
+}
+
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, addTask scheduler.AddTask, stateLoader monitorstate.StateLoader, pluginsReg *plugin.PluginsReg, pcf PipelineClientFactory) *RunnerFactory {
+func NewFactory(fp FactoryParams) *RunnerFactory {
 	return &RunnerFactory{
-		info:                  info,
-		addTask:               addTask,
+		info:                  fp.BeatInfo,
+		addTask:               fp.AddTask,
 		byId:                  map[string]*Monitor{},
 		mtx:                   &sync.Mutex{},
-		pluginsReg:            pluginsReg,
+		pluginsReg:            fp.PluginsReg,
 		logger:                logp.L(),
-		pipelineClientFactory: pcf,
+		pipelineClientFactory: fp.PipelineClientFactory,
+		location:              fp.Location,
 	}
 }
 
@@ -220,7 +232,7 @@ func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor
 	}, nil
 }
 
-// preProcessors sets up the required event.dataset, data_stream.*, and write index processors for future event publishes.
+// preProcessors sets up the required geo, event.dataset, data_stream.*, and write index processors for future event publishes.
 func preProcessors(info beat.Info, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
 	procs = processors.NewList(nil)
 

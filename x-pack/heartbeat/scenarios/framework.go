@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 
@@ -21,7 +22,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
@@ -172,9 +172,15 @@ func setupFactoryAndSched() (factory *monitors.RunnerFactory, sched *scheduler.S
 		true,
 	)
 
-	return monitors.NewFactory(info, sched.Add, monitorstate.NilStateLoader, plugin.GlobalPluginsReg, func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
-			c, _ := pipeline.Connect()
-			return monitors.SyncPipelineClientAdaptor{C: c}, nil
+	return monitors.NewFactory(monitors.FactoryParams{
+			BeatInfo:    info,
+			AddTask:     sched.Add,
+			StateLoader: monitorstate.NilStateLoader,
+			PluginsReg:  plugin.GlobalPluginsReg,
+			PipelineClientFactory: func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
+				c, _ := pipeline.Connect()
+				return monitors.SyncPipelineClientAdaptor{C: c}, nil
+			},
 		}),
 		sched,
 		sched.Stop

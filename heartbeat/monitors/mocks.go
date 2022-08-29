@@ -75,10 +75,15 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		nil,
 		true,
 	)
-
-	return NewFactory(info, sched.Add, monitorstate.NilStateLoader, pluginsReg, func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
-			c, _ := pipeline.Connect()
-			return SyncPipelineClientAdaptor{C: c}, nil
+	return NewFactory(FactoryParams{
+			BeatInfo:    info,
+			AddTask:     sched.Add,
+			StateLoader: monitorstate.NilStateLoader,
+			PluginsReg:  pluginsReg,
+			PipelineClientFactory: func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
+				c, _ := pipeline.Connect()
+				return SyncPipelineClientAdaptor{C: c}, nil
+			},
 		}),
 		sched,
 		sched.Stop

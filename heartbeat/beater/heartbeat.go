@@ -109,7 +109,14 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		scheduler: sched,
 		// monitorFactory is the factory used for creating all monitor instances,
 		// wiring them up to everything needed to actually execute.
-		monitorFactory: monitors.NewFactory(b.Info, sched.Add, stateLoader, plugin.GlobalPluginsReg, pipelineClientFactory),
+		monitorFactory: monitors.NewFactory(monitors.FactoryParams{
+			BeatInfo:              b.Info,
+			AddTask:               sched.Add,
+			StateLoader:           stateLoader,
+			PluginsReg:            plugin.GlobalPluginsReg,
+			PipelineClientFactory: pipelineClientFactory,
+			Location:              parsedConfig.Location,
+		}),
 	}
 	return bt, nil
 }
