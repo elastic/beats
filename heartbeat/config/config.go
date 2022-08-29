@@ -39,7 +39,7 @@ type Config struct {
 	Scheduler      Scheduler            `config:"scheduler"`
 	Autodiscover   *autodiscover.Config `config:"autodiscover"`
 	Jobs           map[string]*JobLimit `config:"jobs"`
-	Location       *LocationWithID      `config:"location`
+	Location       *LocationWithID      `config:"location"`
 }
 
 type JobLimit struct {
