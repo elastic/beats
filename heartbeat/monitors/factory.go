@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
@@ -52,7 +53,7 @@ type RunnerFactory struct {
 	pluginsReg            *plugin.PluginsReg
 	logger                *logp.Logger
 	pipelineClientFactory PipelineClientFactory
-	location              config.LocationWithID
+	beatLocation          *config.LocationWithID
 }
 
 type PipelineClientFactory func(pipeline beat.Pipeline) (pipeline.ISyncClient, error)
@@ -82,7 +83,7 @@ type FactoryParams struct {
 	StateLoader           monitorstate.StateLoader
 	PluginsReg            *plugin.PluginsReg
 	PipelineClientFactory PipelineClientFactory
-	Location              config.LocationWithID
+	BeatLocation          *config.LocationWithID
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
@@ -95,7 +96,7 @@ func NewFactory(fp FactoryParams) *RunnerFactory {
 		pluginsReg:            fp.PluginsReg,
 		logger:                logp.L(),
 		pipelineClientFactory: fp.PipelineClientFactory,
-		location:              fp.Location,
+		beatLocation:          fp.BeatLocation,
 	}
 }
 
@@ -122,7 +123,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		return nil, err
 	}
 
-	configEditor, err := newCommonPublishConfigs(f.info, c)
+	configEditor, err := newCommonPublishConfigs(f.info, f.beatLocation, c)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +182,7 @@ func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
 }
 
-func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor, error) {
+func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID, cfg *conf.C) (pipetool.ConfigEditor, error) {
 	var settings publishSettings
 	if err := cfg.Unpack(&settings); err != nil {
 		return nil, err
@@ -193,7 +194,15 @@ func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor
 	}
 
 	// Early stage processors for setting data_stream, event.dataset, and index to write to
-	preProcs, err := preProcessors(info, settings, sf.Type)
+
+	// Use the monitor-specific location if possible, otherwise use the beat's location
+	var loc *config.LocationWithID
+	if sf.Location != nil {
+		loc = sf.Location
+	} else {
+		loc = beatLocation
+	}
+	preProcs, err := preProcessors(info, loc, settings, sf.Type)
 	if err != nil {
 		return nil, err
 	}
@@ -232,8 +241,10 @@ func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor
 	}, nil
 }
 
+var geoErrOnce = &sync.Once{}
+
 // preProcessors sets up the required geo, event.dataset, data_stream.*, and write index processors for future event publishes.
-func preProcessors(info beat.Info, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
+func preProcessors(info beat.Info, location *config.LocationWithID, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
 	procs = processors.NewList(nil)
 
 	var dataset string
@@ -245,6 +256,27 @@ func preProcessors(info beat.Info, settings publishSettings, monitorType string)
 
 	// Always set event.dataset
 	procs.AddProcessor(actions.NewAddFields(mapstr.M{"event": mapstr.M{"dataset": dataset}}, true, true))
+
+	// If we have a location to add, use the add_observer_metadata processor
+	if location != nil {
+		var geoM mapstr.M
+
+		geoM, err := util.GeoConfigToMap(location.Geo)
+		if err != nil {
+			geoErrOnce.Do(func() {
+				logp.L().Warnf("could not add heartbeat geo info: %s", err)
+			})
+		}
+
+		obsFields := mapstr.M{
+			"observer": mapstr.M{
+				"name": location.ID,
+				"geo":  geoM,
+			},
+		}
+
+		procs.AddProcessor(actions.NewAddFields(obsFields, true, true))
+	}
 
 	// always use synthetics data streams for browser monitors, there is no good reason not to
 	// the default `heartbeat` data stream won't split out network and screenshot data.

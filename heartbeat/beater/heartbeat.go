@@ -115,7 +115,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			StateLoader:           stateLoader,
 			PluginsReg:            plugin.GlobalPluginsReg,
 			PipelineClientFactory: pipelineClientFactory,
-			Location:              parsedConfig.Location,
+			BeatLocation:          parsedConfig.Location,
 		}),
 	}
 	return bt, nil
