@@ -62,27 +62,29 @@ type EsConfig struct {
 
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
+	parsedConfig := config.DefaultConfig
+	if err := rawConfig.Unpack(&parsedConfig); err != nil {
+		return nil, fmt.Errorf("error reading config file: %w", err)
+	}
+
+	// Connect to ES and setup the State loader
 	esc, err := getESClient(b.Config.Output.Config())
 	if err != nil {
 		return nil, err
 	}
 	var stateLoader monitorstate.StateLoader
 	if esc != nil {
-		stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*")
+		stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.Location)
 	} else {
 		stateLoader = monitorstate.NilStateLoader
 	}
 
-	parsedConfig := config.DefaultConfig
-	if err := rawConfig.Unpack(&parsedConfig); err != nil {
-		return nil, fmt.Errorf("error reading config file: %w", err)
-	}
 	limit := parsedConfig.Scheduler.Limit
-	locationName := parsedConfig.Scheduler.Location
-	if locationName == "" {
-		locationName = "Local"
+	schedLocationName := parsedConfig.Scheduler.Location
+	if schedLocationName == "" {
+		schedLocationName = "Local"
 	}
-	location, err := time.LoadLocation(locationName)
+	location, err := time.LoadLocation(schedLocationName)
 	if err != nil {
 		return nil, err
 	}

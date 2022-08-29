@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -49,27 +50,27 @@ type Tracker struct {
 
 // StateLoader has signature as loadLastESState, useful for test mocking, and maybe for a future impl
 // other than ES if necessary
-type StateLoader func(monitorID string) (*State, error)
+type StateLoader func(stdfields.StdMonitorFields) (*State, error)
 
-func (t *Tracker) RecordStatus(monitorID string, newStatus StateStatus) (ms *State) {
+func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateStatus) (ms *State) {
 	//note: the return values have no concurrency controls, they may be unsafely read unless
 	//copied to the stack, copying the structs before  returning
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	state := t.getCurrentState(monitorID)
+	state := t.getCurrentState(sf)
 	if state == nil {
-		state = newMonitorState(monitorID, newStatus, 0)
-		t.states[monitorID] = state
+		state = newMonitorState(sf, newStatus, 0)
+		t.states[sf.ID] = state
 	} else {
-		state.recordCheck(monitorID, newStatus)
+		state.recordCheck(sf, newStatus)
 	}
 	// return a copy since the state itself is a pointer that is frequently mutated
 	return state.copy()
 }
 
-func (t *Tracker) getCurrentState(monitorID string) (state *State) {
-	if state, ok := t.states[monitorID]; ok {
+func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) {
+	if state, ok := t.states[sf.ID]; ok {
 		return state
 	}
 
@@ -77,7 +78,7 @@ func (t *Tracker) getCurrentState(monitorID string) (state *State) {
 	var loadedState *State
 	var err error
 	for i := 0; i < tries; i++ {
-		loadedState, err = t.stateLoader(monitorID)
+		loadedState, err = t.stateLoader(sf)
 		if err != nil {
 			sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
 			logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
@@ -85,11 +86,11 @@ func (t *Tracker) getCurrentState(monitorID string) (state *State) {
 		}
 	}
 	if err != nil {
-		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor %s", tries, monitorID)
+		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor %s", tries, sf.ID)
 	}
 
 	if loadedState != nil {
-		t.states[monitorID] = loadedState
+		t.states[sf.ID] = loadedState
 	}
 
 	// Return what we found, even if nil
@@ -98,6 +99,6 @@ func (t *Tracker) getCurrentState(monitorID string) (state *State) {
 
 // NilStateLoader always returns nil, nil. It's the default when no ES conn is available
 // or during testing
-func NilStateLoader(_ string) (*State, error) {
+func NilStateLoader(_ stdfields.StdMonitorFields) (*State, error) {
 	return nil, nil
 }

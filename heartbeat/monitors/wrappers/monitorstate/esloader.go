@@ -27,33 +27,46 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/esutil"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 )
 
-func MakeESLoader(esc *elasticsearch.Client, indexPattern string) StateLoader {
+func MakeESLoader(esc *elasticsearch.Client, indexPattern string, beatLocation *config.LocationWithID) StateLoader {
 	if indexPattern == "" {
 		// Should never happen, but if we ever make a coding error...
 		logp.L().Warn("ES state loader initialized with no index pattern, will not load states from ES")
 		return NilStateLoader
 	}
-	return func(monitorId string) (*State, error) {
+	return func(sf stdfields.StdMonitorFields) (*State, error) {
+		queryMustClauses := []mapstr.M{
+			{
+				"match": mapstr.M{"monitor.id": sf.ID},
+			},
+			{
+				"match": mapstr.M{"monitor.type": sf.Type},
+			},
+			{
+				"exists": mapstr.M{"field": "state"},
+			},
+			{
+				// Only search the past 6h of data for perf, otherwise we reset the state
+				// Monitors should run more frequently than that.
+				"range": mapstr.M{"@timestamp": mapstr.M{"gt": "now-6h"}},
+			},
+		}
+
+		if sf.Location != nil {
+			queryMustClauses = append(queryMustClauses, mapstr.M{
+				"match": mapstr.M{"observer.name": sf.Location.ID},
+			})
+		}
+
 		reqBody, err := json.Marshal(mapstr.M{
 			"sort": mapstr.M{"@timestamp": "desc"},
 			"query": mapstr.M{
 				"bool": mapstr.M{
-					"must": []mapstr.M{
-						{
-							"match": mapstr.M{"monitor.id": monitorId},
-						},
-						{
-							"exists": mapstr.M{"field": "state"},
-						},
-						{
-							// Only search the past 6h of data for perf, otherwise we reset the state
-							// Monitors should run more frequently than that.
-							"range": mapstr.M{"@timestamp": mapstr.M{"gt": "now-6h"}},
-						},
-					},
+					"must": queryMustClauses,
 				},
 			},
 		})
@@ -81,17 +94,17 @@ func MakeESLoader(esc *elasticsearch.Client, indexPattern string) StateLoader {
 
 		respBody, err := esutil.CheckRetResp(r, err)
 		if err != nil {
-			return nil, fmt.Errorf("error executing state search for %s: %w", monitorId, err)
+			return nil, fmt.Errorf("error executing state search for %s: %w", sf.ID, err)
 		}
 
 		sh := stateHits{}
 		err = json.Unmarshal(respBody, &sh)
 		if err != nil {
-			return nil, fmt.Errorf("could not unmarshal state hits for %s: %w", monitorId, err)
+			return nil, fmt.Errorf("could not unmarshal state hits for %s: %w", sf.ID, err)
 		}
 
 		if len(sh.Hits.Hits) == 0 {
-			logp.L().Infof("no previous state found for monitor %s", monitorId)
+			logp.L().Infof("no previous state found for monitor %s", sf.ID)
 			return nil, nil
 		}
 

@@ -20,6 +20,8 @@ package monitorstate
 import (
 	"fmt"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 )
 
 // FlappingThreshold defines how many consecutive checks with the same status
@@ -36,19 +38,19 @@ const (
 	StatusFlapping StateStatus = "flap"
 )
 
-func newMonitorState(monitorId string, status StateStatus, ctr int) *State {
+func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int) *State {
 	now := time.Now()
 	ms := &State{
 		// ID is unique and sortable by time for easier aggregations
 		// Note that we add an incrementing counter to help with the fact that
 		// millisecond res isn't quite enough for uniqueness (esp. in tests)
-		ID:         fmt.Sprintf("%s-%x-%x", monitorId, now.UnixMilli(), ctr),
+		ID:         fmt.Sprintf("%s-%s-%x-%x", sf.ID, sf.Location, now.UnixMilli(), ctr),
 		StartedAt:  now,
 		DurationMs: 0,
 		Status:     status,
 		ctr:        ctr + 1,
 	}
-	ms.recordCheck(monitorId, status)
+	ms.recordCheck(sf, status)
 
 	return ms
 }
@@ -99,7 +101,7 @@ func (s *State) truncateFlapHistory() {
 // If the current state is continued it just updates counters and other record keeping,
 // if the state ends it actually swaps out the full value the state points to
 // and sets state.Ends.
-func (s *State) recordCheck(monitorID string, newStatus StateStatus) {
+func (s *State) recordCheck(sf stdfields.StdMonitorFields, newStatus StateStatus) {
 	if s.Status == StatusFlapping {
 		s.truncateFlapHistory()
 
@@ -117,7 +119,7 @@ func (s *State) recordCheck(monitorID string, newStatus StateStatus) {
 			s.FlapHistory = append(s.FlapHistory, newStatus)
 			s.incrementCounters(newStatus)
 		} else { // flap has ended
-			s.transitionTo(monitorID, newStatus)
+			s.transitionTo(sf, newStatus)
 		}
 	} else if s.Status == newStatus { // stable state, status has not changed
 		// The state is stable, no changes needed
@@ -128,7 +130,7 @@ func (s *State) recordCheck(monitorID string, newStatus StateStatus) {
 		s.Status = StatusFlapping
 		s.FlapHistory = append(s.FlapHistory, newStatus)
 	} else {
-		s.transitionTo(monitorID, newStatus)
+		s.transitionTo(sf, newStatus)
 	}
 
 	// Ensure that the ends field is set to nil
@@ -138,11 +140,11 @@ func (s *State) recordCheck(monitorID string, newStatus StateStatus) {
 	}
 }
 
-func (s *State) transitionTo(monitorID string, newStatus StateStatus) {
+func (s *State) transitionTo(sf stdfields.StdMonitorFields, newStatus StateStatus) {
 	// state has changed, but we aren't flapping (yet), since we've been stable past the
 	// flapping threshold
 	oldState := *s
-	*s = *newMonitorState(monitorID, newStatus, s.ctr)
+	*s = *newMonitorState(sf, newStatus, s.ctr)
 	// We don't need to retain extra data when transitioning
 	oldState.FlapHistory = nil
 	// W edon't want an infinite linked list!

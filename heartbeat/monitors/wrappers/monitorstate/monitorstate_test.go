@@ -21,18 +21,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRecordingAndFlapping(t *testing.T) {
-	monitorID := "test"
-	ms := newMonitorState(monitorID, StatusUp, 0)
-	recordFlappingSeries(monitorID, ms)
+	ms := newMonitorState(TestSf, StatusUp, 0)
+	recordFlappingSeries(TestSf, ms)
 	require.Equal(t, StatusFlapping, ms.Status)
 	require.Equal(t, FlappingThreshold+1, ms.Checks)
 	require.Equal(t, ms.Up+ms.Down, ms.Checks)
 
-	recordStableSeries(monitorID, ms, FlappingThreshold*2, StatusDown)
+	recordStableSeries(TestSf, ms, FlappingThreshold*2, StatusDown)
 	require.Equal(t, StatusDown, ms.Status)
 	// The count should be FlappingThreshold+1 since we used double the threshold before
 	// This is because we have one full threshold of stable checks, as well as the final check that
@@ -41,46 +41,44 @@ func TestRecordingAndFlapping(t *testing.T) {
 	require.Nil(t, ms.Ends, "expected nil ends after a stable series")
 
 	// Since we're now in a stable state a single up check should create a new state from a stable one
-	ms.recordCheck(monitorID, StatusUp)
+	ms.recordCheck(TestSf, StatusUp)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSCounts(t, ms, 1, 0)
 }
 
 func TestDuration(t *testing.T) {
-	monitorID := "test"
-	ms := newMonitorState(monitorID, StatusUp, 0)
-	ms.recordCheck(monitorID, StatusUp)
+	ms := newMonitorState(TestSf, StatusUp, 0)
+	ms.recordCheck(TestSf, StatusUp)
 	time.Sleep(time.Millisecond * 10)
-	ms.recordCheck(monitorID, StatusUp)
+	ms.recordCheck(TestSf, StatusUp)
 	// Pretty forgiving upper bound to account for flaky CI
 	require.True(t, ms.DurationMs > 9 && ms.DurationMs < 300, "Expected duration to be ~10ms, got %d", ms.DurationMs)
 }
 
 // recordFlappingSeries is a helper that should always put the monitor into a flapping state.
-func recordFlappingSeries(monitorID string, ms *State) {
+func recordFlappingSeries(TestSf stdfields.StdMonitorFields, ms *State) {
 	for i := 0; i < FlappingThreshold; i++ {
 		if i%2 == 0 {
-			ms.recordCheck(monitorID, StatusUp)
+			ms.recordCheck(TestSf, StatusUp)
 		} else {
-			ms.recordCheck(monitorID, StatusDown)
+			ms.recordCheck(TestSf, StatusDown)
 		}
 	}
 }
 
 // recordStableSeries is a test helper for repeatedly recording one status
-func recordStableSeries(monitorID string, ms *State, count int, s StateStatus) {
+func recordStableSeries(TestSf stdfields.StdMonitorFields, ms *State, count int, s StateStatus) {
 	for i := 0; i < count; i++ {
-		ms.recordCheck(monitorID, s)
+		ms.recordCheck(TestSf, s)
 	}
 }
 
 func TestTransitionTo(t *testing.T) {
-	id := "mymonitor"
-	s := newMonitorState(id, StatusUp, 0)
+	s := newMonitorState(TestSf, StatusUp, 0)
 	first := *s
-	s.transitionTo(id, StatusDown)
+	s.transitionTo(TestSf, StatusDown)
 	second := *s
-	s.transitionTo(id, StatusUp)
+	s.transitionTo(TestSf, StatusUp)
 
 	require.NotEqual(t, s.ID, second.ID)
 	require.NotEqual(t, s.ID, first)

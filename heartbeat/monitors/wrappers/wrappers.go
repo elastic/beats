@@ -102,7 +102,7 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) j
 				return nil, fmt.Errorf("could not wrap state for '%s', no status assigned: %w", sf.ID, err)
 			}
 
-			ms := mst.RecordStatus(sf.ID, monitorstate.StateStatus(status.(string)))
+			ms := mst.RecordStatus(sf, monitorstate.StateStatus(status.(string)))
 
 			eventext.MergeEventFields(event, mapstr.M{"state": ms})
 

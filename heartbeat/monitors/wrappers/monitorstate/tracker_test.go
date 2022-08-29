@@ -24,19 +24,18 @@ import (
 )
 
 func TestTrackerRecord(t *testing.T) {
-	monId := "mymonitor"
 	mst := NewTracker(NilStateLoader)
-	ms := mst.RecordStatus(monId, StatusUp)
+	ms := mst.RecordStatus(TestSf, StatusUp)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
 
 	for i := 0; i < FlappingThreshold; i++ {
-		ms = mst.RecordStatus(monId, StatusUp)
+		ms = mst.RecordStatus(TestSf, StatusUp)
 	}
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSCounts(t, ms, FlappingThreshold+1, 0)
 
-	ms = mst.RecordStatus(monId, StatusDown)
+	ms = mst.RecordStatus(TestSf, StatusDown)
 	require.Equal(t, StatusDown, ms.Status)
 	requireMSStatusCount(t, ms, StatusDown, 1)
 }

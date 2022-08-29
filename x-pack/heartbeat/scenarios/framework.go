@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
+	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -31,10 +32,11 @@ import (
 type ScenarioRun func() (config mapstr.M, close func(), err error)
 
 type Scenario struct {
-	Name   string
-	Type   string
-	Runner ScenarioRun
-	Tags   []string
+	Name     string
+	Type     string
+	Runner   ScenarioRun
+	Tags     []string
+	Location *hbconfig.LocationWithID
 }
 
 func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error)) {
@@ -47,7 +49,7 @@ func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error
 
 	t.Run(s.Name, func(t *testing.T) {
 		t.Parallel()
-		mtr, err := runMonitorOnce(t, cfgMap)
+		mtr, err := runMonitorOnce(t, cfgMap, s.Location)
 		mtr.Wait()
 		callback(mtr, err)
 		mtr.Close()
@@ -109,7 +111,7 @@ type MonitorTestRun struct {
 	Close     func()
 }
 
-func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, err error) {
+func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.LocationWithID) (mtr *MonitorTestRun, err error) {
 	mtr = &MonitorTestRun{
 		Config:    monitorConfig,
 		StdFields: stdfields.StdMonitorFields{},
@@ -118,7 +120,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, 
 	// make a pipeline
 	pipe := &monitors.MockPipeline{}
 	// pass it to the factory
-	f, sched, closeFactory := setupFactoryAndSched()
+	f, sched, closeFactory := setupFactoryAndSched(location)
 	conf, err := config.NewConfigFrom(monitorConfig)
 	require.NoError(t, err)
 	err = conf.Unpack(&mtr.StdFields)
@@ -143,7 +145,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M) (mtr *MonitorTestRun, 
 	return mtr, err
 }
 
-func setupFactoryAndSched() (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
+func setupFactoryAndSched(location *hbconfig.LocationWithID) (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
 	id, _ := uuid.NewV4()
 	eid, _ := uuid.NewV4()
 	info := beat.Info{
@@ -181,6 +183,7 @@ func setupFactoryAndSched() (factory *monitors.RunnerFactory, sched *scheduler.S
 				c, _ := pipeline.Connect()
 				return monitors.SyncPipelineClientAdaptor{C: c}, nil
 			},
+			BeatLocation: location,
 		}),
 		sched,
 		sched.Stop
