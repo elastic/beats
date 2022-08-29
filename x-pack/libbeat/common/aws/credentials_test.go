@@ -156,6 +156,34 @@ func TestCreateServiceName(t *testing.T) {
 			"us-east-1",
 			"ec2-fips",
 		},
+		{
+			"SQS - fips - us-gov-east-1",
+			"sqs",
+			true,
+			"us-gov-east-1",
+			"sqs",
+		},
+		{
+			"SQS - fips - us-east-1",
+			"sqs",
+			true,
+			"us-east-1",
+			"sqs-fips",
+		},
+		{
+			"logs - fips - us-gov-east-1",
+			"logs",
+			true,
+			"us-gov-east-1",
+			"logs",
+		},
+		{
+			"logs - fips - us-east-1",
+			"logs",
+			true,
+			"us-east-1",
+			"logs-fips",
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
