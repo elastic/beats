@@ -8,6 +8,7 @@ from parameterized import parameterized
 
 
 @metricbeat.parameterized_with_supported_versions
+@unittest.skip("broken test suite: https://github.com/elastic/beats/issues/32898")
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['ceph']
