@@ -87,7 +87,7 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 	d, err := dst.GetValue(typ)
 	if err != nil {
 		if err != mapstr.ErrKeyNotFound {
-			panic(err)
+			return fmt.Errorf("invalid destination key: %q not found in map", typ)
 		}
 		details = make(mapstr.M)
 		dst[typ] = details
