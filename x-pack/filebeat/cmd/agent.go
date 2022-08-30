@@ -18,9 +18,6 @@ func filebeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) (
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
-	for iter := range modules {
-		modules[iter]["type"] = translateFilebeatType(rawIn)
-	}
 
 	// format for the reloadable list needed bythe cm.Reload() method
 	configList, err := management.CreateReloadConfigFromInputs(modules)
@@ -28,24 +25,4 @@ func filebeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) (
 		return nil, fmt.Errorf("error creating config for reloader: %w", err)
 	}
 	return configList, nil
-}
-
-func translateFilebeatType(rawIn *proto.UnitExpectedConfig) string {
-	// I'm not sure what this does
-	if rawIn.Type == "logfile" || rawIn.Type == "event/file" {
-		return "log"
-	} else if rawIn.Type == "event/stdin" {
-		return "stdin"
-	} else if rawIn.Type == "event/tcp" {
-		return "tcp"
-	} else if rawIn.Type == "event/udp" {
-		return "udp"
-	} else if rawIn.Type == "log/docker" {
-		return "docker"
-	} else if rawIn.Type == "log/redis_slowlog" {
-		return "redis"
-	} else if rawIn.Type == "log/syslog" {
-		return "syslog"
-	}
-	return rawIn.Type
 }
