@@ -1,0 +1,860 @@
+{
+    "attributes": {
+        "description": "Network data overview via ArcSight",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset:cef.log"
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 48,
+                    "x": 0,
+                    "y": 44
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "2",
+                    "w": 48,
+                    "x": 0,
+                    "y": 68
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 48,
+                    "x": 0,
+                    "y": 60
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "7",
+                    "w": 40,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "/Attempt": "#0A50A1",
+                            "/Failure": "#BF1B00",
+                            "/Success": "#629E51"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "9",
+                    "w": 16,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "/Attempt": "#0A50A1",
+                            "/Failure": "#BF1B00",
+                            "/Success": "#629E51"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "11",
+                    "w": 16,
+                    "x": 16,
+                    "y": 20
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "13",
+                    "w": 32,
+                    "x": 0,
+                    "y": 32
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0% - 17%": "rgb(255,255,204)",
+                            "17% - 34%": "rgb(255,230,146)",
+                            "34% - 50%": "rgb(254,191,90)",
+                            "50% - 67%": "rgb(253,141,60)",
+                            "67% - 84%": "rgb(244,61,37)",
+                            "84% - 100%": "rgb(202,8,35)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "15",
+                    "w": 16,
+                    "x": 32,
+                    "y": 32
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "Anti-Virus": "#EF843C",
+                            "Content Security": "#7EB26D",
+                            "Firewall": "#E24D42",
+                            "Integrated Security": "#962D82",
+                            "Network-based IDS/IPS": "#1F78C1",
+                            "Operating System": "#1F78C1",
+                            "VPN": "#EAB839"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "16",
+                    "w": 16,
+                    "x": 32,
+                    "y": 20
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "17",
+                    "w": 48,
+                    "x": 0,
+                    "y": 52
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "18",
+                    "w": 24,
+                    "x": 0,
+                    "y": 76
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "19",
+                    "w": 24,
+                    "x": 24,
+                    "y": 76
+                },
+                "panelIndex": "19",
+                "panelRefName": "panel_19",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "20",
+                    "w": 8,
+                    "x": 40,
+                    "y": 4
+                },
+                "panelIndex": "20",
+                "panelRefName": "panel_20",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "21",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "21",
+                "panelRefName": "panel_21",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "layerListJSON": [
+                            {
+                                "alpha": 1,
+                                "id": "c6a1fd07-de0f-444b-8814-902cbf2d019a",
+                                "includeInFitToBounds": true,
+                                "label": null,
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "isAutoSelect": true,
+                                    "lightModeDefault": "road_map_desaturated",
+                                    "type": "EMS_TMS"
+                                },
+                                "style": {
+                                    "type": "TILE"
+                                },
+                                "type": "EMS_VECTOR_TILE",
+                                "visible": true
+                            },
+                            {
+                                "alpha": 0.75,
+                                "id": "c1643919-b9de-4588-826f-93710a159e2b",
+                                "includeInFitToBounds": true,
+                                "joins": [],
+                                "label": "Top Destination Locations by Events — ArcSight [Filebeat CEF]",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "applyForceRefresh": true,
+                                    "applyGlobalQuery": true,
+                                    "applyGlobalTime": true,
+                                    "geoField": "destination.geo.location",
+                                    "id": "5183bb72-a077-4cf0-8aba-561a15b012cf",
+                                    "indexPatternRefName": "layer_1_source_index_pattern",
+                                    "metrics": [
+                                        {
+                                            "type": "count"
+                                        }
+                                    ],
+                                    "requestType": "point",
+                                    "resolution": "MOST_FINE",
+                                    "type": "ES_GEO_GRID"
+                                },
+                                "style": {
+                                    "isTimeAware": true,
+                                    "properties": {
+                                        "fillColor": {
+                                            "options": {
+                                                "color": "Yellow to Red",
+                                                "colorCategory": "palette_0",
+                                                "field": {
+                                                    "name": "doc_count",
+                                                    "origin": "source"
+                                                },
+                                                "fieldMetaOptions": {
+                                                    "isEnabled": false,
+                                                    "sigma": 3
+                                                },
+                                                "type": "ORDINAL"
+                                            },
+                                            "type": "DYNAMIC"
+                                        },
+                                        "icon": {
+                                            "options": {
+                                                "value": "marker"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconOrientation": {
+                                            "options": {
+                                                "orientation": 0
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconSize": {
+                                            "options": {
+                                                "size": 6
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderSize": {
+                                            "options": {
+                                                "size": "SMALL"
+                                            }
+                                        },
+                                        "labelColor": {
+                                            "options": {
+                                                "color": "#000000"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelSize": {
+                                            "options": {
+                                                "size": 14
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelText": {
+                                            "options": {
+                                                "value": ""
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineColor": {
+                                            "options": {
+                                                "color": "#3d3d3d"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineWidth": {
+                                            "options": {
+                                                "size": 1
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "symbolizeAs": {
+                                            "options": {
+                                                "value": "circle"
+                                            }
+                                        }
+                                    },
+                                    "type": "VECTOR"
+                                },
+                                "type": "GEOJSON_VECTOR",
+                                "visible": true
+                            }
+                        ],
+                        "mapStateJSON": {
+                            "center": {
+                                "lat": 16.40767,
+                                "lon": 0
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "refreshConfig": {
+                                "interval": 0,
+                                "isPaused": true
+                            },
+                            "settings": {
+                                "autoFitToDataBounds": false,
+                                "backgroundColor": "#ffffff",
+                                "browserLocation": {
+                                    "zoom": 2
+                                },
+                                "disableInteractive": false,
+                                "disableTooltipControl": false,
+                                "fixedLocation": {
+                                    "lat": 0,
+                                    "lon": 0,
+                                    "zoom": 2
+                                },
+                                "hideLayerControl": false,
+                                "hideToolbarOverlay": false,
+                                "hideViewControl": false,
+                                "initialLocation": "LAST_SAVED_LOCATION",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "showScaleControl": false,
+                                "showSpatialFilters": true,
+                                "showTimesliderToggleButton": true,
+                                "spatialFiltersAlpa": 0.3,
+                                "spatialFiltersFillColor": "#DA8B45",
+                                "spatialFiltersLineColor": "#DA8B45"
+                            },
+                            "timeFilters": {
+                                "from": "now-24h",
+                                "to": "now"
+                            },
+                            "zoom": 1.78
+                        },
+                        "references": [],
+                        "title": "Top Destination Locations by Events — ArcSight [Filebeat CEF]",
+                        "uiStateJSON": {
+                            "isLayerTOCOpen": true,
+                            "openTOCDetails": []
+                        }
+                    },
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": true,
+                    "mapBuffer": {
+                        "maxLat": 66.51326,
+                        "maxLon": 90,
+                        "minLat": -66.51326,
+                        "minLon": -90
+                    },
+                    "mapCenter": {
+                        "lat": 16.40767,
+                        "lon": 0,
+                        "zoom": 1.78
+                    },
+                    "openTOCDetails": [],
+                    "type": "map"
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "49de47fb-1382-4009-89d2-b96a4161e12d",
+                    "w": 24,
+                    "x": 0,
+                    "y": 92
+                },
+                "panelIndex": "49de47fb-1382-4009-89d2-b96a4161e12d",
+                "type": "map",
+                "version": "8.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "layerListJSON": [
+                            {
+                                "alpha": 1,
+                                "id": "c2329af2-2183-45cb-9f40-d0f2e984c5b3",
+                                "includeInFitToBounds": true,
+                                "label": null,
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "isAutoSelect": true,
+                                    "lightModeDefault": "road_map_desaturated",
+                                    "type": "EMS_TMS"
+                                },
+                                "style": {
+                                    "type": "TILE"
+                                },
+                                "type": "EMS_VECTOR_TILE",
+                                "visible": true
+                            },
+                            {
+                                "alpha": 0.75,
+                                "id": "1fc250c2-4990-401e-b709-61e1f4824005",
+                                "includeInFitToBounds": true,
+                                "joins": [],
+                                "label": "Top Source Locations by Events — ArcSight [Filebeat CEF]",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "applyForceRefresh": true,
+                                    "applyGlobalQuery": true,
+                                    "applyGlobalTime": true,
+                                    "geoField": "source.geo.location",
+                                    "id": "e1eda4fd-94b9-4c31-9615-70334517a966",
+                                    "indexPatternRefName": "layer_1_source_index_pattern",
+                                    "metrics": [
+                                        {
+                                            "type": "count"
+                                        }
+                                    ],
+                                    "requestType": "point",
+                                    "resolution": "MOST_FINE",
+                                    "type": "ES_GEO_GRID"
+                                },
+                                "style": {
+                                    "isTimeAware": true,
+                                    "properties": {
+                                        "fillColor": {
+                                            "options": {
+                                                "color": "Yellow to Red",
+                                                "colorCategory": "palette_0",
+                                                "field": {
+                                                    "name": "doc_count",
+                                                    "origin": "source"
+                                                },
+                                                "fieldMetaOptions": {
+                                                    "isEnabled": false,
+                                                    "sigma": 3
+                                                },
+                                                "type": "ORDINAL"
+                                            },
+                                            "type": "DYNAMIC"
+                                        },
+                                        "icon": {
+                                            "options": {
+                                                "value": "marker"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconOrientation": {
+                                            "options": {
+                                                "orientation": 0
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconSize": {
+                                            "options": {
+                                                "size": 6
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderSize": {
+                                            "options": {
+                                                "size": "SMALL"
+                                            }
+                                        },
+                                        "labelColor": {
+                                            "options": {
+                                                "color": "#000000"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelSize": {
+                                            "options": {
+                                                "size": 14
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelText": {
+                                            "options": {
+                                                "value": ""
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineColor": {
+                                            "options": {
+                                                "color": "#3d3d3d"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineWidth": {
+                                            "options": {
+                                                "size": 1
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "symbolizeAs": {
+                                            "options": {
+                                                "value": "circle"
+                                            }
+                                        }
+                                    },
+                                    "type": "VECTOR"
+                                },
+                                "type": "GEOJSON_VECTOR",
+                                "visible": true
+                            }
+                        ],
+                        "mapStateJSON": {
+                            "center": {
+                                "lat": 16.40767,
+                                "lon": 0
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "refreshConfig": {
+                                "interval": 0,
+                                "isPaused": true
+                            },
+                            "settings": {
+                                "autoFitToDataBounds": false,
+                                "backgroundColor": "#ffffff",
+                                "browserLocation": {
+                                    "zoom": 2
+                                },
+                                "disableInteractive": false,
+                                "disableTooltipControl": false,
+                                "fixedLocation": {
+                                    "lat": 0,
+                                    "lon": 0,
+                                    "zoom": 2
+                                },
+                                "hideLayerControl": false,
+                                "hideToolbarOverlay": false,
+                                "hideViewControl": false,
+                                "initialLocation": "LAST_SAVED_LOCATION",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "showScaleControl": false,
+                                "showSpatialFilters": true,
+                                "showTimesliderToggleButton": true,
+                                "spatialFiltersAlpa": 0.3,
+                                "spatialFiltersFillColor": "#DA8B45",
+                                "spatialFiltersLineColor": "#DA8B45"
+                            },
+                            "timeFilters": {
+                                "from": "now-24h",
+                                "to": "now"
+                            },
+                            "zoom": 1.78
+                        },
+                        "references": [],
+                        "title": "Top Source Locations by Events — ArcSight [Filebeat CEF]",
+                        "uiStateJSON": {
+                            "isLayerTOCOpen": true,
+                            "openTOCDetails": []
+                        }
+                    },
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": true,
+                    "mapBuffer": {
+                        "maxLat": 66.51326,
+                        "maxLon": 90,
+                        "minLat": -66.51326,
+                        "minLon": -90
+                    },
+                    "mapCenter": {
+                        "lat": 16.40767,
+                        "lon": 0,
+                        "zoom": 1.78
+                    },
+                    "openTOCDetails": [],
+                    "type": "map"
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "9d097034-9ebb-4f53-ad39-e42e625b541c",
+                    "w": 24,
+                    "x": 24,
+                    "y": 92
+                },
+                "panelIndex": "9d097034-9ebb-4f53-ad39-e42e625b541c",
+                "type": "map",
+                "version": "8.3.0"
+            }
+        ],
+        "refreshInterval": {
+            "pause": true,
+            "value": 0
+        },
+        "timeFrom": "now-24h",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat CEF] ArcSight — Network Overview Dashboard",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-346ac50b-0900-464d-aad6-007756a4e215",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-fe42b0d8-1fd3-4d8a-a4ff-4ca9915d2644",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-18e25223-652f-4768-9317-f611f8880313",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-1f1e8ad1-8232-4e9d-895b-096169da6e5a",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-29370aab-8b50-4553-b57e-f0c719cf00f5",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-05c3090d-ca0e-4e4a-8793-dee6fdf6134d",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-0e817af9-4cfe-42bf-823b-9fcc5e31fa79",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-0e4a06ad-6227-46df-8387-6d3987880709",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-43c3366e-6840-4956-8c82-dbe9b4eb9f16",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-d24ad888-a5cf-4b17-ac08-ae13d4cea23e",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-3064f3fe-01de-4e6c-9e90-68961338c2ed",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-765d9f2a-7f2e-4765-94f3-77d9359ef50f",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-f1da0e00-c6a0-4e86-b9df-403f81818f62",
+            "name": "18:panel_18",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-15982ea6-25d7-4435-891e-a04fdfba6bf4",
+            "name": "19:panel_19",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-d618f6ab-e55c-42e9-b71e-f65e45630795",
+            "name": "20:panel_20",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-8ed5df68-1651-4e52-8c89-997109ddee63",
+            "name": "21:panel_21",
+            "type": "visualization"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "49de47fb-1382-4009-89d2-b96a4161e12d:layer_1_source_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "9d097034-9ebb-4f53-ad39-e42e625b541c:layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzIzNDcsMV0="
+}
