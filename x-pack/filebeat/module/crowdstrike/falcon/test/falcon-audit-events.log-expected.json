@@ -638,7 +638,6 @@
         "crowdstrike.event.Success": true,
         "crowdstrike.event.UTCTimestamp": "2020-02-13T13:50:20.289Z",
         "crowdstrike.event.UserId": "alice@company.com",
-        "crowdstrike.event.UserIp": "N/A",
         "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
         "crowdstrike.metadata.eventCreationTime": "2020-02-13T13:50:20.289Z",
         "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
@@ -660,7 +659,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 6627,
+        "log.offset": 8094,
         "message": "CrowdStrike Authentication",
         "related.user": [
             "alice@company.com"
