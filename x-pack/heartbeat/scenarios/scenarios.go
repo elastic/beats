@@ -5,6 +5,7 @@
 package scenarios
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -34,7 +35,8 @@ func startTestWebserver(t *testing.T) *httptest.Server {
 		var err error
 		for i := 0; i < 20; i++ {
 			var resp *http.Response
-			resp, err = http.Get(testWs.URL)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, testWs.URL, nil)
+			resp, err = http.DefaultClient.Do(req)
 			if err == nil {
 				resp.Body.Close()
 				if resp.StatusCode == 200 {
