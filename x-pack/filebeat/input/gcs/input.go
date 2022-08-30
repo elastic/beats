@@ -58,8 +58,8 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		bucket := tryOverrideOrDefault(config, b)
 		sources = append(sources, &types.Source{
 			ProjectId:     config.ProjectId,
-			BucketName:    b.Name,
-			BucketTimeOut: *b.BucketTimeOut,
+			BucketName:    bucket.Name,
+			BucketTimeOut: *bucket.BucketTimeOut,
 			MaxWorkers:    *bucket.MaxWorkers,
 			Poll:          *bucket.Poll,
 			PollInterval:  *bucket.PollInterval,

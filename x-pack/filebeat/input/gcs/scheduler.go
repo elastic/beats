@@ -59,16 +59,18 @@ func (gcsis *gcsInputScheduler) Schedule(ctx context.Context) error {
 	workerPool := pool.NewWorkerPool(ctx, gcsis.src.MaxWorkers, gcsis.log)
 	workerPool.Start()
 
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, gcsis.src.BucketTimeOut)
-	defer cancel()
-
 	if !gcsis.src.Poll {
+		ctxWithTimeout, cancel := context.WithTimeout(ctx, gcsis.src.BucketTimeOut)
+		defer cancel()
 		availableWorkers = workerPool.AvailableWorkers()
 		pager = gcsis.fetchObjectPager(ctxWithTimeout, availableWorkers)
 		return gcsis.scheduleOnce(ctx, pager, workerPool)
 	}
 
 	for {
+		ctxWithTimeout, cancel := context.WithTimeout(ctx, gcsis.src.BucketTimeOut)
+		defer cancel()
+
 		availableWorkers = workerPool.AvailableWorkers()
 		if availableWorkers == 0 {
 			continue
