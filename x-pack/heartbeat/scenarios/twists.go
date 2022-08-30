@@ -5,6 +5,8 @@
 package scenarios
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 )
@@ -19,7 +21,19 @@ var TestLocationMpls = &config.LocationWithID{
 	},
 }
 
+var TwistEnableES = MakeTwist("with ES", func(s Scenario) Scenario {
+	s.ESEnabled = true
+	return s
+})
+
 var TwistAddLocation = MakeTwist("add location", func(s Scenario) Scenario {
 	s.Location = TestLocationDefault
 	return s
 })
+
+func TwistMultiRun(times int) Twist {
+	return MakeTwist(fmt.Sprintf("run %d times", times), func(s Scenario) Scenario {
+		s.NumberOfRuns = times
+		return s
+	})
+}

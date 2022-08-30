@@ -33,12 +33,13 @@ import (
 type ScenarioRun func(t *testing.T) (config mapstr.M, close func(), err error)
 
 type Scenario struct {
-	Name      string
-	Type      string
-	Runner    ScenarioRun
-	Tags      []string
-	Location  *hbconfig.LocationWithID
-	ESEnabled bool
+	Name         string
+	Type         string
+	Runner       ScenarioRun
+	Tags         []string
+	Location     *hbconfig.LocationWithID
+	ESEnabled    bool
+	NumberOfRuns int
 }
 
 type Twist func(Scenario) Scenario
@@ -46,8 +47,18 @@ type Twist func(Scenario) Scenario
 func MakeTwist(name string, fn Twist) Twist {
 	return func(s Scenario) Scenario {
 		newS := s.clone()
-		newS.Name = fmt.Sprintf("%s>Twist(%s)", s.Name, name)
+		newS.Name = fmt.Sprintf("%s~<%s>", s.Name, name)
 		return fn(newS)
+	}
+}
+
+func MultiTwist(twists ...Twist) Twist {
+	return func(s Scenario) Scenario {
+		res := s
+		for _, twist := range twists {
+			res = twist(res)
+		}
+		return res
 	}
 }
 
@@ -82,10 +93,36 @@ func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr
 
 	t.Run(runS.Name, func(t *testing.T) {
 		t.Parallel()
-		mtr, err := runMonitorOnce(t, cfgMap, runS.Location, stateLoader)
-		mtr.Wait()
-		callback(t, mtr, err)
-		mtr.Close()
+
+		numberRuns := runS.NumberOfRuns
+		if numberRuns < 1 {
+			numberRuns = 1 // default to one run
+		}
+
+		var events []*beat.Event
+
+		var err error
+		var sf stdfields.StdMonitorFields
+		var conf mapstr.M
+		for i := 0; i < numberRuns; i++ {
+			var mtr *MonitorTestRun
+			mtr, err = runMonitorOnce(t, cfgMap, runS.Location, stateLoader)
+			mtr.wait()
+			events = append(events, mtr.Events()...)
+			sf = mtr.StdFields
+			conf = mtr.Config
+			mtr.close()
+		}
+
+		sumMtr := MonitorTestRun{
+			StdFields: sf,
+			Config:    conf,
+			Events: func() []*beat.Event {
+				return events
+			},
+		}
+
+		callback(t, &sumMtr, err)
 	})
 }
 
@@ -149,10 +186,10 @@ func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist Twis
 type MonitorTestRun struct {
 	StdFields stdfields.StdMonitorFields
 	Config    mapstr.M
-	Monitor   *monitors.Monitor
 	Events    func() []*beat.Event
-	Wait      func()
-	Close     func()
+	monitor   *monitors.Monitor
+	wait      func()
+	close     func()
 }
 
 func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (mtr *MonitorTestRun, err error) {
@@ -172,20 +209,20 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.Loc
 
 	mIface, err := f.Create(pipe, conf)
 	require.NoError(t, err)
-	mtr.Monitor = mIface.(*monitors.Monitor)
-	require.NotNil(t, mtr.Monitor, "could not convert to monitor %v", mIface)
+	mtr.monitor = mIface.(*monitors.Monitor)
+	require.NotNil(t, mtr.monitor, "could not convert to monitor %v", mIface)
 	mtr.Events = pipe.PublishedEvents
 
 	// start the monitor
-	mtr.Monitor.Start()
-	mtr.Wait = func() {
+	mtr.monitor.Start()
+	mtr.wait = func() {
 		// wait for the monitor to stop
 		sched.WaitForRunOnce()
 		// stop the monitor itself
-		mtr.Monitor.Stop()
+		mtr.monitor.Stop()
 		closeFactory()
 	}
-	mtr.Close = closeFactory
+	mtr.close = closeFactory
 	return mtr, err
 }
 
