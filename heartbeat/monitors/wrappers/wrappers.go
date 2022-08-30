@@ -42,7 +42,8 @@ import (
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader) []jobs.Job {
-	mst := monitorstate.NewTracker(stateLoader)
+	// flapping is disabled by default until we sort out how it should work
+	mst := monitorstate.NewTracker(stateLoader, false)
 	if stdMonFields.Type == "browser" {
 		return WrapBrowser(js, stdMonFields, mst)
 	} else {

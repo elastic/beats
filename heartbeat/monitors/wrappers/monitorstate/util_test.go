@@ -34,7 +34,7 @@ func requireMSStatusCount(t *testing.T, ms *State, status StateStatus, count int
 }
 
 func requireMSCounts(t *testing.T, ms *State, up int, down int) {
-	require.Equal(t, up+down, ms.Checks)
-	require.Equal(t, up, ms.Up)
-	require.Equal(t, down, ms.Down)
+	require.Equal(t, up+down, ms.Checks, "expected %d total checks, got %d (%d up / %d down)", up+down, ms.Checks, ms.Up, ms.Down)
+	require.Equal(t, up, ms.Up, "expected %d up checks, got %d", up, ms.Up)
+	require.Equal(t, down, ms.Down, "expected %d down checks, got %d", down, ms.Down)
 }

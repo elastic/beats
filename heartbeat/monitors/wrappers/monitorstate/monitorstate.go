@@ -38,17 +38,18 @@ const (
 	StatusFlapping StateStatus = "flap"
 )
 
-func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int) *State {
+func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int, flappingEnabled bool) *State {
 	now := time.Now()
 	ms := &State{
 		// ID is unique and sortable by time for easier aggregations
 		// Note that we add an incrementing counter to help with the fact that
 		// millisecond res isn't quite enough for uniqueness (esp. in tests)
-		ID:         fmt.Sprintf("%s-%s-%x-%x", sf.ID, sf.Location, now.UnixMilli(), ctr),
-		StartedAt:  now,
-		DurationMs: 0,
-		Status:     status,
-		ctr:        ctr + 1,
+		ID:              fmt.Sprintf("%s-%s-%x-%x", sf.ID, sf.Location, now.UnixMilli(), ctr),
+		StartedAt:       now,
+		DurationMs:      0,
+		Status:          status,
+		flappingEnabled: flappingEnabled,
+		ctr:             ctr + 1,
 	}
 	ms.recordCheck(sf, status)
 
@@ -68,8 +69,9 @@ type State struct {
 	// computation if loading from ES or another source
 	FlapHistory []StateStatus `json:"flap_history"`
 	// Ends is a pointer to the prior state if this is the start of a new state
-	Ends *State `json:"ends"`
-	ctr  int
+	Ends            *State `json:"ends"`
+	flappingEnabled bool
+	ctr             int
 }
 
 func (s *State) incrementCounters(status StateStatus) {
@@ -124,7 +126,7 @@ func (s *State) recordCheck(sf stdfields.StdMonitorFields, newStatus StateStatus
 	} else if s.Status == newStatus { // stable state, status has not changed
 		// The state is stable, no changes needed
 		s.incrementCounters(newStatus)
-	} else if s.Checks < FlappingThreshold {
+	} else if s.Checks < FlappingThreshold && s.flappingEnabled {
 		// The state changed too quickly, we're now flapping
 		s.incrementCounters(newStatus)
 		s.Status = StatusFlapping
@@ -144,7 +146,7 @@ func (s *State) transitionTo(sf stdfields.StdMonitorFields, newStatus StateStatu
 	// state has changed, but we aren't flapping (yet), since we've been stable past the
 	// flapping threshold
 	oldState := *s
-	*s = *newMonitorState(sf, newStatus, s.ctr)
+	*s = *newMonitorState(sf, newStatus, s.ctr, s.flappingEnabled)
 	// We don't need to retain extra data when transitioning
 	oldState.FlapHistory = nil
 	// W edon't want an infinite linked list!

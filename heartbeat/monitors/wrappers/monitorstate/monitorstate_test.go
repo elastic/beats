@@ -27,7 +27,7 @@ import (
 )
 
 func TestRecordingAndFlapping(t *testing.T) {
-	ms := newMonitorState(TestSf, StatusUp, 0)
+	ms := newMonitorState(TestSf, StatusUp, 0, true)
 	recordFlappingSeries(TestSf, ms)
 	require.Equal(t, StatusFlapping, ms.Status)
 	require.Equal(t, FlappingThreshold+1, ms.Checks)
@@ -48,7 +48,7 @@ func TestRecordingAndFlapping(t *testing.T) {
 }
 
 func TestDuration(t *testing.T) {
-	ms := newMonitorState(TestSf, StatusUp, 0)
+	ms := newMonitorState(TestSf, StatusUp, 0, true)
 	ms.recordCheck(TestSf, StatusUp)
 	time.Sleep(time.Millisecond * 10)
 	ms.recordCheck(TestSf, StatusUp)
@@ -75,7 +75,7 @@ func recordStableSeries(TestSf stdfields.StdMonitorFields, ms *State, count int,
 }
 
 func TestTransitionTo(t *testing.T) {
-	s := newMonitorState(TestSf, StatusUp, 0)
+	s := newMonitorState(TestSf, StatusUp, 0, true)
 	first := *s
 	s.transitionTo(TestSf, StatusDown)
 	second := *s

@@ -31,21 +31,23 @@ import (
 // before seen monitor, which usually means using ES. If set to nil
 // it will use ES if configured, otherwise it will only track state from
 // memory.
-func NewTracker(sl StateLoader) *Tracker {
+func NewTracker(sl StateLoader, flappingEnabled bool) *Tracker {
 	if sl == nil {
 		sl = NilStateLoader
 	}
 	return &Tracker{
-		states:      map[string]*State{},
-		mtx:         sync.Mutex{},
-		stateLoader: sl,
+		states:          map[string]*State{},
+		mtx:             sync.Mutex{},
+		stateLoader:     sl,
+		flappingEnabled: flappingEnabled,
 	}
 }
 
 type Tracker struct {
-	states      map[string]*State
-	mtx         sync.Mutex
-	stateLoader StateLoader
+	states          map[string]*State
+	mtx             sync.Mutex
+	stateLoader     StateLoader
+	flappingEnabled bool
 }
 
 // StateLoader has signature as loadLastESState, useful for test mocking, and maybe for a future impl
@@ -60,7 +62,7 @@ func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateSta
 
 	state := t.getCurrentState(sf)
 	if state == nil {
-		state = newMonitorState(sf, newStatus, 0)
+		state = newMonitorState(sf, newStatus, 0, t.flappingEnabled)
 		t.states[sf.ID] = state
 	} else {
 		state.recordCheck(sf, newStatus)
