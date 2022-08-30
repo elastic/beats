@@ -10,19 +10,20 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
-var esIntegTwists = MultiTwist(TwistAddLocation, TwistMultiRun(3))
+var esIntegTwists = framework.MultiTwist(TwistAddLocation, TwistMultiRun(3))
 
 func TestStateContinuity(t *testing.T) {
-	Scenarios.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *MonitorTestRun, err error) {
-		lastSS := LastState(mtr.Events())
+	scenarioDB.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+		lastSS := framework.LastState(mtr.Events())
 
-		require.Equal(t, monitorstate.StatusUp, lastSS.state.Status)
+		require.Equal(t, monitorstate.StatusUp, lastSS.State.Status)
 
-		allSS := AllStates(mtr.Events())
+		allSS := framework.AllStates(mtr.Events())
 		require.Len(t, allSS, 3)
 
-		require.Equal(t, 3, lastSS.state.Checks)
+		require.Equal(t, 3, lastSS.State.Checks)
 	})
 }

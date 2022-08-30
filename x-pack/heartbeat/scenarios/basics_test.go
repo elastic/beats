@@ -18,10 +18,11 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
 func TestSimpleScenariosBasicFields(t *testing.T) {
-	Scenarios.RunAll(t, func(t *testing.T, mtr *MonitorTestRun, err error) {
+	scenarioDB.RunAll(t, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		require.GreaterOrEqual(t, len(mtr.Events()), 1)
 		lastCg := ""
 		for i, e := range mtr.Events() {
@@ -48,7 +49,7 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 }
 
 func TestLightweightUrls(t *testing.T) {
-	Scenarios.RunTag(t, "lightweight", func(t *testing.T, mtr *MonitorTestRun, err error) {
+	scenarioDB.RunTag(t, "lightweight", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		for _, e := range mtr.Events() {
 			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
 				"url": map[string]interface{}{
@@ -62,7 +63,7 @@ func TestLightweightUrls(t *testing.T) {
 }
 
 func TestLightweightSummaries(t *testing.T) {
-	Scenarios.RunTag(t, "lightweight", func(t *testing.T, mtr *MonitorTestRun, err error) {
+	scenarioDB.RunTag(t, "lightweight", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
 		testslike.Test(t, lookslike.MustCompile(map[string]interface{}{

@@ -19,14 +19,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
-var Scenarios = &ScenarioDB{
-	initOnce: &sync.Once{},
-	ByTag:    map[string][]Scenario{},
-	All:      []Scenario{},
-}
-
+var scenarioDB = framework.NewScenarioDB()
 var testWs *httptest.Server
 
 var testWsOnce = &sync.Once{}
@@ -54,8 +50,8 @@ func startTestWebserver(t *testing.T) *httptest.Server {
 }
 
 func init() {
-	Scenarios.Add(
-		Scenario{
+	scenarioDB.Add(
+		framework.Scenario{
 			Name: "http-simple",
 			Type: "http",
 			Tags: []string{"lightweight", "http"},
@@ -71,7 +67,7 @@ func init() {
 				return config, nil, nil
 			},
 		},
-		Scenario{
+		framework.Scenario{
 			Name: "tcp-simple",
 			Type: "tcp",
 			Tags: []string{"lightweight", "tcp"},
@@ -91,7 +87,7 @@ func init() {
 				return config, nil, nil
 			},
 		},
-		Scenario{
+		framework.Scenario{
 			Name: "simple-icmp",
 			Type: "icmp",
 			Tags: []string{"icmp"},
@@ -105,7 +101,7 @@ func init() {
 				}, func() {}, nil
 			},
 		},
-		Scenario{
+		framework.Scenario{
 			Name: "simple-browser",
 			Type: "browser",
 			Tags: []string{"browser", "browser-inline"},

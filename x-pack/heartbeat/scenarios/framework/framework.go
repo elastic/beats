@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package scenarios
+package framework
 
 import (
 	"fmt"
@@ -107,7 +107,7 @@ func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr
 			mtr.wait()
 			events = append(events, mtr.Events()...)
 
-			if lse := LastState(events).state; lse != nil {
+			if lse := LastState(events).State; lse != nil {
 				loaderDB.AddState(mtr.StdFields, lse)
 			}
 
@@ -132,6 +132,15 @@ type ScenarioDB struct {
 	All      []Scenario
 	ByTag    map[string][]Scenario
 	initOnce *sync.Once
+}
+
+func NewScenarioDB() *ScenarioDB {
+	return &ScenarioDB{
+		initOnce: &sync.Once{},
+		ByTag:    map[string][]Scenario{},
+		All:      []Scenario{},
+	}
+
 }
 
 func (sdb *ScenarioDB) Init() {
@@ -277,8 +286,8 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 }
 
 type stateEvent struct {
-	event *beat.Event
-	state *monitorstate.State
+	Event *beat.Event
+	State *monitorstate.State
 }
 
 func AllStates(events []*beat.Event) (stateEvents []stateEvent) {
@@ -289,7 +298,7 @@ func AllStates(events []*beat.Event) (stateEvents []stateEvent) {
 				panic(fmt.Sprintf("state is not a monitorstate.State, got %v", state))
 			}
 
-			se := stateEvent{event: e, state: state}
+			se := stateEvent{Event: e, State: state}
 			stateEvents = append(stateEvents, se)
 		}
 	}
