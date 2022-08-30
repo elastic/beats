@@ -70,25 +70,25 @@ func Load() {
 		return
 	}
 
-	secretConfigName := os.Getenv("FB_SECRET_CONFIG_NAME")
-	s3ConfigBucketName := os.Getenv("FB_S3_CONFIG_BUCKET_NAME")
-	s3ConfigBucketKey := os.Getenv("FB_S3_CONFIG_BUCKET_KEY")
+	configSecretId := os.Getenv("FB_CONFIG_SECRET_ID")
+	configS3BucketName := os.Getenv("FB_CONFIG_S3_BUCKET_NAME")
+	configS3BucketKey := os.Getenv("FB_CONFIG_S3_BUCKET_KEY")
 
-	if len(secretConfigName) > 0 && len(s3ConfigBucketName) > 0 {
+	if len(configSecretId) > 0 && len(configS3BucketName) > 0 {
 		panic(fmt.Errorf("can only load config from S3 or SecretsManager. Not both"))
 	}
 
-	if len(secretConfigName) > 0 {
-		getConfigFromASM(secretConfigName)
+	if len(configSecretId) > 0 {
+		getConfigFromASM(configSecretId)
 		return
 	}
 
-	if len(s3ConfigBucketName) > 0 {
-		if len(s3ConfigBucketKey) == 0 {
+	if len(configS3BucketName) > 0 {
+		if len(configS3BucketKey) == 0 {
 			panic(fmt.Errorf("bucket Key must be provided"))
 		}
 
-		getConfigFromS3(s3ConfigBucketName, s3ConfigBucketKey)
+		getConfigFromS3(configS3BucketName, configS3BucketKey)
 		return
 	}
 
