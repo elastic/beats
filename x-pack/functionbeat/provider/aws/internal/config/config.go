@@ -36,19 +36,23 @@ func fileExists(fileName string) bool {
 }
 
 func writeConfig(content []byte) {
+	fmt.Println("Writing configuration")
 	err := os.WriteFile(fileName, content, 0444)
 	errCheck(err)
+	fmt.Println("Done")
 }
 
 func getConfigFromASM(secretId string) {
+	fmt.Println("Fetching configuration from SecretsManager")
 	asmClient := secretsmanager.NewFromConfig(getAwsConfig())
 	result, err := asmClient.GetSecretValue(context.TODO(), &secretsmanager.GetSecretValueInput{SecretId: &secretId})
 
 	errCheck(err)
-	writeConfig(result.SecretBinary)
+	writeConfig([]byte(*result.SecretString))
 }
 
 func getConfigFromS3(bucketName string, bucketKey string) {
+	fmt.Println("Fetching configuration from S3")
 	s3Client := s3.NewFromConfig(getAwsConfig())
 	buffer := manager.NewWriteAtBuffer([]byte{})
 	downloader := manager.NewDownloader(s3Client)
@@ -71,7 +75,7 @@ func Load() {
 	s3ConfigBucketKey := os.Getenv("FB_S3_CONFIG_BUCKET_KEY")
 
 	if len(secretConfigName) > 0 && len(s3ConfigBucketName) > 0 {
-		panic(fmt.Errorf("can only load config from S3 or ASM. Not both"))
+		panic(fmt.Errorf("can only load config from S3 or SecretsManager. Not both"))
 	}
 
 	if len(secretConfigName) > 0 {
@@ -88,5 +92,5 @@ func Load() {
 		return
 	}
 
-	panic(fmt.Errorf("failed to find or load functiobeat configuration"))
+	panic(fmt.Errorf("failed to find or load configuration"))
 }
