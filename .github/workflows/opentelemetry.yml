@@ -3,9 +3,20 @@ name: OpenTelemetry Export Trace
 on:
   workflow_run:
     workflows:
-      - check-x-pack-dockerlogbeat
-      - check-x-pack-packetbeat
+      - check-auditbeat
+      - check-dev-tools
+      - check-filebeat
+      - check-metricbeat
       - check-packetbeat
+      - check-winlogbeat
+      - check-x-pack-auditbeat
+      - check-x-pack-dockerlogbeat
+      - check-x-pack-filebeat
+      - check-x-pack-functionbeat
+      - check-x-pack-metricbeat
+      - check-x-pack-osquerybeat
+      - check-x-pack-packetbeat
+      - check-x-pack-winlogbeat
       - golangci-lint
       - auditbeat
       - filebeat
@@ -19,7 +30,6 @@ on:
       - x-pack-metricbeat
       - x-pack-osquerybeat
       - x-pack-packetbeat
-      - pre-commit
       - check-default
       - check-docs
     types: [completed]
