@@ -11,6 +11,9 @@ import (
 	"context"
 	"time"
 
+	"cloud.google.com/go/storage"
+	"github.com/googleapis/gax-go/v2"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
@@ -54,20 +57,21 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	for _, b := range config.Buckets {
 		bucket := tryOverrideOrDefault(config, b)
 		sources = append(sources, &types.Source{
-			ProjectId:    config.ProjectId,
-			BucketName:   b.Name,
-			MaxWorkers:   *bucket.MaxWorkers,
-			Poll:         *bucket.Poll,
-			PollInterval: *bucket.PollInterval,
+			ProjectId:     config.ProjectId,
+			BucketName:    b.Name,
+			BucketTimeOut: *b.BucketTimeOut,
+			MaxWorkers:    *bucket.MaxWorkers,
+			Poll:          *bucket.Poll,
+			PollInterval:  *bucket.PollInterval,
 		})
 	}
 
 	return sources, &gcsInput{config: config}, nil
 }
 
-// tryOverrideOrDefault , overrides global values with local
+// tryOverrideOrDefault, overrides global values with local
 // bucket level values if present. If both global & local values
-// are absent , assigns default values
+// are absent, assigns default values
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil && cfg.MaxWorkers != nil {
 		b.MaxWorkers = cfg.MaxWorkers
@@ -93,7 +97,7 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.BucketTimeOut == nil && cfg.BucketTimeOut != nil {
 		b.BucketTimeOut = cfg.BucketTimeOut
 	} else if b.BucketTimeOut == nil && cfg.BucketTimeOut == nil {
-		timeout := time.Second * 30
+		timeout := time.Second * 50
 		b.BucketTimeOut = &timeout
 	}
 
@@ -137,7 +141,15 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor
 	if err != nil {
 		return err
 	}
-	bucket := client.Bucket(currentSource.BucketName)
+	bucket := client.Bucket(currentSource.BucketName).Retryer(
+		// Use WithBackoff to change the timing of the exponential backoff.
+		storage.WithBackoff(gax.Backoff{
+			Initial: 2 * time.Second,
+		}),
+		// RetryAlways will retry the operation even if it is non-idempotent.
+		// Since we are only reading, the operation is always idempotent
+		storage.WithPolicy(storage.RetryAlways),
+	)
 
 	scheduler := NewGcsInputScheduler(publisher, bucket, currentSource, &input.config, st, log)
 	err = scheduler.Schedule(ctx)

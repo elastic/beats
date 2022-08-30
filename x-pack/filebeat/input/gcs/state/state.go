@@ -20,14 +20,12 @@ type State struct {
 	cp *Checkpoint
 }
 
-// Azure sdks do not return results based on timestamps , but only based on alphabetical order
+// Gcs sdks do not return results based on timestamps , but only based on lexicographic order
 // This forces us to maintain 2 different vars in addition to the page marker to calculate the
 // exact checkpoint based on various scenarios
 type Checkpoint struct {
-	// marker contains the last known position in the blob pager which was fetched
-	Marker *string
 	// name of the latest blob in alphabetical order
-	BlobName string
+	ObjectName string
 	// timestamp to denote which is the latest blob
 	LatestEntryTime *time.Time
 }
@@ -39,14 +37,14 @@ func NewState() *State {
 }
 
 // Save , saves/updates the current state for cursor checkpoint
-func (s *State) Save(name string, marker *string, lastModifiedOn *time.Time) {
+func (s *State) Save(name string, lastModifiedOn *time.Time) {
 	s.mu.Lock()
-	if len(s.cp.BlobName) == 0 {
-		s.cp.BlobName = name
-	} else if strings.ToLower(name) > strings.ToLower(s.cp.BlobName) {
-		s.cp.BlobName = name
+	if len(s.cp.ObjectName) == 0 {
+		s.cp.ObjectName = name
+	} else if strings.ToLower(name) > strings.ToLower(s.cp.ObjectName) {
+		s.cp.ObjectName = name
 	}
-	s.cp.Marker = marker
+
 	if s.cp.LatestEntryTime == nil {
 		s.cp.LatestEntryTime = lastModifiedOn
 	} else if lastModifiedOn.After(*s.cp.LatestEntryTime) {

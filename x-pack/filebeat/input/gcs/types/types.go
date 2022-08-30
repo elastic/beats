@@ -14,11 +14,12 @@ import (
 
 // Source , it is the cursor source
 type Source struct {
-	BucketName   string
-	ProjectId    string
-	MaxWorkers   int
-	Poll         bool
-	PollInterval time.Duration
+	BucketName    string
+	BucketTimeOut time.Duration
+	ProjectId     string
+	MaxWorkers    int
+	Poll          bool
+	PollInterval  time.Duration
 }
 
 func (s *Source) Name() string {
@@ -26,23 +27,8 @@ func (s *Source) Name() string {
 }
 
 const (
-	SharedKeyType        string = "sharedKeyType"
-	ConnectionStringType string = "connectionStringType"
-	Json                 string = "application/json"
+	Json string = "application/json"
 )
-
-// currently only shared key & connection string types of credentials are supported
-type ServiceCredentials struct {
-	// SharedKeyCreds     *azblob.SharedKeyCredential
-	ConnectionStrCreds string
-	Ctype              string
-}
-
-type ObjectCredentials struct {
-	ServiceCreds *ServiceCredentials
-	ObjectName   string
-	BucketName   string
-}
 
 var AllowedContentTypes = map[string]bool{
 	Json: true,

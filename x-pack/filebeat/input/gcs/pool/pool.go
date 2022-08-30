@@ -19,7 +19,7 @@ type Pool interface {
 	Start()
 	Stop()
 	Submit(job job.Job)
-	AvailableWorkers() int32
+	AvailableWorkers() int
 }
 
 type pool struct {
@@ -80,8 +80,8 @@ func (q *pool) Submit(job job.Job) {
 }
 
 // AvailableWorkers returns the number of free workers at any point of time
-func (q *pool) AvailableWorkers() int32 {
-	return int32(len(q.readyPool))
+func (q *pool) AvailableWorkers() int {
+	return len(q.readyPool)
 }
 
 // Stop , gracefully stops the workers & frees the worker pool

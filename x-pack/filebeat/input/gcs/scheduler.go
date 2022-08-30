@@ -9,9 +9,10 @@ package gcs
 
 import (
 	"context"
+	"strings"
 
 	"cloud.google.com/go/storage"
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"google.golang.org/api/iterator"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/job"
@@ -23,7 +24,7 @@ import (
 )
 
 type scheduler interface {
-	createJobs(pager *azblob.ContainerListBlobFlatPager) ([]job.Job, error)
+	createJobs(objects []*storage.ObjectAttrs) []job.Job
 	Schedule(ctx context.Context) error
 }
 
@@ -36,7 +37,7 @@ type gcsInputScheduler struct {
 	log       *logp.Logger
 }
 
-// NewGcsInputScheduler , returns a new scheduler instance
+// NewGcsInputScheduler, returns a new scheduler instance
 func NewGcsInputScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *types.Source, cfg *config,
 	state *state.State, log *logp.Logger,
 ) scheduler {
@@ -50,18 +51,21 @@ func NewGcsInputScheduler(publisher cursor.Publisher, bucket *storage.BucketHand
 	}
 }
 
-// Schedule , is responsible for fetching & scheduling jobs using the workerpool model
-func (gcs *gcsInputScheduler) Schedule(ctx context.Context) error {
-	var pager *azblob.ContainerListBlobFlatPager
-	var availableWorkers int32
+// Schedule, is responsible for fetching & scheduling jobs using the workerpool model
+func (gcsis *gcsInputScheduler) Schedule(ctx context.Context) error {
+	var pager *iterator.Pager
+	var availableWorkers int
 
-	workerPool := pool.NewWorkerPool(ctx, gcs.src.MaxWorkers, gcs.log)
+	workerPool := pool.NewWorkerPool(ctx, gcsis.src.MaxWorkers, gcsis.log)
 	workerPool.Start()
 
-	if !gcs.src.Poll {
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, gcsis.src.BucketTimeOut)
+	defer cancel()
+
+	if !gcsis.src.Poll {
 		availableWorkers = workerPool.AvailableWorkers()
-		pager = gcs.fetchBlobPager(availableWorkers)
-		return gcs.scheduleOnce(ctx, pager, workerPool)
+		pager = gcsis.fetchObjectPager(ctxWithTimeout, availableWorkers)
+		return gcsis.scheduleOnce(ctx, pager, workerPool)
 	}
 
 	for {
@@ -72,88 +76,79 @@ func (gcs *gcsInputScheduler) Schedule(ctx context.Context) error {
 
 		// availableWorkers is used as the batch size for a blob page so that
 		// work distribution remains efficient
-		pager = gcs.fetchBlobPager(availableWorkers)
-		err := gcs.scheduleOnce(ctx, pager, workerPool)
+		pager = gcsis.fetchObjectPager(ctxWithTimeout, availableWorkers)
+		err := gcsis.scheduleOnce(ctx, pager, workerPool)
 		if err != nil {
 			return err
 		}
 
-		err = timed.Wait(ctx, gcs.src.PollInterval)
+		err = timed.Wait(ctx, gcsis.src.PollInterval)
 		if err != nil {
 			return err
 		}
 	}
 }
 
-func (gcs *gcsInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.ContainerListBlobFlatPager, workerPool pool.Pool) error {
-	for pager.NextPage(ctx) {
-		jobs, err := gcs.createJobs(pager)
+func (gcsis *gcsInputScheduler) scheduleOnce(ctx context.Context, pager *iterator.Pager, workerPool pool.Pool) error {
+	for {
+		var objects []*storage.ObjectAttrs
+		nextPageToken, err := pager.NextPage(&objects)
 		if err != nil {
-			gcs.log.Errorf("Job creation failed for container %s with error %v", gcs.src.BucketName, err)
 			return err
 		}
 
+		jobs := gcsis.createJobs(objects)
+
 		// If previous checkpoint was saved then look up starting point for new jobs
-		if gcs.state.Checkpoint().LatestEntryTime != nil {
-			jobs = gcs.moveToLastSeenJob(jobs)
+		if gcsis.state.Checkpoint().LatestEntryTime != nil {
+			jobs = gcsis.moveToLastSeenJob(jobs)
 		}
 
 		// Submits job to worker pool for further processing
 		for _, job := range jobs {
 			workerPool.Submit(job)
 		}
+
+		if nextPageToken == "" {
+			break
+		}
 	}
 	return nil
 }
 
-func (gcs *gcsInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]job.Job, error) {
+func (gcsis *gcsInputScheduler) createJobs(objects []*storage.ObjectAttrs) []job.Job {
 	var jobs []job.Job
-	pageMarker := pager.PageResponse().Marker
 
-	for _, v := range pager.PageResponse().Segment.BlobItems {
-		blobURL := gcs.serviceURL + gcs.src.ContainerName + "/" + *v.Name
-		blobCreds := &types.BlobCredentials{
-			ServiceCreds:  gcs.credential,
-			BlobName:      *v.Name,
-			ContainerName: gcs.src.ContainerName,
+	for _, obj := range objects {
+		// check required to ignore directories & sub folders, since there is no inbuilt option to
+		// do so. In gcs all the directories are emulated and represented by a prefix, we can
+		// define specific prefix's & delimiters to ignore known directories but there is no generic
+		// way to do so.
+		file := strings.Split(obj.Name, "/")
+		if len(file) > 1 && file[len(file)-1] == "" {
+			continue
 		}
 
-		blobClient, err := fetchBlobClient(blobURL, blobCreds, gcs.log)
-		if err != nil {
-			return nil, err
-		}
-
-		job := job.NewAzureInputJob(blobClient, v, blobURL, pageMarker, gcs.state, gcs.src, gcs.publisher)
+		objectURI := "gs://" + gcsis.src.BucketName + "/" + obj.Name
+		job := job.NewGcsInputJob(gcsis.bucket, obj, objectURI, gcsis.state, gcsis.src, gcsis.publisher)
 		jobs = append(jobs, job)
 	}
 
-	return jobs, nil
+	return jobs
 }
 
-// fetchBlobPager fetches the current blob page object given a batch size & a page marker.
-// The page marker has been disabled since it was found that it operates on the basis of
-// lexicographical order , and not on the basis of the latest file uploaded, meaning if a blob with a name
-// of lesser lexicographic value is uploaded after a blob with a name of higher value , the latest
-// marker stored in the checkpoint will not retrieve that new blob , this distorts the polling logic
-// hence disabling it for now , until more feedback is given. Disabling this how ever makes the sheduler loop
-// through all the blobs on every poll action to arrive at the latest checkpoint.
-// [NOTE] : There are no api's / sdk functions that list blobs via timestamp/latest entry , it's always lexicographical order
-func (gcs *gcsInputScheduler) fetchBlobPager(batchSize int32) *azblob.ContainerListBlobFlatPager {
-	pager := gcs.client.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{
-		Include: []azblob.ListBlobsIncludeItem{
-			azblob.ListBlobsIncludeItemMetadata,
-			azblob.ListBlobsIncludeItemTags,
-		},
-		// Marker:     gcs.state.Checkpoint().Marker,
-		MaxResults: &batchSize,
-	})
+// fetchObjectPager fetches the page handler for objects, given a batch size.
+// [NOTE] : There are no api's / sdk functions that list blobs via timestamp/latest entry, it's always lexicographical order
+func (gcsis *gcsInputScheduler) fetchObjectPager(ctx context.Context, pageSize int) *iterator.Pager {
+	bktIt := gcsis.bucket.Objects(ctx, &storage.Query{})
+	pager := iterator.NewPager(bktIt, pageSize, "")
 
 	return pager
 }
 
-// moveToLastSeenJob , moves to the latest job position past the last seen job
+// moveToLastSeenJob, moves to the latest job position past the last seen job
 // Jobs are stored in lexicographical order always , hence the latest position can be found either on the basis of job name or timestamp
-func (gcs *gcsInputScheduler) moveToLastSeenJob(jobs []job.Job) []job.Job {
+func (gcsis *gcsInputScheduler) moveToLastSeenJob(jobs []job.Job) []job.Job {
 	var latestJobs []job.Job
 	jobsToReturn := make([]job.Job, 0)
 	counter := 0
@@ -161,16 +156,16 @@ func (gcs *gcsInputScheduler) moveToLastSeenJob(jobs []job.Job) []job.Job {
 	ignore := false
 
 	for _, job := range jobs {
-		if job.Timestamp().After(*gcs.state.Checkpoint().LatestEntryTime) {
+		if job.Timestamp().After(*gcsis.state.Checkpoint().LatestEntryTime) {
 			latestJobs = append(latestJobs, job)
-		} else if job.Name() == gcs.state.Checkpoint().BlobName {
+		} else if job.Name() == gcsis.state.Checkpoint().ObjectName {
 			flag = true
 			break
-		} else if job.Name() > gcs.state.Checkpoint().BlobName {
+		} else if job.Name() > gcsis.state.Checkpoint().ObjectName {
 			flag = true
 			counter--
 			break
-		} else if job.Name() <= gcs.state.Checkpoint().BlobName && !ignore {
+		} else if job.Name() <= gcsis.state.Checkpoint().ObjectName && !ignore {
 			ignore = true
 		}
 		counter++
@@ -183,7 +178,7 @@ func (gcs *gcsInputScheduler) moveToLastSeenJob(jobs []job.Job) []job.Job {
 	}
 
 	// in a senario where there are some jobs which have a later time stamp
-	// but lesser alphanumeric order and some jobs have greater alphanumeric order
+	// but lesser lexicographic order and some jobs have greater lexicographic order
 	// than the current checkpoint
 	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
 		jobsToReturn = append(latestJobs, jobsToReturn...)

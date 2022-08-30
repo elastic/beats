@@ -14,7 +14,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"cloud.google.com/go/storage"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -30,36 +30,34 @@ type Job interface {
 	Source() *types.Source
 }
 
-type AzureInputJob struct {
-	marker    *string
-	client    *azblob.BlobClient
-	blob      *azblob.BlobItemInternal
-	blobURL   string
+type GcsInputJob struct {
+	bucket    *storage.BucketHandle
+	object    *storage.ObjectAttrs
+	objectURI string
 	state     *state.State
 	src       *types.Source
 	publisher cursor.Publisher
 }
 
-// NewAzureInputJob, returns an instance of a job , which is a unit of work that can be assigned to a go routine
-func NewAzureInputJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL string,
-	marker *string, state *state.State, src *types.Source, publisher cursor.Publisher,
+// NewGcsInputJob, returns an instance of a job , which is a unit of work that can be assigned to a go routine
+func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI string,
+	state *state.State, src *types.Source, publisher cursor.Publisher,
 ) Job {
-	return &AzureInputJob{
-		marker:    marker,
-		client:    client,
-		blob:      blob,
-		blobURL:   blobURL,
+	return &GcsInputJob{
+		bucket:    bucket,
+		object:    object,
+		objectURI: objectURI,
 		state:     state,
 		src:       src,
 		publisher: publisher,
 	}
 }
 
-func (aij *AzureInputJob) Do(ctx context.Context, id string) error {
+func (gcsij *GcsInputJob) Do(ctx context.Context, id string) error {
 	var fields mapstr.M
 
-	if types.AllowedContentTypes[*aij.blob.Properties.ContentType] {
-		data, err := aij.extractData(ctx)
+	if types.AllowedContentTypes[gcsij.object.ContentType] {
+		data, err := gcsij.extractData(ctx)
 		if err != nil {
 			return fmt.Errorf("job with jobId %s encountered an error : %w", id, err)
 		}
@@ -73,7 +71,7 @@ func (aij *AzureInputJob) Do(ctx context.Context, id string) error {
 		}()
 
 		var blobData []mapstr.M
-		switch *aij.blob.Properties.ContentType {
+		switch gcsij.object.ContentType {
 		case types.Json:
 			blobData, _, _, err = httpReadJSON(reader)
 			if err != nil {
@@ -84,10 +82,10 @@ func (aij *AzureInputJob) Do(ctx context.Context, id string) error {
 			return fmt.Errorf("job with jobId %s encountered an unexpected error", id)
 		}
 
-		fields = aij.createEventFields(data.String(), blobData)
+		fields = gcsij.createEventFields(data.String(), blobData)
 
 	} else {
-		err := fmt.Errorf("job with jobId %s encountered an error : content-type %s not supported", id, *aij.blob.Properties.ContentType)
+		err := fmt.Errorf("job with jobId %s encountered an error : content-type %s not supported", id, gcsij.object.ContentType)
 		fields = mapstr.M{
 			"message": err.Error(),
 			"event": mapstr.M{
@@ -102,73 +100,75 @@ func (aij *AzureInputJob) Do(ctx context.Context, id string) error {
 	}
 	event.SetID(id)
 
-	aij.state.Save(*aij.blob.Name, aij.marker, aij.blob.Properties.LastModified)
-	if err := aij.publisher.Publish(event, aij.state.Checkpoint()); err != nil {
+	gcsij.state.Save(gcsij.object.Name, &gcsij.object.Updated)
+	if err := gcsij.publisher.Publish(event, gcsij.state.Checkpoint()); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (aij *AzureInputJob) Name() string {
-	return *aij.blob.Name
+func (gcsij *GcsInputJob) Name() string {
+	return gcsij.object.Name
 }
 
-func (aij *AzureInputJob) Source() *types.Source {
-	return aij.src
+func (gcsij *GcsInputJob) Source() *types.Source {
+	return gcsij.src
 }
 
-func (aij *AzureInputJob) Timestamp() *time.Time {
-	return aij.blob.Properties.LastModified
+func (gcsij *GcsInputJob) Timestamp() *time.Time {
+	return &gcsij.object.Updated
 }
 
-func (aij *AzureInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
+func (gcsij *GcsInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
 	var err error
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, gcsij.src.BucketTimeOut)
+	defer cancel()
 
-	get, err := aij.client.Download(ctx, nil)
+	obj := gcsij.bucket.Object(gcsij.object.Name)
+	reader, err := obj.NewReader(ctxWithTimeout)
 	if err != nil {
-		return nil, fmt.Errorf("failed to download data from blob with error : %w", err)
+		return nil, fmt.Errorf("failed to read data from object with error : %w", err)
 	}
-
-	downloadedData := &bytes.Buffer{}
-	reader := get.Body(&azblob.RetryReaderOptions{})
 	defer func() {
 		err = reader.Close()
 		if err != nil {
-			err = fmt.Errorf("failed to close blob reader with error : %w", err)
+			err = fmt.Errorf("failed to close object reader with error : %w", err)
 		}
 	}()
 
-	_, err = downloadedData.ReadFrom(reader)
+	data := &bytes.Buffer{}
+
+	_, err = data.ReadFrom(reader)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read data from blob with error : %w", err)
+		return nil, fmt.Errorf("failed to read data from object reader with error : %w", err)
 	}
 
-	return downloadedData, err
+	return data, err
 }
 
-func (aij *AzureInputJob) createEventFields(message string, data []mapstr.M) mapstr.M {
+func (gcsij *GcsInputJob) createEventFields(message string, data []mapstr.M) mapstr.M {
 	fields := mapstr.M{
 		"message": message, // original stringified data
 		"log": mapstr.M{
 			"file": mapstr.M{
-				"path": aij.blobURL,
+				"path": gcsij.objectURI,
 			},
 		},
-		"azure": mapstr.M{
-			"blob": mapstr.M{
+		"gcs": mapstr.M{
+			"object": mapstr.M{
 				"container": mapstr.M{
-					"name": aij.src.ContainerName,
+					"name": gcsij.src.BucketName,
 				},
 				"object": mapstr.M{
-					"name":         aij.blob.Name,
-					"content_type": aij.blob.Properties.ContentType,
+					"name":         gcsij.object.Name,
+					"content_type": gcsij.object.ContentType,
 					"data":         data, // objectified data
 				},
 			},
 		},
 		"cloud": mapstr.M{
-			"provider": "azure",
+			"provider": "goole cloud",
 		},
 		"event": mapstr.M{
 			"kind": "publish_data",

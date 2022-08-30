@@ -58,7 +58,7 @@ func (w *worker) Process(work job.Job) {
 		}
 	}()
 
-	jobID := fetchJobID(w.id, work.Source().ContainerName, work.Name())
+	jobID := fetchJobID(w.id, work.Source().BucketName, work.Name())
 	w.log.Infof("job with id %s and timeStamp %s executed\n", jobID, work.Timestamp().String())
 	err := work.Do(w.ctx, jobID)
 	if err != nil {
