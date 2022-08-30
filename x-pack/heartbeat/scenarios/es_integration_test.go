@@ -6,8 +6,20 @@ package scenarios
 
 import (
 	"testing"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/stretchr/testify/require"
 )
 
-func TestStart(t *testing.T) {
+func TestBlankState(t *testing.T) {
+	Scenarios.RunAllWithATwist(t, TwistAddLocation, func(t *testing.T, mtr *MonitorTestRun, err error) {
+		for _, e := range mtr.Events() {
+			if stateIface, _ := e.Fields.GetValue("state"); stateIface != nil {
+				state, ok := stateIface.(*monitorstate.State)
+				require.True(t, ok, "state is not a monitorstate.State, got %v", state)
 
+				require.Equal(t, monitorstate.StatusUp, state.Status)
+			}
+		}
+	})
 }

@@ -5,6 +5,7 @@
 package scenarios
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"testing"
@@ -29,32 +30,63 @@ import (
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
-type ScenarioRun func() (config mapstr.M, close func(), err error)
+type ScenarioRun func(t *testing.T) (config mapstr.M, close func(), err error)
 
 type Scenario struct {
-	Name     string
-	Type     string
-	Runner   ScenarioRun
-	Tags     []string
-	Location *hbconfig.LocationWithID
+	Name      string
+	Type      string
+	Runner    ScenarioRun
+	Tags      []string
+	Location  *hbconfig.LocationWithID
+	ESEnabled bool
 }
 
-func (s Scenario) Run(t *testing.T, callback func(mtr *MonitorTestRun, err error)) {
-	cfgMap, rClose, err := s.Runner()
-	defer rClose()
+type Twist func(Scenario) Scenario
+
+func MakeTwist(name string, fn Twist) Twist {
+	return func(s Scenario) Scenario {
+		newS := s.clone()
+		newS.Name = fmt.Sprintf("%s>Twist(%s)", s.Name, name)
+		return fn(newS)
+	}
+}
+
+func (s Scenario) clone() Scenario {
+	copy := s
+	if s.Location != nil {
+		locationCopy := *s.Location
+		copy.Location = &locationCopy
+	}
+	return copy
+}
+
+func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr *MonitorTestRun, err error)) {
+	runS := s
+	if twist != nil {
+		runS = twist(s.clone())
+	}
+
+	cfgMap, rClose, err := runS.Runner(t)
+	if rClose != nil {
+		defer rClose()
+	}
 	if err != nil {
-		callback(nil, err)
+		callback(t, nil, err)
 		return
 	}
 
-	t.Run(s.Name, func(t *testing.T) {
+	stateLoader := monitorstate.NilStateLoader
+	if s.ESEnabled {
+		stateLoader = monitorstate.IntegESLoader(t, "heartbeat-*,synthetics-*", TestLocationDefault)
+	}
+
+	t.Run(runS.Name, func(t *testing.T) {
 		t.Parallel()
-		mtr, err := runMonitorOnce(t, cfgMap, s.Location)
+		mtr, err := runMonitorOnce(t, cfgMap, runS.Location, stateLoader)
 		mtr.Wait()
-		callback(mtr, err)
+		callback(t, mtr, err)
 		mtr.Close()
 	})
-
 }
 
 type ScenarioDB struct {
@@ -89,20 +121,28 @@ func (sdb *ScenarioDB) Add(s ...Scenario) {
 	sdb.All = append(sdb.All, s...)
 }
 
-func (sdb *ScenarioDB) RunAll(t *testing.T, callback func(*MonitorTestRun, error)) {
+func (sdb *ScenarioDB) RunAll(t *testing.T, callback func(*testing.T, *MonitorTestRun, error)) {
+	sdb.RunAllWithATwist(t, nil, callback)
+}
+
+func (sdb *ScenarioDB) RunAllWithATwist(t *testing.T, twist Twist, callback func(*testing.T, *MonitorTestRun, error)) {
 	sdb.Init()
 	for _, s := range sdb.All {
-		s.Run(t, callback)
+		s.Run(t, twist, callback)
 	}
 }
 
-func (sdb *ScenarioDB) RunTag(t *testing.T, tagName string, callback func(*MonitorTestRun, error)) {
+func (sdb *ScenarioDB) RunTag(t *testing.T, tagName string, callback func(*testing.T, *MonitorTestRun, error)) {
+	sdb.RunTagWithATwist(t, tagName, nil, callback)
+}
+
+func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist Twist, callback func(*testing.T, *MonitorTestRun, error)) {
 	sdb.Init()
 	if len(sdb.ByTag[tagName]) < 1 {
 		require.Failf(t, "no scenarios have tags matching %s", tagName)
 	}
 	for _, s := range sdb.ByTag[tagName] {
-		s.Run(t, callback)
+		s.Run(t, twist, callback)
 	}
 }
 
@@ -115,7 +155,7 @@ type MonitorTestRun struct {
 	Close     func()
 }
 
-func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.LocationWithID) (mtr *MonitorTestRun, err error) {
+func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (mtr *MonitorTestRun, err error) {
 	mtr = &MonitorTestRun{
 		Config:    monitorConfig,
 		StdFields: stdfields.StdMonitorFields{},
@@ -124,7 +164,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.Loc
 	// make a pipeline
 	pipe := &monitors.MockPipeline{}
 	// pass it to the factory
-	f, sched, closeFactory := setupFactoryAndSched(location)
+	f, sched, closeFactory := setupFactoryAndSched(location, stateLoader)
 	conf, err := config.NewConfigFrom(monitorConfig)
 	require.NoError(t, err)
 	err = conf.Unpack(&mtr.StdFields)
@@ -149,7 +189,7 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.Loc
 	return mtr, err
 }
 
-func setupFactoryAndSched(location *hbconfig.LocationWithID) (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
+func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (factory *monitors.RunnerFactory, sched *scheduler.Scheduler, close func()) {
 	id, _ := uuid.NewV4()
 	eid, _ := uuid.NewV4()
 	info := beat.Info{
@@ -178,10 +218,14 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID) (factory *monitors.
 		true,
 	)
 
+	if stateLoader == nil {
+		stateLoader = monitorstate.NilStateLoader
+	}
+
 	return monitors.NewFactory(monitors.FactoryParams{
 			BeatInfo:    info,
 			AddTask:     sched.Add,
-			StateLoader: monitorstate.NilStateLoader,
+			StateLoader: stateLoader,
 			PluginsReg:  plugin.GlobalPluginsReg,
 			PipelineClientFactory: func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
 				c, _ := pipeline.Connect()

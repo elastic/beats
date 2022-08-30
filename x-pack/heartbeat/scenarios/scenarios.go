@@ -6,12 +6,16 @@ package scenarios
 
 import (
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"sync"
+	"testing"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 )
@@ -22,14 +26,40 @@ var Scenarios = &ScenarioDB{
 	All:      []Scenario{},
 }
 
+var testWs *httptest.Server
+
+var testWsOnce = &sync.Once{}
+
+// Starting this thing up is expensive, let's just do it once
+func startTestWebserver(t *testing.T) *httptest.Server {
+	testWsOnce.Do(func() {
+		testWs = httptest.NewServer(hbtest.HelloWorldHandler(200))
+		var err error
+		for i := 0; i < 20; i++ {
+			var resp *http.Response
+			resp, err = http.Get(testWs.URL)
+			if err == nil && resp.StatusCode == 200 {
+				break
+			}
+			time.Sleep(time.Millisecond * 250)
+		}
+
+		if err != nil {
+			require.NoError(t, err, "could not retrieve successful response from test webserver")
+		}
+	})
+
+	return testWs
+}
+
 func init() {
 	Scenarios.Add(
 		Scenario{
 			Name: "http-simple",
 			Type: "http",
 			Tags: []string{"lightweight", "http"},
-			Runner: func() (config mapstr.M, close func(), err error) {
-				server := httptest.NewServer(hbtest.HelloWorldHandler(200))
+			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+				server := startTestWebserver(t)
 				config = mapstr.M{
 					"id":       "http-test-id",
 					"name":     "http-test-name",
@@ -37,15 +67,15 @@ func init() {
 					"schedule": "@every 1m",
 					"urls":     []string{server.URL},
 				}
-				return config, server.Close, nil
+				return config, nil, nil
 			},
 		},
 		Scenario{
 			Name: "tcp-simple",
 			Type: "tcp",
 			Tags: []string{"lightweight", "tcp"},
-			Runner: func() (config mapstr.M, close func(), err error) {
-				server := httptest.NewServer(hbtest.HelloWorldHandler(200))
+			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+				server := startTestWebserver(t)
 				parsedUrl, err := url.Parse(server.URL)
 				if err != nil {
 					panic(fmt.Sprintf("URL %s should always be parsable: %s", server.URL, err))
@@ -55,16 +85,16 @@ func init() {
 					"name":     "tcp-test-name",
 					"type":     "tcp",
 					"schedule": "@every 1m",
-					"hosts":    []string{fmt.Sprintf("%s:%s", parsedUrl.Host, parsedUrl.Port())},
+					"hosts":    []string{parsedUrl.Host}, // Host includes host:port
 				}
-				return config, server.Close, nil
+				return config, nil, nil
 			},
 		},
 		Scenario{
 			Name: "simple-icmp",
 			Type: "icmp",
 			Tags: []string{"icmp"},
-			Runner: func() (config mapstr.M, close func(), err error) {
+			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
 				return mapstr.M{
 					"id":       "icmp-test-id",
 					"name":     "icmp-test-name",
@@ -78,12 +108,12 @@ func init() {
 			Name: "simple-browser",
 			Type: "browser",
 			Tags: []string{"browser", "browser-inline"},
-			Runner: func() (config mapstr.M, close func(), err error) {
+			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
 				err = os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
 				if err != nil {
 					return nil, nil, err
 				}
-				server := httptest.NewServer(hbtest.HelloWorldHandler(200))
+				server := startTestWebserver(t)
 				config = mapstr.M{
 					"id":       "browser-test-id",
 					"name":     "browser-test-name",
@@ -96,7 +126,7 @@ func init() {
 						},
 					},
 				}
-				return config, server.Close, nil
+				return config, nil, nil
 			},
 		},
 	)

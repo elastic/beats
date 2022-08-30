@@ -20,7 +20,6 @@
 package monitorstate
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -106,11 +105,11 @@ func newESTestContext(t *testing.T) *esTestContext {
 		},
 	}
 	namespace, _ := uuid.NewV4()
-	esc := integES(t)
+	esc := IntegES(t)
 	etc := &esTestContext{
 		namespace: namespace.String(),
 		esc:       esc,
-		loader:    MakeESLoader(esc, fmt.Sprintf("synthetics-*-%s", namespace.String()), location),
+		loader:    IntegESLoader(t, fmt.Sprintf("synthetics-*-%s", namespace.String()), location),
 		location:  location,
 	}
 
@@ -156,25 +155,4 @@ func (etc *esTestContext) setInitialState(t *testing.T, sf stdfields.StdMonitorF
 
 	}))
 	require.NoError(t, err)
-}
-
-func integES(t *testing.T) (esc *elasticsearch.Client) {
-	esc, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{"http://127.0.0.1:9200"},
-		Username:  "admin",
-		Password:  "testing",
-	})
-	require.NoError(t, err)
-	respBody, err := esc.Cluster.Health()
-	healthRaw, err := esutil.CheckRetResp(respBody, err)
-	require.NoError(t, err)
-
-	healthResp := struct {
-		Status string `json:"status"`
-	}{}
-	err = json.Unmarshal(healthRaw, &healthResp)
-	require.NoError(t, err)
-	require.Contains(t, []string{"green", "yellow"}, healthResp.Status)
-
-	return esc
 }
