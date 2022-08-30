@@ -85,6 +85,10 @@ func (sdb *ScenarioDB) Init() {
 	sdb.All = prunedList
 }
 
+func (sdb *ScenarioDB) Add(s ...Scenario) {
+	sdb.All = append(sdb.All, s...)
+}
+
 func (sdb *ScenarioDB) RunAll(t *testing.T, callback func(*MonitorTestRun, error)) {
 	sdb.Init()
 	for _, s := range sdb.All {

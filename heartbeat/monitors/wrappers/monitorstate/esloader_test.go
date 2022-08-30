@@ -31,7 +31,10 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/esutil"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/libbeat/processors/util"
 )
 
 func TestStatesESLoader(t *testing.T) {
@@ -92,33 +95,44 @@ type esTestContext struct {
 	esc       *elasticsearch.Client
 	loader    StateLoader
 	tracker   *Tracker
+	location  *config.LocationWithID
 }
 
 func newESTestContext(t *testing.T) *esTestContext {
+	location := &config.LocationWithID{
+		ID: "TestId",
+		Geo: util.GeoConfig{
+			Name: "TestGeoName",
+		},
+	}
 	namespace, _ := uuid.NewV4()
 	esc := integES(t)
 	etc := &esTestContext{
 		namespace: namespace.String(),
 		esc:       esc,
-		loader:    MakeESLoader(esc, fmt.Sprintf("synthetics-*-%s", namespace.String())),
+		loader:    MakeESLoader(esc, fmt.Sprintf("synthetics-*-%s", namespace.String()), location),
+		location:  location,
 	}
 
-	etc.tracker = NewTracker(etc.loader)
+	etc.tracker = NewTracker(etc.loader, true)
 
 	return etc
 }
 
-func (etc *esTestContext) createTestMonitorStateInES(t *testing.T, s StateStatus) (id string) {
+func (etc *esTestContext) createTestMonitorStateInES(t *testing.T, s StateStatus) (sf stdfields.StdMonitorFields) {
 	mUUID, _ := uuid.NewV4()
-	mID := mUUID.String()
-	mType := "testtyp"
-	initState := newMonitorState(mID, s, 0)
-	etc.setInitialState(t, mType, mID, initState)
-	return mID
+	sf = stdfields.StdMonitorFields{
+		ID:   mUUID.String(),
+		Type: "test_type",
+	}
+
+	initState := newMonitorState(sf, s, 0, true)
+	etc.setInitialState(t, sf, initState)
+	return sf
 }
 
-func (etc *esTestContext) setInitialState(t *testing.T, typ string, monitorID string, ms *State) {
-	idx := fmt.Sprintf("synthetics-%s-%s", typ, etc.namespace)
+func (etc *esTestContext) setInitialState(t *testing.T, sf stdfields.StdMonitorFields, ms *State) {
+	idx := fmt.Sprintf("synthetics-%s-%s", sf.Type, etc.namespace)
 
 	type Mon struct {
 		Id   string `json:"id"`
@@ -131,7 +145,7 @@ func (etc *esTestContext) setInitialState(t *testing.T, typ string, monitorID st
 		State   *State    `json:"state"`
 	}{
 		Ts:      time.Now(),
-		Monitor: Mon{Id: monitorID, Type: typ},
+		Monitor: Mon{Id: sf.ID, Type: sf.Type},
 		State:   ms,
 	})
 	require.NoError(t, err)

@@ -19,8 +19,12 @@ import (
 var Scenarios = &ScenarioDB{
 	initOnce: &sync.Once{},
 	ByTag:    map[string][]Scenario{},
-	All: []Scenario{
-		{
+	All:      []Scenario{},
+}
+
+func init() {
+	Scenarios.Add(
+		Scenario{
 			Name: "http-simple",
 			Type: "http",
 			Tags: []string{"lightweight", "http"},
@@ -36,7 +40,7 @@ var Scenarios = &ScenarioDB{
 				return config, server.Close, nil
 			},
 		},
-		{
+		Scenario{
 			Name: "tcp-simple",
 			Type: "tcp",
 			Tags: []string{"lightweight", "tcp"},
@@ -56,7 +60,7 @@ var Scenarios = &ScenarioDB{
 				return config, server.Close, nil
 			},
 		},
-		{
+		Scenario{
 			Name: "simple-icmp",
 			Type: "icmp",
 			Tags: []string{"icmp"},
@@ -70,7 +74,7 @@ var Scenarios = &ScenarioDB{
 				}, func() {}, nil
 			},
 		},
-		{
+		Scenario{
 			Name: "simple-browser",
 			Type: "browser",
 			Tags: []string{"browser", "browser-inline"},
@@ -95,5 +99,5 @@ var Scenarios = &ScenarioDB{
 				return config, server.Close, nil
 			},
 		},
-	},
+	)
 }
