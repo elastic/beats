@@ -71,4 +71,3 @@
               type: keyword
               description: >
                 Name of the deployment that created this event.
->>>>>>> origin/7.x
