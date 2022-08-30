@@ -38,7 +38,6 @@ type Scenario struct {
 	Runner       ScenarioRun
 	Tags         []string
 	Location     *hbconfig.LocationWithID
-	ESEnabled    bool
 	NumberOfRuns int
 }
 
@@ -86,11 +85,6 @@ func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr
 		return
 	}
 
-	stateLoader := monitorstate.NilStateLoader
-	if s.ESEnabled {
-		stateLoader = monitorstate.IntegESLoader(t, "heartbeat-*,synthetics-*", TestLocationDefault)
-	}
-
 	t.Run(runS.Name, func(t *testing.T) {
 		t.Parallel()
 
@@ -99,6 +93,8 @@ func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr
 			numberRuns = 1 // default to one run
 		}
 
+		loaderDB := newLoaderDB()
+
 		var events []*beat.Event
 
 		var err error
@@ -106,9 +102,15 @@ func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr
 		var conf mapstr.M
 		for i := 0; i < numberRuns; i++ {
 			var mtr *MonitorTestRun
-			mtr, err = runMonitorOnce(t, cfgMap, runS.Location, stateLoader)
+			mtr, err = runMonitorOnce(t, cfgMap, runS.Location, loaderDB.StateLoader())
+
 			mtr.wait()
 			events = append(events, mtr.Events()...)
+
+			if lse := LastState(events).state; lse != nil {
+				loaderDB.AddState(mtr.StdFields, lse)
+			}
+
 			sf = mtr.StdFields
 			conf = mtr.Config
 			mtr.close()
@@ -272,4 +274,34 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		}),
 		sched,
 		sched.Stop
+}
+
+type stateEvent struct {
+	event *beat.Event
+	state *monitorstate.State
+}
+
+func AllStates(events []*beat.Event) (stateEvents []stateEvent) {
+	for _, e := range events {
+		if stateIface, _ := e.Fields.GetValue("state"); stateIface != nil {
+			state, ok := stateIface.(*monitorstate.State)
+			if !ok {
+				panic(fmt.Sprintf("state is not a monitorstate.State, got %v", state))
+			}
+
+			se := stateEvent{event: e, state: state}
+			stateEvents = append(stateEvents, se)
+		}
+	}
+	return stateEvents
+}
+
+func LastState(events []*beat.Event) *stateEvent {
+	all := AllStates(events)
+
+	if len(all) == 0 {
+		return nil
+	}
+
+	return &all[len(all)-1]
 }

@@ -97,6 +97,7 @@ func NewFactory(fp FactoryParams) *RunnerFactory {
 		logger:                logp.L(),
 		pipelineClientFactory: fp.PipelineClientFactory,
 		beatLocation:          fp.BeatLocation,
+		stateLoader:           fp.StateLoader,
 	}
 }
 

@@ -21,11 +21,6 @@ var TestLocationMpls = &config.LocationWithID{
 	},
 }
 
-var TwistEnableES = MakeTwist("with ES", func(s Scenario) Scenario {
-	s.ESEnabled = true
-	return s
-})
-
 var TwistAddLocation = MakeTwist("add location", func(s Scenario) Scenario {
 	s.Location = TestLocationDefault
 	return s
