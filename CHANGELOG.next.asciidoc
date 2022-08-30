@@ -15,7 +15,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
- - [Httpjson]- Fix for pagination at root level not working when used with chaining.
+- [Httpjson]- Fix for pagination at root level not working when used with chaining.
 
 *Heartbeat*
 
@@ -42,14 +42,13 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
-- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 
 *Heartbeat*
 
 
 *Metricbeat*
 
+- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 
 *Packetbeat*
 
@@ -74,7 +73,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
 
 *Auditbeat*
 
@@ -122,6 +120,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
