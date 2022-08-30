@@ -139,12 +139,12 @@ func (s *shipper) Connect() error {
 
 	// we don't need a timeout context here anymore, we use the
 	// `s.backgroundCtx` instead, it's going to be a long running client
-	ackCtx, ackCanel := context.WithCancel(s.backgroundCtx)
+	ackCtx, ackCancel := context.WithCancel(s.backgroundCtx)
 	defer func() {
 		// in case we return an error before we start the `ackLoop`
 		// then we don't need this client anymore and must close the stream
 		if err != nil {
-			ackCanel()
+			ackCancel()
 		}
 	}()
 
@@ -163,7 +163,7 @@ func (s *shipper) Connect() error {
 	s.log.Debugf("connection to %s (%s) established.", s.config.Server, s.serverID)
 
 	go func() {
-		defer ackCanel()
+		defer ackCancel()
 		s.log.Debugf("starting acknowledgment loop with server %s", s.serverID)
 		// the loop returns only in case of error
 		err := s.ackLoop(s.backgroundCtx, indexClient)
