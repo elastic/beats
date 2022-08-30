@@ -1,0 +1,27 @@
+name: check-winlogbeat
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check-winlogbeat.yml'
+      - 'winlogbeat/**'
+      - 'x-pack/winlogbeat/**'
+
+env:
+  BEAT_MODULE: 'winlogbeat'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Fetch Go version from .go-version
+      run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: Run check/update
+      run: |
+        go install github.com/magefile/mage
+        make -C ${{ env.BEAT_MODULE }} check update
+        make check-no-changes

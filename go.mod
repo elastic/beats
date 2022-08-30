@@ -75,13 +75,13 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
 	github.com/elastic/go-concert v0.2.0
-	github.com/elastic/go-libaudit/v2 v2.3.1
+	github.com/elastic/go-libaudit/v2 v2.3.2
 	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-lookslike v0.3.0
-	github.com/elastic/go-lumber v0.1.0
+	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.2.0
-	github.com/elastic/go-structform v0.0.9
+	github.com/elastic/go-structform v0.0.10
 	github.com/elastic/go-sysinfo v1.8.1
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/go-windows v1.0.1 // indirect
@@ -159,7 +159,7 @@ require (
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
-	go.elastic.co/ecszap v1.0.1 // indirect
+	go.elastic.co/ecszap v1.0.1
 	go.elastic.co/go-licence-detector v0.5.0
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.9.0
@@ -171,7 +171,7 @@ require (
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
-	golang.org/x/sys v0.0.0-20220702020025-31831981b65f
+	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10
 	golang.org/x/text v0.3.7
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
 	golang.org/x/tools v0.1.9
@@ -202,9 +202,9 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.2.1
-	github.com/elastic/elastic-agent-libs v0.2.9
-	github.com/elastic/elastic-agent-shipper-client v0.2.0
-	github.com/elastic/elastic-agent-system-metrics v0.4.2 // do not upgrade until https://github.com/elastic/beats/issues/32467 is fixed
+	github.com/elastic/elastic-agent-libs v0.2.11
+	github.com/elastic/elastic-agent-shipper-client v0.4.0
+	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/pierrec/lz4/v4 v4.1.15
 	github.com/shirou/gopsutil/v3 v3.21.12
@@ -212,6 +212,7 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
 	go.elastic.co/apm/v2 v2.0.0
 	go.mongodb.org/mongo-driver v1.5.1
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
 require (
@@ -293,7 +294,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect

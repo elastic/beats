@@ -296,6 +296,15 @@ func (b GolangCrossBuilder) Build() error {
 		verbose = "true"
 	}
 	var args []string
+	// There's a bug on certain debian versions:
+	// https://discuss.linuxcontainers.org/t/debian-jessie-containers-have-extremely-low-performance/1272
+	// basically, apt-get has a bug where will try to iterate through every possible FD as set by the NOFILE ulimit.
+	// On certain docker installs, docker will set the ulimit to a value > 10^9, which means apt-get will take >1 hour.
+	// This runs across all possible debian platforms, since there's no real harm in it.
+	if strings.Contains(image, "debian") {
+		args = append(args, "--ulimit", "nofile=262144:262144")
+	}
+
 	if runtime.GOOS != "windows" {
 		args = append(args,
 			"--env", "EXEC_UID="+strconv.Itoa(os.Getuid()),

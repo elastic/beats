@@ -168,7 +168,19 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	defer closeAuditClient(ms.client, ms.log)
 
-	if err := ms.addRules(reporter); err != nil {
+	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
+	// Will result in EPERM.
+	status, err := ms.client.GetStatus()
+	if err != nil {
+		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
+		reporter.Error(err)
+		return
+	}
+
+	if status.Enabled == auditLocked {
+		err := errors.New("Skipping rule configuration: Audit rules are locked")
+		reporter.Error(err)
+	} else if err := ms.addRules(reporter); err != nil {
 		reporter.Error(err)
 		ms.log.Errorw("Failure adding audit rules", "error", err)
 		return
@@ -181,7 +193,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		return
 	}
 
-	if ms.config.Immutable {
+	if ms.config.Immutable && status.Enabled != auditLocked {
 		if err := ms.client.SetImmutable(libaudit.WaitForReply); err != nil {
 			reporter.Error(err)
 			ms.log.Errorw("Failure setting audit config as immutable", "error", err)
@@ -267,18 +279,6 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	}
 	defer closeAuditClient(client, ms.log)
 
-	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
-	// Will result in EPERM.
-	status, err := client.GetStatus()
-	if err != nil {
-		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
-		reporter.Error(err)
-		return err
-	}
-	if status.Enabled == auditLocked {
-		return errors.New("Skipping rule configuration: Audit rules are locked")
-	}
-
 	// Delete existing rules.
 	n, err := client.DeleteRules()
 	if err != nil {
@@ -333,56 +333,60 @@ func (ms *MetricSet) initClient() error {
 	ms.log.Infow("audit status from kernel at start", "audit_status", status)
 
 	if status.Enabled == auditLocked {
-		return errors.New("failed to configure: The audit system is locked")
-	}
-
-	if fm, _ := ms.config.failureMode(); status.Failure != fm {
-		if err = ms.client.SetFailure(libaudit.FailureMode(fm), libaudit.NoWait); err != nil {
-			return fmt.Errorf("failed to set audit failure mode in kernel: %w", err)
+		if !ms.config.Immutable {
+			return errors.New("failed to configure: The audit system is locked")
 		}
 	}
 
-	if status.BacklogLimit != ms.config.BacklogLimit {
-		if err = ms.client.SetBacklogLimit(ms.config.BacklogLimit, libaudit.NoWait); err != nil {
-			return fmt.Errorf("failed to set audit backlog limit in kernel: %w", err)
-		}
-	}
-
-	if ms.backpressureStrategy&(bsKernel|bsAuto) != 0 {
-		// "kernel" backpressure mitigation strategy
-		//
-		// configure the kernel to drop audit events immediately if the
-		// backlog queue is full.
-		if status.FeatureBitmap&libaudit.AuditFeatureBitmapBacklogWaitTime != 0 {
-			ms.log.Info("Setting kernel backlog wait time to prevent backpressure propagating to the kernel.")
-			if err = ms.client.SetBacklogWaitTime(0, libaudit.NoWait); err != nil {
-				return fmt.Errorf("failed to set audit backlog wait time in kernel: %w", err)
+	if status.Enabled != auditLocked {
+		if fm, _ := ms.config.failureMode(); status.Failure != fm {
+			if err = ms.client.SetFailure(libaudit.FailureMode(fm), libaudit.NoWait); err != nil {
+				return fmt.Errorf("failed to set audit failure mode in kernel: %w", err)
 			}
-		} else {
-			if ms.backpressureStrategy == bsAuto {
-				ms.log.Warn("setting backlog wait time is not supported in this kernel. Enabling workaround.")
-				ms.backpressureStrategy |= bsUserSpace
+		}
+
+		if status.BacklogLimit != ms.config.BacklogLimit {
+			if err = ms.client.SetBacklogLimit(ms.config.BacklogLimit, libaudit.NoWait); err != nil {
+				return fmt.Errorf("failed to set audit backlog limit in kernel: %w", err)
+			}
+		}
+
+		if ms.backpressureStrategy&(bsKernel|bsAuto) != 0 {
+			// "kernel" backpressure mitigation strategy
+			//
+			// configure the kernel to drop audit events immediately if the
+			// backlog queue is full.
+			if status.FeatureBitmap&libaudit.AuditFeatureBitmapBacklogWaitTime != 0 {
+				ms.log.Info("Setting kernel backlog wait time to prevent backpressure propagating to the kernel.")
+				if err = ms.client.SetBacklogWaitTime(0, libaudit.NoWait); err != nil {
+					return fmt.Errorf("failed to set audit backlog wait time in kernel: %w", err)
+				}
 			} else {
-				return errors.New("kernel backlog wait time not supported by kernel, but required by backpressure_strategy")
+				if ms.backpressureStrategy == bsAuto {
+					ms.log.Warn("setting backlog wait time is not supported in this kernel. Enabling workaround.")
+					ms.backpressureStrategy |= bsUserSpace
+				} else {
+					return errors.New("kernel backlog wait time not supported by kernel, but required by backpressure_strategy")
+				}
 			}
 		}
-	}
 
-	if ms.backpressureStrategy&(bsKernel|bsUserSpace) == bsUserSpace && ms.config.RateLimit == 0 {
-		// force a rate limit if the user-space strategy will be used without
-		// corresponding backlog_wait_time setting in the kernel
-		ms.config.RateLimit = 5000
-	}
-
-	if status.RateLimit != ms.config.RateLimit {
-		if err = ms.client.SetRateLimit(ms.config.RateLimit, libaudit.NoWait); err != nil {
-			return fmt.Errorf("failed to set audit rate limit in kernel: %w", err)
+		if ms.backpressureStrategy&(bsKernel|bsUserSpace) == bsUserSpace && ms.config.RateLimit == 0 {
+			// force a rate limit if the user-space strategy will be used without
+			// corresponding backlog_wait_time setting in the kernel
+			ms.config.RateLimit = 5000
 		}
-	}
 
-	if status.Enabled == 0 {
-		if err = ms.client.SetEnabled(true, libaudit.NoWait); err != nil {
-			return fmt.Errorf("failed to enable auditing in the kernel: %w", err)
+		if status.RateLimit != ms.config.RateLimit {
+			if err = ms.client.SetRateLimit(ms.config.RateLimit, libaudit.NoWait); err != nil {
+				return fmt.Errorf("failed to set audit rate limit in kernel: %w", err)
+			}
+		}
+
+		if status.Enabled == 0 {
+			if err = ms.client.SetEnabled(true, libaudit.NoWait); err != nil {
+				return fmt.Errorf("failed to enable auditing in the kernel: %w", err)
+			}
 		}
 	}
 
@@ -997,7 +1001,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		"select the most suitable subscription method."
 	switch c.SocketType {
 	case unicast:
-		if isLocked {
+		if isLocked && !c.Immutable {
 			log.Errorf("requested unicast socket_type is not available "+
 				"because audit configuration is locked in the kernel "+
 				"(enabled=2). %s", useAutodetect)
@@ -1022,7 +1026,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		// attempt to determine the optimal socket_type
 		if hasMulticast {
 			if hasRules {
-				if isLocked {
+				if isLocked && !c.Immutable {
 					log.Warn("Audit rules specified in the configuration " +
 						"cannot be applied because the audit rules have been locked " +
 						"in the kernel (enabled=2). A multicast audit subscription " +
@@ -1033,7 +1037,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 			}
 			return multicast, nil
 		}
-		if isLocked {
+		if isLocked && !c.Immutable {
 			log.Errorf("Cannot continue: audit configuration is locked " +
 				"in the kernel (enabled=2) which prevents using unicast " +
 				"sockets. Multicast audit subscriptions are not available " +
