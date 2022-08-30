@@ -145,6 +145,7 @@ processors in your config.
 
 [float]
 [[monitor-data-stream]]
+==== `data_stream`
 
 Contains options pertaining to data stream naming, following the conventions followed by [Fleet Data Streams](https://www.elastic.co/guide/en/fleet/current/data-streams.html). By default Heartbeat will
 write to a datastream named `heartbeat-VERSION` except in the case of `browser` monitors, which will
