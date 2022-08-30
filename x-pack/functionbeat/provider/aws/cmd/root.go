@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"flag"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/internal/config"
 
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/beater"
 	funcmd "github.com/elastic/beats/v7/x-pack/functionbeat/function/cmd"
@@ -18,6 +19,8 @@ var Name = "functionbeat"
 var RootCmd *funcmd.FunctionCmd
 
 func init() {
+	config.Load()
+
 	RootCmd = funcmd.NewFunctionCmd(Name, beater.New)
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("d"))
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
