@@ -261,6 +261,7 @@ func (s *shipper) Close() error {
 	err := s.conn.Close()
 	s.conn = nil
 	s.client = nil
+	s.pending = nil
 
 	return err
 }
