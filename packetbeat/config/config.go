@@ -19,6 +19,9 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -51,10 +54,32 @@ func (c Config) FromStatic(cfg *conf.C) (Config, error) {
 		}
 	}
 	c.Interface = nil
-	for i := range c.Interfaces {
+	counts := make(map[string]int)
+	for i, iface := range c.Interfaces {
+		name := iface.Device
+		if name == "" {
+			if runtime.GOOS == "linux" {
+				name = "any"
+			} else {
+				name = "default_route"
+			}
+		}
+		counts[name]++
 		if 0 < c.Interfaces[i].PollDefaultRoute && c.Interfaces[i].PollDefaultRoute < time.Second {
 			c.Interfaces[i].PollDefaultRoute = time.Second
 		}
+	}
+	for n, c := range counts {
+		if c == 1 {
+			delete(counts, n)
+		}
+	}
+	if len(counts) != 0 {
+		dups := make([]string, 0, len(counts))
+		for n := range counts {
+			dups = append(dups, n)
+		}
+		return c, fmt.Errorf("duplicated device configurations: %s", strings.Join(dups, ", "))
 	}
 	return c, nil
 }

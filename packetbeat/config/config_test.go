@@ -18,6 +18,7 @@
 package config
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -27,10 +28,11 @@ import (
 )
 
 var fromStaticTests = []struct {
-	name   string
-	cli    Config
-	config string
-	want   Config
+	name    string
+	cli     Config
+	config  string
+	want    Config
+	wantErr error
 }{
 	{
 		name: "single_interface",
@@ -420,6 +422,30 @@ protocols:
 			},
 		},
 	},
+	{
+		name: "duplicated_interface",
+		config: `
+interfaces:
+- device: default_route
+  dumpfile: dwnp
+  poll_default_route: 1m
+  internal_networks:
+  - private
+- device: default_route
+  dumpfile: dwnp
+  poll_default_route: 1m
+  internal_networks:
+  - private
+
+protocols:
+- type: icmp
+  enabled: true
+
+- type: amqp
+  ports: [5672]
+`,
+		wantErr: errors.New("duplicated device configurations: default_route"),
+	},
 }
 
 func TestFromStatic(t *testing.T) {
@@ -431,13 +457,32 @@ func TestFromStatic(t *testing.T) {
 			}
 			got := test.cli
 			got, err = got.FromStatic(cfg)
+			if !sameErr(err, test.wantErr) {
+				if err != nil {
+					t.Fatalf("failed to construct config.C: %v", err)
+				}
+				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
+			}
 			if err != nil {
-				t.Fatalf("failed to construct config.C: %v", err)
+				return
 			}
 			if !cmp.Equal(got, test.want, cmp.Comparer(configC)) {
 				t.Errorf("unexpected result: got:- want:+\n%s", cmp.Diff(got, test.want, cmp.Comparer(configC)))
 			}
 		})
+	}
+}
+
+func sameErr(a, b error) bool {
+	switch {
+	case a == nil && b == nil:
+		return true
+	case a == nil:
+		return false
+	case b == nil:
+		return false
+	default:
+		return a.Error() == b.Error()
 	}
 }
 
