@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Fix namespacing on self-monitoring {pull}32336[32336]
-
+- Fix SigningRegion not being used in AWS credentials {pull}32921[32921] {issue}32888[32888]
 
 *Auditbeat*
 
