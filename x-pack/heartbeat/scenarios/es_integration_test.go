@@ -7,8 +7,9 @@ package scenarios
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 )
 
 func TestBlankState(t *testing.T) {
