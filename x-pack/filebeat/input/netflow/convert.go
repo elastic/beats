@@ -391,10 +391,27 @@ func getKeyIP(dict record.Map, key string) (value net.IP, found bool) {
 // because HardwareAddr doesn't implement Marshaler interface.
 func fixMacAddresses(dict map[string]interface{}) {
 	for key, value := range dict {
-		if asMac, ok := value.(net.HardwareAddr); ok {
-			dict[key] = asMac.String()
+		if addr, ok := value.(net.HardwareAddr); ok {
+			if len(addr) == 0 {
+				delete(dict, key)
+				continue
+			}
+			dict[key] = formatHardwareAddr(addr)
 		}
 	}
+}
+
+// formatHardwareAddr formats hardware addresses according to the ECS spec.
+func formatHardwareAddr(addr net.HardwareAddr) string {
+	buf := make([]byte, 0, len(addr)*3-1)
+	for _, b := range addr {
+		if len(buf) != 0 {
+			buf = append(buf, '-')
+		}
+		const hexDigit = "0123456789ABCDEF"
+		buf = append(buf, hexDigit[b>>4], hexDigit[b&0xf])
+	}
+	return string(buf)
 }
 
 // Locality is an enum representing the locality of a network address.

@@ -43,7 +43,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 22
         },
         "event": {
@@ -62,7 +62,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 22,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -73,7 +73,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 65058,
           "type": "netflow_flow"
         },
@@ -95,7 +95,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 65058
         }
       },
@@ -109,7 +109,7 @@
         "destination": {
           "ip": "172.16.32.100",
           "locality": "internal",
-          "mac": "00:0c:29:8d:af:c3",
+          "mac": "00-0C-29-8D-AF-C3",
           "port": 123
         },
         "event": {
@@ -128,7 +128,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.100",
-          "destination_mac_address": "00:0c:29:8d:af:c3",
+          "destination_mac_address": "00-0C-29-8D-AF-C3",
           "destination_transport_port": 123,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -139,7 +139,7 @@
           },
           "protocol_identifier": 17,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 123,
           "type": "netflow_flow"
         },
@@ -161,7 +161,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 123
         }
       },
@@ -175,7 +175,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 123
         },
         "event": {
@@ -194,7 +194,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 123,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -205,7 +205,7 @@
           },
           "protocol_identifier": 17,
           "source_ipv4_address": "172.16.32.100",
-          "source_mac_address": "00:0c:29:8d:af:c3",
+          "source_mac_address": "00-0C-29-8D-AF-C3",
           "source_transport_port": 123,
           "type": "netflow_flow"
         },
@@ -227,7 +227,7 @@
         "source": {
           "ip": "172.16.32.100",
           "locality": "internal",
-          "mac": "00:0c:29:8d:af:c3",
+          "mac": "00-0C-29-8D-AF-C3",
           "port": 123
         }
       },
@@ -241,7 +241,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 80
         },
         "event": {
@@ -260,7 +260,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 80,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -271,7 +271,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59157,
           "type": "netflow_flow"
         },
@@ -293,7 +293,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59157
         }
       },
@@ -307,7 +307,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59157
         },
         "event": {
@@ -326,7 +326,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59157,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -337,7 +337,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 80,
           "type": "netflow_flow"
         },
@@ -359,7 +359,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 80
         }
       },
@@ -373,7 +373,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 443
         },
         "event": {
@@ -392,7 +392,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 443,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -403,7 +403,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59158,
           "type": "netflow_flow"
         },
@@ -425,7 +425,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59158
         }
       },
@@ -439,7 +439,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59158
         },
         "event": {
@@ -458,7 +458,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59158,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -469,7 +469,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 443,
           "type": "netflow_flow"
         },
@@ -491,7 +491,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 443
         }
       },
@@ -505,7 +505,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 139
         },
         "event": {
@@ -524,7 +524,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 139,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -535,7 +535,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59159,
           "type": "netflow_flow"
         },
@@ -557,7 +557,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59159
         }
       },
@@ -571,7 +571,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59159
         },
         "event": {
@@ -590,7 +590,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59159,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -601,7 +601,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 139,
           "type": "netflow_flow"
         },
@@ -623,7 +623,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 139
         }
       },
@@ -637,7 +637,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 23
         },
         "event": {
@@ -656,7 +656,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 23,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -667,7 +667,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59160,
           "type": "netflow_flow"
         },
@@ -689,7 +689,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59160
         }
       },
@@ -703,7 +703,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59160
         },
         "event": {
@@ -722,7 +722,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59160,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -733,7 +733,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 23,
           "type": "netflow_flow"
         },
@@ -755,7 +755,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 23
         }
       },
@@ -769,7 +769,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 995
         },
         "event": {
@@ -788,7 +788,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 995,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -799,7 +799,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59161,
           "type": "netflow_flow"
         },
@@ -821,7 +821,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59161
         }
       },
@@ -835,7 +835,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59161
         },
         "event": {
@@ -854,7 +854,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59161,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -865,7 +865,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 995,
           "type": "netflow_flow"
         },
@@ -887,7 +887,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 995
         }
       },
@@ -901,7 +901,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 443
         },
         "event": {
@@ -920,7 +920,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 443,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -931,7 +931,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59162,
           "type": "netflow_flow"
         },
@@ -953,7 +953,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59162
         }
       },
@@ -967,7 +967,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59162
         },
         "event": {
@@ -986,7 +986,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59162,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -997,7 +997,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 443,
           "type": "netflow_flow"
         },
@@ -1019,7 +1019,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 443
         }
       },
@@ -1033,7 +1033,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 135
         },
         "event": {
@@ -1052,7 +1052,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 135,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1063,7 +1063,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59163,
           "type": "netflow_flow"
         },
@@ -1085,7 +1085,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59163
         }
       },
@@ -1099,7 +1099,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59163
         },
         "event": {
@@ -1118,7 +1118,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59163,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1129,7 +1129,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 135,
           "type": "netflow_flow"
         },
@@ -1151,7 +1151,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 135
         }
       },
@@ -1165,7 +1165,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 110
         },
         "event": {
@@ -1184,7 +1184,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 110,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1195,7 +1195,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59164,
           "type": "netflow_flow"
         },
@@ -1217,7 +1217,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59164
         }
       },
@@ -1231,7 +1231,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59164
         },
         "event": {
@@ -1250,7 +1250,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59164,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1261,7 +1261,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 110,
           "type": "netflow_flow"
         },
@@ -1283,7 +1283,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 110
         }
       },
@@ -1297,7 +1297,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 111
         },
         "event": {
@@ -1316,7 +1316,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 111,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1327,7 +1327,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59165,
           "type": "netflow_flow"
         },
@@ -1349,7 +1349,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59165
         }
       },
@@ -1363,7 +1363,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59165
         },
         "event": {
@@ -1382,7 +1382,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59165,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1393,7 +1393,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 111,
           "type": "netflow_flow"
         },
@@ -1415,7 +1415,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 111
         }
       },
@@ -1429,7 +1429,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 143
         },
         "event": {
@@ -1448,7 +1448,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 143,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1459,7 +1459,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59166,
           "type": "netflow_flow"
         },
@@ -1481,7 +1481,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59166
         }
       },
@@ -1495,7 +1495,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59166
         },
         "event": {
@@ -1514,7 +1514,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59166,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1525,7 +1525,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 143,
           "type": "netflow_flow"
         },
@@ -1547,7 +1547,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 143
         }
       },
@@ -1561,7 +1561,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 3389
         },
         "event": {
@@ -1580,7 +1580,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 3389,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1591,7 +1591,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59167,
           "type": "netflow_flow"
         },
@@ -1613,7 +1613,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59167
         }
       },
@@ -1627,7 +1627,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59167
         },
         "event": {
@@ -1646,7 +1646,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59167,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1657,7 +1657,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 3389,
           "type": "netflow_flow"
         },
@@ -1679,7 +1679,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 3389
         }
       },
@@ -1693,7 +1693,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 80
         },
         "event": {
@@ -1712,7 +1712,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 80,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1723,7 +1723,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59168,
           "type": "netflow_flow"
         },
@@ -1745,7 +1745,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59168
         }
       },
@@ -1759,7 +1759,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59168
         },
         "event": {
@@ -1778,7 +1778,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59168,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1789,7 +1789,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 80,
           "type": "netflow_flow"
         },
@@ -1811,7 +1811,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 80
         }
       },
@@ -1825,7 +1825,7 @@
         "destination": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 25
         },
         "event": {
@@ -1844,7 +1844,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.201",
-          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_mac_address": "00-0C-29-70-86-09",
           "destination_transport_port": 25,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1855,7 +1855,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.1",
-          "source_mac_address": "00:50:56:c0:00:01",
+          "source_mac_address": "00-50-56-C0-00-01",
           "source_transport_port": 59169,
           "type": "netflow_flow"
         },
@@ -1877,7 +1877,7 @@
         "source": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59169
         }
       },
@@ -1891,7 +1891,7 @@
         "destination": {
           "ip": "172.16.32.1",
           "locality": "internal",
-          "mac": "00:50:56:c0:00:01",
+          "mac": "00-50-56-C0-00-01",
           "port": 59169
         },
         "event": {
@@ -1910,7 +1910,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "172.16.32.1",
-          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_mac_address": "00-50-56-C0-00-01",
           "destination_transport_port": 59169,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1921,7 +1921,7 @@
           },
           "protocol_identifier": 6,
           "source_ipv4_address": "172.16.32.201",
-          "source_mac_address": "00:0c:29:70:86:09",
+          "source_mac_address": "00-0C-29-70-86-09",
           "source_transport_port": 25,
           "type": "netflow_flow"
         },
@@ -1943,7 +1943,7 @@
         "source": {
           "ip": "172.16.32.201",
           "locality": "internal",
-          "mac": "00:0c:29:70:86:09",
+          "mac": "00-0C-29-70-86-09",
           "port": 25
         }
       },
