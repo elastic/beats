@@ -94,7 +94,6 @@ func TestFilebeat(t *testing.T) {
 		"agent.id":              "test-agent",
 		"data_stream.dataset":   "system.syslog",
 		"data_stream.namespace": "default",
-		"data_stream.type":      "logs",
 	}
 	tests.ValuesExist(t, expectedMetaValuesSyslog, events, tests.ONCE)
 
