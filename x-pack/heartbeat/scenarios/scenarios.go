@@ -35,9 +35,13 @@ func startTestWebserver(t *testing.T) *httptest.Server {
 		for i := 0; i < 20; i++ {
 			var resp *http.Response
 			resp, err = http.Get(testWs.URL)
-			if err == nil && resp.StatusCode == 200 {
-				break
+			if err == nil {
+				resp.Body.Close()
+				if resp.StatusCode == 200 {
+					break
+				}
 			}
+
 			time.Sleep(time.Millisecond * 250)
 		}
 
