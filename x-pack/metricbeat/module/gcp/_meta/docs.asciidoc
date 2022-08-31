@@ -120,6 +120,7 @@ Generally, you have to create a Service Account and assign it the following role
 
 * `Monitoring Viewer` (2 permissions in use of 13)
 - `compute.instances.get`
+- `compute.instances.list`
 
 You can play in IAM pretty much with your service accounts and Instance level access to your resources (for example, allowing that everything running in an Instance is authorized to use the Compute API). The module uses Google Cloud Platform libraries for authentication so many possibilities are open but the Module is only supported by using the method mentioned above.
 
