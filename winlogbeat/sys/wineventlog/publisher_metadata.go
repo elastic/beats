@@ -548,13 +548,8 @@ type EventMetadataIterator struct {
 
 func NewEventMetadataIterator(publisher *PublisherMetadata) (*EventMetadataIterator, error) {
 	eventMetadataEnumHandle, err := _EvtOpenEventMetadataEnum(publisher.Handle, 0)
-<<<<<<< HEAD
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open event metadata enumerator with EvtOpenEventMetadataEnum")
-=======
 	if err != nil && err != windows.ERROR_FILE_NOT_FOUND { //nolint:errorlint // Bad linter! This is always errno or nil.
 		return nil, fmt.Errorf("failed to open event metadata enumerator with EvtOpenEventMetadataEnum: %w (%#v)", err, err)
->>>>>>> 56ca6f5c4d ([automation] Update go release version 1.18.5 (#32574))
 	}
 
 	return &EventMetadataIterator{
