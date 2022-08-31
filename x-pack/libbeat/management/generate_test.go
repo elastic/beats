@@ -16,6 +16,43 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func TestBareConfig(t *testing.T) {
+	// config with datastreams, metadata, etc, removed
+	rawExpected := proto.UnitExpectedConfig{
+		Id:   "system/metrics-system-default-system",
+		Type: "system/metrics",
+		Name: "system-1",
+		Streams: []*proto.Stream{
+			{
+				Id: "system/metrics-system.filesystem-default-system",
+				Source: requireNewStruct(t, map[string]interface{}{
+					"metricsets": []interface{}{"filesystem"},
+					"period":     "1m",
+				}),
+			},
+		},
+	}
+
+	// First test: this doesn't panic on nil pointer dereference
+	reloadCfg, err := generateBeatConfig(&rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+	require.NoError(t, err, "error in generateBeatConfig")
+	cfgMap := mapstr.M{}
+	err = reloadCfg[0].Config.Unpack(&cfgMap)
+	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+
+	t.Logf("Config: %s", cfgMap.StringToPrint())
+	// Actual checks
+	processorFields := map[string]interface{}{
+		"add_fields.fields.stream_id": "system/metrics-system.filesystem-default-system",
+		"add_fields.fields.dataset":   "generic",
+		"add_fields.fields.namespace": "default",
+		"add_fields.fields.type":      "log",
+		"add_fields.fields.input_id":  "system/metrics-system-default-system",
+		"add_fields.fields.id":        "beat-ID",
+	}
+	findFieldsInProcessors(t, processorFields, cfgMap)
+}
+
 func TestMBGenerate(t *testing.T) {
 	sourceStream := requireNewStruct(t, map[string]interface{}{
 		"metricsets": []interface{}{"filesystem"},
@@ -68,30 +105,7 @@ func TestMBGenerate(t *testing.T) {
 		"add_fields.fields.input_id":  "system/metrics-system-default-system",
 		"add_fields.fields.id":        "beat-ID",
 	}
-
-	for key, val := range configFields {
-		gotKey := false
-		gotVal := false
-		errStr := ""
-		for _, proc := range cfgMap["processors"].([]interface{}) {
-			processor := mapstr.M(proc.(map[string]interface{}))
-			found, ok := processor.GetValue(key)
-			if ok == nil {
-				gotKey = true
-				if val == nil {
-					gotVal = true
-				} else {
-					if val == found {
-						gotVal = true
-					} else {
-						errStr = found.(string)
-					}
-				}
-			}
-		}
-		assert.True(t, gotKey, "did not find key for %s", key)
-		assert.True(t, gotVal, "got incorrect key for %s, expected %s, got %s", key, val, errStr)
-	}
+	findFieldsInProcessors(t, configFields, cfgMap)
 
 }
 
@@ -123,4 +137,30 @@ func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
 		require.NoError(t, err)
 	}
 	return str
+}
+
+func findFieldsInProcessors(t *testing.T, configFields map[string]interface{}, cfgMap mapstr.M) {
+	for key, val := range configFields {
+		gotKey := false
+		gotVal := false
+		errStr := ""
+		for _, proc := range cfgMap["processors"].([]interface{}) {
+			processor := mapstr.M(proc.(map[string]interface{}))
+			found, ok := processor.GetValue(key)
+			if ok == nil {
+				gotKey = true
+				if val == nil {
+					gotVal = true
+				} else {
+					if val == found {
+						gotVal = true
+					} else {
+						errStr = found.(string)
+					}
+				}
+			}
+		}
+		assert.True(t, gotKey, "did not find key for %s", key)
+		assert.True(t, gotVal, "got incorrect key for %s, expected %s, got %s", key, val, errStr)
+	}
 }
