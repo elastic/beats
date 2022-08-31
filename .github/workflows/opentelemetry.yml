@@ -7,6 +7,7 @@ on:
       - check-dev-tools
       - check-filebeat
       - check-heartbeat
+      - check-libbeat
       - check-metricbeat
       - check-packetbeat
       - check-winlogbeat
@@ -14,6 +15,7 @@ on:
       - check-x-pack-filebeat
       - check-x-pack-functionbeat
       - check-x-pack-heartbeat
+      - check-x-pack-libbeat
       - check-x-pack-metricbeat
       - check-x-pack-osquerybeat
       - check-x-pack-packetbeat
