@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"os"
 	"sync"
 	"testing"
 	"time"
@@ -55,6 +54,8 @@ func startTestWebserver(t *testing.T) *httptest.Server {
 	return testWs
 }
 
+// Note, no browser scenarios here, those all go in browserscenarios.go
+// since they have different build tags
 func init() {
 	scenarioDB.Add(
 		framework.Scenario{
@@ -105,31 +106,6 @@ func init() {
 					"schedule": "@every 1m",
 					"hosts":    []string{"127.0.0.1"},
 				}, func() {}, nil
-			},
-		},
-		framework.Scenario{
-			Name: "simple-browser",
-			Type: "browser",
-			Tags: []string{"browser", "browser-inline"},
-			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
-				err = os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
-				if err != nil {
-					return nil, nil, err
-				}
-				server := startTestWebserver(t)
-				config = mapstr.M{
-					"id":       "browser-test-id",
-					"name":     "browser-test-name",
-					"type":     "browser",
-					"schedule": "@every 1m",
-					"hosts":    []string{"127.0.0.1"},
-					"source": mapstr.M{
-						"inline": mapstr.M{
-							"script": fmt.Sprintf("step('load server', async () => {await page.goto('%s')})", server.URL),
-						},
-					},
-				}
-				return config, nil, nil
 			},
 		},
 	)
