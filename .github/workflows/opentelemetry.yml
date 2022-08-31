@@ -6,12 +6,14 @@ on:
       - check-auditbeat
       - check-dev-tools
       - check-filebeat
+      - check-heartbeat
       - check-metricbeat
       - check-packetbeat
       - check-winlogbeat
       - check-x-pack-auditbeat
       - check-x-pack-filebeat
       - check-x-pack-functionbeat
+      - check-x-pack-heartbeat
       - check-x-pack-metricbeat
       - check-x-pack-osquerybeat
       - check-x-pack-packetbeat
