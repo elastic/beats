@@ -13,6 +13,7 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
+<<<<<<< HEAD
     lint:
         make: |
           make -C heartbeat check;
@@ -21,6 +22,8 @@ stages:
           make -C x-pack/heartbeat update;
           make check-no-changes;
         stage: lint
+=======
+>>>>>>> 5eb9a13985 (action: checks for heartbeat and x-pack/heartbeat (#32749))
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
