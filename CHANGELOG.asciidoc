@@ -29,6 +29,16 @@ https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 === Beats version 8.4.0
 https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
+==== Known Issue 
+
+*Auditbeat* 
+Auditbeat/auditd integration may send malformed data and crash in version 8.4.0. {issue}32818[32818]
+
+Suggested resolution:
+Do not start Auditbeat or auditd integration on Elastic Agent at version 8.4.0, and immediately upgrade to 8.4.1. 
+
+This issue is resolved in 8.4.1 and later.
+
 ==== Breaking changes
 
 *Heartbeat*
