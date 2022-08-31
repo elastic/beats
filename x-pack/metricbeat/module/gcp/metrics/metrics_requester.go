@@ -140,6 +140,11 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 		}
 
 		f = fmt.Sprintf(`%s AND resource.labels.location = "%s"`, f, r.config.Region)
+	case gcp.ServiceCloudSQL:
+		if r.config.Region != "" {
+			region := strings.TrimSuffix(r.config.Region, "*")
+			f = fmt.Sprintf(`%s AND resource.labels.region = starts_with("%s")`, f, region)
+		}
 	default:
 		if r.config.Region != "" && r.config.Zone != "" {
 			r.logger.Warnf("when region %s and zone %s config parameter "+
@@ -152,7 +157,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 			// }
 
 			region := strings.TrimSuffix(r.config.Region, "*")
-			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, region)
+			f = fmt.Sprintf(`%s AND resource.labels.region = starts_with("%s")`, f, region)
 		} else if r.config.Zone != "" {
 			// zone := r.config.Zone
 			// if strings.HasSuffix(r.config.Zone, "*") {
