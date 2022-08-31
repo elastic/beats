@@ -14,16 +14,18 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metadataPrefix = "aws.rds.db_instance."
 
 // AddMetadata adds metadata for RDS instances from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
-	rdsServiceName := awscommon.CreateServiceName("rds", fips_enabled, regionName)
-	svc := rds.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(endpoint, rdsServiceName, regionName, awsConfig))
+func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
+	svc := rds.NewFromConfig(awsConfig, func(o *rds.Options) {
+		if fips_enabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+	})
 
 	// Get DBInstance IDs per region
 	dbDetailsMap, err := getDBInstancesPerRegion(svc)

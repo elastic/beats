@@ -19,7 +19,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -206,7 +205,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
-			events, err := addMetadata(namespace, m.Endpoint, regionName, beatsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier)
+			events, err := addMetadata(namespace, regionName, beatsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier)
 			if err != nil {
 				// TODO What to do if add metadata fails? I guess to continue, probably we have an 90% of reliable data
 				m.Logger().Warn("could not add metadata to events: %w", err)
@@ -224,13 +223,18 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionName string, config aws.Config) (*cloudwatch.Client, *resourcegroupstaggingapi.Client, error) {
 	m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 
-	monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
+	svcCloudwatchClient := cloudwatch.NewFromConfig(beatsConfig, func(o *cloudwatch.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
 
-	svcCloudwatchClient := cloudwatch.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
-		m.Endpoint, monitoringServiceName, regionName, beatsConfig))
+	})
 
-	svcResourceAPIClient := resourcegroupstaggingapi.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
-		m.Endpoint, "tagging", regionName, beatsConfig)) //Does not support FIPS
+	svcResourceAPIClient := resourcegroupstaggingapi.NewFromConfig(beatsConfig, func(o *resourcegroupstaggingapi.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+	})
 
 	return svcCloudwatchClient, svcResourceAPIClient, nil
 }
