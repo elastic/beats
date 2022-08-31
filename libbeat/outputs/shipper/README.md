@@ -19,6 +19,7 @@ output.shipper:
   timeout: 30
   max_retries: 3
   bulk_max_size: 50
+  ack_polling_interval: '5ms'
   backoff:
     init: 1
     max: 60
@@ -60,6 +61,12 @@ Specifying a larger batch size may add some latency and buffering during publish
 Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
+
+### `ack_polling_interval`
+
+The minimal interval for getting persisted index updates from the shipper server. Batches of events are acknowledged asynchronously in the background. If after the `ack_polling_interval` duration the persisted index value changed all batches pending acknowledgment will be checked against the new value and acknowledged if `persisted_index` >= `accepted_index`.
+
+The default value is `5ms`, cannot be set to a value less then the default.
 
 ### `backoff.init`
 
