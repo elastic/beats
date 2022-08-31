@@ -7,12 +7,13 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
-	"os"
 )
 
 const fileName = "functionbeat.yml"
@@ -40,14 +41,14 @@ func fileExists(fileName string) bool {
 }
 
 func writeConfig(content []byte) {
-	fmt.Println("Writing configuration")
+	fmt.Print("\nWriting configuration")
 	err := os.WriteFile(fileName, content, 0444)
 	errCheck(err)
-	fmt.Println("Done")
+	fmt.Print("\nDone")
 }
 
 func getConfigFromASM(secretId string) {
-	fmt.Println("Fetching configuration from SecretsManager")
+	fmt.Print("\nFetching configuration from SecretsManager")
 	asmClient := secretsmanager.NewFromConfig(getAwsConfig())
 	result, err := asmClient.GetSecretValue(context.TODO(), &secretsmanager.GetSecretValueInput{SecretId: &secretId})
 
@@ -56,7 +57,7 @@ func getConfigFromASM(secretId string) {
 }
 
 func getConfigFromS3(bucketName string, bucketKey string) {
-	fmt.Println("Fetching configuration from S3")
+	fmt.Print("\nFetching configuration from S3")
 	s3Client := s3.NewFromConfig(getAwsConfig())
 	buffer := manager.NewWriteAtBuffer([]byte{})
 	downloader := manager.NewDownloader(s3Client)
@@ -96,5 +97,5 @@ func Load() {
 		return
 	}
 
-	panic(fmt.Errorf("failed to find or load configuration"))
+	panic(fmt.Errorf("failed to find configuration"))
 }

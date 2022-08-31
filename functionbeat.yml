@@ -1,0 +1,78 @@
+cloud.id: {{ cloud_id }}
+cloud.auth: {{ cloud_ingestion_user }}:{{ cloud_ingestion_password }}
+setup.ilm.policy_name: {{ ilm_policy }}
+setup.ilm.rollover_alias: {{ index_name }}
+processors:
+  - drop_fields:
+      fields:
+        - agent
+        - event_source_arn
+        - event_name
+        - event_id
+        - event_version
+        - kinesis_partition_key
+        - kinesis_schema_version
+        - kinesis_sequence_number
+        - kinesis_encryption_type
+      ignore_missing: true
+  - dissect:
+      when:
+        regexp:
+          message: "^END .*"
+      tokenizer: "%{type} RequestId: %{request_id}\n"
+      field: "message"
+      target_prefix: "lambda"
+      ignore_failure: true
+  - dissect:
+      when:
+        regexp:
+          message: "^START .*"
+      tokenizer: "%{type} RequestId: %{request_id} Version: %{version}\n"
+      field: "message"
+      target_prefix: "lambda"
+      ignore_failure: true
+  - dissect:
+      when:
+        regexp:
+          message: "^REPORT .*"
+      tokenizer: "%{type} RequestId: %{request_id}\tDuration: %{duration_ms} ms\tBilled Duration: %{billed_duration_ms} ms\tMemory Size: %{memory_size_mb} MB\tMax Memory Used: %{max_memory_used_mb} MB\t%{extra}"
+      field: "message"
+      target_prefix: "lambda"
+      ignore_failure: true
+  - dissect:
+      when:
+        has_fields: ["lambda.extra"]
+      tokenizer: "Init Duration: %{init_duration} ms"
+      field: "lambda.extra"
+      target_prefix: "lambda"
+      ignore_failure: true
+  - dissect:
+      when:
+        regexp:
+          message: "^.*Z\t.*\t.*\t.*\n"
+      tokenizer: "%{timestamp}\t%{request_id}\t%{log_level}\t%{message}\n"
+      field: "message"
+      target_prefix: "nodejs"
+      ignore_failure: true
+  - decode_json_fields:
+      add_error_key: false
+      fields:
+        - message
+        - nodejs.message
+      max_depth: 2
+      overwrite_keys: true
+      process_array: false
+      target: ""
+output.elasticsearch:
+  max_retries: {{ max_retries }}
+  bulk_max_size: {{ bulk_max_size }}
+  backoff.init: {{ backoff_init }}
+  backoff.max: {{ backoff_max }}
+  timeout: {{ es_timeout }}
+
+queue.mem:
+  events: {{ fb_queue_events }}
+  flush.min_events: {{ fb_queue_flush_min_events }}
+  flush.timeout: {{ fb_queue_flush_timeout }}
+
+logging.level: {{ fb_log_level }}
