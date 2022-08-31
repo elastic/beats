@@ -148,6 +148,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Packetbeat*
 
 - Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
+- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
 
 *Functionbeat*
 
