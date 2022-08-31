@@ -239,6 +239,10 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 
 	if regionName != originalAwsConfigRegion {
 		s3Client = s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+			if in.config.NonAWSBucketName != "" {
+				o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
+			}
+
 			if in.config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
