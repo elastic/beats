@@ -127,20 +127,28 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
 func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, streamIter int, stream map[string]interface{}) map[string]interface{} {
+	if expected.DataStream == nil {
+		expected.DataStream = &proto.DataStream{
+			Type:      inputType,
+			Dataset:   "generic",
+			Namespace: "default",
+		}
+	}
 	streamType := expected.DataStream.Type
 	if streamType == "" {
 		streamType = inputType
 	}
 
 	dataset := "generic"
-	if expected.Streams[streamIter] == nil || expected.Streams[streamIter].DataStream.Dataset != "" {
+	if expected.Streams[streamIter].DataStream != nil && expected.Streams[streamIter].DataStream.Dataset != "" {
 		dataset = expected.Streams[streamIter].DataStream.Dataset
 	}
 
 	namespace := "default"
-	if expected.DataStream == nil || expected.DataStream.Namespace != "" {
+	if expected.DataStream.Namespace != "" {
 		namespace = expected.DataStream.Namespace
 	}
+
 	index := fmt.Sprintf("%s-%s-%s", streamType, dataset, namespace)
 	stream["index"] = index
 	return stream
@@ -148,18 +156,20 @@ func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, str
 
 //injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
 func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string, streamIter int, stream map[string]interface{}) (map[string]interface{}, error) {
+	//1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
 	procInputType := inputType
-	if expected.DataStream == nil || expected.DataStream.Type != "" {
+	if expected.DataStream != nil && expected.DataStream.Type != "" {
 		procInputType = expected.DataStream.Type
 	}
 
 	procInputNamespace := "default"
-	if expected.DataStream == nil || expected.DataStream.Namespace != "" {
+	if expected.DataStream != nil && expected.DataStream.Namespace != "" {
 		procInputNamespace = expected.DataStream.Namespace
 	}
 
 	var processors = []interface{}{}
+
 	// the AST injects input_id at the input level and not the stream level,
 	// for reasons I can't understand, as it just ends up shuffling it around
 	// to individual metricsets anyway, at least on metricbeat
@@ -169,10 +179,11 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string
 	}
 
 	procInputDataset := "generic"
-	if expected.Streams[streamIter].DataStream == nil || expected.Streams[streamIter].DataStream.Dataset != "" {
+	if expected.Streams[streamIter].DataStream != nil && expected.Streams[streamIter].DataStream.Dataset != "" {
 		procInputDataset = expected.Streams[streamIter].DataStream.Dataset
 	}
 
+	//2. Actually add the processors
 	// namespace
 	datastream := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset,
 		"namespace": procInputNamespace, "type": procInputType}, "data_stream")
@@ -220,11 +231,18 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 // This has to handle both universal config changes and changes specific to the beats
 // This is a replacement for the AST code that lived in V1
 func generateBeatConfig(unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	if unitRaw.DataStream == nil || unitRaw.DataStream.Namespace == "" {
-		unitRaw.DataStream.Namespace = "default"
-	}
-	if unitRaw.DataStream == nil || unitRaw.DataStream.Dataset == "" {
-		unitRaw.DataStream.Dataset = "generic"
+	if unitRaw.DataStream == nil {
+		unitRaw.DataStream = &proto.DataStream{
+			Namespace: "default",
+			Dataset:   "generic",
+		}
+	} else {
+		if unitRaw.DataStream.Namespace == "" {
+			unitRaw.DataStream.Namespace = "default"
+		}
+		if unitRaw.DataStream.Dataset == "" {
+			unitRaw.DataStream.Dataset = "generic"
+		}
 	}
 
 	// Generate the config that's unique to a beat
