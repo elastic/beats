@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strings"
 	"time"
@@ -15,25 +16,24 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
-	"github.com/pkg/errors"
 )
 
-// GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
-func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time, time.Time) {
-	endTime := time.Now()
-	if latency != 0 {
-		// add latency if config is not 0
-		endTime = endTime.Add(latency * -1)
-	}
-
-	// Set startTime to be one period earlier than the endTime. If metrics are
-	// not being collected, use latency config parameter to offset the startTime
-	// and endTime.
-	startTime := endTime.Add(period * -1)
-	// Defining duration
-	d := 60 * time.Second
-	// Calling Round() method
-	return startTime.Round(d), endTime.Round(d)
+// GetStartTimeEndTime calculates start and end times for queries based on the current time and a duration.
+//
+// Whilst the inputs to this function are continuous, the maximum period granularity we can consistently use
+// is 1 minute. The resulting interval should also be aligned to the period for best performance. This means
+// if a period of 3 minutes is requested at 12:05, for example, the calculated times are 12:00->12:03. See
+// https://github.com/aws/aws-sdk-go-v2/blob/fdbd882cdf5c63a578caed14688cf9a456c75f2b/service/cloudwatch/api_op_GetMetricData.go#L88
+// for more information about granularity and period alignment.
+//
+// If durations are configured in non-whole minute periods, they are rounded up to the next minute e.g. 90s becomes 120s.
+//
+// If `latency` is configured, the period is shifted back in time by specified duration (before period alignment).
+func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration) (time.Time, time.Time) {
+	periodInMinutes := (period + time.Second*29).Round(time.Second * 60)
+	endTime := now.Add(latency * -1).Truncate(periodInMinutes)
+	startTime := endTime.Add(periodInMinutes * -1)
+	return startTime, endTime
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
@@ -59,7 +59,7 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 	}
 
 	if err := paginator.Err(); err != nil {
-		return metricsTotal, errors.Wrap(err, "error ListMetrics with Paginator, skipping region "+regionName)
+		return metricsTotal, fmt.Errorf("error ListMetrics with Paginator, skipping region %s. error: %w", regionName, err)
 	}
 	return metricsTotal, nil
 }
@@ -92,7 +92,7 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 		}
 
 		if err := paginator.Err(); err != nil {
-			return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "error GetMetricData with Paginator")
+			return getMetricDataOutput.MetricDataResults, fmt.Errorf("error GetMetricData with Paginator: %w", err)
 		}
 	}
 	return getMetricDataOutput.MetricDataResults, nil
@@ -172,7 +172,7 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 			if err == nil {
 				resourceTagMap[shortIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when processing shortIdentifier")
+				err = fmt.Errorf("error occurs when processing shortIdentifier: %w", err)
 				return nil, err
 			}
 
@@ -180,14 +180,14 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 			if err == nil {
 				resourceTagMap[wholeIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when processing longIdentifier")
+				err = fmt.Errorf("error occurs when processing longIdentifier: %w", err)
 				return nil, err
 			}
 		}
 	}
 
 	if err := paginator.Err(); err != nil {
-		err = errors.Wrap(err, "error GetResources with Paginator")
+		err = fmt.Errorf("error GetResources with Paginator: %w", err)
 		return nil, err
 	}
 	return resourceTagMap, nil
@@ -197,15 +197,15 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
+		err = fmt.Errorf("error Parse arn: %w", err)
 		return "", err
 	}
 
 	resourceARNSplit := []string{arnParsed.Resource}
 	if strings.Contains(arnParsed.Resource, ":") {
-		resourceARNSplit = strings.Split(arnParsed.Resource, ":")
+		resourceARNSplit = strings.Split(strings.Trim(arnParsed.Resource, ":"), ":")
 	} else if strings.Contains(arnParsed.Resource, "/") {
-		resourceARNSplit = strings.Split(arnParsed.Resource, "/")
+		resourceARNSplit = strings.Split(strings.Trim(arnParsed.Resource, "/"), "/")
 	}
 
 	if len(resourceARNSplit) <= 1 {
@@ -214,11 +214,11 @@ func FindShortIdentifierFromARN(resourceARN string) (string, error) {
 	return strings.Join(resourceARNSplit[1:], "/"), nil
 }
 
-// FindWholeIdentifierFromARN funtion extracts whole resource filed of ARN
+// FindWholeIdentifierFromARN function extracts whole resource filed of ARN
 func FindWholeIdentifierFromARN(resourceARN string) (string, error) {
 	arnParsed, err := arn.Parse(resourceARN)
 	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
+		err = fmt.Errorf("error Parse arn: %w", err)
 		return "", err
 	}
 	return arnParsed.Resource, nil

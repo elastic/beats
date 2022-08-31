@@ -8,6 +8,7 @@
 package cloudwatch
 
 import (
+	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -17,7 +18,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -162,7 +162,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 		},
 		resourceTypeFilters: resourceTypeFiltersEC2,
@@ -191,7 +190,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 			{
 				cloudwatch.Metric{
@@ -207,7 +205,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/RDS"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 		},
 		resourceTypeFilters: resourceTypeFiltersEC2RDS,
@@ -238,7 +235,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 			{
 				cloudwatch.Metric{
@@ -254,7 +250,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/RDS"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 		},
 		resourceTypeFilters: resourceTypeFiltersEC2RDSWithTag,
@@ -409,7 +404,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 			{
 				cloudwatch.Metric{
@@ -421,10 +415,52 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 				[]string{"Average"},
-				nil,
 			},
 		},
 		resourceTypeFilters: resourceTypeFiltersEC2,
+	}
+
+	expectedListMetricWithDetailEC2sRDSWithTag := listMetricWithDetail{
+		metricsWithStats: []metricsWithStatistics{
+			{
+				cloudwatch.Metric{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("InstanceId"),
+						Value: awssdk.String("i-1"),
+					}},
+					MetricName: awssdk.String("CPUUtilization"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+				[]string{"Average"},
+			},
+			{
+				cloudwatch.Metric{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("InstanceId"),
+						Value: awssdk.String("i-2"),
+					}},
+					MetricName: awssdk.String("DiskReadBytes"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+				[]string{"Sum"},
+			},
+			{
+				cloudwatch.Metric{
+					Dimensions: []cloudwatch.Dimension{{
+						Name:  awssdk.String("DBClusterIdentifier"),
+						Value: awssdk.String("test1-cluster"),
+					},
+						{
+							Name:  awssdk.String("Role"),
+							Value: awssdk.String("READER"),
+						}},
+					MetricName: awssdk.String("CommitThroughput"),
+					Namespace:  awssdk.String("AWS/RDS"),
+				},
+				[]string{"Average"},
+			},
+		},
+		resourceTypeFilters: resourceTypeFiltersEC2RDSWithTag,
 	}
 
 	cases := []struct {
@@ -706,6 +742,59 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 			nil,
 			expectedListMetricsEC2WithDim,
+			map[string][]namespaceDetail{},
+		},
+		{
+			"Test with same namespace and tag filters but different metric names",
+			[]Config{
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: []string{"CPUUtilization"},
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: "i-1",
+						},
+					},
+					Statistic:    []string{"Average"},
+					ResourceType: "ec2:instance",
+				},
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: []string{"DiskReadBytes"},
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: "i-2",
+						},
+					},
+					Statistic:    []string{"Sum"},
+					ResourceType: "ec2:instance",
+				},
+				{
+					Namespace:  "AWS/RDS",
+					MetricName: []string{"CommitThroughput"},
+					Dimensions: []Dimension{
+						{
+							Name:  "DBClusterIdentifier",
+							Value: "test1-cluster",
+						},
+						{
+							Name:  "Role",
+							Value: "READER",
+						},
+					},
+					Statistic:    []string{"Average"},
+					ResourceType: "rds",
+				},
+			},
+			[]aws.Tag{
+				{
+					Key:   "name",
+					Value: "test",
+				},
+			},
+			expectedListMetricWithDetailEC2sRDSWithTag,
 			map[string][]namespaceDetail{},
 		},
 	}
@@ -1070,7 +1159,6 @@ func TestFilterListMetricsOutput(t *testing.T) {
 						Namespace:  awssdk.String("AWS/EC2"),
 					},
 					[]string{"Average"},
-					nil,
 				},
 			},
 		},
@@ -1117,7 +1205,6 @@ func TestFilterListMetricsOutput(t *testing.T) {
 						Namespace:  awssdk.String("AWS/EC2"),
 					},
 					[]string{"Average"},
-					nil,
 				},
 			},
 		},
@@ -1373,7 +1460,6 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 			Namespace:  awssdk.String("AWS/EC2"),
 		},
 		[]string{"Average"},
-		nil,
 	}}
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
@@ -1382,7 +1468,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 			Value: "test-ec2",
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1411,7 +1497,6 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 				Namespace:  awssdk.String("AWS/EC2"),
 			},
 			[]string{"Average"},
-			nil,
 		},
 		{
 			cloudwatch.Metric{
@@ -1419,12 +1504,11 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 				Namespace:  awssdk.String("AWS/EC2"),
 			},
 			[]string{"Average"},
-			nil,
 		},
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1458,23 +1542,32 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 				Namespace:  awssdk.String("AWS/EC2"),
 			},
 			[]string{"Average"},
-			[]aws.Tag{
-				{Key: "name", Value: "test-ec2"},
-			},
 		},
 	}
 
-	// Specify a tag filter that does not match the tag for i-1
+	// Check that the event is created when the tag filter matches
 	resourceTypeTagFilters := map[string][]aws.Tag{}
+	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
+		{
+			Key:   "name",
+			Value: "test-ec2",
+		},
+	}
+
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(events))
+
+	// Specify a tag filter that does not match the tag for i-1
 	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
 		{
 			Key:   "name",
 			Value: "foo",
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
-	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	events, err = m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(events))
 }
@@ -1609,12 +1702,11 @@ func TestCreateEventsTimestamp(t *testing.T) {
 				Namespace:  awssdk.String("AWS/EC2"),
 			},
 			[]string{"Average"},
-			nil,
 		},
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(&MockCloudWatchClientWithoutDim{}, &MockResourceGroupsTaggingClient{}, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1626,6 +1718,6 @@ func TestGetStartTimeEndTime(t *testing.T) {
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
 	m.MetricSet = &aws.MetricSet{Period: 5 * time.Minute}
 	m.logger = logp.NewLogger("test")
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 	assert.Equal(t, 5*time.Minute, endTime.Sub(startTime))
 }

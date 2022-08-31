@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled. {pull}30331[30331]
 
 *Auditbeat*
 
@@ -43,12 +44,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
+- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
+- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
 
 *Heartbeat*
 
 
 *Metricbeat*
 
+- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 
 *Packetbeat*
 
@@ -70,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Auditbeat*
+
 
 *Filebeat*
 
@@ -113,6 +118,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 

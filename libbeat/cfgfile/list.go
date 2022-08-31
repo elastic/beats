@@ -80,13 +80,22 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 	r.logger.Debugf("Start list: %d, Stop list: %d", len(startList), len(stopList))
 
+	wg := sync.WaitGroup{}
 	// Stop removed runners
 	for hash, runner := range stopList {
+		wg.Add(1)
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
-		go runner.Stop()
+		go func(runner Runner) {
+			defer wg.Done()
+			runner.Stop()
+			r.logger.Debugf("Runner: '%s' has stopped", runner)
+		}(runner)
 		moduleStops.Add(1)
 	}
+
+	// Wait for all runners to stop before starting new ones
+	wg.Wait()
 
 	// Start new runners
 	for hash, config := range startList {

@@ -68,7 +68,7 @@ pipeline {
           // Skip all the stages except docs for PR's with asciidoc, md or deploy k8s templates changes only
           setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '(.*\\.(asciidoc|md)|deploy/kubernetes/.*-kubernetes\\.yaml)' ], shouldMatchAll: true).toString())
           setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
-          setEnvVar('PACKAGING_CHANGES', isGitRegionMatch(patterns: [ '^dev-tools/packaging/.*' ], shouldMatchAll: false).toString())
+          setEnvVar('PACKAGING_CHANGES', isGitRegionMatch(patterns: [ '(^dev-tools/packaging/.*|.go-version)' ], shouldMatchAll: false).toString())
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
           withEnv(["HOME=${env.WORKSPACE}"]) {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
@@ -89,9 +89,6 @@ pipeline {
           stageStatusCache(id: 'Lint'){
             withBeatsEnv(archive: false, id: "lint") {
               dumpVariables()
-              whenTrue(env.ONLY_DOCS == 'true') {
-                cmd(label: "make check", script: "make check")
-              }
               whenTrue(env.ONLY_DOCS == 'false') {
                 runLinting()
               }
@@ -204,11 +201,16 @@ VERSION=${env.VERSION}-SNAPSHOT""")
         notifyBuildResult(prComment: true,
                           slackComment: true,
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
-                          githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS",
+                          githubIssue: isGitHubIssueEnabled(),
                           githubLabels: 'Team:Elastic-Agent-Data-Plane')
       }
     }
   }
+}
+
+// When to create a GiHub issue
+def isGitHubIssueEnabled() {
+  return isBranch() && currentBuild.currentResult != "SUCCESS" && currentBuild.currentResult != "ABORTED"
 }
 
 def runLinting() {
@@ -219,9 +221,19 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
-
+  // Run pre-commit within the current node and in Jenkins
+  // hence there is no need to use docker login in the GitHub actions
+  // some docker images are hosted in an internal docker registry.
+  mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
+}
+
+def runPreCommit() {
+  return {
+    withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
+      preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+    }
+  }
 }
 
 def runBuildAndTest(Map args = [:]) {
@@ -511,7 +523,7 @@ def e2e(Map args = [:]) {
   if (args.e2e.get('entrypoint', '')?.trim()) {
     e2e_with_entrypoint(args)
   } else {
-    runE2E(testMatrixFile: args.e2e?.get('testMatrixFile', ''),
+    runE2E(testMatrixFile: '.ci/.e2e-tests-beats.yaml',
            beatVersion: "${env.VERSION}-SNAPSHOT",
            gitHubCheckName: "e2e-${args.context}",
            gitHubCheckRepo: env.REPO,

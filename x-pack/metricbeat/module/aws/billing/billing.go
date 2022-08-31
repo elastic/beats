@@ -118,7 +118,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startDate, endDate := getStartDateEndDate(m.Period)
 
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
 
 	// get cost metrics from cost explorer
 	awsConfig := m.MetricSet.AwsConfig.Copy()
