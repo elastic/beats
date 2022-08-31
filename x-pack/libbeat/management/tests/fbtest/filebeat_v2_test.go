@@ -94,6 +94,7 @@ func TestFilebeat(t *testing.T) {
 		"agent.id":              "test-agent",
 		"data_stream.dataset":   "system.syslog",
 		"data_stream.namespace": "default",
+		"data_stream.type":      "logs",
 	}
 	tests.ValuesExist(t, expectedMetaValuesSyslog, events, tests.ONCE)
 
@@ -108,7 +109,6 @@ func TestFilebeat(t *testing.T) {
 
 	expectedLogValues := map[string]interface{}{
 		"log.file.path": nil,
-		"input.type":    "log",
 		"message":       nil,
 	}
 	tests.ValuesExist(t, expectedLogValues, events, tests.ONCE)

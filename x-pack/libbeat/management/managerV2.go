@@ -260,7 +260,7 @@ func (cm *BeatV2Manager) unitListen() {
 				cm.logger.Debugf("Got unit modified: %s, type: %s expected state: %s", change.Unit.ID(), change.Unit.Type(), state.String())
 				// I'm assuming that a state STOPPED just tells us to shut down the entire beat,
 				// as such we don't really care about updating via a particular unit
-				if state == client.UnitStateStopped {
+				if state == client.UnitStateStopped || state == client.UnitStateStopping {
 					cm.stopBeat()
 				} else {
 					go cm.handleUnitReload(change.Unit)

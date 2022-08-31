@@ -131,13 +131,15 @@ func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, str
 	if streamType == "" {
 		streamType = inputType
 	}
-	dataset := expected.Streams[streamIter].DataStream.Dataset
-	if dataset == "" {
-		dataset = "generic"
+
+	dataset := "generic"
+	if expected.Streams[streamIter] == nil || expected.Streams[streamIter].DataStream.Dataset != "" {
+		dataset = expected.Streams[streamIter].DataStream.Dataset
 	}
-	namespace := expected.DataStream.Namespace
-	if namespace == "" {
-		namespace = "default"
+
+	namespace := "default"
+	if expected.DataStream == nil || expected.DataStream.Namespace != "" {
+		namespace = expected.DataStream.Namespace
 	}
 	index := fmt.Sprintf("%s-%s-%s", streamType, dataset, namespace)
 	stream["index"] = index
@@ -148,12 +150,12 @@ func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, str
 func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string, streamIter int, stream map[string]interface{}) (map[string]interface{}, error) {
 	// logic from datastreamTypeFromInputNode
 	procInputType := inputType
-	if expected.DataStream.Type != "" {
+	if expected.DataStream == nil || expected.DataStream.Type != "" {
 		procInputType = expected.DataStream.Type
 	}
 
 	procInputNamespace := "default"
-	if expected.DataStream.Namespace != "" {
+	if expected.DataStream == nil || expected.DataStream.Namespace != "" {
 		procInputNamespace = expected.DataStream.Namespace
 	}
 
@@ -167,7 +169,7 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string
 	}
 
 	procInputDataset := "generic"
-	if expected.Streams[streamIter].DataStream.Dataset != "" {
+	if expected.Streams[streamIter].DataStream == nil || expected.Streams[streamIter].DataStream.Dataset != "" {
 		procInputDataset = expected.Streams[streamIter].DataStream.Dataset
 	}
 
@@ -218,10 +220,10 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 // This has to handle both universal config changes and changes specific to the beats
 // This is a replacement for the AST code that lived in V1
 func generateBeatConfig(unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	if unitRaw.DataStream.Namespace == "" {
+	if unitRaw.DataStream == nil || unitRaw.DataStream.Namespace == "" {
 		unitRaw.DataStream.Namespace = "default"
 	}
-	if unitRaw.DataStream.Dataset == "" {
+	if unitRaw.DataStream == nil || unitRaw.DataStream.Dataset == "" {
 		unitRaw.DataStream.Dataset = "generic"
 	}
 
