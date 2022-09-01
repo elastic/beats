@@ -256,8 +256,8 @@ func generateBeatConfig(unitRaw *proto.UnitExpectedConfig, agentInfo *client.Age
 func groupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, error) {
 	// We still need to emulate the InjectHeadersRule AST code,
 	// I don't think we can get the `Headers()` data reported by the AgentInfo()
-	sourceMap := outCfg.Source.AsMap()
-	outputType := outCfg.Type
+	sourceMap := outCfg.GetSource().AsMap()
+	outputType := outCfg.GetType()
 	formattedOut := mapstr.M{
 		outputType: sourceMap,
 	}
