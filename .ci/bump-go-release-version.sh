@@ -37,6 +37,11 @@ find . -maxdepth 3 -name Dockerfile -print0 |
 ${SED} -E -e "s#(:go-version:) [0-9]+\.[0-9]+\.[0-9]+#\1 ${GO_RELEASE_VERSION}#g" libbeat/docs/version.asciidoc
 git add libbeat/docs/version.asciidoc
 
+GO_MAJOR_VERSION=$(echo ${GO_RELEASE_VERSION} | cut -f1 -d.)
+GO_MINOR_VERSION=$(echo ${GO_RELEASE_VERSION} | cut -f2 -d.)
+${SED} -E -e "s#(go) [0-9]+\.[0-9]+#\1 ${GO_MAJOR_VERSION}\.${GO_MINOR_VERSION}#g" go.mod
+git add go.mod
+
 git diff --staged --quiet || git commit -m "[Automation] Update go release version to ${GO_RELEASE_VERSION}"
 git --no-pager log -1
 
