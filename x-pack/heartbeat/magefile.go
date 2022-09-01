@@ -58,6 +58,15 @@ func Package() {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
+// Ironbank packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	start := time.Now()
+	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
+	return devtools.Ironbank()
+}
+
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages(devtools.WithMonitorsD())

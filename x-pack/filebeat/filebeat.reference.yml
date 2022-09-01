@@ -3530,7 +3530,7 @@ filebeat.inputs:
 #          config:
 #            - type: container
 #              paths:
-#                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+#                - /var/log/containers/*.log
 
 # ========================== Filebeat global options ===========================
 
@@ -4208,9 +4208,6 @@ output.elasticsearch:
 
     # Strategy for fetching the topics metadata from the broker. Default is false.
     #full: false
-
-  # The number of concurrent load-balanced Kafka output workers.
-  #worker: 1
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, events are typically dropped.

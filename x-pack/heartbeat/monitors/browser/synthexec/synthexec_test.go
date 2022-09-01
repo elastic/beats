@@ -2,11 +2,15 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package synthexec
 
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -95,11 +99,23 @@ func TestJsonToSynthEvent(t *testing.T) {
 	}
 }
 
+func goCmd(args ...string) *exec.Cmd {
+	goBinary := "go" // relative by default
+	// GET the GOROOT if defined, this helps in scenarios where
+	// GOROOT is defined, but GOROOT/bin is not in the path
+	// This can happen when targeting WSL from intellij running on windows
+	goRoot := os.Getenv("GOROOT")
+	if goRoot != "" {
+		goBinary = filepath.Join(goRoot, "bin", "go")
+	}
+	return exec.Command(goBinary, args...)
+}
+
 func TestRunCmd(t *testing.T) {
-	cmd := exec.Command("go", "run", "./main.go")
+	cmd := goCmd("run", "./main.go")
 
 	stdinStr := "MY_STDIN"
-	synthEvents := runAndCollect(t, cmd, stdinStr)
+	synthEvents := runAndCollect(t, cmd, stdinStr, 15*time.Minute)
 
 	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
 		stdoutEvents := eventsWithType(Stdout, synthEvents)
@@ -132,8 +148,8 @@ func TestRunCmd(t *testing.T) {
 }
 
 func TestRunBadExitCodeCmd(t *testing.T) {
-	cmd := exec.Command("go", "run", "./main.go", "exit")
-	synthEvents := runAndCollect(t, cmd, "")
+	cmd := goCmd("run", "./main.go", "exit")
+	synthEvents := runAndCollect(t, cmd, "", 15*time.Minute)
 
 	// go run outputs "exit status 123" to stderr so we have two messages
 	require.Len(t, synthEvents, 2)
@@ -149,11 +165,27 @@ func TestRunBadExitCodeCmd(t *testing.T) {
 	})
 }
 
-func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string) []*SynthEvent {
-	_, filename, _, _ := runtime.Caller(0)
-	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
+func TestRunTimeoutExitCodeCmd(t *testing.T) {
+	cmd := goCmd("run", "./main.go")
+	synthEvents := runAndCollect(t, cmd, "", 0*time.Second)
 
-	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
+	// go run should not produce any additional stderr output in this case
+	require.Len(t, synthEvents, 1)
+
+	t.Run("has a cmd status event", func(t *testing.T) {
+		stdoutEvents := eventsWithType(CmdStatus, synthEvents)
+		require.Len(t, stdoutEvents, 1)
+		require.Equal(t, synthEvents[0].Error.Code, "CMD_TIMEOUT")
+	})
+}
+
+func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+	cmd.Dir = filepath.Join(cwd, "testcmd")
+	ctx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
+
+	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent

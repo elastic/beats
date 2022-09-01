@@ -73,14 +73,19 @@ both compression and encryption are enabled.  The next 128-bits are
 the initialization vector and the rest of the file is LZ4 compressed
 frames.
 
+If the options field has the third bit set, then Google Protobuf is
+used to serialize the data in the frame instead of CBOR.
+
 ![Segment Schema Version 2](./schemaV2.svg)
 
 The frames for version 2, consist of a header, followed by the
 serialized event and a footer.  The header contains one field which is
 the size of the frame, which is an unsigned 32-bit integer in
-little-endian format.  The serialization format is CBOR.  The footer
-contains 2 fields, the first of which is a checksum which is an
-unsigned 32-bit integer in little-endian format, followed by a repeat
-of the size from the header.  This is the same as version 1.
+little-endian format.  The serialization format is CBOR or Google
+Protobuf.  The footer contains 2 fields, the first of which is a
+checksum which is an unsigned 32-bit integer in little-endian format,
+followed by a repeat of the size from the header.  The only difference
+from Version 1 is the option for the serialization format to be CBOR
+or Google Protobuf.
 
 ![Frame Version 2](./frameV2.svg)

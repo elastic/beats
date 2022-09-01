@@ -34,48 +34,6 @@ RUN for iter in {1..10}; do \
     (exit $exit_code)
 {{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
-RUN apt-get update -y && \
-    for iter in {1..10}; do \
-        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes \
-        libglib2.0-0\
-        libnss3\
-        libnspr4\
-        libatk1.0-0\
-        libatk-bridge2.0-0\
-        libcups2\
-        libdrm2\
-        libdbus-1-3\
-        libxcb1\
-        libxkbcommon0\
-        libx11-6\
-        libxcomposite1\
-        libxdamage1\
-        libxext6\
-        libxfixes3\
-        libxrandr2\
-        libgbm1\
-        libpango-1.0-0\
-        libcairo2\
-        libasound2\
-        libatspi2.0-0\
-        libxshmfence1 \
-        fonts-noto \
-        fonts-noto-cjk && \
-        apt-get clean all && \
-        exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
-    done; \
-    (exit $exit_code)
-ENV NODE_PATH={{ $beatHome }}/.node
-RUN echo \
-    $NODE_PATH \
-    {{ $beatHome }}/.config \
-    {{ $beatHome }}/.synthetics \
-    {{ $beatHome }}/.npm \
-    {{ $beatHome }}/.cache \
-    | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
-{{- end }}
-
 LABEL \
   org.label-schema.build-date="{{ date }}" \
   org.label-schema.schema-version="1.0" \
@@ -150,13 +108,17 @@ RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
-{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal")))  }}
-RUN chown {{ .user }} $NODE_PATH
-{{- end }}
-{{- end }}
-USER {{ .user }}
 
-{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal")))  }}
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
+ENV NODE_PATH={{ $beatHome }}/.node
+RUN echo \
+    $NODE_PATH \
+    {{ $beatHome }}/.config \
+    {{ $beatHome }}/.synthetics \
+    {{ $beatHome }}/.npm \
+    {{ $beatHome }}/.cache \
+    | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
+
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV SUITES_DIR={{ $beatHome }}/suites
@@ -165,24 +127,49 @@ ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
 # Setup node
+# Also try to add any deps that were missed earlier in terms of playwright reqs
+# playwright install-deps is kept up to date with additional packages chromium needs
+# beyond the base packages listed above
 RUN cd /usr/share/heartbeat/.node \
-  && NODE_DOWNLOAD_URL="" \
-  && case "$(arch)" in \
-       x86_64) \
-           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
-           ;; \
-       aarch64) \
-           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.xz \
-           ;; \
-       *) \
-           echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
-           ;; \
-     esac \
-  && mkdir -p node \
-  && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
-  && chmod ug+rwX -R $NODE_PATH \
-  && npm i -g -f @elastic/synthetics && chmod ug+rwX -R $NODE_PATH
+    && NODE_DOWNLOAD_URL="" \
+    && case "$(arch)" in \
+        x86_64) \
+            NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
+            ;; \
+        aarch64) \
+            NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.xz \
+            ;; \
+        *) \
+            echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+            ;; \
+        esac \
+    && mkdir -p node \
+    && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
+    && chmod ug+rwX -R $NODE_PATH
+
+# Install synthetics as a regular user, installing npm deps as root odesn't work
+RUN chown -R {{ .user }} $NODE_PATH
+USER {{ .user }}
+# If this fails dump the NPM logs
+RUN npm i -g --loglevel verbose -f @elastic/synthetics || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
+RUN chmod ug+rwX -R $NODE_PATH 
+USER root
+
+# Install the deps as needed by the exact version of playwright elastic synthetics uses
+# We don't use npx playwright install-deps because that could pull a newer version
+# Install additional fonts as well
+RUN for iter in {1..10}; do \
+    apt-get update -y && \
+    $NODE_PATH/node/lib/node_modules/@elastic/synthetics/node_modules/.bin/playwright install-deps chromium && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes \
+    fonts-noto \
+    fonts-noto-cjk && \
+    exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
+done; \
+(exit $exit_code)
 {{- end }}
+{{- end }}
+USER {{ .user }}
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}

@@ -65,7 +65,7 @@ func (h *fileHandler) open() error {
 func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 	data, ci, err := h.pcapHandle.ReadPacketData()
 	if err != nil {
-		if err != io.EOF {
+		if err != io.EOF { //nolint:errorlint // io.EOF should never be wrapped.
 			return data, ci, err
 		}
 
@@ -79,7 +79,7 @@ func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 
 		logp.Debug("sniffer", "Reopening the file")
 		if err = h.open(); err != nil {
-			return nil, ci, fmt.Errorf("Error reopening file: %s", err)
+			return nil, ci, fmt.Errorf("failed to reopen file: %w", err)
 		}
 
 		data, ci, err = h.pcapHandle.ReadPacketData()

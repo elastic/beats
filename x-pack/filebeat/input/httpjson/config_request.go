@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/natefinch/lumberjack.v2"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -49,8 +51,10 @@ func (c retryConfig) getWaitMin() time.Duration {
 }
 
 func (c retryConfig) getWaitMax() time.Duration {
-	if c.WaitMax == nil {
+	if c.WaitMax == nil && c.WaitMin == nil {
 		return 0
+	} else if c.WaitMax == nil && c.WaitMin != nil {
+		return *c.WaitMin
 	}
 	return *c.WaitMax
 }
@@ -98,6 +102,8 @@ type requestConfig struct {
 	Transforms             transformsConfig `config:"transforms"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+
+	Tracer *lumberjack.Logger `config:"tracer"`
 }
 
 func (c *requestConfig) Validate() error {
@@ -119,6 +125,18 @@ func (c *requestConfig) Validate() error {
 	if c.EncodeAs != "" {
 		if _, found := registeredEncoders[c.EncodeAs]; !found {
 			return fmt.Errorf("encoder not found for contentType: %v", c.EncodeAs)
+		}
+	}
+
+	if c.Tracer != nil {
+		if c.Tracer.Filename == "" {
+			return errors.New("request tracer must have a filename if used")
+		}
+		if c.Tracer.MaxSize == 0 {
+			// By default Lumberjack caps file sizes at 100MB which
+			// is excessive for a debugging logger, so default to 1MB
+			// which is the minimum.
+			c.Tracer.MaxSize = 1
 		}
 	}
 

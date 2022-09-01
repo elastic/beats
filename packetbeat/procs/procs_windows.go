@@ -21,9 +21,9 @@
 package procs
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
+	"math/bits"
 	"net"
 	"syscall"
 	"unsafe"
@@ -33,43 +33,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/go-sysinfo/types"
 )
-
-var machineEndiannes = getMachineEndiannes()
-
-type extractor interface {
-	// Extract extracts useful information from the pointed-to structure
-	Extract(unsafe.Pointer)
-	// Size of the structure
-	Size() int
-}
-
-type (
-	callbackFn       func(net.IP, uint16, int)
-	extractorFactory func(fn callbackFn) extractor
-)
-
-type (
-	tcpRowOwnerPIDExtractor  callbackFn
-	tcp6RowOwnerPIDExtractor callbackFn
-	udpRowOwnerPIDExtractor  callbackFn
-	udp6RowOwnerPIDExtractor callbackFn
-)
-
-var tablesByTransport = map[applayer.Transport][]struct {
-	family    uint32
-	function  GetExtendedTableFn
-	class     uint32
-	extractor extractorFactory
-}{
-	applayer.TransportTCP: {
-		{windows.AF_INET, _GetExtendedTcpTable, TCP_TABLE_OWNER_PID_ALL, extractTCPRowOwnerPID},
-		{windows.AF_INET6, _GetExtendedTcpTable, TCP_TABLE_OWNER_PID_ALL, extractTCP6RowOwnerPID},
-	},
-	applayer.TransportUDP: {
-		{windows.AF_INET, _GetExtendedUdpTable, UDP_TABLE_OWNER_PID, extractUDPRowOwnerPID},
-		{windows.AF_INET6, _GetExtendedUdpTable, UDP_TABLE_OWNER_PID, extractUDP6RowOwnerPID},
-	},
-}
 
 // procName returns the name for the process.
 func procName(info types.ProcessInfo) string {
@@ -100,6 +63,31 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 		}
 	}
 	return ports, nil
+}
+
+type extractor interface {
+	// Extract extracts useful information from the pointed-to structure
+	Extract(unsafe.Pointer)
+	// Size of the structure
+	Size() int
+}
+
+type callbackFn func(net.IP, uint16, int)
+
+var tablesByTransport = map[applayer.Transport][]struct {
+	family    uint32
+	function  GetExtendedTableFn
+	class     uint32
+	extractor func(fn callbackFn) extractor
+}{
+	applayer.TransportTCP: {
+		{windows.AF_INET, _GetExtendedTcpTable, TCP_TABLE_OWNER_PID_ALL, extractTCPRowOwnerPID},
+		{windows.AF_INET6, _GetExtendedTcpTable, TCP_TABLE_OWNER_PID_ALL, extractTCP6RowOwnerPID},
+	},
+	applayer.TransportUDP: {
+		{windows.AF_INET, _GetExtendedUdpTable, UDP_TABLE_OWNER_PID, extractUDPRowOwnerPID},
+		{windows.AF_INET6, _GetExtendedUdpTable, UDP_TABLE_OWNER_PID, extractUDP6RowOwnerPID},
+	},
 }
 
 func getNetTable(fn GetExtendedTableFn, order bool, family uint32, tableClass uint32) ([]byte, error) {
@@ -135,13 +123,6 @@ func parseTable(data []byte, extractor extractor) error {
 	return nil
 }
 
-// The MIB_TCP_ROW_xxx structures uses a 32-bit field to store ports:
-// The first 16 bits contain the port in big-endian encoding
-// The last 16 bits are unused.
-func uint32FieldToPort(be uint32) uint16 {
-	return binary.BigEndian.Uint16((*[2]byte)(unsafe.Pointer(&be))[:])
-}
-
 func extractTCPRowOwnerPID(fn callbackFn) extractor {
 	return tcpRowOwnerPIDExtractor(fn)
 }
@@ -158,6 +139,8 @@ func extractUDP6RowOwnerPID(fn callbackFn) extractor {
 	return udp6RowOwnerPIDExtractor(fn)
 }
 
+type tcpRowOwnerPIDExtractor callbackFn
+
 // Extract will parse a row of Size() bytes pointed to by ptr
 func (e tcpRowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
 	row := (*TCPRowOwnerPID)(ptr)
@@ -168,6 +151,8 @@ func (e tcpRowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
 func (tcpRowOwnerPIDExtractor) Size() int {
 	return int(unsafe.Sizeof(TCPRowOwnerPID{}))
 }
+
+type tcp6RowOwnerPIDExtractor callbackFn
 
 // Extract will parse a row of Size() bytes pointed to by ptr
 func (e tcp6RowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
@@ -180,6 +165,8 @@ func (tcp6RowOwnerPIDExtractor) Size() int {
 	return int(unsafe.Sizeof(TCP6RowOwnerPID{}))
 }
 
+type udpRowOwnerPIDExtractor callbackFn
+
 // Extract will parse a row of Size() bytes pointed to by ptr
 func (e udpRowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
 	row := (*UDPRowOwnerPID)(ptr)
@@ -190,6 +177,8 @@ func (e udpRowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
 func (udpRowOwnerPIDExtractor) Size() int {
 	return int(unsafe.Sizeof(UDPRowOwnerPID{}))
 }
+
+type udp6RowOwnerPIDExtractor callbackFn
 
 // Extract will parse a row of Size() bytes pointed to by ptr
 func (e udp6RowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
@@ -202,21 +191,18 @@ func (udp6RowOwnerPIDExtractor) Size() int {
 	return int(unsafe.Sizeof(UDP6RowOwnerPID{}))
 }
 
-func addressIPv4(value uint32) net.IP {
-	address := make([]byte, 4)
-	machineEndiannes.PutUint32(address, value)
-	return net.IP(address)
-}
-
 func addressIPv6(s [16]byte) net.IP {
-	return net.IP(s[:])
+	return s[:]
 }
 
-func getMachineEndiannes() binary.ByteOrder {
-	var buf [2]byte
-	*(*uint16)(unsafe.Pointer(&buf[0])) = 1
-	if buf[0] == 1 {
-		return binary.LittleEndian
-	}
-	return binary.BigEndian
+func addressIPv4(value uint32) net.IP {
+	return net.IP((*[4]byte)(unsafe.Pointer(&value))[:])
+}
+
+// The MIB_(TCP|UDP)_ROW_xxx structures use a 32-bit field to store ports:
+// The first 16 bits contain the port in big-endian encoding
+// The last 16 bits are unused.
+// See links on the corresponding types in syscall_windows.go.
+func uint32FieldToPort(be uint32) uint16 {
+	return bits.ReverseBytes16(uint16(be))
 }

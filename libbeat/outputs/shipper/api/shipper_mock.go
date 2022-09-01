@@ -19,28 +19,42 @@ package api
 
 import (
 	context "context"
+	"errors"
+	"time"
+
+	pb "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
+
+	"github.com/gofrs/uuid"
 )
 
 func NewProducerMock(cap int) *ProducerMock {
+	id, _ := uuid.NewV4()
 	return &ProducerMock{
-		Q: make([]*Event, 0, cap),
+		uuid: id.String(),
+		Q:    make([]*messages.Event, 0, cap),
 	}
 }
 
 type ProducerMock struct {
-	UnimplementedProducerServer
-	Q     []*Event
-	Error error
+	pb.UnimplementedProducerServer
+	Q              []*messages.Event
+	uuid           string
+	AcceptedCount  uint32
+	persistedIndex uint64
+	Error          error
 }
 
-func (p *ProducerMock) PublishEvents(ctx context.Context, r *PublishRequest) (*PublishReply, error) {
+func (p *ProducerMock) PublishEvents(ctx context.Context, r *messages.PublishRequest) (*messages.PublishReply, error) {
 	if p.Error != nil {
 		return nil, p.Error
 	}
 
-	resp := &PublishReply{
-		Results: make([]*EventResult, 0, len(r.Events)),
+	if r.Uuid != p.uuid {
+		return nil, errors.New("UUID does not match")
 	}
+
+	resp := &messages.PublishReply{}
 
 	for _, e := range r.Events {
 		if len(p.Q) == cap(p.Q) {
@@ -48,13 +62,45 @@ func (p *ProducerMock) PublishEvents(ctx context.Context, r *PublishRequest) (*P
 		}
 
 		p.Q = append(p.Q, e)
-
-		resp.Results = append(resp.Results, &EventResult{
-			Timestamp: e.GetTimestamp(),
-			QueueId:   "queue",
-			EventId:   e.GetEventId(),
-		})
+		resp.AcceptedCount++
+		if resp.AcceptedCount == p.AcceptedCount {
+			break
+		}
 	}
 
+	resp.AcceptedIndex = uint64(len(p.Q))
+
 	return resp, nil
+}
+
+func (p *ProducerMock) Persist(count uint64) {
+	p.persistedIndex = count
+}
+
+func (p *ProducerMock) PersistedIndex(req *messages.PersistedIndexRequest, producer pb.Producer_PersistedIndexServer) error {
+	err := producer.Send(&messages.PersistedIndexReply{
+		Uuid:           p.uuid,
+		PersistedIndex: p.persistedIndex,
+	})
+	if err != nil {
+		return err
+	}
+
+	if !req.PollingInterval.IsValid() || req.PollingInterval.AsDuration() == 0 {
+		return nil
+	}
+
+	ticker := time.NewTicker(req.PollingInterval.AsDuration())
+	defer ticker.Stop()
+
+	for range ticker.C {
+		err = producer.Send(&messages.PersistedIndexReply{
+			Uuid:           p.uuid,
+			PersistedIndex: p.persistedIndex,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

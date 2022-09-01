@@ -62,14 +62,14 @@
           type: long
           description: >
             Number of requests as client
-        - name: request.duration.sec.bucket.*
+        - name: request.duration.us.bucket.*
           type: object
           object_type: long
           description: Response latency distribution, histogram buckets
-        - name: request.duration.sec.sum
+        - name: request.duration.us.sum
           type: long
-          description: Request duration, sum in seconds
-        - name: request.duration.sec.count
+          description: Request duration, sum in microseconds
+        - name: request.duration.us.count
           type: long
           description: Request duration, number of operations
     - name: workqueue
@@ -90,16 +90,6 @@
         - name: retries.count
           type: long
           description: Workqueue number of retries
-        - name: work.duration.sec.sum
-          type: long
-          description: Processing time of workqueue item, sum in seconds
-        - name: work.duration.sec.count
-          type: long
-          description: Processing time of workqueue item, number of operations
-        - name: work.duration.sec.bucket.*
-          type: object
-          object_type: long
-          description: Processing time of workqueue item, histogram buckets
     - name: node.collector
       type: group
       fields:

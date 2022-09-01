@@ -10,6 +10,7 @@
 *beat/build
 *beat/logs
 *beat/data
+**/ironbank/build/
 x-pack/functionbeat/pkg
 
 # Files
@@ -19,7 +20,6 @@ x-pack/functionbeat/pkg
 *.generated.yml
 coverage.out
 docker.env
-.python-version
 beat.db
 *.keystore
 go_env.properties
