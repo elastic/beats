@@ -3,7 +3,7 @@ beat defines the basic testing infrastructure used by individual python unit/int
 """
 
 import subprocess
-
+import random
 import unittest
 import os
 import shutil
@@ -396,7 +396,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # create working dir
         self.working_dir = os.path.abspath(os.path.join(
-            self.build_path + "run", self.id()))
+            self.build_path, "run", self.id() + str(random.randrange(1000))))
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
@@ -411,12 +411,24 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # update the last_run link
             if os.path.islink(self.build_path + "last_run"):
                 os.unlink(self.build_path + "last_run")
-            os.symlink(self.build_path + f"run/{self.id()}",
+            os.symlink(self.working_dir,
                        self.build_path + "last_run")
         except BaseException:
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
+
+        # Keep last 5 runs
+        candidates = []
+        to_keep = 5
+        for dir_entry in os.listdir(os.path.join(self.build_path, "run")):
+            if re.search(self.id() + r"[0-9]+$", dir_entry):
+                candidates.append(dir_entry)
+        if len(candidates) > to_keep:
+            candidates.sort(reverse=True, key=lambda dirname: os.path.getmtime(
+                os.path.join(self.build_path, "run", dirname)))
+            for d in candidates[to_keep:]:
+                shutil.rmtree(os.path.join(self.build_path, "run", d))
 
     def wait_until(self, cond, max_timeout=20, poll_interval=0.1, name="cond", err_msg=""):
         """

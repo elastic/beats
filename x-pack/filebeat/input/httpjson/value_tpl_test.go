@@ -189,7 +189,24 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "2020-11-05 13:25:32 +0000 UTC",
 		},
 		{
-			name:  "func getRFC5988Link",
+			name:  "func getRFC5988Link single rel matches",
+			value: `[[ getRFC5988Link "next" .last_response.header.Link ]]`,
+			paramCtx: &transformContext{
+				firstEvent: &mapstr.M{},
+				lastEvent:  &mapstr.M{},
+				lastResponse: newTestResponse(
+					nil,
+					http.Header{"Link": []string{
+						`<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>; title="Page 3"; rel="next"`,
+					}},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: "https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK",
+		},
+		{
+			name:  "func getRFC5988Link multiple rel as separate strings matches",
 			value: `[[ getRFC5988Link "previous" .last_response.header.Link ]]`,
 			paramCtx: &transformContext{
 				firstEvent: &mapstr.M{},
@@ -205,6 +222,60 @@ func TestValueTpl(t *testing.T) {
 			},
 			paramTr:     transformable{},
 			expectedVal: "https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK",
+		},
+		{
+			name:  "func getRFC5988Link multiple rel as separate strings in random order matches",
+			value: `[[ getRFC5988Link "previous" .last_response.header.Link ]]`,
+			paramCtx: &transformContext{
+				firstEvent: &mapstr.M{},
+				lastEvent:  &mapstr.M{},
+				lastResponse: newTestResponse(
+					nil,
+					http.Header{"Link": []string{
+						`<https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK>; title="Page 1"; rel="previous"`,
+						`<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>; title="Page 3"; rel="next"`,
+					}},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: "https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK",
+		},
+		{
+			name:  "func getRFC5988Link multiple rel as single string matches",
+			value: `[[ getRFC5988Link "previous" .last_response.header.Link ]]`,
+			paramCtx: &transformContext{
+				firstEvent: &mapstr.M{},
+				lastEvent:  &mapstr.M{},
+				lastResponse: newTestResponse(
+					nil,
+					http.Header{"Link": []string{
+						`<https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK>; title="Page 1"; rel="previous",
+						<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>; title="Page 3"; rel="next"`,
+					}},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: "https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK",
+		},
+		{
+			name:  "func getRFC5988Link multiple rel as single string in random order matches",
+			value: `[[ getRFC5988Link "next" .last_response.header.Link ]]`,
+			paramCtx: &transformContext{
+				firstEvent: &mapstr.M{},
+				lastEvent:  &mapstr.M{},
+				lastResponse: newTestResponse(
+					nil,
+					http.Header{"Link": []string{
+						`<https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK>; title="Page 1"; rel="previous",
+						<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>; title="Page 3"; rel="next"`,
+					}},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: "https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK",
 		},
 		{
 			name:  "func getRFC5988Link does not match",
@@ -573,6 +644,17 @@ func TestValueTpl(t *testing.T) {
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
 			expectedVal: "my value",
+		},
+		{
+			name:  "func toJSON",
+			value: "[[ toJSON .first_event.events ]]",
+			paramCtx: &transformContext{
+				firstEvent:   &mapstr.M{"events": []interface{}{map[string]interface{}{"id": 1234}}},
+				lastEvent:    &mapstr.M{},
+				lastResponse: newTestResponse(nil, nil, ""),
+			},
+			paramTr:     transformable{},
+			expectedVal: `[{"id":1234}]`,
 		},
 	}
 
