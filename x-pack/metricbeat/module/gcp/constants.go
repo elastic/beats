@@ -77,7 +77,7 @@ const (
 	LabelMetadata = "metadata"
 )
 
-// AlignersMapToGCP map contains Available perSeriesAligner map
+// AlignersMapToGCP map contains available perSeriesAligner
 // https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies#Aligner
 var AlignersMapToGCP = map[string]monitoringpb.Aggregation_Aligner{
 	"ALIGN_NONE":           monitoringpb.Aggregation_ALIGN_NONE,
