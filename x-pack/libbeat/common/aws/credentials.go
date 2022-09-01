@@ -185,7 +185,7 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 
 		beatsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(
 			func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-				return awssdk.Endpoint{URL: eurl}, nil
+				return awssdk.Endpoint{URL: eurl, SigningRegion: region}, nil
 			})
 	}
 	return beatsConfig
