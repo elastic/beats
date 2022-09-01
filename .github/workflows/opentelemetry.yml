@@ -12,6 +12,7 @@ on:
       - check-packetbeat
       - check-winlogbeat
       - check-x-pack-auditbeat
+      - check-x-pack-dockerlogbeat
       - check-x-pack-filebeat
       - check-x-pack-functionbeat
       - check-x-pack-heartbeat
