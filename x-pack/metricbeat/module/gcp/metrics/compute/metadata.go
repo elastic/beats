@@ -26,11 +26,12 @@ const (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(projectID, zone string, region string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:     projectID,
 		zone:          zone,
 		region:        region,
+		regions:       regions,
 		opt:           opt,
 		instanceCache: common.NewCache(cacheTTL, initialCacheSize),
 		logger:        logp.NewLogger("metrics-compute"),
@@ -57,6 +58,7 @@ type metadataCollector struct {
 	projectID     string
 	zone          string
 	region        string
+	regions       []string
 	opt           []option.ClientOption
 	instanceCache *common.Cache
 	logger        *logp.Logger

@@ -15,12 +15,13 @@ import (
 )
 
 // NewStackdriverCollectorInputData returns a ready to use MetadataCollectorInputData to be sent to Metadata collectors
-func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zone string, region string) *MetadataCollectorInputData {
+func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zone string, region string, regions []string) *MetadataCollectorInputData {
 	return &MetadataCollectorInputData{
 		TimeSeries: ts,
 		ProjectID:  projectID,
 		Zone:       zone,
 		Region:     region,
+		Regions:    regions,
 	}
 }
 
