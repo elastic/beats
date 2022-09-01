@@ -1,1 +1,13 @@
 include::{libbeat-dir}/shared-docker.asciidoc[]
+
+[float]
+==== Required network capabilities
+
+Under Docker, {beatname_uc} runs as a non-root user, but requires some privileged
+network capabilities to operate correctly. Ensure that the +NET_RAW+
+capability is available to the container.
+
+["source","sh",subs="attributes"]
+----
+docker run --cap-add=NET_RAW {dockerimage}
+----
