@@ -21,9 +21,6 @@ stages:
         mage: "mage goIntegTest"
         withNodejs: true
         stage: mandatory
-    ironbank:
-        mage: "mage ironbank"
-        stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -66,9 +63,7 @@ stages:
 #            - "windows-8"
 #        stage: extended_win
     packaging-linux:
-        packaging-linux: |
-          mage package;
-          mage validateIronbank;
+        packaging-linux: "mage package"
         e2e:
             enabled: false
         stage: packaging

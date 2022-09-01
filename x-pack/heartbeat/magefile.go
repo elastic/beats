@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
@@ -59,36 +58,13 @@ func Package() {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
-// ValidateIronbank validates the existing dependencies needed
-// for the Ironbank have not changed and if so, then fail the build.
-//
-func ValidateIronbank() error {
-	start := time.Now()
-	defer func() { fmt.Println("validateIronbank ran for", time.Since(start)) }()
-	return Ironbank()
-}
-
 // Ironbank packages the Beat for IronBank distribution.
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
 	start := time.Now()
 	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
-	err := customiseIronbank()
-	if err != nil {
-		return err
-	}
 	return devtools.Ironbank()
-}
-
-func customiseIronbank() error {
-	fmt.Println(">>> customiseIronbank (I'm downloading all the required dependencies...)")
-	makeIronbankPrepare := sh.OutCmd("make", "-C", "ironbank", "generate-custom")
-	if out, err := makeIronbankPrepare(); err != nil {
-		fmt.Println(out)
-		return err
-	}
-	return nil
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
