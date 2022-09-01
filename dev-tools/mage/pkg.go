@@ -18,9 +18,7 @@
 package mage
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -194,30 +192,6 @@ func prepareIronbankBuild() error {
 		}
 	}
 
-	// heartbeat produces some extra files so it's required to be appended
-	if BeatName == "heartbeat" {
-		customisedManifest := filepath.Join("ironbank", "build", "hardening_manifest.yml.add")
-		sourceManifest := filepath.Join(buildDir, "hardening_manifest.yaml")
-		newManifest := filepath.Join("build", "hardening_manifest.yaml.new")
-		if _, err := os.Stat(customisedManifest); !os.IsNotExist(err) {
-			files := []string{sourceManifest, customisedManifest}
-			var buf bytes.Buffer
-			for _, file := range files {
-				b, err := ioutil.ReadFile(file)
-				if err != nil {
-					return fmt.Errorf("cannot merge the hardening_manifest files for the IronBank: %w", err)
-				}
-				buf.Write(b)
-			}
-			err := ioutil.WriteFile(newManifest, buf.Bytes(), 0644)
-			if err != nil {
-				return fmt.Errorf("cannot merge the hardening_manifest files for the IronBank: %w", err)
-			}
-			if err := Copy(newManifest, sourceManifest); err != nil {
-				return fmt.Errorf("cannot create files for the IronBank: %w", err)
-			}
-		}
-	}
 	return nil
 }
 
