@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// Source , it is the cursor source
+// Source, it is the cursor source
 type Source struct {
 	BucketName    string
 	BucketTimeOut time.Duration

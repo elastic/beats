@@ -21,8 +21,7 @@ type State struct {
 }
 
 // Gcs sdks do not return results based on timestamps , but only based on lexicographic order
-// This forces us to maintain 2 different vars in addition to the page marker to calculate the
-// exact checkpoint based on various scenarios
+// This forces us to maintain 2 different variables to calculate the exact checkpoint based on various scenarios
 type Checkpoint struct {
 	// name of the latest blob in alphabetical order
 	ObjectName string
@@ -36,7 +35,7 @@ func NewState() *State {
 	}
 }
 
-// Save , saves/updates the current state for cursor checkpoint
+// Save, saves/updates the current state for cursor checkpoint
 func (s *State) Save(name string, lastModifiedOn *time.Time) {
 	s.mu.Lock()
 	if len(s.cp.ObjectName) == 0 {
@@ -53,12 +52,12 @@ func (s *State) Save(name string, lastModifiedOn *time.Time) {
 	s.mu.Unlock()
 }
 
-// SetCheckpoint , sets checkpoint from source to current state instance
+// SetCheckpoint, sets checkpoint from source to current state instance
 func (s *State) SetCheckpoint(chkpt *Checkpoint) {
 	s.cp = chkpt
 }
 
-// Checkpoint , returns the current state checkpoint
+// Checkpoint, returns the current state checkpoint
 func (s *State) Checkpoint() *Checkpoint {
 	return s.cp
 }
