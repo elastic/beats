@@ -66,15 +66,11 @@ func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *
 func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo) ([]map[string]interface{}, error) {
 	inputs := make([]map[string]interface{}, len(raw.Streams))
 
-	for iter := range raw.Streams {
-		streamSource := raw.Streams[iter].Source.AsMap()
-		// All the processors care about the Datastream field, so set it as non-nil in one place
-		if raw.Streams[iter].DataStream == nil {
-			raw.Streams[iter].DataStream = &proto.DataStream{}
-		}
+	for iter, stream := range raw.GetStreams() {
+		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
 
-		streamSource = injectIndexStream(raw, inputType, iter, streamSource)
-		streamSource, err := injectStreamProcessors(raw, inputType, iter, streamSource)
+		streamSource = injectIndexStream(raw, inputType, stream, streamSource)
+		streamSource, err := injectStreamProcessors(raw, inputType, stream, streamSource)
 		if err != nil {
 			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
 		}
@@ -134,20 +130,20 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 }
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
-func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, streamIter int, stream map[string]interface{}) map[string]interface{} {
-	streamType := expected.DataStream.Type
+func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, streamExpected *proto.Stream, stream map[string]interface{}) map[string]interface{} {
+	streamType := expected.GetDataStream().GetType()
 	if streamType == "" {
 		streamType = inputType
 	}
 
 	dataset := DefaultDatasetName
-	if expected.Streams[streamIter].DataStream.Dataset != "" {
-		dataset = expected.Streams[streamIter].DataStream.Dataset
+	if testDataset := streamExpected.GetDataStream().GetDataset(); testDataset != "" {
+		dataset = testDataset
 	}
 
 	namespace := DefaultNamespaceName
-	if expected.DataStream.Namespace != "" {
-		namespace = expected.DataStream.Namespace
+	if testNamespace := expected.GetDataStream().GetNamespace(); testNamespace != "" {
+		namespace = testNamespace
 	}
 
 	index := fmt.Sprintf("%s-%s-%s", streamType, dataset, namespace)
@@ -156,17 +152,17 @@ func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, str
 }
 
 //injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
-func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string, streamIter int, stream map[string]interface{}) (map[string]interface{}, error) {
+func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string, streamExpected *proto.Stream, stream map[string]interface{}) (map[string]interface{}, error) {
 	//1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
 	procInputType := inputType
-	if expected.DataStream.Type != "" {
-		procInputType = expected.DataStream.Type
+	if testInputType := expected.GetDataStream().GetType(); testInputType != "" {
+		procInputType = testInputType
 	}
 
 	procInputNamespace := DefaultNamespaceName
-	if expected.DataStream.Namespace != "" {
-		procInputNamespace = expected.DataStream.Namespace
+	if testInputNamespace := expected.GetDataStream().GetNamespace(); testInputNamespace != "" {
+		procInputNamespace = testInputNamespace
 	}
 
 	var processors = []interface{}{}
@@ -174,14 +170,14 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string
 	// the AST injects input_id at the input level and not the stream level,
 	// for reasons I can't understand, as it just ends up shuffling it around
 	// to individual metricsets anyway, at least on metricbeat
-	if expected.Id != "" {
+	if expected.GetId() != "" {
 		inputId := generateAddFieldsProcessor(mapstr.M{"input_id": expected.Id}, "@metadata")
 		processors = append(processors, inputId)
 	}
 
 	procInputDataset := DefaultDatasetName
-	if expected.Streams[streamIter].DataStream.Dataset != "" {
-		procInputDataset = expected.Streams[streamIter].DataStream.Dataset
+	if testStreamDataset := streamExpected.GetDataStream().GetDataset(); testStreamDataset != "" {
+		procInputDataset = testStreamDataset
 	}
 
 	//2. Actually add the processors
@@ -195,7 +191,7 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string
 	processors = append(processors, event)
 
 	// source stream
-	streamID := expected.Streams[streamIter].Id
+	streamID := streamExpected.GetId()
 	sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
 	processors = append(processors, sourceStream)
 
@@ -233,16 +229,16 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 // This is a replacement for the AST code that lived in V1
 func generateBeatConfig(unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	// We aren't guaranteed a DataStream field from the config
-	if unitRaw.DataStream == nil {
+	if unitRaw.GetDataStream() == nil {
 		unitRaw.DataStream = &proto.DataStream{
 			Namespace: DefaultNamespaceName,
 			Dataset:   DefaultDatasetName,
 		}
 	} else {
-		if unitRaw.DataStream.Namespace == "" {
+		if unitRaw.GetDataStream().GetNamespace() == "" {
 			unitRaw.DataStream.Namespace = DefaultNamespaceName
 		}
-		if unitRaw.DataStream.Dataset == "" {
+		if unitRaw.GetDataStream().GetDataset() == "" {
 			unitRaw.DataStream.Dataset = DefaultDatasetName
 		}
 	}

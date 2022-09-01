@@ -40,7 +40,6 @@ func TestBareConfig(t *testing.T) {
 	err = reloadCfg[0].Config.Unpack(&cfgMap)
 	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
 
-	t.Logf("Config: %s", cfgMap.StringToPrint())
 	// Actual checks
 	processorFields := map[string]interface{}{
 		"add_fields.fields.stream_id": "system/metrics-system.filesystem-default-system",
