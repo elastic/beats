@@ -109,7 +109,7 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 
 func getEndpointResolverWithOptionsFunc(e string) awssdk.EndpointResolverWithOptionsFunc {
 	return func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-		return awssdk.Endpoint{URL: e}, nil
+		return awssdk.Endpoint{URL: e, SigningRegion: region}, nil
 	}
 }
 
