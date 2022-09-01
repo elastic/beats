@@ -156,8 +156,8 @@ func (gcsij *GcsInputJob) createEventFields(message string, data []mapstr.M) map
 			},
 		},
 		"gcs": mapstr.M{
-			"object": mapstr.M{
-				"container": mapstr.M{
+			"storage": mapstr.M{
+				"bucket": mapstr.M{
 					"name": gcsij.src.BucketName,
 				},
 				"object": mapstr.M{
