@@ -79,6 +79,7 @@ var (
 	tagKey3   = "Organization"
 	tagValue3 = "Engineering"
 	tagValue4 = "Product"
+	tagValue5 = "ElastiCache Redis"
 )
 
 func TestCheckTagFiltersExist(t *testing.T) {
@@ -176,14 +177,62 @@ func TestCheckTagFiltersExist(t *testing.T) {
 					Value: []string{"Product", "Engineering"},
 				},
 			},
-			[]resourcegroupstaggingapitypes.Tag{
+			[][]resourcegroupstaggingapitypes.Tag{
 				{
-					Key:   awssdk.String(tagKey3),
-					Value: awssdk.String(tagValue3),
+					{
+						Key:   awssdk.String(tagKey1),
+						Value: awssdk.String(tagValue1),
+					},
+					{
+						Key:   awssdk.String(tagKey3),
+						Value: awssdk.String(tagValue3),
+					},
 				},
 				{
-					Key:   awssdk.String(tagKey3),
-					Value: awssdk.String(tagValue4),
+					{
+						Key:   awssdk.String(tagKey2),
+						Value: awssdk.String(tagValue2),
+					},
+					{
+						Key:   awssdk.String(tagKey3),
+						Value: awssdk.String(tagValue4),
+					},
+				},
+			},
+			true,
+		},
+		{
+			"a set of tagFilters where every key contains more than one value is included in resourcegroupstaggingapi tags",
+			[]Tag{
+				{
+					Key:   "Name",
+					Value: []string{"ECS Instance", "ElastiCache Redis"},
+				},
+				{
+					Key:   "Organization",
+					Value: []string{"Product", "Engineering"},
+				},
+			},
+			[][]resourcegroupstaggingapitypes.Tag{
+				{
+					{
+						Key:   awssdk.String(tagKey1),
+						Value: awssdk.String(tagValue1),
+					},
+					{
+						Key:   awssdk.String(tagKey3),
+						Value: awssdk.String(tagValue3),
+					},
+				},
+				{
+					{
+						Key:   awssdk.String(tagKey1),
+						Value: awssdk.String(tagValue5),
+					},
+					{
+						Key:   awssdk.String(tagKey3),
+						Value: awssdk.String(tagValue4),
+					},
 				},
 			},
 			true,
@@ -191,8 +240,18 @@ func TestCheckTagFiltersExist(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			exists := CheckTagFiltersExist(c.tagFilters, c.tags)
-			assert.Equal(t, c.expectedExists, exists)
+			switch c.tags.(type) {
+			case [][]resourcegroupstaggingapitypes.Tag:
+				allExist := true
+				for _, tags := range c.tags.([][]resourcegroupstaggingapitypes.Tag) {
+					exists := CheckTagFiltersExist(c.tagFilters, tags)
+					allExist = exists && allExist
+				}
+				assert.Equal(t, c.expectedExists, allExist)
+			default:
+				exists := CheckTagFiltersExist(c.tagFilters, c.tags)
+				assert.Equal(t, c.expectedExists, exists)
+			}
 		})
 	}
 }
