@@ -28,6 +28,19 @@ pipeline {
         deleteDir()
         gitCheckout(basedir: "${BASE_DIR}")
         setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
+        dir("${BASE_DIR}"){
+          setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+        }
+      }
+    }
+    stage('Package'){
+      options { skipDefaultCheckout() }
+      steps {
+        withMageEnv(){
+          dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
+            sh(label: 'make ironbank-package', script: "make -C ironbank package")
+          }
+        }
       }
     }
     stage('Ironbank'){
@@ -35,7 +48,7 @@ pipeline {
       steps {
         withMageEnv(){
           dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
-            sh(label: 'mage ironbank', script: 'mage ironbank')
+            sh(label: 'make ironbank', script: 'make -C ironbank ironbank')
           }
         }
       }
@@ -45,7 +58,7 @@ pipeline {
       steps {
         withMageEnv(){
           dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
-            sh(label: 'mage validate-ironbank', script: 'mage validate-ironbank')
+            sh(label: 'make validate-ironbank', script: "make -C ironbank validate-ironbank")
           }
         }
       }
