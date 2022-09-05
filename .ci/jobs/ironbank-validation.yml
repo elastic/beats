@@ -1,6 +1,6 @@
 ---
 - job:
-    name: Beats/ironbank-validation
+    name: Beats/ironbank-validation-mbp
     display-name: Ironbank validation
     description: Validates the Ironbank docker context
     view: Beats
