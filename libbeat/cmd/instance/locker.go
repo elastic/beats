@@ -18,6 +18,7 @@
 package instance
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gofrs/flock"
@@ -54,7 +55,7 @@ func (l *locker) lock() error {
 	}
 
 	if !isLocked {
-		return ErrAlreadyLocked
+		return fmt.Errorf("data path %s: %w", l.fl.Path(), ErrAlreadyLocked)
 	}
 
 	return nil
