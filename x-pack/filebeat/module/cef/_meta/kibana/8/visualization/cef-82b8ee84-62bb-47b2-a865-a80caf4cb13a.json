@@ -1,0 +1,120 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Devices by Bandwidth [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Device",
+                        "field": "observer.hostname",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Source(s)",
+                        "field": "source.ip"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "5",
+                    "params": {
+                        "customLabel": "Destination(s)",
+                        "field": "destination.ip"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "6",
+                    "params": {
+                        "customLabel": "Destination Ports",
+                        "field": "destination.port"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Bandwidth (Incoming)",
+                        "field": "source.bytes"
+                    },
+                    "schema": "metric",
+                    "type": "sum"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Bandwidth (Outgoing)",
+                        "field": "destination.bytes"
+                    },
+                    "schema": "metric",
+                    "type": "sum"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "perPage": 10,
+                "showMeticsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Top 10 Devices by Bandwidth [Filebeat CEF]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-82b8ee84-62bb-47b2-a865-a80caf4cb13a",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-d687d631-96df-4c49-99ee-9e51c7053084",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0MTgsMV0="
+}

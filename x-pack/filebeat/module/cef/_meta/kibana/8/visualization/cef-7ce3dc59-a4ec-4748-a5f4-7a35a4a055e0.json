@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "query_string": {
+                        "query": "*"
+                    }
+                }
+            }
+        },
+        "title": " Dashboard Navigation — ArcSight [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "markdown": "[Network Overview](#/dashboard/cef-346ac50b-0900-464d-aad6-007756a4e215) | [Network Suspicious Activity](#/dashboard/cef-6d77b0a1-7b83-4c32-bbc5-cb1f6a4ee634) | [Endpoint Overview](#dashboard/cef-1ef1282f-382b-4bdd-9cb1-810b8f083e74) | [Endpoint OS Activity](#/dashboard/cef-110da36b-6544-4507-9ae5-591d44bd2333) | [Microsoft DNS Overview](#/dashboard/cef-b16c980c-21ad-47ca-8103-7ce949ddc87a)"
+            },
+            "title": " Dashboard Navigation — ArcSight [Filebeat CEF]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-7ce3dc59-a4ec-4748-a5f4-7a35a4a055e0",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0MTYsMV0="
+}

@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package source
 
 import (
@@ -60,7 +63,7 @@ func (z *ZipURLSource) Fetch() error {
 		os.RemoveAll(z.TargetDirectory)
 	}
 
-	tf, err := ioutil.TempFile("/tmp", "elastic-synthetics-zip-")
+	tf, err := ioutil.TempFile(os.TempDir(), "elastic-synthetics-zip-")
 	if err != nil {
 		return fmt.Errorf("could not create tmpfile for zip source: %w", err)
 	}
@@ -79,7 +82,7 @@ func (z *ZipURLSource) Fetch() error {
 			return fmt.Errorf("could not make directory %s: %w", z.TargetDirectory, err)
 		}
 	} else {
-		z.TargetDirectory, err = ioutil.TempDir("/tmp", "elastic-synthetics-unzip-")
+		z.TargetDirectory, err = ioutil.TempDir(os.TempDir(), "elastic-synthetics-unzip-")
 		if err != nil {
 			return fmt.Errorf("could not make temp dir for zip download: %w", err)
 		}

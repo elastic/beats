@@ -124,7 +124,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startDate, endDate := getStartDateEndDate(m.Period)
 
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
 
 	// get cost metrics from cost explorer
 	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
@@ -444,8 +444,8 @@ func (m *MetricSet) getAccountName(svc *organizations.Client) map[string]string 
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.Background())
 		if err != nil {
-			//TODO continue or return with error? Probably is return but...
-			continue
+			m.Logger().Warnf("an error occurred while listing account: %s", err.Error())
+			return accounts
 		}
 		for _, a := range page.Accounts {
 			accounts[*a.Id] = *a.Name

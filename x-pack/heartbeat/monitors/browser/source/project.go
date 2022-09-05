@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package source
 
@@ -41,7 +43,7 @@ func (p *ProjectSource) Fetch() error {
 		return err
 	}
 
-	tf, err := ioutil.TempFile("/tmp", "elastic-synthetics-zip-")
+	tf, err := ioutil.TempFile(os.TempDir(), "elastic-synthetics-zip-")
 	if err != nil {
 		return fmt.Errorf("could not create tmpfile for project monitor source: %w", err)
 	}
@@ -53,7 +55,7 @@ func (p *ProjectSource) Fetch() error {
 		return err
 	}
 
-	p.TargetDirectory, err = ioutil.TempDir("/tmp", "elastic-synthetics-unzip-")
+	p.TargetDirectory, err = ioutil.TempDir(os.TempDir(), "elastic-synthetics-unzip-")
 	if err != nil {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}

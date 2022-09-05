@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package main
 
 import (
@@ -12,6 +15,8 @@ import (
 )
 
 func main() {
+	//Sleep first to test timeout feature async
+	time.Sleep(time.Millisecond * 500)
 	// For sending JSON results
 	pipe := os.NewFile(3, "pipe")
 

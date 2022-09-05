@@ -1,0 +1,11 @@
+FROM alpine:3.15
+
+ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin
+
+WORKDIR /usr/share/metricbeat
+
+COPY build/metricbeat /usr/share/metricbeat/metricbeat
+
+ENTRYPOINT ["./metricbeat"]
+
+CMD [ "-e" ]

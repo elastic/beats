@@ -74,6 +74,7 @@ ifeval::["{beatname_lc}"=="heartbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run \
+--cap-add=NET_RAW \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
 -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
@@ -206,6 +207,7 @@ docker run -d \
   --name={beatname_lc} \
   --user={beatname_lc} \
   --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  --cap-add=NET_RAW \
   {dockerimage} \
   --strict.perms=false -e \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>

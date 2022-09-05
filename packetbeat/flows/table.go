@@ -44,6 +44,8 @@ type flowMetaTable struct {
 // Shared flow table.
 type flowTable struct {
 	mutex sync.Mutex
+
+	// table maps from flowID to biFlow.
 	table map[string]*biFlow
 
 	// linked list used to delete flows while iterating

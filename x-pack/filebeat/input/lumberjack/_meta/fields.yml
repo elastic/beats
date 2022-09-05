@@ -1,0 +1,9 @@
+- key: lumberjack
+  title: "Lumberjack"
+  description: >
+    Fields from Lumberjack input.
+  fields:
+    - name: lumberjack
+      type: flattened
+      description: >
+        Structured data received in an event sent over the Lumberjack protocol.
