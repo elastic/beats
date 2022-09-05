@@ -95,7 +95,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// add ECS orchestrator fields
 	config, err := util.GetValidatedConfig(base)
 	if err != nil {
-		logp.Info("Kubernetes metricset enriching is disabled")
+		logp.Info("could not retrieve validated config")
 	} else {
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {

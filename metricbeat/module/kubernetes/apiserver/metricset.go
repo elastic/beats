@@ -30,22 +30,21 @@ import (
 )
 
 // Metricset for apiserver is a prometheus based metricset
-type metricset struct {
+type Metricset struct {
 	mb.BaseMetricSet
 	prometheusClient   prometheus.Prometheus
 	prometheusMappings *prometheus.MetricsMapping
 	clusterMeta        mapstr.M
 }
 
-var _ mb.ReportingMetricSetV2Error = (*metricset)(nil)
+var _ mb.ReportingMetricSetV2Error = (*Metricset)(nil)
 
-// getMetricsetFactory as required by` mb.Registry.MustAddMetricSet`
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	pc, err := prometheus.NewPrometheusClient(base)
 	if err != nil {
 		return nil, err
 	}
-	ms := &metricset{
+	ms := &Metricset{
 		BaseMetricSet:      base,
 		prometheusClient:   pc,
 		prometheusMappings: mapping,
@@ -71,7 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch gathers information from the apiserver and reports events with this information.
-func (m *metricset) Fetch(reporter mb.ReporterV2) error {
+func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
 	if err != nil {
 		return fmt.Errorf("error getting metrics: %w", err)
