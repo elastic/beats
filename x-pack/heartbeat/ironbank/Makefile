@@ -3,11 +3,18 @@ LOCATION := ../build/heartbeat-ironbank-$(BEAT_VERSION)-docker-build-context
 
 YQ_VERSION ?= v4.13.2
 YQ ?= "../build/yq"
+## Support for 64 bits (arm and amd/intel)
+ARCH = $(shell uname -m)
+ifeq ($(ARCH),x86_64)
+	YQ_ARCH ?= amd64
+else
+	YQ_ARCH ?= arm64
+endif
 OS = $(shell uname)
 ifeq ($(OS),Darwin)
-	YQ_BINARY ?= yq_darwin_amd64
+	YQ_BINARY ?= yq_darwin_$(YQ_ARCH)
 else
-	YQ_BINARY ?= yq_linux_amd64
+	YQ_BINARY ?= yq_linux_$(YQ_ARCH)
 endif
 
 ## @help:setup-yq: Install yq in ../build/yq.
