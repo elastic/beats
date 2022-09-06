@@ -113,35 +113,6 @@ ignored.
 
 * `metrics` metricset is enabled to collect metrics from all zones under
 `europe-west1-c` region in `elastic-observability` project. One set of metrics
-will be collected: metric types that starts with `instance/cpu` under `compute`
-service with aligner ALIGN_NONE. These metric types all have 240 seconds ingest
-delay time and 60 seconds sample period. With `period` specified as `1m` in
-the config below, Metricbeat will collect compute metrics from Google Cloud
-every minute with no aggregation. The metric types in `compute` service with
-`instance/cpu` prefix are: `instance/cpu/reserved_cores`,
-`instance/cpu/scheduler_wait_time`, `instance/cpu/usage_time`, and
-`instance/cpu/utilization`.
-
-+
-[source,yaml]
-----
-- module: gcp
-  metricsets:
-    - metrics
-  zone: "europe-west1-c"
-  project_id: elastic-observability
-  credentials_file_path: "your JSON credentials file path"
-  exclude_labels: false
-  period: 1m
-  metrics:
-    - aligner: ALIGN_NONE
-      service: compute
-      metric_types:
-        - "instance/cpu"
-----
-
-* `metrics` metricset is enabled to collect metrics from all zones under
-`europe-west1-c` region in `elastic-observability` project. One set of metrics
 will be collected: core usage time for containers in GCP GKE.
 Note that the is required to use `service_metric_prefix` to override the default
 metric prefix, as for GKE metrics the required prefix is `kubernetes.io/`
