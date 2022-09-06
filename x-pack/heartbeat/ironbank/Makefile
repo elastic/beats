@@ -1,14 +1,32 @@
 BEAT_VERSION ?= 8.5.0
-
 LOCATION := ../build/heartbeat-ironbank-$(BEAT_VERSION)-docker-build-context
 
+YQ_VERSION ?= v4.13.2
+YQ ?= "../build/yq"
+OS = $(shell uname)
+ifeq ($(OS),Darwin)
+	YQ_BINARY ?= yq_darwin_amd64
+else
+	YQ_BINARY ?= yq_linux_amd64
+endif
+
+## @help:setup-yq: Install yq in ../build/yq.
+.PHONY: setup-yq
+setup-yq:
+	@if [ ! -f "../build/yq" ]; then \
+		echo "Downloading yq - $(YQ_VERSION)/$(YQ_BINARY)" ; \
+		wget https://github.com/mikefarah/yq/releases/download/$(YQ_VERSION)/$(YQ_BINARY) -O $(YQ) ; \
+		chmod +x $(YQ) ; \
+	fi
+
 .PHONY: download-hardening-manifest-artifacts
-download-hardening-manifest-artifacts: ## Parse hardening_manifest.yaml and download each artifact.
-	@for i in $(shell cat $(LOCATION)/hardening_manifest.yaml | grep ' url:' | grep 'https' | cut -d':' -f2-);\
+download-hardening-manifest-artifacts: setup-yq ## Parse hardening_manifest.yaml and download each artifact.
+	@for i in $(shell $(YQ) -M e '.resources[] | select(.url == "https*") | { .filename: .url }' - < $(LOCATION)/hardening_manifest.yaml | sed 's#: #=#g');\
 	do \
-		echo "Downloading $${i}"; \
-		BASENAME=$$(basename "$${i}"); \
-		curl -sSfL -o $(LOCATION)/$${BASENAME} "$${i}"; \
+		BASENAME=$$(echo "$${i}" | cut -d'=' -f1); \
+		URL=$$(echo "$${i}" | cut -d'=' -f2); \
+		echo "Downloading $${URL}"; \
+		curl -sSfL -o $(LOCATION)/$${BASENAME} "$${URL}"; \
 	done
 
 .PHONY: prepare

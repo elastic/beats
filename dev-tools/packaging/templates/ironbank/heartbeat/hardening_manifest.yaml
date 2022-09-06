@@ -527,7 +527,7 @@ resources:
       type: sha256
       value: 89eaf038c41439dcbc543d1783adc0e9f38ddf07c993c08e111d55fe35dadc21
   - filename: elastic-synthetics.tar.gz
-    url: https://storage.googleapis.com/obs-ci-cache/beats/elastic-synthetics-1.0.0-beta.17.tar.gz
+    url: https://storage.googleapis.com/obs-ci-cache/beats/elastic-synthetics-1.0.0-beta.17.tgz
     validation:
       type: sha256
       value: aa890887a1630abf9c73ac2568b1d7a59494bf1ed23d44789c162da92655178c
