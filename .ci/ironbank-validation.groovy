@@ -48,7 +48,7 @@ pipeline {
       steps {
         withMageEnv(){
           dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
-            sh(label: 'make ironbank', script: 'make -C ironbank ironbank')
+            sh(label: 'mage ironbank', script: 'mage ironbank')
           }
         }
       }
