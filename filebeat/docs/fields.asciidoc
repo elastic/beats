@@ -110750,6 +110750,16 @@ type: keyword
 
 --
 
+*`nginx.ingress_controller.http.request.id`*::
++
+--
+A unique identifier for each HTTP request to correlate logs between clients and servers in transactions. The id may be contained in a non-standard HTTP header, such as X-Request-ID or X-Correlation-ID.
+
+
+type: keyword
+
+--
+
 *`nginx.ingress_controller.http.request.length`*::
 +
 --
