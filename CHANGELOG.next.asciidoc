@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 * Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
-* Add lock path when returning ErrAlreadyLocked. {pull}32980[32980]
+* Add lock file path to the error when the data path is already locked. {pull}32980[32980]
 
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix formatting of hardware addresses populated by the add-host-metadata processor. {issue}32264[32264] {pull}32265[32265]
