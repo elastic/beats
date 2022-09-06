@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -101,13 +102,13 @@ func HandleFlags() error {
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		if *homePath == "" {
-			return fmt.Errorf("The absolute path to %s could not be obtained. %v",
+			return fmt.Errorf("The absolute path to %s could not be obtained. %w",
 				os.Args[0], err)
 		}
 		home = *homePath
 	}
 
-	defaults.SetString("path.home", -1, home)
+	_ = defaults.SetString("path.home", -1, home)
 
 	if len(overwrites.GetFields()) > 0 {
 		common.PrintConfigDebugf(overwrites, "CLI setting overwrites (-E flag):")
@@ -133,30 +134,36 @@ func Read(out interface{}, path string) error {
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
+// This function cares about the underlying fleet setting, and if beats is running with
+// the management.enabled flag, Load() will bypass reading a config file, and merely merge any overrides.
 func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 	var c *config.C
 	var err error
 
 	cfgpath := GetPathConfig()
 
-	if path == "" {
-		list := []string{}
-		for _, cfg := range configfiles.List() {
-			if !filepath.IsAbs(cfg) {
-				list = append(list, filepath.Join(cfgpath, cfg))
-			} else {
-				list = append(list, cfg)
+	if !fleetmode.Enabled() {
+		if path == "" {
+			list := []string{}
+			for _, cfg := range configfiles.List() {
+				if !filepath.IsAbs(cfg) {
+					list = append(list, filepath.Join(cfgpath, cfg))
+				} else {
+					list = append(list, cfg)
+				}
 			}
+			c, err = common.LoadFiles(list...)
+		} else {
+			if !filepath.IsAbs(path) {
+				path = filepath.Join(cfgpath, path)
+			}
+			c, err = common.LoadFile(path)
 		}
-		c, err = common.LoadFiles(list...)
+		if err != nil {
+			return nil, err
+		}
 	} else {
-		if !filepath.IsAbs(path) {
-			path = filepath.Join(cfgpath, path)
-		}
-		c, err = common.LoadFile(path)
-	}
-	if err != nil {
-		return nil, err
+		c = config.NewConfig()
 	}
 
 	if beatOverrides != nil {
@@ -183,6 +190,9 @@ func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
 			c,
 			overwrites,
 		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	common.PrintConfigDebugf(c, "Complete configuration loaded:")
@@ -194,13 +204,13 @@ func LoadList(file string) ([]*config.C, error) {
 	logp.Debug("cfgfile", "Load config from file: %s", file)
 	rawConfig, err := common.LoadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("invalid config: %s", err)
+		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
 	var c []*config.C
 	err = rawConfig.Unpack(&c)
 	if err != nil {
-		return nil, fmt.Errorf("error reading configuration from file %s: %s", file, err)
+		return nil, fmt.Errorf("error reading configuration from file %s: %w", file, err)
 	}
 
 	return c, nil

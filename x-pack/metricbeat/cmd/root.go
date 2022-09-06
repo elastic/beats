@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register the includes.
@@ -43,6 +44,7 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 func init() {
+	management.ConfigTransform.SetTransform(metricbeatCfg)
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	settings := instance.Settings{

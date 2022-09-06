@@ -11,17 +11,17 @@ import (
 )
 
 func init() {
-	lbmanagement.Register("x-pack-fleet", NewFleetManagerPlugin, feature.Beta)
+	lbmanagement.Register("x-pack-fleet", NewFleetManagerPluginV2, feature.Beta)
 }
 
-// NewFleetManagerPlugin creates a plugin function returning factory if configuration matches the criteria
-func NewFleetManagerPlugin(config *conf.C) lbmanagement.FactoryFunc {
-	c := defaultConfig()
+// NewFleetManagerPluginV2 registers the V2 callback
+func NewFleetManagerPluginV2(config *conf.C) lbmanagement.FactoryFunc {
+	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil
 		}
-		return NewFleetManager
+		return NewV2AgentManager
 	}
 
 	return nil

@@ -9625,11 +9625,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-a
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-client/v7
-Version: v7.0.0-20210727140539-f0905d9377f6
+Version: v7.0.0-20220804181728-b0328d2fe484
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.0-20210727140539-f0905d9377f6/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.0-20220804181728-b0328d2fe484/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
@@ -21297,11 +21297,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.0.0-20220225172249-27dd8689420f
+Version: v0.0.0-20220425223048-2871e0cb64e4
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20220225172249-27dd8689420f/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20220425223048-2871e0cb64e4/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -21593,11 +21593,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto
-Version: v0.0.0-20220329172620-7be39ac1afc7
+Version: v0.0.0-20220426171045-31bebdecfb46
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20220329172620-7be39ac1afc7/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20220426171045-31bebdecfb46/LICENSE:
 
 
                                  Apache License
@@ -21805,11 +21805,11 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/grpc
-Version: v1.45.0
+Version: v1.46.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.45.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.46.0/LICENSE:
 
 
                                  Apache License
@@ -32500,11 +32500,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/envoyproxy/go-control-plane
-Version: v0.10.1
+Version: v0.10.2-0.20220325020618-49ff273808a1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/envoyproxy/go-control-plane@v0.10.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/envoyproxy/go-control-plane@v0.10.2-0.20220325020618-49ff273808a1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004

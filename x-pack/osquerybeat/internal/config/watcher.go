@@ -65,7 +65,7 @@ func WatchInputs(ctx context.Context, log *logp.Logger) <-chan []InputConfig {
 		log: log,
 		ch:  ch,
 	}
-	reload.Register.MustRegisterList("inputs", r)
+	reload.RegisterV2.MustRegisterInput(r)
 
 	return ch
 }
