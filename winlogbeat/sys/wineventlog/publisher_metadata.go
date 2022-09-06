@@ -21,6 +21,7 @@
 package wineventlog
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 
