@@ -15,7 +15,7 @@ endif
 setup-yq:
 	@if [ ! -f "../build/yq" ]; then \
 		echo "Downloading yq - $(YQ_VERSION)/$(YQ_BINARY)" ; \
-		wget https://github.com/mikefarah/yq/releases/download/$(YQ_VERSION)/$(YQ_BINARY) -O $(YQ) ; \
+		curl -sSfL -o $(YQ) https://github.com/mikefarah/yq/releases/download/$(YQ_VERSION)/$(YQ_BINARY) ; \
 		chmod +x $(YQ) ; \
 	fi
 
