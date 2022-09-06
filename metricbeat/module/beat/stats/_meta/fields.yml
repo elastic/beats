@@ -387,13 +387,13 @@
           type: group
           fields:
             - name: running
-              type: short
+              type: long
             - name: starts
-              type: short
+              type: long
             - name: stops
-              type: short
+              type: long
             - name: reloads
-              type: short
+              type: long
         - name: output
           type: group
           description: >
@@ -466,7 +466,3 @@
                   type: long
                   description: >
                     Number of write errors
-
-
-
-
