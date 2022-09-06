@@ -42,6 +42,11 @@ pipeline {
           }
         }
       }
+      post {
+        failure {
+          notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${BRANCH_NAME}] package for ${env.BEATS_FOLDER}", body: "Contact the heartbeats team. (<${env.RUN_DISPLAY_URL}|Open>)")
+        }
+      }
     }
     stage('Ironbank'){
       options { skipDefaultCheckout() }
@@ -50,6 +55,11 @@ pipeline {
           dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
             sh(label: 'mage ironbank', script: 'mage ironbank')
           }
+        }
+      }
+      post {
+        failure {
+          notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${BRANCH_NAME}] Ironbank docker context for ${env.BEATS_FOLDER}", body: "Contact the obl-robots team. (<${env.RUN_DISPLAY_URL}|Open>)")
         }
       }
     }
@@ -62,12 +72,14 @@ pipeline {
           }
         }
       }
+      post {
+        failure {
+          notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${BRANCH_NAME}] Ironbank validation failed", body: "Contact the obl-robots team. (<${env.RUN_DISPLAY_URL}|Open>)")
+        }
+      }
     }
   }
   post {
-    failure {
-      notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Ironbank validation failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
-    }
     cleanup {
       notifyBuildResult(prComment: true)
     }
