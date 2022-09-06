@@ -195,8 +195,6 @@ require (
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.57
 )
 
-require github.com/elastic/elastic-agent-libs v0.2.11
-
 require (
 	cloud.google.com/go v0.99.0 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
