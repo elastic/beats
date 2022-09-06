@@ -13,7 +13,7 @@ pipeline {
     NOTIFY_TO = 'observability-robots-internal+ironbank-beats-validation@elastic.co'
   }
   options {
-    timeout(time: 31, unit: 'HOURS')
+    timeout(time: 1, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
