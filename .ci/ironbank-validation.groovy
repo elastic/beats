@@ -10,7 +10,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = "INFO"
     BEATS_FOLDER = "x-pack/heartbeat"
     SLACK_CHANNEL = '#beats'
-    NOTIFY_TO = 'ironbank-beats-validation+observability-robots-internal@elastic.co'
+    NOTIFY_TO = 'observability-robots-internal+ironbank-beats-validation@elastic.co'
   }
   options {
     timeout(time: 31, unit: 'HOURS')
@@ -59,7 +59,7 @@ pipeline {
       }
       post {
         failure {
-          notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${BRANCH_NAME}] Ironbank docker context for ${env.BEATS_FOLDER}", body: "Contact the obl-robots team. (<${env.RUN_DISPLAY_URL}|Open>)")
+          notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${BRANCH_NAME}] Ironbank docker context for ${env.BEATS_FOLDER}", body: "Contact the @observablt-robots-team team. (<${env.RUN_DISPLAY_URL}|Open>)")
         }
       }
     }
@@ -74,7 +74,7 @@ pipeline {
       }
       post {
         failure {
-          notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${BRANCH_NAME}] Ironbank validation failed", body: "Contact the obl-robots team. (<${env.RUN_DISPLAY_URL}|Open>)")
+          notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${BRANCH_NAME}] Ironbank validation failed", body: "Contact the @observablt-robots-team team. (<${env.RUN_DISPLAY_URL}|Open>)")
         }
       }
     }
