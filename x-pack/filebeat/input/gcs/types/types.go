@@ -20,6 +20,7 @@ type Source struct {
 	MaxWorkers    int
 	Poll          bool
 	PollInterval  time.Duration
+	ParseJSON     bool
 }
 
 func (s *Source) Name() string {

@@ -15,6 +15,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// Pool is a dynamic & configurable worker pool that performs work distribution similar to a job pool.
+// The number of workers a pool can have is configured by the user and based on that number and available free workers,
+// jobs are distributed. The workers if free send a signal to the ready pool saying "I'm free to do some work".
+// They do this by making their job channel available on the ready pool. When a new job is submitted to the job queue & a free worker is
+// available in the ready pool, this job is then sent over the worker channel available in the ready pool.
+// The worker on receiving a new job on it's job channel will now pick it up and execute it. Once the job is complete, the worker is free
+// again and will make itself available on the ready pool.
 type Pool interface {
 	Start()
 	Stop()
@@ -34,7 +41,7 @@ type pool struct {
 	log           *logp.Logger
 }
 
-var poolError string = "worker pool error : %w"
+var poolError = "worker pool error : %w"
 
 // NewWorkerPool returns an instance of a worker pool with 'maxWorkers' ready to accept work
 func NewWorkerPool(ctx context.Context, maxWorkers int, log *logp.Logger) Pool {
@@ -73,7 +80,7 @@ func (q *pool) Start() {
 	go q.dispatch()
 }
 
-// Submit , submits the job to the job queue
+// Submit, submits the job to the job queue
 // This is a blocking if all workers are busy
 func (q *pool) Submit(job job.Job) {
 	q.jobQueue <- job
@@ -84,7 +91,7 @@ func (q *pool) AvailableWorkers() int {
 	return len(q.readyPool)
 }
 
-// Stop , gracefully stops the workers & frees the worker pool
+// Stop, gracefully stops the workers & frees the worker pool
 func (q *pool) Stop() {
 	q.quit <- true
 	q.dispatcherWg.Wait()

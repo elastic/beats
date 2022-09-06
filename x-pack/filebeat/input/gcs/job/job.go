@@ -26,7 +26,7 @@ import (
 type Job interface {
 	Do(ctx context.Context, id string) error
 	Name() string
-	Timestamp() *time.Time
+	Timestamp() time.Time
 	Source() *types.Source
 }
 
@@ -39,7 +39,7 @@ type GcsInputJob struct {
 	publisher cursor.Publisher
 }
 
-// NewGcsInputJob, returns an instance of a job , which is a unit of work that can be assigned to a go routine
+// NewGcsInputJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
 func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI string,
 	state *state.State, src *types.Source, publisher cursor.Publisher,
 ) Job {
@@ -53,11 +53,11 @@ func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, o
 	}
 }
 
-func (gcsij *GcsInputJob) Do(ctx context.Context, id string) error {
+func (j *GcsInputJob) Do(ctx context.Context, id string) (err error) {
 	var fields mapstr.M
 
-	if types.AllowedContentTypes[gcsij.object.ContentType] {
-		data, err := gcsij.extractData(ctx)
+	if types.AllowedContentTypes[j.object.ContentType] {
+		data, err := j.extractData(ctx)
 		if err != nil {
 			return fmt.Errorf("job with jobId %s encountered an error : %w", id, err)
 		}
@@ -70,22 +70,24 @@ func (gcsij *GcsInputJob) Do(ctx context.Context, id string) error {
 			}
 		}()
 
-		var blobData []mapstr.M
-		switch gcsij.object.ContentType {
+		var objectData []mapstr.M
+		switch j.object.ContentType {
 		case types.Json:
-			blobData, _, _, err = httpReadJSON(reader)
-			if err != nil {
-				return err
+			if j.src.ParseJSON {
+				objectData, _, _, err = httpReadJSON(reader)
+				if err != nil {
+					return err
+				}
 			}
 			// Support for more types will be added here, in the future.
 		default:
 			return fmt.Errorf("job with jobId %s encountered an unexpected error", id)
 		}
 
-		fields = gcsij.createEventFields(data.String(), blobData)
+		fields = j.createEventFields(data.String(), objectData)
 
 	} else {
-		err := fmt.Errorf("job with jobId %s encountered an error : content-type %s not supported", id, gcsij.object.ContentType)
+		err := fmt.Errorf("job with jobId %s encountered an error : content-type %s not supported", id, j.object.ContentType)
 		fields = mapstr.M{
 			"message": err.Error(),
 			"event": mapstr.M{
@@ -100,32 +102,32 @@ func (gcsij *GcsInputJob) Do(ctx context.Context, id string) error {
 	}
 	event.SetID(id)
 
-	gcsij.state.Save(gcsij.object.Name, &gcsij.object.Updated)
-	if err := gcsij.publisher.Publish(event, gcsij.state.Checkpoint()); err != nil {
+	j.state.Save(j.object.Name, &j.object.Updated)
+	if err := j.publisher.Publish(event, j.state.Checkpoint()); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (gcsij *GcsInputJob) Name() string {
-	return gcsij.object.Name
+func (j *GcsInputJob) Name() string {
+	return j.object.Name
 }
 
-func (gcsij *GcsInputJob) Source() *types.Source {
-	return gcsij.src
+func (j *GcsInputJob) Source() *types.Source {
+	return j.src
 }
 
-func (gcsij *GcsInputJob) Timestamp() *time.Time {
-	return &gcsij.object.Updated
+func (j *GcsInputJob) Timestamp() time.Time {
+	return j.object.Updated
 }
 
-func (gcsij *GcsInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
+func (j *GcsInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
 	var err error
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, gcsij.src.BucketTimeOut)
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, j.src.BucketTimeOut)
 	defer cancel()
 
-	obj := gcsij.bucket.Object(gcsij.object.Name)
+	obj := j.bucket.Object(j.object.Name)
 	reader, err := obj.NewReader(ctxWithTimeout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read data from object with error : %w", err)
@@ -147,23 +149,23 @@ func (gcsij *GcsInputJob) extractData(ctx context.Context) (*bytes.Buffer, error
 	return data, err
 }
 
-func (gcsij *GcsInputJob) createEventFields(message string, data []mapstr.M) mapstr.M {
+func (j *GcsInputJob) createEventFields(message string, data []mapstr.M) mapstr.M {
 	fields := mapstr.M{
 		"message": message, // original stringified data
 		"log": mapstr.M{
 			"file": mapstr.M{
-				"path": gcsij.objectURI,
+				"path": j.objectURI,
 			},
 		},
 		"gcs": mapstr.M{
 			"storage": mapstr.M{
 				"bucket": mapstr.M{
-					"name": gcsij.src.BucketName,
+					"name": j.src.BucketName,
 				},
 				"object": mapstr.M{
-					"name":         gcsij.object.Name,
-					"content_type": gcsij.object.ContentType,
-					"data":         data, // objectified data
+					"name":         j.object.Name,
+					"content_type": j.object.ContentType,
+					"json_data":    data, // objectified data
 				},
 			},
 		},

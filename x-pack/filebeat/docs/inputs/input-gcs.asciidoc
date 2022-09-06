@@ -41,6 +41,7 @@ filebeat.inputs:
   enabled: true
   project_id: my_project_id
   auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  parse_json: true
   buckets:
   - name: gcs-test-new
     max_workers: 3
@@ -106,7 +107,7 @@ calls to the bucket list api if it exceeds the given value. Each iteration consi
       "object": {
         "name": "data_3.json",
         "content_type": "application/json",
-        "data": [
+        "json_data": [
           {
             "id": 1,
             "discountPercentage": 12.96,
@@ -145,7 +146,7 @@ As we can see from the response above, the `message` field contains the original
     3. *gcs.storage.bucket.name* : Name of the bucket from which the file has been read.
     4. *gcs.storage.object.name* : Name of the file/object which has been read.
     5. *gcs.storage.object.content_type* : Content type of the file/object. You can find the supported content types <<supported-types,here>> .
-    6. *gcs.storage.object.data* :  Objectified file data, representing the contents of the file.
+    6. *gcs.storage.object.json_data* :  Objectified json file data, representing the contents of the file.
 
 Now let's explore the configuration attributes a bit more elaborately.
 
@@ -161,6 +162,7 @@ Now let's explore the configuration attributes a bit more elaborately.
     7. <<attrib-max_workers,max_workers>>
     8. <<attrib-poll,poll>>
     9. <<attrib-poll_interval,poll_interval>>
+   10. <<attrib-parse_json,parse_json>>
 
 
 [id="attrib-project-id"]
@@ -236,6 +238,15 @@ defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here `s = secon
 Example : `10s` would mean we would like the polling to occur every 10 seconds. If no value is specified for this, by default its initialized to `300 seconds`. 
 This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority 
 and override the root level values if both are specified.
+
+[id="attrib-parse_json"]
+[float]
+==== `parse_json`
+
+This attribute informs the publisher  whether to parse & objectify json data or not. By default this is set to `false`, since it can get expensive dealing with 
+highly nested json data. If this is set to `false` the *gcs.storage.object.json_data* field in the response will have an empty array. This attribute is only
+applicable for json objects and has no effect on other types of objects. This attribute can be specified both at the root level of the configuration as well at the bucket level. 
+The bucket level values will always take priority and override the root level values if both are specified.
 
 
 [id="bucket-overrides"]

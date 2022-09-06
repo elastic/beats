@@ -24,6 +24,13 @@ var (
 	errUnsupportedType = errors.New("only JSON objects are accepted")
 )
 
+// httpReadJSON accepts json file data in the form of an io.Reader, decodes the json data and returns the decoded
+// data in the form of an object represended by a map[string]interface{}. Along with the objectified json data,
+// this function also returns the raw json message in binary format. The status value in the return parameter
+// is the http status value and have the following values : -
+// 1) - StatusNotAcceptable (406) if body is missing
+// 2) - StatusBadRequest (400) if the decoding fails
+// 3) - StatusOK (200) if the decoding is successful
 func httpReadJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, status int, err error) {
 	if body == http.NoBody {
 		return nil, nil, http.StatusNotAcceptable, errBodyEmpty
@@ -35,9 +42,11 @@ func httpReadJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessag
 	return obj, rawMessage, http.StatusOK, err
 }
 
-func decodeJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
+func decodeJSON(body io.Reader) ([]mapstr.M, []json.RawMessage, error) {
+	var objs []mapstr.M
+	var rawMessages []json.RawMessage
 	decoder := json.NewDecoder(body)
-	for decoder.More() {
+	for {
 		var raw json.RawMessage
 		if err := decoder.Decode(&raw); err != nil {
 			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
@@ -55,7 +64,7 @@ func decodeJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage,
 			objs = append(objs, v)
 			rawMessages = append(rawMessages, raw)
 		case []interface{}:
-			nobjs, nrawMessages, err := decodeJSONArray(bytes.NewReader(raw))
+			nobjs, nrawMessages, err := decodeJSONArray(bytes.NewReader(raw), decoder.InputOffset())
 			if err != nil {
 				return nil, nil, fmt.Errorf("recursive error %d: %w", decoder.InputOffset(), err)
 			}
@@ -71,7 +80,9 @@ func decodeJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage,
 	return objs, rawMessages, nil
 }
 
-func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
+func decodeJSONArray(raw *bytes.Reader, parentOffset int64) ([]mapstr.M, []json.RawMessage, error) {
+	var objs []mapstr.M
+	var rawMessages []json.RawMessage
 	dec := newJSONDecoder(raw)
 	token, err := dec.Token()
 	if err != nil {
@@ -81,21 +92,21 @@ func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, rawMessages []json.Raw
 		return nil, nil, fmt.Errorf("failed reading JSON array: %w", err)
 	}
 	if token != json.Delim('[') {
-		return nil, nil, fmt.Errorf("malformed JSON array, not starting with delimiter [ at position: %d", dec.InputOffset())
+		return nil, nil, fmt.Errorf("malformed JSON array, not starting with delimiter [ at position: %d", parentOffset+dec.InputOffset())
 	}
 
-	for dec.More() {
+	for {
 		var raw json.RawMessage
 		if err := dec.Decode(&raw); err != nil {
 			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 				break
 			}
-			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
+			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", parentOffset+dec.InputOffset(), err)
 		}
 
 		var obj interface{}
 		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
-			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
+			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", parentOffset+dec.InputOffset(), err)
 		}
 
 		m, ok := obj.(map[string]interface{})

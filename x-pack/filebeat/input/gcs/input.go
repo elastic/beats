@@ -28,7 +28,7 @@ type gcsInput struct {
 }
 
 const (
-	inputName string = "gcs"
+	inputName = "gcs"
 )
 
 func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
@@ -48,7 +48,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 }
 
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	config := defaultConfig()
+	config := config{}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
@@ -63,6 +63,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			MaxWorkers:    *bucket.MaxWorkers,
 			Poll:          *bucket.Poll,
 			PollInterval:  *bucket.PollInterval,
+			ParseJSON:     *bucket.ParseJSON,
 		})
 	}
 
@@ -73,32 +74,44 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 // bucket level values if present. If both global & local values
 // are absent, assigns default values
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
-	if b.MaxWorkers == nil && cfg.MaxWorkers != nil {
-		b.MaxWorkers = cfg.MaxWorkers
-	} else if b.MaxWorkers == nil && cfg.MaxWorkers == nil {
-		workers := 1
-		b.MaxWorkers = &workers
+	if b.MaxWorkers == nil {
+		maxWorkers := 1
+		if cfg.MaxWorkers != nil {
+			maxWorkers = *cfg.MaxWorkers
+		}
+		b.MaxWorkers = &maxWorkers
 	}
 
-	if b.Poll == nil && cfg.Poll != nil {
-		b.Poll = cfg.Poll
-	} else if b.Poll == nil && cfg.Poll == nil {
-		poll := false
+	if b.Poll == nil {
+		var poll bool
+		if cfg.Poll != nil {
+			poll = *cfg.Poll
+		}
 		b.Poll = &poll
 	}
 
-	if b.PollInterval == nil && cfg.PollInterval != nil {
-		b.PollInterval = cfg.PollInterval
-	} else if b.PollInterval == nil && cfg.PollInterval == nil {
+	if b.PollInterval == nil {
 		interval := time.Second * 300
+		if cfg.PollInterval != nil {
+			interval = *cfg.PollInterval
+		}
 		b.PollInterval = &interval
 	}
 
-	if b.BucketTimeOut == nil && cfg.BucketTimeOut != nil {
-		b.BucketTimeOut = cfg.BucketTimeOut
-	} else if b.BucketTimeOut == nil && cfg.BucketTimeOut == nil {
-		timeout := time.Second * 50
-		b.BucketTimeOut = &timeout
+	if b.ParseJSON == nil {
+		parse := false
+		if cfg.ParseJSON != nil {
+			parse = *cfg.ParseJSON
+		}
+		b.ParseJSON = &parse
+	}
+
+	if b.BucketTimeOut == nil {
+		timeOut := time.Second * 50
+		if cfg.BucketTimeOut != nil {
+			timeOut = *cfg.BucketTimeOut
+		}
+		b.BucketTimeOut = &timeOut
 	}
 
 	return b
@@ -112,7 +125,8 @@ func (input *gcsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 	return nil
 }
 
-func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor.Cursor, publisher cursor.Publisher) error {
+func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
+	cursor cursor.Cursor, publisher cursor.Publisher) error {
 	var cp *state.Checkpoint
 	st := state.NewState()
 	currentSource := src.(*types.Source)
@@ -128,13 +142,10 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor
 		st.SetCheckpoint(cp)
 	}
 
-	ctx, cancelInputCtx := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		defer cancelInputCtx()
-		select {
-		case <-inputCtx.Cancelation.Done():
-		case <-ctx.Done():
-		}
+		<-inputCtx.Cancelation.Done()
+		cancel()
 	}()
 
 	client, err := fetchStorageClient(ctx, input.config, log)
@@ -150,12 +161,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-
 	scheduler := NewGcsInputScheduler(publisher, bucket, currentSource, &input.config, st, log)
-	err = scheduler.Schedule(ctx)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return scheduler.Schedule(ctx)
 }
