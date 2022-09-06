@@ -80,7 +80,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add network name to data.json {pull}32981[32981]
+- Add network name to data.json {pull}32986[32986]
 
 *Packetbeat*
 
