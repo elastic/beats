@@ -26,7 +26,20 @@ class BaseTest(TestCase):
 
                 self.wfile.write(bytes(content, "utf-8"))
 
+        # set up a HTTPHandler that supports OPTIONS method as well
+        class HTTPHandlerEnabledOPTIONS(HTTPHandler):
+            def do_OPTIONS(self):
+                self.send_response(status_code)
+                self.send_header('Access-Control-Allow-Credentials', 'true')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'HEAD, GET, POST, OPTIONS')
+                self.end_headers()
+
+        # initialize http server based on if it needs to support OPTIONS method
         server = http.server.HTTPServer(('localhost', 0), HTTPHandler)
+        # setup enable_options_method as False if it's not set
+        if kwargs.get("enable_options_method", False):
+            server = http.server.HTTPServer(('localhost', 0), HTTPHandlerEnabledOPTIONS)
 
         thread = threading.Thread(target=server.serve_forever)
         thread.start()

@@ -67,6 +67,44 @@ class Test(BaseTest):
             raise unittest.SkipTest
         self.assert_fields_are_documented(output[0])
 
+    @parameterized.expand([
+        # enable_options_method
+        (lambda enable_options: True, 200),
+        (lambda enable_options: False, 501),
+    ])
+    def test_http_check_with_options_method(self, enable_options, status_code):
+        """
+        Test http server if it supports OPTIONS method check
+        """
+        # get enable_options value from parameterized decorator
+        enable_options = enable_options(enable_options)
+        status_code = int(status_code)
+        server = self.start_server("hello world", status_code,
+                                   enable_options_method=enable_options)
+
+        self.render_http_config_with_options_method(
+            ["localhost:{}".format(server.server_port)])
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("heartbeat is running"))
+
+        self.wait_until(
+            lambda: self.output_has(lines=1))
+
+        proc.check_kill_and_wait()
+
+        server.shutdown()
+        output = self.read_output()
+        assert status_code == output[0]["http.response.status_code"]
+        if enable_options:
+            # make sure OPTIONS is in the allowed methods from the response
+            assert -1 != output[0]["http.response.headers.Access-Control-Allow-Methods"].find("OPTIONS")
+
+        if os.name == "nt":
+            # Currently skipped on Windows as fields.yml not generated
+            raise unittest.SkipTest
+        self.assert_fields_are_documented(output[0])
+
     def test_http_delayed(self):
         """
         Ensure that the HTTP monitor consumes the whole body.
@@ -141,5 +179,14 @@ class Test(BaseTest):
             monitors=[{
                 "type": "http",
                 "hosts": urls,
+            }]
+        )
+
+    def render_http_config_with_options_method(self, urls):
+        self.render_config_template(
+            monitors=[{
+                "type": "http",
+                "hosts": urls,
+                "check_request_method": "OPTIONS",
             }]
         )
