@@ -23,9 +23,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -90,24 +87,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:      base,
 		prometheusClient:   pc,
 		prometheusMappings: mapping,
-	}
-	// add ECS orchestrator fields
-	config, err := util.GetValidatedConfig(base)
-	if err != nil {
-		logp.Info("could not retrieve validated config")
-	} else {
-		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
-		if err != nil {
-			return nil, fmt.Errorf("fail to get kubernetes client: %w", err)
-		}
-		cfg, _ := conf.NewConfigFrom(&config)
-		ecsClusterMeta, err := util.GetClusterECSMeta(cfg, client, ms.Logger())
-		if err != nil {
-			ms.Logger().Debugf("could not retrieve cluster metadata: %w", err)
-		}
-		if ecsClusterMeta != nil {
-			ms.clusterMeta = ecsClusterMeta
-		}
+		clusterMeta:        util.AddClusterECSMeta(base),
 	}
 	return ms, nil
 }

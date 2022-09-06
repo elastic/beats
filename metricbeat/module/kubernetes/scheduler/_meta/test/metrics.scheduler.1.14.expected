@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"process": {
@@ -72,7 +72,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"operation": "preemption_evaluation",
@@ -102,7 +102,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"operation": "predicate_evaluation",
@@ -132,7 +132,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"leader": {
@@ -152,7 +152,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"result": "scheduled",
@@ -176,7 +176,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -200,7 +200,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"result": "error",
@@ -224,7 +224,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -248,7 +248,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"result": "unschedulable",
@@ -272,7 +272,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"handler": "prometheus",
@@ -328,7 +328,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"operation": "binding",
@@ -358,7 +358,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -382,7 +382,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -406,7 +406,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"code": "200",

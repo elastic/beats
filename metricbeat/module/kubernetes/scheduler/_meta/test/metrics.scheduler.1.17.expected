@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -24,7 +24,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"process": {
@@ -110,7 +110,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"operation": "predicate_evaluation",
@@ -140,7 +140,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"operation": "binding",
@@ -170,7 +170,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -194,7 +194,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"leader": {
@@ -214,7 +214,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -238,7 +238,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {

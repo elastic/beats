@@ -574,3 +574,24 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 	}
 	return ecsClusterMeta, nil
 }
+
+// AddClusterECSMeta adds ECS orchestrator fields
+func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
+		logp.Info("could not retrieve validated config")
+		return nil
+	}
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+	if err != nil {
+		logp.Err("fail to get kubernetes client: %s", err)
+		return nil
+	}
+	cfg, _ := conf.NewConfigFrom(&config)
+	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
+	if err != nil {
+		logp.Info("could not retrieve cluster metadata: %s", err)
+		return nil
+	}
+	return ecsClusterMeta
+}
