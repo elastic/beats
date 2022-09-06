@@ -31,11 +31,6 @@
       description: >
         An array of upstream response status codes. It is a list because it is common that several upstream servers
         were contacted during request processing.
-    - name: http.request.id
-      type: keyword
-      description: >
-        A unique identifier for each HTTP request to correlate logs between clients and servers in transactions.
-        The id may be contained in a non-standard HTTP header, such as X-Request-ID or X-Correlation-ID.
     - name: http.request.length
       type: long
       format: bytes
