@@ -1,6 +1,6 @@
 Load Balancing metricset fetches metrics from https://cloud.google.com/load-balancing/[Load Balancing] in Google Cloud Platform.
 
-The `loadbalancing` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[Stackdriver API]. The field names have been left untouched for people already familiar with them.
+The `loadbalancing` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[Stackdriver API]. The field names are aligned to https://www.elastic.co/guide/en/beats/devguide/current/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
 
 [float]
 === Metrics
