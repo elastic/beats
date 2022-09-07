@@ -52,8 +52,8 @@ type MetricSet struct {
 
 // Tag holds a configuration specific for ec2 and cloudwatch metricset.
 type Tag struct {
-	Key   string `config:"key"`
-	Value string `config:"value"`
+	Key   string   `config:"key"`
+	Value []string `config:"value"`
 }
 
 // ModuleName is the name of this module.
@@ -248,7 +248,12 @@ func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
 	}
 
 	for _, tagFilter := range tagsFilter {
-		if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
+		if exists, idx := StringInSlice(tagFilter.Key, tagKeys); exists {
+			valueExists, _ := StringInSlice(tagValues[idx], tagFilter.Value)
+			if !valueExists {
+				return false
+			}
+		} else {
 			return false
 		}
 	}
