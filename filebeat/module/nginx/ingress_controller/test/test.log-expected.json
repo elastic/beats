@@ -1465,5 +1465,220 @@
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14",
         "user_agent.version": "72.0."
+    },
+    {
+        "@timestamp": "2022-08-24T21:04:17.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "2a02:cf40:: - remote_monitoring_user [24/Aug/2022:21:04:17 +0000] \"POST /_bulk HTTP/1.1\" 200 470 \"-\" \"Elastic-metricbeat/7.16.3 (linux; amd64; e7cede6a62ed4452bd9044fc6f4947df; 2022-01-07 00:50:33 +0000 UTC)\" 2057 0.033 [esmon-esmon-es-http-9200] [] [2a02:cf40::]:9200 470 0.036 200 3db73c6c673c4256ade033a6ce08c2ab",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "http.request.method": "POST",
+        "http.response.body.bytes": 470,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 6375,
+        "nginx.ingress_controller.http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "nginx.ingress_controller.http.request.length": 2057,
+        "nginx.ingress_controller.http.request.time": 0.033,
+        "nginx.ingress_controller.remote_ip_list": [
+            "2a02:cf40::"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "2a02:cf40::",
+        "nginx.ingress_controller.upstream.name": "esmon-esmon-es-http-9200",
+        "nginx.ingress_controller.upstream.port": 9200,
+        "nginx.ingress_controller.upstream.response.length": 470,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "470"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "200"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.036,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.036"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "[2a02:cf40::]:9200"
+        ],
+        "related.ip": [
+            "2a02:cf40::"
+        ],
+        "related.user": [
+            "remote_monitoring_user"
+        ],
+        "service.type": "nginx",
+        "source.address": "2a02:cf40::",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "NO",
+        "source.geo.country_name": "Norway",
+        "source.geo.location.lat": 62.0,
+        "source.geo.location.lon": 10.0,
+        "source.ip": "2a02:cf40::",
+        "url.original": "/_bulk",
+        "url.path": "/_bulk",
+        "user.name": "remote_monitoring_user",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "Elastic-metricbeat/7.16.3 (linux; amd64; e7cede6a62ed4452bd9044fc6f4947df; 2022-01-07 00:50:33 +0000 UTC)",
+        "user_agent.os.name": "Linux"
+    },
+    {
+        "@timestamp": "2022-08-24T18:05:41.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "2a02:cf40::4e36 - - [24/Aug/2022:18:05:41 +0000] \"GET /favicon.ico HTTP/2.0\" 502 552 \"https://localhost:8080/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36\" 27 0.000 [localhost-8080] [] [2a02:cf40::7]:5000, [2a02:cf40::4e36]:5000 0, 0 0.000, 0.000 502, 502 3db73c6c673c4256ade033a6ce08c2ab",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "http.request.method": "GET",
+        "http.request.referrer": "https://localhost:8080/",
+        "http.response.body.bytes": 552,
+        "http.response.status_code": 502,
+        "http.version": "2.0",
+        "input.type": "log",
+        "log.offset": 6691,
+        "nginx.ingress_controller.http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "nginx.ingress_controller.http.request.length": 27,
+        "nginx.ingress_controller.http.request.time": 0.0,
+        "nginx.ingress_controller.remote_ip_list": [
+            "2a02:cf40::4e36"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "2a02:cf40::4e36",
+        "nginx.ingress_controller.upstream.name": "localhost-8080",
+        "nginx.ingress_controller.upstream.port": 5000,
+        "nginx.ingress_controller.upstream.response.length": 0,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "0",
+            "0"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 502,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "502",
+            "502"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.0,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.000",
+            "0.000"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "[2a02:cf40::4e36]:5000",
+            "[2a02:cf40::7]:5000"
+        ],
+        "related.ip": [
+            "2a02:cf40::4e36"
+        ],
+        "service.type": "nginx",
+        "source.address": "2a02:cf40::4e36",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "NO",
+        "source.geo.country_name": "Norway",
+        "source.geo.location.lat": 62.0,
+        "source.geo.location.lon": 10.0,
+        "source.ip": "2a02:cf40::4e36",
+        "url.extension": "ico",
+        "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Chrome",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+        "user_agent.os.full": "Mac OS X 10.15.7",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15.7",
+        "user_agent.version": "104.0.0.0"
+    },
+    {
+        "@timestamp": "2022-08-24T18:05:41.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "2a02:cf40::4e36 - - [24/Aug/2022:18:05:41 +0000] \"GET /favicon.ico HTTP/2.0\" 502 552 \"https://localhost:8080/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36\" 27 0.000 [localhost-8080] [] [2a02:cf40::7]:5000, [2a02:cf40::::::::4e36]:500000000 0, 0 0.000, 0.000 502, 502 3db73c6c673c4256ade033a6ce08c2ab",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "http.request.method": "GET",
+        "http.request.referrer": "https://localhost:8080/",
+        "http.response.body.bytes": 552,
+        "http.response.status_code": 502,
+        "http.version": "2.0",
+        "input.type": "log",
+        "log.offset": 7055,
+        "nginx.ingress_controller.http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "nginx.ingress_controller.http.request.length": 27,
+        "nginx.ingress_controller.http.request.time": 0.0,
+        "nginx.ingress_controller.remote_ip_list": [
+            "2a02:cf40::4e36"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.name": "localhost-8080",
+        "nginx.ingress_controller.upstream.response.length": 0,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "0",
+            "0"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 502,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "502",
+            "502"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.0,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.000",
+            "0.000"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "[2a02:cf40::7]:5000",
+            "[2a02:cf40::::::::4e36]:500000000"
+        ],
+        "related.ip": [
+            "2a02:cf40::4e36"
+        ],
+        "service.type": "nginx",
+        "source.address": "2a02:cf40::4e36",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "NO",
+        "source.geo.country_name": "Norway",
+        "source.geo.location.lat": 62.0,
+        "source.geo.location.lon": 10.0,
+        "source.ip": "2a02:cf40::4e36",
+        "url.extension": "ico",
+        "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Chrome",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+        "user_agent.os.full": "Mac OS X 10.15.7",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15.7",
+        "user_agent.version": "104.0.0.0"
     }
 ]
