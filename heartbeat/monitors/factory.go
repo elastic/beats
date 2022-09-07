@@ -197,6 +197,8 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 	// Early stage processors for setting data_stream, event.dataset, and index to write to
 
 	// Use the monitor-specific location if possible, otherwise use the beat's location
+	// Generally speaking direct HB users would use the beat location, and the synthetics service may as well (TBD)
+	// while Fleet configured monitors will always use a per location monitor
 	var loc *config.LocationWithID
 	if sf.Location != nil {
 		loc = sf.Location

@@ -87,7 +87,7 @@ func (s *State) incrementCounters(status StateStatus) {
 // truncate flap history to be at most as many items as the threshold indicates, minus one
 func (s *State) truncateFlapHistory() {
 	endIdx := len(s.FlapHistory)
-	if endIdx < 0 {
+	if endIdx <= 0 {
 		return // flap history is empty
 	}
 	// truncate to one less than the threshold since our later calculations
