@@ -923,7 +923,41 @@ This will output:
 ]
 ----
 
+<<<<<<< HEAD
 [[cursor]]
+=======
+[[chain]]
+[float]
+=== `chain`
+
+A chain is a list of requests to be made after the first one.
+
+[float]
+==== `chain[].step`
+
+Contains basic request and response configuration for chained calls.
+
+[float]
+==== `chain[].step.request`
+
+See <<request-parameters,request parameters>>. Required.
+
+Example:
+
+First call: \https://example.com/services/data/v1.0/
+
+Second call: \https://example.com/services/data/v1.0/1/export_ids
+
+Third call: \https://example.com/services/data/v1.0/export_ids/file_1/info
+
+[float]
+==== `chain[].step.response.split`
+
+See <<response-split,response split parameter>>.
+
++
+[[chain-step-replace]]
+>>>>>>> ed2bd0d06f (x-pack/filebeat/docs/inputs/input-httpjson: don't linkify example URLs (#32975))
 [float]
 ==== `cursor`
 
@@ -931,6 +965,7 @@ Cursor is a list of key value objects where arbitrary values are defined. The va
 
 Each cursor entry is formed by:
 
+<<<<<<< HEAD
 - A `value` template, which will define the value to store when evaluated.
 - A `default` template, which will define the value to store when the value template fails or is empty.
 - An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
@@ -938,11 +973,23 @@ Each cursor entry is formed by:
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 
 NOTE: Default templates do not have access to any state, only to functions.
+=======
+- First call: \https://example.com/services/data/v1.0/
++
+<<response-json1,response>>
+
+- Second call: \https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
++
+<<response-json2,response>>
+
+- Third call: \https://example.com/services/data/v1.0/export_ids/`$.file_name`/info
+>>>>>>> ed2bd0d06f (x-pack/filebeat/docs/inputs/input-httpjson: don't linkify example URLs (#32975))
 
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
 - type: httpjson
+<<<<<<< HEAD
   config_version: 2
   interval: 1m
   request.url: https://api.ipify.org/?format=json
@@ -960,15 +1007,119 @@ filebeat.inputs:
         target: "json"
 ----
 
+=======
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/records
+  interval: 1h
+  chain:
+    # second call
+    - step:
+      request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
+      request.method: GET
+      replace: $.records[:].id
+    # third call
+    - step:
+      request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
+      request.method: GET
+      replace: $.file_name
+----
+
+Example:
+
+- First call to collect record ids
+
++
+request_url: \https://example.com/services/data/v1.0/records
+
++
+response_json:
+
++
+[[response-json1]]
+["source","json",subs="attributes"]
+----
+{
+    "records": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+
+- Second call to collect `file_name` using collected ids from first call.
+
++
+request_url using id as '1': \https://example.com/services/data/v1.0/1/export_ids
+
++
+response_json using id as '1':
+
++
+[[response-json2]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_1"
+}
+----
+
++
+request_url using id as '2': \https://example.com/services/data/v1.0/2/export_ids
+
++
+response_json using id as '2':
+
++
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_2"
+}
+----
+
+- Third call to collect `files` using collected `file_name` from second call.
+
++
+request_url using file_name as 'file_1': \https://example.com/services/data/v1.0/export_ids/file_1/info
+
++
+request_url using file_name as 'file_2': \https://example.com/services/data/v1.0/export_ids/file_2/info
+
++
+Collect and make events from response in any format supported by httpjson for all calls.
+
+>>>>>>> ed2bd0d06f (x-pack/filebeat/docs/inputs/input-httpjson: don't linkify example URLs (#32975))
 [float]
 ==== `api_key`
 
 Deprecated, use `request.transforms`.
 
 [float]
+<<<<<<< HEAD
 ==== `http_client_timeout`
 
 Deprecated, use `request.timeout`.
+=======
+==== `chain[].while.request`
+
+See  <<request-parameters,request parameters>> .
+
+Example:
+
+First call: \http://example.com/services/data/v1.0/exports
+
+Second call: \http://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+
+Third call: \http://example.com/services/data/v1.0/export_ids/1/info
+>>>>>>> ed2bd0d06f (x-pack/filebeat/docs/inputs/input-httpjson: don't linkify example URLs (#32975))
 
 [float]
 ==== `http_headers`
@@ -980,13 +1131,78 @@ Deprecated, use `request.transforms`.
 
 Deprecated, use `request.method`.
 
+<<<<<<< HEAD
 [float]
 ==== `http_request_body`
+=======
+Example:
+
+- First call: \http://example.com/services/data/v1.0/exports
++
+<<response-json1-while,response>>
+
+- Second call: \http://example.com/services/data/v1.0/`$.exportId`/export_ids/status
++
+<<response-json2-while,response>>
+
+- Third call: \http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
++
+<<response-json3-while,response 1>> , <<response-json4-while,response 2>>
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  id: my-httpjson-id
+  request.url: http://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - while:
+        request.url: http://example.com/services/data/v1.0/$.exportId/export_ids/status
+        request.method: GET
+        replace: $.exportId
+        until: '[[ eq .last_response.body.status "completed" ]]'
+        request.retry.max_attempts: 5
+        request.retry.wait_min: 5s
+    # third call
+    - step:
+        request.url: http://example.com/services/data/v1.0/export_ids/$.files[:].id/info
+        request.method: GET
+        replace: $.files[:].id
+----
+
+Example:
+
+- First call to collect export ids
+
++
+request_url: \https://example.com/services/data/v1.0/exports
+
++
+response_json:
+
++
+[[response-json1-while]]
+["source","json",subs="attributes"]
+----
+{
+    "exportId": "9ef0e6a5"
+}
+----
+>>>>>>> ed2bd0d06f (x-pack/filebeat/docs/inputs/input-httpjson: don't linkify example URLs (#32975))
 
 Deprecated, use `request.body`.
 
+<<<<<<< HEAD
 [float]
 ==== `json_objects_array`
+=======
++
+request_url using id as '9ef0e6a5': \https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+>>>>>>> ed2bd0d06f (x-pack/filebeat/docs/inputs/input-httpjson: don't linkify example URLs (#32975))
 
 Deprecated, use `request.split`.
 
@@ -995,10 +1211,18 @@ Deprecated, use `request.split`.
 
 Deprecated, use `request.split`.
 
+<<<<<<< HEAD
 [float]
 ==== `no_http_body`
 
 Deprecated.
+=======
++
+request_url using file_id as '1': \https://example.com/services/data/v1.0/export_ids/1/info
+
++
+request_url using file_id as '2': \https://example.com/services/data/v1.0/export_ids/2/info
+>>>>>>> ed2bd0d06f (x-pack/filebeat/docs/inputs/input-httpjson: don't linkify example URLs (#32975))
 
 [float]
 ==== `pagination.*`
