@@ -19,16 +19,16 @@
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                            "key": "data_stream.dataset",
+                            "key": "event.dataset",
                             "negate": false,
                             "params": {
-                                "query": "fortinet_fortigate.log"
+                                "query": "fortinet.firewall"
                             },
                             "type": "phrase"
                         },
                         "query": {
                             "match_phrase": {
-                                "data_stream.dataset": "fortinet_fortigate.log"
+                                "event.dataset": "fortinet.firewall"
                             }
                         }
                     }
