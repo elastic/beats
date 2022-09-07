@@ -133,8 +133,8 @@ Example configuration:
 
 Under `check.request`, specify these options:
 
-*`method`*:: The HTTP method to use. Valid values are `"HEAD"`, `"GET"` and
-`"POST"`.
+*`method`*:: The HTTP method to use. Valid values are `"HEAD"`, `"GET"`, `"POST"` and
+`"OPTIONS"`.
 *`headers`*:: A dictionary of additional HTTP headers to send. By default heartbeat
 will set the 'User-Agent' header to identify itself.
 *`body`*:: Optional request body content.
