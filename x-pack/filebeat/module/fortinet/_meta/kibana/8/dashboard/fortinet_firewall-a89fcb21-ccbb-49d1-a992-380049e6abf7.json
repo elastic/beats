@@ -51,7 +51,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
                                 "type": "index-pattern"
                             }
@@ -151,7 +151,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
                                 "type": "index-pattern"
                             }
@@ -252,7 +252,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
                                 "type": "index-pattern"
                             }
@@ -353,7 +353,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
                                 "type": "index-pattern"
                             }
@@ -454,7 +454,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
                                 "type": "index-pattern"
                             }
@@ -555,7 +555,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
                                 "type": "index-pattern"
                             }
@@ -656,7 +656,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
                                 "type": "index-pattern"
                             }
@@ -779,7 +779,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
                                 "type": "index-pattern"
                             }
@@ -902,7 +902,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-2573c22c-9787-4385-a01b-779b948ee617",
                                 "type": "index-pattern"
                             }
@@ -1019,7 +1019,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-64b9d1d0-7503-4967-849c-be0201d51ac1",
                                 "type": "index-pattern"
                             }
@@ -1424,7 +1424,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3b509c65-21ea-4bc9-98ac-38f059b301f9",
                                 "type": "index-pattern"
                             }
@@ -1525,7 +1525,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3b509c65-21ea-4bc9-98ac-38f059b301f9",
                                 "type": "index-pattern"
                             }
@@ -1626,7 +1626,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3b509c65-21ea-4bc9-98ac-38f059b301f9",
                                 "type": "index-pattern"
                             }
@@ -1727,7 +1727,7 @@
                     "attributes": {
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3b509c65-21ea-4bc9-98ac-38f059b301f9",
                                 "type": "index-pattern"
                             }
@@ -1835,117 +1835,117 @@
     },
     "references": [
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "aef92dcc-7959-4c94-90ef-373478d28419:indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "53ff2f86-bf06-4677-92d2-067155f609f3:indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "b3871313-73e1-4197-af66-2ff82506fafd:indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "941798ef-1ae4-4ebe-8867-a17eb8b1a4b9:indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "f20139de-a0eb-463f-a9c8-183dce76b3fa:indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "14f2d7bc-a79b-4917-a0a3-9656891cc0d8:indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "85b98bdc-73a7-4032-aef1-91921b5235ce:indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "3652abe3-b251-4cc0-a014-a81bbe764d33:indexpattern-datasource-layer-3315c7ab-9184-4bc2-8d29-bfa4f03c0357",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "c284fd4a-cd25-4fe3-8124-f2458aed0257:indexpattern-datasource-layer-2573c22c-9787-4385-a01b-779b948ee617",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "58884a18-ec0a-46f1-bf37-de86aba407ad:indexpattern-datasource-layer-64b9d1d0-7503-4967-849c-be0201d51ac1",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "3559260b-1b7d-4053-b958-d6eb5f4e839e:layer_1_source_index_pattern",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "3559260b-1b7d-4053-b958-d6eb5f4e839e:layer_2_source_index_pattern",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "3559260b-1b7d-4053-b958-d6eb5f4e839e:layer_3_source_index_pattern",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "9eb208d4-f6d7-468a-b558-a98ecc64e262:indexpattern-datasource-layer-3b509c65-21ea-4bc9-98ac-38f059b301f9",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "bbd15cda-94cf-4624-acfe-f255efbb5855:indexpattern-datasource-layer-3b509c65-21ea-4bc9-98ac-38f059b301f9",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "83c59f55-5df1-4715-8fb1-d088f0e10019:indexpattern-datasource-layer-3b509c65-21ea-4bc9-98ac-38f059b301f9",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "1e4ffbda-33d2-40eb-9746-4469775466f7:indexpattern-datasource-layer-3b509c65-21ea-4bc9-98ac-38f059b301f9",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "controlGroup_eb2ef977-0de8-4bd4-a936-8bd25a74543c:optionsListDataView",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "controlGroup_cfa74479-5cd8-48b4-b302-86302d5cc8a6:optionsListDataView",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "controlGroup_ee56c2d4-3f4e-4914-bc04-74a600f57188:optionsListDataView",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "controlGroup_ad683801-15c1-4243-a870-c533cf32c7e3:optionsListDataView",
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "controlGroup_c66d9124-057b-40aa-bc0a-fab5624ed285:optionsListDataView",
             "type": "index-pattern"
         }
