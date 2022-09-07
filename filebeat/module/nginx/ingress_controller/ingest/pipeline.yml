@@ -163,10 +163,16 @@ processors:
       field: nginx.ingress_controller.upstream.ip
       type: ip
       ignore_missing: true
+      on_failure:
+      - remove:
+          field: nginx.ingress_controller.upstream.ip
   - convert:
       field: nginx.ingress_controller.upstream.port
       type: long
       ignore_missing: true
+      on_failure:
+      - remove:
+          field: nginx.ingress_controller.upstream.port
   - remove:
       field: nginx.ingress_controller.upstream.address
       ignore_failure: true
