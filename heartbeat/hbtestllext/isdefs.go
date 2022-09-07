@@ -74,11 +74,11 @@ var IsECSErr = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
 		givenErr = &givenErrNoPtr
 
 		if expectedErr.Code != givenErr.Code {
-			return llresult.SimpleResult(path, false, "ECS error type does not match, expected %s, got %s", expectedErr.Code, givenErr.Code)
+			return llresult.SimpleResult(path, false, "ECS error code does not match, expected %s, got %s", expectedErr.Code, givenErr.Code)
 		}
 
 		if expectedErr.Type != givenErr.Type {
-			return llresult.SimpleResult(path, false, "ECS error message does not match, expected %s, got %s", expectedErr.Type, givenErr.Type)
+			return llresult.SimpleResult(path, false, "ECS error type does not match, expected %s, got %s", expectedErr.Type, givenErr.Type)
 		}
 
 		if expectedErr.Message != givenErr.Message {
@@ -101,7 +101,7 @@ var IsECSErrMatchingCode = func(ecode ecserr.ECode, messageContains string) isde
 		givenErr = &givenErrNoPtr
 
 		if ecode != givenErr.Code {
-			return llresult.SimpleResult(path, false, "ECS error type does not match, expected %s, got %s", ecode, givenErr.Code)
+			return llresult.SimpleResult(path, false, "ECS error code does not match, expected %s, got %s", ecode, givenErr.Code)
 		}
 
 		if !strings.Contains(givenErr.Message, messageContains) {
