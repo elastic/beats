@@ -72,7 +72,7 @@ func (j *GcsInputJob) Do(ctx context.Context, id string) (err error) {
 
 		var objectData []mapstr.M
 		switch j.object.ContentType {
-		case types.Json:
+		case types.ContentTypeJSON:
 			if j.src.ParseJSON {
 				objectData, _, _, err = httpReadJSON(reader)
 				if err != nil {

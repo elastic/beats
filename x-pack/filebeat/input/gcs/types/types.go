@@ -28,9 +28,9 @@ func (s *Source) Name() string {
 }
 
 const (
-	Json string = "application/json"
+	ContentTypeJSON string = "application/json"
 )
 
 var AllowedContentTypes = map[string]bool{
-	Json: true,
+	ContentTypeJSON: true,
 }

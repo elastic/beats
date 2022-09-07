@@ -9,7 +9,7 @@ package gcs
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
@@ -23,5 +23,5 @@ func fetchStorageClient(ctx context.Context, cfg config, log *logp.Logger) (*sto
 	} else if cfg.Auth.CredentialsFile != nil {
 		return storage.NewClient(ctx, option.WithCredentialsFile(cfg.Auth.CredentialsFile.Path))
 	}
-	return nil, fmt.Errorf("no valid auth specified")
+	return nil, errors.New("no valid auth specified")
 }
