@@ -265,7 +265,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 		geoM, err := util.GeoConfigToMap(location.Geo)
 		if err != nil {
 			geoErrOnce.Do(func() {
-				logp.L().Warnf("could not add heartbeat geo info: %s", err)
+				logp.L().Warnf("could not add heartbeat geo info: %w", err)
 			})
 		}
 
