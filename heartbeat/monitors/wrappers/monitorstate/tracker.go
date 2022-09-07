@@ -88,7 +88,7 @@ func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 		}
 	}
 	if err != nil {
-		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor %s", tries, sf.ID)
+		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", tries, sf.ID)
 	}
 
 	if loadedState != nil {
