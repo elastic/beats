@@ -1825,7 +1825,7 @@
             }
         ],
         "timeRestore": false,
-        "title": "[Fortinet Fortigate] Firewall Overview",
+        "title": "[Filebeat Fortinet] Firewall Overview",
         "version": 1
     },
     "coreMigrationVersion": "8.3.3",
