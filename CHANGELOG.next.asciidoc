@@ -46,20 +46,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Filebeat*
 
 - Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
-- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
-- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
-- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
-- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
-- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
-- Import dashboards from CEF integration. {pull}32766[32766]
 - Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
 
 *Heartbeat*
 
