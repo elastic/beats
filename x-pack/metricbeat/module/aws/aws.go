@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 
-	"strings"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -110,12 +109,12 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		awsConfig.Region = config.Regions[0]
 	}
 
-	stsServiceName := awscommon.CreateServiceName("sts", config.AWSConfig.FIPSEnabled, awsConfig.Region)
-	iamServiceName := awscommon.CreateServiceName("iam", config.AWSConfig.FIPSEnabled, awsConfig.Region)
-
 	// Get IAM account id
-	svcSts := sts.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, stsServiceName, "", awsConfig))
+	svcSts := sts.NewFromConfig(awsConfig, func(o *sts.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+	})
 	outputIdentity, err := svcSts.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
 	if err != nil {
 		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
@@ -123,20 +122,22 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		metricSet.AccountID = *outputIdentity.Account
 		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.AccountID)
 	}
-	iamRegion := ""
-	if strings.HasPrefix(awsConfig.Region, "us-gov-") {
-		iamRegion = "us-gov"
-	}
 	// Get account name/alias
-	svcIam := iam.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, iamServiceName, iamRegion, awsConfig))
+	svcIam := iam.NewFromConfig(awsConfig, func(o *iam.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+
+	})
 	metricSet.AccountName = getAccountName(svcIam, base, metricSet)
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
-		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsConfig.Region)
-		svcEC2 := ec2.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, ec2ServiceName, "", awsConfig))
+		svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
+			if config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		})
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
 			return nil, err
