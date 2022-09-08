@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -53,6 +52,7 @@ func TestGetAWSCredentials(t *testing.T) {
 	assert.Equal(t, inputConfig.SessionToken, retrievedAWSConfig.SessionToken)
 }
 
+<<<<<<< HEAD
 func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 	cases := []struct {
 		title                                   string
@@ -165,6 +165,8 @@ func TestCreateServiceName(t *testing.T) {
 	}
 }
 
+=======
+>>>>>>> d0bc413a50 (Refactor endpoint resolver for AWS services (#32921))
 func TestDefaultRegion(t *testing.T) {
 	cases := []struct {
 		title          string

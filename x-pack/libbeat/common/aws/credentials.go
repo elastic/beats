@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
@@ -164,6 +163,7 @@ func addStaticCredentialsProviderToAwsConfig(beatsConfig ConfigAWS, awsConfig *a
 
 	awsConfig.Credentials = staticCredentialsProvider
 }
+<<<<<<< HEAD
 
 // EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS service clients when endpoint is given in config.
 func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, beatsConfig awssdk.Config) awssdk.Config {
@@ -201,3 +201,5 @@ func CreateServiceName(serviceName string, fipsEnabled bool, region string) stri
 	}
 	return serviceName
 }
+=======
+>>>>>>> d0bc413a50 (Refactor endpoint resolver for AWS services (#32921))
