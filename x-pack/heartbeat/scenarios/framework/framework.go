@@ -266,10 +266,6 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		true,
 	)
 
-	if stateLoader == nil {
-		stateLoader = monitorstate.NilStateLoader
-	}
-
 	return monitors.NewFactory(monitors.FactoryParams{
 			BeatInfo:    info,
 			AddTask:     sched.Add,
