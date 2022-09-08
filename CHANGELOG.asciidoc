@@ -35,10 +35,10 @@ the configuration. For example:
 filebeat.inputs:
 - type: aws-s3
 ...
-  endpoint: ""
+  endpoint: "" <1>
   default_region: us-east-1
 ----
-
+<1> You can set this value to an empty string or remove the configuration setting.
 Or for modules:
 
 [source,yaml]
@@ -46,9 +46,10 @@ Or for modules:
 s3access:
     enabled: false
 ...
-    var.endpoint: ""
+    var.endpoint: "" <1>
     var.default_region: us-east-1
 ----
+<1> You can set this value to an empty string or remove the configuration setting
 
 // end::credentials-error[]
 
