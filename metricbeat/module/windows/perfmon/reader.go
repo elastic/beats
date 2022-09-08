@@ -27,18 +27,8 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
-
-<<<<<<< HEAD
-	"github.com/pkg/errors"
-
-	"math/rand"
-
-	"golang.org/x/sys/windows"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
-=======
->>>>>>> f0bc6c8012 (Changed collection method of the second counter value in the Windows Perfmon module of Metricbeat (#32305))
+	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
