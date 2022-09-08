@@ -13,8 +13,7 @@ https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 
 *Filebeat*
 
-Filebeat agents configured to read from S3 or SQS may return the following
-error:
+Filebeat agents configured to read from AWS inputs may return an error similar to the following:
 
 [source,shell]
 ----
@@ -26,7 +25,7 @@ api error SignatureDoesNotMatch: Credential should be scoped to a valid region.
 This error was introduced by a breaking change in the AWS library.
 
 Suggested resolution: In the Filebeat configuration, if an AWS input or module
-configuration sets `endpoint` to `amazonaws.com`, set it to an empty string
+configuration sets `endpoint` to a non empty string, set it to an empty string
 instead. Also make sure the default AWS region is set in an environment
 variable, credentials or instance profile, or in the `default_region` setting in
 the configuration. For example:
