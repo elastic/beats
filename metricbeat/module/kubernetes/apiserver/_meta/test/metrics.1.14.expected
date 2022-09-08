@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8,6 +8,2931 @@
 				"duration": {
 					"us": {
 						"bucket": {
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
+=======
+							"+Inf": 7,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 7,
+						"sum": 2839007440.349
+					}
+				},
+				"group": "apps",
+				"longrunning": {
+					"count": 3
+				},
+				"resource": "deployments",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 7,
+							"1000": 7,
+							"10000": 7,
+							"100000": 7,
+							"1000000": 7,
+							"10000000": 7,
+							"100000000": 7,
+							"1000000000": 7
+						},
+						"count": 7,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 2,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 2,
+						"sum": 1081003139.2180002
+					}
+				},
+				"group": "policy",
+				"longrunning": {
+					"count": 1
+				},
+				"resource": "poddisruptionbudgets",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1beta1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 2,
+							"1000": 2,
+							"10000": 2,
+							"100000": 2,
+							"1000000": 2,
+							"10000000": 2,
+							"100000000": 2,
+							"1000000000": 2
+						},
+						"count": 2,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 7,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 7,
+						"sum": 3222008102.2929997
+					}
+				},
+				"group": "storage.k8s.io",
+				"longrunning": {
+					"count": 3
+				},
+				"resource": "volumeattachments",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 7,
+							"1000": 7,
+							"10000": 7,
+							"100000": 7,
+							"1000000": 7,
+							"10000000": 7,
+							"100000000": 7,
+							"1000000000": 7
+						},
+						"count": 7,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 62,
+				"resource": "pods",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 2,
+				"group": "networking.k8s.io",
+				"resource": "ingresses",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"etcd": {
+				"object": {
+					"count": 3
+				}
+			},
+			"request": {
+				"resource": "replicasets.apps"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "ResourceQuota",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 34,
+								"1024": 34,
+								"131072": 34,
+								"16384": 34,
+								"2048": 34,
+								"32768": 34,
+								"4096": 34,
+								"65536": 34,
+								"8192": 34
+							},
+							"count": 34,
+							"sum": 2006
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 15,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 1,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 1,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 1,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 1,
+							"300000": 0,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 0,
+							"3500000": 1,
+							"400000": 0,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 0,
+							"4500000": 1,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 0,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 0,
+							"7000000": 1,
+							"800000": 0,
+							"8000000": 1,
+							"900000": 0,
+							"9000000": 1
+						},
+						"count": 15,
+						"sum": 5839543516.696
+					}
+				},
+				"group": "storage.k8s.io",
+				"longrunning": {
+					"count": 5
+				},
+				"resource": "csidrivers",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 15,
+							"1000": 15,
+							"10000": 15,
+							"100000": 15,
+							"1000000": 15,
+							"10000000": 15,
+							"100000000": 15,
+							"1000000000": 15
+						},
+						"count": 15,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"1250000": 1,
+							"150000": 1,
+							"1500000": 1,
+							"15000000": 1,
+							"1750000": 1,
+							"200000": 1,
+							"2000000": 1,
+							"20000000": 1,
+							"250000": 1,
+							"2500000": 1,
+							"25000000": 1,
+							"300000": 1,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 1,
+							"3500000": 1,
+							"400000": 1,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 1,
+							"4500000": 1,
+							"50000": 1,
+							"500000": 1,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 1,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 1,
+							"7000000": 1,
+							"800000": 1,
+							"8000000": 1,
+							"900000": 1,
+							"9000000": 1
+						},
+						"count": 1,
+						"sum": 1277.362
+					}
+				},
+				"group": "batch",
+				"resource": "cronjobs",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 1,
+							"1000": 1,
+							"10000": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"100000000": 1,
+							"1000000000": 1
+						},
+						"count": 1,
+						"sum": 210
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"etcd": {
+				"object": {
+					"count": 0
+				}
+			},
+			"request": {
+				"resource": "ingresses.networking.k8s.io"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"1250000": 1,
+							"150000": 1,
+							"1500000": 1,
+							"15000000": 1,
+							"1750000": 1,
+							"200000": 1,
+							"2000000": 1,
+							"20000000": 1,
+							"250000": 1,
+							"2500000": 1,
+							"25000000": 1,
+							"300000": 1,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 1,
+							"3500000": 1,
+							"400000": 1,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 1,
+							"4500000": 1,
+							"50000": 1,
+							"500000": 1,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 1,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 1,
+							"7000000": 1,
+							"800000": 1,
+							"8000000": 1,
+							"900000": 1,
+							"9000000": 1
+						},
+						"count": 1,
+						"sum": 500.09499999999997
+					}
+				},
+				"group": "discovery.k8s.io",
+				"resource": "endpointslices",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 1,
+							"1000": 1,
+							"10000": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"100000000": 1,
+							"1000000000": 1
+						},
+						"count": 1,
+						"sum": 427
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 9,
+				"resource": "secrets",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"etcd": {
+				"object": {
+					"count": 3
+				}
+			},
+			"request": {
+				"resource": "nodes"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 11,
+							"100000": 11,
+							"1000000": 11,
+							"10000000": 11,
+							"1250000": 11,
+							"150000": 11,
+							"1500000": 11,
+							"15000000": 11,
+							"1750000": 11,
+							"200000": 11,
+							"2000000": 11,
+							"20000000": 11,
+							"250000": 11,
+							"2500000": 11,
+							"25000000": 11,
+							"300000": 11,
+							"3000000": 11,
+							"30000000": 11,
+							"350000": 11,
+							"3500000": 11,
+							"400000": 11,
+							"4000000": 11,
+							"40000000": 11,
+							"450000": 11,
+							"4500000": 11,
+							"50000": 11,
+							"500000": 11,
+							"5000000": 11,
+							"50000000": 11,
+							"600000": 11,
+							"6000000": 11,
+							"60000000": 11,
+							"700000": 11,
+							"7000000": 11,
+							"800000": 11,
+							"8000000": 11,
+							"900000": 11,
+							"9000000": 11
+						},
+						"count": 11,
+						"sum": 11747.101
+					}
+				},
+				"group": "rbac.authorization.k8s.io",
+				"resource": "roles",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 11,
+							"1000": 11,
+							"10000": 11,
+							"100000": 11,
+							"1000000": 11,
+							"10000000": 11,
+							"100000000": 11,
+							"1000000000": 11
+						},
+						"count": 11,
+						"sum": 2603
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 34,
+				"resource": "services",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 3,
+				"group": "coordination.k8s.io",
+				"resource": "leases",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 6,
+				"group": "policy",
+				"resource": "poddisruptionbudgets",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 11,
+							"100000": 11,
+							"1000000": 11,
+							"10000000": 11,
+							"1250000": 11,
+							"150000": 11,
+							"1500000": 11,
+							"15000000": 11,
+							"1750000": 11,
+							"200000": 11,
+							"2000000": 11,
+							"20000000": 11,
+							"250000": 11,
+							"2500000": 11,
+							"25000000": 11,
+							"300000": 11,
+							"3000000": 11,
+							"30000000": 11,
+							"350000": 11,
+							"3500000": 11,
+							"400000": 11,
+							"4000000": 11,
+							"40000000": 11,
+							"450000": 11,
+							"4500000": 11,
+							"50000": 11,
+							"500000": 11,
+							"5000000": 11,
+							"50000000": 11,
+							"600000": 11,
+							"6000000": 11,
+							"60000000": 11,
+							"700000": 11,
+							"7000000": 11,
+							"800000": 11,
+							"8000000": 11,
+							"900000": 11,
+							"9000000": 11
+						},
+						"count": 11,
+						"sum": 36154.111000000004
+					}
+				},
+				"group": "flowcontrol.apiserver.k8s.io",
+				"resource": "flowschemas",
+				"scope": "resource",
+				"verb": "POST",
+				"version": "v1beta1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"1250000": 1,
+							"150000": 1,
+							"1500000": 1,
+							"15000000": 1,
+							"1750000": 1,
+							"200000": 1,
+							"2000000": 1,
+							"20000000": 1,
+							"250000": 1,
+							"2500000": 1,
+							"25000000": 1,
+							"300000": 1,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 1,
+							"3500000": 1,
+							"400000": 1,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 1,
+							"4500000": 1,
+							"50000": 1,
+							"500000": 1,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 1,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 1,
+							"7000000": 1,
+							"800000": 1,
+							"8000000": 1,
+							"900000": 1,
+							"9000000": 1
+						},
+						"count": 1,
+						"sum": 2405.561
+					}
+				},
+				"group": "apps",
+				"resource": "statefulsets",
+				"scope": "resource",
+				"subresource": "status",
+				"verb": "PUT",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 2,
+				"group": "apiregistration.k8s.io",
+				"resource": "apiservices",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 2,
+				"group": "policy",
+				"resource": "poddisruptionbudgets",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1beta1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 8,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 8,
+						"sum": 3669013015.7660003
+					}
+				},
+				"group": "discovery.k8s.io",
+				"longrunning": {
+					"count": 3
+				},
+				"resource": "endpointslices",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1beta1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 8,
+							"1000": 8,
+							"10000": 8,
+							"100000": 8,
+							"1000000": 8,
+							"10000000": 8,
+							"100000000": 8,
+							"1000000000": 8
+						},
+						"count": 8,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "201",
+				"component": "apiserver",
+				"count": 124,
+				"group": "authorization.k8s.io",
+				"resource": "subjectaccessreviews",
+				"scope": "resource",
+				"verb": "POST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 22,
+				"resource": "nodes",
+				"scope": "resource",
+				"subresource": "status",
+				"verb": "PATCH",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "batch",
+				"version": "v1beta1"
+			},
+			"watch": {
+				"events": {
+					"kind": "CronJob",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 38,
+								"1024": 19,
+								"131072": 38,
+								"16384": 38,
+								"2048": 20,
+								"32768": 38,
+								"4096": 38,
+								"65536": 38,
+								"8192": 38
+							},
+							"count": 38,
+							"sum": 55822
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 48,
+				"resource": "pods",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 8,
+							"100000": 8,
+							"1000000": 8,
+							"10000000": 8,
+							"1250000": 8,
+							"150000": 8,
+							"1500000": 8,
+							"15000000": 8,
+							"1750000": 8,
+							"200000": 8,
+							"2000000": 8,
+							"20000000": 8,
+							"250000": 8,
+							"2500000": 8,
+							"25000000": 8,
+							"300000": 8,
+							"3000000": 8,
+							"30000000": 8,
+							"350000": 8,
+							"3500000": 8,
+							"400000": 8,
+							"4000000": 8,
+							"40000000": 8,
+							"450000": 8,
+							"4500000": 8,
+							"50000": 8,
+							"500000": 8,
+							"5000000": 8,
+							"50000000": 8,
+							"600000": 8,
+							"6000000": 8,
+							"60000000": 8,
+							"700000": 8,
+							"7000000": 8,
+							"800000": 8,
+							"8000000": 8,
+							"900000": 8,
+							"9000000": 8
+						},
+						"count": 8,
+						"sum": 8839.859
+					}
+				},
+				"group": "certificates.k8s.io",
+				"resource": "certificatesigningrequests",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 8,
+							"1000": 6,
+							"10000": 8,
+							"100000": 8,
+							"1000000": 8,
+							"10000000": 8,
+							"100000000": 8,
+							"1000000000": 8
+						},
+						"count": 8,
+						"sum": 12945
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 5,
+				"group": "networking.k8s.io",
+				"resource": "networkpolicies",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"1250000": 1,
+							"150000": 1,
+							"1500000": 1,
+							"15000000": 1,
+							"1750000": 1,
+							"200000": 1,
+							"2000000": 1,
+							"20000000": 1,
+							"250000": 1,
+							"2500000": 1,
+							"25000000": 1,
+							"300000": 1,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 1,
+							"3500000": 1,
+							"400000": 1,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 1,
+							"4500000": 1,
+							"50000": 1,
+							"500000": 1,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 1,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 1,
+							"7000000": 1,
+							"800000": 1,
+							"8000000": 1,
+							"900000": 1,
+							"9000000": 1
+						},
+						"count": 1,
+						"sum": 2144.12
+					}
+				},
+				"resource": "persistentvolumeclaims",
+				"scope": "resource",
+				"subresource": "status",
+				"verb": "PUT",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"1250000": 1,
+							"150000": 1,
+							"1500000": 1,
+							"15000000": 1,
+							"1750000": 1,
+							"200000": 1,
+							"2000000": 1,
+							"20000000": 1,
+							"250000": 1,
+							"2500000": 1,
+							"25000000": 1,
+							"300000": 1,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 1,
+							"3500000": 1,
+							"400000": 1,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 1,
+							"4500000": 1,
+							"50000": 1,
+							"500000": 1,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 1,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 1,
+							"7000000": 1,
+							"800000": 1,
+							"8000000": 1,
+							"900000": 1,
+							"9000000": 1
+						},
+						"count": 1,
+						"sum": 3979.419
+					}
+				},
+				"group": "rbac.authorization.k8s.io",
+				"resource": "clusterrolebindings",
+				"scope": "resource",
+				"verb": "DELETE",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 6,
+				"group": "rbac.authorization.k8s.io",
+				"resource": "clusterroles",
+				"scope": "resource",
+				"verb": "APPLY",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 3,
+				"group": "certificates.k8s.io",
+				"resource": "certificatesigningrequests",
+				"scope": "resource",
+				"subresource": "approval",
+				"verb": "PUT",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 1,
+				"group": "policy",
+				"resource": "podsecuritypolicies",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1beta1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 4,
+				"group": "rbac.authorization.k8s.io",
+				"resource": "clusterrolebindings",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 7,
+							"100000": 7,
+							"1000000": 7,
+							"10000000": 7,
+							"1250000": 7,
+							"150000": 7,
+							"1500000": 7,
+							"15000000": 7,
+							"1750000": 7,
+							"200000": 7,
+							"2000000": 7,
+							"20000000": 7,
+							"250000": 7,
+							"2500000": 7,
+							"25000000": 7,
+							"300000": 7,
+							"3000000": 7,
+							"30000000": 7,
+							"350000": 7,
+							"3500000": 7,
+							"400000": 7,
+							"4000000": 7,
+							"40000000": 7,
+							"450000": 7,
+							"4500000": 7,
+							"50000": 7,
+							"500000": 7,
+							"5000000": 7,
+							"50000000": 7,
+							"600000": 7,
+							"6000000": 7,
+							"60000000": 7,
+							"700000": 7,
+							"7000000": 7,
+							"800000": 7,
+							"8000000": 7,
+							"900000": 7,
+							"9000000": 7
+						},
+						"count": 7,
+						"sum": 10219.432
+					}
+				},
+				"group": "flowcontrol.apiserver.k8s.io",
+				"resource": "prioritylevelconfigurations",
+				"scope": "resource",
+				"verb": "POST",
+				"version": "v1beta1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "201",
+				"component": "apiserver",
+				"count": 3,
+				"group": "certificates.k8s.io",
+				"resource": "certificatesigningrequests",
+				"scope": "resource",
+				"verb": "POST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 11,
+				"group": "flowcontrol.apiserver.k8s.io",
+				"resource": "flowschemas",
+				"scope": "resource",
+				"subresource": "status",
+				"verb": "PATCH",
+				"version": "v1beta1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "networking.k8s.io",
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "IngressClass",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 16,
+								"1024": 16,
+								"131072": 16,
+								"16384": 16,
+								"2048": 16,
+								"32768": 16,
+								"4096": 16,
+								"65536": 16,
+								"8192": 16
+							},
+							"count": 16,
+							"sum": 1216
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 2,
+				"group": "networking.k8s.io",
+				"resource": "ingressclasses",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 6,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 6,
+						"sum": 2599005191.02
+					}
+				},
+				"group": "scheduling.k8s.io",
+				"longrunning": {
+					"count": 2
+				},
+				"resource": "priorityclasses",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 6,
+							"1000": 6,
+							"10000": 6,
+							"100000": 6,
+							"1000000": 6,
+							"10000000": 6,
+							"100000000": 6,
+							"1000000000": 6
+						},
+						"count": 6,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 2,
+				"group": "flowcontrol.apiserver.k8s.io",
+				"resource": "prioritylevelconfigurations",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1beta1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "404",
+				"component": "apiserver",
+				"count": 1,
+				"group": "batch",
+				"resource": "cronjobs",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 2,
+				"group": "batch",
+				"resource": "cronjobs",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 5,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 5,
+						"sum": 2164003818.5230002
+					}
+				},
+				"group": "rbac.authorization.k8s.io",
+				"longrunning": {
+					"count": 2
+				},
+				"resource": "rolebindings",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 5,
+							"1000": 5,
+							"10000": 5,
+							"100000": 5,
+							"1000000": 5,
+							"10000000": 5,
+							"100000000": 5,
+							"1000000000": 5
+						},
+						"count": 5,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 1,
+				"resource": "persistentvolumes",
+				"scope": "resource",
+				"verb": "PUT",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 12,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 12,
+						"sum": 5385011154.172999
+					}
+				},
+				"longrunning": {
+					"count": 5
+				},
+				"resource": "persistentvolumeclaims",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 12,
+							"1000": 12,
+							"10000": 12,
+							"100000": 12,
+							"1000000": 12,
+							"10000000": 12,
+							"100000000": 12,
+							"1000000000": 12
+						},
+						"count": 12,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"etcd": {
+				"object": {
+					"count": 0
+				}
+			},
+			"request": {
+				"resource": "runtimeclasses.node.k8s.io"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 3,
+							"100000": 3,
+							"1000000": 3,
+							"10000000": 3,
+							"1250000": 3,
+							"150000": 3,
+							"1500000": 3,
+							"15000000": 3,
+							"1750000": 3,
+							"200000": 3,
+							"2000000": 3,
+							"20000000": 3,
+							"250000": 3,
+							"2500000": 3,
+							"25000000": 3,
+							"300000": 3,
+							"3000000": 3,
+							"30000000": 3,
+							"350000": 3,
+							"3500000": 3,
+							"400000": 3,
+							"4000000": 3,
+							"40000000": 3,
+							"450000": 3,
+							"4500000": 3,
+							"50000": 3,
+							"500000": 3,
+							"5000000": 3,
+							"50000000": 3,
+							"600000": 3,
+							"6000000": 3,
+							"60000000": 3,
+							"700000": 3,
+							"7000000": 3,
+							"800000": 3,
+							"8000000": 3,
+							"900000": 3,
+							"9000000": 3
+						},
+						"count": 3,
+						"sum": 9930.704
+					}
+				},
+				"resource": "services",
+				"scope": "resource",
+				"verb": "POST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 10,
+							"100000": 9,
+							"1000000": 10,
+							"10000000": 10,
+							"1250000": 10,
+							"150000": 10,
+							"1500000": 10,
+							"15000000": 10,
+							"1750000": 10,
+							"200000": 10,
+							"2000000": 10,
+							"20000000": 10,
+							"250000": 10,
+							"2500000": 10,
+							"25000000": 10,
+							"300000": 10,
+							"3000000": 10,
+							"30000000": 10,
+							"350000": 10,
+							"3500000": 10,
+							"400000": 10,
+							"4000000": 10,
+							"40000000": 10,
+							"450000": 10,
+							"4500000": 10,
+							"50000": 9,
+							"500000": 10,
+							"5000000": 10,
+							"50000000": 10,
+							"600000": 10,
+							"6000000": 10,
+							"60000000": 10,
+							"700000": 10,
+							"7000000": 10,
+							"800000": 10,
+							"8000000": 10,
+							"900000": 10,
+							"9000000": 10
+						},
+						"count": 10,
+						"sum": 161328.207
+					}
+				},
+				"group": "discovery.k8s.io",
+				"resource": "endpointslices",
+				"scope": "resource",
+				"verb": "PUT",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 48,
+							"100000": 48,
+							"1000000": 48,
+							"10000000": 48,
+							"1250000": 48,
+							"150000": 48,
+							"1500000": 48,
+							"15000000": 48,
+							"1750000": 48,
+							"200000": 48,
+							"2000000": 48,
+							"20000000": 48,
+							"250000": 48,
+							"2500000": 48,
+							"25000000": 48,
+							"300000": 48,
+							"3000000": 48,
+							"30000000": 48,
+							"350000": 48,
+							"3500000": 48,
+							"400000": 48,
+							"4000000": 48,
+							"40000000": 48,
+							"450000": 48,
+							"4500000": 48,
+							"50000": 48,
+							"500000": 48,
+							"5000000": 48,
+							"50000000": 48,
+							"600000": 48,
+							"6000000": 48,
+							"60000000": 48,
+							"700000": 48,
+							"7000000": 48,
+							"800000": 48,
+							"8000000": 48,
+							"900000": 48,
+							"9000000": 48
+						},
+						"count": 48,
+						"sum": 53500.069
+					}
+				},
+				"group": "flowcontrol.apiserver.k8s.io",
+				"resource": "flowschemas",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1beta1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 48,
+							"1000": 48,
+							"10000": 48,
+							"100000": 48,
+							"1000000": 48,
+							"10000000": 48,
+							"100000000": 48,
+							"1000000000": 48
+						},
+						"count": 48,
+						"sum": 41108
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "storage.k8s.io",
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "CSINode",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 27,
+								"1024": 27,
+								"131072": 27,
+								"16384": 27,
+								"2048": 27,
+								"32768": 27,
+								"4096": 27,
+								"65536": 27,
+								"8192": 27
+							},
+							"count": 27,
+							"sum": 3746
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"count": 143,
+				"subresource": "/livez",
+				"verb": "GET"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "rbac.authorization.k8s.io",
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "ClusterRoleBinding",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 79,
+								"1024": 77,
+								"131072": 79,
+								"16384": 79,
+								"2048": 79,
+								"32768": 79,
+								"4096": 79,
+								"65536": 79,
+								"8192": 79
+							},
+							"count": 79,
+							"sum": 43699
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 3,
+							"100000": 3,
+							"1000000": 3,
+							"10000000": 3,
+							"1250000": 3,
+							"150000": 3,
+							"1500000": 3,
+							"15000000": 3,
+							"1750000": 3,
+							"200000": 3,
+							"2000000": 3,
+							"20000000": 3,
+							"250000": 3,
+							"2500000": 3,
+							"25000000": 3,
+							"300000": 3,
+							"3000000": 3,
+							"30000000": 3,
+							"350000": 3,
+							"3500000": 3,
+							"400000": 3,
+							"4000000": 3,
+							"40000000": 3,
+							"450000": 3,
+							"4500000": 3,
+							"50000": 3,
+							"500000": 3,
+							"5000000": 3,
+							"50000000": 3,
+							"600000": 3,
+							"6000000": 3,
+							"60000000": 3,
+							"700000": 3,
+							"7000000": 3,
+							"800000": 3,
+							"8000000": 3,
+							"900000": 3,
+							"9000000": 3
+						},
+						"count": 3,
+						"sum": 1737.233
+					}
+				},
+				"group": "admissionregistration.k8s.io",
+				"resource": "mutatingwebhookconfigurations",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 3,
+							"1000": 3,
+							"10000": 3,
+							"100000": 3,
+							"1000000": 3,
+							"10000000": 3,
+							"100000000": 3,
+							"1000000000": 3
+						},
+						"count": 3,
+						"sum": 264
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "404",
+				"component": "apiserver",
+				"count": 42,
+				"resource": "serviceaccounts",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 2,
+				"group": "storage.k8s.io",
+				"resource": "csinodes",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 2,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 2,
+						"sum": 897001982.94
+					}
+				},
+				"longrunning": {
+					"count": 1
+				},
+				"resource": "events",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 2,
+							"1000": 2,
+							"10000": 2,
+							"100000": 2,
+							"1000000": 2,
+							"10000000": 2,
+							"100000000": 2,
+							"1000000000": 2
+						},
+						"count": 2,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 2,
+				"group": "autoscaling",
+				"resource": "horizontalpodautoscalers",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v2beta1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"1250000": 1,
+							"150000": 1,
+							"1500000": 1,
+							"15000000": 1,
+							"1750000": 1,
+							"200000": 1,
+							"2000000": 1,
+							"20000000": 1,
+							"250000": 1,
+							"2500000": 1,
+							"25000000": 1,
+							"300000": 1,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 1,
+							"3500000": 1,
+							"400000": 1,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 1,
+							"4500000": 1,
+							"50000": 1,
+							"500000": 1,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 1,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 1,
+							"7000000": 1,
+							"800000": 1,
+							"8000000": 1,
+							"900000": 1,
+							"9000000": 1
+						},
+						"count": 1,
+						"sum": 191.292
+					}
+				},
+				"group": "coordination.k8s.io",
+				"resource": "leases",
+				"scope": "namespace",
+				"verb": "LIST",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 1,
+							"1000": 0,
+							"10000": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"100000000": 1,
+							"1000000000": 1
+						},
+						"count": 1,
+						"sum": 1592
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 							"+Inf": 1,
 							"100000": 1,
 							"1000000": 1,
@@ -84,7 +3009,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -95,7 +3020,11 @@
 				"count": 1,
 				"resource": "nodes",
 				"scope": "cluster",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"verb": "GET",
+				"version": "v1"
+=======
+				"verb": "LIST",
 				"version": "v1"
 			}
 		},
@@ -111,7 +3040,179 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 117,
+							"100000": 117,
+							"1000000": 117,
+							"10000000": 117,
+							"1250000": 117,
+							"150000": 117,
+							"1500000": 117,
+							"15000000": 117,
+							"1750000": 117,
+							"200000": 117,
+							"2000000": 117,
+							"20000000": 117,
+							"250000": 117,
+							"2500000": 117,
+							"25000000": 117,
+							"300000": 117,
+							"3000000": 117,
+							"30000000": 117,
+							"350000": 117,
+							"3500000": 117,
+							"400000": 117,
+							"4000000": 117,
+							"40000000": 117,
+							"450000": 117,
+							"4500000": 117,
+							"50000": 117,
+							"500000": 117,
+							"5000000": 117,
+							"50000000": 117,
+							"600000": 117,
+							"6000000": 117,
+							"60000000": 117,
+							"700000": 117,
+							"7000000": 117,
+							"800000": 117,
+							"8000000": 117,
+							"900000": 117,
+							"9000000": 117
+						},
+						"count": 117,
+						"sum": 189362.956
+					}
+				},
+				"resource": "serviceaccounts",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 117,
+							"1000": 117,
+							"10000": 117,
+							"100000": 117,
+							"1000000": 117,
+							"10000000": 117,
+							"100000000": 117,
+							"1000000000": 117
+						},
+						"count": 117,
+						"sum": 19717
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 143,
+							"100000": 140,
+							"1000000": 142,
+							"10000000": 143,
+							"1250000": 143,
+							"150000": 140,
+							"1500000": 143,
+							"15000000": 143,
+							"1750000": 143,
+							"200000": 140,
+							"2000000": 143,
+							"20000000": 143,
+							"250000": 140,
+							"2500000": 143,
+							"25000000": 143,
+							"300000": 140,
+							"3000000": 143,
+							"30000000": 143,
+							"350000": 140,
+							"3500000": 143,
+							"400000": 140,
+							"4000000": 143,
+							"40000000": 143,
+							"450000": 141,
+							"4500000": 143,
+							"50000": 139,
+							"500000": 141,
+							"5000000": 143,
+							"50000000": 143,
+							"600000": 141,
+							"6000000": 143,
+							"60000000": 143,
+							"700000": 141,
+							"7000000": 143,
+							"800000": 141,
+							"8000000": 143,
+							"900000": 142,
+							"9000000": 143
+						},
+						"count": 143,
+						"sum": 2504873.9210000015
+					}
+				},
+				"subresource": "/livez",
+				"verb": "GET"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 143,
+							"1000": 143,
+							"10000": 143,
+							"100000": 143,
+							"1000000": 143,
+							"10000000": 143,
+							"100000000": 143,
+							"1000000000": 143
+						},
+						"count": 143,
+						"sum": 286
+					}
+				}
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -195,7 +3296,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -362,7 +3463,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -390,7 +3491,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -474,7 +3575,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -501,7 +3602,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -528,7 +3629,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -611,7 +3712,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -638,7 +3739,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -665,7 +3766,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -693,7 +3794,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -779,7 +3880,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -806,7 +3907,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -890,7 +3991,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -974,7 +4075,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1058,7 +4159,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1142,7 +4243,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1169,7 +4270,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1196,7 +4297,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1223,9 +4324,10 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 			"request": {
 				"client": "kubeadm/v1.14.2 (linux/amd64) kubernetes/66049e3",
 				"code": "404",
@@ -1235,6 +4337,86 @@
 				"resource": "secrets",
 				"scope": "namespace",
 				"verb": "GET",
+=======
+			"etcd": {
+				"object": {
+					"count": 0
+				}
+			},
+			"request": {
+				"resource": "customresourcedefinitions.apiextensions.k8s.io"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 14,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 14,
+						"sum": 5997012252.085001
+					}
+				},
+				"longrunning": {
+					"count": 5
+				},
+				"resource": "endpoints",
+				"scope": "cluster",
+				"verb": "WATCH",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"version": "v1"
 			}
 		},
@@ -1250,7 +4432,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1278,7 +4460,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1305,7 +4487,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1388,7 +4570,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1473,7 +4655,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1501,7 +4683,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1529,7 +4711,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1640,7 +4822,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1667,7 +4849,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1694,7 +4876,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1722,7 +4904,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1806,7 +4988,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1834,7 +5016,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1861,7 +5043,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1889,7 +5071,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1916,7 +5098,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1943,9 +5125,20 @@
 		"DisableTimeSeries": false
 	},
 	{
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
+=======
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"etcd": {
+				"object": {
+					"count": 3
+				}
+			},
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 			"request": {
 				"client": "kube-controller-manager/v1.14.2 (linux/amd64) kubernetes/66049e3/shared-informers",
 				"code": "200",
@@ -1971,7 +5164,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1999,7 +5192,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -2023,7 +5216,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2092,7 +5285,28 @@
 				"resource": "csidrivers",
 				"scope": "cluster",
 				"verb": "LIST",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"version": "v1beta1"
+=======
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 3,
+							"1000": 2,
+							"10000": 2,
+							"100000": 2,
+							"1000000": 3,
+							"10000000": 3,
+							"100000000": 3,
+							"1000000000": 3
+						},
+						"count": 3,
+						"sum": 114365
+					}
+				}
 			}
 		},
 		"Index": "",
@@ -2107,7 +5321,77 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 6,
+							"100000": 6,
+							"1000000": 6,
+							"10000000": 6,
+							"1250000": 6,
+							"150000": 6,
+							"1500000": 6,
+							"15000000": 6,
+							"1750000": 6,
+							"200000": 6,
+							"2000000": 6,
+							"20000000": 6,
+							"250000": 6,
+							"2500000": 6,
+							"25000000": 6,
+							"300000": 6,
+							"3000000": 6,
+							"30000000": 6,
+							"350000": 6,
+							"3500000": 6,
+							"400000": 6,
+							"4000000": 6,
+							"40000000": 6,
+							"450000": 6,
+							"4500000": 6,
+							"50000": 6,
+							"500000": 6,
+							"5000000": 6,
+							"50000000": 6,
+							"600000": 6,
+							"6000000": 6,
+							"60000000": 6,
+							"700000": 6,
+							"7000000": 6,
+							"800000": 6,
+							"8000000": 6,
+							"900000": 6,
+							"9000000": 6
+						},
+						"count": 6,
+						"sum": 34706.153000000006
+					}
+				},
+				"resource": "pods",
+				"scope": "resource",
+				"verb": "DELETE",
+				"version": "v1"
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2135,7 +5419,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -2159,7 +5443,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2187,7 +5471,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2215,7 +5499,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2242,7 +5526,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2270,7 +5554,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2298,7 +5582,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2325,7 +5609,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -2349,7 +5633,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2377,7 +5661,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2464,7 +5748,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2549,7 +5833,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2577,7 +5861,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2660,7 +5944,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2747,7 +6031,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2774,7 +6058,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -2798,7 +6082,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2826,7 +6110,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2913,7 +6197,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2996,7 +6280,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3024,7 +6308,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3051,7 +6335,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3078,7 +6362,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3165,7 +6449,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3249,7 +6533,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3276,7 +6560,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3303,7 +6587,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3330,7 +6614,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3358,7 +6642,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3470,7 +6754,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -3494,7 +6778,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3522,7 +6806,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3550,7 +6834,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -3574,7 +6858,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -3598,7 +6882,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -3622,7 +6906,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3650,7 +6934,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3678,7 +6962,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3705,7 +6989,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3732,7 +7016,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3819,7 +7103,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -3843,7 +7127,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3871,7 +7155,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3899,7 +7183,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3927,7 +7211,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4014,7 +7298,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4041,7 +7325,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4069,7 +7353,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4153,7 +7437,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4182,7 +7466,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4210,7 +7494,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4238,7 +7522,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4321,7 +7605,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4433,7 +7717,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4516,7 +7800,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4543,7 +7827,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4571,7 +7855,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -4597,7 +7881,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4680,7 +7964,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4764,7 +8048,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4847,7 +8131,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4930,7 +8214,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5014,7 +8298,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5042,7 +8326,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5127,7 +8411,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5154,7 +8438,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5238,7 +8522,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -5262,7 +8546,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5289,7 +8573,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5317,7 +8601,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5344,7 +8628,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -5368,7 +8652,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5454,7 +8738,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -5478,7 +8762,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5506,7 +8790,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5533,7 +8817,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5560,7 +8844,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5587,7 +8871,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -5611,7 +8895,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5638,7 +8922,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -5662,7 +8946,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5717,7 +9001,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5829,7 +9113,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5856,7 +9140,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -5880,7 +9164,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5908,7 +9192,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5936,7 +9220,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5964,7 +9248,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5991,7 +9275,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6102,7 +9386,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6130,7 +9414,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6217,7 +9501,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6245,7 +9529,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6272,7 +9556,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6436,7 +9720,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6464,7 +9748,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6550,7 +9834,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6633,7 +9917,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -6657,7 +9941,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6684,7 +9968,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6711,7 +9995,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6738,7 +10022,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6822,7 +10106,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6909,7 +10193,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"audit": {
@@ -6954,7 +10238,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6982,7 +10266,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7069,7 +10353,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7096,7 +10380,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7182,9 +10466,20 @@
 		"DisableTimeSeries": false
 	},
 	{
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
+=======
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"etcd": {
+				"object": {
+					"count": 43
+				}
+			},
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 			"request": {
 				"client": "kube-apiserver/v1.14.2 (linux/amd64) kubernetes/66049e3",
 				"code": "200",
@@ -7210,7 +10505,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7237,7 +10532,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7264,7 +10559,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7291,7 +10586,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7318,7 +10613,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7346,7 +10641,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7373,7 +10668,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7460,7 +10755,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -7484,7 +10779,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7594,7 +10889,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7705,7 +11000,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7757,6 +11052,7 @@
 					}
 				},
 				"group": "rbac.authorization.k8s.io",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"latency": {
 					"bucket": {
 						"+Inf": 11,
@@ -7770,6 +11066,136 @@
 					},
 					"count": 11,
 					"sum": 33701
+=======
+				"resource": "rolebindings",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 11,
+							"1000": 11,
+							"10000": 11,
+							"100000": 11,
+							"1000000": 11,
+							"10000000": 11,
+							"100000000": 11,
+							"1000000000": 11
+						},
+						"count": 11,
+						"sum": 2773
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "discovery.k8s.io",
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "EndpointSlice",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 25,
+								"1024": 15,
+								"131072": 25,
+								"16384": 25,
+								"2048": 25,
+								"32768": 25,
+								"4096": 25,
+								"65536": 25,
+								"8192": 25
+							},
+							"count": 25,
+							"sum": 14416
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 45,
+							"100000": 45,
+							"1000000": 45,
+							"10000000": 45,
+							"1250000": 45,
+							"150000": 45,
+							"1500000": 45,
+							"15000000": 45,
+							"1750000": 45,
+							"200000": 45,
+							"2000000": 45,
+							"20000000": 45,
+							"250000": 45,
+							"2500000": 45,
+							"25000000": 45,
+							"300000": 45,
+							"3000000": 45,
+							"30000000": 45,
+							"350000": 45,
+							"3500000": 45,
+							"400000": 45,
+							"4000000": 45,
+							"40000000": 45,
+							"450000": 45,
+							"4500000": 45,
+							"50000": 45,
+							"500000": 45,
+							"5000000": 45,
+							"50000000": 45,
+							"600000": 45,
+							"6000000": 45,
+							"60000000": 45,
+							"700000": 45,
+							"7000000": 45,
+							"800000": 45,
+							"8000000": 45,
+							"900000": 45,
+							"9000000": 45
+						},
+						"count": 45,
+						"sum": 103197.935
+					}
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				},
 				"resource": "rolebindings",
 				"scope": "namespace",
@@ -7789,12 +11215,58 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"client": "kube-apiserver/v1.14.2 (linux/amd64) kubernetes/66049e3",
 				"code": "200",
+=======
+				"group": "events.k8s.io",
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "Event",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 204,
+								"1024": 204,
+								"131072": 204,
+								"16384": 204,
+								"2048": 204,
+								"32768": 204,
+								"4096": 204,
+								"65536": 204,
+								"8192": 204
+							},
+							"count": 204,
+							"sum": 140685
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"component": "apiserver",
 				"content_type": "application/vnd.kubernetes.protobuf",
 				"count": 1,
@@ -7816,6 +11288,7 @@
 		"DisableTimeSeries": false
 	},
 	{
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
@@ -7827,6 +11300,61 @@
 				"count": 60,
 				"group": "rbac.authorization.k8s.io",
 				"resource": "clusterroles",
+=======
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"1250000": 1,
+							"150000": 1,
+							"1500000": 1,
+							"15000000": 1,
+							"1750000": 1,
+							"200000": 1,
+							"2000000": 1,
+							"20000000": 1,
+							"250000": 1,
+							"2500000": 1,
+							"25000000": 1,
+							"300000": 1,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 1,
+							"3500000": 1,
+							"400000": 1,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 1,
+							"4500000": 1,
+							"50000": 1,
+							"500000": 1,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 1,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 1,
+							"7000000": 1,
+							"800000": 1,
+							"8000000": 1,
+							"900000": 1,
+							"9000000": 1
+						},
+						"count": 1,
+						"sum": 1241.2079999999999
+					}
+				},
+				"group": "extensions",
+				"resource": "ingresses",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"scope": "cluster",
 				"verb": "GET",
 				"version": "v1"
@@ -7844,7 +11372,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7928,7 +11456,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8012,7 +11540,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8039,7 +11567,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8066,7 +11594,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8149,7 +11677,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8232,7 +11760,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8259,7 +11787,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8287,7 +11815,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8314,7 +11842,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8342,7 +11870,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8370,7 +11898,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8454,7 +11982,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8482,7 +12010,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8533,6 +12061,7 @@
 						"sum": 400.125
 					}
 				},
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"group": "admissionregistration.k8s.io",
 				"latency": {
 					"bucket": {
@@ -8552,6 +12081,30 @@
 				"scope": "cluster",
 				"verb": "LIST",
 				"version": "v1beta1"
+=======
+				"group": "apps",
+				"resource": "deployments",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 2,
+							"1000": 2,
+							"10000": 2,
+							"100000": 2,
+							"1000000": 2,
+							"10000000": 2,
+							"100000000": 2,
+							"1000000000": 2
+						},
+						"count": 2,
+						"sum": 484
+					}
+				}
 			}
 		},
 		"Index": "",
@@ -8566,7 +12119,85 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 6,
+				"group": "rbac.authorization.k8s.io",
+				"resource": "clusterrolebindings",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "404",
+				"component": "apiserver",
+				"count": 1,
+				"resource": "secrets",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "201",
+				"component": "apiserver",
+				"count": 1,
+				"group": "storage.k8s.io",
+				"resource": "storageclasses",
+				"scope": "resource",
+				"verb": "POST",
+				"version": "v1"
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8595,7 +12226,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8678,7 +12309,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8706,7 +12337,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -8730,7 +12361,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8758,7 +12389,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8786,7 +12417,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8814,7 +12445,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8842,7 +12473,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8926,7 +12557,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8953,7 +12584,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8980,7 +12611,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9116,7 +12747,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9310,7 +12941,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -9336,7 +12967,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9420,7 +13051,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9449,7 +13080,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9463,6 +13094,30 @@
 				"scope": "cluster",
 				"verb": "LIST",
 				"version": "v1"
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
+=======
+			},
+			"watch": {
+				"events": {
+					"kind": "PodDisruptionBudget",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 17,
+								"1024": 17,
+								"131072": 17,
+								"16384": 17,
+								"2048": 17,
+								"32768": 17,
+								"4096": 17,
+								"65536": 17,
+								"8192": 17
+							},
+							"count": 17,
+							"sum": 1394
+						}
+					}
+				}
 			}
 		},
 		"Index": "",
@@ -9477,7 +13132,32 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"etcd": {
+				"object": {
+					"count": 12
+				}
+			},
+			"request": {
+				"resource": "configmaps"
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9504,7 +13184,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9616,7 +13296,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9700,7 +13380,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9781,7 +13461,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -9805,7 +13485,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9832,7 +13512,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9905,6 +13585,26 @@
 				"scope": "cluster",
 				"verb": "WATCH",
 				"version": "v1"
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
+=======
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 34,
+							"1000": 34,
+							"10000": 34,
+							"100000": 34,
+							"1000000": 34,
+							"10000000": 34,
+							"100000000": 34,
+							"1000000000": 34
+						},
+						"count": 34,
+						"sum": 0
+					}
+				}
 			}
 		},
 		"Index": "",
@@ -9919,7 +13619,34 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "200",
+				"component": "apiserver",
+				"count": 1,
+				"group": "apps",
+				"resource": "controllerrevisions",
+				"scope": "resource",
+				"verb": "GET",
+				"version": "v1"
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10003,7 +13730,11 @@
 		"DisableTimeSeries": false
 	},
 	{
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 		"RootFields": null,
+=======
+		"RootFields": {},
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10011,6 +13742,7 @@
 				"duration": {
 					"us": {
 						"bucket": {
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 							"+Inf": 1,
 							"100000": 1,
 							"1000000": 1,
@@ -10049,6 +13781,46 @@
 							"8000000": 1,
 							"900000": 1,
 							"9000000": 1
+=======
+							"+Inf": 6,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 						},
 						"count": 1,
 						"sum": 270.347
@@ -10087,7 +13859,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10115,7 +13887,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10142,7 +13914,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10169,7 +13941,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10197,7 +13969,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10224,7 +13996,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10252,7 +14024,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10335,7 +14107,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10362,17 +14134,76 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
 				"client": "kube-scheduler/v1.14.2 (linux/amd64) kubernetes/66049e3/scheduler",
 				"code": "200",
 				"component": "apiserver",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"content_type": "application/vnd.kubernetes.protobuf;stream=watch",
 				"count": 228,
 				"group": "apps",
 				"resource": "replicasets",
+=======
+				"count": 6,
+				"group": "storage.k8s.io",
+				"resource": "csidrivers",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "409",
+				"component": "apiserver",
+				"count": 2,
+				"group": "apps",
+				"resource": "daemonsets",
+				"scope": "resource",
+				"subresource": "status",
+				"verb": "PUT",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 6,
+				"group": "storage.k8s.io",
+				"resource": "csinodes",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"scope": "cluster",
 				"verb": "WATCH",
 				"version": "v1"
@@ -10390,18 +14221,70 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
 				"client": "coredns/v0.0.0 (linux/amd64) kubernetes/$Format",
 				"code": "200",
 				"component": "apiserver",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"content_type": "application/vnd.kubernetes.protobuf;stream=watch",
 				"count": 460,
 				"resource": "namespaces",
 				"scope": "cluster",
 				"verb": "WATCH",
+				"version": "v1"
+=======
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 44,
+							"100000": 44,
+							"1000000": 44,
+							"10000000": 44,
+							"1250000": 44,
+							"150000": 44,
+							"1500000": 44,
+							"15000000": 44,
+							"1750000": 44,
+							"200000": 44,
+							"2000000": 44,
+							"20000000": 44,
+							"250000": 44,
+							"2500000": 44,
+							"25000000": 44,
+							"300000": 44,
+							"3000000": 44,
+							"30000000": 44,
+							"350000": 44,
+							"3500000": 44,
+							"400000": 44,
+							"4000000": 44,
+							"40000000": 44,
+							"450000": 44,
+							"4500000": 44,
+							"50000": 44,
+							"500000": 44,
+							"5000000": 44,
+							"50000000": 44,
+							"600000": 44,
+							"6000000": 44,
+							"60000000": 44,
+							"700000": 44,
+							"7000000": 44,
+							"800000": 44,
+							"8000000": 44,
+							"900000": 44,
+							"9000000": 44
+						},
+						"count": 44,
+						"sum": 69778.238
+					}
+				},
+				"resource": "serviceaccounts",
+				"scope": "resource",
+				"verb": "PUT",
 				"version": "v1"
 			}
 		},
@@ -10417,7 +14300,50 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "rbac.authorization.k8s.io",
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "Role",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 46,
+								"1024": 46,
+								"131072": 46,
+								"16384": 46,
+								"2048": 46,
+								"32768": 46,
+								"4096": 46,
+								"65536": 46,
+								"8192": 46
+							},
+							"count": 46,
+							"sum": 16472
+						}
+					}
+				}
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10445,7 +14371,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10529,7 +14455,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10613,7 +14539,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10696,7 +14622,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10724,7 +14650,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10751,7 +14677,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10837,7 +14763,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10864,7 +14790,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10891,7 +14817,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10918,7 +14844,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10945,7 +14871,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10972,7 +14898,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10999,7 +14925,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11274,7 +15200,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11358,7 +15284,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11385,7 +15311,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11412,7 +15338,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11441,7 +15367,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11468,7 +15394,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11496,7 +15422,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -11520,7 +15446,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11603,7 +15529,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11758,7 +15684,54 @@
 				},
 				"resource": "horizontalpodautoscalers",
 				"scope": "cluster",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"verb": "LIST",
+=======
+				"verb": "WATCH",
+				"version": "v1beta1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 2,
+							"1000": 2,
+							"10000": 2,
+							"100000": 2,
+							"1000000": 2,
+							"10000000": 2,
+							"100000000": 2,
+							"1000000000": 2
+						},
+						"count": 2,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "404",
+				"component": "apiserver",
+				"count": 61,
+				"resource": "nodes",
+				"scope": "resource",
+				"verb": "GET",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"version": "v1"
 			}
 		},
@@ -11774,7 +15747,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11857,9 +15830,36 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
+=======
+			"etcd": {
+				"object": {
+					"count": 0
+				}
+			},
+			"request": {
+				"resource": "validatingwebhookconfigurations.admissionregistration.k8s.io"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 			"request": {
 				"component": "apiserver",
 				"duration": {
@@ -11944,7 +15944,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11995,6 +15995,7 @@
 						"sum": 15127.316000000003
 					}
 				},
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"group": "apps",
 				"latency": {
 					"bucket": {
@@ -12012,6 +16013,10 @@
 				},
 				"resource": "controllerrevisions",
 				"scope": "namespace",
+=======
+				"resource": "pods",
+				"scope": "resource",
+				"subresource": "binding",
 				"verb": "POST",
 				"version": "v1"
 			}
@@ -12028,7 +16033,34 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "201",
+				"component": "apiserver",
+				"count": 6,
+				"group": "coordination.k8s.io",
+				"resource": "leases",
+				"scope": "resource",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+				"verb": "POST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12111,7 +16143,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12138,7 +16170,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12165,7 +16197,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12238,6 +16270,26 @@
 				"scope": "cluster",
 				"verb": "WATCH",
 				"version": "v1"
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
+=======
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 8,
+							"1000": 8,
+							"10000": 8,
+							"100000": 8,
+							"1000000": 8,
+							"10000000": 8,
+							"100000000": 8,
+							"1000000000": 8
+						},
+						"count": 8,
+						"sum": 0
+					}
+				}
 			}
 		},
 		"Index": "",
@@ -12252,7 +16304,32 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"etcd": {
+				"object": {
+					"count": 4
+				}
+			},
+			"request": {
+				"resource": "controllerrevisions.apps"
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12280,7 +16357,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12308,7 +16385,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12336,7 +16413,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12423,7 +16500,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -12447,7 +16524,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12475,7 +16552,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12503,18 +16580,42 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
 				"client": "kube-controller-manager/v1.14.2 (linux/amd64) kubernetes/66049e3/kube-controller-manager",
 				"code": "201",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"component": "apiserver",
 				"content_type": "application/vnd.kubernetes.protobuf",
 				"count": 1,
 				"resource": "events",
 				"scope": "namespace",
 				"verb": "POST",
+=======
+				"host": "[::1]:6443",
+				"method": "POST"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "storage.k8s.io",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"version": "v1"
 			}
 		},
@@ -12530,7 +16631,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12557,7 +16658,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12727,7 +16828,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12755,7 +16856,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12782,7 +16883,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12850,7 +16951,55 @@
 				"longrunning": {
 					"count": 7
 				},
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"resource": "services",
+=======
+				"resource": "poddisruptionbudgets",
+				"scope": "cluster",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 6,
+							"1000": 6,
+							"10000": 6,
+							"100000": 6,
+							"1000000": 6,
+							"10000000": 6,
+							"100000000": 6,
+							"1000000000": 6
+						},
+						"count": 6,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 3,
+				"group": "discovery.k8s.io",
+				"resource": "endpointslices",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"scope": "cluster",
 				"verb": "WATCH",
 				"version": "v1"
@@ -12868,7 +17017,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12952,7 +17101,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13036,7 +17185,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13064,7 +17213,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13092,7 +17241,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13119,7 +17268,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13147,7 +17296,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -13171,7 +17320,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13254,7 +17403,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13368,7 +17517,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13396,7 +17545,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13424,7 +17573,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13452,7 +17601,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13479,7 +17628,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13506,7 +17655,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13533,7 +17682,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13620,7 +17769,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13706,7 +17855,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13733,7 +17882,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13760,7 +17909,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13844,7 +17993,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13928,7 +18077,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13956,7 +18105,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -14007,7 +18156,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14035,7 +18184,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14062,7 +18211,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14089,7 +18238,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14116,7 +18265,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14143,7 +18292,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14226,7 +18375,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14313,7 +18462,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -14337,7 +18486,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14420,7 +18569,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14471,6 +18620,7 @@
 						"sum": 203725241187.41006
 					}
 				},
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"group": "admissionregistration.k8s.io",
 				"latency": {
 					"bucket": {
@@ -14490,6 +18640,53 @@
 					"count": 2
 				},
 				"resource": "validatingwebhookconfigurations",
+=======
+				"resource": "services",
+				"scope": "cluster",
+				"verb": "LIST",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 32,
+							"1000": 6,
+							"10000": 32,
+							"100000": 32,
+							"1000000": 32,
+							"10000000": 32,
+							"100000000": 32,
+							"1000000000": 32
+						},
+						"count": 32,
+						"sum": 69902
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"component": "apiserver",
+				"count": 6,
+				"group": "flowcontrol.apiserver.k8s.io",
+				"resource": "prioritylevelconfigurations",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"scope": "cluster",
 				"verb": "WATCH",
 				"version": "v1beta1"
@@ -14507,7 +18704,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -14533,7 +18730,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14616,7 +18813,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14815,7 +19012,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14843,7 +19040,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14927,7 +19124,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14954,7 +19151,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14982,7 +19179,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15010,7 +19207,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15043,7 +19240,11 @@
 							"40000000": 4,
 							"450000": 4,
 							"4500000": 4,
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 							"50000": 3,
+=======
+							"50000": 4,
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 							"500000": 4,
 							"5000000": 4,
 							"50000000": 4,
@@ -15056,6 +19257,79 @@
 							"8000000": 4,
 							"900000": 4,
 							"9000000": 4
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
+=======
+						},
+						"count": 4,
+						"sum": 14914.901000000002
+					}
+				},
+				"resource": "pods",
+				"scope": "resource",
+				"subresource": "status",
+				"verb": "PUT",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 1,
+							"100000": 1,
+							"1000000": 1,
+							"10000000": 1,
+							"1250000": 1,
+							"150000": 1,
+							"1500000": 1,
+							"15000000": 1,
+							"1750000": 1,
+							"200000": 1,
+							"2000000": 1,
+							"20000000": 1,
+							"250000": 1,
+							"2500000": 1,
+							"25000000": 1,
+							"300000": 1,
+							"3000000": 1,
+							"30000000": 1,
+							"350000": 1,
+							"3500000": 1,
+							"400000": 1,
+							"4000000": 1,
+							"40000000": 1,
+							"450000": 1,
+							"4500000": 1,
+							"50000": 1,
+							"500000": 1,
+							"5000000": 1,
+							"50000000": 1,
+							"600000": 1,
+							"6000000": 1,
+							"60000000": 1,
+							"700000": 1,
+							"7000000": 1,
+							"800000": 1,
+							"8000000": 1,
+							"900000": 1,
+							"9000000": 1
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 						},
 						"count": 4,
 						"sum": 105848.52400000002
@@ -15093,7 +19367,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15121,7 +19395,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15148,7 +19422,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15177,7 +19451,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15260,7 +19534,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15347,7 +19621,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15431,7 +19705,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15514,7 +19788,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15526,7 +19800,31 @@
 				"group": "rbac.authorization.k8s.io",
 				"resource": "roles",
 				"scope": "cluster",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"verb": "WATCH",
+=======
+				"verb": "LIST",
+				"version": "v1beta1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "apps",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"version": "v1"
 			}
 		},
@@ -15542,7 +19840,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15570,7 +19868,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15598,7 +19896,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15625,7 +19923,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15709,16 +20007,94 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
 				"client": "kube-apiserver/v1.14.2 (linux/amd64) kubernetes/66049e3",
 				"code": "200",
 				"component": "apiserver",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"content_type": "application/vnd.kubernetes.protobuf",
 				"count": 1,
 				"resource": "namespaces",
+=======
+				"count": 1,
+				"resource": "serviceaccounts",
+				"scope": "namespace",
+				"verb": "LIST",
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 5,
+							"100000": 0,
+							"1000000": 0,
+							"10000000": 0,
+							"1250000": 0,
+							"150000": 0,
+							"1500000": 0,
+							"15000000": 0,
+							"1750000": 0,
+							"200000": 0,
+							"2000000": 0,
+							"20000000": 0,
+							"250000": 0,
+							"2500000": 0,
+							"25000000": 0,
+							"300000": 0,
+							"3000000": 0,
+							"30000000": 0,
+							"350000": 0,
+							"3500000": 0,
+							"400000": 0,
+							"4000000": 0,
+							"40000000": 0,
+							"450000": 0,
+							"4500000": 0,
+							"50000": 0,
+							"500000": 0,
+							"5000000": 0,
+							"50000000": 0,
+							"600000": 0,
+							"6000000": 0,
+							"60000000": 0,
+							"700000": 0,
+							"7000000": 0,
+							"800000": 0,
+							"8000000": 0,
+							"900000": 0,
+							"9000000": 0
+						},
+						"count": 5,
+						"sum": 2425003419.499
+					}
+				},
+				"group": "storage.k8s.io",
+				"longrunning": {
+					"count": 2
+				},
+				"resource": "csistoragecapacities",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"scope": "cluster",
 				"verb": "LIST",
 				"version": "v1"
@@ -15736,7 +20112,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15791,7 +20167,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15818,7 +20194,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15845,7 +20221,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15957,7 +20333,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15985,7 +20361,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16007,7 +20383,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16093,7 +20469,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16120,7 +20496,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16147,7 +20523,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16174,7 +20550,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16257,7 +20633,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16284,7 +20660,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16312,7 +20688,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16339,7 +20715,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16593,7 +20969,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -16617,7 +20993,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16645,7 +21021,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16673,7 +21049,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16701,7 +21077,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16784,7 +21160,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16811,7 +21187,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16838,7 +21214,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16866,7 +21242,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16893,7 +21269,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16920,7 +21296,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17090,7 +21466,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17174,7 +21550,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17260,7 +21636,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17288,7 +21664,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17315,7 +21691,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17342,7 +21718,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17429,7 +21805,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17456,7 +21832,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17484,11 +21860,12 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
 				"component": "apiserver",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"duration": {
 					"us": {
 						"bucket": {
@@ -17554,6 +21931,13 @@
 				"scope": "cluster",
 				"verb": "LIST",
 				"version": "v1beta1"
+=======
+				"count": 58,
+				"resource": "serviceaccounts",
+				"scope": "resource",
+				"subresource": "token",
+				"verb": "POST",
+				"version": "v1"
 			}
 		},
 		"Index": "",
@@ -17568,7 +21952,30 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"code": "0",
+				"count": 14,
+				"subresource": "/readyz",
+				"verb": "GET"
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17595,7 +22002,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17679,7 +22086,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17706,7 +22113,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17734,7 +22141,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17821,7 +22228,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17991,7 +22398,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18074,7 +22481,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18157,7 +22564,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18184,7 +22591,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18212,7 +22619,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18296,7 +22703,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18323,7 +22730,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18406,7 +22813,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18489,7 +22896,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18517,7 +22924,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18545,7 +22952,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -18569,7 +22976,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18597,7 +23004,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18663,8 +23070,138 @@
 					"count": 232,
 					"sum": 102111235424
 				},
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"longrunning": {
 					"count": 1
+=======
+				"resource": "leases",
+				"scope": "namespace",
+				"verb": "WATCH",
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 3,
+							"1000": 3,
+							"10000": 3,
+							"100000": 3,
+							"1000000": 3,
+							"10000000": 3,
+							"100000000": 3,
+							"1000000000": 3
+						},
+						"count": 3,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "PersistentVolume",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 31,
+								"1024": 18,
+								"131072": 31,
+								"16384": 31,
+								"2048": 31,
+								"32768": 31,
+								"4096": 31,
+								"65536": 31,
+								"8192": 31
+							},
+							"count": 31,
+							"sum": 22753
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 3,
+							"100000": 3,
+							"1000000": 3,
+							"10000000": 3,
+							"1250000": 3,
+							"150000": 3,
+							"1500000": 3,
+							"15000000": 3,
+							"1750000": 3,
+							"200000": 3,
+							"2000000": 3,
+							"20000000": 3,
+							"250000": 3,
+							"2500000": 3,
+							"25000000": 3,
+							"300000": 3,
+							"3000000": 3,
+							"30000000": 3,
+							"350000": 3,
+							"3500000": 3,
+							"400000": 3,
+							"4000000": 3,
+							"40000000": 3,
+							"450000": 3,
+							"4500000": 3,
+							"50000": 3,
+							"500000": 3,
+							"5000000": 3,
+							"50000000": 3,
+							"600000": 3,
+							"6000000": 3,
+							"60000000": 3,
+							"700000": 3,
+							"7000000": 3,
+							"800000": 3,
+							"8000000": 3,
+							"900000": 3,
+							"9000000": 3
+						},
+						"count": 3,
+						"sum": 6648.844999999999
+					}
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				},
 				"resource": "certificatesigningrequests",
 				"scope": "cluster",
@@ -18711,7 +23248,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18738,7 +23275,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18766,7 +23303,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18794,7 +23331,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18849,7 +23386,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18936,7 +23473,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19023,7 +23560,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19107,7 +23644,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19135,7 +23672,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19161,7 +23698,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19188,7 +23725,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19303,7 +23840,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19359,7 +23896,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19471,7 +24008,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19498,7 +24035,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19569,6 +24106,96 @@
 				"resource": "secrets",
 				"scope": "cluster",
 				"verb": "WATCH",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
+=======
+				"version": "v1beta1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 3,
+							"1000": 3,
+							"10000": 3,
+							"100000": 3,
+							"1000000": 3,
+							"10000000": 3,
+							"100000000": 3,
+							"1000000000": 3
+						},
+						"count": 3,
+						"sum": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"component": "apiserver",
+				"duration": {
+					"us": {
+						"bucket": {
+							"+Inf": 470,
+							"100000": 462,
+							"1000000": 469,
+							"10000000": 470,
+							"1250000": 470,
+							"150000": 463,
+							"1500000": 470,
+							"15000000": 470,
+							"1750000": 470,
+							"200000": 463,
+							"2000000": 470,
+							"20000000": 470,
+							"250000": 463,
+							"2500000": 470,
+							"25000000": 470,
+							"300000": 463,
+							"3000000": 470,
+							"30000000": 470,
+							"350000": 463,
+							"3500000": 470,
+							"400000": 463,
+							"4000000": 470,
+							"40000000": 470,
+							"450000": 463,
+							"4500000": 470,
+							"50000": 462,
+							"500000": 463,
+							"5000000": 470,
+							"50000000": 470,
+							"600000": 466,
+							"6000000": 470,
+							"60000000": 470,
+							"700000": 466,
+							"7000000": 470,
+							"800000": 468,
+							"8000000": 470,
+							"900000": 468,
+							"9000000": 470
+						},
+						"count": 470,
+						"sum": 10186391.616000004
+					}
+				},
+				"resource": "nodes",
+				"scope": "cluster",
+				"verb": "LIST",
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 				"version": "v1"
 			}
 		},
@@ -19584,7 +24211,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19668,7 +24295,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19696,7 +24323,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19725,7 +24352,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19752,7 +24379,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19780,7 +24407,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19864,7 +24491,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19947,7 +24574,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19974,7 +24601,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20002,7 +24629,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20024,7 +24651,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20110,9 +24737,36 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
+=======
+			"etcd": {
+				"object": {
+					"count": 1
+				}
+			},
+			"request": {
+				"resource": "cronjobs.batch"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
 			"request": {
 				"component": "apiserver",
 				"duration": {
@@ -20194,7 +24848,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20221,7 +24875,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -20245,7 +24899,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20272,7 +24926,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20300,7 +24954,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -20324,7 +24978,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20351,7 +25005,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20378,7 +25032,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20406,7 +25060,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20434,7 +25088,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -20458,7 +25112,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20486,7 +25140,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"http": {
@@ -20529,7 +25183,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20616,7 +25270,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20699,7 +25353,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20726,7 +25380,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20813,7 +25467,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20896,7 +25550,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20924,7 +25578,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20952,7 +25606,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -20980,7 +25634,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21035,7 +25689,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21122,7 +25776,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21149,7 +25803,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21176,7 +25830,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -21200,7 +25854,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21228,7 +25882,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21255,7 +25909,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -21305,7 +25959,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21333,7 +25987,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21360,7 +26014,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21388,7 +26042,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21473,7 +26127,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21557,7 +26211,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21609,7 +26263,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21636,7 +26290,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21663,7 +26317,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21774,7 +26428,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21846,7 +26500,28 @@
 				"resource": "cronjobs",
 				"scope": "cluster",
 				"verb": "WATCH",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"version": "v1beta1"
+=======
+				"version": "v1"
+			},
+			"response": {
+				"size": {
+					"bytes": {
+						"bucket": {
+							"+Inf": 8,
+							"1000": 8,
+							"10000": 8,
+							"100000": 8,
+							"1000000": 8,
+							"10000000": 8,
+							"100000000": 8,
+							"1000000000": 8
+						},
+						"count": 8,
+						"sum": 0
+					}
+				}
 			}
 		},
 		"Index": "",
@@ -21861,7 +26536,50 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+				"group": "networking.k8s.io",
+				"version": "v1"
+			},
+			"watch": {
+				"events": {
+					"kind": "NetworkPolicy",
+					"size": {
+						"bytes": {
+							"bucket": {
+								"+Inf": 16,
+								"1024": 16,
+								"131072": 16,
+								"16384": 16,
+								"2048": 16,
+								"32768": 16,
+								"4096": 16,
+								"65536": 16,
+								"8192": 16
+							},
+							"count": 16,
+							"sum": 1232
+						}
+					}
+				}
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21889,7 +26607,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21916,7 +26634,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21943,7 +26661,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -21970,7 +26688,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22049,7 +26767,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22076,7 +26794,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22187,7 +26905,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22214,7 +26932,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -22349,7 +27067,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22403,7 +27121,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22430,7 +27148,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22457,7 +27175,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22540,7 +27258,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22623,7 +27341,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22651,7 +27369,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22679,7 +27397,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22765,7 +27483,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22849,7 +27567,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22877,7 +27595,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -22905,7 +27623,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -22929,7 +27647,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23015,7 +27733,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23099,7 +27817,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23186,7 +27904,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"etcd": {
@@ -23234,7 +27952,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23261,7 +27979,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23344,7 +28062,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23371,7 +28089,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23458,18 +28176,25 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
 				"client": "kubeadm/v1.14.2 (linux/amd64) kubernetes/66049e3",
 				"code": "201",
 				"component": "apiserver",
+<<<<<<< HEAD:metricbeat/module/kubernetes/apiserver/_meta/test/metrics.1.14.expected
 				"content_type": "application/json",
 				"count": 1,
 				"resource": "services",
 				"scope": "namespace",
 				"verb": "POST",
+=======
+				"count": 7,
+				"group": "admissionregistration.k8s.io",
+				"resource": "mutatingwebhookconfigurations",
+				"scope": "cluster",
+				"verb": "WATCH",
 				"version": "v1"
 			}
 		},
@@ -23485,7 +28210,27 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"request": {
+>>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979)):metricbeat/module/kubernetes/apiserver/_meta/test/metrics.2.0.expected
+				"version": "v1"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23569,7 +28314,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23653,7 +28398,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23737,7 +28482,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23765,7 +28510,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23793,7 +28538,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23820,7 +28565,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23903,7 +28648,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23931,7 +28676,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23958,7 +28703,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -23985,7 +28730,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -24013,7 +28758,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -24041,7 +28786,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -24068,7 +28813,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -24096,7 +28841,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"http": {
@@ -24122,7 +28867,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -24150,7 +28895,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -24234,7 +28979,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -24262,7 +29007,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
