@@ -12,7 +12,7 @@
           discover-pr-forks-trust: permission
           discover-pr-origin: merge-current
           discover-tags: true
-          notification-context: 'beats-ci'
+          notification-context: 'fleet-ci'
           head-filter-regex: '(main|\.\d+\.\d+|PR-.*|v\d+\.\d+\.\d+)'
           repo: elastic-agent-libs
           repo-owner: elastic
@@ -40,4 +40,4 @@
             timeout: 100
           timeout: '15'
           use-author: true
-          wipe-workspace: 'True'
+          wipe-workspace: true
