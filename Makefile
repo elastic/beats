@@ -172,7 +172,7 @@ docs:
 .PHONY: notice
 notice:
 	@echo "Generating NOTICE"
-	go mod tidy -compat=1.17
+	go mod tidy
 	go mod download
 	go list -m -json all | go run go.elastic.co/go-licence-detector \
 		-includeIndirect \
