@@ -1,5 +1,5 @@
 Dataproc metricset fetches metrics from https://cloud.google.com/dataproc/[Dataproc] in Google Cloud Platform.
 
-The `dataproc` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-dataproc[GCP Dataproc Monitoring API]. The field names are aligned to https://www.elastic.co/guide/en/beats/devguide/current/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
+The `dataproc` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-dataproc[GCP Dataproc Monitoring API]. The field names are aligned to {beats-devguide}/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
 
 You can specify a single region to fetch metrics like `us-central1`. Be aware that GCP Storage does not use zones so `us-central1-a` will return nothing. If no region is specified, it will return metrics from all buckets.

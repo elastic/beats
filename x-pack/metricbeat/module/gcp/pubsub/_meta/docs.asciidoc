@@ -1,5 +1,5 @@
 PubSub metricsetf fetches metrics from https://cloud.google.com/pubsub/[Pub/Sub] topics and subscriptions in Google Cloud Platform.
 
-The `pubsub` metricset contains all GA stage metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-pubsub[Stackdriver API]. The field names are aligned to https://www.elastic.co/guide/en/beats/devguide/current/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
+The `pubsub` metricset contains all GA stage metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-pubsub[Stackdriver API]. The field names are aligned to {beats-devguide}/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
 
 No special permissions are needed apart from the ones detailed in the module section of the docs.

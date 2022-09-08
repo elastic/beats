@@ -1,6 +1,6 @@
 Compute metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine] Virtual Machines in Google Cloud Platform. No Monitoring or Logging agent is required in your instances to use this metricset.
 
-The `compute` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API]. The field names are aligned to https://www.elastic.co/guide/en/beats/devguide/current/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
+The `compute` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API]. The field names are aligned to {beats-devguide}/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
 
 Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API]. This is enough to get most of the info associated with a metric like Compute labels and metadata and metric specific Labels.
 
