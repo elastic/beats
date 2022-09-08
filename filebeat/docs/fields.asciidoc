@@ -65903,14 +65903,14 @@ type: keyword
 [float]
 === authentication_info
 
-Authentication information. 
+Authentication information.
 
 
 
 *`gcp.audit.authentication_info.principal_email`*::
 +
 --
-The email address of the authenticated user making the request. 
+The email address of the authenticated user making the request.
 
 
 type: keyword
@@ -65920,7 +65920,7 @@ type: keyword
 *`gcp.audit.authentication_info.authority_selector`*::
 +
 --
-The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority. 
+The authority selector specified by the requestor, if any. It is not guaranteed that the principal was allowed to use this authority.
 
 
 type: keyword
@@ -65940,7 +65940,7 @@ type: array
 *`gcp.audit.method_name`*::
 +
 --
-The name of the service method or operation. For API calls, this  should be the name of the API method.  For example, 'google.datastore.v1.Datastore.RunQuery'.
+The name of the service method or operation. For API calls, this should be the name of the API method. For example, 'google.datastore.v1.Datastore.RunQuery'.
 
 
 type: keyword
@@ -65987,7 +65987,7 @@ type: keyword
 *`gcp.audit.request.name`*::
 +
 --
-Name of the request. 
+Name of the request.
 
 
 type: keyword
@@ -65997,7 +65997,7 @@ type: keyword
 *`gcp.audit.request.resource_name`*::
 +
 --
-Name of the request resource. 
+Name of the request resource.
 
 
 type: keyword
@@ -66014,7 +66014,7 @@ Metadata about the request.
 *`gcp.audit.request_metadata.caller_ip`*::
 +
 --
-The IP address of the caller. 
+The IP address of the caller.
 
 
 type: ip
@@ -66024,7 +66024,7 @@ type: ip
 *`gcp.audit.request_metadata.caller_supplied_user_agent`*::
 +
 --
-The user agent of the caller. This information is not authenticated and  should be treated accordingly.
+The user agent of the caller. This information is not authenticated and should be treated accordingly.
 
 
 type: keyword
@@ -66098,7 +66098,7 @@ type: keyword
 *`gcp.audit.response.status`*::
 +
 --
-Status of the response. 
+Status of the response.
 
 
 type: keyword
@@ -66108,7 +66108,7 @@ type: keyword
 *`gcp.audit.resource_name`*::
 +
 --
-The resource or collection that is the target of the operation.  The name is a scheme-less URI, not including the API service name.  For example, 'shelves/SHELF_ID/books'.
+The resource or collection that is the target of the operation. The name is a scheme-less URI, not including the API service name. For example, 'shelves/SHELF_ID/books'.
 
 
 type: keyword
@@ -66132,10 +66132,64 @@ type: keyword
 
 --
 
+[float]
+=== policy_delta
+
+Details of the changes within IAM policies.
+
+
+
+*`gcp.audit.policy_delta.binding_deltas`*::
++
+--
+Bindings changes within IAM policies.
+
+
+type: nested
+
+--
+
+*`gcp.audit.policy_delta.audit_config_deltas`*::
++
+--
+Audit config changes within IAM policies.
+
+
+type: nested
+
+--
+
+[float]
+=== iap
+
+Details of an IAP HTTP request.
+
+
+
+*`gcp.audit.iap.host`*::
++
+--
+Host being called through the IAP.
+
+
+type: keyword
+
+--
+
+*`gcp.audit.iap.path`*::
++
+--
+Path of the HTTP request going through the IAP.
+
+
+type: keyword
+
+--
+
 *`gcp.audit.service_name`*::
 +
 --
-The name of the API service performing the operation.  For example, datastore.googleapis.com.
+The name of the API service performing the operation. For example, datastore.googleapis.com.
 
 
 type: keyword
@@ -66145,14 +66199,14 @@ type: keyword
 [float]
 === status
 
-The status of the overall operation. 
+The status of the overall operation.
 
 
 
 *`gcp.audit.status.code`*::
 +
 --
-The status code, which should be an enum value of google.rpc.Code. 
+The status code, which should be an enum value of google.rpc.Code.
 
 
 type: integer
@@ -66162,10 +66216,426 @@ type: integer
 *`gcp.audit.status.message`*::
 +
 --
-A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client. 
+A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.
 
 
 type: keyword
+
+--
+
+[float]
+=== bigquery
+
+Details pertaining to different BigQuery jobs.
+
+
+
+*`gcp.audit.bigquery.query`*::
++
+--
+The query executed as part of the BigQuery operation.
+
+
+type: text
+
+--
+
+*`gcp.audit.bigquery.table_id`*::
++
+--
+The BigQuery table ID on which the query is being ran.
+
+
+type: keyword
+
+--
+
+*`gcp.audit.bigquery.dataset_id`*::
++
+--
+The BigQuery dataset ID on which the query is being ran.
+
+
+type: keyword
+
+--
+
+*`gcp.audit.bigquery.tmp_table_id`*::
++
+--
+The temporary BigQuery table ID on which the data is exported to.
+
+
+type: keyword
+
+--
+
+*`gcp.audit.bigquery.tmp_dataset_id`*::
++
+--
+The temporary BigQuery dataset ID on which the data is exported to.
+
+
+type: keyword
+
+--
+
+*`gcp.audit.bigquery.export_destination`*::
++
+--
+The BigQuery export destination (example GCS bucket URI).
+
+
+type: keyword
+
+--
+
+*`gcp.audit.bigquery.output_row_count`*::
++
+--
+The BigQuery query output row count.
+
+
+type: integer
+
+--
+
+[float]
+=== cilium
+
+Fields for Cilium logs
+
+
+
+*`gcp.cilium.type`*::
++
+--
+Type property.
+
+
+type: keyword
+
+--
+
+[float]
+=== destination
+
+Destination property.
+
+
+
+*`gcp.cilium.destination.hosts`*::
++
+--
+The hostnames the verdict was rendered for.
+
+
+type: array
+
+--
+
+*`gcp.cilium.destination.ip`*::
++
+--
+The IP of the traffic destination.
+
+
+type: ip
+
+--
+
+*`gcp.cilium.direction`*::
++
+--
+The direction of traffic i.e. INGRESS or EGRESS.
+
+
+type: keyword
+
+--
+
+[float]
+=== source
+
+Source property.
+
+
+
+*`gcp.cilium.source.ip`*::
++
+--
+The IP source of the traffic.
+
+
+type: ip
+
+--
+
+*`gcp.cilium.source.namespace`*::
++
+--
+The namespace the pod the verdict was rendered for exists in.
+
+
+type: keyword
+
+--
+
+*`gcp.cilium.source.pod`*::
++
+--
+The name of the pod the traffic originated from or is destined for.
+
+
+type: keyword
+
+--
+
+*`gcp.cilium.verdict`*::
++
+--
+The verdict given by Cilium. One of ALLOW, DROPPED or AUDIT.
+
+
+type: keyword
+
+--
+
+[float]
+=== cloud_armor
+
+Fields for Google Cloud HTTP load balancer cloud armor logs
+
+
+
+*`gcp.cloud_armor.type`*::
++
+--
+Type property.
+
+
+type: keyword
+
+--
+
+[float]
+=== http_request
+
+HTTP request information.
+
+
+
+*`gcp.cloud_armor.http_request.method`*::
++
+--
+The HTTP method of the request.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.http_request.url`*::
++
+--
+The HTTP method URL of the request.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.http_request.request_size`*::
++
+--
+The HTTP request size.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.http_request.status_code`*::
++
+--
+The HTTP response status code.
+
+
+type: short
+
+--
+
+*`gcp.cloud_armor.http_request.response_size`*::
++
+--
+The HTTP response size.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.http_request.user_agent`*::
++
+--
+The provided user agent header in the HTTP request.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.http_request.remote_ip`*::
++
+--
+The IP address of the client (this is what will enable us to do nice attack maps).
+
+
+type: ip
+
+--
+
+*`gcp.cloud_armor.http_request.server_ip`*::
++
+--
+The IP address of the server.
+
+
+type: ip
+
+--
+
+*`gcp.cloud_armor.http_request.referer`*::
++
+--
+Referer HTTP header value.
+
+
+type: keyword
+
+--
+
+[float]
+=== enforced_security_policy
+
+Cloud armor enforced security policy information.
+
+
+
+*`gcp.cloud_armor.enforced_security_policy.action`*::
++
+--
+Action from the policy (either ALLOW or DENY). The action != outcome when the policy is in preview mode.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.enforced_security_policy.outcome`*::
++
+--
+Outcome from the policy (either ACCEPT or DENY). The action != outcome when the policy is in preview mode.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.enforced_security_policy.signature_ids`*::
++
+--
+Array of signatures that matched the request.
+
+
+type: array
+
+--
+
+*`gcp.cloud_armor.enforced_security_policy.priority`*::
++
+--
+Priority of the security policy rule that affected the request.
+
+
+type: integer
+
+--
+
+*`gcp.cloud_armor.enforced_security_policy.name`*::
++
+--
+Name of the security policy.
+
+
+type: keyword
+
+--
+
+[float]
+=== preview_security_policy
+
+Cloud armor preview security policy information.
+
+
+
+*`gcp.cloud_armor.preview_security_policy.action`*::
++
+--
+Action from the policy (either ALLOW or DENY). The action != outcome when the policy is in preview mode.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.preview_security_policy.outcome`*::
++
+--
+Outcome from the policy (either ACCEPT or DENY). The action != outcome when the policy is in preview mode.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.preview_security_policy.signature_ids`*::
++
+--
+Array of signatures that matched the request.
+
+
+type: array
+
+--
+
+*`gcp.cloud_armor.preview_security_policy.priority`*::
++
+--
+Priority of the security policy rule that affected the request.
+
+
+type: integer
+
+--
+
+*`gcp.cloud_armor.preview_security_policy.name`*::
++
+--
+Name of the security policy.
+
+
+type: keyword
+
+--
+
+*`gcp.cloud_armor.signature_ids`*::
++
+--
+Field which aggregates either the value of enforced_security_policy.signature_ids or preview_security_policy.signature_ids (for ease of use when using these values in visualisations).
+
+
+type: array
 
 --
 

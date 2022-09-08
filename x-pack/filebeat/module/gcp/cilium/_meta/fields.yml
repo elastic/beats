@@ -1,0 +1,48 @@
+- name: cilium
+  type: group
+  description: >
+    Fields for Cilium logs
+  fields:
+  - name: type
+    type: keyword
+    description: >
+      Type property.
+  - name: destination
+    type: group
+    description: >
+      Destination property.
+    fields:
+    - name: hosts
+      type: array
+      description: >
+        The hostnames the verdict was rendered for.
+    - name: ip
+      type: ip
+      description: >
+        The IP of the traffic destination.
+  - name: direction
+    type: keyword
+    description: >
+      The direction of traffic i.e. INGRESS or EGRESS.
+  - name: source
+    type: group
+    description: >
+      Source property.
+    fields:
+    - name: ip
+      type: ip
+      description: >
+        The IP source of the traffic.
+    - name: namespace
+      type: keyword
+      description: >
+        The namespace the pod the verdict was rendered for exists in.
+    - name: pod
+      type: keyword
+      description: >
+        The name of the pod the traffic originated from or is destined for.
+  - name: verdict
+    type: keyword
+    description: >
+      The verdict given by Cilium. One of ALLOW, DROPPED or AUDIT.
+
