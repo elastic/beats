@@ -39,6 +39,7 @@ filebeat.inputs:
   default_region: us-east-1
 ----
 <1> You can set this value to an empty string or remove the configuration setting.
+
 Or for modules:
 
 [source,yaml]
