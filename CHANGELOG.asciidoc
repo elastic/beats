@@ -24,6 +24,10 @@ api error SignatureDoesNotMatch: Credential should be scoped to a valid region.
 
 This error was introduced by a breaking change in the AWS library.
 
+IMPORTANT: This issue also affects FIPS-enabled endpoints. **If you rely on FIPS,
+do not upgrade until version 8.4.2 of the {stack} is available.** The workaround
+documented here will not resolve this problem.
+
 Suggested resolution: In the Filebeat configuration, if an AWS input or module
 configuration sets `endpoint` to a non empty string, set it to an empty string
 instead. Also make sure the default AWS region is set in an environment
