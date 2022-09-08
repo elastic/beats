@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
+- Add missing cluster metadata to k8s module metricsets {pull}32979[32979]
 
 *Packetbeat*
 
