@@ -58,7 +58,7 @@ pipeline {
         axes {
           axis {
             name 'PLATFORM'
-            values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable', 'darwin && orka && x86_64'
+            values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable', 'x86_64 && macos11'
           }
         }
         stages {
@@ -69,7 +69,14 @@ pipeline {
                 unstash 'source'
                 dir("${BASE_DIR}"){
                   withGoEnv(){
-                    goTestJUnit(options: '-v ./...', output: 'junit-report.xml')
+                    // goTestSum for go1.18.5 on MacOS produces a segmentation violation. See https://github.com/elastic/elastic-agent-libs/pull/80
+                    // For the time being there will not junit transformation in MacOS
+                    whenTrue(isDarwin()) {
+                      cmd(label: 'go test', script: 'go test -v ./...')
+                    }
+                    whenFalse(isDarwin()) {
+                      goTestJUnit(options: '-v ./...', output: 'junit-report.xml')
+                    }
                   }
                 }
               }
