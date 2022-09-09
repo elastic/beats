@@ -29,14 +29,9 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system/filesystem"
-<<<<<<< HEAD
 
-	"github.com/pkg/errors"
-=======
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
->>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
 )
 
 func init() {
@@ -58,15 +53,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-<<<<<<< HEAD
-
-	if config.IgnoreTypes == nil {
-		config.IgnoreTypes = filesystem.DefaultIgnoredTypes()
-=======
 	sys, _ := base.Module().(resolve.Resolver)
 	if config.IgnoreTypes == nil {
 		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
->>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
 	}
 	if len(config.IgnoreTypes) > 0 {
 		base.Logger().Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))

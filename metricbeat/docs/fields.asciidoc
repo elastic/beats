@@ -52125,7 +52125,7 @@ type: keyword
 *`system.filesystem.files`*::
 +
 --
-The total number of file nodes in the file system.
+Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices.
 
 
 type: long

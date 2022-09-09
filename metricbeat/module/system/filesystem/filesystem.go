@@ -24,33 +24,20 @@ import (
 	"fmt"
 	"strings"
 
-<<<<<<< HEAD
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
-	"github.com/pkg/errors"
-=======
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
->>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
 )
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "filesystem", New,
 		mb.WithHostParser(parse.EmptyHostParser),
 	)
-}
-
-// Config stores the metricset-local config
-type Config struct {
-	IgnoreTypes []string `config:"filesystem.ignore_types"`
 }
 
 // MetricSet for fetching filesystem metrics.
@@ -60,17 +47,17 @@ type MetricSet struct {
 	sys    resolve.Resolver
 }
 
+// Config stores the metricset-local config
+type Config struct {
+	IgnoreTypes []string `config:"filesystem.ignore_types"`
+}
+
 // New creates and returns a new instance of MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-<<<<<<< HEAD
-
-	if config.IgnoreTypes == nil {
-		config.IgnoreTypes = DefaultIgnoredTypes()
-=======
 	sys, ok := base.Module().(resolve.Resolver)
 	if !ok {
 		return nil, fmt.Errorf("resolver cannot be cast from the module")
@@ -78,7 +65,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	if config.IgnoreTypes == nil {
 		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
->>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
 	}
 	if len(config.IgnoreTypes) > 0 {
 		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
@@ -104,7 +90,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		if err != nil {
 			return fmt.Errorf("error getting filesystem usage for %s: %w", fs.Directory, err)
 		}
-		out := mapstr.M{}
+		out := common.MapStr{}
 		err = typeconv.Convert(&out, fs)
 		if err != nil {
 			return fmt.Errorf("error converting event %s: %w", fs.Device, err)

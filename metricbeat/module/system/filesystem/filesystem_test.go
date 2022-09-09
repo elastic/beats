@@ -26,13 +26,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-<<<<<<< HEAD
-=======
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
->>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
 )
 
 func TestFetch(t *testing.T) {
@@ -60,11 +57,7 @@ func TestData(t *testing.T) {
 }
 
 func getConfig() map[string]interface{} {
-<<<<<<< HEAD
-	ignoreTypes := append(DefaultIgnoredTypes(), "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs")
-=======
 	ignoreTypes := append(fs.DefaultIgnoredTypes(resolve.NewTestResolver("")), "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs")
->>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
 	return map[string]interface{}{
 		"module":                  "system",
 		"metricsets":              []string{"filesystem"},

@@ -64,42 +64,40 @@ SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
 SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "free",
                                     "mount_point", "total", "used.bytes",
                                     "used.pct"]
-<<<<<<< HEAD
-=======
-}
-SYSTEM_FILESYSTEM[metricbeat.P_DEF] = SYSTEM_FILESYSTEM[metricbeat.P_WIN] + \
+
+SYSTEM_FILESYSTEM[metricbeat.P_DEF] = SYSTEM_FILESYSTEM[metricbeat.P_WIN] +
     ["files", "free_files", "options"]
 
->>>>>>> 1d4a7ca00e (Filesystem refactor (#31001))
 
-SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
-SYSTEM_MEMORY_FIELDS_LINUX = ["swap", "actual.free", "free", "total", "cached", "used.bytes", "used.pct", "actual.used.bytes",
+SYSTEM_FSSTAT_FIELDS=["count", "total_files", "total_size"]
+
+SYSTEM_MEMORY_FIELDS_LINUX=["swap", "actual.free", "free", "total", "cached", "used.bytes", "used.pct", "actual.used.bytes",
                               "actual.used.pct", "hugepages", "page_stats"]
 
-SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
+SYSTEM_MEMORY_FIELDS=["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
                                 "actual.used.pct", "hugepages", "page_stats"]
 
-SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
+SYSTEM_NETWORK_FIELDS=["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
 
-SYSTEM_CPU_HOST_FIELDS = ["usage"]
+SYSTEM_CPU_HOST_FIELDS=["usage"]
 
-SYSTEM_NETWORK_HOST_FIELDS = ["ingress.bytes",
+SYSTEM_NETWORK_HOST_FIELDS=["ingress.bytes",
                               "egress.bytes", "ingress.packets", "egress.packets"]
 
-SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
+SYSTEM_DISK_HOST_FIELDS=["read.bytes", "write.bytes"]
 
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
+SYSTEM_PROCESS_FIELDS=["cpu", "memory", "state"]
 
 
 class Test(metricbeat.BaseTest):
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):
         """
         Test cpu system output.
@@ -109,18 +107,18 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["cpu"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertEqual(len(output), 1)
-        evt = output[0]
+        evt=output[0]
         self.assert_fields_are_documented(evt)
 
         if "system" in evt:
-            cpu = evt["system"]["cpu"]
+            cpu=evt["system"]["cpu"]
             if sys.platform.startswith("linux"):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CPU_FIELDS_LINUX), cpu.keys())
@@ -131,11 +129,11 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CPU_FIELDS_WINDOWS), cpu.keys())
         else:
-            host_cpu = evt["host"]["cpu"]
+            host_cpu=evt["host"]["cpu"]
             self.assertCountEqual(self.de_dot(
                 SYSTEM_CPU_HOST_FIELDS), host_cpu.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
         """
         Test cpu_ticks configuration option.
@@ -148,17 +146,17 @@ class Test(metricbeat.BaseTest):
                 "cpu.metrics": ["percentages", "ticks"],
             },
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            cpuStats = evt["system"]["cpu"]
+            cpuStats=evt["system"]["cpu"]
             if sys.platform.startswith("linux"):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CPU_FIELDS_LINUX_ALL), cpuStats.keys())
@@ -169,7 +167,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CPU_FIELDS_DARWIN_ALL), cpuStats.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
         """
         Test core system output.
@@ -179,17 +177,17 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["core"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            core_stats = evt["system"]["core"]
+            core_stats=evt["system"]["core"]
             if sys.platform.startswith("linux"):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CORE_FIELDS_LINUX), core_stats.keys())
@@ -200,7 +198,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CORE_FIELDS_DARWIN), core_stats.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core_with_cpu_ticks(self):
         """
         Test core system output.
@@ -213,17 +211,17 @@ class Test(metricbeat.BaseTest):
                 "core.metrics": ["percentages", "ticks"],
             },
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            core_stats = evt["system"]["core"]
+            core_stats=evt["system"]["core"]
             if sys.platform.startswith("linux"):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CORE_FIELDS_LINUX_ALL), core_stats.keys())
@@ -234,7 +232,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CORE_FIELDS_DARWIN_ALL), core_stats.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_load(self):
         """
         Test system load.
@@ -244,20 +242,20 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["load"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertEqual(len(output), 1)
-        evt = output[0]
+        evt=output[0]
         self.assert_fields_are_documented(evt)
 
-        cpu = evt["system"]["load"]
+        cpu=evt["system"]["load"]
         self.assertCountEqual(self.de_dot(SYSTEM_LOAD_FIELDS), cpu.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|freebsd", sys.platform), "os")
     def test_diskio(self):
         """
         Test system/diskio output.
@@ -267,27 +265,27 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["diskio"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
             if 'error' not in evt:
                 if "system" in evt:
-                    diskio = evt["system"]["diskio"]
+                    diskio=evt["system"]["diskio"]
                     self.assertCountEqual(self.de_dot(
                         SYSTEM_DISKIO_FIELDS), diskio.keys())
                 elif "host" in evt:
-                    host_disk = evt["host"]["disk"]
+                    host_disk=evt["host"]["disk"]
                     self.assertCountEqual(
                         SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_diskio_linux(self):
         """
         Test system/diskio output on linux.
@@ -297,26 +295,26 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["diskio"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
             if "system" in evt:
-                diskio = evt["system"]["diskio"]
+                diskio=evt["system"]["diskio"]
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_DISKIO_FIELDS_LINUX), diskio.keys())
             else:
-                host_disk = evt["host"]["disk"]
+                host_disk=evt["host"]["disk"]
                 self.assertCountEqual(
                     SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
         """
         Test system/filesystem output.
@@ -326,17 +324,17 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["filesystem"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            filesystem = evt["system"]["filesystem"]
+            filesystem=evt["system"]["filesystem"]
             if sys.platform.startswith("win"):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_FILESYSTEM_FIELDS_WINDOWS), filesystem.keys())
@@ -344,7 +342,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_fsstat(self):
         """
         Test system/fsstat output.
@@ -354,20 +352,20 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["fsstat"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertEqual(len(output), 1)
-        evt = output[0]
+        evt=output[0]
         self.assert_fields_are_documented(evt)
 
-        fsstat = evt["system"]["fsstat"]
+        fsstat=evt["system"]["fsstat"]
         self.assertCountEqual(SYSTEM_FSSTAT_FIELDS, fsstat.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_memory(self):
         """
         Test system memory output.
@@ -377,23 +375,23 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["memory"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertEqual(len(output), 1)
-        evt = output[0]
+        evt=output[0]
         self.assert_fields_are_documented(evt)
 
-        memory = evt["system"]["memory"]
+        memory=evt["system"]["memory"]
         if not re.match("(?i)linux", sys.platform) and not "hugepages" in memory:
             # Ensure presence of hugepages only in Linux
-            memory["hugepages"] = None
+            memory["hugepages"]=None
         if not re.match("(?i)linux", sys.platform) and not "page_stats" in memory:
             # Ensure presence of page_stats only in Linux
-            memory["page_stats"] = None
+            memory["page_stats"]=None
 
         if sys.platform.startswith("linux"):
             self.assertCountEqual(self.de_dot(
@@ -403,17 +401,17 @@ class Test(metricbeat.BaseTest):
                 SYSTEM_MEMORY_FIELDS), memory.keys())
 
         # Check that percentages are calculated.
-        mem = memory
+        mem=memory
         if mem["total"] != 0:
-            used_p = float(mem["used"]["bytes"]) / mem["total"]
+            used_p=float(mem["used"]["bytes"]) / mem["total"]
             self.assertAlmostEqual(mem["used"]["pct"], used_p, places=4)
 
-        swap = memory["swap"]
+        swap=memory["swap"]
         if swap["total"] != 0:
-            used_p = float(swap["used"]["bytes"]) / swap["total"]
+            used_p=float(swap["used"]["bytes"]) / swap["total"]
             self.assertAlmostEqual(swap["used"]["pct"], used_p, places=4)
 
-    @unittest.skipUnless(re.match("(?i)darwin|win|linux|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)darwin|win|linux|freebsd", sys.platform), "os")
     def test_network(self):
         """
         Test system/network output.
@@ -423,26 +421,26 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["network"],
             "period": "5s"
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
             if "system" in evt:
-                network = evt["system"]["network"]
+                network=evt["system"]["network"]
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_NETWORK_FIELDS), network.keys())
             else:
-                host_network = evt["host"]["network"]
+                host_network=evt["host"]["network"]
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_NETWORK_HOST_FIELDS), host_network.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_summary(self):
         """
         Test system/process_summary output.
@@ -452,18 +450,18 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["process_summary"],
             "period": "5s",
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
 
-            summary = evt["system"]["process"]["summary"]
+            summary=evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
             assert isinstance(summary["sleeping"], int)
             assert isinstance(summary["running"], int)
@@ -481,7 +479,7 @@ class Test(metricbeat.BaseTest):
                 assert summary["total"] == summary["sleeping"] + \
                     summary["running"] + summary["unknown"]
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
         """
         Test system/process output.
@@ -498,17 +496,17 @@ class Test(metricbeat.BaseTest):
                 "process.include_per_cpu": False,
             }
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
-        found_cmdline = False
+        found_cmdline=False
         for evt in output:
-            process = evt["system"]["process"]
+            process=evt["system"]["process"]
             found_cmdline |= "cmdline" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
@@ -525,7 +523,7 @@ class Test(metricbeat.BaseTest):
             self.assertTrue(
                 found_cmdline, "cmdline not found in any process events")
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
         """
         Test system/process output for fields specific of unix systems.
@@ -553,26 +551,26 @@ class Test(metricbeat.BaseTest):
                 },
             }],
         )
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
-        found_fd = False
-        found_env = False
-        found_cwd = not sys.platform.startswith("linux")
+        found_fd=False
+        found_env=False
+        found_cwd=not sys.platform.startswith("linux")
         for evt in output:
             found_cwd |= "working_directory" in evt["process"]
 
-            process = evt["system"]["process"]
+            process=evt["system"]["process"]
             found_fd |= "fd" in process
             found_env |= "env" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
-            env = process.pop("env", None)
+            env=process.pop("env", None)
             self.assert_fields_are_documented(evt)
 
             # Remove optional keys.
@@ -589,7 +587,7 @@ class Test(metricbeat.BaseTest):
         self.assertTrue(
             found_cwd, "working_directory not found in any process events")
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):
         """
         Checks that the per proc stats are found in the output and
@@ -602,11 +600,11 @@ class Test(metricbeat.BaseTest):
             "processes": ["(?i)metricbeat.test"]
         }])
 
-        metricbeat = self.start_beat()
+        metricbeat=self.start_beat()
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         metricbeat.check_kill_and_wait()
 
-        output = self.read_output()[0]
+        output=self.read_output()[0]
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
@@ -618,7 +616,7 @@ class Test(metricbeat.BaseTest):
             output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["user.name"])
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_socket_summary(self):
         """
         Test system/socket_summary output.
@@ -628,21 +626,21 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["socket_summary"],
             "period": "5s",
         }])
-        proc = self.start_beat()
+        proc=self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
-        output = self.read_output_json()
+        output=self.read_output_json()
         self.assertGreater(len(output), 0)
 
         for evt in output:
             self.assert_fields_are_documented(evt)
 
-            summary = evt["system"]["socket"]["summary"]
-            a = summary["all"]
-            tcp = summary["tcp"]
-            udp = summary["udp"]
+            summary=evt["system"]["socket"]["summary"]
+            a=summary["all"]
+            tcp=summary["tcp"]
+            udp=summary["udp"]
 
             assert isinstance(a["count"], int)
             assert isinstance(a["listening"], int)
@@ -655,16 +653,16 @@ class Test(metricbeat.BaseTest):
 
             assert isinstance(udp["all"]["count"], int)
 
-    @unittest.skipIf(sys.platform == "win32", "Flaky test")
+    @ unittest.skipIf(sys.platform == "win32", "Flaky test")
     def check_username(self, observed, expected=None):
         if expected is None:
-            expected = getpass.getuser()
+            expected=getpass.getuser()
 
         if os.name == 'nt':
-            parts = observed.split("\\", 2)
+            parts=observed.split("\\", 2)
             assert len(
                 parts) == 2, "Expected proc.username to be of form DOMAIN\\username, but was %s" % observed
-            observed = parts[1]
+            observed=parts[1]
 
         assert expected == observed, "proc.username = %s, but expected %s" % (
             observed, expected)
