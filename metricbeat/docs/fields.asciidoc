@@ -36735,7 +36735,7 @@ type: long
 
 --
 
-*`gcp.storage.authz.acl_based_object_access_.ount`*::
+*`gcp.storage.authz.acl_based_object_access.count`*::
 +
 --
 Delta count of requests that result in an object being granted access solely due to object ACLs.
