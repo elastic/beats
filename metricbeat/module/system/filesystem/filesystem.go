@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
@@ -58,13 +59,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	sys, ok := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(system.SystemModule)
 	if !ok {
 		return nil, fmt.Errorf("resolver cannot be cast from the module")
 	}
-
+	wrapper := resolve.NewTestResolver(sys.GetHostFS())
 	if config.IgnoreTypes == nil {
-		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
+		config.IgnoreTypes = fs.DefaultIgnoredTypes(wrapper)
 	}
 	if len(config.IgnoreTypes) > 0 {
 		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
@@ -72,7 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		sys:           sys,
+		sys:           wrapper,
 	}, nil
 }
 
