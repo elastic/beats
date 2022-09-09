@@ -7,11 +7,11 @@ package cmd
 import (
 	auditbeatcmd "github.com/elastic/beats/v7/auditbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	// Register Auditbeat x-pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 )
 
 // Name of the beat
