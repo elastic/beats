@@ -88,7 +88,7 @@ func Test_StorageClient(t *testing.T) {
 			httpclient := http.Client{
 				Transport: &http.Transport{
 					TLSClientConfig: &tls.Config{
-						InsecureSkipVerify: true,
+						InsecureSkipVerify: true, //nolint:gosec // We can ignore as this is just for testing
 					},
 				},
 			}

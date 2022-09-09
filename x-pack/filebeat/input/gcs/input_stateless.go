@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/googleapis/gax-go/v2"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -16,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/state"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/types"
-	"github.com/googleapis/gax-go/v2"
 )
 
 type statelessInput struct {

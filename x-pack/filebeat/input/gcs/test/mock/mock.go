@@ -13,6 +13,7 @@ const (
 	bucket = "gcs-test-new"
 )
 
+//nolint:errcheck // We can ignore as this is just for testing
 func GCSServer() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
