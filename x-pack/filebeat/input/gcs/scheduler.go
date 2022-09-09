@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package gcs
 
 import (
@@ -62,9 +59,16 @@ func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
 	if !s.src.Poll {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
 		defer cancel()
-		availableWorkers = workerPool.AvailableWorkers()
+		for {
+			availableWorkers = workerPool.AvailableWorkers()
+			if availableWorkers == 0 {
+				continue
+			} else {
+				break
+			}
+		}
 		pager = s.fetchObjectPager(ctxWithTimeout, availableWorkers)
-		return s.scheduleOnce(ctx, pager, workerPool)
+		return s.scheduleOnce(ctxWithTimeout, pager, workerPool)
 	}
 
 	for {
@@ -79,7 +83,7 @@ func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
 		// availableWorkers is used as the batch size for a blob page so that
 		// work distribution remains efficient
 		pager = s.fetchObjectPager(ctxWithTimeout, availableWorkers)
-		err := s.scheduleOnce(ctx, pager, workerPool)
+		err := s.scheduleOnce(ctxWithTimeout, pager, workerPool)
 		if err != nil {
 			return err
 		}
@@ -104,6 +108,9 @@ func (s *gcsInputScheduler) scheduleOnce(ctx context.Context, pager *iterator.Pa
 		// If previous checkpoint was saved then look up starting point for new jobs
 		if s.state.Checkpoint().LatestEntryTime != nil {
 			jobs = s.moveToLastSeenJob(jobs)
+			if len(s.state.Checkpoint().FailedJobs) > 0 {
+				jobs = s.addFailedJobs(ctx, jobs)
+			}
 		}
 
 		// Submits job to worker pool for further processing
@@ -132,7 +139,7 @@ func (s *gcsInputScheduler) createJobs(objects []*storage.ObjectAttrs) []job.Job
 		}
 
 		objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-		job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher)
+		job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, false)
 		jobs = append(jobs, job)
 	}
 
@@ -187,4 +194,26 @@ func (s *gcsInputScheduler) moveToLastSeenJob(jobs []job.Job) []job.Job {
 	}
 
 	return jobsToReturn
+}
+
+func (s *gcsInputScheduler) addFailedJobs(ctx context.Context, jobs []job.Job) []job.Job {
+	jobMap := make(map[string]bool)
+
+	for _, j := range jobs {
+		jobMap[j.Name()] = true
+	}
+
+	for name := range s.state.Checkpoint().FailedJobs {
+		if !jobMap[name] {
+			obj, err := s.bucket.Object(name).Attrs(ctx)
+			if err != nil {
+				s.log.Errorf("adding failed job %s to job list caused an error : %w", err)
+			}
+
+			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
+			job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, true)
+			jobs = append(jobs, job)
+		}
+	}
+	return jobs
 }

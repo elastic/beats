@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package job
 
 import (
@@ -46,7 +43,7 @@ func decodeJSON(body io.Reader) ([]mapstr.M, []json.RawMessage, error) {
 	var objs []mapstr.M
 	var rawMessages []json.RawMessage
 	decoder := json.NewDecoder(body)
-	for {
+	for decoder.More() {
 		var raw json.RawMessage
 		if err := decoder.Decode(&raw); err != nil {
 			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
@@ -95,7 +92,7 @@ func decodeJSONArray(raw *bytes.Reader, parentOffset int64) ([]mapstr.M, []json.
 		return nil, nil, fmt.Errorf("malformed JSON array, not starting with delimiter [ at position: %d", parentOffset+dec.InputOffset())
 	}
 
-	for {
+	for dec.More() {
 		var raw json.RawMessage
 		if err := dec.Decode(&raw); err != nil {
 			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.

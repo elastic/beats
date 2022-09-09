@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package job
 
 import (
@@ -37,11 +34,12 @@ type GcsInputJob struct {
 	state     *state.State
 	src       *types.Source
 	publisher cursor.Publisher
+	isFailed  bool
 }
 
 // NewGcsInputJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
 func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI string,
-	state *state.State, src *types.Source, publisher cursor.Publisher,
+	state *state.State, src *types.Source, publisher cursor.Publisher, isFailed bool,
 ) Job {
 	return &GcsInputJob{
 		bucket:    bucket,
@@ -50,6 +48,7 @@ func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, o
 		state:     state,
 		src:       src,
 		publisher: publisher,
+		isFailed:  isFailed,
 	}
 }
 
@@ -59,6 +58,7 @@ func (j *GcsInputJob) Do(ctx context.Context, id string) (err error) {
 	if types.AllowedContentTypes[j.object.ContentType] {
 		data, err := j.extractData(ctx)
 		if err != nil {
+			j.state.UpdateFailedJobs(j.object.Name)
 			return fmt.Errorf("job with jobId %s encountered an error : %w", id, err)
 		}
 
@@ -101,9 +101,10 @@ func (j *GcsInputJob) Do(ctx context.Context, id string) (err error) {
 		Fields:    fields,
 	}
 	event.SetID(id)
-
 	j.state.Save(j.object.Name, &j.object.Updated)
+
 	if err := j.publisher.Publish(event, j.state.Checkpoint()); err != nil {
+		j.state.UpdateFailedJobs(j.object.Name)
 		return err
 	}
 
@@ -126,7 +127,6 @@ func (j *GcsInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
 	var err error
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, j.src.BucketTimeOut)
 	defer cancel()
-
 	obj := j.bucket.Object(j.object.Name)
 	reader, err := obj.NewReader(ctxWithTimeout)
 	if err != nil {

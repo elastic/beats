@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package pool
 
 import (
@@ -59,7 +56,6 @@ func (w *worker) Process(work job.Job) {
 	}()
 
 	jobID := fetchJobID(w.id, work.Source().BucketName, work.Name())
-	w.log.Infof("job with id %s and timeStamp %s executed\n", jobID, work.Timestamp().String())
 	err := work.Do(w.ctx, jobID)
 	if err != nil {
 		w.errChan <- fmt.Errorf("worker %d encountered an error : %w", w.id, err)
