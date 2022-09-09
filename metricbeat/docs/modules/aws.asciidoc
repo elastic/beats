@@ -407,6 +407,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-billing,billing>>
 
+* <<metricbeat-metricset-aws-cloudfront,cloudfront>>
+
 * <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
 
 * <<metricbeat-metricset-aws-dynamodb,dynamodb>>
@@ -440,6 +442,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-aws-vpn,vpn>>
 
 include::aws/billing.asciidoc[]
+
+include::aws/cloudfront.asciidoc[]
 
 include::aws/cloudwatch.asciidoc[]
 

@@ -1722,6 +1722,204 @@ type: object
 --
 
 [float]
+=== cloudfront
+
+cloudfront
+
+
+
+
+*`aws.cloudfront.metrics.4xxErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 4xx.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.401ErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 401.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.403ErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 403.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.404ErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 404.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.5xxErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 5xx.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.502ErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 502.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.503ErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 503.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.504ErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 504.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.CacheHitRate.avg`*::
++
+--
+The percentage of all cacheable requests for which CloudFront served the content from its cache. HTTP POST and PUT requests, and errors, are not considered cacheable requests.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.TotalErrorRate.avg`*::
++
+--
+The percentage of all viewer requests for which the response's HTTP status code is 4xx or 5xx.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.ExecutionTime.avg`*::
++
+--
+The amount of time (0-100) that the function took to run as a percentage of the maximum allowed time. For example, a value of 35 means that the function completed in 35% of the maximum allowed time.
+
+
+type: double
+
+--
+
+*`aws.cloudfront.metrics.BytesDownloaded.sum`*::
++
+--
+The total number of bytes downloaded by viewers for GET, HEAD, and OPTIONS requests.
+
+
+type: long
+
+--
+
+*`aws.cloudfront.metrics.BytesUploaded.sum`*::
++
+--
+The total number of bytes that viewers uploaded to your origin with CloudFront, using POST and PUT requests.
+
+
+type: long
+
+--
+
+*`aws.cloudfront.metrics.Requests.sum`*::
++
+--
+The total number of viewer requests received by CloudFront, for all HTTP methods and for both HTTP and HTTPS requests.
+
+
+type: long
+
+--
+
+*`aws.cloudfront.metrics.Invocations.sum`*::
++
+--
+The number of times the function was started (invoked) in a given time period.
+
+
+type: long
+
+--
+
+*`aws.cloudfront.metrics.ValidationErrors.sum`*::
++
+--
+The number of validation errors produced by the function in a given time period. Validation errors occur when the function runs successfully but returns invalid data (an invalid event object).
+
+
+type: long
+
+--
+
+*`aws.cloudfront.metrics.ExecutionErrors.sum`*::
++
+--
+The number of execution errors that occurred in a given time period. Execution errors occur when the function fails to complete successfully.
+
+
+type: long
+
+--
+
+*`aws.cloudfront.metrics.FunctionThrottles.sum`*::
++
+--
+The number of times that the function was throttled in a given time period.
+
+
+type: long
+
+--
+
+*`aws.cloudfront.metrics.OriginLatency.percentile`*::
++
+--
+The total time spent, in milliseconds, from when CloudFront receives a request to when it starts providing a response to the network (not the viewer), for requests that are served from the origin, not the CloudFront cache. This is also known as first byte latency, or time-to-first-byte.
+
+
+type: long
+
+--
+
+[float]
 === cloudwatch
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
