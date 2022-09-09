@@ -22,7 +22,7 @@ pipeline {
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     SLACK_CHANNEL = "#beats"
     SNAPSHOT = 'true'
-    TERRAFORM_VERSION = "0.13.7"
+    TERRAFORM_VERSION = "1.0.2"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     KIND_VERSION = 'v0.14.0'
     K8S_VERSION = 'v1.24.0'
