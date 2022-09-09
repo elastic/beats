@@ -11,7 +11,6 @@ import (
 	// Register Auditbeat x-pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 )
 
 // Name of the beat
@@ -21,7 +20,6 @@ var Name = auditbeatcmd.Name
 var RootCmd *cmd.BeatsRootCmd
 
 func init() {
-	management.ConfigTransform.SetTransform(auditbeatCfg)
 	settings := auditbeatcmd.AuditbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = auditbeatcmd.Initialize(settings)
