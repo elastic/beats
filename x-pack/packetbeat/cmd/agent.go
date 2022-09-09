@@ -14,7 +14,7 @@ import (
 )
 
 // packetbeatCfg is a callback registered with central management to perform any needed config transformations
-// before agent configs are sent to a beatß
+// before agent configs are sent to a beat
 func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	uconfig, err := conf.NewConfigFrom(rawIn.Source.AsMap())
 	if err != nil {
