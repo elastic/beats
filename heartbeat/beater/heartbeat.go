@@ -67,16 +67,17 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
-	// Connect to ES and setup the State loader
-	esc, err := getESClient(b.Config.Output.Config())
-	if err != nil {
-		return nil, err
-	}
-	var stateLoader monitorstate.StateLoader
-	if esc != nil {
-		stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.Location)
-	} else {
-		stateLoader = monitorstate.NilStateLoader
+	stateLoader := monitorstate.NilStateLoader
+
+	if b.Config.Output.Name() == "elasticsearch" {
+		// Connect to ES and setup the State loader
+		esc, err := getESClient(b.Config.Output.Config())
+		if err != nil {
+			return nil, err
+		}
+		if esc != nil {
+			stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.Location)
+		}
 	}
 
 	limit := parsedConfig.Scheduler.Limit
