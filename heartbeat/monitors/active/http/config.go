@@ -137,7 +137,7 @@ func (r *responseConfig) Validate() error {
 // Validate validates of the requestParameters object is valid or not
 func (r *requestParameters) Validate() error {
 	switch strings.ToUpper(r.Method) {
-	case "HEAD", "GET", "POST":
+	case "HEAD", "GET", "POST", "OPTIONS":
 	default:
 		return fmt.Errorf("HTTP method '%v' not supported", r.Method)
 	}

@@ -8965,28 +8965,28 @@ type: long
 *`beat.stats.libbeat.config.running`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.starts`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.stops`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.reloads`*::
 +
 --
-type: short
+type: long
 
 --
 
@@ -36735,7 +36735,7 @@ type: long
 
 --
 
-*`gcp.storage.authz.acl_based_object_access_.ount`*::
+*`gcp.storage.authz.acl_based_object_access.count`*::
 +
 --
 Delta count of requests that result in an object being granted access solely due to object ACLs.
