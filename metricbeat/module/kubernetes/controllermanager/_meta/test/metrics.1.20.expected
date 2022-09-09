@@ -3,165 +3,22 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 126,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 1070,
-								"256000": 7920,
-								"32000": 7920,
-								"4000": 3721,
-								"512000": 7920,
-								"64000": 7920,
-								"8000": 7839
-							},
-							"count": 7921,
-							"sum": 32028062.373999964
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/networking.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 5445.045
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/storage.k8s.io/v1/csinodes?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 1330.3519999999999
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/resourcequotas?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"node": {
-				"collector": {
-					"count": 1,
-					"eviction": {
-						"count": 0
-					},
-					"health": {
-						"pct": 100
-					},
-					"unhealthy": {
-						"count": 0
-					}
-				}
-			},
-			"process": {
-				"cpu": {
-					"sec": 2461
+			"name": "garbage_collector_attempt_to_delete",
+			"workqueue": {
+				"adds": {
+					"count": 13
 				},
-				"fds": {
-					"max": {
-						"count": 1048576
-					},
-					"open": {
-						"count": 17
-					}
+				"depth": {
+					"count": 0
 				},
-				"memory": {
-					"resident": {
-						"bytes": 108044288
-					},
-					"virtual": {
-						"bytes": 788058112
-					}
+				"longestrunning": {
+					"sec": 0
 				},
-				"started": {
-					"sec": 1655707927.95
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
 				}
 			}
 		},
@@ -180,31 +37,24 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 6997.829
-						}
-					}
+			"name": "job",
+			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
 				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/persistentvolumes/%7Bname%7D",
-			"verb": "GET"
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -221,10 +71,10 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "endpoint_slice_mirroring",
+			"name": "garbage_collector_graph_changes",
 			"workqueue": {
 				"adds": {
-					"count": 6
+					"count": 468043
 				},
 				"depth": {
 					"count": 0
@@ -257,356 +107,11 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 0,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 533260.944
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/flowcontrol.apiserver.k8s.io/v1beta1/prioritylevelconfigurations?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "cronjob",
-			"workqueue": {
-				"adds": {
-					"count": 8259
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 8259
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 40,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 663,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3393,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7841
-							},
-							"count": 7921,
-							"sum": 32966486.31899999
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/authorization.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 31,
-								"128000": 7921,
-								"16000": 7920,
-								"2000": 549,
-								"256000": 7921,
-								"32000": 7920,
-								"4000": 3288,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7836
-							},
-							"count": 7921,
-							"sum": 33411074.78999993
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/scheduling.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 1,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 862.9010000000001
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apiextensions.k8s.io/v1/customresourcedefinitions?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 313
+					"count": 1113352
 				}
 			},
 			"code": "200",
-			"host": "172.18.0.2:6443",
-			"method": "PATCH"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 5126.341
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 5315.358
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/autoscaling/v1/horizontalpodautoscalers?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 23,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 517,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3164,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7818
-							},
-							"count": 7921,
-							"sum": 33747268.298
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/node.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 387658
-				}
-			},
-			"code": "200",
-			"host": "172.18.0.2:6443",
+			"host": "192.168.205.10:6443",
 			"method": "GET"
 		},
 		"Index": "",
@@ -624,388 +129,16 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 54,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 733,
-								"256000": 7920,
-								"32000": 7920,
-								"4000": 3497,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7848
-							},
-							"count": 7921,
-							"sum": 33072480.697999936
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/policy/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 30,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 628,
-								"256000": 7920,
-								"32000": 7920,
-								"4000": 3430,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7839
-							},
-							"count": 7921,
-							"sum": 33331486.811000027
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/policy/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 1,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 199746.336
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/replicationcontrollers?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 26,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 576,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3377,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7840
-							},
-							"count": 7921,
-							"sum": 33167423.892999955
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/rbac.authorization.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 17,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 518,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3203,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7828
-							},
-							"count": 7921,
-							"sum": 33685464.92800006
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1585,
-								"1000": 0,
-								"128000": 1585,
-								"16000": 1584,
-								"2000": 1327,
-								"256000": 1585,
-								"32000": 1585,
-								"4000": 1570,
-								"512000": 1585,
-								"64000": 1585,
-								"8000": 1584
-							},
-							"count": 1585,
-							"sum": 2828044.9830000033
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces/%7Bnamespace%7D/pods/%7Bname%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 2,
-								"1000": 1,
-								"128000": 2,
-								"16000": 2,
-								"2000": 2,
-								"256000": 2,
-								"32000": 2,
-								"4000": 2,
-								"512000": 2,
-								"64000": 2,
-								"8000": 2
-							},
-							"count": 2,
-							"sum": 2408.319
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/authorization.k8s.io/v1/subjectaccessreviews?timeout=10s",
-			"verb": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 3,
-								"1000": 0,
-								"128000": 3,
-								"16000": 3,
-								"2000": 3,
-								"256000": 3,
-								"32000": 3,
-								"4000": 3,
-								"512000": 3,
-								"64000": 3,
-								"8000": 3
-							},
-							"count": 3,
-							"sum": 5033.812000000001
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/namespaces/%7Bnamespace%7D/deployments/%7Bname%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 577,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 2786,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 5511,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7877
-							},
-							"count": 7921,
-							"sum": 24079648.88199997
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/flowcontrol.apiserver.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "ttlcontroller",
+			"name": "noexec_taint_pod",
 			"workqueue": {
 				"adds": {
-					"count": 317
+					"count": 35
 				},
 				"depth": {
 					"count": 0
 				},
 				"longestrunning": {
 					"sec": 0
-				},
-				"retries": {
-					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -1063,29 +196,12 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 4378.482
-						}
-					}
+					"count": 1
 				}
 			},
-			"url": "https://172.18.0.2:6443/apis/storage.k8s.io/v1/csidrivers?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
+			"code": "403",
+			"host": "192.168.205.10:6443",
+			"method": "GET"
 		},
 		"Index": "",
 		"ID": "",
@@ -1102,51 +218,10 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 6075.867
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/rbac.authorization.k8s.io/v1/roles?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "DynamicCABundle-request-header",
+			"name": "ClusterRoleAggregator",
 			"workqueue": {
 				"adds": {
-					"count": 1585
+					"count": 68
 				},
 				"depth": {
 					"count": 0
@@ -1155,7 +230,7 @@
 					"sec": 0
 				},
 				"retries": {
-					"count": 0
+					"count": 2
 				},
 				"unfinished": {
 					"sec": 0
@@ -1177,207 +252,16 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 5955
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1/cronjobs?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 52,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 739,
-								"256000": 7920,
-								"32000": 7920,
-								"4000": 3489,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7832
-							},
-							"count": 7921,
-							"sum": 32978230.279000036
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/extensions/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 383570.902
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/admissionregistration.k8s.io/v1/validatingwebhookconfigurations?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 6513
-				}
-			},
-			"code": "201",
-			"host": "172.18.0.2:6443",
-			"method": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 315,
-								"1000": 0,
-								"128000": 315,
-								"16000": 315,
-								"2000": 2,
-								"256000": 315,
-								"32000": 315,
-								"4000": 178,
-								"512000": 315,
-								"64000": 315,
-								"8000": 313
-							},
-							"count": 315,
-							"sum": 1259640.6289999997
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces/%7Bnamespace%7D/events/%7Bname%7D",
-			"verb": "PATCH"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "deployment",
+			"name": "claims",
 			"workqueue": {
 				"adds": {
-					"count": 205
+					"count": 0
 				},
 				"depth": {
 					"count": 0
 				},
 				"longestrunning": {
 					"sec": 0
-				},
-				"retries": {
-					"count": 198
 				},
 				"unfinished": {
 					"sec": 0
@@ -1399,471 +283,7 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 1257.167
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/serviceaccounts?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 3200,
-								"1000": 0,
-								"128000": 3200,
-								"16000": 3196,
-								"2000": 190,
-								"256000": 3200,
-								"32000": 3199,
-								"4000": 2389,
-								"512000": 3200,
-								"64000": 3200,
-								"8000": 3174
-							},
-							"count": 3200,
-							"sum": 11213909.066999974
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces/%7Bnamespace%7D/events",
-			"verb": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "endpoint_slice",
-			"workqueue": {
-				"adds": {
-					"count": 10
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 7
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1585,
-								"1000": 0,
-								"128000": 1585,
-								"16000": 1582,
-								"2000": 0,
-								"256000": 1585,
-								"32000": 1585,
-								"4000": 688,
-								"512000": 1585,
-								"64000": 1585,
-								"8000": 1569
-							},
-							"count": 1585,
-							"sum": 6896629.352000009
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces/%7Bnamespace%7D/pods/%7Bname%7D",
-			"verb": "DELETE"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "resource_quota_controller_resource_changes",
-			"workqueue": {
-				"adds": {
-					"count": 13983
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 28,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 617,
-								"256000": 7921,
-								"32000": 7920,
-								"4000": 3327,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7832
-							},
-							"count": 7921,
-							"sum": 33451801.867
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apiextensions.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "root_ca_cert_publisher",
-			"workqueue": {
-				"adds": {
-					"count": 10
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 2,
-								"1000": 0,
-								"128000": 2,
-								"16000": 2,
-								"2000": 0,
-								"256000": 2,
-								"32000": 2,
-								"4000": 1,
-								"512000": 2,
-								"64000": 2,
-								"8000": 1
-							},
-							"count": 2,
-							"sum": 12623.51
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/namespaces/%7Bnamespace%7D/deployments/%7Bname%7D/status",
-			"verb": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 1,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 903.169
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/podtemplates?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 2144.357
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/secrets?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 5913.528
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/services?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "garbage_collector_attempt_to_delete",
-			"workqueue": {
-				"adds": {
-					"count": 1592
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "pvcs",
+			"name": "bootstrap_signer_queue",
 			"workqueue": {
 				"adds": {
 					"count": 2
@@ -1897,10 +317,34 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "daemonset",
+			"client": {
+				"request": {
+					"count": 145
+				}
+			},
+			"code": "201",
+			"host": "192.168.205.10:6443",
+			"method": "POST"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "serviceaccount_tokens_secret",
 			"workqueue": {
 				"adds": {
-					"count": 6
+					"count": 34
 				},
 				"depth": {
 					"count": 0
@@ -1915,88 +359,6 @@
 					"sec": 0
 				}
 			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 18,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 524,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3158,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7831
-							},
-							"count": 7921,
-							"sum": 33750895.59099998
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/certificates.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 7787.689
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/events.k8s.io/v1/events?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
 		},
 		"Index": "",
 		"ID": "",
@@ -2017,105 +379,6 @@
 			"workqueue": {
 				"adds": {
 					"count": 0
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 23,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 556,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3303,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7838
-							},
-							"count": 7921,
-							"sum": 33369705.887999758
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/storage.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 1585
-				}
-			},
-			"code": "409",
-			"host": "172.18.0.2:6443",
-			"method": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "garbage_collector_graph_changes",
-			"workqueue": {
-				"adds": {
-					"count": 190259
 				},
 				"depth": {
 					"count": 0
@@ -2182,29 +445,12 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 0,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 734162.309
-						}
-					}
+					"count": 12
 				}
 			},
-			"url": "https://172.18.0.2:6443/apis/policy/v1beta1/podsecuritypolicies?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
+			"code": "409",
+			"host": "192.168.205.10:6443",
+			"method": "PUT"
 		},
 		"Index": "",
 		"ID": "",
@@ -2221,253 +467,7 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 21,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 536,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3200,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7830
-							},
-							"count": 7921,
-							"sum": 33739958.584
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/coordination.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 0,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 632319.982
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/networking.k8s.io/v1/ingressclasses?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 1286.213
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/healthz?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 23,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 565,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3309,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7819
-							},
-							"count": 7921,
-							"sum": 33406713.9199999
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/storage.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 2,
-								"1000": 0,
-								"128000": 2,
-								"16000": 2,
-								"2000": 0,
-								"256000": 2,
-								"32000": 2,
-								"4000": 0,
-								"512000": 2,
-								"64000": 2,
-								"8000": 1
-							},
-							"count": 2,
-							"sum": 19134.250999999997
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/authentication.k8s.io/v1/tokenreviews",
-			"verb": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 64,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 876,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3720,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7848
-							},
-							"count": 7921,
-							"sum": 32026618.21400003
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "certificate",
+			"name": "pvcs",
 			"workqueue": {
 				"adds": {
 					"count": 0
@@ -2501,164 +501,10 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 22,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 552,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3260,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7839
-							},
-							"count": 7921,
-							"sum": 33459086.083999977
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 30,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 512,
-								"256000": 7921,
-								"32000": 7920,
-								"4000": 3208,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7823
-							},
-							"count": 7921,
-							"sum": 33784837.885
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/admissionregistration.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 33,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 503,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3059,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7828
-							},
-							"count": 7921,
-							"sum": 33942666.33799993
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/discovery.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "volumes",
+			"name": "deployment",
 			"workqueue": {
 				"adds": {
-					"count": 6340
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "DynamicServingCertificateController",
-			"workqueue": {
-				"adds": {
-					"count": 1585
+					"count": 46
 				},
 				"depth": {
 					"count": 0
@@ -2667,7 +513,7 @@
 					"sec": 0
 				},
 				"retries": {
-					"count": 0
+					"count": 11
 				},
 				"unfinished": {
 					"sec": 0
@@ -2689,31 +535,21 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 31,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 596,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3350,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7826
-							},
-							"count": 7921,
-							"sum": 33256375.38899997
-						}
-					}
+			"name": "noexec_taint_node",
+			"workqueue": {
+				"adds": {
+					"count": 12
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"unfinished": {
+					"sec": 0
 				}
-			},
-			"url": "https://172.18.0.2:6443/apis/authorization.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -2733,123 +569,7 @@
 			"name": "endpoint",
 			"workqueue": {
 				"adds": {
-					"count": 7
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 4
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 47243,
-								"1000": 0,
-								"128000": 47241,
-								"16000": 47143,
-								"2000": 433,
-								"256000": 47241,
-								"32000": 47174,
-								"4000": 3292,
-								"512000": 47241,
-								"64000": 47240,
-								"8000": 21617
-							},
-							"count": 47243,
-							"sum": 379170587.88699937
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/coordination.k8s.io/v1/namespaces/%7Bnamespace%7D/leases/%7Bname%7D?timeout=5s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 34,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 647,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3450,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7840
-							},
-							"count": 7921,
-							"sum": 32910601.177999992
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/events.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "replicaset",
-			"workqueue": {
-				"adds": {
-					"count": 9
+					"count": 26
 				},
 				"depth": {
 					"count": 0
@@ -2864,252 +584,6 @@
 					"sec": 0
 				}
 			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 6161.415
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/storage.k8s.io/v1/volumeattachments?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 20,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 547,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3182,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7836
-							},
-							"count": 7921,
-							"sum": 33695198.23299993
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/certificates.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 2,
-								"1000": 0,
-								"128000": 2,
-								"16000": 2,
-								"2000": 0,
-								"256000": 2,
-								"32000": 2,
-								"4000": 1,
-								"512000": 2,
-								"64000": 2,
-								"8000": 1
-							},
-							"count": 2,
-							"sum": 16458.466
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/namespaces/%7Bnamespace%7D/replicasets/%7Bname%7D/status",
-			"verb": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 139,
-								"1000": 0,
-								"128000": 139,
-								"16000": 138,
-								"2000": 0,
-								"256000": 139,
-								"32000": 139,
-								"4000": 29,
-								"512000": 139,
-								"64000": 139,
-								"8000": 138
-							},
-							"count": 139,
-							"sum": 676824.807
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces/%7Bnamespace%7D/serviceaccounts/%7Bname%7D/token",
-			"verb": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 47237,
-								"1000": 0,
-								"128000": 47237,
-								"16000": 47157,
-								"2000": 1929,
-								"256000": 47237,
-								"32000": 47188,
-								"4000": 29430,
-								"512000": 47237,
-								"64000": 47233,
-								"8000": 46836
-							},
-							"count": 47237,
-							"sum": 182520478.1909993
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/coordination.k8s.io/v1/namespaces/%7Bnamespace%7D/leases/%7Bname%7D?timeout=5s",
-			"verb": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 3,
-								"1000": 0,
-								"128000": 3,
-								"16000": 3,
-								"2000": 0,
-								"256000": 3,
-								"32000": 3,
-								"4000": 0,
-								"512000": 3,
-								"64000": 3,
-								"8000": 2
-							},
-							"count": 3,
-							"sum": 20303.007
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/discovery.k8s.io/v1/namespaces/%7Bnamespace%7D/endpointslices/%7Bname%7D",
-			"verb": "PUT"
 		},
 		"Index": "",
 		"ID": "",
@@ -3146,133 +620,10 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 29,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 575,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3324,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7833
-							},
-							"count": 7921,
-							"sum": 33364429.504999924
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/scheduling.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 56,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 755,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3433,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7830
-							},
-							"count": 7921,
-							"sum": 32762698.44599994
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/networking.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 1480.236
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/networking.k8s.io/v1/ingresses?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
 			"name": "statefulset",
 			"workqueue": {
 				"adds": {
-					"count": 2
+					"count": 0
 				},
 				"depth": {
 					"count": 0
@@ -3303,174 +654,10 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 5936.288
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/storage.k8s.io/v1beta1/csistoragecapacities?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 27,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 621,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3345,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7858
-							},
-							"count": 7921,
-							"sum": 33030734.36400006
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/authentication.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 10220.903
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/certificates.k8s.io/v1/certificatesigningrequests?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 3440,
-								"1000": 3,
-								"128000": 3440,
-								"16000": 3436,
-								"2000": 649,
-								"256000": 3440,
-								"32000": 3439,
-								"4000": 3006,
-								"512000": 3440,
-								"64000": 3440,
-								"8000": 3373
-							},
-							"count": 3440,
-							"sum": 10386672.363999987
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1/namespaces/%7Bnamespace%7D/jobs/%7Bname%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "ttl_jobs_to_delete",
+			"name": "resource_quota_controller_resource_changes",
 			"workqueue": {
 				"adds": {
-					"count": 0
+					"count": 132
 				},
 				"depth": {
 					"count": 0
@@ -3501,31 +688,24 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 3,
-								"1000": 0,
-								"128000": 3,
-								"16000": 3,
-								"2000": 0,
-								"256000": 3,
-								"32000": 3,
-								"4000": 0,
-								"512000": 3,
-								"64000": 3,
-								"8000": 2
-							},
-							"count": 3,
-							"sum": 20853.000999999997
-						}
-					}
+			"name": "service",
+			"workqueue": {
+				"adds": {
+					"count": 3
+				},
+				"depth": {
+					"count": 3
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
 				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces/%7Bnamespace%7D/endpoints/%7Bname%7D",
-			"verb": "PUT"
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -3544,1125 +724,12 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 0,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 584920.7239999999
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/flowcontrol.apiserver.k8s.io/v1beta1/flowschemas?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 6118.409
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/deployments?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 5635.227
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/statefulsets?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 27,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 569,
-								"256000": 7920,
-								"32000": 7920,
-								"4000": 3377,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7832
-							},
-							"count": 7921,
-							"sum": 33491676.60099996
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/rbac.authorization.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 3437,
-								"1000": 0,
-								"128000": 3437,
-								"16000": 3435,
-								"2000": 183,
-								"256000": 3437,
-								"32000": 3435,
-								"4000": 3001,
-								"512000": 3437,
-								"64000": 3437,
-								"8000": 3270
-							},
-							"count": 3437,
-							"sum": 11231488.972000027
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1/namespaces/%7Bnamespace%7D/jobs/%7Bname%7D/status",
-			"verb": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 9297.166000000001
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/persistentvolumes?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 9125.225
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/controllerrevisions?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 3170
+					"count": 18
 				}
 			},
 			"code": "200",
-			"host": "172.18.0.2:6443",
-			"method": "DELETE"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "DynamicCABundle-client-ca-bundle",
-			"workqueue": {
-				"adds": {
-					"count": 1585
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 21,
-								"128000": 7921,
-								"16000": 7920,
-								"2000": 480,
-								"256000": 7921,
-								"32000": 7920,
-								"4000": 3157,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7835
-							},
-							"count": 7921,
-							"sum": 33900589.35399998
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/discovery.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 1206.6209999999999
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/storage.k8s.io/v1/storageclasses?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 3386.321
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/nodes/%7Bname%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 24,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 574,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3334,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7842
-							},
-							"count": 7921,
-							"sum": 33281374.038000047
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/autoscaling/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "job",
-			"workqueue": {
-				"adds": {
-					"count": 9938
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 12734
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 6878,
-								"128000": 7921,
-								"16000": 7915,
-								"2000": 7793,
-								"256000": 7921,
-								"32000": 7915,
-								"4000": 7886,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7915
-							},
-							"count": 7921,
-							"sum": 6718848.776000002
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 1479.616
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/nodes?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "ephemeral_volume",
-			"workqueue": {
-				"adds": {
-					"count": 0
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1585,
-								"1000": 0,
-								"128000": 1585,
-								"16000": 1585,
-								"2000": 33,
-								"256000": 1585,
-								"32000": 1585,
-								"4000": 1552,
-								"512000": 1585,
-								"64000": 1585,
-								"8000": 1585
-							},
-							"count": 1585,
-							"sum": 3998630.6189999986
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1/namespaces/%7Bnamespace%7D/jobs/%7Bname%7D",
-			"verb": "DELETE"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 19,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 510,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3132,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7833
-							},
-							"count": 7921,
-							"sum": 33787002.02399993
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/node.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 39,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 732,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3565,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7856
-							},
-							"count": 7921,
-							"sum": 32403059.004999947
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 11306.875
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/rbac.authorization.k8s.io/v1/clusterroles?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "ClusterRoleAggregator",
-			"workqueue": {
-				"adds": {
-					"count": 27
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "DynamicCABundle-csr-controller",
-			"workqueue": {
-				"adds": {
-					"count": 6340
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 24,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 551,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3241,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7821
-							},
-							"count": 7921,
-							"sum": 33549185.952999942
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/coordination.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 482711.14999999997
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/node.k8s.io/v1/runtimeclasses?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 4304.235
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/limitranges?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 0,
-								"2000": 0,
-								"256000": 1,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 101172.363
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/pods?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 18103,
-								"1000": 0,
-								"128000": 18103,
-								"16000": 17812,
-								"2000": 2459,
-								"256000": 18103,
-								"32000": 18088,
-								"4000": 14393,
-								"512000": 18103,
-								"64000": 18102,
-								"8000": 16165
-							},
-							"count": 18103,
-							"sum": 70206541.67600028
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1/namespaces/%7Bnamespace%7D/cronjobs/%7Bname%7D/status",
-			"verb": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 334037.013
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/scheduling.k8s.io/v1/priorityclasses?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
+			"host": "192.168.205.10:6443",
+			"method": "PATCH"
 		},
 		"Index": "",
 		"ID": "",
@@ -4747,88 +814,6 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 0,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 20868.19
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/nodes",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 432324.775
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
 			"name": "namespace",
 			"workqueue": {
 				"adds": {
@@ -4863,31 +848,41 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 0,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 684430.812
-						}
+			"node": {
+				"collector": {
+					"count": 2,
+					"eviction": {
+						"count": 7
+					},
+					"health": {
+						"pct": 100
+					},
+					"unhealthy": {
+						"count": 0
 					}
 				}
 			},
-			"url": "https://172.18.0.2:6443/apis/rbac.authorization.k8s.io/v1/clusterrolebindings?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
+			"process": {
+				"cpu": {
+					"sec": 6265
+				},
+				"fds": {
+					"open": {
+						"count": 14
+					}
+				},
+				"memory": {
+					"resident": {
+						"bytes": 100958208
+					},
+					"virtual": {
+						"bytes": 222724096
+					}
+				},
+				"started": {
+					"sec": 1559227199.05
+				}
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -4904,10 +899,10 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "serviceaccount",
+			"name": "serviceaccount_tokens_service",
 			"workqueue": {
 				"adds": {
-					"count": 5
+					"count": 68
 				},
 				"depth": {
 					"count": 0
@@ -4940,29 +935,12 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 1,
-								"256000": 1,
-								"32000": 1,
-								"4000": 1,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 1325.518
-						}
-					}
+					"count": 28
 				}
 			},
-			"url": "https://172.18.0.2:6443/apis/apiregistration.k8s.io/v1/apiservices?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
+			"code": "404",
+			"host": "192.168.205.10:6443",
+			"method": "GET"
 		},
 		"Index": "",
 		"ID": "",
@@ -4979,246 +957,10 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 3,
-								"1000": 0,
-								"128000": 3,
-								"16000": 3,
-								"2000": 0,
-								"256000": 3,
-								"32000": 3,
-								"4000": 3,
-								"512000": 3,
-								"64000": 3,
-								"8000": 3
-							},
-							"count": 3,
-							"sum": 9478.231
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/namespaces/%7Bnamespace%7D/replicasets/%7Bname%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "noexec_taint_pod",
+			"name": "replicaset",
 			"workqueue": {
 				"adds": {
-					"count": 4770
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 3,
-								"1000": 0,
-								"128000": 3,
-								"16000": 3,
-								"2000": 2,
-								"256000": 3,
-								"32000": 3,
-								"4000": 3,
-								"512000": 3,
-								"64000": 3,
-								"8000": 3
-							},
-							"count": 3,
-							"sum": 4963.458
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1/namespaces/%7Bnamespace%7D/cronjobs/%7Bname%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 7561.396
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/rbac.authorization.k8s.io/v1/rolebindings?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 1361,
-								"128000": 7921,
-								"16000": 7486,
-								"2000": 1675,
-								"256000": 7921,
-								"32000": 7907,
-								"4000": 2198,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 3799
-							},
-							"count": 7921,
-							"sum": 64480292.32100003
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 41,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 751,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3563,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7836
-							},
-							"count": 7921,
-							"sum": 32459685.32300009
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/events.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "serviceaccount_tokens_secret",
-			"workqueue": {
-				"adds": {
-					"count": 45
+					"count": 51
 				},
 				"depth": {
 					"count": 0
@@ -5249,31 +991,82 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
+			"name": "daemonset",
+			"workqueue": {
+				"adds": {
+					"count": 78
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 3
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
 			"client": {
 				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 182,
-								"1000": 0,
-								"128000": 182,
-								"16000": 173,
-								"2000": 76,
-								"256000": 182,
-								"32000": 182,
-								"4000": 86,
-								"512000": 182,
-								"64000": 182,
-								"8000": 113
-							},
-							"count": 182,
-							"sum": 1193234.1
-						}
-					}
+					"count": 172664
 				}
 			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces/%7Bnamespace%7D/serviceaccounts/%7Bname%7D",
-			"verb": "GET"
+			"code": "200",
+			"host": "192.168.205.10:6443",
+			"method": "PUT"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "ttlcontroller",
+			"workqueue": {
+				"adds": {
+					"count": 17424
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -5324,612 +1117,10 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 67202
-				}
-			},
-			"code": "200",
-			"host": "172.18.0.2:6443",
-			"method": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 1,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 251192.335
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/replicasets?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 8323.121
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/discovery.k8s.io/v1/endpointslices?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "claims",
+			"name": "serviceaccount",
 			"workqueue": {
 				"adds": {
-					"count": 6340
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 18,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 561,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3312,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7839
-							},
-							"count": 7921,
-							"sum": 33337573.244000025
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/autoscaling/v2beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 9554.270999999999
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/policy/v1/poddisruptionbudgets?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "noexec_taint_node",
-			"workqueue": {
-				"adds": {
-					"count": 1
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 72,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 998,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3865,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7858
-							},
-							"count": 7921,
-							"sum": 31296825.181000117
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apiregistration.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 8447.322
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/configmaps?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 6885.754
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/extensions/v1beta1/ingresses?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 0,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 298650.755
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1/jobs?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 39,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 652,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3406,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7844
-							},
-							"count": 7921,
-							"sum": 32928653.598000012
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/authentication.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1585,
-								"1000": 0,
-								"128000": 1585,
-								"16000": 1581,
-								"2000": 0,
-								"256000": 1585,
-								"32000": 1583,
-								"4000": 712,
-								"512000": 1585,
-								"64000": 1584,
-								"8000": 1546
-							},
-							"count": 1585,
-							"sum": 6961083.008000002
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/namespaces/%7Bnamespace%7D/pods",
-			"verb": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 23,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 555,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3227,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7830
-							},
-							"count": 7921,
-							"sum": 33560942.23699999
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/autoscaling/v2beta2?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 0,
-								"16000": 0,
-								"2000": 0,
-								"256000": 1,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 0,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 168521.167
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/persistentvolumeclaims?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 1
-				}
-			},
-			"code": "403",
-			"host": "172.18.0.2:6443",
-			"method": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "serviceaccount_tokens_service",
-			"workqueue": {
-				"adds": {
-					"count": 45
+					"count": 4
 				},
 				"depth": {
 					"count": 0
@@ -5960,31 +1151,110 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
+			"name": "volumes",
+			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "certificate",
+			"workqueue": {
+				"adds": {
+					"count": 12
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"code": "200",
+			"handler": "prometheus",
+			"http": {
 				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 10918.125
-						}
-					}
+					"count": 4
 				}
 			},
-			"url": "https://172.18.0.2:6443/apis/apps/v1/daemonsets?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
+			"method": "get"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "node_lifecycle_controller",
+			"workqueue": {
+				"adds": {
+					"count": 17427
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -6069,154 +1339,24 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 26,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 532,
-								"256000": 7920,
-								"32000": 7920,
-								"4000": 3205,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7835
-							},
-							"count": 7921,
-							"sum": 33847457.39399993
-						}
-					}
+			"name": "token_cleaner",
+			"workqueue": {
+				"adds": {
+					"count": 2
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
 				}
-			},
-			"url": "https://172.18.0.2:6443/apis/admissionregistration.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
-							},
-							"count": 1,
-							"sum": 9219.587
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/networking.k8s.io/v1/networkpolicies?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 44,
-								"128000": 7920,
-								"16000": 7920,
-								"2000": 703,
-								"256000": 7921,
-								"32000": 7920,
-								"4000": 3385,
-								"512000": 7921,
-								"64000": 7920,
-								"8000": 7833
-							},
-							"count": 7921,
-							"sum": 33136716.741999913
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apiextensions.k8s.io/v1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 5865.891
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/api/v1/endpoints?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -6267,48 +1407,14 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "bootstrap_signer_queue",
-			"workqueue": {
-				"adds": {
-					"count": 1
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
 			"client": {
 				"request": {
-					"count": 2
+					"count": 6
 				}
 			},
-			"code": "404",
-			"host": "172.18.0.2:6443",
-			"method": "PATCH"
+			"code": "200",
+			"host": "192.168.205.10:6443",
+			"method": "DELETE"
 		},
 		"Index": "",
 		"ID": "",
@@ -6325,312 +1431,44 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "node_lifecycle_controller",
-			"workqueue": {
-				"adds": {
-					"count": 317
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
+			"handler": "prometheus",
+			"http": {
 				"request": {
 					"duration": {
 						"us": {
-							"bucket": {
-								"+Inf": 1585,
-								"1000": 0,
-								"128000": 1585,
-								"16000": 1585,
-								"2000": 0,
-								"256000": 1585,
-								"32000": 1585,
-								"4000": 1202,
-								"512000": 1585,
-								"64000": 1585,
-								"8000": 1584
+							"count": 4,
+							"percentile": {
+								"50": 12285.837,
+								"90": 12285.837,
+								"99": 12285.837
 							},
-							"count": 1585,
-							"sum": 5924777.266000009
+							"sum": 37076.665
+						}
+					},
+					"size": {
+						"bytes": {
+							"count": 4,
+							"percentile": {
+								"50": 69,
+								"90": 69,
+								"99": 69
+							},
+							"sum": 271
 						}
 					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/batch/v1/namespaces/%7Bnamespace%7D/jobs",
-			"verb": "POST"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 0,
-								"2000": 0,
-								"256000": 1,
-								"32000": 0,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 0
+				},
+				"response": {
+					"size": {
+						"bytes": {
+							"count": 4,
+							"percentile": {
+								"50": 192971,
+								"90": 192971,
+								"99": 192971
 							},
-							"count": 1,
-							"sum": 51489.332
+							"sum": 771764
 						}
 					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/coordination.k8s.io/v1/leases?limit=%7Bvalue%7D\u0026resourceVersion=%7Bvalue%7D",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "orphaned_pods_nodes",
-			"workqueue": {
-				"adds": {
-					"count": 0
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "volume_expand",
-			"workqueue": {
-				"adds": {
-					"count": 1
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "token_cleaner",
-			"workqueue": {
-				"adds": {
-					"count": 0
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"duration": {
-						"us": {
-							"bucket": {
-								"+Inf": 7921,
-								"1000": 59,
-								"128000": 7921,
-								"16000": 7921,
-								"2000": 864,
-								"256000": 7921,
-								"32000": 7921,
-								"4000": 3725,
-								"512000": 7921,
-								"64000": 7921,
-								"8000": 7849
-							},
-							"count": 7921,
-							"sum": 31881754.901999995
-						}
-					}
-				}
-			},
-			"url": "https://172.18.0.2:6443/apis/apiregistration.k8s.io/v1beta1?timeout=32s",
-			"verb": "GET"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "node_lifecycle_controller_pods",
-			"workqueue": {
-				"adds": {
-					"count": 1600
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "service",
-			"workqueue": {
-				"adds": {
-					"count": 0
-				},
-				"depth": {
-					"count": 0
-				},
-				"longestrunning": {
-					"sec": 0
-				},
-				"retries": {
-					"count": 0
-				},
-				"unfinished": {
-					"sec": 0
 				}
 			}
 		},
