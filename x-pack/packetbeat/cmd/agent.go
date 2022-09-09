@@ -13,14 +13,12 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
+// packetbeatCfg is a callback registered with central management to perform any needed config transformations
+// before agent configs are sent to a beatß
 func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	configList := make([]*reload.ConfigWithMeta, 1)
 	uconfig, err := conf.NewConfigFrom(rawIn.Source.AsMap())
 	if err != nil {
 		return nil, fmt.Errorf("error in conversion to conf.C: %w", err)
 	}
-
-	configList[0] = &reload.ConfigWithMeta{Config: uconfig}
-
-	return configList, nil
+	return []*reload.ConfigWithMeta{{Config: uconfig}}, nil
 }

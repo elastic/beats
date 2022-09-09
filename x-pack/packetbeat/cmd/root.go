@@ -7,11 +7,11 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	packetbeatCmd "github.com/elastic/beats/v7/packetbeat/cmd"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 
 	// This registers the Npcap installer on Windows.
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	_ "github.com/elastic/beats/v7/x-pack/packetbeat/npcap"
 )
 
