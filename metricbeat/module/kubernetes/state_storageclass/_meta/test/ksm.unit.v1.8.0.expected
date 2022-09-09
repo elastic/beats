@@ -1,11 +1,7 @@
 [
 	{
-		"RootFields": {},
-		"ModuleFields": {
-			"labels": {
-				"foo": "bar"
-			}
-		},
+		"RootFields": null,
+		"ModuleFields": null,
 		"MetricSetFields": {
 			"created": "2017-08-01T06:30:18.000Z",
 			"name": "test_storageclass",
