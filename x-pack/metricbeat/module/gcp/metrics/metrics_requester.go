@@ -208,7 +208,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 		return f
 	case gcp.ServiceStorage:
 		if r.config.Region != "" && len(r.config.Regions) != 0 {
-			r.logger.Warnf("when region and regions config parameters are both provided, use region", r.config.Region)
+			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
 		}
 
 		switch {
