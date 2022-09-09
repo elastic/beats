@@ -23,10 +23,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-<<<<<<< HEAD
-=======
 	"github.com/elastic/elastic-agent-libs/mapstr"
->>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979))
 )
 
 // Metricset for apiserver is a prometheus based metricset
@@ -61,7 +58,6 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("error getting metrics: %w", err)
 	}
 
-<<<<<<< HEAD
 	rcPost14 := false
 	for _, event := range events {
 		if ok, _ := event.HasKey("request.count"); ok {
@@ -91,21 +87,14 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			}
 		}
 
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
-			Namespace:       m.prometheusMappings.Namespace,
-		})
-=======
-	for _, e := range events {
-		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
+		e := mb.TransformMapStrToEvent("kubernetes", event, nil)
 		if m.clusterMeta != nil {
-			event.RootFields.DeepUpdate(m.clusterMeta)
+			e.RootFields.DeepUpdate(m.clusterMeta)
 		}
-		isOpen := reporter.Event(event)
+		isOpen := reporter.Event(e)
 		if !isOpen {
 			return nil
 		}
->>>>>>> 1f5b863424 (Add missing cluster metadata to multiple k8s metricsests (#32979))
 	}
 
 	return nil
