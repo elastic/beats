@@ -11,6 +11,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 
 	// This registers the Npcap installer on Windows.
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	_ "github.com/elastic/beats/v7/x-pack/packetbeat/npcap"
 )
 
@@ -21,6 +22,7 @@ var Name = packetbeatCmd.Name
 var RootCmd *cmd.BeatsRootCmd
 
 func init() {
+	management.ConfigTransform.SetTransform(packetbeatCfg)
 	settings := packetbeatCmd.PacketbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = packetbeatCmd.Initialize(settings)
