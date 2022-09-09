@@ -22,7 +22,7 @@ pipeline {
     quietPeriod(10)
   }
   triggers {
-    issueCommentTrigger("${obltGitHubComments()}")
+    issueCommentTrigger("(${obltGitHubComments()}|^/test all)")
   }
   stages {
     stage('Checkout') {
@@ -58,11 +58,26 @@ pipeline {
         axes {
           axis {
             name 'PLATFORM'
-            values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable', 'darwin && orka && x86_64'
+            values 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable', 'darwin && orka && x86_64', 'darwin && orka && aarch64'
           }
         }
         stages {
           stage('Test') {
+            when {
+              beforeAgent true
+              anyOf {
+                not { changeRequest() }
+                // As agreed macos M1 will be used in merge-commits
+                allOf {
+                  changeRequest()
+                  not {
+                    environment name: 'PLATFORM', value: 'darwin && orka && aarch64'
+                  }
+                }
+                // Allow to run on PRs if `/test all`
+                expression { return env.GITHUB_COMMENT?.contains('all') }
+              }
+            }
             steps {
               withGithubNotify(context: "Test-${PLATFORM}") {
                 deleteDir()
