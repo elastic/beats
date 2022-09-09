@@ -25,13 +25,6 @@
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="brew-tab-install-filebeat"
-            id="brew-install-filebeat"
-            tabindex="-1">
-      Brew
-    </button>
-    <button role="tab"
-            aria-selected="false"
             aria-controls="linux-tab-install-filebeat"
             id="linux-install-filebeat"
             tabindex="-1">
@@ -74,17 +67,6 @@ include::install.asciidoc[tag=rpm]
 ++++
 
 include::install.asciidoc[tag=mac]
-
-++++
-  </div>
-  <div tabindex="0"
-       role="tabpanel"
-       id="brew-tab-install-filebeat"
-       aria-labelledby="brew-install-filebeat"
-       hidden="">
-++++
-
-include::install.asciidoc[tag=brew]
 
 ++++
   </div>

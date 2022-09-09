@@ -97,7 +97,7 @@ func TestWtmp(t *testing.T) {
 		"Timestamp is not equal: %+v", events[0].Timestamp)
 
 	// Append logout event to wtmp file and check that it's read
-	wtmpFile, err := os.OpenFile(wtmpFilepath, os.O_APPEND|os.O_WRONLY, 0644)
+	wtmpFile, err := os.OpenFile(wtmpFilepath, os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
 		t.Fatalf("error opening %v: %v", wtmpFilepath, err)
 	}
@@ -264,7 +264,6 @@ func checkFieldValue(t *testing.T, mapstr common.MapStr, fieldName string, field
 		default:
 			assert.Equal(t, fieldValue, v)
 		}
-
 	}
 }
 

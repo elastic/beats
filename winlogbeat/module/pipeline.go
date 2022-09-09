@@ -189,6 +189,9 @@ func applyTemplates(prefix string, version string, filename string, original []b
 	}
 
 	encodedString, err := fileset.ApplyTemplate(vars, string(original), true)
+	if err != nil {
+		return nil, fmt.Errorf("failed to apply template: %w", err)
+	}
 
 	var content map[string]interface{}
 	switch extension := strings.ToLower(filepath.Ext(filename)); extension {

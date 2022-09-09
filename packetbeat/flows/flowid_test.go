@@ -54,14 +54,6 @@ func addVLan(u []byte) applyAddr {
 	}
 }
 
-func addUDP(a, b []byte) applyAddr {
-	src := binary.LittleEndian.Uint16(a)
-	dst := binary.LittleEndian.Uint16(b)
-	return func(f *FlowID) {
-		f.AddUDP(src, dst)
-	}
-}
-
 func addTCP(a, b []byte) applyAddr {
 	src := binary.LittleEndian.Uint16(a)
 	dst := binary.LittleEndian.Uint16(b)

@@ -29,7 +29,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/go-libaudit/v2/rule"
 	"github.com/elastic/go-libaudit/v2/rule/flags"
@@ -102,7 +101,7 @@ func (c *Config) Validate() error {
 	switch c.SocketType {
 	case "", "unicast", "multicast":
 	default:
-		errs = append(errs, errors.Errorf("invalid socket_type "+
+		errs = append(errs, fmt.Errorf("invalid socket_type "+
 			"'%v' (use unicast, multicast, or don't set a value)", c.SocketType))
 	}
 
@@ -161,7 +160,7 @@ func (c Config) failureMode() (uint32, error) {
 	case "panic":
 		return 2, nil
 	default:
-		return 0, errors.Errorf("invalid failure_mode '%v' (use silent, log, or panic)", c.FailureMode)
+		return 0, fmt.Errorf("invalid failure_mode '%v' (use silent, log, or panic)", c.FailureMode)
 	}
 }
 
@@ -179,21 +178,21 @@ func readRules(reader io.Reader, source string, knownRules ruleSet) (rules []aud
 		// Parse the CLI flags into an intermediate rule specification.
 		r, err := flags.Parse(line)
 		if err != nil {
-			errs = append(errs, errors.Wrapf(err, "at %s: failed to parse rule '%v'", location, line))
+			errs = append(errs, fmt.Errorf("at %s: failed to parse rule '%v': %w", location, line, err))
 			continue
 		}
 
 		// Convert rule specification to a binary rule representation.
 		data, err := rule.Build(r)
 		if err != nil {
-			errs = append(errs, errors.Wrapf(err, "at %s: failed to interpret rule '%v'", location, line))
+			errs = append(errs, fmt.Errorf("at %s: failed to interpret rule '%v': %w", location, line, err))
 			continue
 		}
 
 		// Detect duplicates based on the normalized binary rule representation.
 		existing, found := knownRules[string(data)]
 		if found {
-			errs = append(errs, errors.Errorf("at %s: rule '%v' is a duplicate of '%v' at %s", location, line, existing.rule.flags, existing.source))
+			errs = append(errs, fmt.Errorf("at %s: rule '%v' is a duplicate of '%v' at %s", location, line, existing.rule.flags, existing.source))
 			continue
 		}
 		rule := auditRule{flags: line, data: []byte(data)}
@@ -203,7 +202,7 @@ func readRules(reader io.Reader, source string, knownRules ruleSet) (rules []aud
 	}
 
 	if len(errs) > 0 {
-		return nil, errors.Wrap(errs.Err(), "failed loading rules")
+		return nil, fmt.Errorf("failed loading rules: %w", errs.Err())
 	}
 	return rules, nil
 }

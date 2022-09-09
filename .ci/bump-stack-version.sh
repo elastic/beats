@@ -24,8 +24,7 @@ else
 	SED="sed -i"
 fi
 
-FILES="testing/environments/snapshot-oss.yml
-testing/environments/snapshot.yml
+FILES="testing/environments/snapshot.yml
 "
 
 echo "Update stack with version ${VERSION}"

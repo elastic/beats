@@ -19,13 +19,6 @@
 ----
 // end::mac[]
 
-// tag::brew[]
-["source","sh",subs="attributes"]
-----
-{beatname_lc} modules list
-----
-// end::brew[]
-
 // tag::linux[]
 ["source","sh",subs="attributes"]
 ----

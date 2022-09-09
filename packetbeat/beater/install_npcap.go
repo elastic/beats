@@ -51,6 +51,10 @@ func installNpcap(b *beat.Beat) error {
 			log.Infof("npcap version: %s", npcapVersion)
 		}
 	}()
+	if !npcap.Upgradeable() {
+		npcap.Installer = nil
+		return nil
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
 	defer cancel()

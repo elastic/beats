@@ -86,7 +86,7 @@ func TestGenerateFuzzCorpus(t *testing.T) {
 		h.Write([]byte(m))
 		name := hex.EncodeToString(h.Sum(nil))
 
-		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0644)
+		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
 	}
 }
 
@@ -433,6 +433,7 @@ func StringField(v string) *Field { return &Field{String: v, Type: StringType, I
 func IntegerField(v int32) *Field {
 	return &Field{String: strconv.Itoa(int(v)), Type: IntegerType, Interface: v}
 }
+
 func LongField(v int64) *Field {
 	return &Field{String: strconv.Itoa(int(v)), Type: LongType, Interface: v}
 }

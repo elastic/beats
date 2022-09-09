@@ -27,10 +27,11 @@ package file_integrity
 import "C"
 
 import (
+	"errors"
+	"fmt"
 	"syscall"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	"howett.net/plist"
 )
 
@@ -73,9 +74,13 @@ func GetFileOrigin(path string) ([]string, error) {
 	defer C.free(unsafe.Pointer(cPath))
 
 	// Query length kMDItemWhereFroms extended-attribute
-	attrSize, err := C.getxattr(cPath, kMDItemWhereFroms, nil, 0, 0, 0)
+	attrSize, errno := C.getxattr(cPath, kMDItemWhereFroms, nil, 0, 0, 0)
 	if attrSize == -1 {
-		return nil, errors.Wrap(filterErrno(err), "getxattr: query attribute length failed")
+		err := filterErrno(errno)
+		if err != nil {
+			return nil, fmt.Errorf("getxattr: query attribute length failed: %w", err)
+		}
+		return nil, nil
 	}
 	if attrSize == 0 {
 		return nil, nil
@@ -83,9 +88,13 @@ func GetFileOrigin(path string) ([]string, error) {
 
 	// Read the kMDItemWhereFroms attribute
 	data := make([]byte, attrSize)
-	newSize, err := C.getxattr(cPath, kMDItemWhereFroms, unsafe.Pointer(&data[0]), C.size_t(attrSize), 0, 0)
+	newSize, errno := C.getxattr(cPath, kMDItemWhereFroms, unsafe.Pointer(&data[0]), C.size_t(attrSize), 0, 0)
 	if newSize == -1 {
-		return nil, errors.Wrap(filterErrno(err), "getxattr failed")
+		err := filterErrno(errno)
+		if err != nil {
+			return nil, fmt.Errorf("getxattr failed: %w", filterErrno(err))
+		}
+		return nil, nil
 	}
 	if newSize != attrSize {
 		return nil, errors.New("getxattr: attribute changed while reading")
@@ -93,8 +102,8 @@ func GetFileOrigin(path string) ([]string, error) {
 
 	// Decode plist format. A list of strings is expected
 	var urls []string
-	if _, err = plist.Unmarshal(data, &urls); err != nil {
-		return nil, errors.Wrap(err, "plist unmarshal failed")
+	if _, err := plist.Unmarshal(data, &urls); err != nil {
+		return nil, fmt.Errorf("plist unmarshal failed: %w", err)
 	}
 
 	// The returned list seems to be padded with empty strings when some of

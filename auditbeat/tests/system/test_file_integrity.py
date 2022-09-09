@@ -62,7 +62,7 @@ class Test(BaseTest):
             else:
                 break
 
-    @unittest.skipIf(os.getenv("BUILD_ID") is not None and platform.system() == 'Darwin',
+    @unittest.skipIf(os.getenv("CI") is not None and platform.system() == 'Darwin',
                      'Flaky test: https://github.com/elastic/beats/issues/24678')
     def test_non_recursive(self):
         """

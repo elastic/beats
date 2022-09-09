@@ -52,7 +52,6 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-
 	out, err := outlet.Connect(cfg)
 	if err != nil {
 		return nil, err

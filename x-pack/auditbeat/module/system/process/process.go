@@ -15,7 +15,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
@@ -148,12 +147,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open persistent datastore")
+		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
 
 	hasher, err := hasher.NewFileHasher(config.HasherConfig, nil)
@@ -231,13 +230,13 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 	processes, err := ms.getProcesses()
 	if err != nil {
-		return errors.Wrap(err, "failed to get process infos")
+		return fmt.Errorf("failed to get process infos: %w", err)
 	}
 	ms.log.Debugf("Found %v processes", len(processes))
 
 	stateID, err := uuid.NewV4()
 	if err != nil {
-		return errors.Wrap(err, "error generating state ID")
+		return fmt.Errorf("error generating state ID: %w", err)
 	}
 	for _, p := range processes {
 		ms.enrichProcess(p)
@@ -264,7 +263,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	}
 	err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
 	if err != nil {
-		return errors.Wrap(err, "error writing state timestamp to disk")
+		return fmt.Errorf("error writing state timestamp to disk: %w", err)
 	}
 
 	return nil
@@ -274,7 +273,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	processes, err := ms.getProcesses()
 	if err != nil {
-		return errors.Wrap(err, "failed to get processes")
+		return fmt.Errorf("failed to get processes: %w", err)
 	}
 	ms.log.Debugf("Found %v processes", len(processes))
 
@@ -322,8 +321,7 @@ func (ms *MetricSet) enrichProcess(process *Process) {
 		sharedMntNS, err := isNsSharedWith(process.Info.PID, "mnt")
 		if err != nil {
 			if process.Error == nil {
-				process.Error = errors.Wrapf(err, "failed to get namespaces for %v PID %v", process.Info.Exe,
-					process.Info.PID)
+				process.Error = fmt.Errorf("failed to get namespaces for %v PID %v: %w", process.Info.Exe, process.Info.PID, err)
 			}
 			return
 		}
@@ -333,8 +331,7 @@ func (ms *MetricSet) enrichProcess(process *Process) {
 		hashes, err := ms.hasher.HashFile(process.Info.Exe)
 		if err != nil {
 			if process.Error == nil {
-				process.Error = errors.Wrapf(err, "failed to hash executable %v for PID %v", process.Info.Exe,
-					process.Info.PID)
+				process.Error = fmt.Errorf("failed to hash executable %v for PID %v: %w", process.Info.Exe, process.Info.PID, err)
 			}
 			return
 		}
@@ -442,7 +439,7 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 
 	sysinfoProcs, err := sysinfo.Processes()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to fetch processes")
+		return nil, fmt.Errorf("failed to fetch processes: %w", err)
 	}
 
 	for _, sysinfoProc := range sysinfoProcs {
@@ -473,7 +470,7 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			// Record what we can and continue
 			process = &Process{
 				Info:  pInfo,
-				Error: errors.Wrapf(err, "failed to load process information for PID %d", sysinfoProc.PID()),
+				Error: fmt.Errorf("failed to load process information for PID %d: %w", sysinfoProc.PID(), err),
 			}
 			process.Info.PID = sysinfoProc.PID() // in case pInfo did not contain it
 		} else {
@@ -485,7 +482,7 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 		userInfo, err := sysinfoProc.User()
 		if err != nil {
 			if process.Error == nil {
-				process.Error = errors.Wrapf(err, "failed to load user for PID %d", sysinfoProc.PID())
+				process.Error = fmt.Errorf("failed to load user for PID %d: %w", sysinfoProc.PID(), err)
 			}
 		} else {
 			process.UserInfo = &userInfo

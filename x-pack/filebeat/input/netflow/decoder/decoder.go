@@ -27,7 +27,6 @@ type Decoder struct {
 	protos  map[uint16]protocol.Protocol
 	started bool
 	logger  log.Logger
-	config  config.Config
 }
 
 // NewDecoder returns a new NetFlow decoder configured using the passed

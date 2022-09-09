@@ -38,6 +38,7 @@ type s3ObjectPayload struct {
 	s3ObjectInfo    s3ObjectInfo
 	s3ObjectEvent   s3EventV2
 }
+
 type s3Poller struct {
 	numberOfWorkers      int
 	bucket               string

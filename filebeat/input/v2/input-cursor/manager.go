@@ -76,8 +76,10 @@ type Source interface {
 	Name() string
 }
 
-var errNoSourceConfigured = errors.New("no source has been configured")
-var errNoInputRunner = errors.New("no input runner available")
+var (
+	errNoSourceConfigured = errors.New("no source has been configured")
+	errNoInputRunner      = errors.New("no input runner available")
+)
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
 type StateStore interface {

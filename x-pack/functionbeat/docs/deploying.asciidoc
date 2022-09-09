@@ -16,8 +16,8 @@ when you don't have your own deployment infrastructure or process in place.
 During deployment, the {beatname_uc} manager:
 
 * Exports a function template to use for deployment. For AWS, it exports an
-{cloudformation-ref} template. For Google Cloud, it exports a YAML configuration
-file. To inspect the template, run the <<export-command,`export`>> command.
+{cloudformation-ref} template. To inspect the template, run the
+<<export-command,`export`>> command.
 * Creates a zip package that includes the function code and +{beatname_lc}.yml+
 config file.
 * Uploads the package to the specified cloud provider.
@@ -103,13 +103,11 @@ same path as the configured +{beatname_lc}.yml+ file.
 ----------------------------------------------------------------------
 +
 {beatname_uc} writes the template to stdout. For AWS functions, it writes an
-{cloudformation-ref} tempalte. For Google Cloud, it writes a YAML configuration
-file.
+{cloudformation-ref} template.
 
 . Modify the template to work with your infrastructure.
 
 . Deploy the package, using the infrastructure and automation supported by your
-cloud provider, for example, {cloudformation-ref} or
-https://cloud.google.com/deployment-manager[Google Cloud Deployment manager].
+cloud provider, for example, {cloudformation-ref}.
 +
 For more information about deployment, see your cloud provider's documentation.

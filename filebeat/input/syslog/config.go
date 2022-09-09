@@ -49,13 +49,11 @@ const (
 	syslogFormatAuto
 )
 
-var (
-	syslogFormats = map[string]syslogFormat{
-		"rfc3164": syslogFormatRFC3164,
-		"rfc5424": syslogFormatRFC5424,
-		"auto":    syslogFormatAuto,
-	}
-)
+var syslogFormats = map[string]syslogFormat{
+	"rfc3164": syslogFormatRFC3164,
+	"rfc5424": syslogFormatRFC5424,
+	"auto":    syslogFormatAuto,
+}
 
 var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{

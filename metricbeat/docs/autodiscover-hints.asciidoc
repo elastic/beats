@@ -96,6 +96,28 @@ co.elastic.logs/processors.add_locale.abbrevation: "PST"
 
 In the above sample the processor definition tagged with `1` would be executed first.
 
+When hints are used along with templates, then hints will be evaluated only in case
+there is no template's condition that resolves to true. For example:
+
+[source,yaml]
+-----
+metricbeat.autodiscover.providers:
+  - type: kubernetes
+    hints.enabled: true
+    templates:
+        - condition:
+            contains:
+              kubernetes.annotations.prometheus.io/scrape: "true"
+          config:
+            - module: prometheus
+              metricsets: ["collector"]
+              hosts: "${data.host}:${data.port}"
+-----
+
+In this example first the condition `kubernetes.annotations.prometheus.io/scrape: "true"`
+is evaluated and if not matched the hints will be processed.
+
+
 [float]
 === Kubernetes
 

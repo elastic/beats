@@ -120,6 +120,7 @@ func main() {
 		}
 	}
 }
+
 func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	f, err := os.Open(logfile)
 	if err != nil {
@@ -226,7 +227,6 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 	}
 
 	return paths, nil
-
 }
 
 func isPipelineFileExtension(path string) bool {

@@ -52,11 +52,6 @@ const (
 	// EventCreate.exe has valid event IDs in the range of 1-1000 where each
 	// event message requires a single parameter.
 	eventCreateMsgFile = "%SystemRoot%\\System32\\EventCreate.exe"
-	// services.exe is used by the Service Control Manager as its event message
-	// file; these tests use it to log messages with more than one parameter.
-	servicesMsgFile = "%SystemRoot%\\System32\\services.exe"
-	// netevent.dll has messages that require no message parameters.
-	netEventMsgFile = "%SystemRoot%\\System32\\netevent.dll"
 )
 
 func TestWinEventLogConfig_Validate(t *testing.T) {

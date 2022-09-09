@@ -173,6 +173,85 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		}
 
 		objType = "job"
+
+	case *Role:
+		r := client.RbacV1().Roles(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return r.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return r.Watch(ctx, options)
+			},
+		}
+
+		objType = "role"
+
+	case *RoleBinding:
+		rb := client.RbacV1().RoleBindings(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return rb.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return rb.Watch(ctx, options)
+			},
+		}
+
+		objType = "rolebinding"
+
+	case *ClusterRole:
+		cr := client.RbacV1().ClusterRoles()
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return cr.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return cr.Watch(ctx, options)
+			},
+		}
+
+		objType = "clusterrole"
+
+	case *ClusterRoleBinding:
+		crb := client.RbacV1().ClusterRoleBindings()
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return crb.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return crb.Watch(ctx, options)
+			},
+		}
+
+		objType = "clusterrolebinding"
+
+	case *PodSecurityPolicy:
+		psp := client.PolicyV1beta1().PodSecurityPolicies()
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return psp.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return psp.Watch(ctx, options)
+			},
+		}
+
+		objType = "podsecuritypolicy"
+
+	case *NetworkPolicy:
+		np := client.ExtensionsV1beta1().NetworkPolicies(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return np.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return np.Watch(ctx, options)
+			},
+		}
+
+		objType = "networkpolicy"
+
 	default:
 		return nil, "", fmt.Errorf("unsupported resource type for watching %T", resource)
 	}

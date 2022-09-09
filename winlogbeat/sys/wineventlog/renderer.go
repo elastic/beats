@@ -39,13 +39,6 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
-const (
-	// keywordClassic indicates the log was published with the "classic" event
-	// logging API.
-	// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.eventing.reader.standardeventkeywords?view=netframework-4.8
-	keywordClassic = 0x80000000000000
-)
-
 // Renderer is used for converting event log handles into complete events.
 type Renderer struct {
 	// Cache of publisher metadata. Maps publisher names to stored metadata.
@@ -258,7 +251,10 @@ func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values [
 	// Fingerprint the argument types to help ensure we match these values with
 	// the correct event data parameter names.
 	argumentHash := xxhash.New()
-	binary.Write(argumentHash, binary.LittleEndian, propertyCount)
+	err = binary.Write(argumentHash, binary.LittleEndian, int64(propertyCount))
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to hash property count: %w", err)
+	}
 
 	values = make([]interface{}, propertyCount)
 	for i := 0; i < propertyCount; i++ {
@@ -357,15 +353,13 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 			Value: strVal,
 		})
 	}
-
-	return
 }
 
 // formatMessage adds the message to the event.
 func (r *Renderer) formatMessage(publisherMeta *PublisherMetadataStore,
 	eventMeta *EventMetadata, eventHandle EvtHandle, values []interface{},
-	eventID uint16) (string, error) {
-
+	eventID uint16) (string, error,
+) {
 	if eventMeta != nil {
 		if eventMeta.MsgStatic != "" {
 			return eventMeta.MsgStatic, nil

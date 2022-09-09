@@ -289,7 +289,6 @@ func (s *states) readStatesFrom(store *statestore.Store) error {
 		states = append(states, st)
 		return true, nil
 	})
-
 	if err != nil {
 		return err
 	}

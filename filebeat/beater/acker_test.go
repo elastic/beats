@@ -58,13 +58,13 @@ func TestACKer(t *testing.T) {
 		{
 			name:      "only stateful",
 			data:      []interface{}{file.State{Source: "-"}, file.State{Source: "-"}},
-			stateful:  []file.State{file.State{Source: "-"}, file.State{Source: "-"}},
+			stateful:  []file.State{{Source: "-"}, {Source: "-"}},
 			stateless: 0,
 		},
 		{
 			name:      "both",
 			data:      []interface{}{file.State{Source: "-"}, nil, file.State{Source: "-"}},
-			stateful:  []file.State{file.State{Source: "-"}, file.State{Source: "-"}},
+			stateful:  []file.State{{Source: "-"}, {Source: "-"}},
 			stateless: 1,
 		},
 		{

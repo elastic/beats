@@ -70,7 +70,7 @@ func TestDateParsing(t *testing.T) {
 	e.SetMonth([]byte("Sept"))
 	e.SetHour(itb(18))
 	e.SetMinute(itb(14))
-	e.SetSecond(itb(04))
+	e.SetSecond(itb(0o4))
 	e.SetNanosecond(itb(5555))
 
 	// Use google parser to compare.
@@ -78,7 +78,7 @@ func TestDateParsing(t *testing.T) {
 	t1 = t1.UTC()
 	t2, _ := time.Parse(time.RFC3339, "2018-09-12T18:14:04.5555+07:00")
 	t2 = t2.UTC()
-	alreadyutc := time.Date(2018, 9, 12, 18, 14, 04, 555500000, time.UTC)
+	alreadyutc := time.Date(2018, 9, 12, 18, 14, 0o4, 555500000, time.UTC)
 
 	tests := []struct {
 		name     string
@@ -115,7 +115,7 @@ func TestNanosecondParsing(t *testing.T) {
 	e.SetMonth([]byte("Sept"))
 	e.SetHour(itb(18))
 	e.SetMinute(itb(14))
-	e.SetSecond(itb(04))
+	e.SetSecond(itb(0o4))
 
 	// Use google parser to compare.
 	dt := func(s string) int {

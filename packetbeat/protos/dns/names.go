@@ -62,7 +62,7 @@ func dnsTypeToString(t uint16) string {
 	return s
 }
 
-// dnsClassToString converts a RR class value to a string. If the class'es
+// dnsClassToString converts a RR class value to a string. If the class's
 // string representation is unknown then the numeric value will be returned
 // as a string.
 func dnsClassToString(c uint16) string {

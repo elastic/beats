@@ -1,0 +1,32 @@
+[
+    {
+        "@timestamp": "2022-01-27T11:48:45.809Z",
+        "data_stream.dataset": "deprecation.elasticsearch",
+        "data_stream.namespace": "default",
+        "data_stream.type": "logs",
+        "elasticsearch.cluster.name": "runTask",
+        "elasticsearch.cluster.uuid": "5alW33KLT16Lp1SevDqDSQ",
+        "elasticsearch.elastic_product_origin": "",
+        "elasticsearch.event.category": "compatible_api",
+        "elasticsearch.http.request.x_opaque_id": "v7app",
+        "elasticsearch.node.id": "tVLnAGLgQum5ca6z50aqbw",
+        "elasticsearch.node.name": "runTask-0",
+        "event.category": "database",
+        "event.code": "create_index_with_types",
+        "event.dataset": "elasticsearch.deprecation",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.type": "info",
+        "fileset.name": "deprecation",
+        "host.id": "tVLnAGLgQum5ca6z50aqbw",
+        "input.type": "log",
+        "log.level": "CRITICAL",
+        "log.logger": "org.elasticsearch.deprecation.rest.action.admin.indices.RestCreateIndexAction",
+        "log.offset": 0,
+        "message": "[types removal] Using include_type_name in create index requests is deprecated. The parameter will be removed in the next major version.",
+        "process.thread.name": "elasticsearch[runTask-0][transport_worker][T#8]",
+        "service.name": "ES_ECS",
+        "service.type": "elasticsearch",
+        "trace.id": "0af7651916cd43dd8448eb211c80319c"
+    }
+]

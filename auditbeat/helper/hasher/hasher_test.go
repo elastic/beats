@@ -18,12 +18,12 @@
 package hasher
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,7 +35,7 @@ func TestHasher(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	file := filepath.Join(dir, "exe")
-	if err = ioutil.WriteFile(file, []byte("test exe\n"), 0600); err != nil {
+	if err = ioutil.WriteFile(file, []byte("test exe\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -69,7 +69,7 @@ func TestHasherLimits(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	file := filepath.Join(dir, "exe")
-	if err = ioutil.WriteFile(file, []byte("test exe\n"), 0600); err != nil {
+	if err = ioutil.WriteFile(file, []byte("test exe\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -88,5 +88,5 @@ func TestHasherLimits(t *testing.T) {
 	hashes, err := hasher.HashFile(file)
 	assert.Empty(t, hashes)
 	assert.Error(t, err)
-	assert.IsType(t, FileTooLargeError{}, errors.Cause(err))
+	assert.True(t, errors.As(err, &FileTooLargeError{}))
 }

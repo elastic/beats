@@ -163,5 +163,4 @@ func (j Journey) ToMap() common.MapStr {
 		"name": j.Name,
 		"id":   j.Id,
 	}
-
 }

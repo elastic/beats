@@ -940,10 +940,11 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 				minute = strconv.Itoa(int(data[paramOffset+5]))
 				second = strconv.Itoa(int(data[paramOffset+6]))
 			}
-			if paramLen >= 11 {
-				// Billionth of a second
-				// Skip
-			}
+
+			// If paramLen is greater or equal to 11
+			// then nanoseconds are also available.
+			// We do not handle them.
+
 			datetime := year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second
 			paramString = append(paramString, datetime)
 			paramOffset += paramLen

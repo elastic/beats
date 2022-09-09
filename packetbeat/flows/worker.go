@@ -156,7 +156,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 	defer fw.table.Unlock()
 	ts := time.Now()
 
-	// TODO: create snapshot inside flows/tables, so deletion of timedout flows
+	// TODO: create snapshot inside flows/tables, so deletion of timed-out flows
 	//       and reporting flows stats can be done more concurrent to packet
 	//       processing.
 

@@ -19,6 +19,7 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -120,7 +121,7 @@ func (pf *config) getMappings() (mappings common.MapStr, err error) {
 		wantedFields = []string{"process", "container"}
 	}
 	for _, docSrc := range wantedFields {
-		dstField := fieldPrefix + docSrc
+		dstField := constructPath(fieldPrefix, docSrc)
 		reqField, err := validFields.GetValue(docSrc)
 		if err != nil {
 			return nil, fmt.Errorf("field '%v' not found", docSrc)
@@ -144,4 +145,14 @@ func (pf *config) getMappings() (mappings common.MapStr, err error) {
 		}
 	}
 	return mappings.Flatten(), nil
+}
+
+// constructPath returns a full JSON path given the prefix and target taking
+// care to ensure that parent process attributes are placed directly within the
+// parent object.
+func constructPath(prefix, target string) string {
+	if prefix == "parent." || strings.HasSuffix(prefix, ".parent.") {
+		return prefix + strings.TrimPrefix(target, "process.")
+	}
+	return prefix + target
 }

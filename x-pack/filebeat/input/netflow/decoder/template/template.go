@@ -19,9 +19,7 @@ const (
 	VariableLength uint16 = 0xffff
 )
 
-var (
-	ErrEmptyTemplate = errors.New("empty template")
-)
+var ErrEmptyTemplate = errors.New("empty template")
 
 type Template struct {
 	ID             uint16

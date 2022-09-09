@@ -35,22 +35,45 @@ func init() {
 	)
 }
 
+// Config "imports" the base module-level config, plus our metricset options
+type Config struct {
+	TLS       *docker.TLSConfig `config:"ssl"`
+	DeDot     bool              `config:"labels.dedot"`
+	SkipMajor []uint64          `config:"skip_major"`
+}
+
+// The major devices we'll skip by default. 9 == mdraid, 253 == device-mapper
+var defaultMajorDev = []uint64{9, 253}
+
+func defaultConfig() Config {
+	//This is a bit awkward, but the config Unwrap() function is a bit awkward in that it will only partly overwrite
+	// an array value, which makes handling the `skip_major` array a bit annoying.
+	parentDefault := docker.DefaultConfig()
+	return Config{
+		TLS:   parentDefault.TLS,
+		DeDot: parentDefault.DeDot,
+	}
+}
+
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	blkioService *BlkioService
 	dockerClient *client.Client
-	dedot        bool
+	config       Config
 }
 
 // New create a new instance of the docker diskio MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := docker.DefaultConfig()
+	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
+	if config.SkipMajor == nil {
+		config.SkipMajor = defaultMajorDev
+	}
 
-	client, err := docker.NewDockerClient(base.HostData().URI, config)
+	client, err := docker.NewDockerClient(base.HostData().URI, docker.Config{TLS: config.TLS, DeDot: config.DeDot})
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +82,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		dockerClient:  client,
 		blkioService:  NewBlkioService(),
-		dedot:         config.DeDot,
+		config:        config,
 	}, nil
 }
 
@@ -70,7 +93,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get docker stats")
 	}
 
-	formattedStats := m.blkioService.getBlkioStatsList(stats, m.dedot)
+	formattedStats := m.blkioService.getBlkioStatsList(stats, m.config.DeDot, m.config.SkipMajor)
 	eventsMapping(r, formattedStats)
 
 	return nil

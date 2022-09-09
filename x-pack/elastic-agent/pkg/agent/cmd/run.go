@@ -308,7 +308,9 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 		Host:    beats.AgentMonitoringEndpoint(operatingSystem, cfg.HTTP),
 	}
 
-	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP))
+	bufferEnabled := cfg.HTTP.Buffer != nil && cfg.HTTP.Buffer.Enabled
+
+	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP), bufferEnabled)
 	if err != nil {
 		return nil, errors.New(err, "could not start the HTTP server for the API")
 	}

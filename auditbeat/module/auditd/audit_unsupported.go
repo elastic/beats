@@ -21,7 +21,7 @@
 package auditd
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -36,5 +36,5 @@ func init() {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return nil, errors.Errorf("the %v module is only supported on Linux", metricsetName)
+	return nil, fmt.Errorf("the %v module is only supported on Linux", metricsetName)
 }

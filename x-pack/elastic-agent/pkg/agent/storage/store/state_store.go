@@ -11,7 +11,7 @@ import (
 	"io"
 	"sync"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -46,7 +46,7 @@ type action = fleetapi.Action
 // receives multiples actions to persist to disk, the implementation of the store only
 // take care of action policy change every other action are discarded. The store will only keep the
 // last good action on disk, we assume that the action is added to the store after it was ACK with
-// Fleet. The store is not threadsafe.
+// Fleet. The store is not thread safe.
 type StateStore struct {
 	log   *logger.Logger
 	store storeLoad

@@ -112,6 +112,7 @@ func init() {
 					"recvmsg",
 					"rename",
 					"renameat",
+					"rseq",
 					"rt_sigaction",
 					"rt_sigprocmask",
 					"rt_sigreturn",

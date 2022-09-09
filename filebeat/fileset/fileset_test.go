@@ -44,7 +44,7 @@ func makeTestInfo(version string) beat.Info {
 func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
-	fs, err := New(modulesPath, fileset, &ModuleConfig{Module: module}, &FilesetConfig{})
+	fs, err := New(modulesPath, fileset, module, &FilesetConfig{})
 	require.NoError(t, err)
 
 	return fs
@@ -98,7 +98,7 @@ func TestEvaluateVarsNginx(t *testing.T) {
 func TestEvaluateVarsNginxOverride(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
-	fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
+	fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
 		Var: map[string]interface{}{
 			"pipeline": "no_plugins",
 		},
@@ -239,7 +239,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
+			fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
 				Input: test.input,
 			})
 			require.NoError(t, err)

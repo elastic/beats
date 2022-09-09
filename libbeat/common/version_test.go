@@ -207,3 +207,52 @@ func TestVersionLessThan(t *testing.T) {
 		assert.Equal(t, v.LessThan(v1), test.result, test.name)
 	}
 }
+
+func TestVersionLessThanMajorMinor(t *testing.T) {
+	tests := []struct {
+		name     string
+		version  string
+		version1 string
+		result   bool
+	}{
+		{
+			name:     "1.2.x < 2.0.x",
+			version:  "1.2.3",
+			version1: "2.0.0",
+			result:   true,
+		},
+		{
+			name:     "1.2.3 = 1.2.3-beta1",
+			version:  "1.2.3",
+			version1: "1.2.3-beta1",
+			result:   false,
+		},
+		{
+			name:     "5.4.x == 5.4.x",
+			version:  "5.4.1",
+			version1: "5.4.2",
+			result:   false,
+		},
+		{
+			name:     "5.5.x > 5.4.x",
+			version:  "5.5.1",
+			version1: "5.4.2",
+			result:   false,
+		},
+		{
+			name:     "6.1.x < 6.2.x",
+			version:  "6.1.1-alpha3",
+			version1: "6.2.0",
+			result:   true,
+		},
+	}
+
+	for _, test := range tests {
+		v, err := NewVersion(test.version)
+		assert.NoError(t, err)
+		v1, err := NewVersion(test.version1)
+		assert.NoError(t, err)
+
+		assert.Equal(t, v.LessThanMajorMinor(v1), test.result, test.name)
+	}
+}

@@ -51,7 +51,7 @@ func extractCertificate(certificates []*x509.Certificate) []string {
 	strCertificate := make([]string, len(certificates))
 	for idx, c := range certificates {
 		// Ignore errors here, problematics cert have failed
-		//the handshake at this point.
+		// the handshake at this point.
 		b, _ := x509.MarshalPKIXPublicKey(c.PublicKey)
 		strCertificate[idx] = string(b)
 	}

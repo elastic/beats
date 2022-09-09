@@ -8,11 +8,10 @@
 package process
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"syscall"
-
-	"github.com/pkg/errors"
 )
 
 // isNsSharedWith returns whether the process with the given pid shares the

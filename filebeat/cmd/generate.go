@@ -30,9 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
-var (
-	defaultHomePath = paths.Resolve(paths.Home, "")
-)
+var defaultHomePath = paths.Resolve(paths.Home, "")
 
 func genGenerateCmd() *cobra.Command {
 	generateCmd := cobra.Command{

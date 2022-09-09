@@ -117,7 +117,7 @@ class TestCommands(metricbeat.BaseTest):
         self.write_system_yml()
 
         exit_code = self.run_beat(
-            logging_args=None,
+            logging_args=[],
             extra_args=["test", "modules"])
 
         assert exit_code == 0
@@ -132,7 +132,7 @@ class TestCommands(metricbeat.BaseTest):
         }])
 
         exit_code = self.run_beat(
-            logging_args=None,
+            logging_args=[],
             extra_args=["test", "modules"])
 
         assert exit_code == 0
@@ -147,7 +147,7 @@ class TestCommands(metricbeat.BaseTest):
         self.write_nginx_yml()
 
         exit_code = self.run_beat(
-            logging_args=None,
+            logging_args=[],
             extra_args=["test", "modules"])
 
         assert exit_code == 0
@@ -170,7 +170,7 @@ class TestCommands(metricbeat.BaseTest):
         self.write_system_yml()
 
         exit_code = self.run_beat(
-            logging_args=None,
+            logging_args=[],
             extra_args=["test", "modules", "apache"])
 
         assert exit_code == 0
@@ -184,7 +184,7 @@ class TestCommands(metricbeat.BaseTest):
         self.write_nginx_yml()
 
         exit_code = self.run_beat(
-            logging_args=None,
+            logging_args=[],
             extra_args=["test", "modules", "system", "cpu"])
 
         assert exit_code == 0
