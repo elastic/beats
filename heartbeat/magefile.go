@@ -23,6 +23,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -91,7 +92,10 @@ func IntegTest() {
 }
 
 func GoIntegTest(ctx context.Context) error {
-	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	if runtime.GOOS != "windows" {
+		return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	}
+	return nil
 }
 
 func PythonIntegTest() {
