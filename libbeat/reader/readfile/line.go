@@ -25,7 +25,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const unlimited = 0
@@ -88,7 +88,10 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
 		if err != nil {
-			return nil, 0, err
+			// return and reset consumed bytes count
+			sz := r.byteCount
+			r.byteCount = 0
+			return nil, sz, err
 		}
 
 		// Check last decoded byte really being newline also unencoded
@@ -235,7 +238,7 @@ func (r *LineReader) skipUntilNewLine() (int, error) {
 
 			if idx != -1 {
 				r.inBuffer.Write(r.tempBuffer[idx+len(r.nl) : n])
-				skipped += idx
+				skipped += idx + len(r.nl)
 			} else {
 				skipped += n
 			}

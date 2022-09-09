@@ -1,0 +1,59 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Cluster Filter [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "orchestrator.cluster.name",
+                        "id": "1627653028481",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Cluster Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": false
+            },
+            "title": "Cluster Filter [Metricbeat Kubernetes]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-a3929d80-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3NzQsM10="
+}

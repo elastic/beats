@@ -27,5 +27,9 @@ are dropped.
 
 The `drop_fields` processor has the following configuration settings:
 
+`fields`:: If non-empty, a list of matching field names will be removed.
+Any element in array can contain a regular expression delimited by two
+slashes ('/reg_exp/'), in order to match (name) and remove more than one field.
+
 `ignore_missing`:: (Optional) If `true` the processor will not return an error
 when a specified field does not exist. Defaults to `false`.

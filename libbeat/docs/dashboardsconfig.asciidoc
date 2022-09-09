@@ -128,3 +128,8 @@ Duration interval between Kibana connection retries. Defaults to 1 second.
 
 Maximum number of retries before exiting with an error. Set to 0 for unlimited retrying.
 Default is unlimited.
+
+[float]
+==== `setup.dashboards.string_replacements`
+
+The needle and replacements string map, which is used to replace needle string in dashboards and their references contents.

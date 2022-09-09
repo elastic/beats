@@ -1,0 +1,94 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "b23da578-55ca-4199-9298-1e54b87997ac": {
+                            "columnOrder": [
+                                "9ed4cf14-b3bd-4cb0-8fe3-4ed86a0aedae"
+                            ],
+                            "columns": {
+                                "9ed4cf14-b3bd-4cb0-8fe3-4ed86a0aedae": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Namespaces ",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.namespace"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "75099d91-28ec-41a2-b349-00b4fa7a2ff0",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "pod"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "pod"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "accessor": "9ed4cf14-b3bd-4cb0-8fe3-4ed86a0aedae",
+                "layerId": "b23da578-55ca-4199-9298-1e54b87997ac",
+                "layerType": "data",
+                "size": "xl",
+                "textAlign": "center",
+                "titlePosition": "bottom"
+            }
+        },
+        "title": "Total Number of Namespaces [Metricbeat Kubernetes]",
+        "visualizationType": "lnsMetric"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-af808260-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-b23da578-55ca-4199-9298-1e54b87997ac",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "75099d91-28ec-41a2-b349-00b4fa7a2ff0",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-11T10:39:24.896Z",
+    "version": "WzEyMTMsMV0="
+}

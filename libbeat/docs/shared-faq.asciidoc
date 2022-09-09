@@ -192,7 +192,6 @@ a "could not locate that index-pattern" error. To resolve this problem:
 
 . If that doesn't work, go to the Management app in {kib}, and under
 *Index Patterns*, look for the pattern.
-.. If the pattern exists, click it, then click Refresh.
 
 .. If the pattern doesn't exist, create it manually.
 +

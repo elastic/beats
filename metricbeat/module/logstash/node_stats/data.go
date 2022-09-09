@@ -19,9 +19,13 @@ package node_stats
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 
@@ -144,7 +148,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
+func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
@@ -173,9 +177,20 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	}
 
 	var pipelines []PipelineStats
+
+	// The version from which we expect the node stats API to return a hash with pipeline documents. This is really just a formality so that
+	// unit tests with much older fixture versions still work.
+	var PipelineDocumentsContainHashVersion = version.MustNew("7.3.0")
+	var StatsVersion = version.MustNew(nodeStats.Version)
+	pipelineDocumentsShouldContainHash := !StatsVersion.LessThan(PipelineDocumentsContainHashVersion)
+
 	for pipelineID, pipeline := range nodeStats.Pipelines {
-		pipeline.ID = pipelineID
-		pipelines = append(pipelines, pipeline)
+		if pipelineDocumentsShouldContainHash && (pipeline.Hash == "" || pipeline.Vertices == nil) {
+			logger.Warn(fmt.Sprintf("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed. Pipeline ID: %s", pipelineID))
+		} else {
+			pipeline.ID = pipelineID
+			pipelines = append(pipelines, pipeline)
+		}
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
@@ -192,10 +207,10 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		}
 
 		event := mb.Event{
-			RootFields: common.MapStr{
-				"service": common.MapStr{"name": logstash.ModuleName},
+			RootFields: mapstr.M{
+				"service": mapstr.M{"name": logstash.ModuleName},
 			},
-			ModuleFields: common.MapStr{},
+			ModuleFields: mapstr.M{},
 		}
 
 		event.ModuleFields.Put("node.stats", logstashStats)

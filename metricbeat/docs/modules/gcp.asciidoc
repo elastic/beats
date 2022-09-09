@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: gcp
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/gcp/_meta/docs.asciidoc
+
 
 [[metricbeat-module-gcp]]
 [role="xpack"]
@@ -126,12 +128,13 @@ Authentication and authorization in Google Cloud Platform can be achieved in man
 
 Generally, you have to create a Service Account and assign it the following roles or the permissions described on each role (applies to all metricsets):
 
-* `Compute Viewer` (1 permission in use of 138):
+* `Monitoring Viewer`:
 - `monitoring.metricDescriptors.list`
 - `monitoring.timeSeries.list`
 
-* `Monitoring Viewer` (2 permissions in use of 13)
+* `Compute Viewer`:
 - `compute.instances.get`
+- `compute.instances.list`
 
 You can play in IAM pretty much with your service accounts and Instance level access to your resources (for example, allowing that everything running in an Instance is authorized to use the Compute API). The module uses Google Cloud Platform libraries for authentication so many possibilities are open but the Module is only supported by using the method mentioned above.
 
@@ -253,6 +256,8 @@ The `storage` metricset comes with a predefined dashboard:
 image::./images/metricbeat-gcp-storage-overview.png[]
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -276,6 +281,7 @@ metricbeat.modules:
     - pubsub
     - loadbalancing
     - firestore
+    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -308,17 +314,11 @@ metricbeat.modules:
 
 - module: gcp
   metricsets:
-    - metrics
+    - gke
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
-  metrics:
-    - aligner: ALIGN_NONE
-      service: gke
-      service_metric_prefix: kubernetes.io/
-      metric_types:
-        - "container/cpu/core_usage_time"
 
 - module: gcp
   metricsets:
@@ -340,6 +340,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-gcp-compute,compute>>
 
+* <<metricbeat-metricset-gcp-dataproc,dataproc>>
+
 * <<metricbeat-metricset-gcp-firestore,firestore>>
 
 * <<metricbeat-metricset-gcp-gke,gke>>
@@ -356,6 +358,8 @@ include::gcp/billing.asciidoc[]
 
 include::gcp/compute.asciidoc[]
 
+include::gcp/dataproc.asciidoc[]
+
 include::gcp/firestore.asciidoc[]
 
 include::gcp/gke.asciidoc[]
@@ -368,3 +372,4 @@ include::gcp/pubsub.asciidoc[]
 
 include::gcp/storage.asciidoc[]
 
+:edit_url!:

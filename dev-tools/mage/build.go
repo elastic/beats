@@ -37,6 +37,7 @@ type BuildArgs struct {
 	InputFiles  []string
 	OutputDir   string
 	CGO         bool
+	BuildMode   string // Controls `go build -buildmode`
 	Static      bool
 	Env         map[string]string
 	LDFlags     []string
@@ -61,15 +62,17 @@ func DefaultBuildArgs() BuildArgs {
 	}
 
 	if positionIndependentCodeSupported() {
-		args.ExtraFlags = append(args.ExtraFlags, "-buildmode", "pie")
+		args.BuildMode = "pie"
 	}
 
 	if DevBuild {
 		// Disable optimizations (-N) and inlining (-l) for debugging.
-		args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`)
+		args.ExtraFlags = append(args.ExtraFlags, `-gcflags=all=-N -l`)
 	} else {
 		// Strip all debug symbols from binary (does not affect Go stack traces).
 		args.LDFlags = append(args.LDFlags, "-s")
+		// Remove all file system paths from the compiled executable, to improve build reproducibility
+		args.ExtraFlags = append(args.ExtraFlags, "-trimpath")
 	}
 
 	return args
@@ -158,6 +161,9 @@ func Build(params BuildArgs) error {
 		"build",
 		"-o",
 		filepath.Join(params.OutputDir, binaryName),
+	}
+	if params.BuildMode != "" {
+		args = append(args, "-buildmode", params.BuildMode)
 	}
 	args = append(args, params.ExtraFlags...)
 

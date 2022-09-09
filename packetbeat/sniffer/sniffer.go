@@ -22,7 +22,6 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"syscall"
 	"time"
 
 	"github.com/google/gopacket"
@@ -31,7 +30,7 @@ import (
 	"github.com/google/gopacket/pcapgo"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 )
@@ -43,19 +42,10 @@ type Sniffer struct {
 
 	state atomic.Int32 // store snifferState
 
-	// bpf filter
+	// filter is the bpf filter program used by the sniffer.
 	filter string
 
-	factory WorkerFactory
-}
-
-// WorkerFactory constructs a new worker instance for use with a Sniffer.
-type WorkerFactory func(layers.LinkType) (Worker, error)
-
-// Worker defines the callback interfaces a Sniffer instance will use
-// to forward packets.
-type Worker interface {
-	OnPacket(data []byte, ci *gopacket.CaptureInfo)
+	decoders Decoders
 }
 
 type snifferHandle interface {
@@ -74,17 +64,12 @@ const (
 // New create a new Sniffer instance. Settings are validated in a best effort
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method.
-func New(
-	testMode bool,
-	filter string,
-	factory WorkerFactory,
-	interfaces config.InterfacesConfig,
-) (*Sniffer, error) {
+func New(testMode bool, filter string, decoders Decoders, interfaces config.InterfacesConfig) (*Sniffer, error) {
 	s := &Sniffer{
-		filter:  filter,
-		config:  interfaces,
-		factory: factory,
-		state:   atomic.MakeInt32(snifferInactive),
+		filter:   filter,
+		config:   interfaces,
+		decoders: decoders,
+		state:    atomic.MakeInt32(snifferInactive),
 	}
 
 	logp.Debug("sniffer", "BPF filter: '%s'", filter)
@@ -142,7 +127,7 @@ func New(
 func (s *Sniffer) Run() error {
 	handle, err := s.open()
 	if err != nil {
-		return fmt.Errorf("Error starting sniffer: %s", err)
+		return fmt.Errorf("failed to start sniffer: %w", err)
 	}
 	defer handle.Close()
 
@@ -155,10 +140,13 @@ func (s *Sniffer) Run() error {
 		defer f.Close()
 
 		w = pcapgo.NewWriterNanos(f)
-		w.WriteFileHeader(65535, handle.LinkType())
+		err = w.WriteFileHeader(65535, handle.LinkType())
+		if err != nil {
+			return fmt.Errorf("failed to write dump file header to %s: %w", s.config.Dumpfile, err)
+		}
 	}
 
-	worker, err := s.factory(handle.LinkType())
+	decoder, err := s.decoders(handle.LinkType())
 	if err != nil {
 		return err
 	}
@@ -174,28 +162,28 @@ func (s *Sniffer) Run() error {
 	var packets int
 	for s.state.Load() == snifferActive {
 		if s.config.OneAtATime {
-			fmt.Println("Press enter to read packet")
+			fmt.Fprintln(os.Stdout, "Press enter to read packet")
 			fmt.Scanln()
 		}
 
 		data, ci, err := handle.ReadPacketData()
-		if err == pcap.NextErrorTimeoutExpired || err == syscall.EINTR {
-			logp.Debug("sniffer", "Interrupted")
+		if err == pcap.NextErrorTimeoutExpired || isAfpacketErrTimeout(err) { //nolint:errorlint // pcap.NextErrorTimeoutExpired is not wrapped.
+			logp.Debug("sniffer", "timedout")
 			continue
 		}
 
 		if err != nil {
 			// ignore EOF, if sniffer was driven from file
-			if err == io.EOF && s.config.File != "" {
+			if err == io.EOF && s.config.File != "" { //nolint:errorlint // io.EOF should never be wrapped.
 				return nil
 			}
 
 			s.state.Store(snifferInactive)
-			return fmt.Errorf("Sniffing error: %w", err)
+			return fmt.Errorf("sniffing error: %w", err)
 		}
 
 		if len(data) == 0 {
-			// Empty packet, probably timeout from afpacket
+			// Empty packet, probably timeout from afpacket.
 			continue
 		}
 
@@ -209,7 +197,7 @@ func (s *Sniffer) Run() error {
 		}
 
 		logp.Debug("sniffer", "Packet number: %d", packets)
-		worker.OnPacket(data, &ci)
+		decoder.OnPacket(data, &ci)
 	}
 
 	return nil
@@ -226,15 +214,14 @@ func (s *Sniffer) open() (snifferHandle, error) {
 	case "af_packet":
 		return openAFPacket(s.filter, &s.config)
 	default:
-		return nil, fmt.Errorf("Unknown sniffer type: %s", s.config.Type)
+		return nil, fmt.Errorf("unknown sniffer type: %s", s.config.Type)
 	}
 }
 
 // Stop marks a sniffer as stopped. The Run method will return once the stop
 // signal has been given.
-func (s *Sniffer) Stop() error {
+func (s *Sniffer) Stop() {
 	s.state.Store(snifferClosing)
-	return nil
 }
 
 func validateConfig(filter string, cfg *config.InterfacesConfig) error {
@@ -250,7 +237,7 @@ func validateConfig(filter string, cfg *config.InterfacesConfig) error {
 	case "af_packet":
 		return validateAfPacketConfig(cfg)
 	default:
-		return fmt.Errorf("Unknown sniffer type: %s", cfg.Type)
+		return fmt.Errorf("unknown sniffer type: %s", cfg.Type)
 	}
 }
 

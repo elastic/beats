@@ -31,9 +31,7 @@ func ExecJobsAndConts(t *testing.T, jobs []Job) ([]*beat.Event, error) {
 		if err != nil {
 			return nil, err
 		}
-		for _, re := range resultEvents {
-			results = append(results, re)
-		}
+		results = append(results, resultEvents...)
 	}
 
 	return results, nil
@@ -54,9 +52,7 @@ func ExecJobAndConts(t *testing.T, j Job) ([]*beat.Event, error) {
 		if err != nil {
 			return nil, err
 		}
-		for _, cjResults := range cjResults {
-			results = append(results, cjResults)
-		}
+		results = append(results, cjResults...)
 	}
 
 	return results, nil

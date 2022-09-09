@@ -22,18 +22,17 @@ package config
 
 import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Config defines the structure of heartbeat.yml.
 type Config struct {
-	RunOnce         bool                 `config:"run_once"`
-	Monitors        []*common.Config     `config:"monitors"`
-	ConfigMonitors  *common.Config       `config:"config.monitors"`
-	Scheduler       Scheduler            `config:"scheduler"`
-	Autodiscover    *autodiscover.Config `config:"autodiscover"`
-	SyntheticSuites []*common.Config     `config:"synthetic_suites"`
-	Jobs            map[string]JobLimit  `config:"jobs"`
+	RunOnce        bool                 `config:"run_once"`
+	Monitors       []*conf.C            `config:"monitors"`
+	ConfigMonitors *conf.C              `config:"config.monitors"`
+	Scheduler      Scheduler            `config:"scheduler"`
+	Autodiscover   *autodiscover.Config `config:"autodiscover"`
+	Jobs           map[string]*JobLimit `config:"jobs"`
 }
 
 type JobLimit struct {
@@ -47,4 +46,10 @@ type Scheduler struct {
 }
 
 // DefaultConfig is the canonical instantiation of Config.
-var DefaultConfig = Config{}
+var DefaultConfig = Config{
+	Jobs: map[string]*JobLimit{
+		"browser": {
+			Limit: 2,
+		},
+	},
+}

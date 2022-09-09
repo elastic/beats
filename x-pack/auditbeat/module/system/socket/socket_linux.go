@@ -10,6 +10,7 @@ package socket
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -21,17 +22,17 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-perf"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/providers/linux"
@@ -66,7 +67,7 @@ var defaultMounts = []*mountPoint{
 // MetricSet for system/socket.
 type MetricSet struct {
 	system.SystemMetricSet
-	templateVars common.MapStr
+	templateVars mapstr.M
 	config       Config
 	log          *logp.Logger
 	detailLog    *logp.Logger
@@ -103,7 +104,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "failed to unpack the %s config", fullName)
+		return nil, fmt.Errorf("failed to unpack the %s config: %w", fullName, err)
 	}
 	if instance != nil {
 		// Do not instantiate a new dataset if the config hasn't changed.
@@ -127,11 +128,11 @@ func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error
 	logger := logp.NewLogger(metricsetName)
 	sniffer, err := dns.NewSniffer(base, logger)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to create DNS sniffer")
+		return nil, fmt.Errorf("unable to create DNS sniffer: %w", err)
 	}
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
-		templateVars:    make(common.MapStr),
+		templateVars:    make(mapstr.M),
 		config:          config,
 		log:             logger,
 		isDebug:         logp.IsDebug(metricsetName),
@@ -142,7 +143,7 @@ func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error
 	// Setup the metricset before Run() so that startup can be halted in case of
 	// error.
 	if err = ms.Setup(); err != nil {
-		return nil, errors.Wrapf(err, "%s dataset setup failed", fullName)
+		return nil, fmt.Errorf("%s dataset setup failed: %w", fullName, err)
 	}
 	return ms, nil
 }
@@ -168,14 +169,14 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 			m.log.Errorf("Unable to store DNS transaction %+v: %v", tr, err)
 		}
 	}); err != nil {
-		err = errors.Wrap(err, "unable to start DNS sniffer")
+		err = fmt.Errorf("unable to start DNS sniffer: %w", err)
 		r.Error(err)
 		m.log.Error(err)
 		return
 	}
 
 	if err := m.perfChannel.Run(); err != nil {
-		err = errors.Wrap(err, "unable to start perf channel")
+		err = fmt.Errorf("unable to start perf channel: %w", err)
 		r.Error(err)
 		m.log.Error(err)
 		return
@@ -309,7 +310,7 @@ func (m *MetricSet) Setup() (err error) {
 		traceFS, err = tracing.NewTraceFSWithPath(*m.config.TraceFSPath)
 	}
 	if err != nil {
-		return errors.Wrap(err, "tracefs/debugfs is not mounted or not writeable")
+		return fmt.Errorf("tracefs/debugfs is not mounted or not writeable: %w", err)
 	}
 
 	//
@@ -366,7 +367,7 @@ func (m *MetricSet) Setup() (err error) {
 	// remove existing Auditbeat KProbes that match the current PID.
 	//
 	if err = m.installer.UninstallIf(isThisAuditbeat); err != nil {
-		return errors.Wrapf(err, "unable to delete existing KProbes for group %s", groupName)
+		return fmt.Errorf("unable to delete existing KProbes for group %s: %w", groupName, err)
 	}
 
 	//
@@ -420,7 +421,7 @@ func (m *MetricSet) Setup() (err error) {
 			Vars:    m.templateVars,
 			Timeout: m.config.GuessTimeout,
 		}); err != nil {
-		return errors.Wrap(err, "unable to guess one or more required parameters")
+		return fmt.Errorf("unable to guess one or more required parameters: %w", err)
 	}
 
 	if m.isDebug {
@@ -446,7 +447,7 @@ func (m *MetricSet) Setup() (err error) {
 		tracing.WithTID(perf.AllThreads),
 		tracing.WithTimestamp())
 	if err != nil {
-		return errors.Wrapf(err, "unable to create perf channel")
+		return fmt.Errorf("unable to create perf channel: %w", err)
 	}
 
 	//
@@ -455,10 +456,10 @@ func (m *MetricSet) Setup() (err error) {
 	for _, probeDef := range getKProbes(hasIPv6) {
 		format, decoder, err := m.installer.Install(probeDef)
 		if err != nil {
-			return errors.Wrapf(err, "unable to register probe %s", probeDef.Probe.String())
+			return fmt.Errorf("unable to register probe %s: %w", probeDef.Probe.String(), err)
 		}
 		if err = m.perfChannel.MonitorProbe(format, decoder); err != nil {
-			return errors.Wrapf(err, "unable to monitor probe %s", probeDef.Probe.String())
+			return fmt.Errorf("unable to monitor probe %s: %w", probeDef.Probe.String(), err)
 		}
 	}
 	return nil

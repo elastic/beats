@@ -22,20 +22,21 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Modules related command line flags.
 var (
 	modulesFlag     = flag.String("modules", "", "List of enabled modules (comma separated)")
-	moduleOverrides = common.SettingFlag(nil, "M", "Module configuration overwrite")
+	moduleOverrides = config.SettingFlag(nil, "M", "Module configuration overwrite")
 )
 
-type ModuleOverrides map[string]map[string]*common.Config // module -> fileset -> Config
+type ModuleOverrides map[string]map[string]*conf.C // module -> fileset -> Config
 
 // Get returns an array of configuration overrides that should be merged in order.
-func (mo *ModuleOverrides) Get(module, fileset string) []*common.Config {
-	ret := []*common.Config{}
+func (mo *ModuleOverrides) Get(module, fileset string) []*conf.C {
+	ret := []*conf.C{}
 
 	moduleWildcard := (*mo)["*"]["*"]
 	if moduleWildcard != nil {

@@ -5,13 +5,14 @@
 package httpjson
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"io"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type encoderFunc func(trReq transformable) ([]byte, error)
@@ -79,15 +80,26 @@ func decode(contentType string, p []byte, dst *response) error {
 
 func registerEncoders() {
 	log := logp.L().Named(logName)
-	log.Debug(registerEncoder("application/json", encodeAsJSON))
-	log.Debug(registerEncoder("application/x-www-form-urlencoded", encodeAsForm))
+	log.Debugf("registering encoder 'application/json': returned error: %#v",
+		registerEncoder("application/json", encodeAsJSON))
+
+	log.Debugf("registering encoder 'application/x-www-form-urlencoded': returned error: %#v",
+		registerEncoder("application/x-www-form-urlencoded", encodeAsForm))
 }
 
 func registerDecoders() {
 	log := logp.L().Named(logName)
-	log.Debug(registerDecoder("application/json", decodeAsJSON))
-	log.Debug(registerDecoder("application/x-ndjson", decodeAsNdjson))
-	log.Debug(registerDecoder("text/csv", decodeAsCSV))
+	log.Debugf("registering decoder 'application/json': returned error: %#v",
+		registerDecoder("application/json", decodeAsJSON))
+
+	log.Debugf("registering decoder 'application/x-ndjson': returned error: %#v",
+		registerDecoder("application/x-ndjson", decodeAsNdjson))
+
+	log.Debugf("registering decoder 'text/csv': returned error: %#v",
+		registerDecoder("text/csv", decodeAsCSV))
+
+	log.Debugf("registering decoder 'application/zip': returned error: %#v",
+		registerDecoder("application/zip", decodeAsZip))
 }
 
 func encodeAsJSON(trReq transformable) ([]byte, error) {
@@ -138,7 +150,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 	// values to keys in the event
 	header, err := r.Read()
 	if err != nil {
-		if err == io.EOF {
+		if err == io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
 			return nil
 		}
 		return err
@@ -159,9 +171,39 @@ func decodeAsCSV(p []byte, dst *response) error {
 	}
 
 	if err != nil {
-		if err != io.EOF {
+		if err != io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
 			return err
 		}
+	}
+
+	dst.body = results
+
+	return nil
+}
+
+func decodeAsZip(p []byte, dst *response) error {
+	var results []interface{}
+	r, err := zip.NewReader(bytes.NewReader(p), int64(len(p)))
+	if err != nil {
+		return err
+	}
+
+	for _, f := range r.File {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+
+		dec := json.NewDecoder(rc)
+		for dec.More() {
+			var o interface{}
+			if err := dec.Decode(&o); err != nil {
+				rc.Close()
+				return err
+			}
+			results = append(results, o)
+		}
+		rc.Close()
 	}
 
 	dst.body = results

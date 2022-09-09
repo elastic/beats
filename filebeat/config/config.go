@@ -27,10 +27,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Defaults for config variables which are not set
@@ -39,13 +39,13 @@ const (
 )
 
 type Config struct {
-	Inputs             []*common.Config     `config:"inputs"`
+	Inputs             []*conf.C            `config:"inputs"`
 	Registry           Registry             `config:"registry"`
 	ConfigDir          string               `config:"config_dir"`
 	ShutdownTimeout    time.Duration        `config:"shutdown_timeout"`
-	Modules            []*common.Config     `config:"modules"`
-	ConfigInput        *common.Config       `config:"config.inputs"`
-	ConfigModules      *common.Config       `config:"config.modules"`
+	Modules            []*conf.C            `config:"modules"`
+	ConfigInput        *conf.C              `config:"config.inputs"`
+	ConfigModules      *conf.C              `config:"config.modules"`
 	Autodiscover       *autodiscover.Config `config:"autodiscover"`
 	OverwritePipelines bool                 `config:"overwrite_pipelines"`
 }
@@ -58,18 +58,17 @@ type Registry struct {
 	MigrateFile   string        `config:"migrate_file"`
 }
 
-var (
-	DefaultConfig = Config{
-		Registry: Registry{
-			Path:          "registry",
-			Permissions:   0600,
-			MigrateFile:   "",
-			CleanInterval: 5 * time.Minute,
-		},
-		ShutdownTimeout:    0,
-		OverwritePipelines: false,
-	}
-)
+var DefaultConfig = Config{
+	Registry: Registry{
+		Path:          "registry",
+		Permissions:   0o600,
+		MigrateFile:   "",
+		CleanInterval: 5 * time.Minute,
+		FlushTimeout:  time.Second,
+	},
+	ShutdownTimeout:    0,
+	OverwritePipelines: false,
+}
 
 // getConfigFiles returns list of config files.
 // In case path is a file, it will be directly returned.
@@ -86,7 +85,6 @@ func getConfigFiles(path string) (configFiles []string, err error) {
 
 	if stat.IsDir() {
 		files, err := filepath.Glob(path + "/*.yml")
-
 		if err != nil {
 			return nil, err
 		}
@@ -109,9 +107,10 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 		tmpConfig := struct {
 			Filebeat Config
 		}{}
+		//nolint:staticcheck // Let's keep the logic here
 		err := cfgfile.Read(&tmpConfig, file)
 		if err != nil {
-			return fmt.Errorf("Failed to read %s: %s", file, err)
+			return fmt.Errorf("failed to read %s: %w", file, err)
 		}
 
 		config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Inputs...)
@@ -138,7 +137,6 @@ func (config *Config) FetchConfigs() error {
 	logp.Info("Additional config files are fetched from: %s", configDir)
 
 	configFiles, err := getConfigFiles(configDir)
-
 	if err != nil {
 		log.Fatal("Could not use config_dir of: ", configDir, err)
 		return err
@@ -161,7 +159,7 @@ func (config *Config) ListEnabledInputs() []string {
 	var inputs []string
 	for _, input := range config.Inputs {
 		if input.Enabled() {
-			input.Unpack(&t)
+			_ = input.Unpack(&t)
 			inputs = append(inputs, t.Type)
 		}
 	}

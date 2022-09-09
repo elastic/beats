@@ -1,6 +1,6 @@
 from packetbeat import (BaseTest, FLOWS_REQUIRED_FIELDS)
 from pprint import PrettyPrinter
-from datetime import datetime
+from datetime import datetime, timedelta
 import six
 import os
 
@@ -14,7 +14,14 @@ def check_fields(flow, fields):
 
 
 def parse_timestamp(ts):
-    return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ")
+    if ts[-1] != 'Z':
+        raise Exception("missing time zone marker Z")
+    ts = ts[:-1]
+    parts = ts.split(".")
+    ts = datetime.strptime(parts[0], "%Y-%m-%dT%H:%M:%S")
+    if len(parts[1]) > 6:
+        parts[1] = parts[1][:6]  # ensure we always parse microseconds
+    return ts + timedelta(microseconds=datetime.strptime(parts[1], "%f").microsecond)
 
 
 class Test(BaseTest):
@@ -36,8 +43,8 @@ class Test(BaseTest):
         assert len(objs) == 1
         check_fields(objs[0], {
             'flow.final': True,
-            'source.mac': '0a:00:27:00:00:00',
-            'destination.mac': '08:00:27:76:d7:41',
+            'source.mac': '0A-00-27-00-00-00',
+            'destination.mac': '08-00-27-76-D7-41',
             'destination.ip': '192.168.33.14',
             'source.ip': '192.168.33.1',
             'network.transport': 'tcp',
@@ -71,8 +78,8 @@ class Test(BaseTest):
         assert len(objs) == 1
         check_fields(objs[0], {
             'flow.final': True,
-            'source.mac': 'ac:bc:32:77:41:0b',
-            'destination.mac': '08:00:27:dd:3b:28',
+            'source.mac': 'AC-BC-32-77-41-0B',
+            'destination.mac': '08-00-27-DD-3B-28',
             'source.ip': '192.168.188.37',
             'destination.ip': '192.168.188.38',
             'network.transport': 'udp',
@@ -99,8 +106,8 @@ class Test(BaseTest):
         assert len(objs) == 1
         check_fields(objs[0], {
             'flow.final': True,
-            'source.mac': '00:00:00:00:00:01',
-            'destination.mac': '00:00:00:00:00:02',
+            'source.mac': '00-00-00-00-00-01',
+            'destination.mac': '00-00-00-00-00-02',
             'flow.vlan': 10,
             'source.ip': '10.0.0.1',
             'destination.ip': '10.0.0.2',
@@ -128,11 +135,11 @@ class Test(BaseTest):
         check_fields(objs[0], {
             'flow.final': True,
             'flow.vlan': 10,
-            'source.mac': '00:00:00:00:00:01',
+            'source.mac': '00-00-00-00-00-01',
             'source.ip': '::1',
             'source.bytes': 70,
             'source.packets': 1,
-            'destination.mac': '00:00:00:00:00:02',
+            'destination.mac': '00-00-00-00-00-02',
             'destination.ip': '::2',
             'destination.bytes': 70,
             'destination.packets': 1,
@@ -161,8 +168,8 @@ class Test(BaseTest):
             'source.ip': '192.168.1.1',
             'source.bytes': 82,
             'source.packets': 1,
-            'source.mac': '08:00:27:3d:25:4e',
-            'destination.mac': '1c:af:f7:70:ed:7c',
+            'source.mac': '08-00-27-3D-25-4E',
+            'destination.mac': '1C-AF-F7-70-ED-7C',
             'destination.ip': '192.168.1.2',
             'network.bytes': 82,
             'network.packets': 1,

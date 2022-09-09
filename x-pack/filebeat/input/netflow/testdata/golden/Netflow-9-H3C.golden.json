@@ -13,7 +13,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 89519000000,
@@ -103,7 +102,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 60005000000,
@@ -193,7 +191,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 60016000000,
@@ -283,7 +280,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 90011000000,
@@ -373,7 +369,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 30000000000,
@@ -463,7 +458,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 29467000000,
@@ -553,7 +547,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 29452000000,
@@ -643,7 +636,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 29449000000,
@@ -733,7 +725,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 30000000000,
@@ -823,7 +814,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 29391000000,
@@ -913,7 +903,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 29196000000,
@@ -1003,7 +992,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 30000000000,
@@ -1093,7 +1081,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 89282000000,
@@ -1183,7 +1170,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 90012000000,
@@ -1273,7 +1259,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 60005000000,
@@ -1363,7 +1348,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 60006000000,

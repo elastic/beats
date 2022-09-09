@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type amqpMethod func(*amqpMessage, []byte) (bool, bool)
@@ -204,7 +205,7 @@ type amqpMessage struct {
 	parseArguments bool
 
 	// mapstr containing all the options for the methods and header fields
-	fields common.MapStr
+	fields mapstr.M
 
 	body     []byte
 	bodySize uint64
@@ -236,7 +237,7 @@ type amqpTransaction struct {
 	toString bool
 	notes    []string
 
-	amqp common.MapStr
+	amqp mapstr.M
 
 	timer *time.Timer
 }

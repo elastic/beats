@@ -20,11 +20,11 @@ package info
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/haproxy"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"reflect"
 	"strconv"
@@ -196,7 +196,7 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 	}
 
 	event := mb.Event{
-		RootFields: common.MapStr{},
+		RootFields: mapstr.M{},
 	}
 
 	fields, err := schema.Apply(source)

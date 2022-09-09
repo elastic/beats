@@ -23,6 +23,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -31,9 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
 
 	_ "github.com/elastic/beats/v7/heartbeat/security"
@@ -51,10 +54,10 @@ type Heartbeat struct {
 }
 
 // New creates a new heartbeat.
-func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 	limit := parsedConfig.Scheduler.Limit
 	locationName := parsedConfig.Scheduler.Location
@@ -67,23 +70,36 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 	jobConfig := parsedConfig.Jobs
 
-	scheduler := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
+	sched := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
+
+	pipelineClientFactory := func(p beat.Pipeline) (pipeline.ISyncClient, error) {
+		if parsedConfig.RunOnce {
+			client, err := pipeline.NewSyncClient(logp.L(), p, beat.ClientConfig{})
+			if err != nil {
+				return nil, fmt.Errorf("could not create pipeline sync client for run_once: %w", err)
+			}
+			return client, nil
+		} else {
+			client, err := p.Connect()
+			return monitors.SyncPipelineClientAdaptor{C: client}, err
+		}
+	}
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
 		config:    parsedConfig,
-		scheduler: scheduler,
+		scheduler: sched,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(b.Info, scheduler.Add, plugin.GlobalPluginsReg, parsedConfig.RunOnce),
+		dynamicFactory: monitors.NewFactory(b.Info, sched.Add, plugin.GlobalPluginsReg, pipelineClientFactory),
 	}
 	return bt, nil
 }
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
-	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
+	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
-	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+	logp.L().Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
 	// It is important this appear before we check for run once mode
 	// In run once mode we depend on these monitors being loaded, but not other more
@@ -96,7 +112,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	if bt.config.RunOnce {
 		bt.scheduler.WaitForRunOnce()
-		logp.Info("Ending run_once run")
+		logp.L().Info("Ending run_once run")
 		return nil
 	}
 
@@ -108,11 +124,17 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
 		defer bt.monitorReloader.Stop()
 
-		err := bt.RunReloadableMonitors(b)
+		err := bt.RunReloadableMonitors()
 		if err != nil {
 			return err
 		}
 	}
+	// Configure the beats Manager to start after all the reloadable hooks are initialized
+	// and shutdown when the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+	defer b.Manager.Stop()
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)
@@ -128,18 +150,18 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	<-bt.done
 
-	logp.Info("Shutting down.")
+	logp.L().Info("Shutting down.")
 	return nil
 }
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
-	var runners []cfgfile.Runner
+	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
 	for _, cfg := range bt.config.Monitors {
 		created, err := bt.dynamicFactory.Create(b.Publisher, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
-				logp.Info("skipping disabled monitor: %s", err)
+				logp.L().Info("skipping disabled monitor: %s", err)
 				continue // don't stop loading monitors just because they're disabled
 			}
 
@@ -160,14 +182,14 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
-	monitors := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
+	mons := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	reload.Register.MustRegisterList(b.Info.Beat+".monitors", mons)
 	inputs := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
 	reload.Register.MustRegisterList("inputs", inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
+func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 	// Check monitor configs
 	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
 		logp.Error(fmt.Errorf("error loading reloadable monitors: %w", err))
@@ -181,7 +203,7 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	autodiscover, err := autodiscover.NewAutodiscover(
+	ad, err := autodiscover.NewAutodiscover(
 		"heartbeat",
 		b.Publisher,
 		bt.dynamicFactory,
@@ -192,7 +214,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 	if err != nil {
 		return nil, err
 	}
-	return autodiscover, nil
+	return ad, nil
 }
 
 // Stop stops the beat.

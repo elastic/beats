@@ -12,12 +12,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -234,7 +233,7 @@ func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 	}
 	g.loopback, err = helper.NewIPv6Loopback()
 	if err != nil {
-		return errors.Wrap(err, "detect IPv6 loopback failed")
+		return fmt.Errorf("detect IPv6 loopback failed: %w", err)
 	}
 	defer func() {
 		if err != nil {
@@ -243,23 +242,23 @@ func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 	}()
 	clientIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
-		return errors.Wrap(err, "failed adding first device address")
+		return fmt.Errorf("failed adding first device address: %w", err)
 	}
 	serverIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
-		return errors.Wrap(err, "failed adding second device address")
+		return fmt.Errorf("failed adding second device address: %w", err)
 	}
 	copy(g.clientAddr.Addr[:], clientIP)
 	copy(g.serverAddr.Addr[:], serverIP)
 
 	if g.client, g.clientAddr, err = createSocket6WithProto(unix.SOCK_STREAM, g.clientAddr); err != nil {
-		return errors.Wrap(err, "error creating server")
+		return fmt.Errorf("error creating server: %w", err)
 	}
 	if g.server, g.serverAddr, err = createSocket6WithProto(unix.SOCK_STREAM, g.serverAddr); err != nil {
-		return errors.Wrap(err, "error creating client")
+		return fmt.Errorf("error creating client: %w", err)
 	}
 	if err = unix.Listen(g.server, 1); err != nil {
-		return errors.Wrap(err, "error in listen")
+		return fmt.Errorf("error in listen: %w", err)
 	}
 	return nil
 }
@@ -267,11 +266,11 @@ func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 // Trigger connects the client to the server, causing an inet_csk_accept call.
 func (g *guessInetSockIPv6) Trigger() error {
 	if err := unix.Connect(g.client, &g.serverAddr); err != nil {
-		return errors.Wrap(err, "connect failed")
+		return fmt.Errorf("connect failed: %w", err)
 	}
 	fd, _, err := unix.Accept(g.server)
 	if err != nil {
-		return errors.Wrap(err, "accept failed")
+		return fmt.Errorf("accept failed: %w", err)
 	}
 	unix.Close(fd)
 	return nil
@@ -279,7 +278,7 @@ func (g *guessInetSockIPv6) Trigger() error {
 
 // Extract scans stores the events from the two different kprobes and then
 // looks for the result in one of them.
-func (g *guessInetSockIPv6) Extract(event interface{}) (common.MapStr, bool) {
+func (g *guessInetSockIPv6) Extract(event interface{}) (mapstr.M, bool) {
 	if w, ok := event.(eventWrapper); ok {
 		g.ptrDump = w.event.([]byte)
 	} else {
@@ -296,7 +295,7 @@ func (g *guessInetSockIPv6) Extract(event interface{}) (common.MapStr, bool) {
 	return result, ok
 }
 
-func (g *guessInetSockIPv6) searchStructSock(raw []byte) (common.MapStr, bool) {
+func (g *guessInetSockIPv6) searchStructSock(raw []byte) (mapstr.M, bool) {
 	var expected []byte
 	expected = append(expected, g.clientAddr.Addr[:]...) // sck_v6_daddr
 	expected = append(expected, g.serverAddr.Addr[:]...) // sck_v6_rcv_saddr
@@ -304,7 +303,7 @@ func (g *guessInetSockIPv6) searchStructSock(raw []byte) (common.MapStr, bool) {
 	if offset == -1 {
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"INET_SOCK_V6_TERM":    ":u64",
 		"INET_SOCK_V6_RADDR_A": fmt.Sprintf("+%d", offset),
 		"INET_SOCK_V6_RADDR_B": fmt.Sprintf("+%d", offset+8),
@@ -314,7 +313,7 @@ func (g *guessInetSockIPv6) searchStructSock(raw []byte) (common.MapStr, bool) {
 	}, true
 }
 
-func (g *guessInetSockIPv6) searchIPv6PInfo(raw []byte) (common.MapStr, bool) {
+func (g *guessInetSockIPv6) searchIPv6PInfo(raw []byte) (mapstr.M, bool) {
 	offset := bytes.Index(raw, g.serverAddr.Addr[:])
 	if offset == -1 {
 		return nil, false
@@ -324,7 +323,7 @@ func (g *guessInetSockIPv6) searchIPv6PInfo(raw []byte) (common.MapStr, bool) {
 		return nil, false
 	}
 	off := g.offsets[idx]
-	return common.MapStr{
+	return mapstr.M{
 		"INET_SOCK_V6_TERM":    "):u64",
 		"INET_SOCK_V6_RADDR_A": fmt.Sprintf("+%d(+%d", 32, off),
 		"INET_SOCK_V6_RADDR_B": fmt.Sprintf("+%d(+%d", 40, off),

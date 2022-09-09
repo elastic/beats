@@ -8,7 +8,6 @@
         "event": {
           "action": "netflow_options",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event"

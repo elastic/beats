@@ -22,10 +22,12 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/google/gopacket/pcap"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/route"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var deviceAnySupported = runtime.GOOS == "linux"
@@ -65,7 +67,7 @@ func formatDeviceNames(devices []pcap.Interface, withDescription, withIP bool) [
 			if len(dev.Addresses) == 0 {
 				buf.WriteString("Not assigned ip address")
 			} else {
-				for i, address := range []pcap.InterfaceAddress(dev.Addresses) {
+				for i, address := range dev.Addresses {
 					if i != 0 {
 						buf.WriteByte(' ')
 					}
@@ -81,31 +83,87 @@ func formatDeviceNames(devices []pcap.Interface, withDescription, withIP bool) [
 
 func resolveDeviceName(name string) (string, error) {
 	if name == "" {
-		return "any", nil
+		if runtime.GOOS == "linux" {
+			return "any", nil
+		}
+		name = "default_route"
 	}
+	if strings.HasPrefix(name, "default_route") {
+		var (
+			iface string
+			err   error
+		)
+		switch name {
+		case "default_route":
+			for _, inet := range []int{syscall.AF_INET, syscall.AF_INET6} {
+				iface, _, err = route.Default(inet)
+				if err == nil {
+					break
+				}
+				if err != route.ErrNotFound { //nolint:errorlint // route.ErrNotFound is never wrapped.
+					return "", err
+				}
+			}
+		case "default_route_ipv4":
+			iface, _, err = route.Default(syscall.AF_INET)
+		case "default_route_ipv6":
+			iface, _, err = route.Default(syscall.AF_INET6)
+		default:
+			return "", fmt.Errorf("invalid default route: %v", name)
+		}
+		if err != nil {
+			return "", fmt.Errorf("failed to get default route device: %w", err)
+		}
 
-	if index, err := strconv.Atoi(name); err == nil { // Device is numeric id
 		devices, err := ListDeviceNames(false, false)
 		if err != nil {
-			return "", fmt.Errorf("Error getting devices list: %v", err)
+			return "", fmt.Errorf("failed to get device list: %w", err)
 		}
-
-		name, err = deviceNameFromIndex(index, devices)
-		if err != nil {
-			return "", fmt.Errorf("Couldn't understand device index %d: %v", index, err)
+		// The order of devices returned by pcap differs from the order
+		// obtained by route, so search by iface name.
+		for _, dev := range devices {
+			if sameDevice(iface, dev) {
+				return dev, nil
+			}
 		}
-
-		logp.Info("Resolved device index %d to device: %s", index, name)
 	}
 
+	index, err := strconv.Atoi(name)
+	if err != nil {
+		return name, nil //nolint:nilerr // This is a non-numeric interface identifier.
+	}
+
+	// The device is an index into the interface list.
+	devices, err := ListDeviceNames(false, false)
+	if err != nil {
+		return "", fmt.Errorf("failed to get device list: %w", err)
+	}
+
+	name, err = deviceNameFromIndex(index, devices)
+	if err != nil {
+		return "", fmt.Errorf("invalid device index %d: %w", index, err)
+	}
+
+	logp.Info("Resolved device index %d to device: %s", index, name)
 	return name, nil
+}
+
+func sameDevice(route, pcap string) bool {
+	if runtime.GOOS == "windows" {
+		// The device returned by route does not have the same device tree
+		// as the device obtained from npcap, so rely on the GUID to match.
+		idx := strings.Index(pcap, "_") // Replace this with strings.Cut.
+		if idx > -1 {
+			pcap = pcap[idx+1:]
+		}
+	}
+	return route == pcap
 }
 
 func deviceNameFromIndex(index int, devices []string) (string, error) {
 	if index >= len(devices) {
-		return "", fmt.Errorf("Looking for device index %d, but there are only %d devices",
+		return "", fmt.Errorf("looking for device index %d, but there are only %d devices",
 			index, len(devices))
 	}
-
 	return devices[index], nil
 }

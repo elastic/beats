@@ -41,3 +41,11 @@ var IsInt64 = isdef.Is("positiveInt64", func(path llpath.Path, v interface{}) *l
 	}
 	return llresult.ValidResult(path)
 })
+
+var IsUint16 = isdef.Is("positiveUInt16", func(path llpath.Path, v interface{}) *llresult.Results {
+	_, ok := v.(uint16)
+	if !ok {
+		return llresult.SimpleResult(path, false, "expected a uint16")
+	}
+	return llresult.ValidResult(path)
+})

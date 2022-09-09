@@ -23,7 +23,8 @@ class TestKeystore(KeystoreBase):
         """
 
         key = "mysecretpath"
-        secret = path.join(self.working_dir, "thisisultrasecretpath")
+        # Include a comma in the path, regression test for https://github.com/elastic/beats/issues/29789
+        secret = path.join(self.working_dir, "thisisultra,secretpath")
 
         self.render_config_template("mockbeat",
                                     keystore_path=self.keystore_path,

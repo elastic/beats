@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -100,7 +100,7 @@ func buildPortsMap(plugins map[protos.Protocol]protos.UDPPlugin) (map[uint16]pro
 	return res, nil
 }
 
-// NewUdp creates and returns a new Udp.
+// NewUDP creates and returns a new UDP.
 func NewUDP(p protos.Protocols) (*UDP, error) {
 	portMap, err := buildPortsMap(p.GetAllUDP())
 	if err != nil {

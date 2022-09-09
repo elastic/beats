@@ -23,14 +23,14 @@ package perfmon
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestValidate(t *testing.T) {
-	conf := common.MapStr{
+	conf := mapstr.M{
 		"module":                                 "windows",
 		"period":                                 "10s",
 		"metricsets":                             []string{"perfmon"},
@@ -41,7 +41,7 @@ func TestValidate(t *testing.T) {
 	var config Config
 	err = c.Unpack(&config)
 	assert.Error(t, err, "no perfmon counters or queries have been configured")
-	conf["perfmon.queries"] = []common.MapStr{
+	conf["perfmon.queries"] = []mapstr.M{
 		{
 			"object": "Process",
 		},
@@ -51,10 +51,10 @@ func TestValidate(t *testing.T) {
 	err = c.Unpack(&config)
 	assert.Error(t, err, "missing required field accessing 'perfmon.queries.0.counters'")
 
-	conf["perfmon.queries"] = []common.MapStr{
+	conf["perfmon.queries"] = []mapstr.M{
 		{
 			"object": "Process",
-			"counters": []common.MapStr{
+			"counters": []mapstr.M{
 				{
 					"name": "Thread Count",
 				},

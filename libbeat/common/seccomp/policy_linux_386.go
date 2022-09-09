@@ -100,6 +100,7 @@ func init() {
 					"rename",
 					"renameat",
 					"restart_syscall",
+					"rseq",
 					"rt_sigaction",
 					"rt_sigprocmask",
 					"rt_sigreturn",

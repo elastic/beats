@@ -32,11 +32,11 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -77,7 +77,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 		e.t.Fatalf("failed to initialise manager: %+v", err)
 	}
 
-	c := common.MustNewConfigFrom(config)
+	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
 		e.t.Fatalf("failed to create input using manager: %+v", err)
@@ -123,7 +123,7 @@ func (e *inputTestingEnvironment) abspath(filename string) string {
 func (e *inputTestingEnvironment) mustWriteFile(filename string, lines []byte) {
 	e.t.Helper()
 	path := e.abspath(filename)
-	if err := os.WriteFile(path, lines, 0644); err != nil {
+	if err := os.WriteFile(path, lines, 0o644); err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
 }
@@ -246,7 +246,6 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
-
 }
 
 func (pc *mockPipelineConnector) cancelAllClients() {
@@ -275,7 +274,6 @@ func newMockACKHandler(starter context.Context, blocking bool, config beat.Clien
 	}
 
 	return acker.Combine(blockingACKer(starter), config.ACKHandler)
-
 }
 
 func blockingACKer(starter context.Context) beat.ACKer {

@@ -33,8 +33,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Processor in the light module
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
@@ -67,18 +67,18 @@ func TestFetchLightModuleWithProcessors(t *testing.T) {
 	assert.Empty(t, errs)
 	assert.NotEmpty(t, events)
 
-	expected := common.MapStr{
-		"http": common.MapStr{
-			"test": common.MapStr{
+	expected := mapstr.M{
+		"http": mapstr.M{
+			"test": mapstr.M{
 				"foo": "bar",
 			},
 		},
-		"service": common.MapStr{
+		"service": mapstr.M{
 			"type": "test",
 		},
 
 		// From the processor in the light module
-		"fields": common.MapStr{
+		"fields": mapstr.M{
 			"test": "fromprocessor",
 		},
 	}

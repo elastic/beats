@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Node represents a node object
@@ -47,7 +47,7 @@ type OsdDfRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var d OsdDfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
@@ -57,9 +57,9 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	nodeList := d.Output.Nodes
 
 	//osd node list
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 	for _, node := range nodeList {
-		nodeInfo := common.MapStr{
+		nodeInfo := mapstr.M{
 			"id":             node.ID,
 			"name":           node.Name,
 			"total.byte":     node.Total,

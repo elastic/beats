@@ -67,7 +67,6 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("line_delimiter cannot be empty when using stream socket")
 	}
 	return nil
-
 }
 
 func (s *SocketType) Unpack(value string) error {

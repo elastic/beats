@@ -23,8 +23,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 )
@@ -102,7 +102,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 func eventMapping(queue map[string]interface{}) mb.Event {
 	fields, _ := schema.Apply(queue)
 
-	moduleFields := common.MapStr{}
+	moduleFields := mapstr.M{}
 	if v, err := fields.GetValue("vhost"); err == nil {
 		moduleFields.Put("vhost", v)
 		fields.Delete("vhost")

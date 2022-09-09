@@ -74,7 +74,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: heartbeat
-        image: docker.elastic.co/beats/heartbeat:8.0.0
+        image: docker.elastic.co/beats/heartbeat:8.4.0
         args: [
           "-c", "/etc/heartbeat.yml",
           "-e",
@@ -100,7 +100,7 @@ spec:
           runAsUser: 0
         resources:
           limits:
-            memory: 1536mi
+            memory: 1536Mi
           requests:
             # for synthetics, 2 full cores is a good starting point for relatively consistent perform of a single concurrent check
             # For lightweight checks as low as 100m is fine
@@ -184,6 +184,10 @@ rules:
 - apiGroups: ["apps"]
   resources:
     - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+    - jobs
   verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

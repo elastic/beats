@@ -1,0 +1,97 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Memory Working Set Usage to Limit [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "effbda00-b658-11ec-b432-f55b76073132"
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "filter": {
+                    "language": "kuery",
+                    "query": "metricset.name :\"pod\"  "
+                },
+                "id": "034a1b39-789a-4c21-ba0f-3a3f01c132c0",
+                "index_pattern_ref_name": "metrics_0_index_pattern",
+                "interval": "",
+                "isModelInvalid": false,
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "percent",
+                        "id": "7cc97db7-b10d-4452-9ea8-8f9ac149c901",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.pod.memory.working_set.limit.pct",
+                                "id": "9080d8bd-59d3-4b3e-b75b-13262188d8d3",
+                                "type": "avg"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kubernetes.pod.name",
+                        "terms_order_by": "9080d8bd-59d3-4b3e-b75b-13262188d8d3",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "timeseries",
+                "use_kibana_indexes": true
+            },
+            "title": "Memory Working Set Usage to Limit [Metricbeat Kubernetes]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-c048f060-bcb9-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "metrics_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-06-28T06:47:02.196Z",
+    "version": "WzU3MjcsM10="
+}

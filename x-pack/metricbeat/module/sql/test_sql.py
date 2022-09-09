@@ -20,6 +20,7 @@ class Test(XPackTest):
             "period": "5s",
             "additional_content": """
   driver: mysql
+  sql_response_format: variables
   sql_query: 'select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0'"""
         }])
         proc = self.start_beat(home=self.beat_path)

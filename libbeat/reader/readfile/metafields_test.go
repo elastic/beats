@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMetaFieldsOffset(t *testing.T) {
@@ -32,17 +32,17 @@ func TestMetaFieldsOffset(t *testing.T) {
 		reader.Message{
 			Content: []byte("my line"),
 			Bytes:   7,
-			Fields:  common.MapStr{},
+			Fields:  mapstr.M{},
 		},
 		reader.Message{
 			Content: []byte("my line again"),
 			Bytes:   13,
-			Fields:  common.MapStr{},
+			Fields:  mapstr.M{},
 		},
 		reader.Message{
 			Content: []byte(""),
 			Bytes:   10,
-			Fields:  common.MapStr{},
+			Fields:  mapstr.M{},
 		},
 	}
 
@@ -54,19 +54,20 @@ func TestMetaFieldsOffset(t *testing.T) {
 		if err == io.EOF {
 			break
 		}
-		offset += int64(msg.Bytes)
 
-		expectedFields := common.MapStr{}
+		expectedFields := mapstr.M{}
 		if len(msg.Content) != 0 {
-			expectedFields = common.MapStr{
-				"log": common.MapStr{
-					"file": common.MapStr{
+			expectedFields = mapstr.M{
+				"log": mapstr.M{
+					"file": mapstr.M{
 						"path": path,
 					},
 					"offset": offset,
 				},
 			}
 		}
+		offset += int64(msg.Bytes)
+
 		require.Equal(t, expectedFields, msg.Fields)
 		require.Equal(t, offset, in.offset)
 	}

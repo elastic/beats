@@ -23,13 +23,6 @@
     </button>
     <button role="tab"
             aria-selected="false"
-            aria-controls="brew-tab-install-libpcap"
-            id="brew-install-libpcap"
-            tabindex="-1">
-      Brew
-    </button>
-    <button role="tab"
-            aria-selected="false"
             aria-controls="linux-tab-install-libpcap"
             id="linux-install-libpcap"
             tabindex="-1">
@@ -72,17 +65,6 @@ include::install-libpcap.asciidoc[tag=rpm]
 ++++
 
 include::install-libpcap.asciidoc[tag=mac]
-
-++++
-  </div>
-  <div tabindex="0"
-       role="tabpanel"
-       id="brew-tab-install-libpcap"
-       aria-labelledby="brew-install-libpcap"
-       hidden="">
-++++
-
-include::install-libpcap.asciidoc[tag=brew]
 
 ++++
   </div>

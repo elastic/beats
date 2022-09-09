@@ -22,11 +22,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/service"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/service"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -53,16 +53,12 @@ type flags struct {
 	dumpfile   *string
 }
 
-var cmdLineArgs flags
-
-func init() {
-	cmdLineArgs = flags{
-		file:       flag.String("I", "", "Read packet data from specified file"),
-		loop:       flag.Int("l", 1, "Loop file. 0 - loop forever"),
-		oneAtAtime: flag.Bool("O", false, "Read packets one at a time (press Enter)"),
-		topSpeed:   flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
-		dumpfile:   flag.String("dump", "", "Write all captured packets to this libpcap file"),
-	}
+var cmdLineArgs = flags{
+	file:       flag.String("I", "", "Read packet data from specified file"),
+	loop:       flag.Int("l", 1, "Loop file. 0 - loop forever"),
+	oneAtAtime: flag.Bool("O", false, "Read packets one at a time (press Enter)"),
+	topSpeed:   flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
+	dumpfile:   flag.String("dump", "", "Write all captured packets to this libpcap file"),
 }
 
 func initialConfig() config.Config {
@@ -79,15 +75,24 @@ func initialConfig() config.Config {
 
 // Beater object. Contains all objects needed to run the beat
 type packetbeat struct {
-	config  *common.Config
+	config  *conf.C
 	factory *processorFactory
 	done    chan struct{}
 }
 
-func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+// New returns a new Packetbeat beat.Beater.
+func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	configurator := config.NewAgentConfig
 	if !b.Manager.Enabled() {
 		configurator = initialConfig().FromStatic
+	}
+
+	// Install Npcap if needed. This need to happen before any other
+	// work on Windows, including config checking, because that involves
+	// probing interfaces.
+	err := installNpcap(b)
+	if err != nil {
+		return nil, err
 	}
 
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
@@ -102,6 +107,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}, nil
 }
 
+// Run starts the packetbeat network capture, decoding and event publication, sending
+// events to b.Publisher. If b is mananaged, packetbeat is registered with the
+// reload.Registry and handled by fleet. Otherwise it is run until cancelled or a
+// fatal error.
 func (pb *packetbeat) Run(b *beat.Beat) error {
 	defer func() {
 		if service.ProfileEnabled() {
@@ -111,18 +120,14 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		}
 	}()
 
-	// Install Npcap if needed.
-	err := installNpcap(b)
-	if err != nil {
-		return err
-	}
-
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)
 	}
 	return pb.runManaged(b, pb.factory)
 }
 
+// runStatic constructs a packetbeat runner and starts it, returning on cancellation
+// or the first fatal error.
 func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 	runner, err := factory.Create(b.Publisher, pb.config)
 	if err != nil {
@@ -142,12 +147,23 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 	return nil
 }
 
+// runManaged registers a packetbeat runner with the reload.Registry and starts
+// the runner by starting the beat's manager. It returns on the first fatal error.
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
 	reload.Register.MustRegisterList("inputs", runner)
-	defer runner.Stop()
-
 	logp.Debug("main", "Waiting for the runner to finish")
+
+	// Start the manager after all the hooks are registered and terminates when
+	// the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
+	defer func() {
+		runner.Stop()
+		b.Manager.Stop()
+	}()
 
 	for {
 		select {

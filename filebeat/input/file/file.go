@@ -20,7 +20,7 @@ package file
 import (
 	"os"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type File struct {
@@ -34,7 +34,6 @@ type File struct {
 // It is used to check if the file has been renamed.
 func IsSameFile(path string, info os.FileInfo) bool {
 	fileInfo, err := os.Stat(path)
-
 	if err != nil {
 		logp.Err("Error during file comparison: %s with %s - Error: %s", path, info.Name(), err)
 		return false

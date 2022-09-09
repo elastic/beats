@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -43,7 +43,7 @@ var testCases = []testCase{
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "198.51.100.255",
 			"destination.port":      int64(15600),
-			"event.category":        []string{"network", "network_traffic"},
+			"event.category":        []string{"network"},
 			"event.code":            "IPACCESSLOGP",
 			"event.original":        isdef.IsNonEmptyString,
 			"event.outcome":         "deny",
@@ -66,7 +66,7 @@ var testCases = []testCase{
 			"cisco.ios.access_list": "100",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "198.51.100.2",
-			"event.category":        []string{"network", "network_traffic"},
+			"event.category":        []string{"network"},
 			"event.code":            "IPACCESSLOGDP",
 			"event.original":        isdef.IsNonEmptyString,
 			"event.outcome":         "deny",
@@ -90,7 +90,7 @@ var testCases = []testCase{
 			"cisco.ios.access_list": "170",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "224.168.168.168",
-			"event.category":        []string{"network", "network_traffic"},
+			"event.category":        []string{"network"},
 			"event.code":            "IPACCESSLOGRP",
 			"event.original":        isdef.IsNonEmptyString,
 			"event.outcome":         "deny",
@@ -112,7 +112,7 @@ var testCases = []testCase{
 			"cisco.ios.access_list": "INBOUND-ON-AP",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "224.0.0.2",
-			"event.category":        []string{"network", "network_traffic"},
+			"event.category":        []string{"network"},
 			"event.code":            "IPACCESSLOGSP",
 			"event.original":        isdef.IsNonEmptyString,
 			"event.outcome":         "deny",
@@ -135,7 +135,7 @@ var testCases = []testCase{
 			"cisco.ios.access_list": "1",
 			"cisco.ios.facility":    "SEC",
 			"destination.ip":        "239.10.10.10",
-			"event.category":        []string{"network", "network_traffic"},
+			"event.category":        []string{"network"},
 			"event.code":            "IPACCESSLOGNP",
 			"event.original":        isdef.IsNonEmptyString,
 			"event.outcome":         "allow",
@@ -200,9 +200,9 @@ func testInput(t *testing.T, input string, p processors.Processor) {
 			}
 
 			e := &beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": tc.message,
-					"input": common.MapStr{
+					"input": mapstr.M{
 						"type": input,
 					},
 				},
@@ -245,9 +245,9 @@ func BenchmarkPipeline(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		e := beat.Event{
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": testCases[i%len(testCases)].message,
-				"input": common.MapStr{
+				"input": mapstr.M{
 					"type": "syslog",
 				},
 			},

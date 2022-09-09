@@ -17,12 +17,13 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var notReportedErrors = []error{
@@ -48,7 +49,7 @@ type Manager struct {
 }
 
 // NewFleetManager returns a X-Pack Beats Fleet Management manager.
-func NewFleetManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
+func NewFleetManager(config *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -96,27 +97,36 @@ func (cm *Manager) Enabled() bool {
 	return cm.config.Enabled
 }
 
-// Start the config manager
-func (cm *Manager) Start(stopFunc func()) {
-	if !cm.Enabled() {
-		return
-	}
-
+// SetStopCallback sets the callback to run when the manager want to shutdown the beats gracefully.
+func (cm *Manager) SetStopCallback(stopFunc func()) {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
+	cm.stopFunc = stopFunc
+}
+
+// Start the config manager.
+func (cm *Manager) Start() error {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
+
+	if !cm.Enabled() {
+		return nil
+	}
 
 	cfgwarn.Beta("Fleet management is enabled")
 	cm.logger.Info("Starting fleet management service")
 
-	cm.stopFunc = stopFunc
 	cm.isRunning = true
 	err := cm.client.Start(context.Background())
 	if err != nil {
 		cm.logger.Errorf("failed to start elastic-agent-client: %s", err)
+		return err
 	}
+	cm.logger.Info("Ready to receive configuration")
+	return nil
 }
 
-// Stop the config manager
+// Stop stops the current Manager and close the connection to Elastic Agent.
 func (cm *Manager) Stop() {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
@@ -133,7 +143,9 @@ func (cm *Manager) Stop() {
 // CheckRawConfig check settings are correct to start the beat. This method
 // checks there are no collision between the existing configuration and what
 // fleet management can configure.
-func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
+//
+// NOTE: This is currently not implemented for fleet.
+func (cm *Manager) CheckRawConfig(cfg *conf.C) error {
 	// TODO implement this method
 	return nil
 }
@@ -170,8 +182,8 @@ func (cm *Manager) updateStatusWithError(err error) {
 func (cm *Manager) OnConfig(s string) {
 	cm.UpdateStatus(lbmanagement.Configuring, "Updating configuration")
 
-	var configMap common.MapStr
-	uconfig, err := common.NewConfigFrom(s)
+	var configMap mapstr.M
+	uconfig, err := conf.NewConfigFrom(s)
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
 		cm.updateStatusWithError(err)
@@ -192,9 +204,10 @@ func (cm *Manager) OnConfig(s string) {
 		return
 	}
 
-	if errs := cm.apply(blocks); errs != nil {
+	if err := cm.apply(blocks); err != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.updateStatusWithError(err)
+		cm.logger.Errorf("failed applying config blocks: %v", err)
 		return
 	}
 
@@ -216,6 +229,9 @@ func (cm *Manager) SetPayload(payload map[string]interface{}) {
 }
 
 func (cm *Manager) OnStop() {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
+
 	if cm.stopFunc != nil {
 		cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 		cm.stopFunc()
@@ -256,8 +272,8 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 	}
 
 	// Unset missing configs
-	for name := range missing {
-		if missing[name] {
+	for name, isMissing := range missing {
+		if isMissing {
 			if err := cm.reload(name, []*ConfigBlock{}); err != nil {
 				errors = multierror.Append(errors, err)
 			}
@@ -312,13 +328,14 @@ func (cm *Manager) reload(t string, blocks []*ConfigBlock) error {
 	return nil
 }
 
-func (cm *Manager) toConfigBlocks(cfg common.MapStr) (ConfigBlocks, error) {
+func (cm *Manager) toConfigBlocks(cfg mapstr.M) (ConfigBlocks, error) {
 	blocks := map[string][]*ConfigBlock{}
 
 	// Extract all registered values beat can respond to
 	for _, regName := range cm.registry.GetRegisteredNames() {
 		iBlock, err := cfg.GetValue(regName)
 		if err != nil {
+			cm.logger.Warnf("failed to get '%s' from config: %v. Continuing to next one", regName, err)
 			continue
 		}
 

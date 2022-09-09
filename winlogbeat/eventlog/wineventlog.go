@@ -22,24 +22,25 @@ package eventlog
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -53,7 +54,19 @@ const (
 	// eventLoggingAPIName is the name used to identify the Event Logging API
 	// as both an event type and an API.
 	eventLoggingAPIName = "eventlogging"
+
+	// metaTTL is the length of time a WinMeta value is valid in the cache.
+	metaTTL = time.Hour
 )
+
+func init() {
+	// Register wineventlog API if it is available.
+	available, _ := win.IsAvailable()
+	if available {
+		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
+		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
+	}
+}
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
@@ -90,7 +103,7 @@ func (a *NoMoreEventsAction) Unpack(v string) error {
 			return nil
 		}
 	}
-	return errors.Errorf("invalid no_more_events action: %v", v)
+	return fmt.Errorf("invalid no_more_events action: %v", v)
 }
 
 // String returns the name of the action.
@@ -160,9 +173,12 @@ type winEventLog struct {
 	lastRead     checkpoint.EventLogState // Record number of the last read event.
 
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+	message   func(event win.EvtHandle) (string, error)      // Message fallback function.
 	renderBuf []byte                                         // Buffer used for rendering event.
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
+
+	winMetaCache // Cached WinMeta tables by provider.
 
 	logPrefix string // String to prefix on log messages.
 }
@@ -196,13 +212,15 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
 	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
 	if err != nil {
-		return nil
+		return err
 	}
-	defer windows.CloseHandle(signalEvent)
+	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
-		flags = win.EvtSubscribeStartAfterBookmark
+		// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+		// subscribe again from the beginning.
+		flags = win.EvtSubscribeStartAfterBookmark | win.EvtSubscribeStrict
 	} else {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
@@ -215,7 +233,18 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 		l.query,  // Query - nil means all events
 		bookmark, // Bookmark - for resuming from a specific event
 		flags)
+
+	switch {
+	case errors.Is(err, win.ERROR_NOT_FOUND), errors.Is(err, win.ERROR_EVT_QUERY_RESULT_STALE),
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION):
+		debugf("%s error subscribing (first chance): %v", l.logPrefix, err)
+		// The bookmarked event was not found, we retry the subscription from the start.
+		incrementMetric(readErrors, err)
+		subscriptionHandle, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+	}
+
 	if err != nil {
+		debugf("%s error subscribing (final): %v", l.logPrefix, err)
 		return err
 	}
 
@@ -228,7 +257,7 @@ func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtH
 
 	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get handle to event log file %v", path)
+		return fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
 	}
 
 	if bookmark > 0 {
@@ -240,16 +269,16 @@ func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtH
 		if err = win.EvtSeek(h, 0, bookmark, win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
 			// Then we advance past the last read event to avoid sending that
 			// event again. This won't fail if we're at the end of the file.
-			err = errors.Wrap(
-				win.EvtSeek(h, 1, bookmark, win.EvtSeekRelativeToBookmark),
-				"failed to seek past bookmarked position")
+			if seekErr := win.EvtSeek(h, 1, bookmark, win.EvtSeekRelativeToBookmark); seekErr != nil {
+				err = fmt.Errorf("failed to seek past bookmarked position: %w", seekErr)
+			}
 		} else {
 			logp.Warn("%s Failed to seek to bookmarked location in %v (error: %v). "+
 				"Recovering by reading the log from the beginning. (Did the file "+
 				"change since it was last read?)", l.logPrefix, path, err)
-			err = errors.Wrap(
-				win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst),
-				"failed to seek to beginning of log")
+			if seekErr := win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst); seekErr != nil {
+				err = fmt.Errorf("failed to seek to beginning of log: %w", seekErr)
+			}
 		}
 
 		if err != nil {
@@ -277,7 +306,8 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
-		if bufErr, ok := err.(sys.InsufficientBufferError); ok {
+		var bufErr sys.InsufficientBufferError
+		if errors.As(err, &bufErr) {
 			detailf("%s Increasing render buffer size to %d", l.logPrefix,
 				bufErr.RequiredSize)
 			l.renderBuf = make([]byte, bufErr.RequiredSize)
@@ -290,7 +320,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 			continue
 		}
 
-		r, _ := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
+		r := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
 		r.Offset = checkpoint.EventLogState{
 			Name:         l.id,
 			RecordNumber: r.RecordID,
@@ -298,6 +328,13 @@ func (l *winEventLog) Read() ([]Record, error) {
 		}
 		if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
+		}
+		if r.Message == "" {
+			r.Message, err = l.message(h)
+			if err != nil {
+				logp.Warn("%s error salvaging message (event id=%d qualifier=%d provider=%q created at %s will be included without a message): %v",
+					l.logPrefix, r.EventIdentifier.ID, r.EventIdentifier.Qualifiers, r.Provider.Name, r.TimeCreated.SystemTime, err)
+			}
 		}
 		records = append(records, r)
 		l.lastRead = r.Offset
@@ -314,7 +351,7 @@ func (l *winEventLog) Close() error {
 
 func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	handles, err := win.EventHandles(l.subscription, maxRead)
-	switch err {
+	switch err { //nolint:errorlint // This is an errno or nil.
 	case nil:
 		if l.maxRead > maxRead {
 			debugf("%s Recovered from RPC_S_INVALID_BOUND error (errno 1734) "+
@@ -330,10 +367,10 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
-			return nil, 0, errors.Wrap(err, "failed to recover from RPC_S_INVALID_BOUND")
+			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
 		if err := l.Open(l.lastRead); err != nil {
-			return nil, 0, errors.Wrap(err, "failed to recover from RPC_S_INVALID_BOUND")
+			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
 		return l.eventHandles(maxRead / 2)
 	default:
@@ -343,7 +380,7 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	}
 }
 
-func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
+func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	includeXML := l.config.IncludeXML
 	e, err := winevent.UnmarshalXML(x)
 	if err != nil {
@@ -366,13 +403,15 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
 	}
 
+	// Get basic string values for raw fields.
+	winevent.EnrichRawValuesWithNames(l.winMeta(e.Provider.Name), &e)
 	if e.Level == "" {
 		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
 		e.Level = win.EventLevel(e.LevelRaw).String()
 	}
 
 	if logp.IsDebug(detailSelector) {
-		detailf("%s XML=%s Event=%+v", l.logPrefix, string(x), e)
+		detailf("%s XML=%s Event=%+v", l.logPrefix, x, e)
 	}
 
 	r := Record{
@@ -388,17 +427,67 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 		r.XML = string(x)
 	}
 
-	return r, nil
+	return r
 }
 
-func newEventLogging(options *common.Config) (EventLog, error) {
+// winMetaCache retrieves and caches WinMeta tables by provider name.
+// It is a cut down version of the PublisherMetadataStore caching in wineventlog.Renderer.
+type winMetaCache struct {
+	ttl    time.Duration
+	logger *logp.Logger
+
+	mu    sync.RWMutex
+	cache map[string]winMetaCacheEntry
+}
+
+type winMetaCacheEntry struct {
+	expire time.Time
+	*winevent.WinMeta
+}
+
+func newWinMetaCache(ttl time.Duration) winMetaCache {
+	return winMetaCache{cache: make(map[string]winMetaCacheEntry), ttl: ttl, logger: logp.L()}
+}
+
+func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
+	c.mu.RLock()
+	e, ok := c.cache[provider]
+	c.mu.RUnlock()
+	if ok && time.Until(e.expire) > 0 {
+		return e.WinMeta
+	}
+
+	// Upgrade lock.
+	defer c.mu.Unlock()
+	c.mu.Lock()
+
+	// Did the cache get updated during lock upgrade?
+	// No need to check expiry here since we must have a new entry
+	// if there is an entry at all.
+	if e, ok := c.cache[provider]; ok {
+		return e.WinMeta
+	}
+
+	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, c.logger)
+	if err != nil {
+		// Return an empty store on error (can happen in cases where the
+		// log was forwarded and the provider doesn't exist on collector).
+		s = win.NewEmptyPublisherMetadataStore(provider, c.logger)
+		logp.Warn("failed to load publisher metadata for %v (returning an empty metadata store): %v", provider, err)
+	}
+	s.Close()
+	c.cache[provider] = winMetaCacheEntry{expire: time.Now().Add(c.ttl), WinMeta: &s.WinMeta}
+	return &s.WinMeta
+}
+
+func newEventLogging(options *conf.C) (EventLog, error) {
 	cfgwarn.Deprecate("8.0.0", fmt.Sprintf("api %s is deprecated and %s will be used instead", eventLoggingAPIName, winEventLogAPIName))
 	return newWinEventLog(options)
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLog(options *common.Config) (EventLog, error) {
+func newWinEventLog(options *conf.C) (EventLog, error) {
 	var xmlQuery string
 	var err error
 
@@ -448,16 +537,17 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	}
 
 	l := &winEventLog{
-		id:          id,
-		config:      c,
-		query:       xmlQuery,
-		channelName: c.Name,
-		file:        filepath.IsAbs(c.Name),
-		maxRead:     c.BatchReadSize,
-		renderBuf:   make([]byte, renderBufferSize),
-		outputBuf:   sys.NewByteBuffer(renderBufferSize),
-		cache:       newMessageFilesCache(id, eventMetadataHandle, freeHandle),
-		logPrefix:   fmt.Sprintf("WinEventLog[%s]", id),
+		id:           id,
+		config:       c,
+		query:        xmlQuery,
+		channelName:  c.Name,
+		file:         filepath.IsAbs(c.Name),
+		maxRead:      c.BatchReadSize,
+		renderBuf:    make([]byte, renderBufferSize),
+		outputBuf:    sys.NewByteBuffer(renderBufferSize),
+		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
+		winMetaCache: newWinMetaCache(metaTTL),
+		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more
@@ -465,7 +555,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	// the event's message.
 	switch {
 	case c.Forwarded == nil && c.Name == "ForwardedEvents",
-		c.Forwarded != nil && *c.Forwarded == true:
+		c.Forwarded != nil && *c.Forwarded:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEventXML(event, l.renderBuf, out)
 		}
@@ -473,6 +563,9 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
+	}
+	l.message = func(event win.EvtHandle) (string, error) {
+		return win.Message(event, l.renderBuf, l.cache.get)
 	}
 
 	return l, nil
@@ -487,13 +580,4 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
 	win.Close(bmHandle)
 	return string(l.outputBuf.Bytes()), err
-}
-
-func init() {
-	// Register wineventlog API if it is available.
-	available, _ := win.IsAvailable()
-	if available {
-		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
-		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
-	}
 }

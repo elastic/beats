@@ -87,8 +87,9 @@ following command enables the +{modulename}+ module config:
 include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 --
 
-. In the module config under `modules.d`, enable the desired datasets and
-change the module settings to match your environment. **Datasets are disabled by default.**
+. In the module config under `modules.d`, change the module settings to match
+your environment. You must enable at least one fileset in the module.
+**Filesets are disabled by default.**
 +
 For example, log locations are set based on the OS. If your logs aren't in
 default locations, set the `paths` variable:
@@ -163,6 +164,8 @@ environment. If you're using a different output, such as {ls}, see:
 * <<load-kibana-dashboards>>
 * <<load-ingest-pipelines>>
 =====
+
+NOTE: Filebeat should not be used to ingest its own log as this may lead to an infinite loop.
 
 [float]
 [[start]]

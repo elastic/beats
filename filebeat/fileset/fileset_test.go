@@ -31,7 +31,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -44,7 +45,7 @@ func makeTestInfo(version string) beat.Info {
 func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
-	fs, err := New(modulesPath, fileset, &ModuleConfig{Module: module}, &FilesetConfig{})
+	fs, err := New(modulesPath, fileset, module, &FilesetConfig{})
 	require.NoError(t, err)
 
 	return fs
@@ -98,7 +99,7 @@ func TestEvaluateVarsNginx(t *testing.T) {
 func TestEvaluateVarsNginxOverride(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
-	fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
+	fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
 		Var: map[string]interface{}{
 			"pipeline": "no_plugins",
 		},
@@ -205,7 +206,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 				"close_eof": true,
 			},
 			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
-				c, ok := cfg.(*common.Config)
+				c, ok := cfg.(*conf.C)
 				if !ok {
 					t.FailNow()
 				}
@@ -225,7 +226,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 				"pipeline": "foobar",
 			},
 			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
-				c, ok := cfg.(*common.Config)
+				c, ok := cfg.(*conf.C)
 				if !ok {
 					t.FailNow()
 				}
@@ -239,7 +240,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			fs, err := New(modulesPath, "access", &ModuleConfig{Module: "nginx"}, &FilesetConfig{
+			fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
 				Input: test.input,
 			})
 			require.NoError(t, err)
@@ -270,7 +271,7 @@ func TestGetPipelineNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 	require.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
-	version := common.MustNewVersion("5.2.0")
+	version := version.MustNew("5.2.0")
 	pipelines, err := fs.GetPipelines(*version)
 	require.NoError(t, err)
 	assert.Len(t, pipelines, 1)

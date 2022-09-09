@@ -18,21 +18,46 @@
 package queue
 
 import (
-	"io"
+	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // Factory for creating a queue used by a pipeline instance.
-type Factory func(ACKListener, *logp.Logger, *common.Config, int) (Queue, error)
+type Factory func(ACKListener, *logp.Logger, *config.C, int) (Queue, error)
 
 // ACKListener listens to special events to be send by queue implementations.
 type ACKListener interface {
 	OnACK(eventCount int) // number of consecutively published events acked by producers
 }
+
+//Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
+type Metrics struct {
+	//EventCount is the total events currently in the queue
+	EventCount opt.Uint
+	//ByteCount is the total byte size of the queue
+	ByteCount opt.Uint
+	//ByteLimit is the user-configured byte limit of the queue
+	ByteLimit opt.Uint
+	//EventLimit is the user-configured event limit of the queue
+	EventLimit opt.Uint
+
+	//UnackedConsumedEvents is the count of events that an output consumer has read, but not yet ack'ed
+	UnackedConsumedEvents opt.Uint
+
+	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
+	OldestActiveTimestamp common.Time
+
+	// OldestActiveID is ID of the oldest unacknowledged event in the queue, or
+	// the next ID that will be assigned if the queue is empty.
+	OldestEntryID EntryID
+}
+
+// ErrMetricsNotImplemented is a hopefully temporary type to mark queue metrics as not yet implemented
+var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
 
 // Queue is responsible for accepting, forwarding and ACKing events.
 // A queue will receive and buffer single events from its producers.
@@ -44,12 +69,17 @@ type ACKListener interface {
 // consumer or flush to some other intermediate storage), it will send an ACK signal
 // with the number of ACKed events to the Producer (ACK happens in batches).
 type Queue interface {
-	io.Closer
+	Close() error
 
 	BufferConfig() BufferConfig
 
 	Producer(cfg ProducerConfig) Producer
-	Consumer() Consumer
+
+	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
+	// there is no bound on the number of returned events.
+	Get(eventCount int) (Batch, error)
+
+	Metrics() (Metrics, error)
 }
 
 // BufferConfig returns the pipelines buffering settings,
@@ -75,26 +105,28 @@ type ProducerConfig struct {
 	// with close happening early might result in the event being dropped. The callback
 	// gives a queue user a chance to keep track of total number of events
 	// being buffered by the queue.
-	OnDrop func(beat.Event)
+	OnDrop func(interface{})
 
 	// DropOnCancel is a hint to the queue to drop events if the producer disconnects
 	// via Cancel.
 	DropOnCancel bool
 }
 
+type EntryID uint64
+
 // Producer is an interface to be used by the pipelines client to forward
 // events to a queue.
 type Producer interface {
 	// Publish adds an event to the queue, blocking if necessary, and returns
-	// true on success.
-	Publish(event publisher.Event) bool
+	// the new entry's id and true on success.
+	Publish(event interface{}) (EntryID, bool)
 
 	// TryPublish adds an event to the queue if doing so will not block the
 	// caller, otherwise it immediately returns. The reasons a publish attempt
 	// might block are defined by the specific queue implementation and its
-	// configuration. Returns true if the event was successfully added, false
-	// otherwise.
-	TryPublish(event publisher.Event) bool
+	// configuration. If the event was successfully added, returns true with
+	// the event's assigned ID, and false otherwise.
+	TryPublish(event interface{}) (EntryID, bool)
 
 	// Cancel closes this Producer endpoint. If the producer is configured to
 	// drop its events on Cancel, the number of dropped events is returned.
@@ -104,21 +136,11 @@ type Producer interface {
 	Cancel() int
 }
 
-// Consumer is an interface to be used by the pipeline output workers,
-// used to read events from the head of the queue.
-type Consumer interface {
-	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
-	// there is no bound on the number of returned events.
-	Get(eventCount int) (Batch, error)
-
-	// Close closes this Consumer. Returns an error if the Consumer is
-	// already closed.
-	Close() error
-}
-
-// Batch of events to be returned to Consumers. The `ACK` method will send the
-// ACK signal to the queue.
+// Batch of events to be returned to Consumers. The `Done` method will tell the
+// queue that the batch has been consumed and its events can be discarded.
 type Batch interface {
-	Events() []publisher.Event
-	ACK()
+	Count() int
+	Entry(i int) interface{}
+	ID(i int) EntryID
+	Done()
 }

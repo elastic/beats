@@ -32,9 +32,9 @@ import (
 	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-autodiscover/docker"
 )
 
 func TestData(t *testing.T) {

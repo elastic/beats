@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // HandlerFactory returns a ConnectionHandler func
@@ -48,7 +48,7 @@ func DatagramReaderFactory(
 			for ctx.Err() == nil {
 
 				buffer := make([]byte, config.MaxMessageSize)
-				//conn.SetDeadline(time.Now().Add(config.Timeout))
+				// conn.SetDeadline(time.Now().Add(config.Timeout))
 
 				// If you are using Windows and you are using a fixed buffer and you get a datagram which
 				// is bigger than the specified size of the buffer, it will return an `err` and the buffer will

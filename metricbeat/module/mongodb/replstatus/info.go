@@ -18,18 +18,22 @@
 package replstatus
 
 import (
+	"context"
 	"errors"
+	"fmt"
 
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type oplogInfo struct {
 	allocated int64
 	used      float64
-	firstTs   int64
-	lastTs    int64
-	diff      int64
+	firstTs   uint32
+	lastTs    uint32
+	diff      uint32
 }
 
 // CollSize contains data about collection size
@@ -40,33 +44,41 @@ type CollSize struct {
 
 const oplogCol = "oplog.rs"
 
-func getReplicationInfo(mongoSession *mgo.Session) (*oplogInfo, error) {
+func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 	// get oplog.rs collection
-	db := mongoSession.DB("local")
-	if collections, err := db.CollectionNames(); err != nil || !contains(collections, oplogCol) {
-		if err == nil {
-			err = errors.New("collection oplog.rs was not found")
-		}
+	db := client.Database("local")
 
-		return nil, err
+	collections, err := db.ListCollectionNames(context.Background(), bson.D{})
+	if err != nil {
+		return nil, fmt.Errorf("could not retrieve collection names: %w", err)
 	}
-	collection := db.C(oplogCol)
+
+	if !contains(collections, oplogCol) {
+		return nil, errors.New("collection oplog.rs was not found")
+	}
+
+	collection := db.Collection(oplogCol)
 
 	// get oplog size
 	var oplogSize CollSize
-	if err := db.Run(bson.D{{Name: "collStats", Value: oplogCol}}, &oplogSize); err != nil {
-		return nil, err
+	res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "collStats", Value: oplogCol}})
+	if err = res.Err(); err != nil {
+		return nil, fmt.Errorf("'collStats' command returned an error: %w", err)
+	}
+
+	if err = res.Decode(&oplogSize); err != nil {
+		return nil, fmt.Errorf("could not decode mongodb op log size: %w", err)
 	}
 
 	// get first and last items in the oplog
 	firstTs, err := getOpTimestamp(collection, "$natural")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not get first operation timestamp in op log: %w", err)
 	}
 
 	lastTs, err := getOpTimestamp(collection, "-$natural")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not get last operation timestamp in op log: %w", err)
 	}
 
 	diff := lastTs - firstTs
@@ -80,15 +92,28 @@ func getReplicationInfo(mongoSession *mgo.Session) (*oplogInfo, error) {
 	}, nil
 }
 
-func getOpTimestamp(collection *mgo.Collection, sort string) (int64, error) {
-	iter := collection.Find(nil).Sort(sort).Iter()
-
-	var opTime OpTime
-	if !iter.Next(&opTime) {
-		return 0, errors.New("objects not found in local.oplog.rs -- Is this a new and empty db instance?")
+func getOpTimestamp(collection *mongo.Collection, sort string) (uint32, error) {
+	opt := options.Find().SetSort(bson.D{{Key: sort, Value: 1}})
+	cursor, err := collection.Find(context.Background(), bson.D{}, opt)
+	if err != nil {
+		return 0, fmt.Errorf("could not get cursor on collection '%s': %w", collection.Name(), err)
 	}
 
-	return opTime.getTimeStamp(), nil
+	if !cursor.Next(context.Background()) {
+		return 0, errors.New("objects not found in local.oplog.rs")
+	}
+
+	var opTime map[string]interface{}
+	if err = cursor.Decode(&opTime); err != nil {
+		return 0, fmt.Errorf("error decoding response: %w", err)
+	}
+
+	ts, ok := opTime["ts"].(primitive.Timestamp)
+	if !ok {
+		return 0, errors.New("an expected timestamp was not found")
+	}
+
+	return ts.T, nil
 }
 
 func contains(s []string, x string) bool {

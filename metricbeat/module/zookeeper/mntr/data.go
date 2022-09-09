@@ -22,12 +22,11 @@ import (
 	"io"
 	"regexp"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -36,9 +35,9 @@ var (
 	schema       = s.Schema{
 		"version": c.Str("zk_version"),
 		"latency": s.Object{
-			"avg": c.Int("zk_avg_latency"),
-			"min": c.Int("zk_min_latency"),
-			"max": c.Int("zk_max_latency"),
+			"avg": c.Float("zk_avg_latency"),
+			"min": c.Float("zk_min_latency"),
+			"max": c.Float("zk_max_latency"),
 		},
 		"packets": s.Object{
 			"received": c.Int("zk_packets_received"),
@@ -53,7 +52,8 @@ var (
 		"approximate_data_size": c.Int("zk_approximate_data_size"),
 	}
 	schemaLeader = s.Schema{
-		"followers":        c.Int("zk_followers"),
+		"learners":         c.Int("zk_learners", s.Optional),
+		"followers":        c.Int("zk_followers", s.Optional), // Not present anymore in ZooKeeper >= 3.6 mntr responses
 		"synced_followers": c.Int("zk_synced_followers"),
 		"pending_syncs":    c.Int("zk_pending_syncs"),
 	}
@@ -77,7 +77,7 @@ func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *
 	}
 
 	event, _ := schema.Apply(fullEvent)
-	e := mb.Event{RootFields: common.MapStr{}}
+	e := mb.Event{RootFields: mapstr.M{}}
 	e.RootFields.Put("service.node.name", serverId)
 
 	if version, ok := event["version"]; ok {
@@ -85,9 +85,22 @@ func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *
 		delete(event, "version")
 	}
 
+	_, hasFollowers := fullEvent["zk_followers"]
+	_, hasLearners := fullEvent["zk_learners"]
+
 	// only exposed by the Leader
-	if _, ok := fullEvent["zk_followers"]; ok {
+	if hasLearners || hasFollowers {
 		schemaLeader.ApplyTo(event, fullEvent)
+
+		// If ZK < 3.6, keep a migration to recent versions view of the "followers" field
+		if followers, ok := event["followers"]; ok {
+			event.Put("learners", followers)
+		}
+
+		// If ZK >= 3.6, keep a legacy view of the "learners" field
+		if learners, ok := event["learners"]; ok {
+			event.Put("followers", learners)
+		}
 	}
 
 	// only available on Unix platforms

@@ -24,7 +24,7 @@ import (
 
 	bolt "go.etcd.io/bbolt"
 
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (
@@ -39,7 +39,7 @@ func OpenBucket(name string) (Bucket, error) {
 	initDatastoreOnce.Do(func() {
 		ds = &boltDatastore{
 			path: paths.Resolve(paths.Data, "beat.db"),
-			mode: 0600,
+			mode: 0o600,
 		}
 	})
 

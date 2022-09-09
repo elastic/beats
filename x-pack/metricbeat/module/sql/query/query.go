@@ -9,12 +9,11 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // represents the response format of the query
@@ -33,17 +32,41 @@ func init() {
 	)
 }
 
+// Single query
+type query struct {
+	Query          string `config:"query" validate:"nonzero,required"`
+	ResponseFormat string `config:"response_format" validate:"nonzero,required"`
+}
+
+// Metricset configuration
+type config struct {
+	// New flag
+	RawData rawData `config:"raw_data"`
+
+	Driver string `config:"driver" validate:"nonzero,required"`
+
+	// Support either the previous query / or the new list of queries.
+	ResponseFormat string `config:"sql_response_format"`
+	Query          string `config:"sql_query" `
+
+	Queries      []query `config:"sql_queries" `
+	MergeResults bool    `config:"merge_results"`
+}
+
 // MetricSet holds any configuration or state information. It must implement
 // the mb.MetricSet interface. And this is best achieved by embedding
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Driver         string
-	Query          string
-	ResponseFormat string
+	Config config
+	db     *sqlx.DB
+}
 
-	db *sqlx.DB
+// rawData is the minimum required set of fields to generate fully customized events with their own module key space
+// and their own metricset key space.
+type rawData struct {
+	Enabled bool `config:"enabled"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -51,26 +74,37 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The sql query metricset is beta.")
 
-	config := struct {
-		Driver         string `config:"driver" validate:"nonzero,required"`
-		Query          string `config:"sql_query" validate:"nonzero,required"`
-		ResponseFormat string `config:"sql_response_format"`
-	}{ResponseFormat: tableResponseFormat}
+	b := &MetricSet{BaseMetricSet: base}
 
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
+	if err := base.Module().UnpackConfig(&b.Config); err != nil {
+		return nil, fmt.Errorf("unpack config failed: %w", err)
 	}
 
-	if config.ResponseFormat != variableResponseFormat && config.ResponseFormat != tableResponseFormat {
-		return nil, fmt.Errorf("invalid sql_response_format value: %s", config.ResponseFormat)
+	if b.Config.ResponseFormat != "" {
+		if b.Config.ResponseFormat != variableResponseFormat && b.Config.ResponseFormat != tableResponseFormat {
+			return nil, fmt.Errorf("invalid sql_response_format value: %s", b.Config.ResponseFormat)
+		}
+	} else {
+		// Backword compartibility, if no value is provided
+		// This will ensure there is no braking change, as the previous code worked with no ResponseFormat
+		b.Config.ResponseFormat = variableResponseFormat
 	}
 
-	return &MetricSet{
-		BaseMetricSet:  base,
-		Driver:         config.Driver,
-		Query:          config.Query,
-		ResponseFormat: config.ResponseFormat,
-	}, nil
+	for _, q := range b.Config.Queries {
+		if q.ResponseFormat != variableResponseFormat && q.ResponseFormat != tableResponseFormat {
+			return nil, fmt.Errorf("invalid sql_response_format value: %s", q.ResponseFormat)
+		}
+	}
+
+	if b.Config.Query == "" && len(b.Config.Queries) == 0 {
+		return nil, fmt.Errorf("no query input provided, must provide either sql_query or sql_queries")
+	}
+
+	if b.Config.Query != "" && len(b.Config.Queries) > 0 {
+		return nil, fmt.Errorf("both query inputs provided, must provide either sql_query or sql_queries")
+	}
+
+	return b, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -78,88 +112,159 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
-func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
-	db, err := sql.NewDBClient(m.Driver, m.HostData().URI, m.Logger())
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "error opening connection")
+		return fmt.Errorf("could not open connection: %w", err)
 	}
 	defer db.Close()
 
-	if m.ResponseFormat == tableResponseFormat {
-		mss, err := db.FetchTableMode(ctx, m.Query)
-		if err != nil {
-			return err
-		}
-
-		for _, ms := range mss {
-			report.Event(m.getEvent(ms))
-		}
-
-		return nil
+	queries := m.Config.Queries
+	if len(queries) == 0 {
+		one_query := query{Query: m.Config.Query, ResponseFormat: m.Config.ResponseFormat}
+		queries = append(queries, one_query)
 	}
 
-	ms, err := db.FetchVariableMode(ctx, m.Query)
-	if err != nil {
-		return err
+	merged := mapstr.M{}
+
+	for _, q := range queries {
+		if q.ResponseFormat == tableResponseFormat {
+			// Table format
+			mss, err := db.FetchTableMode(ctx, q.Query)
+			if err != nil {
+				return fmt.Errorf("fetch table mode failed: %w", err)
+			}
+
+			for _, ms := range mss {
+				if m.Config.MergeResults {
+					if len(mss) > 1 {
+						return fmt.Errorf("can not merge query resulting with more than one rows: %s", q)
+					} else {
+						for k, v := range ms {
+							_, ok := merged[k]
+							if ok {
+								m.Logger().Warn("overwriting duplicate metrics: ", k)
+							}
+							merged[k] = v
+						}
+					}
+				} else {
+					// Report immediately for non-merged cases.
+					m.reportEvent(ms, reporter, q.Query)
+				}
+			}
+		} else {
+			// Variable format
+			ms, err := db.FetchVariableMode(ctx, q.Query)
+			if err != nil {
+				return fmt.Errorf("fetch variable mode failed: %w", err)
+			}
+
+			if m.Config.MergeResults {
+				for k, v := range ms {
+					_, ok := merged[k]
+					if ok {
+						m.Logger().Warn("overwriting duplicate metrics: ", k)
+					}
+					merged[k] = v
+				}
+			} else {
+				// Report immediately for non-merged cases.
+				m.reportEvent(ms, reporter, q.Query)
+			}
+		}
 	}
-	report.Event(m.getEvent(ms))
+	if m.Config.MergeResults {
+		// Report here for merged case.
+		m.reportEvent(merged, reporter, "")
+	}
 
 	return nil
 }
 
-func (m *MetricSet) getEvent(ms common.MapStr) mb.Event {
-	return mb.Event{
-		RootFields: common.MapStr{
-			"sql": common.MapStr{
-				"driver":  m.Driver,
-				"query":   m.Query,
-				"metrics": getMetrics(ms),
+// reportEvent using 'user' mode with keys under `sql.metrics.*` or using Raw data mode (module and metricset key spaces
+// provided by the user)
+func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string) {
+	if m.Config.RawData.Enabled {
+
+		// New usage.
+		// Only driver & query field mapped.
+		// metrics to be mapped by end user.
+		if len(qry) > 0 {
+			// set query.
+			reporter.Event(mb.Event{
+				ModuleFields: mapstr.M{
+					"metrics": ms, // Individual metric
+					"driver":  m.Config.Driver,
+					"query":   qry,
+				},
+			})
+		} else {
+			reporter.Event(mb.Event{
+				// Do not set query.
+				ModuleFields: mapstr.M{
+					"metrics": ms, // Individual metric
+					"driver":  m.Config.Driver,
+				},
+			})
+
+		}
+	} else {
+		// Previous usage. Backword compartibility.
+		// Supports field mapping.
+		reporter.Event(mb.Event{
+			ModuleFields: mapstr.M{
+				"driver":  m.Config.Driver,
+				"query":   qry,
+				"metrics": inferTypeFromMetrics(ms),
 			},
-		},
+		})
 	}
 }
 
-func getMetrics(ms common.MapStr) (ret common.MapStr) {
-	ret = common.MapStr{}
+// inferTypeFromMetrics to organize the output event into 'numeric', 'strings', 'floats' and 'boolean' values
+// so we can dynamically map all fields inside those categories
+func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
+	ret := mapstr.M{}
 
-	numericMetrics := common.MapStr{}
-	stringMetrics := common.MapStr{}
-	boolMetrics := common.MapStr{}
+	numericMetrics := mapstr.M{}
+	stringMetrics := mapstr.M{}
+	boolMetrics := mapstr.M{}
 
 	for k, v := range ms {
 		switch v.(type) {
 		case float64:
-			numericMetrics.Put(k, v)
+			numericMetrics[k] = v
 		case string:
-			stringMetrics.Put(k, v)
+			stringMetrics[k] = v
 		case bool:
-			boolMetrics.Put(k, v)
+			boolMetrics[k] = v
 		case nil:
 		//Ignore because a nil has no data type and thus cannot be indexed
 		default:
-			stringMetrics.Put(k, v)
+			stringMetrics[k] = v
 		}
 	}
 
 	if len(numericMetrics) > 0 {
-		ret.Put("numeric", numericMetrics)
+		ret["numeric"] = numericMetrics
 	}
 
 	if len(stringMetrics) > 0 {
-		ret.Put("string", stringMetrics)
+		ret["string"] = stringMetrics
 	}
 
 	if len(boolMetrics) > 0 {
-		ret.Put("bool", boolMetrics)
+		ret["bool"] = boolMetrics
 	}
 
-	return
+	return ret
 }
 
 // Close closes the connection pool releasing its resources
-func (m *MetricSet) Close() error {
+func (m *MetricSet) Close() (err error) {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "closing connection")
+	return m.db.Close()
 }

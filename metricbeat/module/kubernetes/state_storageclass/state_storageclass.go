@@ -99,5 +99,4 @@ func (m *StorageClassMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-	return
 }

@@ -27,20 +27,21 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Shopify/sarama"
 	"github.com/pkg/errors"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const pluginName = "kafka"
@@ -57,7 +58,7 @@ func Plugin() input.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) (input.Input, error) {
+func configure(cfg *conf.C) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -251,12 +252,15 @@ type channelCtx struct {
 func doneChannelContext(ctx input.Context) context.Context {
 	return channelCtx{ctx}
 }
+
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
 	return
 }
+
 func (c channelCtx) Done() <-chan struct{} {
 	return c.ctx.Cancelation.Done()
 }
+
 func (c channelCtx) Err() error {
 	return c.ctx.Cancelation.Err()
 }
@@ -276,7 +280,6 @@ type groupHandler struct {
 	// ex. in this case are the azure fielsets where the events are found under the json object "records"
 	expandEventListFromField string // TODO
 	log                      *logp.Logger
-	reader                   reader.Reader
 }
 
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
@@ -318,6 +321,7 @@ func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 			Timestamp: message.Ts,
 			Meta:      message.Meta,
 			Fields:    message.Fields,
+			Private:   message.Private,
 		})
 	}
 	return nil
@@ -428,9 +432,9 @@ func (l *listFromFieldReader) parseMultipleMessages(bMessage []byte) []string {
 	return messages
 }
 
-func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler, msg *sarama.ConsumerMessage) (time.Time, common.MapStr) {
+func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler, msg *sarama.ConsumerMessage) (time.Time, mapstr.M) {
 	timestamp := time.Now()
-	kafkaFields := common.MapStr{
+	kafkaFields := mapstr.M{
 		"topic":     claim.Topic(),
 		"partition": claim.Partition(),
 		"offset":    msg.Offset,
@@ -450,16 +454,16 @@ func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler
 	return timestamp, kafkaFields
 }
 
-func composeMessage(timestamp time.Time, content []byte, kafkaFields common.MapStr, ackHandler func()) reader.Message {
+func composeMessage(timestamp time.Time, content []byte, kafkaFields mapstr.M, ackHandler func()) reader.Message {
 	return reader.Message{
 		Ts:      timestamp,
 		Content: content,
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"kafka":   kafkaFields,
 			"message": string(content),
 		},
-		Meta: common.MapStr{
-			"ackHandler": ackHandler,
+		Private: eventMeta{
+			ackHandler: ackHandler,
 		},
 	}
 }

@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // PgState represents placement group state
@@ -84,7 +84,7 @@ type HealthRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
@@ -94,7 +94,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	//osd map info
 	osdmap := d.Output.Osdmap.Osdmap
 
-	osdState := common.MapStr{}
+	osdState := mapstr.M{}
 	osdState["epoch"] = osdmap.Epoch
 	osdState["full"] = osdmap.Full
 	osdState["nearfull"] = osdmap.Nearfull
@@ -106,29 +106,29 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	//pg map info
 	pgmap := d.Output.Pgmap
 
-	traffic := common.MapStr{}
+	traffic := mapstr.M{}
 	traffic["read_bytes"] = pgmap.ReadByteSec
 	traffic["read_op_per_sec"] = pgmap.ReadOpSec
 	traffic["write_bytes"] = pgmap.WriteByteSec
 	traffic["write_op_per_sec"] = pgmap.WriteOpSec
 
-	misplace := common.MapStr{}
+	misplace := mapstr.M{}
 	misplace["objects"] = pgmap.MisplacedObjs
 	misplace["pct"] = pgmap.MisplacedRatio
 	misplace["total"] = pgmap.MisplacedTotal
 
-	degraded := common.MapStr{}
+	degraded := mapstr.M{}
 	degraded["objects"] = pgmap.DegradedObjs
 	degraded["pct"] = pgmap.DegradedRatio
 	degraded["total"] = pgmap.DegradedTotal
 
-	pg := common.MapStr{}
+	pg := mapstr.M{}
 	pg["avail_bytes"] = pgmap.AvailByte
 	pg["total_bytes"] = pgmap.TotalByte
 	pg["used_bytes"] = pgmap.UsedByte
 	pg["data_bytes"] = pgmap.DataByte
 
-	stateEvent := common.MapStr{}
+	stateEvent := mapstr.M{}
 	stateEvent["osd"] = osdState
 	stateEvent["traffic"] = traffic
 	stateEvent["misplace"] = misplace
@@ -136,17 +136,17 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	stateEvent["pg"] = pg
 	stateEvent["version"] = pgmap.Version
 
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 	events = append(events, stateEvent)
 
 	//pg state info
 	for _, state := range pgmap.PgStates {
-		stateEvn := common.MapStr{
+		stateEvn := mapstr.M{
 			"count":      state.Count,
 			"state_name": state.StateName,
 			"version":    pgmap.Version,
 		}
-		evt := common.MapStr{
+		evt := mapstr.M{
 			"pg_state": stateEvn,
 		}
 		events = append(events, evt)

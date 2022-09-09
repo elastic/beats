@@ -30,7 +30,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
@@ -38,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // capture stdout and return captured string
@@ -137,6 +137,6 @@ func run(codec codec.Codec, batches ...publisher.Batch) (string, error) {
 	})
 }
 
-func event(k, v string) common.MapStr {
-	return common.MapStr{k: v}
+func event(k, v string) mapstr.M {
+	return mapstr.M{k: v}
 }

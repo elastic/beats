@@ -22,9 +22,9 @@ import (
 	"io"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Reader produces lines by reading lines from an io.Reader
@@ -58,7 +58,7 @@ func (r EncoderReader) Next() (reader.Message, error) {
 		Ts:      time.Now(),
 		Content: bytes.Trim(c, "\xef\xbb\xbf"),
 		Bytes:   sz,
-		Fields:  common.MapStr{},
+		Fields:  mapstr.M{},
 	}, err
 }
 

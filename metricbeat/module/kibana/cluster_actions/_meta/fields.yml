@@ -1,0 +1,23 @@
+- name: cluster_actions
+  type: group
+  description: >
+    Kibana cluster actions metrics.
+  release: beta
+  fields:
+    - name: kibana
+      type: group
+      fields:
+        - name: status
+          type: keyword
+    - name: overdue
+      type: group
+      fields:
+        - name: count
+          type: long
+        - name: delay
+          type: group
+          fields:
+            - name: p50
+              type: float
+            - name: p99
+              type: float

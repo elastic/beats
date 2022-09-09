@@ -28,11 +28,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type testingImpl struct {
+type mockWatcher struct {
 	localIPs     []net.IP
 	portToPID    map[applayer.Transport]map[endpoint]int
 	pidToProcess map[int]*process
@@ -44,8 +44,8 @@ type runningProcess struct {
 	proto applayer.Transport
 }
 
-func newTestingImpl(localIPs []net.IP, processes []runningProcess) *testingImpl {
-	impl := &testingImpl{
+func newMockWatcher(localIPs []net.IP, processes []runningProcess) *mockWatcher {
+	w := &mockWatcher{
 		localIPs: localIPs,
 		portToPID: map[applayer.Transport]map[endpoint]int{
 			applayer.TransportTCP: make(map[endpoint]int),
@@ -55,31 +55,31 @@ func newTestingImpl(localIPs []net.IP, processes []runningProcess) *testingImpl 
 	}
 	for i, proc := range processes {
 		for _, port := range proc.ports {
-			impl.portToPID[proc.proto][port] = proc.pid
+			w.portToPID[proc.proto][port] = proc.pid
 		}
 
-		impl.pidToProcess[proc.pid] = &processes[i].process
+		w.pidToProcess[proc.pid] = &processes[i].process
 	}
-	return impl
+	return w
 }
 
-func (impl *testingImpl) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
-	return impl.portToPID[transport], nil
+func (w *mockWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
+	return w.portToPID[transport], nil
 }
 
-func (impl *testingImpl) GetProcess(pid int) *process {
-	if cmdline, ok := impl.pidToProcess[pid]; ok {
+func (w *mockWatcher) GetProcess(pid int) *process {
+	if cmdline, ok := w.pidToProcess[pid]; ok {
 		return cmdline
 	}
 	return nil
 }
 
-func (impl *testingImpl) GetLocalIPs() ([]net.IP, error) {
-	return impl.localIPs, nil
+func (w *mockWatcher) GetLocalIPs() ([]net.IP, error) {
+	return w.localIPs, nil
 }
 
 func TestFindProcessTuple(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	config := ProcsConfig{
 		Enabled: true,
 		Monitored: []ProcConfig{
@@ -88,7 +88,7 @@ func TestFindProcessTuple(t *testing.T) {
 			{Process: "NMap", CmdlineGrep: "nmap"},
 		},
 	}
-	impl := newTestingImpl(
+	w := newMockWatcher(
 		[]net.IP{
 			net.ParseIP("127.0.0.1"),
 			net.ParseIP("192.168.1.1"),
@@ -177,7 +177,7 @@ func TestFindProcessTuple(t *testing.T) {
 			},
 		})
 	procs := ProcessesWatcher{}
-	err := procs.initWithImpl(config, impl)
+	err := procs.init(config, w)
 	assert.NoError(t, err)
 
 	for _, testCase := range []struct {
@@ -240,8 +240,8 @@ func TestFindProcessTuple(t *testing.T) {
 			name: "New client",
 			preAction: func() {
 				// add a new running process
-				impl.pidToProcess[555] = &process{args: strings.Fields("/usr/bin/nmap -sT -P443 10.0.0.0/8")}
-				impl.portToPID[applayer.TransportTCP][endpoint{anyIPv6, 55555}] = 555
+				w.pidToProcess[555] = &process{args: strings.Fields("/usr/bin/nmap -sT -P443 10.0.0.0/8")}
+				w.portToPID[applayer.TransportTCP][endpoint{anyIPv6, 55555}] = 555
 			},
 			proto: applayer.TransportTCP,
 			srcIP: "7777::33", srcPort: 55555,

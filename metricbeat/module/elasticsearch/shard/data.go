@@ -22,11 +22,11 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -69,7 +69,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		for _, shards := range index.Shards {
 			for _, shard := range shards {
 				event := mb.Event{
-					ModuleFields: common.MapStr{},
+					ModuleFields: mapstr.M{},
 				}
 
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
@@ -148,19 +148,19 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	return errs.Err()
 }
 
-func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error) {
+func getSourceNode(nodeID string, stateData *stateStruct) (mapstr.M, error) {
 	nodeInfo, ok := stateData.Nodes[nodeID]
 	if !ok {
 		return nil, elastic.MakeErrorForMissingField("nodes."+nodeID, elastic.Elasticsearch)
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"uuid": nodeID,
 		"name": nodeInfo.Name,
 	}, nil
 }
 
-func generateHashForEvent(stateID string, shard common.MapStr) (string, error) {
+func generateHashForEvent(stateID string, shard mapstr.M) (string, error) {
 	var nodeID string
 	if shard["node"] == nil {
 		nodeID = "_na"

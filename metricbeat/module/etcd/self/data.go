@@ -20,7 +20,7 @@ package self
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type LeaderInfo struct {
@@ -59,26 +59,26 @@ type Self struct {
 	State      string `json:"state"`
 }
 
-func eventMapping(content []byte) common.MapStr {
+func eventMapping(content []byte) mapstr.M {
 	var data Self
 	json.Unmarshal(content, &data)
-	event := common.MapStr{
+	event := mapstr.M{
 		"id": data.ID,
-		"leaderinfo": common.MapStr{
+		"leaderinfo": mapstr.M{
 			"leader":    data.LeaderInfo.Leader,
 			"starttime": data.LeaderInfo.StartTime,
 			"uptime":    data.LeaderInfo.Uptime,
 		},
 		"name": data.Name,
-		"recv": common.MapStr{
-			"appendrequest": common.MapStr{
+		"recv": mapstr.M{
+			"appendrequest": mapstr.M{
 				"count": data.Recv.Appendrequest.Count,
 			},
 			"bandwidthrate": data.Recv.Bandwidthrate,
 			"pkgrate":       data.Recv.Pkgrate,
 		},
-		"send": common.MapStr{
-			"appendrequest": common.MapStr{
+		"send": mapstr.M{
+			"appendrequest": mapstr.M{
 				"count": data.Send.AppendRequest.Cnt,
 			},
 			"bandwidthrate": data.Send.BandwidthRate,

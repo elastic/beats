@@ -27,8 +27,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func GetTestUdpServer(host string, port int) (server.Server, error) {

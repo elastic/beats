@@ -11,9 +11,11 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
+	"net/url"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -24,9 +26,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 // we define custom delimiters to prevent issues when using template values as part of other Go templates.
@@ -48,29 +50,35 @@ func (t *valueTpl) Unpack(in string) error {
 	tpl, err := template.New("").
 		Option("missingkey=error").
 		Funcs(template.FuncMap{
+			"add":                 add,
+			"base64Decode":        base64Decode,
+			"base64DecodeNoPad":   base64DecodeNoPad,
+			"base64Encode":        base64Encode,
+			"base64EncodeNoPad":   base64EncodeNoPad,
+			"beatInfo":            beatInfo,
+			"div":                 div,
+			"formatDate":          formatDate,
+			"getRFC5988Link":      getRFC5988Link,
+			"hash":                hashStringHex,
+			"hashBase64":          hashStringBase64,
+			"hexDecode":           hexDecode,
+			"hmac":                hmacStringHex,
+			"hmacBase64":          hmacStringBase64,
+			"join":                join,
+			"toJSON":              toJSON,
+			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
-			"formatDate":          formatDate,
 			"parseDuration":       parseDuration,
 			"parseTimestamp":      parseTimestamp,
 			"parseTimestampMilli": parseTimestampMilli,
 			"parseTimestampNano":  parseTimestampNano,
-			"getRFC5988Link":      getRFC5988Link,
-			"toInt":               toInt,
-			"add":                 add,
-			"mul":                 mul,
-			"div":                 div,
-			"hmac":                hmacStringHex,
-			"base64Encode":        base64Encode,
-			"base64EncodeNoPad":   base64EncodeNoPad,
-			"base64Decode":        base64Decode,
-			"base64DecodeNoPad":   base64DecodeNoPad,
-			"join":                join,
+			"replaceAll":          replaceAll,
 			"sprintf":             fmt.Sprintf,
-			"hmacBase64":          hmacStringBase64,
-			"uuid":                uuidString,
+			"toInt":               toInt,
+			"urlEncode":           urlEncode,
 			"userAgent":           userAgentString,
-			"beatInfo":            beatInfo,
+			"uuid":                uuidString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -120,21 +128,21 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 	return val, nil
 }
 
-var (
-	predefinedLayouts = map[string]string{
-		"ANSIC":       time.ANSIC,
-		"UnixDate":    time.UnixDate,
-		"RubyDate":    time.RubyDate,
-		"RFC822":      time.RFC822,
-		"RFC822Z":     time.RFC822Z,
-		"RFC850":      time.RFC850,
-		"RFC1123":     time.RFC1123,
-		"RFC1123Z":    time.RFC1123Z,
-		"RFC3339":     time.RFC3339,
-		"RFC3339Nano": time.RFC3339Nano,
-		"Kitchen":     time.Kitchen,
-	}
-)
+const defaultTimeLayout = "RFC3339"
+
+var predefinedLayouts = map[string]string{
+	"ANSIC":       time.ANSIC,
+	"UnixDate":    time.UnixDate,
+	"RubyDate":    time.RubyDate,
+	"RFC822":      time.RFC822,
+	"RFC822Z":     time.RFC822Z,
+	"RFC850":      time.RFC850,
+	"RFC1123":     time.RFC1123,
+	"RFC1123Z":    time.RFC1123Z,
+	"RFC3339":     time.RFC3339,
+	"RFC3339Nano": time.RFC3339Nano,
+	"Kitchen":     time.Kitchen,
+}
 
 func now(add ...time.Duration) time.Time {
 	now := timeNow().UTC()
@@ -152,7 +160,7 @@ func parseDuration(s string) time.Duration {
 func parseDate(date string, layout ...string) time.Time {
 	var ly string
 	if len(layout) == 0 {
-		ly = "RFC3339"
+		ly = defaultTimeLayout
 	} else {
 		ly = layout[0]
 	}
@@ -172,7 +180,7 @@ func formatDate(date time.Time, layouttz ...string) string {
 	var layout, tz string
 	switch {
 	case len(layouttz) == 0:
-		layout = "RFC3339"
+		layout = defaultTimeLayout
 	case len(layouttz) == 1:
 		layout = layouttz[0]
 	case len(layouttz) > 1:
@@ -206,8 +214,8 @@ func parseTimestampNano(ns int64) time.Time {
 
 var regexpLinkRel = regexp.MustCompile(`<(.*)>;.*\srel\="?([^;"]*)`)
 
-func getRFC5988Link(rel string, links []string) string {
-	for _, link := range links {
+func getMatchLink(rel string, linksSplit []string) string {
+	for _, link := range linksSplit {
 		if !regexpLinkRel.MatchString(link) {
 			continue
 		}
@@ -223,15 +231,22 @@ func getRFC5988Link(rel string, links []string) string {
 
 		return matches[1]
 	}
-
 	return ""
+}
+
+func getRFC5988Link(rel string, links []string) string {
+	if len(links) == 1 && strings.Count(links[0], "rel=") > 1 {
+		linksSplit := strings.Split(links[0], ",")
+		return getMatchLink(rel, linksSplit)
+	}
+	return getMatchLink(rel, links)
 }
 
 func toInt(v interface{}) int64 {
 	vv := reflect.ValueOf(v)
 	switch vv.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return int64(vv.Int())
+		return vv.Int()
 	case reflect.Float32, reflect.Float64:
 		return int64(vv.Float())
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -327,8 +342,43 @@ func hmacStringBase64(hmacType string, hmacKey string, values ...string) string 
 	}
 	bytes := hmacString(hmacType, []byte(hmacKey), data)
 
-	// Get result and encode as hexadecimal string
+	// Get result and encode as base64 string
 	return base64.StdEncoding.EncodeToString(bytes)
+}
+
+func hashStringHex(typ string, values ...string) string {
+	// Get result and encode as hexadecimal string
+	return hex.EncodeToString(hashStrings(typ, values))
+}
+
+func hashStringBase64(typ string, values ...string) string {
+	// Get result and encode as base64 string
+	return base64.StdEncoding.EncodeToString(hashStrings(typ, values))
+}
+
+func hashStrings(typ string, data []string) []byte {
+	var h hash.Hash
+	switch typ {
+	case "sha256":
+		h = sha256.New()
+	case "sha1":
+		h = sha1.New()
+	default:
+		// Upstream config validation prevents this from happening.
+		return nil
+	}
+	for _, d := range data {
+		h.Write([]byte(d))
+	}
+	return h.Sum(nil)
+}
+
+func hexDecode(enc string) string {
+	decodedString, err := hex.DecodeString(enc)
+	if err != nil {
+		return ""
+	}
+	return string(decodedString)
 }
 
 func uuidString() string {
@@ -367,7 +417,7 @@ func join(v interface{}, sep string) string {
 }
 
 func userAgentString(values ...string) string {
-	return useragent.UserAgent("Filebeat", values...)
+	return useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String(), values...)
 }
 
 func beatInfo() map[string]string {
@@ -378,4 +428,32 @@ func beatInfo() map[string]string {
 		"buildtime": version.BuildTime().String(),
 		"version":   version.GetDefaultVersion(),
 	}
+}
+
+func urlEncode(value string) string {
+	if value == "" {
+		return ""
+	}
+	return url.QueryEscape(value)
+}
+
+// replaceAll returns a copy of the string s with all non-overlapping instances
+// of old replaced by new.
+//
+// Note that the order of the arguments differs from Go's [strings.ReplaceAll] to
+// make pipelining more ergonomic. This allows s to be piped in because it is
+// the final argument. For example,
+//
+//   [[ "some value" | replaceAll "some" "my" ]]  // == "my value"
+func replaceAll(old, new, s string) string {
+	return strings.ReplaceAll(s, old, new)
+}
+
+// toJSON converts the given structure into a JSON string.
+func toJSON(i interface{}) (string, error) {
+	result, err := json.Marshal(i)
+	if err != nil {
+		return "", fmt.Errorf("toJSON failed: %w", err)
+	}
+	return string(bytes.TrimSpace(result)), nil
 }

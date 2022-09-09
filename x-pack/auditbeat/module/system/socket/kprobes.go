@@ -8,16 +8,16 @@
 package socket
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"unsafe"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // This is how many data we dump from sk_buff->data to read full packet headers
@@ -51,14 +51,14 @@ func (p *probeInstaller) Install(pdef helper.ProbeDef) (format tracing.ProbeForm
 		return format, decoder, errors.New("nil decoder in probe definition")
 	}
 	if err = p.traceFS.AddKProbe(pdef.Probe); err != nil {
-		return format, decoder, errors.Wrapf(err, "failed installing probe '%s'", pdef.Probe.String())
+		return format, decoder, fmt.Errorf("failed installing probe '%s': %w", pdef.Probe.String(), err)
 	}
 	p.installed = append(p.installed, pdef.Probe)
 	if format, err = p.traceFS.LoadProbeFormat(pdef.Probe); err != nil {
-		return format, decoder, errors.Wrap(err, "failed to load probe format")
+		return format, decoder, fmt.Errorf("failed to load probe format: %w", err)
 	}
 	if decoder, err = pdef.Decoder(format); err != nil {
-		return format, decoder, errors.Wrap(err, "failed to create decoder")
+		return format, decoder, fmt.Errorf("failed to create decoder: %w", err)
 	}
 	return
 }
@@ -79,13 +79,13 @@ func (p *probeInstaller) UninstallInstalled() error {
 func (p *probeInstaller) UninstallIf(condition helper.ProbeCondition) error {
 	kprobes, err := p.traceFS.ListKProbes()
 	if err != nil {
-		return errors.Wrap(err, "failed to list installed kprobes")
+		return fmt.Errorf("failed to list installed kprobes: %w", err)
 	}
 	var errs multierror.Errors
 	for _, probe := range kprobes {
 		if condition(probe) {
 			if err := p.traceFS.RemoveKProbe(probe); err != nil {
-				errs = append(errs, errors.Wrapf(err, "unable to remove kprobe '%s'", probe.String()))
+				errs = append(errs, fmt.Errorf("unable to remove kprobe '%s': %w", probe.String(), err))
 			}
 		}
 	}
@@ -101,7 +101,7 @@ func WithGroup(name string) ProbeTransform {
 }
 
 // WithTemplates expands templates in probes before they are installed.
-func WithTemplates(vars common.MapStr) ProbeTransform {
+func WithTemplates(vars mapstr.M) ProbeTransform {
 	return func(probe helper.ProbeDef) helper.ProbeDef {
 		return probe.ApplyTemplate(vars)
 	}
@@ -137,10 +137,9 @@ func WithFilterPort(portnum uint16) ProbeTransform {
 
 // KProbes shared with IPv4 and IPv6.
 var sharedKProbes = []helper.ProbeDef{
-
-	/***************************************************************************
-	 * RUNNING PROCESSES
-	 **************************************************************************/
+	//***************************************************************************
+	//* RUNNING PROCESSES
+	//***************************************************************************
 
 	{
 		Probe: tracing.Probe{
@@ -370,9 +369,9 @@ var ipv4OnlyKProbes = []helper.ProbeDef{
 
 // KProbes used when IPv6 is enabled.
 var ipv6KProbes = []helper.ProbeDef{
-	/***************************************************************************
-	 * IPv6
-	 **************************************************************************/
+	//***************************************************************************
+	//* IPv6
+	//***************************************************************************
 
 	// IPv6 socket created. Good for associating sockets with pids.
 	// ** This is a struct socket* not a struct sock* **

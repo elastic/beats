@@ -11,7 +11,7 @@ import (
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetFilterForMetric(t *testing.T) {

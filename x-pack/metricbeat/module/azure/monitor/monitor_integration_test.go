@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/test"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
@@ -36,4 +37,19 @@ func TestData(t *testing.T) {
 			"name": []string{"DataUsage", "DocumentCount", "DocumentQuota"}}}}}
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
+}
+
+func TestDataMultipleDimensions(t *testing.T) {
+	config := test.GetConfig(t, "monitor")
+	config["resources"] = []map[string]interface{}{{
+		"resource_query": "resourceType eq 'Microsoft.KeyVault/vaults'",
+		"metrics": []map[string]interface{}{{"namespace": "Microsoft.KeyVault/vaults",
+			"name": []string{"Availability"}, "dimensions": []map[string]interface{}{{"name": "ActivityName", "value": "*"}}}}}}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEventsCond(t, "/", func(m mapstr.M) bool {
+		if m["azure"].(mapstr.M)["dimensions"].(mapstr.M)["activity_name"] == "secretget" {
+			return true
+		}
+		return false
+	})
 }

@@ -1,0 +1,99 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Select Namespace and Job [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "orchestrator.cluster.name",
+                        "id": "1653382257048",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Cluster Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "kubernetes.namespace",
+                        "id": "1649762924532",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Namespace Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1653382257048",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "kubernetes.job.name",
+                        "id": "1649763012916",
+                        "indexPatternRefName": "control_2_index_pattern",
+                        "label": "Job name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1649762924532",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": true,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": true
+            },
+            "title": "Select Namespace and Job [Metricbeat Kubernetes]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-16da9910-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-05-24T08:51:23.666Z",
+    "version": "Wzk1NDAsMV0="
+}

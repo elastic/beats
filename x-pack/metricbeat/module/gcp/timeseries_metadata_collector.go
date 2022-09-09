@@ -6,14 +6,12 @@ package gcp
 
 import (
 	"context"
+	"fmt"
 	"strings"
-	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/pkg/errors"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // NewStackdriverCollectorInputData returns a ready to use MetadataCollectorInputData to be sent to Metadata collectors
@@ -43,7 +41,7 @@ type StackdriverTimeSeriesMetadataCollector struct {
 // Metadata parses a Timeseries object to return its metadata divided into "unknown" (first object) and ECS (second
 // object https://www.elastic.co/guide/en/ecs/master/index.html)
 func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, in *monitoringpb.TimeSeries) (MetadataCollectorData, error) {
-	m := common.MapStr{}
+	m := mapstr.M{}
 
 	var availabilityZone, accountID string
 
@@ -52,9 +50,9 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		accountID = in.Resource.Labels[TimeSeriesResponsePathForECSAccountID]
 	}
 
-	ecs := common.MapStr{
-		ECSCloud: common.MapStr{
-			ECSCloudAccount: common.MapStr{
+	ecs := mapstr.M{
+		ECSCloud: mapstr.M{
+			ECSCloudAccount: mapstr.M{
 				ECSCloudAccountID:   accountID,
 				ECSCloudAccountName: accountID,
 			},
@@ -75,7 +73,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	//Remove keys from resource that refers to ECS fields
 
 	if s.timeSeries == nil {
-		return MetadataCollectorData{}, errors.New("no time series data found in google found response")
+		return MetadataCollectorData{}, fmt.Errorf("no time series data found in google found response")
 	}
 
 	if s.timeSeries.Metric != nil {
@@ -92,7 +90,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 		//Do not write metrics labels if it's content is empty
 		for k, v := range metrics {
-			m.Put(LabelMetrics+"."+k, v)
+			_, _ = m.Put(LabelMetrics+"."+k, v)
 		}
 	}
 
@@ -110,13 +108,13 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 		//Do not write resources labels if it's content is empty
 		for k, v := range resources {
-			m.Put(LabelResource+"."+k, v)
+			_, _ = m.Put(LabelResource+"."+k, v)
 		}
 	}
 
 	if s.timeSeries.Metadata != nil {
-		m.Put(LabelSystem, s.timeSeries.Metadata.SystemLabels)
-		m.Put(LabelUserMetadata, s.timeSeries.Metadata.UserLabels)
+		_, _ = m.Put(LabelSystem, s.timeSeries.Metadata.SystemLabels)
+		_, _ = m.Put(LabelUserMetadata, s.timeSeries.Metadata.UserLabels)
 	}
 
 	return MetadataCollectorData{
@@ -127,62 +125,64 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 // ID returns a unique generated ID for an event when no service is implemented to get a "better" ID.`El trickerionEl trickerion
 func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *MetadataCollectorInputData) (string, error) {
-	m := common.MapStr{
+	m := mapstr.M{
 		KeyTimestamp: in.Timestamp.UnixNano(),
 	}
 
 	if s.timeSeries == nil {
-		return "", errors.New("no data found on the time series")
+		return "", fmt.Errorf("no data found on the time series")
 	}
 
 	if s.timeSeries.Metric != nil {
 		if s.timeSeries.Metric.Type != "" {
-			m.Put("metric.type", s.timeSeries.Metric.Type)
+			_, _ = m.Put("metric.type", s.timeSeries.Metric.Type)
 		}
 
 		if s.timeSeries.Metric.Labels != nil {
-			m.Put("metric.labels", s.timeSeries.Metric.Labels)
+			_, _ = m.Put("metric.labels", s.timeSeries.Metric.Labels)
 		}
 	}
 
 	if s.timeSeries.Resource != nil {
 		if s.timeSeries.Resource.Type != "" {
-			m.Put("resource.type", s.timeSeries.Resource.Type)
+			_, _ = m.Put("resource.type", s.timeSeries.Resource.Type)
 		}
 
 		if s.timeSeries.Resource.Labels != nil {
-			m.Put("resource.labels", s.timeSeries.Resource.Labels)
+			_, _ = m.Put("resource.labels", s.timeSeries.Resource.Labels)
 		}
 	}
 
 	if s.timeSeries.Metadata != nil {
 		if s.timeSeries.Metadata.SystemLabels != nil {
-			m.Put("metadata.system.labels", s.timeSeries.Metadata.SystemLabels)
+			_, _ = m.Put("metadata.system.labels", s.timeSeries.Metadata.SystemLabels)
 		}
 		if s.timeSeries.Metadata.UserLabels != nil {
-			m.Put("metadata.user.labels", s.timeSeries.Metadata.UserLabels)
+			_, _ = m.Put("metadata.user.labels", s.timeSeries.Metadata.UserLabels)
 		}
 	}
 
 	return m.String(), nil
 }
 
+/*
 func (s *StackdriverTimeSeriesMetadataCollector) getTimestamp(p *monitoringpb.Point) (t time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p != nil && p.Interval != nil {
-		if t, err = ptypes.Timestamp(p.Interval.StartTime); err != nil {
-			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.StartTime)
-		}
+		return p.Interval.StartTime.AsTime(), nil
 	}
 
-	return time.Time{}, errors.New("error trying to extract the timestamp from the point data")
+	return time.Time{}, fmt.Errorf("error trying to extract the timestamp from the point data")
 }
+*/
 
-func getRegionName(availabilityZone string) (region string) {
+func getRegionName(availabilityZone string) string {
 	azSplit := strings.Split(availabilityZone, "-")
 	if len(azSplit) != 3 {
 		return ""
 	}
-	region = azSplit[0] + "-" + azSplit[1]
-	return
+
+	region := azSplit[0] + "-" + azSplit[1]
+
+	return region
 }

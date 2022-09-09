@@ -3,9 +3,15 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: kibana
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/kibana/_meta/docs.asciidoc
+
 
 [[metricbeat-module-kibana]]
 == Kibana module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 The `kibana` module collects metrics about {kib}.
 
@@ -27,6 +33,8 @@ monitoring index instead of the default index typically used by {metricbeat}.
 For more details about the monitoring index, see
 {ref}/config-monitoring-indices.html[Configuring indices for monitoring].
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -57,11 +65,27 @@ It also supports the options described in <<module-http-config-options>>.
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kibana-cluster_actions,cluster_actions>>
+
+* <<metricbeat-metricset-kibana-cluster_rules,cluster_rules>>
+
+* <<metricbeat-metricset-kibana-node_actions,node_actions>>
+
+* <<metricbeat-metricset-kibana-node_rules,node_rules>>
+
 * <<metricbeat-metricset-kibana-settings,settings>>
 
 * <<metricbeat-metricset-kibana-stats,stats>>
 
 * <<metricbeat-metricset-kibana-status,status>>
+
+include::kibana/cluster_actions.asciidoc[]
+
+include::kibana/cluster_rules.asciidoc[]
+
+include::kibana/node_actions.asciidoc[]
+
+include::kibana/node_rules.asciidoc[]
 
 include::kibana/settings.asciidoc[]
 
@@ -69,3 +93,4 @@ include::kibana/stats.asciidoc[]
 
 include::kibana/status.asciidoc[]
 
+:edit_url!:

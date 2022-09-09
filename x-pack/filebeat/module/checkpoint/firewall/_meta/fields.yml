@@ -76,6 +76,11 @@
       description: >
         Override application ID.
 
+    - name: identity_src
+      type: keyword
+      description: >
+        The source for authentication identity information.
+
     - name: information
       type: keyword
       overwrite: true
@@ -423,6 +428,11 @@
       overwrite: true
       description: >
         Risk level we got from the engine.
+
+    - name: roles
+      type: keyword
+      description: >
+        The role of identity.
 
     - name: observable_name
       type: keyword
@@ -1888,6 +1898,11 @@
       description: >
         Reports whether watermark is added to the cleaned file.
 
+    - name: snid
+      type: keyword
+      description: >
+        The Check Point session ID.
+
     - name: source_object
       type: keyword
       overwrite: true
@@ -2206,6 +2221,11 @@
       description: >
         Password authentication protocol used (PAP or EAP).
 
+    - name: auth_status
+      type: keyword
+      description: >
+        The authentication status for an event.
+
     - name: machine
       type: keyword
       overwrite: true
@@ -2421,3 +2441,19 @@
       overwrite: true
       description: >
         In case of phishing event, the domain, which the attacker was impersonating.
+
+    - name: comment
+      type: keyword
+
+    - name: conn_direction
+      type: keyword
+      description: Connection direction
+
+    - name: db_ver
+      type: keyword
+      description: Database version
+
+    - name: update_status
+      type: keyword
+      overwrite: true
+      description: Status of database update

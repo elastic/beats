@@ -2,10 +2,14 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package source
 
 import (
 	"archive/zip"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -15,8 +19,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type ZipURLSource struct {
@@ -36,7 +40,7 @@ type ZipURLSource struct {
 	httpClient *http.Client
 }
 
-var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
+var ErrNoEtag = fmt.Errorf("no ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
 
 func (z *ZipURLSource) Validate() (err error) {
 	if z.httpClient == nil {
@@ -59,7 +63,7 @@ func (z *ZipURLSource) Fetch() error {
 		os.RemoveAll(z.TargetDirectory)
 	}
 
-	tf, err := ioutil.TempFile("/tmp", "elastic-synthetics-zip-")
+	tf, err := ioutil.TempFile(os.TempDir(), "elastic-synthetics-zip-")
 	if err != nil {
 		return fmt.Errorf("could not create tmpfile for zip source: %w", err)
 	}
@@ -73,9 +77,12 @@ func (z *ZipURLSource) Fetch() error {
 	z.etag = newEtag
 
 	if z.TargetDirectory != "" {
-		os.MkdirAll(z.TargetDirectory, 0755)
+		err := os.MkdirAll(z.TargetDirectory, 0755)
+		if err != nil {
+			return fmt.Errorf("could not make directory %s: %w", z.TargetDirectory, err)
+		}
 	} else {
-		z.TargetDirectory, err = ioutil.TempDir("/tmp", "elastic-synthetics-unzip-")
+		z.TargetDirectory, err = ioutil.TempDir(os.TempDir(), "elastic-synthetics-unzip-")
 		if err != nil {
 			return fmt.Errorf("could not make temp dir for zip download: %w", err)
 		}
@@ -91,7 +98,7 @@ func (z *ZipURLSource) Fetch() error {
 	if !Offline() {
 		err = setupOnlineDir(z.TargetDirectory)
 		if err != nil {
-			os.RemoveAll(z.TargetDirectory)
+			z.Close()
 			return fmt.Errorf("failed to install dependencies at: '%s' %w", z.TargetDirectory, err)
 		}
 	}
@@ -100,15 +107,11 @@ func (z *ZipURLSource) Fetch() error {
 }
 
 func unzip(tf *os.File, targetDir string, folder string) error {
-	stat, err := tf.Stat()
+	rdr, err := zip.OpenReader(tf.Name())
 	if err != nil {
 		return err
 	}
-
-	rdr, err := zip.NewReader(tf, stat.Size())
-	if err != nil {
-		return fmt.Errorf("could not read file %s as zip: %w", tf.Name(), err)
-	}
+	defer rdr.Close()
 
 	for _, f := range rdr.File {
 		err = unzipFile(targetDir, folder, f)
@@ -123,24 +126,45 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 	return nil
 }
 
+func sanitizeFilePath(filePath string, workdir string) (string, error) {
+	destPath := filepath.Join(workdir, filePath)
+	if !strings.HasPrefix(destPath, filepath.Clean(workdir)+string(os.PathSeparator)) {
+		return filePath, fmt.Errorf("failed to extract illegal file path: %s", filePath)
+	}
+	return destPath, nil
+}
+
+// unzip file takes a given directory and a zipped file and extracts
+// all the contents of the file based on the provided folder path,
+// if the folder path is empty, it extracts the contents based on file
+// tree structure
 func unzipFile(workdir string, folder string, f *zip.File) error {
-	folderPaths := strings.Split(folder, string(filepath.Separator))
-	var folderDepth = 1
-	for _, path := range folderPaths {
-		if path != "" {
-			folderDepth++
+	var destPath string
+	var err error
+	if folder != "" {
+		folderPaths := strings.Split(folder, string(filepath.Separator))
+		var folderDepth = 1
+		for _, path := range folderPaths {
+			if path != "" {
+				folderDepth++
+			}
+		}
+		splitZipFileName := strings.Split(f.Name, string(filepath.Separator))
+		root := splitZipFileName[0]
+
+		prefix := filepath.Join(root, folder)
+		if !strings.HasPrefix(f.Name, prefix) {
+			return nil
+		}
+
+		sansFolder := splitZipFileName[folderDepth:]
+		destPath = filepath.Join(workdir, filepath.Join(sansFolder...))
+	} else {
+		destPath, err = sanitizeFilePath(f.Name, workdir)
+		if err != nil {
+			return err
 		}
 	}
-	splitZipFileName := strings.Split(f.Name, string(filepath.Separator))
-	root := splitZipFileName[0]
-
-	prefix := filepath.Join(root, folder)
-	if !strings.HasPrefix(f.Name, prefix) {
-		return nil
-	}
-
-	sansFolder := splitZipFileName[folderDepth:]
-	destPath := filepath.Join(workdir, filepath.Join(sansFolder...))
 
 	// Never unpack node modules
 	if strings.HasPrefix(destPath, "node_modules/") {
@@ -155,6 +179,17 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 		return nil
 	}
 
+	// In the case of project monitors, the destPath would be the direct
+	// file path instead of directory, so we create the directory
+	// if its not set up properly
+	destDir := filepath.Dir(destPath)
+	if _, err := os.Stat(destDir); os.IsNotExist(err) {
+		err = os.MkdirAll(destDir, 0700) // Create your file
+		if err != nil {
+			return fmt.Errorf("could not make dest zip dir '%s': %w", destDir, err)
+		}
+	}
+
 	dest, err := os.Create(destPath)
 	if err != nil {
 		return fmt.Errorf("could not create dest file for zip '%s': %w", destPath, err)
@@ -167,6 +202,8 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 	}
 	defer rdr.Close()
 
+	// Cap decompression to a max of 2GiB to prevent decompression bombs
+	//nolint:gosec // zip bomb possibility, but user controls the zip, so it would only impact them
 	_, err = io.Copy(dest, rdr)
 	if err != nil {
 		return err
@@ -199,7 +236,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 }
 
 func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
-	req, err := http.NewRequest(method, z.URL, nil)
+	req, err := http.NewRequestWithContext(context.TODO(), method, z.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not issue request to: %s %w", z.URL, err)
 	}
@@ -221,9 +258,12 @@ func download(z *ZipURLSource, tf *os.File) (etag string, err error) {
 		return "", ErrNoEtag
 	}
 
-	io.Copy(tf, resp.Body)
+	_, err = io.Copy(tf, resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("could not copy resp body: %w", err)
+	}
 
-	return
+	return etag, nil
 }
 
 func checkIfChanged(z *ZipURLSource) (bool, error) {

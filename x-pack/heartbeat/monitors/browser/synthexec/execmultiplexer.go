@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package synthexec
 
@@ -23,7 +25,7 @@ func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 		return
 	}
 
-	if se.Type == "journey/start" {
+	if se.Type == JourneyStart {
 		e.eventCounter.Store(-1)
 	}
 	se.index = e.eventCounter.Inc()

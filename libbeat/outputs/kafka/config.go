@@ -27,21 +27,26 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type backoffConfig struct {
 	Init time.Duration `config:"init"`
 	Max  time.Duration `config:"max"`
+}
+
+type header struct {
+	Key   string `config:"key"`
+	Value string `config:"value"`
 }
 
 type kafkaConfig struct {
@@ -51,7 +56,7 @@ type kafkaConfig struct {
 	Timeout            time.Duration             `config:"timeout"             validate:"min=1"`
 	Metadata           metaConfig                `config:"metadata"`
 	Key                *fmtstr.EventFormatString `config:"key"`
-	Partition          map[string]*common.Config `config:"partition"`
+	Partition          map[string]*config.C      `config:"partition"`
 	KeepAlive          time.Duration             `config:"keep_alive"          validate:"min=0"`
 	MaxMessageBytes    *int                      `config:"max_message_bytes"   validate:"min=1"`
 	RequiredACKs       *int                      `config:"required_acks"       validate:"min=-1"`
@@ -62,6 +67,7 @@ type kafkaConfig struct {
 	BulkMaxSize        int                       `config:"bulk_max_size"`
 	BulkFlushFrequency time.Duration             `config:"bulk_flush_frequency"`
 	MaxRetries         int                       `config:"max_retries"         validate:"min=-1,nonzero"`
+	Headers            []header                  `config:"headers"`
 	Backoff            backoffConfig             `config:"backoff"`
 	ClientID           string                    `config:"client_id"`
 	ChanBufferSize     int                       `config:"channel_buffer_size" validate:"min=1"`
@@ -125,6 +131,7 @@ func defaultConfig() kafkaConfig {
 		CompressionLevel: 4,
 		Version:          kafka.Version("1.0.0"),
 		MaxRetries:       3,
+		Headers:          nil,
 		Backoff: backoffConfig{
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
@@ -136,7 +143,7 @@ func defaultConfig() kafkaConfig {
 	}
 }
 
-func readConfig(cfg *common.Config) (*kafkaConfig, error) {
+func readConfig(cfg *config.C) (*kafkaConfig, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err

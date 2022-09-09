@@ -75,7 +75,8 @@ func TestWriteTimedFlush(t *testing.T) {
 		return
 	}
 
-	cp, err := NewCheckpoint(file, time.Second)
+	const timeout = 5 * time.Second
+	cp, err := NewCheckpoint(file, timeout)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,12 +84,14 @@ func TestWriteTimedFlush(t *testing.T) {
 
 	// Send update then wait longer than the flush interval and it should be
 	// on disk.
+	start := time.Now()
 	cp.Persist("App", 1, time.Now(), "")
 	eventually(t, func() (bool, error) {
 		ps, err := cp.read()
 		return ps != nil && len(ps.States) > 0, err
-	}, time.Second*15)
-
+	}, 3*timeout)
+	took := time.Since(start)
+	assert.True(t, took >= timeout)
 	ps, err := cp.read()
 	if err != nil {
 		t.Fatal("read failed", err)
@@ -132,7 +135,7 @@ func TestCreateDir(t *testing.T) {
 		fileInfo, err := os.Stat(stateDir)
 		if assert.NoError(t, err) {
 			assert.Equal(t, true, fileInfo.IsDir())
-			assert.Equal(t, os.FileMode(0750), fileInfo.Mode().Perm())
+			assert.Equal(t, os.FileMode(0o750), fileInfo.Mode().Perm())
 		}
 	}
 }

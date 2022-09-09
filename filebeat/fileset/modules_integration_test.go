@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -191,7 +191,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		"multibad": {Enabled: &disabled},
 	}
 	configs := []*ModuleConfig{
-		&ModuleConfig{"foo", &enabled, filesetConfigs},
+		{"foo", &enabled, filesetConfigs},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))

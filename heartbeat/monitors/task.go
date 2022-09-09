@@ -21,31 +21,33 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // configuredJob represents a job combined with its config and any
 // subsequent processors.
 type configuredJob struct {
-	job      jobs.Job
-	config   jobConfig
-	monitor  *Monitor
-	cancelFn context.CancelFunc
-	client   *WrappedClient
+	job       jobs.Job
+	config    jobConfig
+	monitor   *Monitor
+	cancelFn  context.CancelFunc
+	pubClient pipeline.ISyncClient
 }
 
-func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
+func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) *configuredJob {
 	return &configuredJob{
 		job:     job,
 		config:  config,
 		monitor: monitor,
-	}, nil
+	}
 }
 
 // jobConfig represents fields needed to execute a single job.
@@ -65,7 +67,7 @@ func (e ProcessorsError) Error() string {
 
 func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
 	return func(_ context.Context) []scheduler.TaskFunc {
-		return runPublishJob(job, t.client)
+		return runPublishJob(job, t.pubClient)
 	}
 }
 
@@ -74,20 +76,20 @@ func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 }
 
 // Start schedules this configuredJob for execution.
-func (t *configuredJob) Start(client *WrappedClient) {
+func (t *configuredJob) Start(pubClient pipeline.ISyncClient) {
 	var err error
 
-	t.client = client
+	t.pubClient = pubClient
 
 	if err != nil {
-		logp.Err("could not start monitor: %v", err)
+		logp.L().Info("could not start monitor: %v", err)
 		return
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, client.wait)
+	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, pubClient.Wait)
 	if err != nil {
-		logp.Err("could not start monitor: %v", err)
+		logp.L().Info("could not start monitor: %v", err)
 	}
 }
 
@@ -96,19 +98,19 @@ func (t *configuredJob) Stop() {
 	if t.cancelFn != nil {
 		t.cancelFn()
 	}
-	if t.client != nil {
-		t.client.Close()
+	if t.pubClient != nil {
+		_ = t.pubClient.Close()
 	}
 }
 
-func runPublishJob(job jobs.Job, client *WrappedClient) []scheduler.TaskFunc {
+func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient) []scheduler.TaskFunc {
 	event := &beat.Event{
-		Fields: common.MapStr{},
+		Fields: mapstr.M{},
 	}
 
 	conts, err := job(event)
 	if err != nil {
-		logp.Err("Job failed with: %s", err)
+		logp.L().Info("Job failed with: %s", err)
 	}
 
 	hasContinuations := len(conts) > 0
@@ -123,10 +125,10 @@ func runPublishJob(job jobs.Job, client *WrappedClient) []scheduler.TaskFunc {
 				Meta:      event.Meta.Clone(),
 				Fields:    event.Fields.Clone(),
 			}
-			client.Publish(clone)
+			_ = pubClient.Publish(clone)
 		} else {
 			// no clone needed if no continuations
-			client.Publish(*event)
+			_ = pubClient.Publish(*event)
 		}
 	}
 
@@ -142,7 +144,7 @@ func runPublishJob(job jobs.Job, client *WrappedClient) []scheduler.TaskFunc {
 		localCont := cont
 
 		contTasks[i] = func(_ context.Context) []scheduler.TaskFunc {
-			return runPublishJob(localCont, client)
+			return runPublishJob(localCont, pubClient)
 		}
 	}
 	return contTasks

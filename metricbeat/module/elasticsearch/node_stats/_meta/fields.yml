@@ -4,9 +4,50 @@
     Statistics about each node in a Elasticsearch cluster
   release: ga
   fields:
+    - name: ingest
+      type: group
+      fields:
+        - name: total
+          type: group
+          fields:
+            - name: count
+              type: long
+            - name: time_in_millis
+              type: long
+            - name: current
+              type: long
+            - name: failed
+              type: long
     - name: indices
       type: group
       fields:
+        - name: bulk
+          type: group
+          fields:
+            - name: avg_time
+              type: group
+              fields:
+                - name: bytes
+                  type: long
+                - name: ms
+                  type: long
+            - name: total_time
+              type: group
+              fields:
+                - name: ms
+                  type: long
+            - name: total_size
+              type: group
+              fields:
+                - name: bytes
+                  type: long
+            - name: avg_size
+              type: group
+              fields:
+                - name: bytes
+                  type: long
+            - name: operations.total.count
+              type: long
         - name: docs.count
           type: long
           description: >
@@ -266,11 +307,9 @@
                 - name: control_group
                   type: keyword
                 - name: limit.bytes
-                  type: long
-                  format: bytes
+                  type: keyword
                 - name: usage.bytes
-                  type: long
-                  format: bytes
+                  type: keyword
     - name: process.cpu.pct
       type: double
       format: percent
@@ -312,4 +351,51 @@
               type: long
             - name: rejected.count
               type: long
-
+    - name: indexing_pressure
+      type: group
+      fields:
+        - name: memory
+          type: group
+          fields:
+            - name: current.combined_coordinating_and_primary.bytes
+              type: long
+              format: bytes
+            - name: total.primary.rejections
+              type: long
+              format: bytes
+            - name: total.primary.bytes
+              type: long
+              format: bytes
+            - name: total.coordinating.rejections
+              type: long
+              format: bytes
+            - name: total.coordinating.bytes
+              type: long
+              format: bytes
+            - name: total.replica.rejections
+              type: long
+              format: bytes
+            - name: total.replica.bytes
+              type: long
+              format: bytes
+            - name: total.combined_coordinating_and_primary.bytes
+              type: long
+              format: bytes
+            - name: current.coordinating.bytes
+              type: long
+              format: bytes
+            - name: current.primary.bytes
+              type: long
+              format: bytes
+            - name: current.replica.bytes
+              type: long
+              format: bytes
+            - name: current.all.bytes
+              type: long
+              format: bytes
+            - name: total.all.bytes
+              type: long
+              format: bytes
+            - name: limit_in_bytes
+              type: long
+              format: bytes

@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/v2"
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )

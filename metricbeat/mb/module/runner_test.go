@@ -24,10 +24,10 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -35,7 +35,7 @@ import (
 func TestRunner(t *testing.T) {
 	pubClient, factory := newPubClientFactory()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})

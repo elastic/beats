@@ -20,6 +20,9 @@ package state_persistentvolumeclaim
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -37,6 +40,7 @@ type persistentvolumeclaimMetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
+	enricher   util.Enricher
 	mod        k8smod.Module
 }
 
@@ -54,6 +58,7 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.PersistentVolumeClaim{}, mod.GetMetricsRepo(), false),
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 
@@ -80,23 +85,40 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
-func (m *persistentvolumeclaimMetricSet) Fetch(reporter mb.ReporterV2) error {
+func (m *persistentvolumeclaimMetricSet) Fetch(reporter mb.ReporterV2) {
+	m.enricher.Start()
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
-		return err
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 	events, err := m.prometheus.ProcessMetrics(families, m.mapping)
 	if err != nil {
-		return err
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 
+	m.enricher.Enrich(events)
 	for _, event := range events {
-		event[mb.NamespaceKey] = "persistentvolumeclaim"
-		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
-		if !reported {
+
+		e, err := util.CreateEvent(event, "kubernetes.persistentvolumeclaim")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
+			return
 		}
 	}
+
+}
+
+// Close stops this metricset
+func (m *persistentvolumeclaimMetricSet) Close() error {
+	m.enricher.Stop()
 	return nil
 }

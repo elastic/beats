@@ -223,6 +223,51 @@ processors:
       target_field: okta.transaction.type
       ignore_missing: true
       ignore_failure: true
+  - set:
+      field: okta.debug_context.debug_data.flattened
+      copy_from: json.debugContext.debugData
+      ignore_failure: true
+  - json:
+      field: okta.debug_context.debug_data.flattened.logOnlySecurityData
+      ignore_failure: true
+  - dissect:
+      field: okta.debug_context.debug_data.flattened.behaviors
+      pattern: "{%{okta.debug_context.debug_data.flattened.behaviors}}"
+      ignore_missing: true
+      ignore_failure: true
+  - kv:
+      field: okta.debug_context.debug_data.flattened.behaviors
+      field_split: ", "
+      value_split: "="
+      target_field: _behaviors_object
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.behaviors != null
+  - remove:
+      field: okta.debug_context.debug_data.flattened.behaviors
+      if: ctx._behaviors_object != null
+  - rename:
+      field: _behaviors_object
+      target_field: okta.debug_context.debug_data.flattened.behaviors
+      ignore_missing: true
+      ignore_failure: true
+  - dissect:
+      field: okta.debug_context.debug_data.flattened.risk
+      pattern: "{%{okta.debug_context.debug_data.flattened.risk}}"
+      ignore_missing: true
+      ignore_failure: true
+  - kv:
+      field: okta.debug_context.debug_data.flattened.risk
+      field_split: ", "
+      value_split: "="
+      target_field: _risk_object
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+  - remove:
+      field: okta.debug_context.debug_data.flattened.risk
+      if: ctx._risk_object != null
+  - rename:
+      field: _risk_object
+      target_field: okta.debug_context.debug_data.flattened.risk
+      ignore_missing: true
+      ignore_failure: true
   - rename:
       field: json.debugContext.debugData.deviceFingerprint
       target_field: okta.debug_context.debug_data.device_fingerprint
@@ -314,6 +359,14 @@ processors:
       formats:
         - ISO8601
       if: ctx?.json?.debugContext?.debugData?.suspiciousActivityTimestamp != null
+  - set:
+      field: okta.debug_context.debug_data.risk_level
+      value: "{{{okta.debug_context.debug_data.flattened.logOnlySecurityData.risk.level}}}"
+      if: 'ctx.okta?.debug_context?.debug_data?.flattened?.logOnlySecurityData?.risk?.level != null && ctx.okta?.debug_context?.debug_data?.flattened?.logOnlySecurityData?.risk?.level != ""'
+  - set:
+      field: okta.debug_context.debug_data.risk_level
+      value: "{{{okta.debug_context.debug_data.flattened.risk.level}}}"
+      if: 'ctx.okta?.debug_context?.debug_data?.risk_level == null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != ""'
   - rename:
       field: json.authenticationContext.authenticationProvider
       target_field: okta.authentication_context.authentication_provider
@@ -394,10 +447,9 @@ processors:
       target_field: event.action
       type: string
       ignore_failure: true
-  - convert:
-      field: okta.security_context.as.number
-      target_field: client.as.number
-      type: string
+  - set:
+      field: client.as.number
+      copy_from: okta.security_context.as.number
       ignore_failure: true
   - convert:
       field: okta.security_context.as.organization.name

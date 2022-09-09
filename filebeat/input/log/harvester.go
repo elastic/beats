@@ -42,8 +42,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -54,6 +55,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -123,13 +125,12 @@ type harvesterProgressMetrics struct {
 // NewHarvester creates a new harvester
 func NewHarvester(
 	logger *logp.Logger,
-	config *common.Config,
+	config *conf.C,
 	state file.State,
 	states *file.States,
 	publishState func(file.State) bool,
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
-
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, err
@@ -306,7 +307,7 @@ func (h *Harvester) Run() error {
 		}
 	}(h.state.Source)
 
-	logger.Info("Harvester started for file.")
+	logger.Infof("Harvester started for paths: %v", h.config.Paths)
 
 	h.doneWg.Add(1)
 	go func() {
@@ -429,10 +430,10 @@ func (h *Harvester) onMessage(
 		return err == nil
 	}
 
-	fields := common.MapStr{
-		"log": common.MapStr{
+	fields := mapstr.M{
+		"log": mapstr.M{
 			"offset": messageOffset, // Offset here is the offset before the starting char.
-			"file": common.MapStr{
+			"file": mapstr.M{
 				"path": state.Source,
 			},
 		},
@@ -440,12 +441,12 @@ func (h *Harvester) onMessage(
 	fields.DeepUpdate(message.Fields)
 
 	// Check if json fields exist
-	var jsonFields common.MapStr
+	var jsonFields mapstr.M
 	if f, ok := fields["json"]; ok {
-		jsonFields = f.(common.MapStr)
+		jsonFields = f.(mapstr.M)
 	}
 
-	var meta common.MapStr
+	var meta mapstr.M
 	timestamp := message.Ts
 	if h.config.JSON != nil && len(jsonFields) > 0 {
 		id, ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
@@ -456,13 +457,13 @@ func (h *Harvester) onMessage(
 		}
 
 		if id != "" {
-			meta = common.MapStr{
+			meta = mapstr.M{
 				"_id": id,
 			}
 		}
 	} else if &text != nil {
 		if fields == nil {
-			fields = common.MapStr{}
+			fields = mapstr.M{}
 		}
 		fields["message"] = text
 	}

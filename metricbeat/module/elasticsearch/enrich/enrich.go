@@ -22,10 +22,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func init() {
@@ -89,7 +89,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return eventsMapping(r, *info, content, m.XPackEnabled)
 }
 
-func (m *MetricSet) checkEnrichAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {
+func (m *MetricSet) checkEnrichAvailability(currentElasticsearchVersion *version.V) (message string, err error) {
 	isAvailable := elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.EnrichStatsAPIAvailableVersion)
 
 	if !isAvailable {

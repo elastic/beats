@@ -26,10 +26,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type Registrar struct {
@@ -209,7 +209,6 @@ func (r *Registrar) commitStateUpdates() {
 		r.out.Published(r.bufferedStateUpdates)
 	}
 	r.bufferedStateUpdates = 0
-
 }
 
 // onEvents processes events received from the publisher pipeline
@@ -290,7 +289,6 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 		states = append(states, st)
 		return true, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

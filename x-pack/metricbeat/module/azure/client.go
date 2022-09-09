@@ -12,10 +12,9 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Client represents the azure client which will make use of the azure sdk go metrics related clients
@@ -30,7 +29,7 @@ type Client struct {
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
 type mapResourceMetrics func(client *Client, resources []resources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
-// NewClient instantiates the an Azure monitoring client
+// NewClient instantiates the Azure monitoring client
 func NewClient(config Config) (*Client, error) {
 	azureMonitorService, err := NewService(config)
 	if err != nil {
@@ -49,7 +48,7 @@ func NewClient(config Config) (*Client, error) {
 // the mapMetric function sent in this case will handle the mapping part as different metric and aggregation options work for different metricsets
 func (client *Client) InitResources(fn mapResourceMetrics) error {
 	if len(client.Config.Resources) == 0 {
-		return errors.New("no resource options defined")
+		return fmt.Errorf("no resource options defined")
 	}
 	// check if refresh interval has been set and if it has expired
 	if !client.ResourceConfigurations.Expired() {
@@ -62,11 +61,11 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 		// retrieve azure resources information
 		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.Id, resource.Group, resource.Type, resource.Query)
 		if err != nil {
-			err = errors.Wrap(err, "failed to retrieve resources")
+			err = fmt.Errorf("failed to retrieve resources: %w", err)
 			return err
 		}
 		if len(resourceList) == 0 {
-			err = errors.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
+			err = fmt.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
 				resource.Id, resource.Group, resource.Type, resource.Query)
 			client.Log.Error(err)
 			continue
@@ -126,7 +125,7 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 		resp, timegrain, err := client.AzureMonitorService.GetMetricValues(metric.ResourceSubId, metric.Namespace, metric.TimeGrain, timespan, metric.Names,
 			metric.Aggregations, filter)
 		if err != nil {
-			err = errors.Wrapf(err, "error while listing metric values by resource ID %s and namespace  %s", metric.ResourceSubId, metric.Namespace)
+			err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metric.ResourceSubId, metric.Namespace, err)
 			client.Log.Error(err)
 			report.Error(err)
 		} else {

@@ -25,8 +25,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-structform/gotype"
 	"github.com/elastic/go-structform/json"
 )
@@ -65,8 +65,8 @@ type gzipEncoder struct {
 }
 
 type event struct {
-	Timestamp time.Time     `struct:"@timestamp"`
-	Fields    common.MapStr `struct:",inline"`
+	Timestamp time.Time `struct:"@timestamp"`
+	Fields    mapstr.M  `struct:",inline"`
 }
 
 func NewJSONEncoder(buf *bytes.Buffer, escapeHTML bool) *jsonEncoder {

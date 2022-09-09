@@ -23,8 +23,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -36,19 +34,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
-
-	_ "github.com/elastic/beats/v7/filebeat/include"
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
@@ -63,9 +59,7 @@ const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for th
 	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
-var (
-	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
-)
+var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
@@ -85,15 +79,15 @@ type StateStore interface {
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
-	return func(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+	return func(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		return newBeater(b, plugins, rawConfig)
 	}
 }
 
-func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (beat.Beater, error) {
+func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("Error reading config file: %w", err)
 	}
 
 	if err := cfgwarn.CheckRemoved6xSettings(
@@ -132,7 +126,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 
 	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !b.Manager.Enabled() {
 		if !b.InSetupCmd {
-			return nil, errors.New("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
+			return nil, fmt.Errorf("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
 
 		// in the `setup` command, log this only as a warning
@@ -140,7 +134,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 	}
 
 	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
-		return nil, errors.New("input configs and -once cannot be used together")
+		return nil, fmt.Errorf("input configs and -once cannot be used together")
 	}
 
 	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {
@@ -170,7 +164,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	}
 
 	overwritePipelines := true
-	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
+	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return err
@@ -293,7 +287,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	var inputTaskGroup unison.TaskGroup
-	defer inputTaskGroup.Stop()
+	defer func() {
+		_ = inputTaskGroup.Stop()
+	}()
 	if err := v2InputLoader.Init(&inputTaskGroup, v2.ModeRun); err != nil {
 		logp.Err("Failed to initialize the input managers: %v", err)
 		return err
@@ -318,7 +314,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the registrar
 	err = registrar.Start()
 	if err != nil {
-		return fmt.Errorf("Could not start registrar: %v", err)
+		return fmt.Errorf("Could not start registrar: %w", err)
 	}
 
 	// Stopping registrar will write last state
@@ -342,7 +338,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	err = crawler.Start(fb.pipeline, config.ConfigInput, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()
-		return fmt.Errorf("Failed to start crawler: %+v", err)
+		return fmt.Errorf("Failed to start crawler: %w", err)
 	}
 
 	// If run once, add crawler completion check as alternative to done signal
@@ -381,6 +377,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	adiscover.Start()
 
+	// We start the manager when all the subsystem are initialized and ready to received events.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
@@ -411,6 +412,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		}
 	}
 
+	// Stop the manager and stop the connection to any dependent services.
+	b.Manager.Stop()
+
 	return nil
 }
 
@@ -423,11 +427,11 @@ func (fb *Filebeat) Stop() {
 }
 
 // Create a new pipeline loader (es client) factory
-func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
+func newPipelineLoaderFactory(esConfig *conf.C) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
 		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
-			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
+			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err)
 		}
 		return esClient, nil
 	}

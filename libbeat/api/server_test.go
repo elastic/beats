@@ -20,6 +20,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -30,7 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfiguration(t *testing.T) {
@@ -39,7 +40,7 @@ func TestConfiguration(t *testing.T) {
 		return
 	}
 	t.Run("when user is set", func(t *testing.T) {
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host": "unix:///tmp/ok",
 			"user": "admin",
 		})
@@ -49,7 +50,7 @@ func TestConfiguration(t *testing.T) {
 	})
 
 	t.Run("when security descriptor is set", func(t *testing.T) {
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host":                "unix:///tmp/ok",
 			"security_descriptor": "D:P(A;;GA;;;1234)",
 		})
@@ -82,7 +83,7 @@ func TestSocket(t *testing.T) {
 
 		sockFile := tmpDir + "/test.sock"
 
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host": "unix://" + sockFile,
 		})
 
@@ -123,7 +124,7 @@ func TestSocket(t *testing.T) {
 		require.NoError(t, err)
 		f.Close()
 
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host": "unix://" + sockFile,
 		})
 
@@ -158,7 +159,7 @@ func TestHTTP(t *testing.T) {
 	// select a random free port.
 	url := "http://localhost:0"
 
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"host": url,
 	})
 
@@ -183,4 +184,40 @@ func simpleMux() *http.ServeMux {
 		fmt.Fprintf(w, "ehlo!")
 	})
 	return mux
+}
+
+func TestAttachHandler(t *testing.T) {
+	url := "http://localhost:0"
+
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
+		"host": url,
+	})
+
+	s, err := New(nil, simpleMux(), cfg)
+	require.NoError(t, err)
+	go s.Start()
+	defer s.Stop()
+
+	h := &testHandler{}
+
+	err = s.AttachHandler("/test", h)
+	require.NoError(t, err)
+
+	r, err := http.Get("http://" + s.l.Addr().String() + "/test")
+	require.NoError(t, err)
+	defer r.Body.Close()
+
+	body, err := io.ReadAll(r.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, "test!", string(body))
+
+	err = s.AttachHandler("/test", h)
+	assert.NotNil(t, err)
+}
+
+type testHandler struct{}
+
+func (t *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "test!")
 }

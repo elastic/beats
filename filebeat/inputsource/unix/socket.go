@@ -26,7 +26,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func cleanupStaleSocket(path string) error {
@@ -88,7 +88,7 @@ func parseFileMode(mode string) (os.FileMode, error) {
 	if err != nil {
 		return 0, err
 	}
-	if parsed > 0777 {
+	if parsed > 0o777 {
 		return 0, errors.New("invalid file mode")
 	}
 	return os.FileMode(parsed), nil

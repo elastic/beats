@@ -26,9 +26,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type testStateStore struct {
@@ -285,7 +285,6 @@ func (ts testStateStore) snapshot() map[string]state {
 		states[key] = st
 		return true, nil
 	})
-
 	if err != nil {
 		panic("unexpected decode error from persistent test store")
 	}
@@ -333,18 +332,6 @@ func storeInSyncSnapshot(store *store) map[string]state {
 func checkEqualStoreState(t *testing.T, want, got map[string]state) bool {
 	if d := cmp.Diff(want, got); d != "" {
 		t.Errorf("store state mismatch (-want +got):\n%s", d)
-		return false
-	}
-	return true
-}
-
-// requireEqualStoreState compares 2 store snapshot tables for equality. The test
-// fails with Fatalf if the state differ.
-//
-// Note: testify is too strict when comparing timestamp, better use checkEqualStoreState.
-func requireEqualStoreState(t *testing.T, want, got map[string]state) bool {
-	if d := cmp.Diff(want, got); d != "" {
-		t.Fatalf("store state mismatch (-want +got):\n%s", d)
 		return false
 	}
 	return true

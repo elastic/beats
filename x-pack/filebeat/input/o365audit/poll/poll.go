@@ -13,8 +13,8 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Transaction is the interface that wraps a request-response transaction to be
@@ -75,6 +75,7 @@ func (r *Poller) Run(item Transaction) error {
 	}
 	return nil
 }
+
 func (r *Poller) fetch(item Transaction) error {
 	return r.fetchWithDelay(item, r.interval)
 }

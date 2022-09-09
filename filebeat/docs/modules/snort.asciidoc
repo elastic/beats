@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/snort/_meta/docs.asciidoc
+
 [[filebeat-module-snort]]
 [role="xpack"]
 
@@ -11,6 +13,10 @@ This file is generated! See scripts/docs_collector.py
 == Snort module
 
 experimental[]
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This is a module for receiving Snort/Sourcefire logs over Syslog or a file.
 
@@ -77,3 +83,4 @@ will be found under `rsa.raw`. The default is false.
 For a description of each field in the module, see the
 <<exported-fields-snort,exported fields>> section.
 
+:edit_url!:

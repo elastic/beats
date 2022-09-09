@@ -31,11 +31,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 const (
@@ -203,18 +204,18 @@ func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
 	c := newMockClient("")
 	h := ilm.NewFileClientHandler(c)
 	name := "test-policy"
-	body := common.MapStr{"foo": "bar"}
+	body := mapstr.M{"foo": "bar"}
 	h.CreateILMPolicy(ilm.Policy{Name: name, Body: body})
 
 	assert.Equal(t, name, c.name)
 	assert.Equal(t, "policy", c.component)
-	var out common.MapStr
+	var out mapstr.M
 	json.Unmarshal([]byte(c.body), &out)
 	assert.Equal(t, body, out)
 }
 
 type mockClient struct {
-	v                     common.Version
+	v                     libversion.V
 	component, name, body string
 }
 
@@ -222,10 +223,10 @@ func newMockClient(v string) *mockClient {
 	if v == "" {
 		v = version.GetDefaultVersion()
 	}
-	return &mockClient{v: *common.MustNewVersion(v)}
+	return &mockClient{v: *libversion.MustNew(v)}
 }
 
-func (c *mockClient) GetVersion() common.Version {
+func (c *mockClient) GetVersion() libversion.V {
 	return c.v
 }
 

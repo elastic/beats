@@ -1,21 +1,5 @@
 version: '2.3'
 services:
-  beat:
-    build: ${PWD}/.
-    depends_on:
-      - proxy_dep
-    environment:
-      - ES_BEATS=/go/src/github.com/elastic/beats
-      - BEAT_STRICT_PERMS=false
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
-    working_dir: /go/src/github.com/elastic/beats/x-pack/libbeat
-    volumes:
-      - ${PWD}/../..:/go/src/github.com/elastic/beats/
-      # We launch docker containers to test docker autodiscover:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: make
-
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
@@ -35,13 +19,14 @@ services:
       start_period: 60s
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=true"
       - "xpack.license.self_generated.type=trial"
       - "xpack.security.authc.realms.file.file1.order=0"
     command: bash -c "bin/elasticsearch-users useradd myelastic -r superuser -p changeme | /usr/local/bin/docker-entrypoint.sh eswrapper"
+    ports:
+      - 9200:9200
 
   kibana:
     depends_on:

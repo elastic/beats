@@ -12,6 +12,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,17 +21,16 @@ import (
 	"time"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -135,15 +135,15 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	// Request object (download).
 	contentType, meta, body, err := p.download()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get s3 object (elasped_time_ns=%d)",
-			time.Since(start).Nanoseconds())
+		return fmt.Errorf("failed to get s3 object (elapsed_time_ns=%d): %w",
+			time.Since(start).Nanoseconds(), err)
 	}
 	defer body.Close()
 	p.s3Metadata = meta
 
 	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(body, p.metrics.s3BytesProcessedTotal))
 	if err != nil {
-		return errors.Wrap(err, "failed checking for gzip content")
+		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
 
 	// Overwrite with user configured Content-Type.
@@ -153,14 +153,14 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 
 	// Process object content stream.
 	switch {
-	case contentType == contentTypeJSON || contentType == contentTypeNDJSON:
+	case strings.HasPrefix(contentType, contentTypeJSON) || strings.HasPrefix(contentType, contentTypeNDJSON):
 		err = p.readJSON(reader)
 	default:
 		err = p.readFile(reader)
 	}
 	if err != nil {
-		return errors.Wrapf(err, "failed reading s3 object (elasped_time_ns=%d)",
-			time.Since(start).Nanoseconds())
+		return fmt.Errorf("failed reading s3 object (elapsed_time_ns=%d): %w",
+			time.Since(start).Nanoseconds(), err)
 	}
 
 	return nil
@@ -170,22 +170,24 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 // Content-Type and reader to get the object's contents. The caller must
 // close the returned reader.
 func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]interface{}, body io.ReadCloser, err error) {
-	resp, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
-
+	getObjectOutput, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
 	if err != nil {
 		return "", nil, nil, err
 	}
 
-	if resp == nil {
-		return "", nil, nil, errors.New("empty response from s3 get object")
+	if getObjectOutput == nil {
+		return "", nil, nil, fmt.Errorf("empty response from s3 get object: %w", err)
 	}
-	p.s3RequestURL = resp.SDKResponseMetdata().Request.HTTPRequest.URL.String()
+	s3RequestURL := getObjectOutput.ResultMetadata.Get(s3RequestURLMetadataKey)
+	if s3RequestURLAsString, ok := s3RequestURL.(string); ok {
+		p.s3RequestURL = s3RequestURLAsString
+	}
 
-	meta := s3Metadata(resp, p.readerConfig.IncludeS3Metadata...)
-	if resp.ContentType == nil {
-		return "", meta, resp.Body, nil
+	meta := s3Metadata(getObjectOutput, p.readerConfig.IncludeS3Metadata...)
+	if getObjectOutput.ContentType == nil {
+		return "", meta, getObjectOutput.Body, nil
 	}
-	return *resp.ContentType, meta, resp.Body, nil
+	return *getObjectOutput.ContentType, meta, getObjectOutput.Body, nil
 }
 
 func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
@@ -298,7 +300,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			// No more lines
 			break
 		}
@@ -325,25 +327,26 @@ func (p *s3ObjectProcessor) publish(ack *awscommon.EventACKTracker, event *beat.
 func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": message,
-			"log": common.MapStr{
+			"log": mapstr.M{
 				"offset": offset,
-				"file": common.MapStr{
+				"file": mapstr.M{
 					"path": p.s3RequestURL,
 				},
 			},
-			"aws": common.MapStr{
-				"s3": common.MapStr{
-					"bucket": common.MapStr{
+			"aws": mapstr.M{
+				"s3": mapstr.M{
+					"bucket": mapstr.M{
 						"name": p.s3Obj.S3.Bucket.Name,
-						"arn":  p.s3Obj.S3.Bucket.ARN},
-					"object": common.MapStr{
+						"arn":  p.s3Obj.S3.Bucket.ARN,
+					},
+					"object": mapstr.M{
 						"key": p.s3Obj.S3.Object.Key,
 					},
 				},
 			},
-			"cloud": common.MapStr{
+			"cloud": mapstr.M{
 				"provider": p.s3Obj.Provider,
 				"region":   p.s3Obj.AWSRegion,
 			},
@@ -352,7 +355,7 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 	event.SetID(objectID(p.s3ObjHash, offset))
 
 	if len(p.s3Metadata) > 0 {
-		event.Fields.Put("aws.s3.metadata", p.s3Metadata)
+		_, _ = event.Fields.Put("aws.s3.metadata", p.s3Metadata)
 	}
 
 	return event
@@ -386,7 +389,7 @@ func isStreamGzipped(r *bufio.Reader) (bool, error) {
 }
 
 // s3Metadata returns a map containing the selected S3 object metadata keys.
-func s3Metadata(resp *s3.GetObjectResponse, keys ...string) common.MapStr {
+func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 	if len(keys) == 0 {
 		return nil
 	}
@@ -399,8 +402,8 @@ func s3Metadata(resp *s3.GetObjectResponse, keys ...string) common.MapStr {
 	allMeta := map[string]interface{}{}
 
 	// Get headers using AWS SDK struct tags.
-	fields := reflect.TypeOf(resp.GetObjectOutput).Elem()
-	values := reflect.ValueOf(resp.GetObjectOutput).Elem()
+	fields := reflect.TypeOf(resp).Elem()
+	values := reflect.ValueOf(resp).Elem()
 	for i := 0; i < fields.NumField(); i++ {
 		f := fields.Field(i)
 
@@ -441,7 +444,7 @@ func s3Metadata(resp *s3.GetObjectResponse, keys ...string) common.MapStr {
 	}
 
 	// Select the matching headers from the config.
-	metadata := common.MapStr{}
+	metadata := mapstr.M{}
 	for _, key := range keys {
 		key = strings.ToLower(key)
 

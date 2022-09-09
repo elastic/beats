@@ -22,15 +22,14 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -155,8 +154,8 @@ func (user User) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (user User) toMapStr() common.MapStr {
-	evt := common.MapStr{
+func (user User) toMapStr() mapstr.M {
+	evt := mapstr.M{
 		"name":  user.Name,
 		"uid":   user.UID,
 		"gid":   user.GID,
@@ -177,9 +176,9 @@ func (user User) toMapStr() common.MapStr {
 	}
 
 	if len(user.Groups) > 0 {
-		var groupMapStr []common.MapStr
+		var groupMapStr []mapstr.M
 		for _, group := range user.Groups {
-			groupMapStr = append(groupMapStr, common.MapStr{
+			groupMapStr = append(groupMapStr, mapstr.M{
 				"name": group.Name,
 				"gid":  group.Gid,
 				"id":   group.Gid,
@@ -237,12 +236,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open persistent datastore")
+		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
 
 	ms := &MetricSet{
@@ -278,7 +277,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Load from disk: Users
 	users, err := ms.restoreUsersFromDisk()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to restore users from disk")
+		return nil, fmt.Errorf("failed to restore users from disk: %w", err)
 	}
 	ms.log.Debugf("Restored %d users from disk", len(users))
 
@@ -322,14 +321,14 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 	users, err := GetUsers(ms.config.DetectPasswordChanges)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "error while getting users"))
+		errs = append(errs, fmt.Errorf("error while getting users: %w", err))
 	}
 
 	ms.log.Debugf("Found %v users", len(users))
 	if len(users) > 0 {
 		stateID, err := uuid.NewV4()
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "error generating state ID"))
+			errs = append(errs, fmt.Errorf("error generating state ID: %w", err))
 		}
 
 		for _, user := range users {
@@ -350,7 +349,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		} else {
 			err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
 			if err != nil {
-				errs = append(errs, errors.Wrap(err, "error writing state timestamp to disk"))
+				errs = append(errs, fmt.Errorf("error writing state timestamp to disk: %w", err))
 			}
 		}
 
@@ -383,7 +382,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 	users, err := GetUsers(ms.config.DetectPasswordChanges)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "error while getting users"))
+		errs = append(errs, fmt.Errorf("error while getting users: %w", err))
 	}
 	ms.log.Debugf("Found %v users", len(users))
 
@@ -456,18 +455,18 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"iam"},
 				"type":     []string{action.Type()},
 				"action":   action.String(),
 			},
-			"user": common.MapStr{
+			"user": mapstr.M{
 				"id":   user.UID,
 				"name": user.Name,
 			},
-			"related": common.MapStr{
+			"related": mapstr.M{
 				"user": []string{user.Name},
 			},
 			"message": userMessage(user, action),
@@ -481,12 +480,12 @@ func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction)
 
 	primaryGroup := user.PrimaryGroup()
 	if primaryGroup != nil {
-		event.RootFields.Put("user.group", common.MapStr{
+		event.RootFields.Put("user.group", mapstr.M{
 			"id":   primaryGroup.Gid,
 			"name": primaryGroup.Name,
 		})
 	} else if user.GID != "" { // fallback to just filling out the GID
-		event.RootFields.Put("user.group", common.MapStr{
+		event.RootFields.Put("user.group", mapstr.M{
 			"id": user.GID,
 		})
 	}
@@ -561,7 +560,7 @@ func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
 				// Read all users
 				break
 			} else {
-				return nil, errors.Wrap(err, "error decoding users")
+				return nil, fmt.Errorf("error decoding users: %w", err)
 			}
 		}
 	}
@@ -577,13 +576,13 @@ func (ms *MetricSet) saveUsersToDisk(users []*User) error {
 	for _, user := range users {
 		err := encoder.Encode(*user)
 		if err != nil {
-			return errors.Wrap(err, "error encoding users")
+			return fmt.Errorf("error encoding users: %w", err)
 		}
 	}
 
 	err := ms.bucket.Store(bucketKeyUsers, buf.Bytes())
 	if err != nil {
-		return errors.Wrap(err, "error writing users to disk")
+		return fmt.Errorf("error writing users to disk: %w", err)
 	}
 	return nil
 }
@@ -593,7 +592,7 @@ func (ms *MetricSet) haveFilesChanged() (bool, error) {
 	var stats syscall.Stat_t
 	for _, path := range ms.userFiles {
 		if err := syscall.Stat(path, &stats); err != nil {
-			return true, errors.Wrapf(err, "failed to stat %v", path)
+			return true, fmt.Errorf("failed to stat %v: %w", path, err)
 		}
 
 		ctime := time.Unix(int64(stats.Ctim.Sec), int64(stats.Ctim.Nsec))

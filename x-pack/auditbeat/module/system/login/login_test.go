@@ -21,8 +21,8 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -97,7 +97,7 @@ func TestWtmp(t *testing.T) {
 		"Timestamp is not equal: %+v", events[0].Timestamp)
 
 	// Append logout event to wtmp file and check that it's read
-	wtmpFile, err := os.OpenFile(wtmpFilepath, os.O_APPEND|os.O_WRONLY, 0644)
+	wtmpFile, err := os.OpenFile(wtmpFilepath, os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
 		t.Fatalf("error opening %v: %v", wtmpFilepath, err)
 	}
@@ -255,7 +255,7 @@ func TestBtmp(t *testing.T) {
 		"Timestamp is not equal: %+v", events[3].Timestamp)
 }
 
-func checkFieldValue(t *testing.T, mapstr common.MapStr, fieldName string, fieldValue interface{}) {
+func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue interface{}) {
 	value, err := mapstr.GetValue(fieldName)
 	if assert.NoError(t, err) {
 		switch v := value.(type) {
@@ -264,7 +264,6 @@ func checkFieldValue(t *testing.T, mapstr common.MapStr, fieldName string, field
 		default:
 			assert.Equal(t, fieldValue, v)
 		}
-
 	}
 }
 

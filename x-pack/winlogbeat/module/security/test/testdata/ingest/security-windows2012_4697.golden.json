@@ -1,0 +1,81 @@
+[
+  {
+    "@timestamp": "2020-04-02T14:34:08.8896056Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "service-installed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": "4697",
+      "ingested": "2022-06-08T06:21:08.156998700Z",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A service was installed in the system.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4C323\n\nService Information:\n\tService Name: \t\twinlogbeat\n\tService File Name:\t\"C:\\Program Files\\Winlogbeat\\winlogbeat.exe\" -c \"C:\\Program Files\\Winlogbeat\\winlogbeat.yml\" -path.home \"C:\\Program Files\\Winlogbeat\" -path.data \"C:\\ProgramData\\winlogbeat\" -path.logs \"C:\\ProgramData\\winlogbeat\\logs\" -E logging.files.redirect_stderr=true\n\tService Type: \t\t0x10\n\tService Start Type:\t2\n\tService Account: \t\tLocalSystem",
+    "related": {
+      "user": [
+        "Administrator"
+      ]
+    },
+    "service": {
+      "name": "winlogbeat",
+      "type": "Win32 Own Process"
+    },
+    "user": {
+      "domain": "WLBEAT",
+      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
+      "name": "Administrator"
+    },
+    "winlog": {
+      "activity_id": "{74b64d41-08ce-0000-454f-b674ce08d601}",
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
+      "event_data": {
+        "ServiceAccount": "LocalSystem",
+        "ServiceFileName": "\"C:\\Program Files\\Winlogbeat\\winlogbeat.exe\" -c \"C:\\Program Files\\Winlogbeat\\winlogbeat.yml\" -path.home \"C:\\Program Files\\Winlogbeat\" -path.data \"C:\\ProgramData\\winlogbeat\" -path.logs \"C:\\ProgramData\\winlogbeat\\logs\" -E logging.files.redirect_stderr=true",
+        "ServiceName": "winlogbeat",
+        "ServiceStartType": "2",
+        "ServiceType": "0x10",
+        "SubjectDomainName": "WLBEAT",
+        "SubjectLogonId": "0x4c323",
+        "SubjectUserName": "Administrator",
+        "SubjectUserSid": "S-1-5-21-101361758-2486510592-3018839910-500"
+      },
+      "event_id": "4697",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x4c323"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 792,
+        "thread": {
+          "id": 2492
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "90108",
+      "task": "Security System Extension"
+    }
+  }
+]

@@ -23,15 +23,14 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -137,47 +136,47 @@ func (pkg Package) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
-	mapstr := common.MapStr{
+func (pkg Package) toMapStr() (mapstr.M, mapstr.M) {
+	mapStr := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
-	ecsMapstr := common.MapStr{
+	ecsMapstr := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
 
 	if pkg.Release != "" {
-		mapstr.Put("release", pkg.Release)
+		mapStr.Put("release", pkg.Release)
 	}
 
 	if pkg.Arch != "" {
-		mapstr.Put("arch", pkg.Arch)
+		mapStr.Put("arch", pkg.Arch)
 		ecsMapstr.Put("architecture", pkg.License)
 	}
 
 	if pkg.License != "" {
-		mapstr.Put("license", pkg.License)
+		mapStr.Put("license", pkg.License)
 		ecsMapstr.Put("license", pkg.License)
 	}
 
 	if !pkg.InstallTime.IsZero() {
-		mapstr.Put("installtime", pkg.InstallTime)
+		mapStr.Put("installtime", pkg.InstallTime)
 		ecsMapstr.Put("installed", pkg.InstallTime)
 	}
 
 	if pkg.Size != 0 {
-		mapstr.Put("size", pkg.Size)
+		mapStr.Put("size", pkg.Size)
 		ecsMapstr.Put("size", pkg.Size)
 	}
 
 	if pkg.Summary != "" {
-		mapstr.Put("summary", pkg.Summary)
+		mapStr.Put("summary", pkg.Summary)
 		ecsMapstr.Put("description", pkg.Summary)
 	}
 
 	if pkg.URL != "" {
-		mapstr.Put("url", pkg.URL)
+		mapStr.Put("url", pkg.URL)
 		ecsMapstr.Put("reference", pkg.URL)
 	}
 
@@ -185,7 +184,7 @@ func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
 		ecsMapstr.Put("type", pkg.Type)
 	}
 
-	return mapstr, ecsMapstr
+	return mapStr, ecsMapstr
 }
 
 // entityID creates an ID that uniquely identifies this package across machines.
@@ -203,12 +202,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open persistent datastore")
+		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
 
 	ms := &MetricSet{
@@ -238,7 +237,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Load from disk: Packages
 	packages, err := ms.restorePackagesFromDisk()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to restore packages from disk")
+		return nil, fmt.Errorf("failed to restore packages from disk: %w", err)
 	}
 	ms.log.Debugf("Restored %d packages from disk", len(packages))
 
@@ -286,12 +285,12 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 	packages, err := ms.getPackages()
 	if err != nil {
-		return errors.Wrap(err, "failed to get packages")
+		return fmt.Errorf("failed to get packages: %w", err)
 	}
 
 	stateID, err := uuid.NewV4()
 	if err != nil {
-		return errors.Wrap(err, "error generating state ID")
+		return fmt.Errorf("error generating state ID: %w", err)
 	}
 	for _, pkg := range packages {
 		event := ms.packageEvent(pkg, eventTypeState, eventActionExistingPackage)
@@ -309,7 +308,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	}
 	err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
 	if err != nil {
-		return errors.Wrap(err, "error writing state timestamp to disk")
+		return fmt.Errorf("error writing state timestamp to disk: %w", err)
 	}
 
 	return ms.savePackagesToDisk(packages)
@@ -319,7 +318,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	packages, err := ms.getPackages()
 	if err != nil {
-		return errors.Wrap(err, "failed to get packages")
+		return fmt.Errorf("failed to get packages: %w", err)
 	}
 
 	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
@@ -374,8 +373,8 @@ func convertToPackage(cacheValues []interface{}) []*Package {
 func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
 	pkgFields, ecsPkgFields := pkg.toMapStr()
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"package"},
 				"type":     []string{action.Type()},
@@ -449,7 +448,7 @@ func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) 
 				// Read all packages
 				break
 			} else {
-				return nil, errors.Wrap(err, "error decoding packages")
+				return nil, fmt.Errorf("error decoding packages: %w", err)
 			}
 		}
 	}
@@ -465,13 +464,13 @@ func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
 	for _, pkg := range packages {
 		err := encoder.Encode(*pkg)
 		if err != nil {
-			return errors.Wrap(err, "error encoding packages")
+			return fmt.Errorf("error encoding packages: %w", err)
 		}
 	}
 
 	err := ms.bucket.Store(bucketKeyPackages, buf.Bytes())
 	if err != nil {
-		return errors.Wrap(err, "error writing packages to disk")
+		return fmt.Errorf("error writing packages to disk: %w", err)
 	}
 	return nil
 }
@@ -485,13 +484,13 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 
 		rpmPackages, err := listRPMPackages()
 		if err != nil {
-			return nil, errors.Wrap(err, "error getting RPM packages")
+			return nil, fmt.Errorf("error getting RPM packages: %w", err)
 		}
 		ms.log.Debugf("RPM packages: %v", len(rpmPackages))
 
 		packages = append(packages, rpmPackages...)
 	} else if err != nil && !os.IsNotExist(err) {
-		return nil, errors.Wrapf(err, "error opening %v", rpmPath)
+		return nil, fmt.Errorf("error opening %v: %w", rpmPath, err)
 	}
 
 	_, err = os.Stat(dpkgPath)
@@ -500,13 +499,13 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 
 		dpkgPackages, err := ms.listDebPackages()
 		if err != nil {
-			return nil, errors.Wrap(err, "error getting DEB packages")
+			return nil, fmt.Errorf("error getting DEB packages: %w", err)
 		}
 		ms.log.Debugf("DEB packages: %v", len(dpkgPackages))
 
 		packages = append(packages, dpkgPackages...)
 	} else if err != nil && !os.IsNotExist(err) {
-		return nil, errors.Wrapf(err, "error opening %v", dpkgPath)
+		return nil, fmt.Errorf("error opening %v: %w", dpkgPath, err)
 	}
 
 	_, err = os.Stat(homebrewCellarPath)
@@ -515,13 +514,13 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 
 		homebrewPackages, err := listBrewPackages()
 		if err != nil {
-			return nil, errors.Wrap(err, "error getting Homebrew packages")
+			return nil, fmt.Errorf("error getting Homebrew packages: %w", err)
 		}
 		ms.log.Debugf("Homebrew packages: %v", len(homebrewPackages))
 
 		packages = append(packages, homebrewPackages...)
 	} else if err != nil && !os.IsNotExist(err) {
-		return nil, errors.Wrapf(err, "error opening %v", homebrewCellarPath)
+		return nil, fmt.Errorf("error opening %v: %w", homebrewCellarPath, err)
 	}
 
 	if !foundPackageManager && !ms.suppressNoPackageWarnings {
@@ -540,7 +539,7 @@ func (ms *MetricSet) listDebPackages() ([]*Package, error) {
 
 	file, err := os.Open(dpkgStatusFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error opening %s", dpkgStatusFile)
+		return nil, fmt.Errorf("error opening %s: %w", dpkgStatusFile, err)
 	}
 	defer file.Close()
 
@@ -611,7 +610,7 @@ func (ms *MetricSet) listDebPackages() ([]*Package, error) {
 	}
 
 	if err = scanner.Err(); err != nil {
-		return nil, errors.Wrapf(err, "error scanning file %v", dpkgStatusFile)
+		return nil, fmt.Errorf("error scanning file %v: %w", dpkgStatusFile, err)
 	}
 
 	// Append last package if file ends without newline

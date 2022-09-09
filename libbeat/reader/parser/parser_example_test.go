@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type inputParsersConfig struct {
@@ -104,7 +104,7 @@ func TestParsersExampleInline(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.parsers)
+			cfg := config.MustNewConfigFrom(test.parsers)
 			var c inputParsersConfig
 			err := cfg.Unpack(&c)
 			require.NoError(t, err)

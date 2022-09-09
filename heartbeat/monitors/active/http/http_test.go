@@ -42,13 +42,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
@@ -72,13 +74,11 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 		configSrc["hosts"] = testURL
 	}
 
-	if extraConfig != nil {
-		for k, v := range extraConfig {
-			configSrc[k] = v
-		}
+	for k, v := range extraConfig {
+		configSrc[k] = v
 	}
 
-	config, err := common.NewConfigFrom(configSrc)
+	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
 	p, err := create("tls", config)
@@ -125,11 +125,11 @@ func respondingHTTPStatusAndTimingChecks(statusCode int) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"http": map[string]interface{}{
 			"response.status_code":   statusCode,
-			"rtt.content.us":         isdef.IsDuration,
-			"rtt.response_header.us": isdef.IsDuration,
-			"rtt.total.us":           isdef.IsDuration,
-			"rtt.validate.us":        isdef.IsDuration,
-			"rtt.write_request.us":   isdef.IsDuration,
+			"rtt.content.us":         hbtestllext.IsInt64,
+			"rtt.response_header.us": hbtestllext.IsInt64,
+			"rtt.total.us":           hbtestllext.IsInt64,
+			"rtt.validate.us":        hbtestllext.IsInt64,
+			"rtt.write_request.us":   hbtestllext.IsInt64,
 		},
 	})
 }
@@ -142,7 +142,7 @@ func minimalRespondingHTTPChecks(url, mimeType string, statusCode int) validator
 			"http": map[string]interface{}{
 				"response.mime_type":   mimeType,
 				"response.status_code": statusCode,
-				"rtt.total.us":         isdef.IsDuration,
+				"rtt.total.us":         hbtestllext.IsInt64,
 			},
 		}),
 	)
@@ -318,7 +318,7 @@ func TestLargeResponse(t *testing.T) {
 		"check.response.body": "x",
 	}
 
-	config, err := common.NewConfigFrom(configSrc)
+	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
 	p, err := create("largeresp", config)
@@ -348,7 +348,7 @@ func TestJsonBody(t *testing.T) {
 		name                string
 		responseBody        string
 		expression          string
-		condition           common.MapStr
+		condition           mapstr.M
 		expectedErrMsg      string
 		expectedContentType string
 	}
@@ -374,8 +374,8 @@ func TestJsonBody(t *testing.T) {
 			"simple condition match",
 			"{\"foo\": \"bar\"}",
 			"",
-			common.MapStr{
-				"equals": common.MapStr{"foo": "bar"},
+			mapstr.M{
+				"equals": mapstr.M{"foo": "bar"},
 			},
 			"",
 			"application/json",
@@ -384,8 +384,8 @@ func TestJsonBody(t *testing.T) {
 			"condition mismatch",
 			"{\"foo\": \"bar\"}",
 			"",
-			common.MapStr{
-				"equals": common.MapStr{"baz": "bot"},
+			mapstr.M{
+				"equals": mapstr.M{"baz": "bot"},
 			},
 			"JSON body did not match",
 			"application/json",
@@ -394,8 +394,8 @@ func TestJsonBody(t *testing.T) {
 			"condition invalid json",
 			"notjson",
 			"",
-			common.MapStr{
-				"equals": common.MapStr{"foo": "bar"},
+			mapstr.M{
+				"equals": mapstr.M{"foo": "bar"},
 			},
 			"could not parse JSON",
 			"text/plain; charset=utf-8",
@@ -404,8 +404,8 @@ func TestJsonBody(t *testing.T) {
 			"condition complex type match json",
 			"{\"number\": 3, \"bool\": true}",
 			"",
-			common.MapStr{
-				"equals": common.MapStr{"number": 3, "bool": true},
+			mapstr.M{
+				"equals": mapstr.M{"number": 3, "bool": true},
 			},
 			"",
 			"application/json",
@@ -417,7 +417,7 @@ func TestJsonBody(t *testing.T) {
 			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200, nil))
 			defer server.Close()
 
-			jsonCheck := common.MapStr{"description": tc.name}
+			jsonCheck := mapstr.M{"description": tc.name}
 			if tc.expression != "" {
 				jsonCheck["expression"] = tc.expression
 			}
@@ -429,12 +429,12 @@ func TestJsonBody(t *testing.T) {
 				"hosts":                 server.URL,
 				"timeout":               "1s",
 				"response.include_body": "never",
-				"check.response.json": []common.MapStr{
+				"check.response.json": []mapstr.M{
 					jsonCheck,
 				},
 			}
 
-			config, err := common.NewConfigFrom(configSrc)
+			config, err := conf.NewConfigFrom(configSrc)
 			require.NoError(t, err)
 
 			p, err := create("largeresp", config)
@@ -508,17 +508,18 @@ func runHTTPSServerCheck(
 	// When connecting through a proxy, the following fields are missing.
 	if _, isProxy := reqExtraConfig["proxy_url"]; isProxy {
 		missing := map[string]interface{}{
-			"http.rtt.response_header.us": time.Duration(0),
-			"http.rtt.content.us":         time.Duration(0),
+			"http.rtt.response_header.us": int64(0),
+			"http.rtt.content.us":         int64(0),
 			"monitor.ip":                  "127.0.0.1",
-			"tcp.rtt.connect.us":          time.Duration(0),
-			"http.rtt.validate.us":        time.Duration(0),
-			"http.rtt.write_request.us":   time.Duration(0),
-			"tls.rtt.handshake.us":        time.Duration(0),
+			"tcp.rtt.connect.us":          int64(0),
+			"http.rtt.validate.us":        int64(0),
+			"http.rtt.write_request.us":   int64(0),
+			"tls.rtt.handshake.us":        int64(0),
 		}
 		for k, v := range missing {
 			if found, err := event.Fields.HasKey(k); !found || err != nil {
-				event.Fields.Put(k, v)
+				_, err := event.Fields.Put(k, v)
+				require.NoError(t, err)
 			}
 		}
 	}
@@ -545,6 +546,8 @@ func TestExpiredHTTPSServer(t *testing.T) {
 	tlsCert, err := tls.LoadX509KeyPair("../fixtures/expired.cert", "../fixtures/expired.key")
 	require.NoError(t, err)
 	host, port, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	defer closeSrv()
 	u := &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}
 
@@ -666,7 +669,7 @@ func TestRedirect(t *testing.T) {
 		"max_redirects":       10,
 	}
 
-	config, err := common.NewConfigFrom(configSrc)
+	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
 	p, err := create("redirect", config)
@@ -713,7 +716,7 @@ func TestNoHeaders(t *testing.T) {
 		"response.include_headers": false,
 	}
 
-	config, err := common.NewConfigFrom(configSrc)
+	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
 	p, err := create("http", config)
@@ -792,22 +795,18 @@ func httpConnectTunnel(writer http.ResponseWriter, request *http.Request) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		io.Copy(destConn, clientReadWriter)
 		wg.Done()
 	}()
 	go func() {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		io.Copy(clientConn, destConn)
 		wg.Done()
 	}()
 	wg.Wait()
-}
-
-func mustParseURL(t *testing.T, url string) *url.URL {
-	parsed, err := common.ParseURL(url)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return parsed
 }
 
 // helper that compresses some content as gzip
@@ -899,7 +898,7 @@ func TestUserAgentInject(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	cfg, err := common.NewConfigFrom(map[string]interface{}{
+	cfg, err := conf.NewConfigFrom(map[string]interface{}{
 		"urls": ts.URL,
 	})
 	require.NoError(t, err)

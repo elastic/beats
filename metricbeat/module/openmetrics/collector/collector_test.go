@@ -28,9 +28,9 @@ import (
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
@@ -46,7 +46,7 @@ func TestSameLabels(t *testing.T) {
 	mbtest.TestDataFilesWithConfig(t, "openmetrics", "collector", dataConfig)
 }
 func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"handler": "query",
 	}
 	tests := []struct {
@@ -75,15 +75,15 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []OpenMetricEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_total": float64(10),
 						},
 					},
 					Help:      "foo",
 					Type:      textparse.MetricTypeCounter,
 					Labels:    labels,
-					Exemplars: common.MapStr{},
+					Exemplars: mapstr.M{},
 				},
 			},
 		},
@@ -102,14 +102,14 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []OpenMetricEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
 					Help:   "foo",
 					Type:   textparse.MetricTypeGauge,
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 			},
 		},
@@ -135,23 +135,23 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []OpenMetricEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_count": uint64(10),
 							"http_request_duration_microseconds_sum":   float64(10),
 						},
 					},
 					Help:   "foo",
 					Type:   textparse.MetricTypeSummary,
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
-					Labels: common.MapStr{
+					Labels: mapstr.M{
 						"quantile": "0.99",
 					},
 				},
@@ -179,24 +179,24 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []OpenMetricEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_count": uint64(10),
 							"http_request_duration_microseconds_sum":   float64(10),
 						},
 					},
 					Help:   "foo",
 					Type:   textparse.MetricTypeHistogram,
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_bucket": uint64(10),
 						},
 					},
-					Labels:    common.MapStr{"le": "0.99"},
-					Exemplars: common.MapStr{},
+					Labels:    mapstr.M{"le": "0.99"},
+					Exemplars: mapstr.M{},
 				},
 			},
 		},
@@ -221,8 +221,8 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []OpenMetricEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},

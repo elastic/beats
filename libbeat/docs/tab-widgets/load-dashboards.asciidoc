@@ -19,13 +19,6 @@
 ----
 // end::mac[]
 
-// tag::brew[]
-["source","sh",subs="attributes"]
-----
-{beatname_lc} setup --dashboards
-----
-// end::brew[]
-
 // tag::linux[]
 ["source","sh",subs="attributes"]
 ----

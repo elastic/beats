@@ -10,13 +10,13 @@ package guess
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -92,13 +92,13 @@ func (g *guessSockaddrIn) Prepare(ctx Context) (err error) {
 		g.remote.Addr = randomLocalIP()
 	}
 	if g.server, g.local, err = createSocket(g.local); err != nil {
-		return errors.Wrap(err, "error creating server")
+		return fmt.Errorf("error creating server: %w", err)
 	}
 	if g.client, g.remote, err = createSocket(g.remote); err != nil {
-		return errors.Wrap(err, "error creating client")
+		return fmt.Errorf("error creating client: %w", err)
 	}
 	if err = unix.Listen(g.server, 1); err != nil {
-		return errors.Wrap(err, "error in listen")
+		return fmt.Errorf("error in listen: %w", err)
 	}
 	return nil
 }
@@ -124,7 +124,7 @@ func (g *guessSockaddrIn) Trigger() error {
 }
 
 // Extract takes the dumped sockaddr_in and scans it for the expected values.
-func (g *guessSockaddrIn) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessSockaddrIn) Extract(ev interface{}) (mapstr.M, bool) {
 	arr := ev.([]byte)
 	if len(arr) < 8 {
 		return nil, false
@@ -146,7 +146,7 @@ func (g *guessSockaddrIn) Extract(ev interface{}) (common.MapStr, bool) {
 	if offsetOfAddr == -1 {
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"SOCKADDR_IN_AF":   offsetOfFamily,
 		"SOCKADDR_IN_PORT": offsetOfPort,
 		"SOCKADDR_IN_ADDR": offsetOfAddr,

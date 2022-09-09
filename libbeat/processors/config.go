@@ -17,12 +17,10 @@
 
 package processors
 
-import (
-	"github.com/elastic/beats/v7/libbeat/common"
-)
+import "github.com/elastic/elastic-agent-libs/config"
 
 // PluginConfig represents the list of processors.
-type PluginConfig []*common.Config
+type PluginConfig []*config.C
 
 // fields that should be always exported
 var MandatoryExportedFields = []string{"type"}

@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package synthexec
 
@@ -10,8 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 
@@ -28,15 +31,15 @@ func TestToMap(t *testing.T) {
 
 	type testCase struct {
 		name     string
-		source   common.MapStr
-		expected common.MapStr
+		source   mapstr.M
+		expected mapstr.M
 	}
 
 	testCases := []testCase{
 		{
 			"root fields with URL",
-			common.MapStr{
-				"type":            "journey/start",
+			mapstr.M{
+				"type":            JourneyStart,
 				"package_version": "1.2.3",
 				"root_fields": map[string]interface{}{
 					"synthetics": map[string]interface{}{
@@ -46,9 +49,9 @@ func TestToMap(t *testing.T) {
 				},
 				"url": testUrl.String(),
 			},
-			common.MapStr{
-				"synthetics": common.MapStr{
-					"type":            "journey/start",
+			mapstr.M{
+				"synthetics": mapstr.M{
+					"type":            JourneyStart,
 					"package_version": "1.2.3",
 					"nested":          "v1",
 				},
@@ -58,11 +61,11 @@ func TestToMap(t *testing.T) {
 		},
 		{
 			"root fields, step metadata",
-			common.MapStr{
+			mapstr.M{
 				"type":            "step/start",
 				"package_version": "1.2.3",
-				"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
-				"step":            common.MapStr{"name": "MyStep", "status": "success", "index": 42, "duration": common.MapStr{"us": int64(1232131)}},
+				"journey":         mapstr.M{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
+				"step":            mapstr.M{"name": "MyStep", "status": "success", "index": 42, "duration": mapstr.M{"us": int64(1232131)}},
 				"root_fields": map[string]interface{}{
 					"synthetics": map[string]interface{}{
 						"nested": "v1",
@@ -70,25 +73,25 @@ func TestToMap(t *testing.T) {
 					"truly_at_root": "v2",
 				},
 			},
-			common.MapStr{
-				"synthetics": common.MapStr{
+			mapstr.M{
+				"synthetics": mapstr.M{
 					"type":            "step/start",
 					"package_version": "1.2.3",
 					"nested":          "v1",
-					"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
-					"step":            common.MapStr{"name": "MyStep", "status": "success", "index": 42, "duration": common.MapStr{"us": int64(1232131)}},
+					"journey":         mapstr.M{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
+					"step":            mapstr.M{"name": "MyStep", "status": "success", "index": 42, "duration": mapstr.M{"us": int64(1232131)}},
 				},
 				"truly_at_root": "v2",
 			},
 		},
 		{
 			"weird error, and blob, no URL",
-			common.MapStr{
+			mapstr.M{
 				"type":            "someType",
 				"package_version": "1.2.3",
-				"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-				"step":            common.MapStr{"name": "MyStep", "index": 42, "status": "down", "duration": common.MapStr{"us": int64(1000)}},
-				"error": common.MapStr{
+				"journey":         mapstr.M{"name": "MyJourney", "id": "MyJourney"},
+				"step":            mapstr.M{"name": "MyStep", "index": 42, "status": "down", "duration": mapstr.M{"us": int64(1000)}},
+				"error": mapstr.M{
 					"name":    "MyErrorName",
 					"message": "MyErrorMessage",
 					"stack":   "MyErrorStack",
@@ -96,13 +99,13 @@ func TestToMap(t *testing.T) {
 				"blob":      "ablob",
 				"blob_mime": "application/weird",
 			},
-			common.MapStr{
-				"synthetics": common.MapStr{
+			mapstr.M{
+				"synthetics": mapstr.M{
 					"type":            "someType",
 					"package_version": "1.2.3",
-					"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-					"step":            common.MapStr{"name": "MyStep", "index": 42, "status": "down", "duration": common.MapStr{"us": int64(1000)}},
-					"error": common.MapStr{
+					"journey":         mapstr.M{"name": "MyJourney", "id": "MyJourney"},
+					"step":            mapstr.M{"name": "MyStep", "index": 42, "status": "down", "duration": mapstr.M{"us": int64(1000)}},
+					"error": mapstr.M{
 						"name":    "MyErrorName",
 						"message": "MyErrorMessage",
 						"stack":   "MyErrorStack",
@@ -128,11 +131,42 @@ func TestToMap(t *testing.T) {
 			// Index will always be zero in thee tests, so helpfully include it
 			llvalidator := lookslike.Strict(lookslike.Compose(
 				lookslike.MustCompile(tc.expected),
-				lookslike.MustCompile(common.MapStr{"synthetics": common.MapStr{"index": 0}}),
+				lookslike.MustCompile(mapstr.M{"synthetics": mapstr.M{"index": 0}}),
 			))
 
 			// Test that even deep maps merge correctly
 			testslike.Test(t, llvalidator, m)
 		})
 	}
+}
+
+func TestSynthErrConversion(t *testing.T) {
+	name := "myname"
+	message := "mymessage"
+	stack := "mystack"
+	code := "mycode"
+
+	t.Run("SynthErr -> ECS", func(t *testing.T) {
+		se := &SynthError{
+			Name:    name,
+			Code:    code,
+			Message: message,
+			Stack:   stack,
+		}
+
+		ecse := se.toECSErr()
+		require.Equal(t, name, ecse.Type)
+		require.Equal(t, code, ecse.Code)
+		require.Equal(t, message, ecse.Message)
+		require.Equal(t, stack, *ecse.StackTrace)
+	})
+
+	t.Run("ECS Err -> SynthErr", func(t *testing.T) {
+		ecse := ecserr.NewECSErrWithStack(name, code, message, &stack)
+		se := ECSErrToSynthError(ecse)
+		require.Equal(t, name, se.Type)
+		require.Equal(t, code, se.Code)
+		require.Equal(t, message, se.Message)
+		require.Equal(t, stack, se.Stack)
+	})
 }

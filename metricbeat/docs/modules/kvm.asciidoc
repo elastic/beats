@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: kvm
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/kvm/_meta/docs.asciidoc
+
 
 [[metricbeat-module-kvm]]
 == KVM module
@@ -11,6 +13,8 @@ beta[]
 
 This is the kvm module.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -47,3 +51,4 @@ include::kvm/dommemstat.asciidoc[]
 
 include::kvm/status.asciidoc[]
 
+:edit_url!:

@@ -18,7 +18,7 @@
 package connection
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -61,21 +61,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("cons", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "'cons' command failed")
+		return fmt.Errorf("'cons' command failed: %w", err)
 	}
 
-	events, err := m.parseCons(outputReader)
+	events := m.parseCons(outputReader)
 	if err != nil {
-		return errors.Wrap(err, "error parsing response from zookeeper")
+		return fmt.Errorf("error parsing response from zookeeper: %w", err)
 	}
 
 	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error obtaining server id")
+		return fmt.Errorf("error obtaining server id %w", err)
 	}
 
 	for _, event := range events {
-		event.RootFields.Put("service.node.name", serverID)
+		_, _ = event.RootFields.Put("service.node.name", serverID)
 		reporter.Event(event)
 	}
 

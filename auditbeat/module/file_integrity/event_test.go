@@ -31,7 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var testEventTime = time.Now().UTC()
@@ -47,7 +47,7 @@ func testEvent() *Event {
 			Inode:  123,
 			UID:    500,
 			GID:    500,
-			Mode:   0600,
+			Mode:   0o600,
 			CTime:  testEventTime,
 			MTime:  testEventTime,
 			SetGID: true,
@@ -94,7 +94,7 @@ func TestDiffEvents(t *testing.T) {
 
 	t.Run("updated metadata", func(t *testing.T) {
 		e := testEvent()
-		e.Info.Mode = 0644
+		e.Info.Mode = 0o644
 
 		action, changed := diffEvents(testEvent(), e)
 		assert.True(t, changed)
@@ -520,7 +520,7 @@ func mustDecodeHex(v string) []byte {
 	return data
 }
 
-func assertHasKey(t testing.TB, m common.MapStr, key string) bool {
+func assertHasKey(t testing.TB, m mapstr.M, key string) bool {
 	t.Helper()
 	found, err := m.HasKey(key)
 	if err != nil || !found {

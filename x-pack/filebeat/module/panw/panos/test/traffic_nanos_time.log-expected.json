@@ -16,8 +16,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,

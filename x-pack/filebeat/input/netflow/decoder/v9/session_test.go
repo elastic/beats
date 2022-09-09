@@ -56,7 +56,6 @@ func TestSessionMap_GetOrCreate(t *testing.T) {
 		s2b := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1235", 43))
 		assert.NotNil(t, s2b)
 		assert.False(t, s2 == s2b)
-
 	})
 	t.Run("parallel", func(t *testing.T) {
 		// Goroutines should observe the same session when created in parallel

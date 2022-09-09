@@ -5,7 +5,7 @@ TIP: Want to get started with synthetic monitoring?
 See the {observability-guide}/synthetics-quickstart.html[quick start guide].
 
 beta[] The options described here configure {beatname_uc} to run the synthetic
-monitoring test suites via Synthetic Agent on the Chromium browser.
+monitoring test projects via Synthetic Agent on the Chromium browser.
 Additional shared options are defined in <<monitor-options>>.
 
 Browser based monitors can only be run in our {beatname_uc} docker image,
@@ -17,7 +17,7 @@ Example configuration:
 [source,yaml]
 ----
 - type: browser
-  id: synthetic-inline-suites
+  id: synthetic-inline-tests
   name: Elastic website
   schedule: '@every 1m'
   source:
@@ -35,7 +35,7 @@ Example configuration:
 [[monitor-browser-source]]
 ==== `source`
 
-Contains information on how to run the synthetic test suites.
+Contains information on how to run synthetic tests.
 
 [float]
 [[monitor-source-inline]]
@@ -47,7 +47,7 @@ more information.
 
 This is the most convenient way to get Synthetic tests up and running, however, it becomes
 harder to maintain and share code as the number of test files increases.
-The recommended way to run Synthetic suites is to create an https://docs.npmjs.com/cli/v7/commands/npm-init[NPM project] and
+The recommended way to run Synthetic tests is to create an https://docs.npmjs.com/cli/v7/commands/npm-init[NPM project] and
 start writing individual tests for all the user journeys and save them as JavaScript or
 TypeScript files. Once the project is created, the tests can be invoked either by
 <<monitor-source-zipurl,Zip Url>> or <<monitor-source-local,Local directory>> method.
@@ -80,7 +80,7 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 - type: browser
-  id: todos-suites
+  id: todos-project
   name: Todos Journeys
   schedule: '@every 1m'
   source:
@@ -189,7 +189,19 @@ run with 5Mbps download, 3Mbps upload and 20ms latency which emulates a standard
 Cable connection.
 
 Users can control the throttling parameters, Below is an example of emulating a
-3G connection with 1.6Mbps download, 750Kbps upload and 150ms round trip time.
+3G connection with 1.6Mbps download, 750Kbps upload and 150ms round trip time
+in two different supported formats.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  schedule: '@every 1m'
+  throttling:
+    download: 1.6
+    upload: 0.75
+    latency: 150
+-------------------------------------------------------------------------------
+
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -233,6 +245,13 @@ Example configuration:
 
 *`tags`*:: run only journeys with the given tag(s), or globs
 *`match`*:: run only journeys with a name or tags that matches the configured glob
+
+[float]
+[[monitor-browser-playwright-options]]
+==== `playwright_options`
+
+A map of extra options to pass in to the synthetics agent. These are used as the context for the Playwright
+browser object. See https://playwright.dev/docs/api/class-browser#browser-new-context[the playwright browser context docs] for more information.
 
 [float]
 [[monitor-browser-synthetics-args]]

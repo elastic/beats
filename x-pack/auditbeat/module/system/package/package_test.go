@@ -22,8 +22,8 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var flagUpdateGob = flag.Bool("update-gob", false, "update persisted gob testdata")
@@ -193,7 +193,7 @@ func TestPackageGobEncodeDecode(t *testing.T) {
 	if *flagUpdateGob {
 		// NOTE: If you are updating this file then you may have introduced a
 		// a breaking change.
-		if err := ioutil.WriteFile(gobTestFile, buf.Bytes(), 0644); err != nil {
+		if err := ioutil.WriteFile(gobTestFile, buf.Bytes(), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

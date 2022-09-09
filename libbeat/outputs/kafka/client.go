@@ -30,13 +30,13 @@ import (
 	"github.com/eapache/go-resiliency/breaker"
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/testing"
+	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 type client struct {
@@ -52,6 +52,8 @@ type client struct {
 	done     chan struct{}
 
 	producer sarama.AsyncProducer
+
+	recordHeaders []sarama.RecordHeader
 
 	wg sync.WaitGroup
 }
@@ -76,6 +78,7 @@ func newKafkaClient(
 	index string,
 	key *fmtstr.EventFormatString,
 	topic outil.Selector,
+	headers []header,
 	writer codec.Codec,
 	cfg *sarama.Config,
 ) (*client, error) {
@@ -90,6 +93,23 @@ func newKafkaClient(
 		config:   *cfg,
 		done:     make(chan struct{}),
 	}
+
+	if len(headers) != 0 {
+		recordHeaders := make([]sarama.RecordHeader, 0, len(headers))
+		for _, h := range headers {
+			if h.Key == "" {
+				continue
+			}
+			recordHeader := sarama.RecordHeader{
+				Key:   []byte(h.Key),
+				Value: []byte(h.Value),
+			}
+
+			recordHeaders = append(recordHeaders, recordHeader)
+		}
+		c.recordHeaders = recordHeaders
+	}
+
 	return c, nil
 }
 

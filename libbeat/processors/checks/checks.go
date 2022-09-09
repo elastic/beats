@@ -20,18 +20,18 @@ package checks
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // ConfigChecked returns a wrapper that will validate the configuration using
 // the passed checks before invoking the original constructor.
 func ConfigChecked(
 	constr processors.Constructor,
-	checks ...func(*common.Config) error,
+	checks ...func(*config.C) error,
 ) processors.Constructor {
 	validator := checkAll(checks...)
-	return func(cfg *common.Config) (processors.Processor, error) {
+	return func(cfg *config.C) (processors.Processor, error) {
 		err := validator(cfg)
 		if err != nil {
 			return nil, fmt.Errorf("%v in %v", err.Error(), cfg.Path())
@@ -41,8 +41,8 @@ func ConfigChecked(
 	}
 }
 
-func checkAll(checks ...func(*common.Config) error) func(*common.Config) error {
-	return func(c *common.Config) error {
+func checkAll(checks ...func(*config.C) error) func(*config.C) error {
+	return func(c *config.C) error {
 		for _, check := range checks {
 			if err := check(c); err != nil {
 				return err
@@ -53,8 +53,8 @@ func checkAll(checks ...func(*common.Config) error) func(*common.Config) error {
 }
 
 // RequireFields checks that the required fields are present in the configuration.
-func RequireFields(fields ...string) func(*common.Config) error {
-	return func(cfg *common.Config) error {
+func RequireFields(fields ...string) func(*config.C) error {
+	return func(cfg *config.C) error {
 		for _, field := range fields {
 			if !cfg.HasField(field) {
 				return fmt.Errorf("missing %v option", field)
@@ -65,8 +65,8 @@ func RequireFields(fields ...string) func(*common.Config) error {
 }
 
 // AllowedFields checks that only allowed fields are used in the configuration.
-func AllowedFields(fields ...string) func(*common.Config) error {
-	return func(cfg *common.Config) error {
+func AllowedFields(fields ...string) func(*config.C) error {
+	return func(cfg *config.C) error {
 		for _, field := range cfg.GetFields() {
 			found := false
 			for _, allowed := range fields {
@@ -87,8 +87,8 @@ func AllowedFields(fields ...string) func(*common.Config) error {
 // MutuallyExclusiveRequiredFields checks that only one of the given
 // fields is used at the same time. It is an error for none of the fields to be
 // present.
-func MutuallyExclusiveRequiredFields(fields ...string) func(*common.Config) error {
-	return func(cfg *common.Config) error {
+func MutuallyExclusiveRequiredFields(fields ...string) func(*config.C) error {
+	return func(cfg *config.C) error {
 		var foundField string
 		for _, field := range cfg.GetFields() {
 			for _, f := range fields {

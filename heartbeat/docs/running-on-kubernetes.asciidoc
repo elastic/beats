@@ -74,3 +74,22 @@ $ kubectl --namespace=kube-system get deployment/{beatname_lc}
 NAME        READY   UP-TO-DATE   AVAILABLE   AGE
 {beatname_lc}   1/1     1            1           1m
 ------------------------------------------------
+
+[float]
+==== Running {beatname_uc} as unprivileged user
+
+Under Kubernetes, {beatname_uc} can run as a non-root user, but requires some privileged
+network capabilities to operate correctly. Ensure that the +NET_RAW+
+capability is available to the container.
+
+["source","yaml",subs="attributes"]
+----
+containers:
+- name: heartbeat
+  image: {dockerimage}
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    capabilities:
+      add: [ NET_RAW ]
+----

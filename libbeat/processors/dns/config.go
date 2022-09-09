@@ -24,7 +24,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Config defines the configuration options for the DNS processor.
@@ -35,7 +35,7 @@ type Config struct {
 	Type         string        `config:"type" validate:"required"` // Reverse is the only supported type currently.
 	Action       FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
 	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
-	Fields       common.MapStr `config:"fields"`                   // Mapping of source fields to target fields.
+	Fields       mapstr.M      `config:"fields"`                   // Mapping of source fields to target fields.
 	Transport    string        `config:"transport"`                // Can be tls or udp.
 	reverseFlat  map[string]string
 }

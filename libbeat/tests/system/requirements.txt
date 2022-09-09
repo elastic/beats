@@ -5,8 +5,8 @@ cached-property==1.4.2
 certifi==2018.1.18
 chardet==3.0.4
 deepdiff==4.2.0
-docker==4.1.0
-docker-compose==1.25.3
+docker==5.0.3
+docker-compose==1.29.2
 docker-pycreds==0.4.0
 dockerpty==0.4.1
 docopt==0.6.2
@@ -16,12 +16,15 @@ idna==2.6
 importlib-metadata==1.7.0
 iniconfig==1.0.1
 ipaddress==1.0.19
-Jinja2==2.11.2
+Jinja2==2.11.3
 jsondiff==1.1.2
 jsonschema==3.2.0
 kafka-python==1.4.3
 MarkupSafe==1.1.1
 more-itertools==8.4.0
+opentelemetry-api==1.11.0
+opentelemetry-exporter-otlp==1.11.0
+opentelemetry-sdk==1.11.0
 ordered-set==3.1.1
 packaging==20.4
 parameterized==0.7.0
@@ -31,6 +34,7 @@ pycodestyle==2.6.0
 pyparsing==2.4.7
 pyrsistent==0.16.0
 pytest==6.2.4
+pytest-otel>=0.0.4
 pytest-rerunfailures==9.1.1
 pytest-timeout==1.4.2
 PyYAML==5.4.1
@@ -47,3 +51,4 @@ urllib3==1.26.5
 wcwidth==0.2.5
 websocket-client==0.47.0
 zipp>=1.2.0,<=3.1.0
+protobuf==3.19.4 #Temporary change because of protobuf new version bug: https://github.com/protocolbuffers/protobuf/issues/10051

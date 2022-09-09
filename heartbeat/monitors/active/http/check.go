@@ -26,6 +26,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
 
+const cfgPositive = "positive"
+const cfgNegative = "negative"
+
 // multiValidator combines multiple validations of each type into a single easy to use object.
 type multiValidator struct {
 	respValidators []respValidator
@@ -155,15 +158,15 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err
 	// in this case, there will be 3 possibilities: positive + negative / positive / negative
 	if m, ok := b.(map[string]interface{}); ok {
 		for checkType, v := range m {
-			if checkType != "positive" && checkType != "negative" {
+			if checkType != cfgPositive && checkType != cfgNegative {
 				return positiveMatch, negativeMatch, errBodyNoValidCheckType
 			}
 			if params, ok := v.([]interface{}); ok {
 				for _, param := range params {
 					if pat, ok := param.(string); ok {
-						if checkType == "positive" {
+						if checkType == cfgPositive {
 							positiveMatch = append(positiveMatch, match.MustCompile(pat))
-						} else if checkType == "negative" {
+						} else if checkType == cfgNegative {
 							negativeMatch = append(negativeMatch, match.MustCompile(pat))
 						}
 					}

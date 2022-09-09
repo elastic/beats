@@ -36,13 +36,12 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Source identifies the source of an event (i.e. what triggered it).
@@ -214,11 +213,14 @@ func NewEvent(
 	hashTypes []HashType,
 ) Event {
 	info, err := os.Lstat(path)
-	if err != nil && os.IsNotExist(err) {
-		// deleted file is signaled by info == nil
-		err = nil
+	if err != nil {
+		if os.IsNotExist(err) {
+			// deleted file is signaled by info == nil
+			err = nil
+		} else {
+			err = fmt.Errorf("failed to lstat: %w", err)
+		}
 	}
-	err = errors.Wrap(err, "failed to lstat")
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
 
@@ -241,13 +243,13 @@ func getDriveLetter(path string) string {
 }
 
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
-	file := common.MapStr{
+	file := mapstr.M{
 		"path": e.Path,
 	}
 	out := mb.Event{
 		Timestamp: e.Timestamp,
 		Took:      e.rtt,
-		MetricSetFields: common.MapStr{
+		MetricSetFields: mapstr.M{
 			"file": file,
 		},
 	}
@@ -307,7 +309,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 	}
 
 	if len(e.Hashes) > 0 {
-		hashes := make(common.MapStr, len(e.Hashes))
+		hashes := make(mapstr.M, len(e.Hashes))
 		for hashType, digest := range e.Hashes {
 			hashes[string(hashType)] = digest
 		}
@@ -449,13 +451,13 @@ func hashFile(name string, maxSize uint64, hashType ...HashType) (nameToHash map
 		case XXH64:
 			hashes = append(hashes, xxhash.New())
 		default:
-			return nil, 0, errors.Errorf("unknown hash type '%v'", name)
+			return nil, 0, fmt.Errorf("unknown hash type '%v'", name)
 		}
 	}
 
 	f, err := file.ReadOpen(name)
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "failed to open file for hashing")
+		return nil, 0, fmt.Errorf("failed to open file for hashing: %w", err)
 	}
 	defer f.Close()
 
@@ -469,7 +471,7 @@ func hashFile(name string, maxSize uint64, hashType ...HashType) (nameToHash map
 	}
 	written, err := io.Copy(hashWriter, r)
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "failed to calculate file hashes")
+		return nil, 0, fmt.Errorf("failed to calculate file hashes: %w", err)
 	}
 
 	// The file grew larger than configured limit.

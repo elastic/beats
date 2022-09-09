@@ -8,11 +8,12 @@ import (
 	"context"
 	"sync"
 
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // fetcher is an interface that can fetch a list of lbListener (load balancer + listener) objects without pagination being necessary.
@@ -59,13 +60,20 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
-	client elasticloadbalancingv2iface.ClientAPI
+	client autodiscoverElbClient
 }
 
-func newAPIFetcher(clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
+type autodiscoverElbClient interface {
+	elasticloadbalancingv2.DescribeListenersAPIClient
+	elasticloadbalancingv2.DescribeLoadBalancersAPIClient
+}
+
+func newAPIFetcher(clients []autodiscoverElbClient) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
-		fetchers[idx] = &apiFetcher{client}
+		fetchers[idx] = &apiFetcher{
+			client: client,
+		}
 	}
 	return &apiMultiFetcher{fetchers}
 }
@@ -76,18 +84,17 @@ func newAPIFetcher(clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
 // additional fetch per lb. We let the goroutine scheduler sort things out, and use
 // a sync.Pool to limit the number of in-flight requests.
 func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
-	var pageSize int64 = 50
-
-	req := f.client.DescribeLoadBalancersRequest(&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize})
+	var pageSize int32 = 50
 
 	ctx, cancel := context.WithCancel(ctx)
 	ir := &fetchRequest{
-		paginator: elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(req),
-		client:    f.client,
-		taskPool:  sync.Pool{},
-		context:   ctx,
-		cancel:    cancel,
-		logger:    logp.NewLogger("autodiscover-elb-fetch"),
+		paginator: elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(f.client,
+			&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize}),
+		client:   f.client,
+		taskPool: sync.Pool{},
+		context:  ctx,
+		cancel:   cancel,
+		logger:   logp.NewLogger("autodiscover-elb-fetch"),
 	}
 
 	// Limit concurrency against the AWS API by creating a pool of objects
@@ -102,8 +109,8 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 // fetchRequest provides a way to get all pages from a
 // elbv2.DescribeLoadBalancersPager and all listeners for the given LoadBalancers.
 type fetchRequest struct {
-	paginator    elasticloadbalancingv2.DescribeLoadBalancersPaginator
-	client       elasticloadbalancingv2iface.ClientAPI
+	paginator    *elasticloadbalancingv2.DescribeLoadBalancersPaginator
+	client       elasticloadbalancingv2.DescribeListenersAPIClient
 	lbListeners  []*lbListener
 	errs         []error
 	resultsLock  sync.Mutex
@@ -141,29 +148,25 @@ func (p *fetchRequest) fetchAllPages() {
 			p.logger.Debug("done fetching ELB pages, context cancelled")
 			return
 		default:
-			if !p.fetchNextPage() {
+			if !p.paginator.HasMorePages() {
 				p.logger.Debug("fetched all ELB pages")
 				return
 			}
+			p.fetchNextPage()
 			p.logger.Debug("fetched ELB page")
 		}
 	}
 }
 
-func (p *fetchRequest) fetchNextPage() (more bool) {
-	success := p.paginator.Next(p.context)
-
-	if success {
-		for _, lb := range p.paginator.CurrentPage().LoadBalancers {
-			p.dispatch(func() { p.fetchListeners(lb) })
-		}
+func (p *fetchRequest) fetchNextPage() {
+	page, err := p.paginator.NextPage(p.context)
+	if err != nil {
+		p.recordErrResult(err)
 	}
 
-	if p.paginator.Err() != nil {
-		p.recordErrResult(p.paginator.Err())
+	for _, lb := range page.LoadBalancers {
+		p.dispatch(func() { p.fetchListeners(lb) })
 	}
-
-	return success
 }
 
 // dispatch runs the given func in a new goroutine, properly throttling requests
@@ -181,32 +184,32 @@ func (p *fetchRequest) dispatch(fn func()) {
 	}()
 }
 
-func (p *fetchRequest) fetchListeners(lb elasticloadbalancingv2.LoadBalancer) {
-	listenReq := p.client.DescribeListenersRequest(&elasticloadbalancingv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
-	listen := elasticloadbalancingv2.NewDescribeListenersPaginator(listenReq)
-
-	if listen.Err() != nil {
-		p.recordErrResult(listen.Err())
-	}
+func (p *fetchRequest) fetchListeners(lb types.LoadBalancer) {
+	describeListenersInput := &elasticloadbalancingv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}
+	paginator := elasticloadbalancingv2.NewDescribeListenersPaginator(p.client, describeListenersInput)
 
 	for {
 		select {
 		case <-p.context.Done():
 			return
 		default:
-			if !listen.Next(p.context) {
+			if !paginator.HasMorePages() {
 				return
 			}
 
-			for _, listener := range listen.CurrentPage().Listeners {
-				p.recordGoodResult(&lb, &listener)
+			page, err := paginator.NextPage(p.context)
+			if err != nil {
+				p.recordErrResult(err)
+			}
+			for i := range page.Listeners {
+				p.recordGoodResult(&lb, &page.Listeners[i])
 			}
 		}
 
 	}
 }
 
-func (p *fetchRequest) recordGoodResult(lb *elasticloadbalancingv2.LoadBalancer, lbl *elasticloadbalancingv2.Listener) {
+func (p *fetchRequest) recordGoodResult(lb *types.LoadBalancer, lbl *types.Listener) {
 	p.resultsLock.Lock()
 	defer p.resultsLock.Unlock()
 

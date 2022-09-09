@@ -8,14 +8,13 @@
 package guess
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Context shared with guesses.
@@ -23,7 +22,7 @@ type Context struct {
 	// Log is a logger so that guesses can log.
 	Log helper.Logger
 	// Vars is the current set of template variables.
-	Vars common.MapStr
+	Vars mapstr.M
 	// Timeout is the maximum time allowed to wait for a guess to complete.
 	Timeout time.Duration
 }
@@ -49,7 +48,7 @@ type Guesser interface {
 	// Extract receives the events generated during trigger.
 	// Done is false when it needs to be called with more events. True when
 	// the guess has completed and results is a map with the discovered values.
-	Extract(event interface{}) (result common.MapStr, done bool)
+	Extract(event interface{}) (result mapstr.M, done bool)
 	// Terminate performs cleanup after the guess is complete.
 	Terminate() error
 }
@@ -61,7 +60,7 @@ type RepeatGuesser interface {
 	// NumRepeats returns how many times the guess is repeated.
 	NumRepeats() int
 	// Reduce takes the output of every repetition and returns the final result.
-	Reduce([]common.MapStr) (common.MapStr, error)
+	Reduce([]mapstr.M) (mapstr.M, error)
 }
 
 // EventualGuesser is a guess that repeats an undetermined amount of times
@@ -88,7 +87,7 @@ type ConditionalGuesser interface {
 // channel and executes the Trigger function. Each record received through the
 // channel is passed to the Extract function. Terminates once Extract succeeds
 // or the timeout expires.
-func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
 	switch v := guesser.(type) {
 	case RepeatGuesser:
 		result, err = guessMultiple(v, installer, ctx)
@@ -98,13 +97,13 @@ func Guess(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (resul
 		result, err = guessOnce(guesser, installer, ctx)
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s failed", guesser.Name())
+		return nil, fmt.Errorf("%s failed: %w", guesser.Name(), err)
 	}
 	return result, nil
 }
 
-func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
-	var results []common.MapStr
+func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
+	var results []mapstr.M
 	for idx := 1; idx <= guess.NumRepeats(); idx++ {
 		r, err := guessOnce(guess, installer, ctx)
 		if err != nil {
@@ -116,7 +115,7 @@ func guessMultiple(guess RepeatGuesser, installer helper.ProbeInstaller, ctx Con
 	return guess.Reduce(results)
 }
 
-func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
 	limit := guess.MaxRepeats()
 	for i := 0; i < limit; i++ {
 		ctx.Log.Debugf(" --- %s run #%d", guess.Name(), i)
@@ -130,9 +129,9 @@ func guessEventually(guess EventualGuesser, installer helper.ProbeInstaller, ctx
 	return nil, fmt.Errorf("guess %s didn't succeed after %d tries", guess.Name(), limit)
 }
 
-func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result common.MapStr, err error) {
+func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (result mapstr.M, err error) {
 	if err := guesser.Prepare(ctx); err != nil {
-		return nil, errors.Wrap(err, "prepare failed")
+		return nil, fmt.Errorf("prepare failed: %w", err)
 	}
 	defer func() {
 		if err := guesser.Terminate(); err != nil {
@@ -141,7 +140,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	}()
 	probes, err := guesser.Probes()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed generating probes")
+		return nil, fmt.Errorf("failed generating probes: %w", err)
 	}
 
 	decoders := make([]tracing.Decoder, 0, len(probes))
@@ -150,7 +149,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	for _, pdesc := range probes {
 		format, decoder, err := installer.Install(pdesc)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to add kprobe '%s'", pdesc.Probe.String())
+			return nil, fmt.Errorf("failed to add kprobe '%s': %w", pdesc.Probe.String(), err)
 		}
 		formats = append(formats, format)
 		decoders = append(decoders, decoder)
@@ -177,18 +176,18 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 		tracing.WithTID(thread.TID),
 		tracing.WithPollTimeout(time.Millisecond*10))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create perfchannel")
+		return nil, fmt.Errorf("failed to create perfchannel: %w", err)
 	}
 	defer perfchan.Close()
 
 	for i := range probes {
 		if err := perfchan.MonitorProbe(formats[i], decoders[i]); err != nil {
-			return nil, errors.Wrap(err, "failed to monitor probe")
+			return nil, fmt.Errorf("failed to monitor probe: %w", err)
 		}
 	}
 
 	if err := perfchan.Run(); err != nil {
-		return nil, errors.Wrap(err, "failed to run perf channel")
+		return nil, fmt.Errorf("failed to run perf channel: %w", err)
 	}
 
 	timer := time.NewTimer(ctx.Timeout)
@@ -211,7 +210,7 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 	select {
 	case r := <-thread.C():
 		if r.Err != nil {
-			return nil, errors.Wrap(r.Err, "trigger execution failed")
+			return nil, fmt.Errorf("trigger execution failed: %w", r.Err)
 		}
 	case <-timer.C:
 		return nil, errors.New("timeout while waiting for trigger to complete")
@@ -233,16 +232,16 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 
 		case err := <-perfchan.ErrC():
 			if err != nil {
-				return nil, errors.Wrap(err, "error received from perf channel")
+				return nil, fmt.Errorf("error received from perf channel: %w", err)
 			}
 
 		case <-perfchan.LostC():
-			return nil, errors.Wrap(err, "event loss in perf channel")
+			return nil, errors.New("event loss in perf channel")
 		}
 	}
 }
 
-func containsAll(requirements []string, dict common.MapStr) bool {
+func containsAll(requirements []string, dict mapstr.M) bool {
 	for _, req := range requirements {
 		if _, found := dict[req]; !found {
 			return false
@@ -265,7 +264,7 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 			if cond, isCond := guesser.(ConditionalGuesser); isCond {
 				mustRun, err := cond.Condition(ctx)
 				if err != nil {
-					return errors.Wrapf(err, "condition failed for %s", cond.Name())
+					return fmt.Errorf("condition failed for %s: %w", cond.Name(), err)
 				}
 				if !mustRun {
 					ctx.Log.Debugf("Guess %s skipped.", cond.Name())
@@ -307,7 +306,7 @@ func GuessAll(installer helper.ProbeInstaller, ctx Context) (err error) {
 	return nil
 }
 
-func isIPv6Enabled(vars common.MapStr) (bool, error) {
+func isIPv6Enabled(vars mapstr.M) (bool, error) {
 	iface, err := vars.GetValue("HAS_IPV6")
 	if err != nil {
 		return false, err

@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func BenchmarkSimpleCondition(b *testing.B) {
@@ -37,7 +37,7 @@ func BenchmarkSimpleCondition(b *testing.B) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"@timestamp": "2015-06-11T09:51:23.642Z",
 			"afield":     "avalue",
 		},
@@ -81,7 +81,7 @@ func BenchmarkCombinedCondition(b *testing.B) {
 
 	event := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"@timestamp":    "2015-06-11T09:51:23.642Z",
 			"bytes_in":      126,
 			"bytes_out":     28033,
@@ -89,7 +89,7 @@ func BenchmarkCombinedCondition(b *testing.B) {
 			"client_port":   42840,
 			"client_proc":   "",
 			"client_server": "mar.local",
-			"http": common.MapStr{
+			"http": mapstr.M{
 				"code":           200,
 				"content_length": 76985,
 				"phrase":         "OK",

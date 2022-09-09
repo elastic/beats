@@ -24,17 +24,17 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // WithFields wraps a Job and all continuations, updating all events returned with the set of
 // fields configured.
-func WithFields(fields common.MapStr, origJob jobs.Job) jobs.Job {
+func WithFields(fields mapstr.M, origJob jobs.Job) jobs.Job {
 	return jobs.Wrap(origJob, Fields(fields))
 }
 
 // Fields is a JobWrapper that adds fields to a given event
-func Fields(fields common.MapStr) jobs.JobWrapper {
+func Fields(fields mapstr.M) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
@@ -46,13 +46,13 @@ func Fields(fields common.MapStr) jobs.JobWrapper {
 
 // WithURLField wraps a job setting the "url" field appropriately using URLFields.
 func WithURLField(u *url.URL, job jobs.Job) jobs.Job {
-	return WithFields(common.MapStr{"url": URLFields(u)}, job)
+	return WithFields(mapstr.M{"url": URLFields(u)}, job)
 }
 
 // URLFields generates ECS compatible URL.* fields from a given url. It also sanitizes
 // the password making sure that, if present, it is replaced with the string '<hidden>'.
-func URLFields(u *url.URL) common.MapStr {
-	fields := common.MapStr{
+func URLFields(u *url.URL) mapstr.M {
+	fields := mapstr.M{
 		"scheme": u.Scheme,
 		"domain": u.Hostname(),
 	}

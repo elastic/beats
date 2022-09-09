@@ -1,0 +1,48 @@
+// tag::deb[]
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup --index-management
+----
+// end::deb[]
+
+// tag::rpm[]
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup --index-management
+----
+// end::rpm[]
+
+// tag::mac[]
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --index-management
+----
+// end::mac[]
+
+// tag::linux[]
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --index-management
+----
+// end::linux[]
+
+// tag::docker[]
+["source","sh",subs="attributes"]
+----
+docker run --net="host" {dockerimage} setup --index-management
+----
+// end::docker[]
+
+// tag::win[]
+
+Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*).
+
+From the PowerShell prompt, change to the directory where you installed {beatname_uc},
+and run:
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup --index-management
+----
+// end::win[]

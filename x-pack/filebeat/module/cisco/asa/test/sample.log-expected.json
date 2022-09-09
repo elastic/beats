@@ -3440,6 +3440,7 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": [
+            "intrusion_detection",
             "network"
         ],
         "event.code": 338004,
@@ -3447,7 +3448,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-338004: Dynamic Filter monitored blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.223/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware",
-        "event.outcome": "monitored",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3932,7 +3933,7 @@
             "89.160.20.156"
         ],
         "related.user": [
-            "user@domain.tld"
+            "user"
         ],
         "service.type": "cisco",
         "source.address": "1.128.3.4",
@@ -3943,7 +3944,7 @@
         "source.nat.port": "34534",
         "source.port": 12312,
         "source.user.domain": "domain.tld",
-        "source.user.name": "user@domain.tld",
+        "source.user.name": "user",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -4027,7 +4028,7 @@
         "destination.as.organization.name": "Telstra Pty Ltd",
         "destination.ip": "1.128.3.4",
         "destination.user.domain": "domain.tld",
-        "destination.user.name": "user@domain.tld",
+        "destination.user.name": "user",
         "event.action": "flow-expiration",
         "event.category": [
             "network"
@@ -4061,7 +4062,7 @@
             "89.160.20.156"
         ],
         "related.user": [
-            "user@domain.tld"
+            "user"
         ],
         "service.type": "cisco",
         "source.address": "89.160.20.156",
@@ -4077,12 +4078,12 @@
         "source.geo.region_name": "\u00d6sterg\u00f6tland County",
         "source.ip": "89.160.20.156",
         "source.user.domain": "domain.tld",
-        "source.user.name": "user@domain.tld",
+        "source.user.name": "user",
         "tags": [
             "cisco-asa",
             "forwarded"
         ],
-        "user.name": "user@domain.tld"
+        "user.name": "user"
     },
     {
         "@timestamp": "2021-01-13T19:12:37.000-02:00",
@@ -4733,5 +4734,91 @@
             "forwarded"
         ],
         "user.name": "81.2.69.1452"
+    },
+    {
+        "@timestamp": "2022-04-26T10:24:37.000-02:00",
+        "cisco.asa.destination_interface": "Inside",
+        "cisco.asa.message_id": "434001",
+        "cisco.asa.source_interface": "outside",
+        "destination.address": "10.12.128.89",
+        "destination.ip": "10.12.128.89",
+        "destination.port": 57388,
+        "event.action": "drop",
+        "event.code": 434001,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-434001: SFR card not up and fail-close mode used, dropping TCP packet from outside:54.239.28.85/443 to Inside:10.12.128.89/57388",
+        "event.outcome": "unknown",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "warning",
+        "log.offset": 13909,
+        "log.syslog.facility.code": 1,
+        "log.syslog.priority": 13,
+        "log.syslog.severity.code": 5,
+        "network.protocol": "tcp",
+        "observer.egress.interface.name": "Inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.12.128.89",
+            "54.239.28.85"
+        ],
+        "service.type": "cisco",
+        "source.address": "54.239.28.85",
+        "source.ip": "54.239.28.85",
+        "source.port": 443,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2019-05-30T09:18:59.000-02:00",
+        "cisco.asa.destination_interface": "Inside",
+        "cisco.asa.message_id": "434003",
+        "cisco.asa.source_interface": "outside",
+        "destination.address": "10.12.128.89",
+        "destination.ip": "10.12.128.89",
+        "destination.port": 57388,
+        "event.action": "reset",
+        "event.code": 434003,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-434003: SFR requested to reset TCP connection from outside:54.239.28.85/443 to Inside:10.12.128.89/57388",
+        "event.outcome": "unknown",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "warning",
+        "log.offset": 14071,
+        "log.syslog.facility.code": 1,
+        "log.syslog.priority": 13,
+        "log.syslog.severity.code": 5,
+        "network.protocol": "tcp",
+        "observer.egress.interface.name": "Inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "10.12.128.89",
+            "54.239.28.85"
+        ],
+        "service.type": "cisco",
+        "source.address": "54.239.28.85",
+        "source.ip": "54.239.28.85",
+        "source.port": 443,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
     }
 ]

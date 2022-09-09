@@ -25,9 +25,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -70,14 +70,14 @@ func TestFetchFleetMode(t *testing.T) {
 	}
 
 	_, err := event.MetricSetFields.GetValue("total_kbytes")
-	assert.Equal(t, common.ErrKeyNotFound, err, "apache.status.total_kbytes shouldn't be present in the fleet mode")
+	assert.Equal(t, mapstr.ErrKeyNotFound, err, "apache.status.total_kbytes shouldn't be present in the fleet mode")
 
 	totalBytes, err := event.MetricSetFields.GetValue("total_bytes")
 	assert.NoError(t, err, "apache.status.total_bytes should be present in the fleet mode")
 	assert.GreaterOrEqual(t, totalBytes.(int64), int64(0), "apache.status.total_bytes should be non-negative")
 
 	_, err = event.MetricSetFields.GetValue("hostname")
-	assert.Equal(t, common.ErrKeyNotFound, err, "apache.status.hostname shouldn't be present in the fleet mode")
+	assert.Equal(t, mapstr.ErrKeyNotFound, err, "apache.status.hostname shouldn't be present in the fleet mode")
 }
 
 func getConfig(host string) map[string]interface{} {

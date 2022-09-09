@@ -5,16 +5,15 @@
 package metrics
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/pkg/errors"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func newIncomingFieldExtractor(l *logp.Logger, mc metricsConfig) *incomingFieldExtractor {
@@ -30,13 +29,13 @@ type incomingFieldExtractor struct {
 type KeyValuePoint struct {
 	Key       string
 	Value     interface{}
-	Labels    common.MapStr
-	ECS       common.MapStr
+	Labels    mapstr.M
+	ECS       mapstr.M
 	Timestamp time.Time
 }
 
 // extractTimeSeriesMetricValues valuable to send to Elasticsearch. This includes, for example, metric values, labels and timestamps
-func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries, aligner string) (points []KeyValuePoint, err error) {
+func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries, aligner string) (points []KeyValuePoint) {
 	points = make([]KeyValuePoint, 0)
 
 	for _, point := range resp.Points {
@@ -56,19 +55,16 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.
 		points = append(points, p)
 	}
 
-	return points, nil
+	return points
 }
 
 func (e *incomingFieldExtractor) getTimestamp(p *monitoring.Point) (ts time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p.Interval != nil {
-		if ts, err = ptypes.Timestamp(p.Interval.EndTime); err != nil {
-			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.EndTime)
-		}
-		return ts, nil
+		return p.Interval.EndTime.AsTime(), nil
 	}
 
-	return time.Time{}, errors.New("error trying to extract the timestamp from the point data")
+	return time.Time{}, fmt.Errorf("error trying to extract the timestamp from the point data")
 }
 
 func cleanMetricNameString(s string, aligner string, mc metricsConfig) string {
@@ -134,22 +130,32 @@ var reMapping = map[string]string{
 	"pod.volume.utilization.value":                    "pod.volume.utilization.pct",
 
 	// gcp.loadbalancing metricset
-	"https.backend_request_bytes_count.value":  "https.backend_request.bytes",
-	"https.backend_request_count.value":        "https.backend_request.count",
-	"https.backend_response_bytes_count.value": "https.backend_response.bytes",
-	"https.request_bytes_count.value":          "https.request.bytes",
-	"https.request_count.value":                "https.request.count",
-	"https.response_bytes_count.value":         "https.response.bytes",
-	"l3.external.egress_bytes_count.value":     "l3.external.egress.bytes",
-	"l3.external.egress_packets_count.value":   "l3.external.egress_packets.count",
-	"l3.external.ingress_bytes_count.value":    "l3.external.ingress.bytes",
-	"l3.external.ingress_packets_count.value":  "l3.external.ingress_packets.count",
-	"l3.internal.egress_bytes_count.value":     "l3.internal.egress.bytes",
-	"l3.internal.egress_packets_count.value":   "l3.internal.egress_packets.count",
-	"l3.internal.ingress_bytes_count.value":    "l3.internal.ingress.bytes",
-	"l3.internal.ingress_packets_count.value":  "l3.internal.ingress_packets.count",
-	"tcp_ssl_proxy.egress_bytes_count.value":   "tcp_ssl_proxy.egress.bytes",
-	"tcp_ssl_proxy.ingress_bytes_count.value":  "tcp_ssl_proxy.ingress.bytes",
+	"https.backend_request_bytes_count.value":         "https.backend_request.bytes",
+	"https.backend_request_count.value":               "https.backend_request.count",
+	"https.backend_response_bytes_count.value":        "https.backend_response.bytes",
+	"https.request_bytes_count.value":                 "https.request.bytes",
+	"https.request_count.value":                       "https.request.count",
+	"https.response_bytes_count.value":                "https.response.bytes",
+	"l3.external.egress_bytes_count.value":            "l3.external.egress.bytes",
+	"l3.external.egress_packets_count.value":          "l3.external.egress_packets.count",
+	"l3.external.ingress_bytes_count.value":           "l3.external.ingress.bytes",
+	"l3.external.ingress_packets_count.value":         "l3.external.ingress_packets.count",
+	"l3.internal.egress_bytes_count.value":            "l3.internal.egress.bytes",
+	"l3.internal.egress_packets_count.value":          "l3.internal.egress_packets.count",
+	"l3.internal.ingress_bytes_count.value":           "l3.internal.ingress.bytes",
+	"l3.internal.ingress_packets_count.value":         "l3.internal.ingress_packets.count",
+	"tcp_ssl_proxy.egress_bytes_count.value":          "tcp_ssl_proxy.egress.bytes",
+	"tcp_ssl_proxy.ingress_bytes_count.value":         "tcp_ssl_proxy.ingress.bytes",
+	"https.backend_latencies.value":                   "https.backend_latencies.value",
+	"https.external.regional.backend_latencies.value": "https.external.regional.backend_latencies.value",
+	"https.external.regional.total_latencies.value":   "https.external.regional.total_latencies.value",
+	"https.frontend_tcp_rtt.value":                    "https.frontend_tcp_rtt.value",
+	"https.internal.backend_latencies.value":          "https.internal.backend_latencies.value",
+	"https.internal.total_latencies.value":            "https.internal.total_latencies.value",
+	"https.total_latencies.value":                     "https.total_latencies.value",
+	"l3.external.rtt_latencies.value":                 "l3.external.rtt_latencies.value",
+	"l3.internal.rtt_latencies.value":                 "l3.internal.rtt_latencies.value",
+	"tcp_ssl_proxy.frontend_tcp_rtt.value":            "tcp_ssl_proxy.frontend_tcp_rtt.value",
 
 	// gcp.metrics metricset
 	// NOTE: nothing here; if the user directly uses this metricset the mapping to ECS is
@@ -202,6 +208,8 @@ var reMapping = map[string]string{
 	"topic.send_request_count.value":                                             "topic.send_request.count",
 	"topic.streaming_pull_response_count.value":                                  "topic.streaming_pull_response.count",
 	"topic.unacked_bytes_by_region.value":                                        "topic.unacked_bytes_by_region.bytes",
+	"subscription.ack_latencies.value":                                           "subscription.ack_latencies.value",
+	"subscription.push_request_latencies.value":                                  "subscription.push_request_latencies.value",
 
 	// gcp.storage metricset
 	"api.request_count.value":                        "api.request.count",
@@ -218,6 +226,29 @@ var reMapping = map[string]string{
 	"document.delete_count.value": "document.delete.count",
 	"document.read_count.value":   "document.read.count",
 	"document.write_count.value":  "document.write.count",
+	// gcp.dataproc
+	"batch.spark.executors.value":                    "batch.spark.executors.count",
+	"cluster.hdfs.datanodes.value":                   "cluster.hdfs.datanodes.count",
+	"cluster.hdfs.storage_capacity.value":            "cluster.hdfs.storage_capacity.value",
+	"cluster.hdfs.storage_utilization.value":         "cluster.hdfs.storage_utilization.value",
+	"cluster.hdfs.unhealthy_blocks.value":            "cluster.hdfs.unhealthy_blocks.count",
+	"cluster.job.failed_count.value":                 "cluster.job.failed.count",
+	"cluster.job.running_count.value":                "cluster.job.running.count",
+	"cluster.job.submitted_count.value":              "cluster.job.submitted.count",
+	"cluster.operation.failed_count.value":           "cluster.operation.failed.count",
+	"cluster.operation.running_count.value":          "cluster.operation.running.count",
+	"cluster.operation.submitted_count.value":        "cluster.operation.submitted.count",
+	"cluster.yarn.allocated_memory_percentage.value": "cluster.yarn.allocated_memory_percentage.value",
+	"cluster.yarn.apps.value":                        "cluster.yarn.apps.count",
+	"cluster.yarn.containers.value":                  "cluster.yarn.containers.count",
+	"cluster.yarn.memory_size.value":                 "cluster.yarn.memory_size.value",
+	"cluster.yarn.nodemanagers.value":                "cluster.yarn.nodemanagers.count",
+	"cluster.yarn.pending_memory_size.value":         "cluster.yarn.pending_memory_size.value",
+	"cluster.yarn.virtual_cores.value":               "cluster.yarn.virtual_cores.count",
+	"cluster.job.completion_time.value":              "cluster.job.completion_time.value",
+	"cluster.job.duration.value":                     "cluster.job.duration.value",
+	"cluster.operation.completion_time.value":        "cluster.operation.completion_time.value",
+	"cluster.operation.duration.value":               "cluster.operation.duration.value",
 }
 
 func remap(l *logp.Logger, s string) string {
@@ -243,8 +274,12 @@ func getValueFromPoint(p *monitoring.Point) (out interface{}) {
 	case *monitoring.TypedValue_StringValue:
 		out = v.StringValue
 	case *monitoring.TypedValue_DistributionValue:
-		//TODO Distribution values aren't simple values. Take a look at this
-		out = v.DistributionValue
+		// Distribution values aren't simple values. Take a look at this
+		histogram := gcp.DistributionHistogramToES(v.DistributionValue)
+
+		out = mapstr.M{
+			"histogram": histogram,
+		}
 	}
 
 	return out

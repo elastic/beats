@@ -33,9 +33,7 @@ const (
 	copytruncateStrategy = "copytruncate"
 )
 
-var (
-	experimentalWarning sync.Once
-)
+var experimentalWarning sync.Once
 
 func newProspector(config config) (loginp.Prospector, error) {
 	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)

@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func GetMetricProcessor() *metricProcessor {
@@ -88,7 +89,7 @@ func TestMetricProcessorProcess(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, event)
 
-	tag := event["tag"].(common.MapStr)
+	tag := event["tag"].(mapstr.M)
 	assert.Equal(t, len(tag), 2)
 	assert.Equal(t, tag["host"], "localhost")
 	assert.Equal(t, tag["shell"], "bash")

@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var result []byte
@@ -30,7 +30,7 @@ var result []byte
 func BenchmarkUTCTime(b *testing.B) {
 	var r []byte
 	codec := New("1.2.3", Config{})
-	fields := common.MapStr{"msg": "message"}
+	fields := mapstr.M{"msg": "message"}
 	var t time.Time
 	var d time.Duration = 1000000000
 
@@ -46,7 +46,7 @@ func BenchmarkUTCTime(b *testing.B) {
 func BenchmarkLocalTime(b *testing.B) {
 	var r []byte
 	codec := New("1.2.3", Config{LocalTime: true})
-	fields := common.MapStr{"msg": "message"}
+	fields := mapstr.M{"msg": "message"}
 	var t time.Time
 	var d time.Duration = 1000000000
 

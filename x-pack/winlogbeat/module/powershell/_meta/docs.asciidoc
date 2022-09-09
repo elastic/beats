@@ -2,7 +2,8 @@
 [role="xpack"]
 == PowerShell Module
 
-The PowerShell module processes event log records from the Microsoft-Windows-PowerShell/Operational and Windows PowerShell logs.
+The PowerShell module processes event log records from the
+Microsoft-Windows-PowerShell/Operational and Windows PowerShell logs.
 
 The module has transformations for the following event IDs:
 
@@ -18,7 +19,10 @@ The module has transformations for the following event IDs:
 [float]
 === Configuration
 
-By default, module and script block logging (event ID's 410x) are disabled, to enable them you can do so through "Windows Powershell" GPO settings and set "Turn on Module Logging" and "Turn on PowerShell Script Block Logging" to enabled.
+By default, module and script block logging (event ID's 410x) are disabled, to
+enable them you can do so through "Windows Powershell" GPO settings and set
+"Turn on Module Logging" and "Turn on PowerShell Script Block Logging" to
+enabled.
 
 Alternatively they can be enabled setting the following registry values:
 
@@ -30,25 +34,19 @@ HKCU/HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging: Ena
 HKCU/HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging: EnableScriptBlockInvocationLogging = 1
 ----
 
-[source,yaml]
+[source,yaml,subs="attributes,callouts"]]
 ----
 winlogbeat.event_logs:
   - name: Windows PowerShell
     event_id: 400, 403, 600, 800
-    processors:
-      - script:
-          lang: javascript
-          id: powershell
-          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js
 
   - name: Microsoft-Windows-PowerShell/Operational
     event_id: 4103, 4104, 4105, 4106
-    processors:
-      - script:
-          lang: javascript
-          id: powershell-operational
-          file: ${path.home}/module/powershell/config/winlogbeat-powershell.js
+
+output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing <1>
 ----
+<1> All module processing is handled via Elasticsearch Ingest Node pipelines.
+See <<{beatname_lc}-modules-setup>> for details.
 
 [float]
 === Example dashboard

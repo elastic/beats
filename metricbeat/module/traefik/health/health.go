@@ -20,10 +20,10 @@ package health
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -72,7 +72,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	metricSetFields, _ := eventMapping(data)
 	event := mb.Event{
 		MetricSetFields: metricSetFields,
-		RootFields:      common.MapStr{},
+		RootFields:      mapstr.M{},
 	}
 	event.RootFields.Put("service.name", "traefik")
 

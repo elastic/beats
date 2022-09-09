@@ -45,7 +45,6 @@ func TestFieldDict_Merge(t *testing.T) {
 	if !checkContains(t, f, c) {
 		t.FailNow()
 	}
-
 }
 
 func checkContains(t testing.TB, dest FieldDict, contains FieldDict) bool {

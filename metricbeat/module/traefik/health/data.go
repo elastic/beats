@@ -18,9 +18,9 @@
 package health
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -37,7 +37,7 @@ var (
 	}
 )
 
-func eventMapping(health map[string]interface{}) (common.MapStr, error) {
+func eventMapping(health map[string]interface{}) (mapstr.M, error) {
 	if averageResponseTimeSec, ok := health["average_response_time_sec"]; ok {
 		if averageResponseTimeSec, ok := averageResponseTimeSec.(float64); ok {
 			health["average_response_time_us"] = averageResponseTimeSec * 1000 * 1000

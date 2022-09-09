@@ -31,7 +31,8 @@ import (
 
 	errw "github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // ErrNotFound returned when we cannot find any dashboard to import.
@@ -53,14 +54,14 @@ type MessageOutputter func(msg string, a ...interface{})
 // Importer is a type to import dashboards
 type Importer struct {
 	cfg     *Config
-	version common.Version
+	version version.V
 
 	loader KibanaLoader
-	fields common.MapStr
+	fields mapstr.M
 }
 
 // NewImporter creates a new dashboard importer
-func NewImporter(version common.Version, cfg *Config, loader KibanaLoader, fields common.MapStr) (*Importer, error) {
+func NewImporter(version version.V, cfg *Config, loader KibanaLoader, fields mapstr.M) (*Importer, error) {
 
 	// Current max version is 7
 	if version.Major > 6 {

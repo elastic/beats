@@ -23,10 +23,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -92,20 +89,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	res, err := m.http.FetchResponse()
 	if err != nil {
-		return errors.Wrap(err, "error fetching response")
+		return fmt.Errorf("error fetching response: %w", err)
 	}
 	defer res.Body.Close()
 
 	content, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return errors.Wrapf(err, "error reading body response")
+		return fmt.Errorf("error reading body response: %w", err)
 	}
 
 	if res.StatusCode == http.StatusOK {
-		reporter.Event(mb.Event{
-			MetricSetFields: eventMapping(content),
-			ModuleFields:    common.MapStr{"api_version": apiVersion},
-		})
+		eventsMapping(reporter, content)
 		return nil
 	}
 

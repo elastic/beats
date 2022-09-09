@@ -17,13 +17,12 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -96,6 +95,7 @@ type Host struct {
 
 // changeDetectionHash creates a hash of selected parts of the host information.
 // This is used later to detect changes to a host over time.
+//nolint:errcheck // All checks are for writes to a hasher.
 func (host *Host) changeDetectionHash() uint64 {
 	h := xxhash.New()
 
@@ -115,8 +115,9 @@ func (host *Host) changeDetectionHash() uint64 {
 	return h.Sum64()
 }
 
-func (host *Host) toMapStr() common.MapStr {
-	mapstr := common.MapStr{
+//nolint:errcheck // All checks are for mapstr.Put.
+func (host *Host) toMapStr() mapstr.M {
+	mapstr := mapstr.M{
 		// https://github.com/elastic/ecs#-host-fields
 		"uptime":              host.Uptime,
 		"boottime":            host.Info.BootTime,
@@ -127,7 +128,7 @@ func (host *Host) toMapStr() common.MapStr {
 		"architecture":        host.Info.Architecture,
 
 		// https://github.com/elastic/ecs#-operating-system-fields
-		"os": common.MapStr{
+		"os": mapstr.M{
 			"platform": host.Info.OS.Platform,
 			"name":     host.Info.OS.Name,
 			"family":   host.Info.OS.Family,
@@ -156,14 +157,26 @@ func (host *Host) toMapStr() common.MapStr {
 
 	var macStrings []string
 	for _, mac := range host.Macs {
-		macStr := mac.String()
-		if macStr != "" {
-			macStrings = append(macStrings, macStr)
+		if len(mac) != 0 {
+			macStrings = append(macStrings, formatHardwareAddr(mac))
 		}
 	}
 	mapstr.Put("mac", macStrings)
 
 	return mapstr
+}
+
+// formatHardwareAddr formats hardware addresses according to the ECS spec.
+func formatHardwareAddr(addr net.HardwareAddr) string {
+	buf := make([]byte, 0, len(addr)*3-1)
+	for _, b := range addr {
+		if len(buf) != 0 {
+			buf = append(buf, '-')
+		}
+		const hexDigit = "0123456789ABCDEF"
+		buf = append(buf, hexDigit[b>>4], hexDigit[b&0xf])
+	}
+	return string(buf)
 }
 
 func init() {
@@ -189,12 +202,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open persistent datastore")
+		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
 
 	ms := &MetricSet{
@@ -207,7 +220,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Load state (lastHost) from disk
 	err = ms.restoreStateFromDisk()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to restore state from disk")
+		return nil, fmt.Errorf("failed to restore state from disk: %w", err)
 	}
 
 	return ms, nil
@@ -274,6 +287,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	var events []mb.Event
 
 	// Report ID changes as a separate, special event.
+	//nolint:errcheck // All checks are for mapstr.Put.
 	if ms.lastHost.Info.UniqueID != currentHost.Info.UniqueID {
 		/*
 		 Issue two events - one for the host with the old ID, one for the new
@@ -310,7 +324,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	if len(events) > 0 {
-		ms.saveStateToDisk()
+		return ms.saveStateToDisk()
 	}
 
 	return nil
@@ -319,7 +333,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 func getHost() (*Host, error) {
 	sysinfoHost, err := sysinfo.Host()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load host information")
+		return nil, fmt.Errorf("failed to load host information: %w", err)
 	}
 
 	ips, macs, err := getNetInfo()
@@ -337,12 +351,13 @@ func getHost() (*Host, error) {
 	return host, nil
 }
 
+//nolint:errcheck // All checks are for mapstr.CopyFieldsTo.
 func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	hostFields := host.toMapStr()
 
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"host"},
 				"type":     []string{action.Type()},
@@ -354,7 +369,7 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	}
 
 	// Copy select host.* fields in case add_host_metadata is not configured.
-	hostTopLevel := common.MapStr{}
+	hostTopLevel := mapstr.M{}
 	hostFields.CopyFieldsTo(hostTopLevel, "architecture")
 	hostFields.CopyFieldsTo(hostTopLevel, "containerized")
 	hostFields.CopyFieldsTo(hostTopLevel, "hostname")
@@ -432,12 +447,12 @@ func (ms *MetricSet) saveStateToDisk() error {
 	if ms.lastHost != nil {
 		err := encoder.Encode(*ms.lastHost)
 		if err != nil {
-			return errors.Wrap(err, "error encoding host information")
+			return fmt.Errorf("error encoding host information: %w", err)
 		}
 
 		err = ms.bucket.Store(bucketKeyLastHost, buf.Bytes())
 		if err != nil {
-			return errors.Wrap(err, "error writing host information to disk")
+			return fmt.Errorf("error writing host information to disk: %w", err)
 		}
 
 		ms.log.Debug("Wrote host information to disk.")
@@ -461,10 +476,12 @@ func (ms *MetricSet) restoreStateFromDisk() error {
 	if decoder != nil {
 		var lastHost Host
 		err = decoder.Decode(&lastHost)
-		if err == nil {
+		switch err { //nolint:errorlint // Bad linter! io.EOF is never wrapped.
+		case nil:
 			ms.lastHost = &lastHost
-		} else if err != io.EOF {
-			return errors.Wrap(err, "error decoding host information")
+		case io.EOF:
+		default:
+			return fmt.Errorf("error decoding host information: %w", err)
 		}
 	}
 
