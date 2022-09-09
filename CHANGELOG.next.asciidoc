@@ -10,13 +10,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+* Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
+
 
 *Auditbeat*
 
 *Filebeat*
 
 *Heartbeat*
-
 
 *Metricbeat*
 
@@ -48,6 +49,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 - Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
 - make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts` {pull}31001[31001]
