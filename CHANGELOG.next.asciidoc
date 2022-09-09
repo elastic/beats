@@ -82,7 +82,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979]
+- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 
 *Packetbeat*
 
