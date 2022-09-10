@@ -398,7 +398,7 @@ func TestGetRegionForBucketARN(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	s3Client := s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
+	s3Client := s3.NewFromConfig(cfg)
 
 	regionName, err := getRegionForBucket(context.Background(), s3Client, getBucketNameFromARN(tfConfig.BucketName))
 	assert.NoError(t, err)
@@ -428,7 +428,7 @@ func TestPaginatorListPrefix(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	s3Client := s3.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", cfg))
+	s3Client := s3.NewFromConfig(cfg)
 
 	s3API := &awsS3API{
 		client: s3Client,

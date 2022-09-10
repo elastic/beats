@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
@@ -163,41 +162,4 @@ func addStaticCredentialsProviderToAwsConfig(beatsConfig ConfigAWS, awsConfig *a
 		beatsConfig.SessionToken)
 
 	awsConfig.Credentials = staticCredentialsProvider
-}
-
-// EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS service clients when endpoint is given in config.
-func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, beatsConfig awssdk.Config) awssdk.Config {
-	var eurl string
-	if endpoint != "" {
-		parsedEndpoint, _ := url.Parse(endpoint)
-
-		// Beats uses the provided endpoint if the scheme is present or...
-		if parsedEndpoint.Scheme != "" {
-			eurl = endpoint
-		} else {
-			// ...build one by using the scheme, service and region names.
-			if regionName == "" {
-				eurl = "https://" + serviceName + "." + endpoint
-			} else {
-				eurl = "https://" + serviceName + "." + regionName + "." + endpoint
-			}
-		}
-
-		beatsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(
-			func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-				return awssdk.Endpoint{URL: eurl}, nil
-			})
-	}
-	return beatsConfig
-}
-
-// CreateServiceName based on Service name, Region and FIPS. Returns service name if Fips is not enabled.
-func CreateServiceName(serviceName string, fipsEnabled bool, region string) string {
-	if fipsEnabled {
-		_, found := OptionalGovCloudFIPS[serviceName]
-		if !strings.HasPrefix(region, "us-gov-") || found {
-			return serviceName + "-fips"
-		}
-	}
-	return serviceName
 }

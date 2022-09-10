@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPreviousDayFrom(t *testing.T) {
-	t.Run("returns the previous day as time interval to collect metrics", func(t *testing.T) {
+func TestUsagePeriodFrom(t *testing.T) {
+	t.Run("returns the start and end times for the usage period", func(t *testing.T) {
 		referenceTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-09 09:41:00")
 		assert.NoError(t, err)
 		expectedStartTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-08 00:00:00")
@@ -20,7 +20,24 @@ func TestPreviousDayFrom(t *testing.T) {
 		expectedEndTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-08 23:59:59")
 		assert.NoError(t, err)
 
-		actualStartTime, actualEndTime := previousDayFrom(referenceTime)
+		actualStartTime, actualEndTime := usageIntervalFrom(referenceTime)
+
+		assert.Equal(t, expectedStartTime, actualStartTime)
+		assert.Equal(t, expectedEndTime, actualEndTime)
+	})
+}
+
+func TestForecastPeriodFrom(t *testing.T) {
+	t.Run("returns the start and end times for the forecast period", func(t *testing.T) {
+		referenceTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-09 09:41:00")
+		assert.NoError(t, err)
+
+		expectedStartTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-01 00:00:00")
+		assert.NoError(t, err)
+		expectedEndTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-31 23:59:59")
+		assert.NoError(t, err)
+
+		actualStartTime, actualEndTime := forecastIntervalFrom(referenceTime)
 
 		assert.Equal(t, expectedStartTime, actualStartTime)
 		assert.Equal(t, expectedEndTime, actualEndTime)
