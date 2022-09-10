@@ -49,7 +49,7 @@ func TestGetFilterForMetric(t *testing.T) {
 			"compute",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
 			metricsRequester{config: config{Region: "us-east1"}, logger: logger},
-			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.region = starts_with(\"us-east1\")",
+			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-east1\")",
 		},
 		{
 			"pubsub service with region in config",
@@ -70,14 +70,14 @@ func TestGetFilterForMetric(t *testing.T) {
 			"compute",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
 			metricsRequester{config: config{Region: "us-central1", Zone: "us-central1-a"}, logger: logger},
-			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.region = starts_with(\"us-central1\")",
+			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-central1\")",
 		},
 		{
 			"compute uptime with partial region",
 			"compute",
 			"compute.googleapis.com/instance/uptime",
 			metricsRequester{config: config{Region: "us-west"}, logger: logger},
-			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.region = starts_with(\"us-west\")",
+			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west\")",
 		},
 		{
 			"compute uptime with partial zone",
@@ -91,7 +91,7 @@ func TestGetFilterForMetric(t *testing.T) {
 			"compute",
 			"compute.googleapis.com/instance/uptime",
 			metricsRequester{config: config{Region: "us-*"}, logger: logger},
-			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.region = starts_with(\"us-\")",
+			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-\")",
 		},
 		{
 			"compute uptime with wildcard in zone",
