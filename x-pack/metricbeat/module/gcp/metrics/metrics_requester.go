@@ -156,8 +156,9 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 			// region = strings.TrimSuffix(r.config.Region, "*")
 			// }
 
+			// FIXME: using resource.labels.zone but should use region.
 			region := strings.TrimSuffix(r.config.Region, "*")
-			f = fmt.Sprintf(`%s AND resource.labels.region = starts_with("%s")`, f, region)
+			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, region)
 		} else if r.config.Zone != "" {
 			// zone := r.config.Zone
 			// if strings.HasSuffix(r.config.Zone, "*") {
