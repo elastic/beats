@@ -21,6 +21,7 @@ RUN cd /usr/lib \
   && curl -sLo instantclient-basic-linux.zip https://download.oracle.com/otn_software/linux/instantclient/19600/instantclient-basic-linux.x64-19.6.0.0.0dbru.zip \
   && unzip instantclient-basic-linux.zip \
   && rm instantclient-basic-linux.zip
+RUN mv /usr/share/metricbeat/modules.d/system.yml /usr/share/metricbeat/modules.d/system.yml.disabled
 ENV LD_LIBRARY_PATH=/usr/lib/instantclient_19_6
 
 ENV PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/oracle/12.2/client64/bin
