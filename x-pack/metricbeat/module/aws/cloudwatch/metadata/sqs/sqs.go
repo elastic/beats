@@ -13,17 +13,19 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metadataPrefix = "aws.sqs.queue"
 
 // AddMetadata adds metadata for SQS queues from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
-	sqsServiceName := awscommon.CreateServiceName("sqs", fips_enabled, regionName)
+func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
+	svc := sqs.NewFromConfig(awsConfig, func(o *sqs.Options) {
+		if fips_enabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
 
-	svc := sqs.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(endpoint, sqsServiceName, regionName, awsConfig))
+	})
 
 	// Get queueUrls for each region
 	queueURLs, err := getQueueUrls(svc)
