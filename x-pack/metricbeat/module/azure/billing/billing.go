@@ -5,6 +5,9 @@
 package billing
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
@@ -70,9 +73,6 @@ type TimeIntervalOptions struct {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-<<<<<<< HEAD
-	results, err := m.client.GetMetrics()
-=======
 	// reference time used to calculate usage and forecast time intervals.
 	referenceTime := time.Now()
 
@@ -91,20 +91,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		Infow("Fetching billing data")
 
 	results, err := m.client.GetMetrics(timeIntervalOptions)
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	if err != nil {
 		return errors.Wrap(err, "error retrieving usage information")
 	}
-<<<<<<< HEAD
-	events := EventsMapping(m.client.Config.SubscriptionId, results)
-=======
 
 	events, err := EventsMapping(m.client.Config.SubscriptionId, results, timeIntervalOptions, m.log)
 	if err != nil {
 		return fmt.Errorf("error mapping events: %w", err)
 	}
 
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	for _, event := range events {
 		isOpen := report.Event(event)
 		if !isOpen {
@@ -114,8 +109,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	return nil
 }
-<<<<<<< HEAD
-=======
 
 // usageIntervalFrom returns the start/end times (UTC) of the usage period given the `reference` time.
 //
@@ -144,4 +137,3 @@ func forecastIntervalFrom(reference time.Time) (time.Time, time.Time) {
 	endOfMonth := beginningOfMonth.AddDate(0, 1, 0).Add(-1 * time.Second)
 	return beginningOfMonth, endOfMonth
 }
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))

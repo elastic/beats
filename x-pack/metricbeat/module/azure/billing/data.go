@@ -6,14 +6,6 @@ package billing
 
 import (
 	"fmt"
-<<<<<<< HEAD
-	"strings"
-	"time"
-
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-
-	"github.com/shopspring/decimal"
-=======
 	"strconv"
 	"strings"
 	"time"
@@ -21,18 +13,10 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
 
 	"errors"
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-<<<<<<< HEAD
-)
-
-func EventsMapping(subscriptionId string, results Usage) []mb.Event {
-	var events []mb.Event
-=======
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // EventsMapping maps the usage details and forecast data to a list of metricbeat events to
@@ -44,33 +28,31 @@ func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOp
 	// Usage Details
 	//
 
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	if len(results.UsageDetails) > 0 {
-		for _, usageDetail := range results.UsageDetails {
-			event := mb.Event{
-				ModuleFields: common.MapStr{
+		for _, ud := range results.UsageDetails {
+			event := mb.Event{Timestamp: time.Now().UTC()}
+
+			// shared fields
+			event.RootFields = common.MapStr{
+				"cloud.provider": "azure",
+			}
+
+			if legacy, isLegacy := ud.AsLegacyUsageDetail(); isLegacy {
+
+				//
+				// legacy data format
+				//
+
+				event.ModuleFields = common.MapStr{
+					"subscription_id":   legacy.SubscriptionID,
+					"subscription_name": legacy.SubscriptionName,
 					"resource": common.MapStr{
-						"type":  usageDetail.ConsumedService,
-						"group": getResourceGroupFromId(*usageDetail.InstanceID),
-						"name":  usageDetail.InstanceName,
+						"name":  legacy.ResourceName,
+						"type":  legacy.ConsumedService,
+						"group": legacy.ResourceGroup,
 					},
-<<<<<<< HEAD
-					"subscription_id": usageDetail.SubscriptionGUID,
-				},
-				MetricSetFields: common.MapStr{
-					"pretax_cost":       usageDetail.PretaxCost,
-					"department_name":   usageDetail.DepartmentName,
-					"product":           usageDetail.Product,
-					"usage_start":       usageDetail.UsageStart.ToTime(),
-					"usage_end":         usageDetail.UsageEnd.ToTime(),
-					"currency":          usageDetail.Currency,
-					"billing_period_id": usageDetail.BillingPeriodID,
-					"account_name":      usageDetail.AccountName,
-				},
-				Timestamp: time.Now().UTC(),
-=======
 				}
-				event.MetricSetFields = mapstr.M{
+				event.MetricSetFields = common.MapStr{
 					// original fields
 					"billing_period_id": legacy.ID,
 					"product":           legacy.Product,
@@ -97,16 +79,16 @@ func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOp
 				// modern data format
 				//
 
-				event.ModuleFields = mapstr.M{
+				event.ModuleFields = common.MapStr{
 					"subscription_id":   modern.SubscriptionGUID,
 					"subscription_name": modern.SubscriptionName,
-					"resource": mapstr.M{
+					"resource": common.MapStr{
 						"name":  getResourceNameFromPath(*modern.InstanceName),
 						"type":  modern.ConsumedService,
 						"group": strings.ToLower(*modern.ResourceGroup),
 					},
 				}
-				event.MetricSetFields = mapstr.M{
+				event.MetricSetFields = common.MapStr{
 					// original fields
 					"billing_period_id": modern.ID,
 					"product":           modern.Product,
@@ -131,39 +113,12 @@ func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOp
 				// Unsupported data format
 				//
 				return events, errors.New("unsupported usage details format: not legacy nor modern")
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 			}
-			event.RootFields = common.MapStr{}
-			event.RootFields.Put("cloud.provider", "azure")
-			event.RootFields.Put("cloud.region", usageDetail.InstanceLocation)
-			event.RootFields.Put("cloud.instance.name", usageDetail.InstanceName)
-			event.RootFields.Put("cloud.instance.id", usageDetail.InstanceID)
+
 			events = append(events, event)
 		}
 	}
 
-<<<<<<< HEAD
-	groupedCosts := make(map[*string][]consumption.Forecast)
-	for _, forecast := range results.ForecastCosts {
-		groupedCosts[forecast.UsageDate] = append(groupedCosts[forecast.UsageDate], forecast)
-	}
-	for _, forecast := range results.ActualCosts {
-		groupedCosts[forecast.UsageDate] = append(groupedCosts[forecast.UsageDate], forecast)
-	}
-	for usageDate, items := range groupedCosts {
-		var actualCost *decimal.Decimal
-		var forecastCost *decimal.Decimal
-		for _, item := range items {
-			if item.ChargeType == consumption.ChargeTypeActual {
-				actualCost = item.Charge
-			} else {
-				forecastCost = item.Charge
-			}
-		}
-		parsedDate, err := time.Parse("2006-01-02", *usageDate)
-		if err != nil {
-			parsedDate = time.Now().UTC()
-=======
 	//
 	// Forecasts
 	//
@@ -294,49 +249,25 @@ func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID 
 		default:
 			logger.Errorf("unsupported cost status: not 'Actual' or 'Forecast'")
 			continue
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 		}
+
 		event := mb.Event{
 			RootFields: common.MapStr{
 				"cloud.provider": "azure",
 			},
-<<<<<<< HEAD
 			ModuleFields: common.MapStr{
-				"subscription_id": subscriptionId,
-			},
-			MetricSetFields: common.MapStr{
-				"actual_cost":   actualCost,
-				"forecast_cost": forecastCost,
-				"usage_date":    parsedDate,
-				"currency":      items[0].Currency,
-=======
-			ModuleFields: mapstr.M{
 				"subscription_id": subscriptionID,
 			},
-			MetricSetFields: mapstr.M{
+			MetricSetFields: common.MapStr{
 				costFieldName: cost,
 				"usage_date":  usageDate,
 				"currency":    currency,
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 			},
 			Timestamp: time.Now().UTC(),
 		}
-		//event.ID = generateEventID(parsedDate)
+
 		events = append(events, event)
 	}
-	return events
-}
-<<<<<<< HEAD
 
-// getResourceGroupFromId maps resource group from resource ID
-func getResourceGroupFromId(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "resourceGroups" {
-			return fmt.Sprintf("%s", params[i+1])
-		}
-	}
-	return ""
+	return events, nil
 }
-=======
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))

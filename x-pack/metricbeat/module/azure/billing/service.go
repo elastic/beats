@@ -10,30 +10,16 @@ import (
 
 	"github.com/Azure/go-autorest/autorest/date"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
-
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-	//"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
+	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
-<<<<<<< HEAD
-	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
-=======
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
-	"github.com/elastic/elastic-agent-libs/logp"
-
-	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 )
 
 // Service interface for the azure monitor service and mock for testing
 type Service interface {
-<<<<<<< HEAD
-	GetForcast(filter string) (consumption.ForecastsListResult, error)
-	GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (prevConsumption.UsageDetailsListResultPage, error)
-=======
 	GetForecast(scope string, startTime, endTime time.Time) (costmanagement.QueryResult, error)
 	GetUsageDetails(
 		scope string,
@@ -44,23 +30,17 @@ type Service interface {
 		metricType consumption.Metrictype,
 		startDate string,
 		endDate string) (consumption.UsageDetailsListResultPage, error)
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 }
 
 // BillingService service wrapper to the azure sdk for go
 type UsageService struct {
-<<<<<<< HEAD
-	usageDetailsClient *prevConsumption.UsageDetailsClient
-	forcastsClient     *consumption.ForecastsClient
-=======
 	usageDetailsClient *consumption.UsageDetailsClient
 	forecastClient     *costmanagement.ForecastClient
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	context            context.Context
 	log                *logp.Logger
 }
 
-// NewService instantiates the Azure monitoring service
+// NewService builds a new UsageService using the given config.
 func NewService(config azure.Config) (*UsageService, error) {
 	clientConfig := auth.NewClientCredentialsConfig(config.ClientId, config.ClientSecret, config.TenantId)
 	clientConfig.AADEndpoint = config.ActiveDirectoryEndpoint
@@ -69,16 +49,7 @@ func NewService(config azure.Config) (*UsageService, error) {
 	if err != nil {
 		return nil, err
 	}
-	forcastsClient := consumption.NewForecastsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
-	usageDetailsClient := prevConsumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 
-<<<<<<< HEAD
-	forcastsClient.Authorizer = authorizer
-	usageDetailsClient.Authorizer = authorizer
-	service := &UsageService{
-		usageDetailsClient: &usageDetailsClient,
-		forcastsClient:     &forcastsClient,
-=======
 	usageDetailsClient := consumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 	forecastsClient := costmanagement.NewForecastClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 
@@ -88,18 +59,13 @@ func NewService(config azure.Config) (*UsageService, error) {
 	service := UsageService{
 		usageDetailsClient: &usageDetailsClient,
 		forecastClient:     &forecastsClient,
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 		context:            context.Background(),
 		log:                logp.NewLogger("azure billing service"),
 	}
-	return service, nil
+
+	return &service, nil
 }
 
-<<<<<<< HEAD
-// GetForcast
-func (service *UsageService) GetForcast(filter string) (consumption.ForecastsListResult, error) {
-	return service.forcastsClient.List(service.context, filter)
-=======
 // GetForecast fetches the forecast for the given scope and time interval.
 func (service *UsageService) GetForecast(scope string, startTime, endTime time.Time) (costmanagement.QueryResult, error) {
 	// With this flag, the Forecast API will also return actual usage data
@@ -154,10 +120,9 @@ func (service *UsageService) GetForecast(scope string, startTime, endTime time.T
 	}
 
 	return queryResult, nil
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 }
 
-// GetUsageDetails
-func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (prevConsumption.UsageDetailsListResultPage, error) {
-	return service.usageDetailsClient.List(service.context, scope, expand, filter, skiptoken, top, apply)
+// GetUsageDetails fetches the usage details for the given filters.
+func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skipToken string, top *int32, metrictype consumption.Metrictype, startDate string, endDate string) (consumption.UsageDetailsListResultPage, error) {
+	return service.usageDetailsClient.List(service.context, scope, expand, filter, skipToken, top, metrictype, startDate, endDate)
 }

@@ -8,95 +8,26 @@ import (
 	"testing"
 	"time"
 
-<<<<<<< HEAD
-	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
-	consumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-	"github.com/Azure/go-autorest/autorest/date"
-	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
-=======
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 )
 
 // TestEventMapping tests that mapping a QueryResult into a list of events is accurate.
 func TestEventMapping(t *testing.T) {
-<<<<<<< HEAD
-	usageDate := "2020-08-08"
-=======
 	logger := logp.NewLogger("TestEventMapping")
 
 	ID := "ID"
 	kind := "legacy"
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	name := "test"
+	billingAccountId := "123"
 	startDate := date.Time{}
 
-<<<<<<< HEAD
-	var charge decimal.Decimal = decimal.NewFromFloat(8.123456)
-	var prop = consumption.ForecastProperties{
-		UsageDate:        &usageDate,
-		Grain:            "",
-		Charge:           &charge,
-		Currency:         &name,
-		ChargeType:       "Forecast",
-		ConfidenceLevels: nil,
-	}
-	var prop2 = consumption.ForecastProperties{
-		UsageDate:        &usageDate,
-		Grain:            "",
-		Charge:           &charge,
-		Currency:         &name,
-		ChargeType:       "Actual",
-		ConfidenceLevels: nil,
-	}
-	var prop1 = prevConsumption.UsageDetailProperties{
-		InstanceName:     &name,
-		SubscriptionName: &name,
-		AccountName:      &name,
-		DepartmentName:   &name,
-		Product:          &name,
-		InstanceID:       &name,
-		UsageStart:       &startDate,
-		UsageEnd:         &startDate,
-	}
-	usage := Usage{
-		UsageDetails: []prevConsumption.UsageDetail{
-			{
-				UsageDetailProperties: &prop1,
-				ID:                    nil,
-				Name:                  nil,
-				Type:                  nil,
-				Tags:                  nil,
-			},
-		},
-		ActualCosts: []consumption.Forecast{
-			{
-				ForecastProperties: &prop2,
-				ID:                 nil,
-				Name:               nil,
-				Type:               nil,
-				Tags:               nil,
-			}},
-		ForecastCosts: []consumption.Forecast{
-			{
-				ForecastProperties: &prop,
-				ID:                 nil,
-				Name:               nil,
-				Type:               nil,
-				Tags:               nil,
-			}},
-	}
-	events := EventsMapping("sub", usage)
-	assert.Equal(t, len(events), 2)
-=======
 	//
 	// Usage Details
 	//
@@ -166,7 +97,6 @@ func TestEventMapping(t *testing.T) {
 	//
 	// Check the results
 	//
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	for _, event := range events {
 		// if is an usage event
 		if ok, _ := event.MetricSetFields.HasKey("department_name"); ok {

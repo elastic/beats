@@ -13,7 +13,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
 
@@ -29,14 +28,8 @@ type Client struct {
 
 // Usage contains the usage details and forecast values.
 type Usage struct {
-<<<<<<< HEAD
-	UsageDetails  []prevConsumption.UsageDetail
-	ActualCosts   []consumption.Forecast
-	ForecastCosts []consumption.Forecast
-=======
 	UsageDetails []consumption.BasicUsageDetail
 	Forecasts    costmanagement.QueryResult
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 }
 
 // NewClient instantiates the an Azure monitoring client
@@ -54,12 +47,7 @@ func NewClient(config azure.Config) (*Client, error) {
 }
 
 // GetMetrics returns the usage detail and forecast values.
-<<<<<<< HEAD
-func (client *Client) GetMetrics() (Usage, error) {
-
-=======
 func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	var usage Usage
 
 	//
@@ -72,13 +60,6 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 	} else if client.Config.BillingScopeAccountId != "" {
 		scope = fmt.Sprintf("/providers/Microsoft.Billing/billingAccounts/%s", client.Config.BillingScopeAccountId)
 	}
-<<<<<<< HEAD
-	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
-	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
-	usageDetails, err := client.BillingService.GetUsageDetails(scope, "properties/meterDetails",
-		fmt.Sprintf("properties/usageStart eq '%s' and properties/usageEnd eq '%s'", startTime.Format(time.RFC3339Nano), endTime.Format(time.RFC3339Nano)),
-		"", nil, "properties/instanceLocation")
-=======
 
 	//
 	// Fetch the usage details
@@ -106,19 +87,9 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 		timeOpts.usageStart.Format("2006-01-02"), // startDate
 		timeOpts.usageEnd.Format("2006-01-02"),   // endDate
 	)
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	if err != nil {
 		return usage, errors.Wrap(err, "Retrieving usage details failed in client")
 	}
-<<<<<<< HEAD
-	usage.UsageDetails = usageDetails.Values()
-	actualCosts, err := client.BillingService.GetForcast(fmt.Sprintf("properties/chargeType eq '%s'", "Actual"))
-	if err != nil {
-		return usage, errors.Wrap(err, "Retrieving forecast - actual costs failed in client")
-	}
-	usage.ActualCosts = *actualCosts.Value
-	forecastCosts, err := client.BillingService.GetForcast(fmt.Sprintf("properties/chargeType eq '%s'", "Forecast"))
-=======
 
 	for paginator.NotDone() {
 		usage.UsageDetails = append(usage.UsageDetails, paginator.Values()...)
@@ -138,16 +109,11 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 		Infow("Getting forecast for scope")
 
 	queryResult, err := client.BillingService.GetForecast(scope, timeOpts.forecastStart, timeOpts.forecastEnd)
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	if err != nil {
 		return usage, errors.Wrap(err, "Retrieving forecast failed in client")
 	}
-<<<<<<< HEAD
-	usage.ForecastCosts = *forecastCosts.Value
-=======
 
 	usage.Forecasts = queryResult
 
->>>>>>> 86b111d594 ([Azure Billing] Switch to Cost Management API for forecast data (#32589))
 	return usage, nil
 }
