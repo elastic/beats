@@ -77,6 +77,13 @@ const (
 	LabelMetadata = "metadata"
 )
 
+const (
+	DefaultResourceLabelZone     = "resource.label.zone"
+	ComputeResourceLabelZone     = "resource.labels.zone"
+	GKEResourceLabelLocation     = "resource.label.location"
+	StorageResourceLabelLocation = "resource.label.location"
+)
+
 // AlignersMapToGCP map contains available perSeriesAligner
 // https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies#Aligner
 var AlignersMapToGCP = map[string]monitoringpb.Aggregation_Aligner{
