@@ -55,6 +55,7 @@ type MetadataCollectorInputData struct {
 	ProjectID  string
 	Zone       string
 	Region     string
+	Regions    []string
 	Point      *monitoringpb.Point
 	Timestamp  *time.Time
 }

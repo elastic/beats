@@ -99,11 +99,21 @@ type metricMeta struct {
 }
 
 type config struct {
+<<<<<<< HEAD
 	Zone                string `config:"zone"`
 	Region              string `config:"region"`
 	ProjectID           string `config:"project_id" validate:"required"`
 	ExcludeLabels       bool   `config:"exclude_labels"`
 	CredentialsFilePath string `config:"credentials_file_path"`
+=======
+	Zone                string   `config:"zone"`
+	Region              string   `config:"region"`
+	Regions             []string `config:"regions"`
+	ProjectID           string   `config:"project_id" validate:"required"`
+	ExcludeLabels       bool     `config:"exclude_labels"`
+	CredentialsFilePath string   `config:"credentials_file_path"`
+	CredentialsJSON     string   `config:"credentials_json"`
+>>>>>>> 3bcefabb28 ([Metricbeat] Add support for multiple regions in GCP (#32964))
 
 	opt    []option.ClientOption
 	period *duration.Duration

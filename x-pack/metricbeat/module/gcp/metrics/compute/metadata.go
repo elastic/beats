@@ -6,10 +6,14 @@ package compute
 
 import (
 	"context"
+<<<<<<< HEAD
+=======
+	"fmt"
+	"strconv"
+>>>>>>> 3bcefabb28 ([Metricbeat] Add support for multiple regions in GCP (#32964))
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
@@ -20,11 +24,12 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(projectID, zone string, region string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:     projectID,
 		zone:          zone,
 		region:        region,
+		regions:       regions,
 		opt:           opt,
 		instanceCache: common.NewCache(30*time.Second, 13),
 		logger:        logp.NewLogger("metrics-compute"),
@@ -34,12 +39,12 @@ func NewMetadataService(projectID, zone string, region string, opt ...option.Cli
 // computeMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
 // reading and writing in the same method)
 type computeMetadata struct {
-	projectID   string
+	// projectID   string
 	zone        string
 	instanceID  string
 	machineType string
 
-	ts *monitoringpb.TimeSeries
+	// ts *monitoringpb.TimeSeries
 
 	User     map[string]string
 	Metadata map[string]string
@@ -48,6 +53,7 @@ type computeMetadata struct {
 }
 
 type metadataCollector struct {
+<<<<<<< HEAD
 	projectID string
 	zone      string
 	region    string
@@ -55,6 +61,13 @@ type metadataCollector struct {
 
 	computeMetadata *computeMetadata
 
+=======
+	projectID     string
+	zone          string
+	region        string
+	regions       []string
+	opt           []option.ClientOption
+>>>>>>> 3bcefabb28 ([Metricbeat] Add support for multiple regions in GCP (#32964))
 	instanceCache *common.Cache
 	logger        *logp.Logger
 }
@@ -75,16 +88,22 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	}
 
 	if resp.Resource != nil && resp.Resource.Labels != nil {
-		metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
 	}
 
 	if resp.Metric.Labels != nil {
-		metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
 	}
 
+<<<<<<< HEAD
 	if s.computeMetadata.machineType != "" {
 		lastIndex := strings.LastIndex(s.computeMetadata.machineType, "/")
 		metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, s.computeMetadata.machineType[lastIndex+1:])
+=======
+	if computeMetadata.machineType != "" {
+		lastIndex := strings.LastIndex(computeMetadata.machineType, "/")
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, computeMetadata.machineType[lastIndex+1:])
+>>>>>>> 3bcefabb28 ([Metricbeat] Add support for multiple regions in GCP (#32964))
 	}
 
 	s.computeMetadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
@@ -110,7 +129,11 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 	// FIXME: remove side effect on metadataCollector instance and use return value instead
 	i, err := s.instance(ctx, instanceID, zone)
 	if err != nil {
+<<<<<<< HEAD
 		return nil, errors.Wrapf(err, "error trying to get data from instance '%s' in zone '%s'", instanceID, zone)
+=======
+		return nil, fmt.Errorf("error trying to get data from instance '%s' %w", instanceID, err)
+>>>>>>> 3bcefabb28 ([Metricbeat] Add support for multiple regions in GCP (#32964))
 	}
 
 	s.computeMetadata = &computeMetadata{

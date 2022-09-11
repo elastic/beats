@@ -25,7 +25,7 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.Metada
 				return nil, err
 			}
 
-			sdCollectorInputData := gcp.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region)
+			sdCollectorInputData := gcp.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region, m.config.Regions)
 			if gcpService == nil {
 				metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(ts)
 			}
