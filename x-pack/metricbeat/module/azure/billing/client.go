@@ -11,8 +11,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
-	"github.com/pkg/errors"
-
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
 
@@ -88,7 +86,7 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 		timeOpts.usageEnd.Format("2006-01-02"),   // endDate
 	)
 	if err != nil {
-		return usage, errors.Wrap(err, "Retrieving usage details failed in client")
+		return usage, fmt.Errorf("retrieving usage details failed in client: %w", err)
 	}
 
 	for paginator.NotDone() {
@@ -110,7 +108,7 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 
 	queryResult, err := client.BillingService.GetForecast(scope, timeOpts.forecastStart, timeOpts.forecastEnd)
 	if err != nil {
-		return usage, errors.Wrap(err, "Retrieving forecast failed in client")
+		return usage, fmt.Errorf("retrieving forecast - forecast costs failed in client: %w", err)
 	}
 
 	usage.Forecasts = queryResult
