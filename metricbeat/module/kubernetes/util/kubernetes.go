@@ -155,6 +155,8 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate("persistentvolume", r)
 			case *kubernetes.PersistentVolumeClaim:
 				m[id] = metaGen.Generate("persistentvolumeclaim", r)
+			case *kubernetes.StorageClass:
+				m[id] = metaGen.Generate("storageclass", r)
 			default:
 				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}

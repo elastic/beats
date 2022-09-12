@@ -55,6 +55,10 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Check for nil metadata in GCP. {pull}32281[32281]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979]
+- Fix GCP storage field naming {pull}32806[32806]
+- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
+- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
+- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 
 *Packetbeat*
 

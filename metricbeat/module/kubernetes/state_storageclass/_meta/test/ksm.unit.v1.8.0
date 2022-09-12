@@ -7,5 +7,3 @@ kube_storageclass_created{storageclass="test_storageclass"} 1.501569018e+09
 # HELP kube_storageclass_labels Kubernetes labels converted to Prometheus labels.
 # TYPE kube_storageclass_labels gauge
 kube_storageclass_labels{storageclass="test_storageclass",label_foo="bar"} 1
-
-
