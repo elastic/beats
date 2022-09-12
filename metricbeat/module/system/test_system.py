@@ -59,14 +59,11 @@ SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
 
 SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
-                            "used.pct"]
+                            "used.pct", "options"]
 
 SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "free",
                                     "mount_point", "total", "used.bytes",
                                     "used.pct"]
-
-SYSTEM_FILESYSTEM[metricbeat.P_DEF] = SYSTEM_FILESYSTEM[metricbeat.P_WIN] +
-["files", "free_files", "options"]
 
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
