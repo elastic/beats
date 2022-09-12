@@ -89,6 +89,21 @@ function Cilium(keep_original_message) {
                 // Type is a string array
             },
             {
+                from: "json.flow.destination.namespace",
+                to: "gcp.cilium.destination.namespace",
+                type: "string"
+            },
+            {
+                from: "json.flow.destination.pod_name",
+                to: "gcp.cilium.destination.pod",
+                type: "string"
+            },
+            {
+                from: "json.flow.destination.labels",
+                to: "gcp.cilium.destination.labels",
+                // Type is a string array
+            },
+            {
                 from: "json.flow.source.namespace",
                 to: "gcp.cilium.source.namespace",
                 type: "string"
@@ -97,6 +112,11 @@ function Cilium(keep_original_message) {
                 from: "json.flow.source.pod_name",
                 to: "gcp.cilium.source.pod",
                 type: "string"
+            },
+            {
+                from: "json.flow.source.labels",
+                to: "gcp.cilium.source.labels",
+                // Type is a string array
             },
             {
                 from: "json.flow.traffic_direction",
@@ -124,6 +144,22 @@ function Cilium(keep_original_message) {
         evt.Delete("json");
     };
 
+    var namespacePods = function(evt) {
+        var source_pod = evt.Get("gcp.cilium.source.pod");
+        var source_namespace = evt.Get("gcp.cilium.source.namespace");
+
+        if (source_pod != undefined && source_namespace != undefined) {
+            evt.Put("gcp.cilium.source.pod_namespaced", source_namespace + "/" + source_pod)
+        }
+
+        var destination_pod = evt.Get("gcp.cilium.destination.pod");
+        var destination_namespace = evt.Get("gcp.cilium.destination.namespace");
+
+        if (destination_pod != undefined && destination_namespace != undefined) {
+            evt.Put("gcp.cilium.destination.pod_namespaced", destination_namespace + "/" + destination_pod)
+        }
+    }
+
     var pipeline = new processor.Chain()
         .Add(decodeJson)
         .Add(parseTimestamp)
@@ -134,6 +170,7 @@ function Cilium(keep_original_message) {
         .Add(convertLogEntry)
         .Add(convertJsonPayload)
         .Add(dropExtraFields)
+        .Add(namespacePods)
         .Build();
 
     return {
