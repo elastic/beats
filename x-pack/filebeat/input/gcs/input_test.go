@@ -7,6 +7,8 @@ package gcs
 import (
 	"context"
 	"crypto/tls"
+	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -24,17 +26,24 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+const (
+	bucketGcsTestNew    = "gcs-test-new"
+	bucketGcsTestLatest = "gcs-test-latest"
+)
+
 func Test_StorageClient(t *testing.T) {
 	tests := []struct {
 		name            string
 		baseConfig      map[string]interface{}
 		mockHandler     func() http.Handler
 		expected        map[string]bool
-		wantErr         bool
+		skipChannelWait map[string]bool
+		checkJSON       bool
+		isError         error
 		unexpectedError error
 	}{
 		{
-			name: "singleBucketWithPollNoErr",
+			name: "Test1_SingleBucketWithPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
@@ -54,11 +63,10 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_new_object_data3_json:    true,
 				mock.Gcs_test_new_object_docs_ata_json: true,
 			},
-			wantErr:         false,
 			unexpectedError: context.Canceled,
 		},
 		{
-			name: "singleBucketWithoutPollNoErr",
+			name: "Test2_SingleBucketWithoutPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
@@ -68,7 +76,7 @@ func Test_StorageClient(t *testing.T) {
 				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
-						"name": "gcs-test-new",
+						"name": bucketGcsTestNew,
 					},
 				},
 			},
@@ -78,13 +86,197 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_new_object_data3_json:    true,
 				mock.Gcs_test_new_object_docs_ata_json: true,
 			},
-			wantErr:         false,
 			unexpectedError: nil,
+		},
+		{
+			name: "Test3_TwoBucketsWithPoll_NoErr",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"parse_json":                 false,
+				"buckets": []map[string]interface{}{
+					{
+						"name": bucketGcsTestNew,
+					},
+					{
+						"name": bucketGcsTestLatest,
+					},
+				},
+			},
+			mockHandler: mock.GCSServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+				mock.Gcs_test_latest_object_ata_json:   true,
+				mock.Gcs_test_latest_object_data3_json: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "Test4_TwoBucketsWithoutPoll_NoErr",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       false,
+				"poll_interval":              "10s",
+				"parse_json":                 false,
+				"buckets": []map[string]interface{}{
+					{
+						"name": bucketGcsTestNew,
+					},
+					{
+						"name": bucketGcsTestLatest,
+					},
+				},
+			},
+			mockHandler: mock.GCSServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+				mock.Gcs_test_latest_object_ata_json:   true,
+				mock.Gcs_test_latest_object_data3_json: true,
+			},
+			unexpectedError: nil,
+		},
+		{
+			name: "Test5_SingleBucketWithPoll_InvalidBucketErr",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"parse_json":                 false,
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test",
+					},
+				},
+			},
+			mockHandler:     mock.GCSServer,
+			expected:        map[string]bool{},
+			isError:         errors.New("storage: bucket doesn't exist"),
+			unexpectedError: nil,
+		},
+		{
+			name: "Test6_SingleBucketWithoutPoll_InvalidBucketErr",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       false,
+				"poll_interval":              "5s",
+				"parse_json":                 false,
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test",
+					},
+				},
+			},
+			mockHandler:     mock.GCSServer,
+			expected:        map[string]bool{},
+			isError:         errors.New("storage: bucket doesn't exist"),
+			unexpectedError: nil,
+		},
+		{
+			name: "Test7_TwoBucketsWithPoll_InvalidBucketErr",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                2,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"parse_json":                 false,
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test",
+					},
+					{
+						"name": "gcs-latest",
+					},
+				},
+			},
+			mockHandler:     mock.GCSServer,
+			expected:        map[string]bool{},
+			isError:         errors.New("storage: bucket doesn't exist"),
+			unexpectedError: nil,
+		},
+		{
+			name: "Test8_SingleBucketWithPoll_InvalidConfigValue",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                5100,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"parse_json":                 false,
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test",
+					},
+				},
+			},
+			mockHandler:     mock.GCSServer,
+			expected:        map[string]bool{},
+			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
+			unexpectedError: nil,
+		},
+		{
+			name: "Test9_TwoBucketWithPoll_InvalidConfigValue",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                5100,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"parse_json":                 false,
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test",
+					},
+					{
+						"name": "gcs-latest",
+					},
+				},
+			},
+			mockHandler:     mock.GCSServer,
+			expected:        map[string]bool{},
+			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
+			unexpectedError: nil,
+		},
+		{
+			name: "Test10_SingleBucketWithPoll_parseJSON",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"parse_json":                 true,
+				"buckets": []map[string]interface{}{
+					{
+						"name": bucketGcsTestLatest,
+					},
+				},
+			},
+			mockHandler: mock.GCSServer,
+			checkJSON:   true,
+			expected: map[string]bool{
+				mock.Gcs_test_latest_object_ata_json_parsed:   true,
+				mock.Gcs_test_latest_object_data3_json_parsed: true,
+			},
+			unexpectedError: context.Canceled,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			serv := httptest.NewTLSServer(tt.mockHandler())
+			serv := httptest.NewServer(tt.mockHandler())
 			httpclient := http.Client{
 				Transport: &http.Transport{
 					TLSClientConfig: &tls.Config{
@@ -92,10 +284,15 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			}
+			t.Cleanup(serv.Close)
+
 			client, _ := storage.NewClient(context.Background(), option.WithEndpoint(serv.URL), option.WithoutAuthentication(), option.WithHTTPClient(&httpclient))
 			cfg := conf.MustNewConfigFrom(tt.baseConfig)
 			conf := config{}
-			assert.NoError(t, cfg.Unpack(&conf))
+			err := cfg.Unpack(&conf)
+			if err != nil {
+				assert.EqualError(t, err, tt.isError.Error())
+			}
 			input := newStatelessInput(conf)
 
 			assert.Equal(t, "gcs-stateless", input.Name())
@@ -112,12 +309,22 @@ func Test_StorageClient(t *testing.T) {
 				return input.Run(ctx, chanClient, client)
 			})
 
-			timeout := time.NewTimer(1*time.Second + *conf.PollInterval)
+			var timeout *time.Timer
+			if conf.PollInterval != nil {
+				timeout = time.NewTimer(1*time.Second + *conf.PollInterval)
+			} else {
+				timeout = time.NewTimer(5 * time.Second)
+			}
 			t.Cleanup(func() { _ = timeout.Stop() })
 
 			if len(tt.expected) == 0 {
-				cancel()
-				assert.NoError(t, g.Wait())
+				if tt.isError != nil && g.Wait() != nil {
+					assert.EqualError(t, g.Wait(), tt.isError.Error())
+					cancel()
+				} else {
+					assert.NoError(t, g.Wait())
+					cancel()
+				}
 				return
 			}
 
@@ -130,10 +337,19 @@ func Test_StorageClient(t *testing.T) {
 					cancel()
 					return
 				case got := <-chanClient.Channel:
-					val, err := got.Fields.GetValue("message")
-					assert.NoError(t, err)
-					assert.True(t, tt.expected[val.(string)])
-					assert.Equal(t, tt.wantErr, !(err == nil))
+					var val interface{}
+					var err error
+					if !tt.checkJSON {
+						val, err = got.Fields.GetValue("message")
+						assert.NoError(t, err)
+						assert.True(t, tt.expected[val.(string)])
+					} else {
+						val, err = got.Fields.GetValue("gcs.storage.object.json_data")
+						fVal := fmt.Sprintf("%v", val)
+						assert.NoError(t, err)
+						assert.True(t, tt.expected[fVal])
+					}
+					assert.Equal(t, tt.isError, err)
 					receivedCount += 1
 					if receivedCount == len(tt.expected) {
 						cancel()

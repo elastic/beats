@@ -9,10 +9,6 @@ import (
 	"strings"
 )
 
-const (
-	bucket = "gcs-test-new"
-)
-
 //nolint:errcheck // We can ignore as this is just for testing
 func GCSServer() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -21,24 +17,24 @@ func GCSServer() http.Handler {
 			switch len(path) {
 			case 2:
 				if path[0] == "b" {
-					if availableBuckets[path[1]] != nil {
-						w.Write([]byte(availableBuckets[path[1]].(string)))
+					if buckets[path[1]] {
+						w.Write([]byte(fetchBucket[path[1]]))
 						return
 					}
-				} else if path[0] == bucket && availableObjects[path[1]] {
-					w.Write([]byte(objects[path[1]].(string)))
+				} else if buckets[path[0]] && availableObjects[path[0]][path[1]] {
+					w.Write([]byte(objects[path[0]][path[1]]))
 					return
 				}
 			case 3:
 				if path[0] == "b" && path[2] == "o" {
-					if availableBuckets[path[1]] != nil {
-						w.Write([]byte(objectList[path[1]].(string)))
+					if buckets[path[1]] {
+						w.Write([]byte(objectList[path[1]]))
 						return
 					}
-				} else if path[0] == bucket {
+				} else if buckets[path[0]] {
 					objName := strings.Join(path[1:], "/")
-					if availableObjects[objName] {
-						w.Write([]byte(objects[objName].(string)))
+					if availableObjects[path[0]][objName] {
+						w.Write([]byte(objects[path[0]][objName]))
 						return
 					}
 				}

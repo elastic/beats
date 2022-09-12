@@ -27,11 +27,13 @@ even though it can get expensive with dealing with a very large number of files.
 3.  If any major error occurs which stops the main thread, the logs will be appropriately generated,
     describing said error.
 
-[id="supported-types"]
+[id="supported-types-gcs"]
 NOTE: Currently only `JSON` is supported with respect to object/file formats. As for authentication types, we currently have support for 
-`json credential keys` and `credential files`.
+`json credential keys` and `credential files`. If a download for a file/object fails or gets interrupted, the download is retried for 2 times. 
+  This is currently not user configurable.
 
-[id="basic-config"]
+
+[id="basic-config-gcs"]
 *A sample configuration with detailed explanation for each field is given below :-*
 ["source","yaml",subs="attributes"]
 ----
@@ -58,7 +60,7 @@ filebeat.inputs:
 *Explanation :*
 This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. 
 Each of these buckets have their own attributes such as `name`, `max_workers`, `poll`, `poll_interval` and `bucket_timeout`. These attributes have detailed explanations 
-given <<supported-attributes,below>>. For now lets try to understand how this config works. 
+given <<supported-attributes-gcs,below>>. For now lets try to understand how this config works. 
 
 For google cloud storage input to identify the files it needs to read and process, it will require the bucket names to be specified. We can have as
 many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll`, `poll_interval` and `bucket_timeout` at the root level, which will
@@ -145,12 +147,12 @@ As we can see from the response above, the `message` field contains the original
     2. *log.file.path* : Path of the object in google cloud.
     3. *gcs.storage.bucket.name* : Name of the bucket from which the file has been read.
     4. *gcs.storage.object.name* : Name of the file/object which has been read.
-    5. *gcs.storage.object.content_type* : Content type of the file/object. You can find the supported content types <<supported-types,here>> .
+    5. *gcs.storage.object.content_type* : Content type of the file/object. You can find the supported content types <<supported-types-gcs,here>> .
     6. *gcs.storage.object.json_data* :  Objectified json file data, representing the contents of the file.
 
 Now let's explore the configuration attributes a bit more elaborately.
 
-[id="supported-attributes"]
+[id="supported-attributes-gcs"]
 *Supported Attributes :-*
 
     1. <<attrib-project-id,project_id>>
@@ -159,9 +161,9 @@ Now let's explore the configuration attributes a bit more elaborately.
     4. <<attrib-buckets,buckets>>
     5. <<attrib-bucket-name,name>>
     6. <<attrib-bucket-timeout,bucket_timeout>>
-    7. <<attrib-max_workers,max_workers>>
-    8. <<attrib-poll,poll>>
-    9. <<attrib-poll_interval,poll_interval>>
+    7. <<attrib-max_workers-gcs,max_workers>>
+    8. <<attrib-poll-gcs,poll>>
+    9. <<attrib-poll_interval-gcs,poll_interval>>
    10. <<attrib-parse_json,parse_json>>
 
 
@@ -212,7 +214,7 @@ It can be defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here 
 If no value is specified for this, by default its initialized to `50 seconds`. This attribute can be specified both at the root level of the configuration as well at the bucket level. 
 The bucket level values will always take priority and override the root level values if both are specified. 
 
-[id="attrib-max_workers"]
+[id="attrib-max_workers-gcs"]
 [float]
 ==== `max_workers`
 
@@ -221,7 +223,7 @@ which read contents of file. More number of workers equals a greater amount of c
 can be defined due to internal sdk constraints. This attribute can be specified both at the root level of the configuration as well at the bucket level. 
 The bucket level values will always take priority and override the root level values if both are specified.
 
-[id="attrib-poll"]
+[id="attrib-poll-gcs"]
 [float]
 ==== `poll`
 
@@ -229,7 +231,7 @@ This attribute informs the scheduler whether to keep polling for new files or no
 specified. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always 
 take priority and override the root level values if both are specified.
 
-[id="attrib-poll_interval"]
+[id="attrib-poll_interval-gcs"]
 [float]
 ==== `poll_interval`
 

@@ -85,10 +85,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 
 		scheduler := NewGcsInputScheduler(pub, bucket, currentSource, &in.config, st, log)
 
-		err := scheduler.Schedule(ctx)
-		if err != nil {
-			return err
-		}
+		return scheduler.Schedule(ctx)
 	}
 	return nil
 }
