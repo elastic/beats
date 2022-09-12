@@ -57,7 +57,7 @@ func NewStorageClassMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.StorageClass{}, mod.GetMetricsRepo(), false),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.StorageClass{}, mod.GetPerfMetricsCache(), false),
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_storageclass_info": p.InfoMetric(),
