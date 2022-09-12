@@ -296,6 +296,7 @@ var Gcs_test_latest_object_data3_json = `{
 }`
 
 // These 2 variables are intentionally indented like this to match the output of certain tests
+//
+//nolint:stylecheck // required for edge case test scenario
 var Gcs_test_latest_object_ata_json_parsed = `[{"brand":"Apple","category":"smartphones","description":"An apple mobile which is nothing like apple","discountPercentage":12.96,"id":1,"images":["https://dummyjson.com/image/i/products/1/1.jpg","https://dummyjson.com/image/i/products/1/2.jpg","https://dummyjson.com/image/i/products/1/3.jpg","https://dummyjson.com/image/i/products/1/4.jpg","https://dummyjson.com/image/i/products/1/thumbnail.jpg"],"price":549,"rating":4.69,"stock":94,"thumbnail":"https://dummyjson.com/image/i/products/1/thumbnail.jpg","title":"iPhone 9"}]`
-
 var Gcs_test_latest_object_data3_json_parsed = `[{"brand":"Samsung","category":"smartphones","description":"Samsung's new variant which goes beyond Galaxy to the Universe","discountPercentage":15.46,"id":3,"images":["https://dummyjson.com/image/i/products/3/1.jpg"],"price":1249,"rating":4.09,"stock":36,"thumbnail":"https://dummyjson.com/image/i/products/3/thumbnail.jpg","title":"Samsung Universe 9"}]`
