@@ -7,6 +7,57 @@
 === Beats version 8.4.1
 https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 
+==== Known Issue 
+
+// tag::credentials-error[]
+
+*Filebeat*
+
+Filebeat agents configured to read from AWS inputs may return an error similar to the following:
+
+[source,shell]
+----
+sqs ReceiveMessage failed: operation error SQS: ReceiveMessage, https response
+error StatusCode: 403, RequestID: cb57783a-505f-5099-9160-23b8eea8ddbb,
+api error SignatureDoesNotMatch: Credential should be scoped to a valid region. 
+----
+
+This error was introduced by a breaking change in the AWS library.
+
+IMPORTANT: This issue also affects FIPS-enabled endpoints. **If you rely on FIPS,
+do not upgrade until version 8.4.2 of the {stack} is available.** The workaround
+documented here will not resolve this problem.
+
+Suggested resolution: In the Filebeat configuration, if an AWS input or module
+configuration sets `endpoint` to a non empty string, set it to an empty string
+instead. Also make sure the default AWS region is set in an environment
+variable, credentials or instance profile, or in the `default_region` setting in
+the configuration. For example:
+
+[source,yaml]
+----
+filebeat.inputs:
+- type: aws-s3
+...
+  endpoint: "" <1>
+  default_region: us-east-1
+----
+<1> You can set this value to an empty string or remove the configuration setting.
+
+Or for modules:
+
+[source,yaml]
+----
+s3access:
+    enabled: false
+...
+    var.endpoint: "" <1>
+    var.default_region: us-east-1
+----
+<1> You can set this value to an empty string or remove the configuration setting
+
+// end::credentials-error[]
+
 ==== Bugfixes
 
 *Auditbeat*
@@ -29,7 +80,7 @@ https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 === Beats version 8.4.0
 https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
-==== Known Issue 
+==== Known Issues 
 
 *Auditbeat* 
 
@@ -39,6 +90,9 @@ Suggested resolution:
 Do not start Auditbeat or auditd integration on Elastic Agent at version 8.4.0. Skip 8.4.0 and upgrade directly to 8.4.1. 
 
 This issue is resolved in 8.4.1 and later.
+
+//include credentials error from 8.4.1 section
+include::CHANGELOG.asciidoc[tag=credentials-error]
 
 ==== Breaking changes
 
