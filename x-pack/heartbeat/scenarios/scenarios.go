@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"sync"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -67,6 +68,31 @@ var Scenarios = &ScenarioDB{
 					"schedule": "@every 1m",
 					"hosts":    []string{"127.0.0.1"},
 				}, func() {}, nil
+			},
+		},
+		{
+			Name: "simple-browser",
+			Type: "browser",
+			Tags: []string{"browser", "browser-inline"},
+			Runner: func() (config mapstr.M, close func(), err error) {
+				err = os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
+				if err != nil {
+					return nil, nil, err
+				}
+				server := httptest.NewServer(hbtest.HelloWorldHandler(200))
+				config = mapstr.M{
+					"id":       "browser-test-id",
+					"name":     "browser-test-name",
+					"type":     "browser",
+					"schedule": "@every 1m",
+					"hosts":    []string{"127.0.0.1"},
+					"source": mapstr.M{
+						"inline": mapstr.M{
+							"script": fmt.Sprintf("step('load server', async () => {await page.goto('%s')})", server.URL),
+						},
+					},
+				}
+				return config, server.Close, nil
 			},
 		},
 	},
