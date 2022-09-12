@@ -200,8 +200,8 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 	// Generally speaking direct HB users would use the beat location, and the synthetics service may as well (TBD)
 	// while Fleet configured monitors will always use a per location monitor
 	var loc *config.LocationWithID
-	if sf.Location != nil {
-		loc = sf.Location
+	if sf.RunFrom != nil {
+		loc = sf.RunFrom
 	} else {
 		loc = beatLocation
 	}

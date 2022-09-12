@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
-var esIntegTwists = framework.MultiTwist(TwistAddLocation, TwistMultiRun(3))
+var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(3))
 
 func TestStateContinuity(t *testing.T) {
 	scenarioDB.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {

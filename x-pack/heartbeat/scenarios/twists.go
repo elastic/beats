@@ -22,8 +22,8 @@ var TestLocationMpls = &config.LocationWithID{
 	},
 }
 
-var TwistAddLocation = framework.MakeTwist("add location", func(s framework.Scenario) framework.Scenario {
-	s.Location = TestLocationDefault
+var TwistAddRunFrom = framework.MakeTwist("add run_from", func(s framework.Scenario) framework.Scenario {
+	s.RunFrom = TestLocationDefault
 	return s
 })
 

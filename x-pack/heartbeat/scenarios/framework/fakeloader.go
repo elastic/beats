@@ -27,8 +27,8 @@ func newLoaderDB() *loaderDB {
 }
 
 func loaderDbKey(sf stdfields.StdMonitorFields) string {
-	if sf.Location != nil {
-		return fmt.Sprintf("%s-%s", sf.ID, sf.Location.ID)
+	if sf.RunFrom != nil {
+		return fmt.Sprintf("%s-%s", sf.ID, sf.RunFrom.ID)
 	}
 	return sf.ID
 }

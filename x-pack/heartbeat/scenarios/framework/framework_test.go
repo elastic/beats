@@ -25,7 +25,7 @@ var testScenario Scenario = Scenario{
 			"schedule": "@every 10s",
 		}, nil, nil
 	},
-	Location: &config.LocationWithID{
+	RunFrom: &config.LocationWithID{
 		ID: "TestID",
 		Geo: util.GeoConfig{
 			Name: "TestName",
@@ -39,9 +39,9 @@ func TestClone(t *testing.T) {
 	require.NotEqual(t, testScenario.Name, clone.Name)
 	clone.Tags = []string{"CloneTag"}
 	require.NotEqual(t, testScenario.Tags, clone.Tags)
-	clone.Location.ID = "CloneID"
-	require.NotEqual(t, testScenario.Location.ID, clone.Location.ID)
-	clone.Location.Geo.Name = "CloneGeoName"
-	require.NotEqual(t, testScenario.Location.Geo.Name, clone.Location.Geo.Name)
+	clone.RunFrom.ID = "CloneID"
+	require.NotEqual(t, testScenario.RunFrom.ID, clone.RunFrom.ID)
+	clone.RunFrom.Geo.Name = "CloneGeoName"
+	require.NotEqual(t, testScenario.RunFrom.Geo.Name, clone.RunFrom.Geo.Name)
 
 }

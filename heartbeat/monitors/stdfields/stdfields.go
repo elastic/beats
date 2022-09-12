@@ -50,7 +50,7 @@ type StdMonitorFields struct {
 		ZipUrl *config.C `config:"zip_url"`
 		Local  *config.C `config:"local"`
 	} `config:"source"`
-	Location *hbconfig.LocationWithID `config:"location"`
+	RunFrom *hbconfig.LocationWithID `config:"run_from"`
 }
 
 func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {

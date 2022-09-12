@@ -37,7 +37,7 @@ type Scenario struct {
 	Type         string
 	Runner       ScenarioRun
 	Tags         []string
-	Location     *hbconfig.LocationWithID
+	RunFrom      *hbconfig.LocationWithID
 	NumberOfRuns int
 }
 
@@ -63,9 +63,9 @@ func MultiTwist(twists ...Twist) Twist {
 
 func (s Scenario) clone() Scenario {
 	copy := s
-	if s.Location != nil {
-		locationCopy := *s.Location
-		copy.Location = &locationCopy
+	if s.RunFrom != nil {
+		locationCopy := *s.RunFrom
+		copy.RunFrom = &locationCopy
 	}
 	return copy
 }
@@ -102,7 +102,7 @@ func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr
 		var conf mapstr.M
 		for i := 0; i < numberRuns; i++ {
 			var mtr *MonitorTestRun
-			mtr, err = runMonitorOnce(t, cfgMap, runS.Location, loaderDB.StateLoader())
+			mtr, err = runMonitorOnce(t, cfgMap, runS.RunFrom, loaderDB.StateLoader())
 
 			mtr.wait()
 			events = append(events, mtr.Events()...)

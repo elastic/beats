@@ -44,7 +44,7 @@ func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int,
 		// ID is unique and sortable by time for easier aggregations
 		// Note that we add an incrementing counter to help with the fact that
 		// millisecond res isn't quite enough for uniqueness (esp. in tests)
-		ID:              fmt.Sprintf("%s-%s-%x-%x", sf.ID, sf.Location, now.UnixMilli(), ctr),
+		ID:              fmt.Sprintf("%s-%s-%x-%x", sf.ID, sf.RunFrom, now.UnixMilli(), ctr),
 		StartedAt:       now,
 		DurationMs:      0,
 		Status:          status,

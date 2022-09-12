@@ -90,10 +90,11 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 }
 
 type mockClient struct {
-	publishLog []*beat.Event
-	pipeline   beat.Pipeline
-	closed     bool
-	mtx        sync.Mutex
+	publishLog   []*beat.Event
+	pipeline     beat.Pipeline
+	closed       bool
+	mtx          sync.Mutex
+	clientConfig beat.ClientConfig
 }
 
 func (c *mockClient) IsClosed() bool {
@@ -104,6 +105,10 @@ func (c *mockClient) IsClosed() bool {
 }
 
 func (c *mockClient) Publish(e beat.Event) {
+	if c.clientConfig.Processing.Processor != nil {
+		outE, _ := c.clientConfig.Processing.Processor.Run(&e)
+		e = *outE
+	}
 	c.PublishAll([]beat.Event{e})
 }
 
@@ -148,11 +153,11 @@ func (pc *MockPipeline) Connect() (beat.Client, error) {
 	return pc.ConnectWith(beat.ClientConfig{})
 }
 
-func (pc *MockPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+func (pc *MockPipeline) ConnectWith(cc beat.ClientConfig) (beat.Client, error) {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	c := &mockClient{pipeline: pc}
+	c := &mockClient{pipeline: pc, clientConfig: cc}
 
 	pc.Clients = append(pc.Clients, c)
 

@@ -56,9 +56,9 @@ func MakeESLoader(esc *elasticsearch.Client, indexPattern string, beatLocation *
 			},
 		}
 
-		if sf.Location != nil {
+		if sf.RunFrom != nil {
 			queryMustClauses = append(queryMustClauses, mapstr.M{
-				"match": mapstr.M{"observer.name": sf.Location.ID},
+				"match": mapstr.M{"observer.name": sf.RunFrom.ID},
 			})
 		}
 
