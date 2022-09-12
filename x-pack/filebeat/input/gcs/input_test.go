@@ -37,7 +37,6 @@ func Test_StorageClient(t *testing.T) {
 		baseConfig      map[string]interface{}
 		mockHandler     func() http.Handler
 		expected        map[string]bool
-		skipChannelWait map[string]bool
 		checkJSON       bool
 		isError         error
 		unexpectedError error
