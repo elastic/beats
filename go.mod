@@ -201,15 +201,9 @@ require (
 	github.com/aws/smithy-go v1.12.0
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
-<<<<<<< HEAD
-	github.com/elastic/elastic-agent-autodiscover v0.2.1
+	github.com/elastic/elastic-agent-autodiscover v0.3.0
 	github.com/elastic/elastic-agent-libs v0.2.9
 	github.com/elastic/elastic-agent-shipper-client v0.2.0
-=======
-	github.com/elastic/elastic-agent-autodiscover v0.3.0
-	github.com/elastic/elastic-agent-libs v0.2.11
-	github.com/elastic/elastic-agent-shipper-client v0.4.0
->>>>>>> d20fff40fa (Add enricher to storageclass metricset (#33032))
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/pierrec/lz4/v4 v4.1.15
