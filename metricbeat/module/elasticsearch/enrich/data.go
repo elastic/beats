@@ -101,8 +101,10 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 		event.MetricSetFields = fields
 
-		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-		event.Index = index
+		if isXpack {
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = index
+		}
 
 		r.Event(event)
 	}
