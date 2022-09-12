@@ -50,7 +50,7 @@ stages:
           - "orka && darwin && aarch64"
         when:                  ## Override the top-level when.
             comments:
-                - "/test auditbeat for macos-m1"
+                - "/test functonbeat for macos-m1"
             labels:
                 - "macos-m1"
             parameters:
