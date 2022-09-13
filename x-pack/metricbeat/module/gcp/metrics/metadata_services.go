@@ -16,7 +16,7 @@ func NewMetadataServiceForConfig(c config, serviceName string) (gcp.MetadataServ
 	switch serviceName {
 	case gcp.ServiceCompute:
 		return compute.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.opt...)
-	case "cloudsql":
+	case gcp.ServiceCloudSQL:
 		return cloudsql.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.opt...)
 	default:
 		return nil, nil
