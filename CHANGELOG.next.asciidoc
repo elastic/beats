@@ -20,7 +20,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
- - [Httpjson]- Fix for pagination at root level not working when used with chaining.
+- [Httpjson]- Fix for pagination at root level not working when used with chaining.
+- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
 
 *Heartbeat*
 
