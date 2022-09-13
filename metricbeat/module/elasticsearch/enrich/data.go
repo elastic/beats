@@ -121,7 +121,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		policyName, ok := policy["name"]
 		if !ok {
 			// No name found for policy. Ignore because all policies require a name
-			errs = append(errs, fmt.Errorf("found an 'executing policy' without a name. Omitting."))
+			errs = append(errs, errors.New("found an 'executing policy' without a name. Omitting."))
 			continue
 		}
 
