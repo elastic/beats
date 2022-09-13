@@ -93,7 +93,7 @@ func TestLoggerPlugin_Log(t *testing.T) {
 			name:             "nosnapshot",
 			logQueryResultFn: queryResultFn,
 			logType:          logger.LogTypeString,
-			logMessage:       "",
+			logMessage:       "{}",
 		},
 		{
 			name:             "snapshot invalid",
