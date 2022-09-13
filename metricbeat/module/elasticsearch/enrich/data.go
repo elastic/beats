@@ -144,8 +144,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 			continue
 		}
 
-		event.MetricSetFields.Put("executing_policy.name", policyName)
-		event.MetricSetFields.Put("executing_policy.task", fields)
+		_, _ = event.MetricSetFields.Put("executing_policy.name", policyName)
+		_, _ = event.MetricSetFields.Put("executing_policy.task", fields)
 
 		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 		// When using Agent, the index name is overwritten anyways.
