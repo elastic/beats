@@ -82,8 +82,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event := mb.Event{}
 
 		event.ModuleFields = mapstr.M{}
-		event.ModuleFields.Put("cluster.name", info.ClusterName)
-		event.ModuleFields.Put("cluster.id", info.ClusterID)
+		_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+		_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		fields, err := schema.Apply(stat)
 		if err != nil {
@@ -96,8 +96,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 			errs = append(errs, errors.Wrap(err, "failure retrieving node ID from Elasticsearch Enrich Stats API response"))
 		}
 
-		event.ModuleFields.Put("node.id", nodeID)
-		fields.Delete("node_id")
+		_, _ = event.ModuleFields.Put("node.id", nodeID)
+		_ = fields.Delete("node_id")
 
 		event.MetricSetFields = fields
 
@@ -113,8 +113,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event := mb.Event{}
 
 		event.ModuleFields = mapstr.M{}
-		event.ModuleFields.Put("cluster.name", info.ClusterName)
-		event.ModuleFields.Put("cluster.id", info.ClusterID)
+		_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+		_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
 		event.MetricSetFields = mapstr.M{}
 
 		policyName, ok := policy["name"]
