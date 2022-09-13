@@ -134,6 +134,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
+- Add new states field for internal use by new synthetics app. {pull}30632[30632]
 
 
 *Metricbeat*

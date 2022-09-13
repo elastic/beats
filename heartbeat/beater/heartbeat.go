@@ -20,26 +20,27 @@ package beater
 import (
 	"errors"
 	"fmt"
+
 	"syscall"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
-
-	_ "github.com/elastic/beats/v7/heartbeat/security"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -49,8 +50,14 @@ type Heartbeat struct {
 	config          config.Config
 	scheduler       *scheduler.Scheduler
 	monitorReloader *cfgfile.Reloader
-	dynamicFactory  *monitors.RunnerFactory
+	monitorFactory  *monitors.RunnerFactory
 	autodiscover    *autodiscover.Autodiscover
+}
+
+type EsConfig struct {
+	Hosts    []string `config:"hosts"`
+	Username string   `config:"username"`
+	Password string   `config:"password"`
 }
 
 // New creates a new heartbeat.
@@ -59,12 +66,26 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
-	limit := parsedConfig.Scheduler.Limit
-	locationName := parsedConfig.Scheduler.Location
-	if locationName == "" {
-		locationName = "Local"
+
+	stateLoader := monitorstate.NilStateLoader
+
+	if b.Config.Output.Name() == "elasticsearch" {
+		// Connect to ES and setup the State loader
+		esc, err := getESClient(b.Config.Output.Config())
+		if err != nil {
+			return nil, err
+		}
+		if esc != nil {
+			stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.RunFrom)
+		}
 	}
-	location, err := time.LoadLocation(locationName)
+
+	limit := parsedConfig.Scheduler.Limit
+	schedLocationName := parsedConfig.Scheduler.Location
+	if schedLocationName == "" {
+		schedLocationName = "Local"
+	}
+	location, err := time.LoadLocation(schedLocationName)
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +110,16 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		done:      make(chan struct{}),
 		config:    parsedConfig,
 		scheduler: sched,
-		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(b.Info, sched.Add, plugin.GlobalPluginsReg, pipelineClientFactory),
+		// monitorFactory is the factory used for creating all monitor instances,
+		// wiring them up to everything needed to actually execute.
+		monitorFactory: monitors.NewFactory(monitors.FactoryParams{
+			BeatInfo:              b.Info,
+			AddTask:               sched.Add,
+			StateLoader:           stateLoader,
+			PluginsReg:            plugin.GlobalPluginsReg,
+			PipelineClientFactory: pipelineClientFactory,
+			BeatRunFrom:           parsedConfig.RunFrom,
+		}),
 	}
 	return bt, nil
 }
@@ -158,7 +187,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
 	for _, cfg := range bt.config.Monitors {
-		created, err := bt.dynamicFactory.Create(b.Publisher, cfg)
+		created, err := bt.monitorFactory.Create(b.Publisher, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
 				logp.L().Info("skipping disabled monitor: %s", err)
@@ -182,21 +211,21 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
-	mons := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	mons := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".monitors", mons)
-	inputs := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
 	reload.Register.MustRegisterList("inputs", inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 	// Check monitor configs
-	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
+	if err := bt.monitorReloader.Check(bt.monitorFactory); err != nil {
 		logp.Error(fmt.Errorf("error loading reloadable monitors: %w", err))
 	}
 
 	// Execute the monitor
-	go bt.monitorReloader.Run(bt.dynamicFactory)
+	go bt.monitorReloader.Run(bt.monitorFactory)
 
 	return nil
 }
@@ -206,7 +235,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 	ad, err := autodiscover.NewAutodiscover(
 		"heartbeat",
 		b.Publisher,
-		bt.dynamicFactory,
+		bt.monitorFactory,
 		autodiscover.QueryConfig(),
 		bt.config.Autodiscover,
 		b.Keystore,
@@ -220,4 +249,25 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	close(bt.done)
+}
+
+// getESClient returns an ES client if one is configured. Will return nil, nil, if none is configured.
+func getESClient(outputConfig *conf.C) (esc *elasticsearch.Client, err error) {
+	esConfig := EsConfig{}
+	err = outputConfig.Unpack(&esConfig)
+	if err != nil {
+		logp.L().Info("output is not elasticsearch, error / state tracking will not be enabled: %w", err)
+		return nil, nil
+	}
+	esc, err = elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: esConfig.Hosts,
+		Username:  esConfig.Username,
+		Password:  esConfig.Password,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not initialize elasticsearch client: %w", err)
+	}
+	logp.L().Infof("successfully connected to elasticsearch for error / state tracking: %v", esConfig.Hosts)
+
+	return esc, nil
 }
