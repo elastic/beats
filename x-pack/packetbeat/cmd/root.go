@@ -29,8 +29,20 @@ var RootCmd *cmd.BeatsRootCmd
 
 // packetbeatCfg is a callback registered via SetTransform that returns a packetbeat Elastic Agent client.Unit
 // configuration generated from a raw Elastic Agent config
-func packetbeatCfg(rawIn *proto.UnitExpectedConfig, _ *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	uconfig, err := conf.NewConfigFrom(rawIn.Source.AsMap())
+func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
+	//grab and properly format the input streams
+	inputStreams, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
+	if err != nil {
+		return nil, fmt.Errorf("error generating new stream config: %w", err)
+	}
+
+	// Packetbeat does its own transformations,
+	// so update the existing config with our new transformations,
+	// then send to packetbeat
+	souceMap := rawIn.Source.AsMap()
+	souceMap["streams"] = inputStreams
+
+	uconfig, err := conf.NewConfigFrom(souceMap)
 	if err != nil {
 		return nil, fmt.Errorf("error in conversion to conf.C: %w", err)
 	}
