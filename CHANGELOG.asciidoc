@@ -34,38 +34,22 @@ https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
 - Fix race conditions when reloading filestream input. {pull}32309[32309]
 - Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
 - Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
-<<<<<<< HEAD
 - Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
 - Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
 - gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
+- Fix handling of stale log message handling in the winlog input {issue}32168[32168] {pull}32176[32176]
 
 *Metricbeat*
 
 - Fix ARN parsing for Cloudwatch resource names with leading slashes. {pull}32445[32445]
 - Add missing metrics in AWS Transit Gateway module. {pull}32617[32617]
 - Replace internal expiring cache used by the Kubernetes module with in-memory dictionary. {pull}32539[32539]
-=======
-- Fix type mapping of client.as.number in okta module. {pull}31676[31676]
-- If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
-- Fix handling of stale log message handling in the winlog input {issue}32168[32168] {pull}32176[32176]
-
-*Heartbeat*
-
-- Fix unintentional use of no-op logger. {pull}31543[31543]
-
-*Metricbeat*
-
-- make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts` {pull}31001[31001]
-- Fix kubernetes module's internal cache expiration issue. This avoid metrics like `kubernetes.container.cpu.usage.limit.pct` from not being populated. {pull}31785[31785]
-- add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
 
 *Winlogbeat*
 
-- Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
 - Fix handling of stale log message handling {issue}32168[32168] {pull}32176[32176]
->>>>>>> e28d89bee4 (winlogbeat/eventlog: allow attempts at recovery from ERROR_EVT_QUERY_RESULT_STALE (#32176))
 
 ==== Added
 
