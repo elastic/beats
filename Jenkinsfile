@@ -22,10 +22,10 @@ pipeline {
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     SLACK_CHANNEL = "#beats"
     SNAPSHOT = 'true'
-    TERRAFORM_VERSION = "0.13.7"
+    TERRAFORM_VERSION = "1.0.2"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     KIND_VERSION = 'v0.14.0'
-    K8S_VERSION = 'v1.24.0'
+    K8S_VERSION = 'v1.25.0'
   }
   options {
     timeout(time: 6, unit: 'HOURS')
@@ -89,9 +89,6 @@ pipeline {
           stageStatusCache(id: 'Checks'){
             withBeatsEnv(archive: false, id: "checks") {
               dumpVariables()
-              whenTrue(env.ONLY_DOCS == 'true') {
-                cmd(label: "make check", script: "make check")
-              }
               whenTrue(env.ONLY_DOCS == 'false') {
                 runChecks()
               }
@@ -204,11 +201,16 @@ VERSION=${env.VERSION}-SNAPSHOT""")
         notifyBuildResult(prComment: true,
                           slackComment: true,
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
-                          githubIssue: isBranch() && currentBuild.currentResult != "SUCCESS",
+                          githubIssue: isGitHubIssueEnabled(),
                           githubLabels: 'Team:Elastic-Agent-Data-Plane')
       }
     }
   }
+}
+
+// When to create a GiHub issue
+def isGitHubIssueEnabled() {
+  return isBranch() && currentBuild.currentResult != "SUCCESS" && currentBuild.currentResult != "ABORTED"
 }
 
 def runChecks() {
@@ -219,23 +221,17 @@ def runChecks() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = {
-    cmd(label: 'make check-default', script: 'make check-default')
-  }
+  // Run pre-commit within the current node and in Jenkins
+  // hence there is no need to use docker login in the GitHub actions
+  // some docker images are hosted in an internal docker registry.
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
 }
 
 def runPreCommit() {
   return {
-    withNode(labels: 'ubuntu-18 && immutable', forceWorkspace: true){
-      withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
-        deleteDir()
-        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-        dir("${BASE_DIR}"){
-          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
-        }
-      }
+    withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
+      preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
     }
   }
 }
@@ -350,6 +346,13 @@ def withTools(Map args = [:], Closure body) {
   } else if (args.get('gcp', false)) {
     withGCP() {
       body()
+    }
+  } else if (args.get('nodejs', false)) {
+    withNodeJSEnv() {
+      withEnv(["ELASTIC_SYNTHETICS_CAPABLE=true"]) {
+        cmd(label: "Install @elastic/synthetics", script: "npm i -g @elastic/synthetics")
+        body()
+      }
     }
   } else {
     body()
@@ -518,7 +521,7 @@ def e2e(Map args = [:]) {
   if (args.e2e.get('entrypoint', '')?.trim()) {
     e2e_with_entrypoint(args)
   } else {
-    runE2E(testMatrixFile: args.e2e?.get('testMatrixFile', ''),
+    runE2E(testMatrixFile: '.ci/.e2e-tests-beats.yaml',
            beatVersion: "${env.VERSION}-SNAPSHOT",
            gitHubCheckName: "e2e-${args.context}",
            gitHubCheckRepo: env.REPO,
@@ -583,10 +586,11 @@ def targetWithoutNode(Map args = [:]) {
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
+  def withNodejs = args.get('withNodejs', false)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
       dumpVariables()
-      withTools(k8s: installK8s, gcp: withGCP) {
+      withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
@@ -1083,6 +1087,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       def installK8s = args.content.get('installK8s', false)
       def withAWS = args.content.get('withAWS', false)
       def withGCP = args.content.get('withGCP', false)
+      def withNodejs = args.content.get('withNodejs', false)
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
@@ -1113,6 +1118,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      withModule: withModule,
                      isMage: true,
                      withGCP: withGCP,
+                     withNodejs: withNodejs,
                      id: args.id,
                      enableRetry: enableRetry)
       }

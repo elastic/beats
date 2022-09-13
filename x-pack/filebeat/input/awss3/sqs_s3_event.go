@@ -15,10 +15,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/smithy-go"
+
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
-	"github.com/aws/aws-sdk-go-v2/aws/awserr"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -28,6 +29,7 @@ import (
 const (
 	sqsApproximateReceiveCountAttribute = "ApproximateReceiveCount"
 	sqsInvalidParameterValueErrorCode   = "InvalidParameterValue"
+	sqsReceiptHandleIsInvalidErrCode    = "ReceiptHandleIsInvalid"
 )
 
 type nonRetryableError struct {
@@ -108,7 +110,7 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 	}
 }
 
-func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
+func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message) error {
 	log := p.log.With(
 		"message_id", *msg.MessageId,
 		"message_receipt_time", time.Now().UTC())
@@ -168,7 +170,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 	return fmt.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
 }
 
-func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *sqs.Message) {
+func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *types.Message) {
 	defer wg.Done()
 
 	t := time.NewTicker(p.sqsVisibilityTimeout / 2)
@@ -186,18 +188,16 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 
 			// Renew visibility.
 			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
-				var awsErr awserr.Error
-				if errors.As(err, &awsErr) {
-					switch awsErr.Code() {
-					case sqs.ErrCodeReceiptHandleIsInvalid, sqsInvalidParameterValueErrorCode:
+				var apiError smithy.APIError
+				if errors.As(err, &apiError) {
+					switch apiError.ErrorCode() {
+					case sqsReceiptHandleIsInvalidErrCode, sqsInvalidParameterValueErrorCode:
 						log.Warnw("Failed to extend message visibility timeout "+
 							"because SQS receipt handle is no longer valid. "+
 							"Stopping SQS message keepalive routine.", "error", err)
 						return
 					}
 				}
-
-				log.Warnw("Failed to extend message visibility timeout.", "error", err)
 			}
 		}
 	}

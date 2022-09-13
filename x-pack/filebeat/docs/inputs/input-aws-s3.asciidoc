@@ -65,8 +65,7 @@ Listing of the S3 bucket will be polled according the time interval defined by
 The `aws-s3` input can also poll 3rd party S3 compatible services such as the self hosted Minio.
 Using non-AWS S3 compatible buckets requires the use of `access_key_id` and `secret_access_key` for authentication.
 To specify the S3 bucket name, use the `non_aws_bucket_name` config and the `endpoint` must be set to replace the default API endpoint.
-`endpoint` should be a full URI in the form of `https(s)://<s3 endpoint>`, that will be used as the API endpoint of the service, or a single domain.
-If a domain is provided, the full endpoint URI will be constructed with the region name in the standard form of `https://s3.<region>.<domain>` supported by AWS and several 3rd party providers.
+`endpoint` should be a full URI in the form of `https(s)://<s3 endpoint>` in the case of `non_aws_bucket_name`, that will be used as the API endpoint of the service.
 No `endpoint` is needed if using the native AWS S3 service hosted at `amazonaws.com`.
 Please see <<aws-credentials-config,Configuration parameters>> for alternate AWS domains that require a different endpoint.
 

@@ -76,6 +76,11 @@
       description: >
         Override application ID.
 
+    - name: identity_src
+      type: keyword
+      description: >
+        The source for authentication identity information.
+
     - name: information
       type: keyword
       overwrite: true
@@ -423,6 +428,11 @@
       overwrite: true
       description: >
         Risk level we got from the engine.
+
+    - name: roles
+      type: keyword
+      description: >
+        The role of identity.
 
     - name: observable_name
       type: keyword
@@ -1888,6 +1898,11 @@
       description: >
         Reports whether watermark is added to the cleaned file.
 
+    - name: snid
+      type: keyword
+      description: >
+        The Check Point session ID.
+
     - name: source_object
       type: keyword
       overwrite: true
@@ -2205,6 +2220,11 @@
       overwrite: true
       description: >
         Password authentication protocol used (PAP or EAP).
+
+    - name: auth_status
+      type: keyword
+      description: >
+        The authentication status for an event.
 
     - name: machine
       type: keyword

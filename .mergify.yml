@@ -129,6 +129,24 @@ pull_request_rules:
         - files~=^\.mergify\.yml$
     actions:
       delete_head_branch:
+  - name: notify the backport policy
+    conditions:
+      - -label~=^backport
+      - base=main
+      - -merged
+      - -closed
+    actions:
+      comment:
+        message: |
+          This pull request does not have a backport label.
+          If this is a bug or security fix, could you label this PR @{{author}}? 🙏.
+          For such, you'll need to label your PR with:
+          * The upcoming major version of the Elastic Stack
+          * The upcoming minor version of the Elastic Stack (if you're not pushing a breaking change)
+
+          To fixup this pull request, you need to add the backport labels for the needed
+          branches, such as:
+          * `backport-v8./d.0` is the label to automatically backport to the `8./d` branch. `/d` is the digit
   - name: notify the backport has not been merged yet
     conditions:
       - -merged
@@ -141,15 +159,6 @@ pull_request_rules:
       comment:
         message: |
           This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
-  - name: remove-backport label
-    conditions:
-      - label~=backport-v
-      - -merged
-      - -closed
-    actions:
-      label:
-        remove:
-          - backport-skip
   - name: backport patches to 7.17 branch
     conditions:
       - merged
@@ -163,19 +172,6 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-  - name: backport patches to 8.2 branch
-    conditions:
-      - merged
-      - label=backport-v8.2.0
-    actions:
-      backport:
-        assignees:
-          - "{{ author }}"
-        branches:
-          - "8.2"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 8.3 branch
     conditions:
       - merged
@@ -186,6 +182,19 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "8.3"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.4 branch
+    conditions:
+      - merged
+      - label=backport-v8.4.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.4"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package source
 
 import (
@@ -56,7 +59,7 @@ func (l *LocalSource) Fetch() (err error) {
 	if l.workingPath != "" {
 		return nil
 	}
-	l.workingPath, err = ioutil.TempDir("/tmp", "elastic-synthetics-")
+	l.workingPath, err = ioutil.TempDir(os.TempDir(), "elastic-synthetics-")
 	if err != nil {
 		return fmt.Errorf("could not create tmp dir: %w", err)
 	}

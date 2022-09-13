@@ -5,10 +5,12 @@
 package ec2
 
 import (
+	"fmt"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -23,18 +25,16 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddProvider("aws_ec2", AutodiscoverBuilder)
+	_ = autodiscover.Registry.AddProvider("aws_ec2", AutodiscoverBuilder)
 }
 
 // Provider implements autodiscover provider for aws EC2s.
 type Provider struct {
-	config        *awsauto.Config
-	bus           bus.Bus
-	templates     *template.Mapper
-	startListener bus.Listener
-	stopListener  bus.Listener
-	watcher       *watcher
-	uuid          uuid.UUID
+	config    *awsauto.Config
+	bus       bus.Bus
+	templates *template.Mapper
+	watcher   *watcher
+	uuid      uuid.UUID
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
@@ -65,9 +65,11 @@ func AutodiscoverBuilder(
 	if config.Regions == nil {
 		// set default region to make initial aws api call
 		awsCfg.Region = "us-west-1"
-		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsCfg.Region)
-		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, ec2ServiceName, awsCfg.Region, awsCfg))
+		svcEC2 := ec2.NewFromConfig(awsCfg, func(o *ec2.Options) {
+			if config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		})
 
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
 		if err != nil {
@@ -77,15 +79,17 @@ func AutodiscoverBuilder(
 		config.Regions = completeRegionsList
 	}
 
-	var clients []ec2iface.ClientAPI
+	var clients []ec2.DescribeInstancesAPIClient
 	for _, region := range config.Regions {
 		if err != nil {
-			logp.Error(errors.Wrap(err, "error loading AWS config for aws_ec2 autodiscover provider"))
+			logp.Error(fmt.Errorf("error loading AWS config for aws_ec2 autodiscover provider: %w", err))
 		}
 		awsCfg.Region = region
-		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, region)
-		clients = append(clients, ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, ec2ServiceName, region, awsCfg)))
+		clients = append(clients, ec2.NewFromConfig(awsCfg, func(o *ec2.Options) {
+			if config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		}))
 	}
 
 	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)

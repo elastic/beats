@@ -24,3 +24,7 @@ input:
           - "cluster/yarn/nodemanagers"
           - "cluster/yarn/pending_memory_size"
           - "cluster/yarn/virtual_cores"
+          - "cluster/job/completion_time"
+          - "cluster/job/duration"
+          - "cluster/operation/completion_time"
+          - "cluster/operation/duration"

@@ -15,6 +15,11 @@
 # to sniff on the device carrying the default route.
 packetbeat.interfaces.device: {{ call .device .GOOS }}
 
+# Specify the amount of time between polling for changes in the default
+# route. This option is only used when one of the default route devices
+# is specified.
+packetbeat.interfaces.poll_default_route: 1m
+
 # The network CIDR blocks that are considered "internal" networks for
 # the purpose of network perimeter boundary classification. The valid
 # values for internal_networks are the same as those that can be used
@@ -118,6 +123,9 @@ packetbeat.protocols:
   # Configure the ports where to listen for SIP traffic. You can disable
   # the SIP protocol by commenting out the list of ports.
   ports: [5060]
+  # You can monitor tcp SIP traffic by setting the transport_protocol option
+  # to tcp, it defaults to udp.
+  #transport_protocol: tcp
 
 {{header "Elasticsearch template setting"}}
 

@@ -1,0 +1,57 @@
+{
+    "attributes": {
+        "columns": [
+            "cef.device.vendor",
+            "cef.device.product",
+            "message",
+            "cef.device.event_class_id",
+            "cef.extensions.deviceEventCategory",
+            "source.user.name",
+            "destination.user.name",
+            "destination.domain",
+            "event.action",
+            "event.outcome",
+            "cef.extensions.sourceNtDomain",
+            "cef.extensions.destinationNtDomain"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "event.dataset:\"cef.log\""
+                    }
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Endpoint - Events [Filebeat CEF]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-12352cbd-ccbb-4ede-a98b-c4c82a358516",
+    "migrationVersion": {
+        "search": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NzEsMV0="
+}

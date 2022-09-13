@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package browser
 
@@ -10,9 +12,10 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
 func init() {

@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 == ActiveMQ module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This module parses Apache ActiveMQ logs. It supports application and audit logs.
 
 include::../include/what-happens.asciidoc[]
@@ -86,4 +88,4 @@ image::./images/filebeat-activemq-audit-events.png[]
 For a description of each field in the module, see the
 <<exported-fields-activemq,exported fields>> section.
 
-edit_url!:
+:edit_url!:

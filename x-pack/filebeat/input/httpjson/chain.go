@@ -56,16 +56,12 @@
 
 package httpjson
 
-import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-)
-
 // chainConfig for chain request.
 // Following contains basic call structure for each call after normal httpjson
 // call.
 type chainConfig struct {
-	Step stepConfig `config:"step" validate:"required"`
+	Step  *stepConfig  `config:"step,omitempty"`
+	While *whileConfig `config:"while,omitempty"`
 }
 
 // stepConfig will contain basic properties like, request.url,
@@ -73,21 +69,47 @@ type chainConfig struct {
 // will contain replace string with original URL to make a skeleton for the
 // call request.
 type stepConfig struct {
-	Request  requestChainConfig  `config:"request"`
-	Response responseChainConfig `config:"response,omitempty"`
-	Replace  string              `config:"replace,omitempty"`
+	Auth     *authConfig          `config:"auth"`
+	Request  *requestConfig       `config:"request" validate:"required"`
+	Response *responseChainConfig `config:"response,omitempty"`
+	Replace  string               `config:"replace,omitempty"`
 }
 
-type requestChainConfig struct {
-	URL        *urlConfig       `config:"url" validate:"required"`
-	Method     string           `config:"method" validate:"required"`
-	Body       *mapstr.M        `config:"body"`
-	Transforms transformsConfig `config:"transforms"`
-
-	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+// whileConfig will contain basic properties like auth parameters, request parameters,
+// response parameters , a replace parameter and an expression parameter called 'until'.
+// While is similar to stepConfig with the addition of 'until'. 'until' holds an expression
+// and with the combination of "request.retry.max_attempts" retries a request 'until' the
+// expression is evaluated to "true" or request.retry.max_attempts is exhausted. If
+// request.retry.max_attempts is not specified , the max_attempts is always 1.
+type whileConfig struct {
+	Auth     *authConfig          `config:"auth"`
+	Request  *requestConfig       `config:"request" validate:"required"`
+	Response *responseChainConfig `config:"response,omitempty"`
+	Replace  string               `config:"replace,omitempty"`
+	Until    *valueTpl            `config:"until" validate:"required"`
 }
 
 type responseChainConfig struct {
 	Transforms transformsConfig `config:"transforms"`
 	Split      *splitConfig     `config:"split"`
+}
+
+func defaultChainConfig() config {
+	chaincfg := defaultConfig()
+	chaincfg.Chain = []chainConfig{
+		{
+			While: &whileConfig{
+				Auth:     chaincfg.Auth,
+				Request:  chaincfg.Request,
+				Response: &responseChainConfig{},
+			},
+			Step: &stepConfig{
+				Auth:     chaincfg.Auth,
+				Request:  chaincfg.Request,
+				Response: &responseChainConfig{},
+			},
+		},
+	}
+
+	return chaincfg
 }

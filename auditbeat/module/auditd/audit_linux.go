@@ -139,7 +139,7 @@ func newAuditClient(c *Config, log *logp.Logger) (*libaudit.AuditClient, error) 
 	return libaudit.NewAuditClient(nil)
 }
 
-func closeAuditClient(client *libaudit.AuditClient) error {
+func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 	discard := func(bytes []byte) ([]syscall.NetlinkMessage, error) {
 		return nil, nil
 	}
@@ -149,24 +149,38 @@ func closeAuditClient(client *libaudit.AuditClient) error {
 	go func() {
 		for {
 			_, err := client.Netlink.Receive(true, discard)
-			switch err {
-			case nil, syscall.EINTR:
-			case syscall.EAGAIN:
+			switch {
+			case err == nil, errors.Is(err, syscall.EINTR):
+			case errors.Is(err, syscall.EAGAIN):
 				time.Sleep(50 * time.Millisecond)
 			default:
 				return
 			}
 		}
 	}()
-	return client.Close()
+	if err := client.Close(); err != nil {
+		log.Errorw("Error closing audit monitoring client", "error", err)
+	}
 }
 
 // Run initializes the audit client and receives audit messages from the
 // kernel until the reporter's done channel is closed.
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
-	defer closeAuditClient(ms.client)
+	defer closeAuditClient(ms.client, ms.log)
 
-	if err := ms.addRules(reporter); err != nil {
+	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
+	// Will result in EPERM.
+	status, err := ms.client.GetStatus()
+	if err != nil {
+		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
+		reporter.Error(err)
+		return
+	}
+
+	if status.Enabled == auditLocked {
+		err := errors.New("Skipping rule configuration: Audit rules are locked")
+		reporter.Error(err)
+	} else if err := ms.addRules(reporter); err != nil {
 		reporter.Error(err)
 		ms.log.Errorw("Failure adding audit rules", "error", err)
 		return
@@ -179,6 +193,14 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		return
 	}
 
+	if ms.config.Immutable && status.Enabled != auditLocked {
+		if err := ms.client.SetImmutable(libaudit.WaitForReply); err != nil {
+			reporter.Error(err)
+			ms.log.Errorw("Failure setting audit config as immutable", "error", err)
+			return
+		}
+	}
+
 	if ms.kernelLost.enabled {
 		client, err := libaudit.NewAuditClient(nil)
 		if err != nil {
@@ -188,7 +210,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		go func() {
 			defer func() { // Close the most recently allocated "client" instance.
 				if client != nil {
-					closeAuditClient(client)
+					closeAuditClient(client, ms.log)
 				}
 			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
@@ -202,9 +224,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
-						if err = closeAuditClient(client); err != nil {
-							ms.log.Errorw("Error closing audit monitoring client", "error", err)
-						}
+						closeAuditClient(client, ms.log)
 						client, err = libaudit.NewAuditClient(nil)
 						if err != nil {
 							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
@@ -257,19 +277,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("failed to create audit client for adding rules: %w", err)
 	}
-	defer closeAuditClient(client)
-
-	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
-	// Will result in EPERM.
-	status, err := client.GetStatus()
-	if err != nil {
-		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
-		reporter.Error(err)
-		return err
-	}
-	if status.Enabled == auditLocked {
-		return errors.New("Skipping rule configuration: Audit rules are locked")
-	}
+	defer closeAuditClient(client, ms.log)
 
 	// Delete existing rules.
 	n, err := client.DeleteRules()
@@ -325,56 +333,60 @@ func (ms *MetricSet) initClient() error {
 	ms.log.Infow("audit status from kernel at start", "audit_status", status)
 
 	if status.Enabled == auditLocked {
-		return errors.New("failed to configure: The audit system is locked")
-	}
-
-	if fm, _ := ms.config.failureMode(); status.Failure != fm {
-		if err = ms.client.SetFailure(libaudit.FailureMode(fm), libaudit.NoWait); err != nil {
-			return fmt.Errorf("failed to set audit failure mode in kernel: %w", err)
+		if !ms.config.Immutable {
+			return errors.New("failed to configure: The audit system is locked")
 		}
 	}
 
-	if status.BacklogLimit != ms.config.BacklogLimit {
-		if err = ms.client.SetBacklogLimit(ms.config.BacklogLimit, libaudit.NoWait); err != nil {
-			return fmt.Errorf("failed to set audit backlog limit in kernel: %w", err)
-		}
-	}
-
-	if ms.backpressureStrategy&(bsKernel|bsAuto) != 0 {
-		// "kernel" backpressure mitigation strategy
-		//
-		// configure the kernel to drop audit events immediately if the
-		// backlog queue is full.
-		if status.FeatureBitmap&libaudit.AuditFeatureBitmapBacklogWaitTime != 0 {
-			ms.log.Info("Setting kernel backlog wait time to prevent backpressure propagating to the kernel.")
-			if err = ms.client.SetBacklogWaitTime(0, libaudit.NoWait); err != nil {
-				return fmt.Errorf("failed to set audit backlog wait time in kernel: %w", err)
+	if status.Enabled != auditLocked {
+		if fm, _ := ms.config.failureMode(); status.Failure != fm {
+			if err = ms.client.SetFailure(libaudit.FailureMode(fm), libaudit.NoWait); err != nil {
+				return fmt.Errorf("failed to set audit failure mode in kernel: %w", err)
 			}
-		} else {
-			if ms.backpressureStrategy == bsAuto {
-				ms.log.Warn("setting backlog wait time is not supported in this kernel. Enabling workaround.")
-				ms.backpressureStrategy |= bsUserSpace
+		}
+
+		if status.BacklogLimit != ms.config.BacklogLimit {
+			if err = ms.client.SetBacklogLimit(ms.config.BacklogLimit, libaudit.NoWait); err != nil {
+				return fmt.Errorf("failed to set audit backlog limit in kernel: %w", err)
+			}
+		}
+
+		if ms.backpressureStrategy&(bsKernel|bsAuto) != 0 {
+			// "kernel" backpressure mitigation strategy
+			//
+			// configure the kernel to drop audit events immediately if the
+			// backlog queue is full.
+			if status.FeatureBitmap&libaudit.AuditFeatureBitmapBacklogWaitTime != 0 {
+				ms.log.Info("Setting kernel backlog wait time to prevent backpressure propagating to the kernel.")
+				if err = ms.client.SetBacklogWaitTime(0, libaudit.NoWait); err != nil {
+					return fmt.Errorf("failed to set audit backlog wait time in kernel: %w", err)
+				}
 			} else {
-				return errors.New("kernel backlog wait time not supported by kernel, but required by backpressure_strategy")
+				if ms.backpressureStrategy == bsAuto {
+					ms.log.Warn("setting backlog wait time is not supported in this kernel. Enabling workaround.")
+					ms.backpressureStrategy |= bsUserSpace
+				} else {
+					return errors.New("kernel backlog wait time not supported by kernel, but required by backpressure_strategy")
+				}
 			}
 		}
-	}
 
-	if ms.backpressureStrategy&(bsKernel|bsUserSpace) == bsUserSpace && ms.config.RateLimit == 0 {
-		// force a rate limit if the user-space strategy will be used without
-		// corresponding backlog_wait_time setting in the kernel
-		ms.config.RateLimit = 5000
-	}
-
-	if status.RateLimit != ms.config.RateLimit {
-		if err = ms.client.SetRateLimit(ms.config.RateLimit, libaudit.NoWait); err != nil {
-			return fmt.Errorf("failed to set audit rate limit in kernel: %w", err)
+		if ms.backpressureStrategy&(bsKernel|bsUserSpace) == bsUserSpace && ms.config.RateLimit == 0 {
+			// force a rate limit if the user-space strategy will be used without
+			// corresponding backlog_wait_time setting in the kernel
+			ms.config.RateLimit = 5000
 		}
-	}
 
-	if status.Enabled == 0 {
-		if err = ms.client.SetEnabled(true, libaudit.NoWait); err != nil {
-			return fmt.Errorf("failed to enable auditing in the kernel: %w", err)
+		if status.RateLimit != ms.config.RateLimit {
+			if err = ms.client.SetRateLimit(ms.config.RateLimit, libaudit.NoWait); err != nil {
+				return fmt.Errorf("failed to set audit rate limit in kernel: %w", err)
+			}
+		}
+
+		if status.Enabled == 0 {
+			if err = ms.client.SetEnabled(true, libaudit.NoWait); err != nil {
+				return fmt.Errorf("failed to enable auditing in the kernel: %w", err)
+			}
 		}
 	}
 
@@ -383,7 +395,8 @@ func (ms *MetricSet) initClient() error {
 	}
 
 	if err := ms.setPID(setPIDMaxRetries); err != nil {
-		if errno, ok := err.(syscall.Errno); ok && errno == syscall.EEXIST && status.PID != 0 {
+		var errno syscall.Errno
+		if ok := errors.As(err, &errno); ok && errno == syscall.EEXIST && status.PID != 0 {
 			return fmt.Errorf("failed to set audit PID. An audit process is already running (PID %d)", status.PID)
 		}
 		return fmt.Errorf("failed to set audit PID (current audit PID %d): %w", status.PID, err)
@@ -397,7 +410,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 	}
 	// At this point the netlink channel is congested (ENOBUFS).
 	// Drain and close the client, then retry with a new client.
-	closeAuditClient(ms.client)
+	closeAuditClient(ms.client, ms.log)
 	if ms.client, err = newAuditClient(&ms.config, ms.log); err != nil {
 		return fmt.Errorf("failed to recover from ENOBUFS: %w", err)
 	}
@@ -545,7 +558,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		},
 	}
 	if auditEvent.Session != uidUnset {
-		out.ModuleFields.Put("session", auditEvent.Session)
+		_, _ = out.ModuleFields.Put("session", auditEvent.Session)
 	}
 
 	// Add root level fields.
@@ -556,14 +569,14 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	addAddress(auditEvent.Dest, "destination", out.RootFields)
 	addNetwork(auditEvent.Net, out.RootFields)
 	if len(auditEvent.Tags) > 0 {
-		out.RootFields.Put("tags", auditEvent.Tags)
+		_, _ = out.RootFields.Put("tags", auditEvent.Tags)
 	}
 	if config.Warnings && len(auditEvent.Warnings) > 0 {
 		warnings := make([]string, 0, len(auditEvent.Warnings))
 		for _, err := range auditEvent.Warnings {
 			warnings = append(warnings, err.Error())
 		}
-		out.RootFields.Put("error.message", warnings)
+		_, _ = out.RootFields.Put("error.message", warnings)
 		addEventOriginal(msgs, out.RootFields)
 	}
 	if config.RawMessage {
@@ -573,25 +586,25 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	// Add module fields.
 	m := out.ModuleFields
 	if auditEvent.Summary.Actor.Primary != "" {
-		m.Put("summary.actor.primary", auditEvent.Summary.Actor.Primary)
+		_, _ = m.Put("summary.actor.primary", auditEvent.Summary.Actor.Primary)
 	}
 	if auditEvent.Summary.Actor.Secondary != "" {
-		m.Put("summary.actor.secondary", auditEvent.Summary.Actor.Secondary)
+		_, _ = m.Put("summary.actor.secondary", auditEvent.Summary.Actor.Secondary)
 	}
 	if auditEvent.Summary.Object.Primary != "" {
-		m.Put("summary.object.primary", auditEvent.Summary.Object.Primary)
+		_, _ = m.Put("summary.object.primary", auditEvent.Summary.Object.Primary)
 	}
 	if auditEvent.Summary.Object.Secondary != "" {
-		m.Put("summary.object.secondary", auditEvent.Summary.Object.Secondary)
+		_, _ = m.Put("summary.object.secondary", auditEvent.Summary.Object.Secondary)
 	}
 	if auditEvent.Summary.Object.Type != "" {
-		m.Put("summary.object.type", auditEvent.Summary.Object.Type)
+		_, _ = m.Put("summary.object.type", auditEvent.Summary.Object.Type)
 	}
 	if auditEvent.Summary.How != "" {
-		m.Put("summary.how", auditEvent.Summary.How)
+		_, _ = m.Put("summary.how", auditEvent.Summary.How)
 	}
 	if len(auditEvent.Paths) > 0 {
-		m.Put("paths", auditEvent.Paths)
+		_, _ = m.Put("paths", auditEvent.Paths)
 	}
 
 	normalizeEventFields(auditEvent, out.RootFields)
@@ -613,17 +626,17 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		nameField := key + ".name"
 		idField := key + ".id"
 		if ent.ID != "" {
-			root.Put(idField, ent.ID)
+			_, _ = root.Put(idField, ent.ID)
 		} else {
-			root.Delete(idField)
+			_ = root.Delete(idField)
 		}
 		if ent.Name != "" {
-			root.Put(nameField, ent.Name)
+			_, _ = root.Put(nameField, ent.Name)
 			if set != nil {
 				set.Add(ent.Name)
 			}
 		} else {
-			root.Delete(nameField)
+			_ = root.Delete(nameField)
 		}
 	}
 
@@ -635,7 +648,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 
 	if userSet != nil {
 		if userSet.Count() != 0 {
-			out.RootFields.Put("related.user", userSet.ToSlice())
+			_, _ = out.RootFields.Put("related.user", userSet.ToSlice())
 		}
 	}
 	getStringField := func(key string, m mapstr.M) (str string) {
@@ -649,7 +662,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	removeRedundantEntity := func(target, original string, m mapstr.M) bool {
 		for _, suffix := range []string{".id", ".name"} {
 			if value := getStringField(original+suffix, m); value != "" && getStringField(target+suffix, m) == value {
-				m.Delete(target)
+				_ = m.Delete(target)
 				return true
 			}
 		}
@@ -660,21 +673,21 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 }
 
 func normalizeEventFields(event *aucoalesce.Event, m mapstr.M) {
-	m.Put("event.kind", "event")
+	_, _ = m.Put("event.kind", "event")
 	if len(event.ECS.Event.Category) > 0 {
-		m.Put("event.category", event.ECS.Event.Category)
+		_, _ = m.Put("event.category", event.ECS.Event.Category)
 	}
 	if len(event.ECS.Event.Type) > 0 {
-		m.Put("event.type", event.ECS.Event.Type)
+		_, _ = m.Put("event.type", event.ECS.Event.Type)
 	}
 	if event.ECS.Event.Outcome != "" {
-		m.Put("event.outcome", event.ECS.Event.Outcome)
+		_, _ = m.Put("event.outcome", event.ECS.Event.Outcome)
 	}
 }
 
 func addUser(u aucoalesce.User, m mapstr.M) {
 	user := mapstr.M{}
-	m.Put("user", user)
+	_, _ = m.Put("user", user)
 
 	for id, value := range u.IDs {
 		if value == uidUnset {
@@ -684,23 +697,23 @@ func addUser(u aucoalesce.User, m mapstr.M) {
 		case "uid":
 			user["id"] = value
 		case "gid":
-			user.Put("group.id", value)
+			_, _ = user.Put("group.id", value)
 		case "euid":
-			user.Put("effective.id", value)
+			_, _ = user.Put("effective.id", value)
 		case "egid":
-			user.Put("effective.group.id", value)
+			_, _ = user.Put("effective.group.id", value)
 		case "suid":
-			user.Put("saved.id", value)
+			_, _ = user.Put("saved.id", value)
 		case "sgid":
-			user.Put("saved.group.id", value)
+			_, _ = user.Put("saved.group.id", value)
 		case "fsuid":
-			user.Put("filesystem.id", value)
+			_, _ = user.Put("filesystem.id", value)
 		case "fsgid":
-			user.Put("filesystem.group.id", value)
+			_, _ = user.Put("filesystem.group.id", value)
 		case "auid":
-			user.Put("audit.id", value)
+			_, _ = user.Put("audit.id", value)
 		default:
-			user.Put(id+".id", value)
+			_, _ = user.Put(id+".id", value)
 		}
 
 		if len(u.SELinux) > 0 {
@@ -713,23 +726,23 @@ func addUser(u aucoalesce.User, m mapstr.M) {
 		case "uid":
 			user["name"] = value
 		case "gid":
-			user.Put("group.name", value)
+			_, _ = user.Put("group.name", value)
 		case "euid":
-			user.Put("effective.name", value)
+			_, _ = user.Put("effective.name", value)
 		case "egid":
-			user.Put("effective.group.name", value)
+			_, _ = user.Put("effective.group.name", value)
 		case "suid":
-			user.Put("saved.name", value)
+			_, _ = user.Put("saved.name", value)
 		case "sgid":
-			user.Put("saved.group.name", value)
+			_, _ = user.Put("saved.group.name", value)
 		case "fsuid":
-			user.Put("filesystem.name", value)
+			_, _ = user.Put("filesystem.name", value)
 		case "fsgid":
-			user.Put("filesystem.group.name", value)
+			_, _ = user.Put("filesystem.group.name", value)
 		case "auid":
-			user.Put("audit.name", value)
+			_, _ = user.Put("audit.name", value)
 		default:
-			user.Put(id+".name", value)
+			_, _ = user.Put(id+".name", value)
 		}
 	}
 }
@@ -740,7 +753,7 @@ func addProcess(p aucoalesce.Process, m mapstr.M) {
 	}
 
 	process := mapstr.M{}
-	m.Put("process", process)
+	_, _ = m.Put("process", process)
 	if p.PID != "" {
 		if pid, err := strconv.Atoi(p.PID); err == nil {
 			process["pid"] = pid
@@ -776,7 +789,7 @@ func addFile(f *aucoalesce.File, m mapstr.M) {
 	}
 
 	file := mapstr.M{}
-	m.Put("file", file)
+	_, _ = m.Put("file", file)
 	if f.Path != "" {
 		file["path"] = f.Path
 	}
@@ -812,7 +825,7 @@ func addAddress(addr *aucoalesce.Address, key string, m mapstr.M) {
 	}
 
 	address := mapstr.M{}
-	m.Put(key, address)
+	_, _ = m.Put(key, address)
 	if addr.Hostname != "" {
 		address["domain"] = addr.Hostname
 	}
@@ -835,7 +848,7 @@ func addNetwork(net *aucoalesce.Network, m mapstr.M) {
 	network := mapstr.M{
 		"direction": net.Direction,
 	}
-	m.Put("network", network)
+	_, _ = m.Put("network", network)
 }
 
 func addEventOriginal(msgs []*auparse.AuditMessage, m mapstr.M) {
@@ -851,18 +864,18 @@ func addEventOriginal(msgs []*auparse.AuditMessage, m mapstr.M) {
 	for _, msg := range msgs {
 		rawMsgs = append(rawMsgs, "type="+msg.RecordType.String()+" msg="+msg.RawData)
 	}
-	m.Put(key, rawMsgs)
+	_, _ = m.Put(key, rawMsgs)
 }
 
 func createAuditdData(data map[string]string) mapstr.M {
 	out := make(mapstr.M, len(data))
 	for key, v := range data {
 		if strings.HasPrefix(key, "socket_") {
-			out.Put("socket."+key[7:], v)
+			_, _ = out.Put("socket."+key[7:], v)
 			continue
 		}
 
-		out.Put(key, v)
+		_, _ = out.Put(key, v)
 	}
 	return out
 }
@@ -988,7 +1001,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		"select the most suitable subscription method."
 	switch c.SocketType {
 	case unicast:
-		if isLocked {
+		if isLocked && !c.Immutable {
 			log.Errorf("requested unicast socket_type is not available "+
 				"because audit configuration is locked in the kernel "+
 				"(enabled=2). %s", useAutodetect)
@@ -1013,7 +1026,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		// attempt to determine the optimal socket_type
 		if hasMulticast {
 			if hasRules {
-				if isLocked {
+				if isLocked && !c.Immutable {
 					log.Warn("Audit rules specified in the configuration " +
 						"cannot be applied because the audit rules have been locked " +
 						"in the kernel (enabled=2). A multicast audit subscription " +
@@ -1024,7 +1037,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 			}
 			return multicast, nil
 		}
-		if isLocked {
+		if isLocked && !c.Immutable {
 			log.Errorf("Cannot continue: audit configuration is locked " +
 				"in the kernel (enabled=2) which prevents using unicast " +
 				"sockets. Multicast audit subscriptions are not available " +
@@ -1038,6 +1051,11 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 
 func getBackpressureStrategy(value string, logger *logp.Logger) backpressureStrategy {
 	switch value {
+	default:
+		logger.Warn("Unknown value for the 'backpressure_strategy' option. Using default.")
+		fallthrough
+	case "", "default":
+		return bsAuto
 	case "kernel":
 		return bsKernel
 	case "userspace", "user-space":
@@ -1048,11 +1066,6 @@ func getBackpressureStrategy(value string, logger *logp.Logger) backpressureStra
 		return bsKernel | bsUserSpace
 	case "none":
 		return 0
-	default:
-		logger.Warn("Unknown value for the 'backpressure_strategy' option. Using default.")
-		fallthrough
-	case "", "default":
-		return bsAuto
 	}
 }
 

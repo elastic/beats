@@ -533,7 +533,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 3 })
 	runners = adapter.Runners()
 	// Ensure the first config is the same as before
-	fmt.Println(runners)
+	t.Log(runners)
 	assert.Equal(t, len(runners), 3)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
 	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
@@ -571,6 +571,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 }
 
 func wait(t *testing.T, test func() bool) {
+	t.Helper()
 	sleep := 20 * time.Millisecond
 	ready := test()
 	for !ready && sleep < 10*time.Second {
@@ -585,6 +586,7 @@ func wait(t *testing.T, test func() bool) {
 }
 
 func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopped bool) {
+	t.Helper()
 	for _, r := range runners {
 		if reflect.DeepEqual(expected, r.config) {
 			ok1 := assert.Equal(t, started, r.started)
