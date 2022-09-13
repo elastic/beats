@@ -118,6 +118,26 @@ pipeline {
           // minor version is created, therefore old release branches won't be able
           // to use the release manager as their definition is removed.
           when {
+<<<<<<< HEAD
+=======
+            expression { return env.IS_BRANCH_AVAILABLE == "true" }
+          }
+          steps {
+            runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
+          }
+          post {
+            failure {
+              notifyStatus(analyse: true,
+                           file: "${BASE_DIR}/${env.DRA_OUTPUT}",
+                           subject: "[${env.REPO}@${env.BRANCH_NAME}] The Daily releasable artifact failed.",
+                           body: 'Contact the Release Platform team [#platform-release]')
+            }
+          }
+        }
+        stage('DRA Release Staging') {
+          options { skipDefaultCheckout() }
+          when {
+>>>>>>> f9bcd845db (ci: rename stage for DRA staging (#33056))
             allOf {
               expression { return env.IS_BRANCH_AVAILABLE == "true" }
               not { branch '7.17' }
