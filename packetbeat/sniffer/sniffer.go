@@ -18,6 +18,7 @@
 package sniffer
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -125,14 +126,50 @@ func New(testMode bool, _ string, decoders Decoders, interfaces []config.Interfa
 				logp.Debug("sniffer", "Sniffer type: %s device: %s", iface.Type, s.device)
 			}
 		}
+		iface = s.config[i]
 
 		err := validateConfig(iface.BpfFilter, &iface) //nolint:gosec // Bad linter! validateConfig completes before the next iteration.
 		if err != nil {
-			return nil, err
+			cfg, _ := json.Marshal(iface)
+			return nil, fmt.Errorf("validate: %w: %s", err, cfg)
 		}
 	}
 
 	return s, nil
+}
+
+func validateConfig(filter string, cfg *config.InterfacesConfig) error {
+	if cfg.File == "" {
+		if err := validatePcapFilter(filter); err != nil {
+			return err
+		}
+	}
+
+	switch cfg.Type {
+	case "pcap":
+		return validatePcapConfig(cfg)
+	case "af_packet":
+		return validateAfPacketConfig(cfg)
+	default:
+		return fmt.Errorf("unknown sniffer type for %s: %q", cfg.Device, cfg.Type)
+	}
+}
+
+func validatePcapFilter(expr string) error {
+	if expr == "" {
+		return nil
+	}
+	_, err := pcap.NewBPF(layers.LinkTypeEthernet, 65535, expr)
+	return err
+}
+
+func validatePcapConfig(cfg *config.InterfacesConfig) error {
+	return nil
+}
+
+func validateAfPacketConfig(cfg *config.InterfacesConfig) error {
+	_, _, _, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
+	return err
 }
 
 // Run opens the sniffing device and processes packets being read from that device.
@@ -383,7 +420,7 @@ func (s *Sniffer) open(device string) (snifferHandle, error) {
 	case "af_packet":
 		return openAFPacket(device, s.filter, &s.config[0])
 	default:
-		return nil, fmt.Errorf("unknown sniffer type: %s", s.config[0].Type)
+		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config[0].Type)
 	}
 }
 
@@ -394,40 +431,6 @@ func (s *Sniffer) Stop() {
 	if s.done != nil {
 		close(s.done)
 	}
-}
-
-func validateConfig(filter string, cfg *config.InterfacesConfig) error {
-	if cfg.File == "" {
-		if err := validatePcapFilter(filter); err != nil {
-			return err
-		}
-	}
-
-	switch cfg.Type {
-	case "pcap":
-		return validatePcapConfig(cfg)
-	case "af_packet":
-		return validateAfPacketConfig(cfg)
-	default:
-		return fmt.Errorf("unknown sniffer type: %s", cfg.Type)
-	}
-}
-
-func validatePcapConfig(cfg *config.InterfacesConfig) error {
-	return nil
-}
-
-func validateAfPacketConfig(cfg *config.InterfacesConfig) error {
-	_, _, _, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
-	return err
-}
-
-func validatePcapFilter(expr string) error {
-	if expr == "" {
-		return nil
-	}
-	_, err := pcap.NewBPF(layers.LinkTypeEthernet, 65535, expr)
-	return err
 }
 
 func openPcap(device, filter string, cfg *config.InterfacesConfig) (snifferHandle, error) {
