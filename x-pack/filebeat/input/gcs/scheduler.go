@@ -6,14 +6,15 @@ package gcs
 
 import (
 	"context"
+	"fmt"
 	"strings"
+	"sync"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/job"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/pool"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/state"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/types"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -21,7 +22,7 @@ import (
 )
 
 type scheduler interface {
-	createJobs(objects []*storage.ObjectAttrs) []job.Job
+	createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []job.Job
 	Schedule(ctx context.Context) error
 }
 
@@ -32,6 +33,27 @@ type gcsInputScheduler struct {
 	cfg       *config
 	state     *state.State
 	log       *logp.Logger
+}
+
+// limiter, is used to limit the number of goroutines from blowing up the stack
+type limiter struct {
+	ctx context.Context
+	wg  sync.WaitGroup
+	// limit specifies the maximum number
+	// of concurrent jobs to perform.
+	limit chan struct{}
+}
+
+// acquire gets an available worker thread.
+func (c *limiter) acquire() {
+	c.wg.Add(1)
+	c.limit <- struct{}{}
+}
+
+// release puts pack a worker thread.
+func (c *limiter) release() {
+	<-c.limit
+	c.wg.Done()
 }
 
 // NewGcsInputScheduler, returns a new scheduler instance
@@ -53,14 +75,16 @@ func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
 	var pager *iterator.Pager
 	var availableWorkers int
 
-	workerPool := pool.NewWorkerPool(ctx, s.src.MaxWorkers, s.log)
-	workerPool.Start()
+	// workerPool := pool.NewWorkerPool(ctx, s.src.MaxWorkers, s.log)
+	// workerPool.Start()
+
+	lmtr := &limiter{limit: make(chan struct{}, s.src.MaxWorkers), ctx: ctx}
 
 	if !s.src.Poll {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
 		defer cancel()
 		for {
-			availableWorkers = workerPool.AvailableWorkers()
+			availableWorkers = s.src.MaxWorkers - len(lmtr.limit)
 			if availableWorkers == 0 {
 				continue
 			} else {
@@ -68,14 +92,14 @@ func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
 			}
 		}
 		pager = s.fetchObjectPager(ctxWithTimeout, availableWorkers)
-		return s.scheduleOnce(ctxWithTimeout, pager, workerPool)
+		return lmtr.scheduleOnce(ctxWithTimeout, pager, s)
 	}
 
 	for {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
 		defer cancel()
 
-		availableWorkers = workerPool.AvailableWorkers()
+		availableWorkers = s.src.MaxWorkers - len(lmtr.limit)
 		if availableWorkers == 0 {
 			continue
 		}
@@ -83,7 +107,7 @@ func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
 		// availableWorkers is used as the batch size for a blob page so that
 		// work distribution remains efficient
 		pager = s.fetchObjectPager(ctxWithTimeout, availableWorkers)
-		err := s.scheduleOnce(ctxWithTimeout, pager, workerPool)
+		err := lmtr.scheduleOnce(ctxWithTimeout, pager, s)
 		if err != nil {
 			return err
 		}
@@ -95,7 +119,7 @@ func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
 	}
 }
 
-func (s *gcsInputScheduler) scheduleOnce(ctx context.Context, pager *iterator.Pager, workerPool pool.Pool) error {
+func (l *limiter) scheduleOnce(ctx context.Context, pager *iterator.Pager, s *gcsInputScheduler) error {
 	for {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
@@ -103,7 +127,7 @@ func (s *gcsInputScheduler) scheduleOnce(ctx context.Context, pager *iterator.Pa
 			return err
 		}
 
-		jobs := s.createJobs(objects)
+		jobs := s.createJobs(objects, s.log)
 
 		// If previous checkpoint was saved then look up starting point for new jobs
 		if s.state.Checkpoint().LatestEntryTime != nil {
@@ -113,9 +137,15 @@ func (s *gcsInputScheduler) scheduleOnce(ctx context.Context, pager *iterator.Pa
 			}
 		}
 
-		// Submits job to worker pool for further processing
-		for _, job := range jobs {
-			workerPool.Submit(job)
+		// distributes jobs among workers with the help of a limiter
+		for i, job := range jobs {
+			id := fetchJobID(i, s.src.BucketName, job.Name())
+			job := job
+			l.acquire()
+			go func() {
+				defer l.release()
+				job.Do(l.ctx, id)
+			}()
 		}
 
 		if nextPageToken == "" {
@@ -125,7 +155,7 @@ func (s *gcsInputScheduler) scheduleOnce(ctx context.Context, pager *iterator.Pa
 	return nil
 }
 
-func (s *gcsInputScheduler) createJobs(objects []*storage.ObjectAttrs) []job.Job {
+func (s *gcsInputScheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []job.Job {
 	var jobs []job.Job
 
 	for _, obj := range objects {
@@ -139,7 +169,7 @@ func (s *gcsInputScheduler) createJobs(objects []*storage.ObjectAttrs) []job.Job
 		}
 
 		objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-		job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, false)
+		job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, log, false)
 		jobs = append(jobs, job)
 	}
 
@@ -211,9 +241,16 @@ func (s *gcsInputScheduler) addFailedJobs(ctx context.Context, jobs []job.Job) [
 			}
 
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-			job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, true)
+			job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.log, true)
 			jobs = append(jobs, job)
 		}
 	}
 	return jobs
+}
+
+// fetchJobID returns a job id which is a combination of worker id, bucket name and object name
+func fetchJobID(workerId int, bucketName string, objectName string) string {
+	jobID := fmt.Sprintf("%s-%s-worker-%d", bucketName, objectName, workerId)
+
+	return jobID
 }

@@ -17,11 +17,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/state"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/types"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type Job interface {
-	Do(ctx context.Context, id string) error
+	Do(ctx context.Context, id string)
 	Name() string
 	Timestamp() time.Time
 	Source() *types.Source
@@ -34,12 +35,13 @@ type GcsInputJob struct {
 	state     *state.State
 	src       *types.Source
 	publisher cursor.Publisher
+	log       *logp.Logger
 	isFailed  bool
 }
 
 // NewGcsInputJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
 func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI string,
-	state *state.State, src *types.Source, publisher cursor.Publisher, isFailed bool,
+	state *state.State, src *types.Source, publisher cursor.Publisher, log *logp.Logger, isFailed bool,
 ) Job {
 	return &GcsInputJob{
 		bucket:    bucket,
@@ -48,25 +50,29 @@ func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, o
 		state:     state,
 		src:       src,
 		publisher: publisher,
+		log:       log,
 		isFailed:  isFailed,
 	}
 }
 
-func (j *GcsInputJob) Do(ctx context.Context, id string) (err error) {
+const jobErrString = "job with jobId %s encountered an error : %w"
+
+func (j *GcsInputJob) Do(ctx context.Context, id string) {
 	var fields mapstr.M
 
 	if types.AllowedContentTypes[j.object.ContentType] {
 		data, err := j.extractData(ctx)
 		if err != nil {
 			j.state.UpdateFailedJobs(j.object.Name)
-			return fmt.Errorf("job with jobId %s encountered an error : %w", id, err)
+			j.log.Errorf(jobErrString, id, err)
+			return
 		}
 
 		reader := io.NopCloser(bytes.NewReader(data.Bytes()))
 		defer func() {
 			err = reader.Close()
 			if err != nil {
-				err = fmt.Errorf("failed to close json reader with error : %w", err)
+				j.log.Errorf("failed to close json reader with error : %w", err)
 			}
 		}()
 
@@ -76,12 +82,14 @@ func (j *GcsInputJob) Do(ctx context.Context, id string) (err error) {
 			if j.src.ParseJSON {
 				objectData, _, _, err = httpReadJSON(reader)
 				if err != nil {
-					return err
+					j.log.Errorf(jobErrString, id, err)
+					return
 				}
 			}
 			// Support for more types will be added here, in the future.
 		default:
-			return fmt.Errorf("job with jobId %s encountered an unexpected error", id)
+			j.log.Errorf("job with jobId %s encountered an unexpected error", id)
+			return
 		}
 
 		fields = j.createEventFields(data.String(), objectData)
@@ -105,10 +113,9 @@ func (j *GcsInputJob) Do(ctx context.Context, id string) (err error) {
 
 	if err := j.publisher.Publish(event, j.state.Checkpoint()); err != nil {
 		j.state.UpdateFailedJobs(j.object.Name)
-		return err
+		j.log.Errorf(jobErrString, id, err)
 	}
 
-	return nil
 }
 
 func (j *GcsInputJob) Name() string {
