@@ -34,7 +34,7 @@ func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
 				Interval: stream.Interval,
 				Platform: stream.Platform,
 				Version:  stream.Version,
-				Snapshot: true, // enforce snapshot for all queries
+				Snapshot: nil, // enforce snapshot for all queries
 			}
 			pack.Queries[stream.ID] = query
 		}

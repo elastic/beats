@@ -19,8 +19,8 @@ type Query struct {
 	// Optional ECS mapping for the query, not rendered into osqueryd configuration
 	ECSMapping map[string]interface{} `config:"ecs_mapping" json:"-"`
 
-	// Always enforced as snapshot, can't be changed via configuration
-	Snapshot bool `json:"snapshot"`
+	// Enforce true if missing otherwise use the value
+	Snapshot *bool `json:"snapshot,omitempty"`
 }
 
 type Pack struct {
