@@ -75,9 +75,6 @@ func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
 	var pager *iterator.Pager
 	var availableWorkers int
 
-	// workerPool := pool.NewWorkerPool(ctx, s.src.MaxWorkers, s.log)
-	// workerPool.Start()
-
 	lmtr := &limiter{limit: make(chan struct{}, s.src.MaxWorkers), ctx: ctx}
 
 	if !s.src.Poll {
