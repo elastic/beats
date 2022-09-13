@@ -44,18 +44,6 @@ type limiter struct {
 	limit chan struct{}
 }
 
-// acquire gets an available worker thread.
-func (c *limiter) acquire() {
-	c.wg.Add(1)
-	c.limit <- struct{}{}
-}
-
-// release puts pack a worker thread.
-func (c *limiter) release() {
-	<-c.limit
-	c.wg.Done()
-}
-
 // NewGcsInputScheduler, returns a new scheduler instance
 func NewGcsInputScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *types.Source, cfg *config,
 	state *state.State, log *logp.Logger,
@@ -114,6 +102,18 @@ func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
 			return err
 		}
 	}
+}
+
+// acquire gets an available worker thread.
+func (l *limiter) acquire() {
+	l.wg.Add(1)
+	l.limit <- struct{}{}
+}
+
+// release puts pack a worker thread.
+func (l *limiter) release() {
+	<-l.limit
+	l.wg.Done()
 }
 
 func (l *limiter) scheduleOnce(ctx context.Context, pager *iterator.Pager, s *gcsInputScheduler) error {
