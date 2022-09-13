@@ -39,12 +39,17 @@ https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
 - gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
+- Fix handling of stale log message handling in the winlog input {issue}32168[32168] {pull}32176[32176]
 
 *Metricbeat*
 
 - Fix ARN parsing for Cloudwatch resource names with leading slashes. {pull}32445[32445]
 - Add missing metrics in AWS Transit Gateway module. {pull}32617[32617]
 - Replace internal expiring cache used by the Kubernetes module with in-memory dictionary. {pull}32539[32539]
+
+*Winlogbeat*
+
+- Fix handling of stale log message handling {issue}32168[32168] {pull}32176[32176]
 
 ==== Added
 
