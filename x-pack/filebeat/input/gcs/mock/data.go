@@ -199,7 +199,6 @@ var objectList = map[string]string{
 	  }`,
 }
 
-// exported strings
 var Gcs_test_new_object_ata_json = `{
     "id": 1,
     "title": "iPhone 9",
