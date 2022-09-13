@@ -22,10 +22,10 @@ pipeline {
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     SLACK_CHANNEL = "#beats"
     SNAPSHOT = 'true'
-    TERRAFORM_VERSION = "0.13.7"
+    TERRAFORM_VERSION = "1.0.2"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     KIND_VERSION = 'v0.14.0'
-    K8S_VERSION = 'v1.24.0'
+    K8S_VERSION = 'v1.25.0'
   }
   options {
     timeout(time: 6, unit: 'HOURS')
@@ -47,6 +47,7 @@ pipeline {
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'armTest', defaultValue: false, description: 'Allow ARM stages.')
     booleanParam(name: 'macosTest', defaultValue: false, description: 'Allow macOS stages.')
+    booleanParam(name: 'macosM1Test', defaultValue: false, description: 'Allow macOS M1 stages.')
     string(name: 'PYTEST_ADDOPTS', defaultValue: '', description: 'Additional options to pass to pytest. Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern. For retries you can use `--reruns 3 --reruns-delay 15`')
   }
   stages {

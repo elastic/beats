@@ -43,6 +43,9 @@ func (c Config) FromStatic(cfg *conf.C) (Config, error) {
 	if err != nil {
 		return c, err
 	}
+	if 0 < c.Interfaces.PollDefaultRoute && c.Interfaces.PollDefaultRoute < time.Second {
+		c.Interfaces.PollDefaultRoute = time.Second
+	}
 	return c, nil
 }
 
@@ -76,17 +79,18 @@ func (c Config) ICMP() (*conf.C, error) {
 }
 
 type InterfacesConfig struct {
-	Device                string   `config:"device"`
-	Type                  string   `config:"type"`
-	File                  string   `config:"file"`
-	WithVlans             bool     `config:"with_vlans"`
-	BpfFilter             string   `config:"bpf_filter"`
-	Snaplen               int      `config:"snaplen"`
-	BufferSizeMb          int      `config:"buffer_size_mb"`
-	EnableAutoPromiscMode bool     `config:"auto_promisc_mode"`
-	InternalNetworks      []string `config:"internal_networks"`
+	Device                string        `config:"device"`
+	PollDefaultRoute      time.Duration `config:"poll_default_route"`
+	Type                  string        `config:"type"`
+	File                  string        `config:"file"`
+	WithVlans             bool          `config:"with_vlans"`
+	BpfFilter             string        `config:"bpf_filter"`
+	Snaplen               int           `config:"snaplen"`
+	BufferSizeMb          int           `config:"buffer_size_mb"`
+	EnableAutoPromiscMode bool          `config:"auto_promisc_mode"`
+	InternalNetworks      []string      `config:"internal_networks"`
 	TopSpeed              bool
-	Dumpfile              string
+	Dumpfile              string // Dumpfile is the basename of pcap dumpfiles. The file names will have a creation time stamp and .pcap extension appended.
 	OneAtATime            bool
 	Loop                  int
 }
