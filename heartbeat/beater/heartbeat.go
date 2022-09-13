@@ -76,7 +76,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			return nil, err
 		}
 		if esc != nil {
-			stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.Location)
+			stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.RunFrom)
 		}
 	}
 
@@ -118,7 +118,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			StateLoader:           stateLoader,
 			PluginsReg:            plugin.GlobalPluginsReg,
 			PipelineClientFactory: pipelineClientFactory,
-			BeatLocation:          parsedConfig.Location,
+			BeatRunFrom:           parsedConfig.RunFrom,
 		}),
 	}
 	return bt, nil

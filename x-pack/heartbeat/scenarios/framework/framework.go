@@ -275,7 +275,7 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 				c, _ := pipeline.Connect()
 				return monitors.SyncPipelineClientAdaptor{C: c}, nil
 			},
-			BeatLocation: location,
+			BeatRunFrom: location,
 		}),
 		sched,
 		sched.Stop

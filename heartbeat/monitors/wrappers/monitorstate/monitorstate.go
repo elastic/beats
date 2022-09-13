@@ -44,7 +44,7 @@ func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int,
 		// ID is unique and sortable by time for easier aggregations
 		// Note that we add an incrementing counter to help with the fact that
 		// millisecond res isn't quite enough for uniqueness (esp. in tests)
-		ID:              fmt.Sprintf("%s-%s-%x-%x", sf.ID, sf.RunFrom, now.UnixMilli(), ctr),
+		ID:              LoaderDBKey(sf, now, ctr),
 		StartedAt:       now,
 		DurationMs:      0,
 		Status:          status,
@@ -160,4 +160,12 @@ func (s *State) copy() *State {
 	copied.FlapHistory = make([]StateStatus, len(s.FlapHistory))
 	copy(copied.FlapHistory, s.FlapHistory)
 	return &copied
+}
+
+func LoaderDBKey(sf stdfields.StdMonitorFields, at time.Time, ctr int) string {
+	rfid := "default"
+	if sf.RunFrom != nil {
+		rfid = sf.RunFrom.ID
+	}
+	return fmt.Sprintf("%s-%s-%x-%x", sf.ID, rfid, at.UnixMilli(), ctr)
 }

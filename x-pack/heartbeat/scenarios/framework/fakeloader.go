@@ -5,8 +5,8 @@
 package framework
 
 import (
-	"fmt"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
@@ -17,6 +17,7 @@ import (
 type loaderDB struct {
 	keysToState map[string]*monitorstate.State
 	mtx         *sync.Mutex
+	lastTime    time.Time
 }
 
 func newLoaderDB() *loaderDB {
@@ -26,25 +27,20 @@ func newLoaderDB() *loaderDB {
 	}
 }
 
-func loaderDbKey(sf stdfields.StdMonitorFields) string {
-	if sf.RunFrom != nil {
-		return fmt.Sprintf("%s-%s", sf.ID, sf.RunFrom.ID)
-	}
-	return sf.ID
-}
-
 func (ldb loaderDB) AddState(sf stdfields.StdMonitorFields, state *monitorstate.State) {
 	ldb.mtx.Lock()
 	defer ldb.mtx.Unlock()
 
-	ldb.keysToState[loaderDbKey(sf)] = state
+	ldb.lastTime = time.Now()
+
+	ldb.keysToState[monitorstate.LoaderDBKey(sf, ldb.lastTime, 0)] = state
 }
 
 func (ldb loaderDB) GetState(sf stdfields.StdMonitorFields) *monitorstate.State {
 	ldb.mtx.Lock()
 	defer ldb.mtx.Unlock()
 
-	found := ldb.keysToState[loaderDbKey(sf)]
+	found := ldb.keysToState[monitorstate.LoaderDBKey(sf, ldb.lastTime, 0)]
 	return found
 }
 
@@ -53,7 +49,7 @@ func (ldb loaderDB) StateLoader() monitorstate.StateLoader {
 		ldb.mtx.Lock()
 		defer ldb.mtx.Unlock()
 
-		found := ldb.keysToState[loaderDbKey(sf)]
+		found := ldb.keysToState[monitorstate.LoaderDBKey(sf, ldb.lastTime, 0)]
 		return found, nil
 	}
 }

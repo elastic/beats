@@ -83,7 +83,7 @@ type FactoryParams struct {
 	StateLoader           monitorstate.StateLoader
 	PluginsReg            *plugin.PluginsReg
 	PipelineClientFactory PipelineClientFactory
-	BeatLocation          *config.LocationWithID
+	BeatRunFrom           *config.LocationWithID
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
@@ -96,7 +96,7 @@ func NewFactory(fp FactoryParams) *RunnerFactory {
 		pluginsReg:            fp.PluginsReg,
 		logger:                logp.L(),
 		pipelineClientFactory: fp.PipelineClientFactory,
-		beatLocation:          fp.BeatLocation,
+		beatLocation:          fp.BeatRunFrom,
 		stateLoader:           fp.StateLoader,
 	}
 }
