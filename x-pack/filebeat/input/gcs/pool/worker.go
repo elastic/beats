@@ -80,7 +80,7 @@ func (w *worker) Start() {
 
 func (w *worker) Stop() {
 	// tells worker to stop
-	w.quit <- true
+	close(w.quit)
 }
 
 // fetchJobID returns a job id which is a combination of worker id, container name and blob name
