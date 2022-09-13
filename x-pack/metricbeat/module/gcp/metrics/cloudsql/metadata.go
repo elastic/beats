@@ -207,9 +207,9 @@ func (s *metadataCollector) ID(ctx context.Context, in *gcp.MetadataCollectorInp
 
 	metadata.ECS.Update(metadata.Labels)
 	if in.Timestamp != nil {
-		metadata.ECS.Put("timestamp", in.Timestamp)
+		_, _ = metadata.ECS.Put("timestamp", in.Timestamp)
 	} else if in.Point != nil {
-		metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
+		_, _ = metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
 	} else {
 		return "", errors.New("no timestamp information found")
 	}
