@@ -549,11 +549,7 @@ type EventMetadataIterator struct {
 func NewEventMetadataIterator(publisher *PublisherMetadata) (*EventMetadataIterator, error) {
 	eventMetadataEnumHandle, err := _EvtOpenEventMetadataEnum(publisher.Handle, 0)
 	if err != nil && err != windows.ERROR_FILE_NOT_FOUND { //nolint:errorlint // Bad linter! This is always errno or nil.
-<<<<<<< HEAD
 		return nil, fmt.Errorf("failed to open event metadata enumerator with EvtOpenEventMetadataEnum: %w (%#v)", err, err)
-=======
-		return nil, fmt.Errorf("failed to open event metadata enumerator with EvtOpenEventMetadataEnum: %w (%#[1]v)", err)
->>>>>>> fe3771625f (winlogbeat: fix testing on windows 11 and re-enable (#32519))
 	}
 
 	return &EventMetadataIterator{

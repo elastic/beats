@@ -547,11 +547,7 @@ func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, property
 	var bufferUsed uint32
 	err := _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, 0, nil, &bufferUsed)
 	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
-<<<<<<< HEAD
 		return "", fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#v)", err, err)
-=======
-		return "", fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#[1]v)", err)
->>>>>>> fe3771625f (winlogbeat: fix testing on windows 11 and re-enable (#32519))
 	}
 
 	buf := make([]byte, bufferUsed)
@@ -613,11 +609,7 @@ func GetEventMetadataProperty(metadataHandle EvtHandle, propertyID EvtEventMetad
 	var bufferUsed uint32
 	err := _EvtGetEventMetadataProperty(metadataHandle, 8, 0, 0, nil, &bufferUsed)
 	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
-<<<<<<< HEAD
 		return nil, fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#v)", err, err)
-=======
-		return nil, fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#[1]v)", err)
->>>>>>> fe3771625f (winlogbeat: fix testing on windows 11 and re-enable (#32519))
 	}
 
 	buf := make([]byte, bufferUsed)
