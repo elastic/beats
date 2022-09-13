@@ -9,7 +9,7 @@
 <titleabbrev>Google Cloud Storage</titleabbrev>
 ++++
 
-Beta[Experimental]
+Beta [Input]
 
 Use the `google cloud storage input` to read content from files stored in buckets which reside on your Google Cloud.
 The input can be configured to work with and without polling, though currently, if polling is disabled it will only 
