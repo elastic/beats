@@ -61,6 +61,7 @@ stages:
 #        mage: "mage build test"
 #        platforms:             ## override default labels in this specific stage.
 #            - "windows-8"
+#        stage: extended_win
     macosM1:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
