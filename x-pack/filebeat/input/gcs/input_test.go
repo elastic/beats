@@ -21,7 +21,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/test/mock"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -291,6 +291,7 @@ func Test_StorageClient(t *testing.T) {
 			err := cfg.Unpack(&conf)
 			if err != nil {
 				assert.EqualError(t, err, tt.isError.Error())
+				return
 			}
 			input := newStatelessInput(conf)
 
