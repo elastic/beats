@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"addonmanager_kubernetes_io_mode": "EnsureExists"
