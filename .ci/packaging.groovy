@@ -132,7 +132,7 @@ pipeline {
             }
           }
         }
-        stage('DRA Staging') {
+        stage('DRA Release Staging') {
           options { skipDefaultCheckout() }
           when {
             allOf {
