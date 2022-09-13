@@ -27,6 +27,7 @@ processors:
         UPSTREAM_RESPONSE_LENGTH_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
         UPSTREAM_RESPONSE_TIME_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
         UPSTREAM_RESPONSE_STATUS_CODE_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
+        IP: (?:\[?%{IPV6}\]?|%{IPV4})
       ignore_missing: true
   - grok:
       field: nginx.ingress_controller.info
@@ -139,18 +140,42 @@ processors:
           for (def item : ctx.nginx.ingress_controller.upstream_address_list) {
             last_upstream = item;
           }
-          StringTokenizer tok = new StringTokenizer(last_upstream, ":");
-          if (tok.countTokens()>1) {
-            ctx.nginx.ingress_controller.upstream.ip = tok.nextToken();
-            ctx.nginx.ingress_controller.upstream.port = Integer.parseInt(tok.nextToken());
-          } else {
-            ctx.nginx.ingress_controller.upstream.ip = last_upstream;
-          }
+
+          ctx.nginx.ingress_controller.upstream.address = last_upstream;
         }
         catch (Exception e) {
-          ctx.nginx.ingress_controller.upstream.ip = null;
-          ctx.nginx.ingress_controller.upstream.port = null;
+          ctx.nginx.ingress_controller.upstream.address = null;
         }
+  - grok:
+      field: nginx.ingress_controller.upstream.address
+      patterns:
+        - "^%{IPV4:nginx.ingress_controller.upstream.ip}:%{NUMBER:nginx.ingress_controller.upstream.port}$"
+        - "^\\[%{IPV6:nginx.ingress_controller.upstream.ip}\\]:%{NUMBER:nginx.ingress_controller.upstream.port}$"
+        - "^%{IPV6NOCOMPRESS:nginx.ingress_controller.upstream.ip}:%{NUMBER:nginx.ingress_controller.upstream.port}$"
+        - "^%{IPV6:nginx.ingress_controller.upstream.ip}%{IPV6PORTSEP}%{NUMBER:nginx.ingress_controller.upstream.port}$"
+        - "^%{IPV6:nginx.ingress_controller.upstream.ip}%{IPV6PORTSEP}%{POSINT:nginx.ingress_controller.upstream.port}$"
+      pattern_definitions:
+        IPV6NOCOMPRESS: '([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}'
+        IPV6PORTSEP: '(?: port |[p#.])'
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: nginx.ingress_controller.upstream.ip
+      type: ip
+      ignore_missing: true
+      on_failure:
+      - remove:
+          field: nginx.ingress_controller.upstream.ip
+  - convert:
+      field: nginx.ingress_controller.upstream.port
+      type: long
+      ignore_missing: true
+      on_failure:
+      - remove:
+          field: nginx.ingress_controller.upstream.port
+  - remove:
+      field: nginx.ingress_controller.upstream.address
+      ignore_failure: true
   - script:
       if: ctx.nginx?.ingress_controller?.remote_ip_list != null && ctx.nginx.ingress_controller.remote_ip_list.length > 0
       lang: painless

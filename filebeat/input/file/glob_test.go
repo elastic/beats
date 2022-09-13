@@ -34,13 +34,14 @@ func TestGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	os.MkdirAll(filepath.Join(root, "foo/bar/baz/qux/quux"), 0o755)
+	if err := os.MkdirAll(filepath.Join(root, "foo/bar/baz/qux/quux"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	for _, test := range globTests {
 		pattern := filepath.Join(root, test.pattern)
 		matches, err := Glob(pattern, 4)
 		if err != nil {
 			t.Fatal(err)
-			continue
 		}
 		var normalizedMatches []string
 		for _, m := range matches {
@@ -92,7 +93,6 @@ func TestGlobPatterns(t *testing.T) {
 		for i, p := range patterns {
 			if p != test.expectedPatterns[i] {
 				t.Fatalf("%q expanded to %q instead of %q", test.pattern, patterns, test.expectedPatterns)
-				break
 			}
 		}
 	}

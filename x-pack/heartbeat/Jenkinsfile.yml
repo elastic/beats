@@ -62,6 +62,19 @@ stages:
 #        platforms:             ## override default labels in this specific stage.
 #            - "windows-8"
 #        stage: extended_win
+    macosM1:
+        mage: "mage build unitTest"
+        platforms:             ## override default label in this specific stage.
+          - "orka && darwin && aarch64"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test heartbeat for macos-m1"
+            labels:
+                - "macos-m1"
+            parameters:
+                - "macosM1Test"
+            tags: false         ## for all the tags
+        stage: extended
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
