@@ -6,6 +6,7 @@ package metrics
 
 import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/cloudsql"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/compute"
 )
 
@@ -15,6 +16,8 @@ func NewMetadataServiceForConfig(c config, serviceName string) (gcp.MetadataServ
 	switch serviceName {
 	case gcp.ServiceCompute:
 		return compute.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.opt...)
+	case "cloudsql":
+		return cloudsql.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.opt...)
 	default:
 		return nil, nil
 	}
