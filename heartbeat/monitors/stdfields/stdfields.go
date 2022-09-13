@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -49,6 +50,7 @@ type StdMonitorFields struct {
 		ZipUrl *config.C `config:"zip_url"`
 		Local  *config.C `config:"local"`
 	} `config:"source"`
+	RunFrom *hbconfig.LocationWithID `config:"run_from"`
 }
 
 func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {

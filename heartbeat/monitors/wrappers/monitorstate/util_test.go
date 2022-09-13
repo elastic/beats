@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ecserr
+package monitorstate
 
 import (
 	"testing"
@@ -23,32 +23,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const typ = "mytype"
-const code = "mycode"
-const message = "mymessage"
-
-// A var since it's often used as a pointer
-var stackTrace = "mystacktrace"
-
-func TestEcsErrNewWithStack(t *testing.T) {
-	e := NewECSErrWithStack(typ, code, message, &stackTrace)
-
-	// Ensure that it implments the error interface
-	var eErr error = e
-
-	// check that wrapping it still includes the right message
-	require.Equal(t, message, eErr.Error())
-	require.Equal(t, message, e.Message)
-
-	require.Equal(t, EType(typ), e.Type)
-	require.Equal(t, ECode(code), e.Code)
-	require.Equal(t, stackTrace, *e.StackTrace)
+func requireMSStatusCount(t *testing.T, ms *State, status StateStatus, count int) {
+	if status == StatusUp {
+		requireMSCounts(t, ms, count, 0)
+	} else if status == StatusDown {
+		requireMSCounts(t, ms, 0, count)
+	} else {
+		panic("can only check up or down statuses")
+	}
 }
 
-func TestEcsErrNew(t *testing.T) {
-	e := NewECSErr(typ, code, message)
-
-	require.Equal(t, message, e.Message)
-	require.Equal(t, EType(typ), e.Type)
-	require.Equal(t, ECode(code), e.Code)
+func requireMSCounts(t *testing.T, ms *State, up int, down int) {
+	require.Equal(t, up+down, ms.Checks, "expected %d total checks, got %d (%d up / %d down)", up+down, ms.Checks, ms.Up, ms.Down)
+	require.Equal(t, up, ms.Up, "expected %d up checks, got %d", up, ms.Up)
+	require.Equal(t, down, ms.Down, "expected %d down checks, got %d", down, ms.Down)
 }
