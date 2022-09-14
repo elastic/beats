@@ -55,7 +55,6 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 func (s *scheduler) Schedule(ctx context.Context) error {
 
 	s.limiter.ctx = ctx
-	defer s.limiter.wait()
 	if !s.src.Poll {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
 		defer cancel()
