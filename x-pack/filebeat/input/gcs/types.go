@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // Shared types are defined here in this package to make structuring better
-package types
+package gcs
 
 import (
 	"time"
@@ -25,9 +25,9 @@ func (s *Source) Name() string {
 }
 
 const (
-	ContentTypeJSON string = "application/json"
+	contentTypeJSON string = "application/json"
 )
 
-var AllowedContentTypes = map[string]bool{
-	ContentTypeJSON: true,
+var allowedContentTypes = map[string]bool{
+	contentTypeJSON: true,
 }

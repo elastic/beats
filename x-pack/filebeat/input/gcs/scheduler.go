@@ -14,24 +14,16 @@ import (
 	"google.golang.org/api/iterator"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/job"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/state"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
 
-type scheduler interface {
-	createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []job.Job
-	Schedule(ctx context.Context) error
-}
-
-type gcsInputScheduler struct {
+type scheduler struct {
 	publisher cursor.Publisher
 	bucket    *storage.BucketHandle
-	src       *types.Source
+	src       *Source
 	cfg       *config
-	state     *state.State
+	state     *state
 	log       *logp.Logger
 }
 
@@ -44,11 +36,11 @@ type limiter struct {
 	limit chan struct{}
 }
 
-// NewGcsInputScheduler, returns a new scheduler instance
-func NewGcsInputScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *types.Source, cfg *config,
-	state *state.State, log *logp.Logger,
-) scheduler {
-	return &gcsInputScheduler{
+// newScheduler, returns a new scheduler instance
+func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
+	state *state, log *logp.Logger,
+) *scheduler {
+	return &scheduler{
 		publisher: publisher,
 		bucket:    bucket,
 		src:       src,
@@ -59,40 +51,21 @@ func NewGcsInputScheduler(publisher cursor.Publisher, bucket *storage.BucketHand
 }
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
-func (s *gcsInputScheduler) Schedule(ctx context.Context) error {
-	var pager *iterator.Pager
-	var availableWorkers int
+func (s *scheduler) Schedule(ctx context.Context) error {
 
 	lmtr := &limiter{limit: make(chan struct{}, s.src.MaxWorkers), ctx: ctx}
-
+	defer lmtr.wait()
 	if !s.src.Poll {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
 		defer cancel()
-		for {
-			availableWorkers = s.src.MaxWorkers - len(lmtr.limit)
-			if availableWorkers == 0 {
-				continue
-			} else {
-				break
-			}
-		}
-		pager = s.fetchObjectPager(ctxWithTimeout, availableWorkers)
-		return lmtr.scheduleOnce(ctxWithTimeout, pager, s)
+		return lmtr.scheduleOnce(ctxWithTimeout, s)
 	}
 
 	for {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
 		defer cancel()
 
-		availableWorkers = s.src.MaxWorkers - len(lmtr.limit)
-		if availableWorkers == 0 {
-			continue
-		}
-
-		// availableWorkers is used as the batch size for a blob page so that
-		// work distribution remains efficient
-		pager = s.fetchObjectPager(ctxWithTimeout, availableWorkers)
-		err := lmtr.scheduleOnce(ctxWithTimeout, pager, s)
+		err := lmtr.scheduleOnce(ctxWithTimeout, s)
 		if err != nil {
 			return err
 		}
@@ -110,26 +83,30 @@ func (l *limiter) acquire() {
 	l.limit <- struct{}{}
 }
 
+func (l *limiter) wait() {
+	l.wg.Wait()
+}
+
 // release puts pack a worker thread.
 func (l *limiter) release() {
 	<-l.limit
 	l.wg.Done()
 }
 
-func (l *limiter) scheduleOnce(ctx context.Context, pager *iterator.Pager, s *gcsInputScheduler) error {
+func (l *limiter) scheduleOnce(ctx context.Context, s *scheduler) error {
+	pager := s.fetchObjectPager(ctx, s.src.MaxWorkers)
 	for {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
 		if err != nil {
 			return err
 		}
-
 		jobs := s.createJobs(objects, s.log)
 
 		// If previous checkpoint was saved then look up starting point for new jobs
-		if s.state.Checkpoint().LatestEntryTime != nil {
+		if s.state.checkpoint().LatestEntryTime != nil {
 			jobs = s.moveToLastSeenJob(jobs)
-			if len(s.state.Checkpoint().FailedJobs) > 0 {
+			if len(s.state.checkpoint().FailedJobs) > 0 {
 				jobs = s.addFailedJobs(ctx, jobs)
 			}
 		}
@@ -152,8 +129,8 @@ func (l *limiter) scheduleOnce(ctx context.Context, pager *iterator.Pager, s *gc
 	return nil
 }
 
-func (s *gcsInputScheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []job.Job {
-	var jobs []job.Job
+func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []*job {
+	var jobs []*job
 
 	for _, obj := range objects {
 		// check required to ignore directories & sub folders, since there is no inbuilt option to
@@ -166,7 +143,7 @@ func (s *gcsInputScheduler) createJobs(objects []*storage.ObjectAttrs, log *logp
 		}
 
 		objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-		job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, log, false)
+		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, log, false)
 		jobs = append(jobs, job)
 	}
 
@@ -175,7 +152,7 @@ func (s *gcsInputScheduler) createJobs(objects []*storage.ObjectAttrs, log *logp
 
 // fetchObjectPager fetches the page handler for objects, given a batch size.
 // [NOTE] : There are no api's / sdk functions that list blobs via timestamp/latest entry, it's always lexicographical order
-func (s *gcsInputScheduler) fetchObjectPager(ctx context.Context, pageSize int) *iterator.Pager {
+func (s *scheduler) fetchObjectPager(ctx context.Context, pageSize int) *iterator.Pager {
 	bktIt := s.bucket.Objects(ctx, &storage.Query{})
 	pager := iterator.NewPager(bktIt, pageSize, "")
 
@@ -184,24 +161,23 @@ func (s *gcsInputScheduler) fetchObjectPager(ctx context.Context, pageSize int) 
 
 // moveToLastSeenJob, moves to the latest job position past the last seen job
 // Jobs are stored in lexicographical order always , hence the latest position can be found either on the basis of job name or timestamp
-func (s *gcsInputScheduler) moveToLastSeenJob(jobs []job.Job) []job.Job {
-	var latestJobs []job.Job
-	jobsToReturn := make([]job.Job, 0)
+func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
+	var latestJobs []*job
+	jobsToReturn := make([]*job, 0)
 	counter := 0
 	flag := false
 	ignore := false
 
 	for _, job := range jobs {
-		if job.Timestamp().After(*s.state.Checkpoint().LatestEntryTime) {
+		switch {
+		case job.Timestamp().After(*s.state.checkpoint().LatestEntryTime):
 			latestJobs = append(latestJobs, job)
-		} else if job.Name() == s.state.Checkpoint().ObjectName {
+		case job.Name() == s.state.checkpoint().ObjectName:
 			flag = true
-			break
-		} else if job.Name() > s.state.Checkpoint().ObjectName {
+		case job.Name() > s.state.checkpoint().ObjectName:
 			flag = true
 			counter--
-			break
-		} else if job.Name() <= s.state.Checkpoint().ObjectName && !ignore {
+		case job.Name() <= s.state.checkpoint().ObjectName && (!ignore):
 			ignore = true
 		}
 		counter++
@@ -223,14 +199,14 @@ func (s *gcsInputScheduler) moveToLastSeenJob(jobs []job.Job) []job.Job {
 	return jobsToReturn
 }
 
-func (s *gcsInputScheduler) addFailedJobs(ctx context.Context, jobs []job.Job) []job.Job {
+func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 	jobMap := make(map[string]bool)
 
 	for _, j := range jobs {
 		jobMap[j.Name()] = true
 	}
 
-	for name := range s.state.Checkpoint().FailedJobs {
+	for name := range s.state.checkpoint().FailedJobs {
 		if !jobMap[name] {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {
@@ -238,7 +214,7 @@ func (s *gcsInputScheduler) addFailedJobs(ctx context.Context, jobs []job.Job) [
 			}
 
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-			job := job.NewGcsInputJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.log, true)
+			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.log, true)
 			jobs = append(jobs, job)
 		}
 	}

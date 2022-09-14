@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package job
+package gcs
 
 import (
 	"bytes"
@@ -15,35 +15,26 @@ import (
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/state"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type Job interface {
-	Do(ctx context.Context, id string)
-	Name() string
-	Timestamp() time.Time
-	Source() *types.Source
-}
-
-type GcsInputJob struct {
+type job struct {
 	bucket    *storage.BucketHandle
 	object    *storage.ObjectAttrs
 	objectURI string
-	state     *state.State
-	src       *types.Source
+	state     *state
+	src       *Source
 	publisher cursor.Publisher
 	log       *logp.Logger
 	isFailed  bool
 }
 
-// NewGcsInputJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
-func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI string,
-	state *state.State, src *types.Source, publisher cursor.Publisher, log *logp.Logger, isFailed bool,
-) Job {
-	return &GcsInputJob{
+// newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
+func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI string,
+	state *state, src *Source, publisher cursor.Publisher, log *logp.Logger, isFailed bool,
+) *job {
+	return &job{
 		bucket:    bucket,
 		object:    object,
 		objectURI: objectURI,
@@ -57,13 +48,13 @@ func NewGcsInputJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, o
 
 const jobErrString = "job with jobId %s encountered an error : %w"
 
-func (j *GcsInputJob) Do(ctx context.Context, id string) {
+func (j *job) Do(ctx context.Context, id string) {
 	var fields mapstr.M
 
-	if types.AllowedContentTypes[j.object.ContentType] {
+	if allowedContentTypes[j.object.ContentType] {
 		data, err := j.extractData(ctx)
 		if err != nil {
-			j.state.UpdateFailedJobs(j.object.Name)
+			j.state.updateFailedJobs(j.object.Name)
 			j.log.Errorf(jobErrString, id, err)
 			return
 		}
@@ -78,7 +69,7 @@ func (j *GcsInputJob) Do(ctx context.Context, id string) {
 
 		var objectData []mapstr.M
 		switch j.object.ContentType {
-		case types.ContentTypeJSON:
+		case contentTypeJSON:
 			if j.src.ParseJSON {
 				objectData, _, _, err = httpReadJSON(reader)
 				if err != nil {
@@ -109,28 +100,28 @@ func (j *GcsInputJob) Do(ctx context.Context, id string) {
 		Fields:    fields,
 	}
 	event.SetID(id)
-	j.state.Save(j.object.Name, &j.object.Updated)
+	j.state.save(j.object.Name, &j.object.Updated)
 
-	if err := j.publisher.Publish(event, j.state.Checkpoint()); err != nil {
-		j.state.UpdateFailedJobs(j.object.Name)
+	if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
+		j.state.updateFailedJobs(j.object.Name)
 		j.log.Errorf(jobErrString, id, err)
 	}
 
 }
 
-func (j *GcsInputJob) Name() string {
+func (j *job) Name() string {
 	return j.object.Name
 }
 
-func (j *GcsInputJob) Source() *types.Source {
+func (j *job) Source() *Source {
 	return j.src
 }
 
-func (j *GcsInputJob) Timestamp() time.Time {
+func (j *job) Timestamp() time.Time {
 	return j.object.Updated
 }
 
-func (j *GcsInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
+func (j *job) extractData(ctx context.Context) (*bytes.Buffer, error) {
 	var err error
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, j.src.BucketTimeOut)
 	defer cancel()
@@ -156,7 +147,7 @@ func (j *GcsInputJob) extractData(ctx context.Context) (*bytes.Buffer, error) {
 	return data, err
 }
 
-func (j *GcsInputJob) createEventFields(message string, data []mapstr.M) mapstr.M {
+func (j *job) createEventFields(message string, data []mapstr.M) mapstr.M {
 	fields := mapstr.M{
 		"message": message, // original stringified data
 		"log": mapstr.M{

@@ -14,8 +14,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/state"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs/types"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -53,7 +51,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	var sources []cursor.Source
 	for _, b := range config.Buckets {
 		bucket := tryOverrideOrDefault(config, b)
-		sources = append(sources, &types.Source{
+		sources = append(sources, &Source{
 			ProjectId:     config.ProjectId,
 			BucketName:    bucket.Name,
 			BucketTimeOut: *bucket.BucketTimeOut,
@@ -124,19 +122,19 @@ func (input *gcsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 
 func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	cursor cursor.Cursor, publisher cursor.Publisher) error {
-	var cp *state.Checkpoint
-	st := state.NewState()
-	currentSource := src.(*types.Source)
+	st := newState()
+	currentSource := src.(*Source)
 
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
 
+	var cp *Checkpoint
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
 			return err
 		}
 
-		st.SetCheckpoint(cp)
+		st.setCheckpoint(cp)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -158,7 +156,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := NewGcsInputScheduler(publisher, bucket, currentSource, &input.config, st, log)
+	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, log)
 
 	return scheduler.Schedule(ctx)
 }

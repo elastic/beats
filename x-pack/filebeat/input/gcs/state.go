@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package state
+package gcs
 
 import (
 	"strings"
@@ -14,8 +14,8 @@ const (
 	maxFailedJobRetries int = 3
 )
 
-// State contains the the current state of the operation
-type State struct {
+// state contains the the current state of the operation
+type state struct {
 	// Mutex lock to help in concurrent R/W
 	mu sync.Mutex
 	cp *Checkpoint
@@ -32,16 +32,16 @@ type Checkpoint struct {
 	FailedJobs map[string]interface{}
 }
 
-func NewState() *State {
-	return &State{
+func newState() *state {
+	return &state{
 		cp: &Checkpoint{
 			FailedJobs: make(map[string]interface{}),
 		},
 	}
 }
 
-// Save, saves/updates the current state for cursor checkpoint
-func (s *State) Save(name string, lastModifiedOn *time.Time) {
+// save, saves/updates the current state for cursor checkpoint
+func (s *state) save(name string, lastModifiedOn *time.Time) {
 	s.mu.Lock()
 	if s.cp.FailedJobs[name] == nil {
 		if len(s.cp.ObjectName) == 0 {
@@ -62,12 +62,12 @@ func (s *State) Save(name string, lastModifiedOn *time.Time) {
 	s.mu.Unlock()
 }
 
-// UpdateFailedJobs, adds a job name to a failedJobs map, which helps
+// updateFailedJobs, adds a job name to a failedJobs map, which helps
 // in keeping track of failed jobs during edge cases when the state might
 // move ahead in timestamp & objectName due to successful operations from other workers.
 // A failed job will be re-tried a maximum of 3 times after which the
 // entry is removed from the map
-func (s *State) UpdateFailedJobs(jobName string) {
+func (s *state) updateFailedJobs(jobName string) {
 	s.mu.Lock()
 	if s.cp.FailedJobs[jobName] == nil {
 		s.cp.FailedJobs[jobName] = 0
@@ -83,12 +83,12 @@ func (s *State) UpdateFailedJobs(jobName string) {
 	s.mu.Unlock()
 }
 
-// SetCheckpoint, sets checkpoint from source to current state instance
-func (s *State) SetCheckpoint(chkpt *Checkpoint) {
+// setCheckpoint, sets checkpoint from source to current state instance
+func (s *state) setCheckpoint(chkpt *Checkpoint) {
 	s.cp = chkpt
 }
 
-// Checkpoint, returns the current state checkpoint
-func (s *State) Checkpoint() *Checkpoint {
+// checkpoint, returns the current state checkpoint
+func (s *state) checkpoint() *Checkpoint {
 	return s.cp
 }
