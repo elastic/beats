@@ -193,6 +193,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 			continue
 		}
 
+		//nolint:errcheck // Bad linter!
 		switch property {
 		case EvtSystemProviderName:
 			event.Provider.Name = data.(string)

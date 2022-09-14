@@ -17,7 +17,9 @@
 
 package wineventlog
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+)
 
 type eventTemplate struct {
 	Data []EventData `xml:"data"`
