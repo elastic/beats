@@ -87,6 +87,10 @@ pipeline {
       steps {
         withGithubNotify(context: "Lint") {
           stageStatusCache(id: 'Lint'){
+            // test the ./dev-tools/run_with_go_ver used by the Unified Release process
+            dir("${BASE_DIR}") {
+              sh "GO_VERSION=${GO_VERSION} ./dev-tools/run_with_go_ver mage dumpVariables"
+            }
             withBeatsEnv(archive: false, id: "lint") {
               dumpVariables()
               whenTrue(env.ONLY_DOCS == 'false') {
