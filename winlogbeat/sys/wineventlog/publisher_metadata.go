@@ -570,6 +570,10 @@ func (itr *EventMetadataIterator) Close() error {
 // no more items or an error occurred. You should call Err() to check for an
 // error.
 func (itr *EventMetadataIterator) Next() bool {
+	if itr.eventMetadataEnumHandle == 0 {
+		// This is only the case when we could not find the event metadata file.
+		return false
+	}
 	// Close existing handle.
 	itr.currentEvent.Close()
 

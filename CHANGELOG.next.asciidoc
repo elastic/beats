@@ -57,6 +57,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Fix fatal invalid memory write on Windows 11. {issue}32469[32469] {pull}32519[32519]
+- Fix handling of event formatting when no metadata is available on Windows 11. {issue}32468[32468] {pull}32519[32519]
 - Reduce severity of message salvage failure logging. {pull}32697[32697]
 
 *Functionbeat*
