@@ -156,7 +156,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, log)
+	scheduler := newScheduler(ctx, publisher, bucket, currentSource, &input.config, st, log)
 
-	return scheduler.schedule(ctx)
+	return scheduler.schedule()
 }

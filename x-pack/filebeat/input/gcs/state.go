@@ -29,13 +29,13 @@ type Checkpoint struct {
 	// timestamp to denote which is the latest blob
 	LatestEntryTime *time.Time
 	// list of failed jobs due to unexpected errors/download errors
-	FailedJobs map[string]interface{}
+	FailedJobs map[string]int
 }
 
 func newState() *state {
 	return &state{
 		cp: &Checkpoint{
-			FailedJobs: make(map[string]interface{}),
+			FailedJobs: make(map[string]int),
 		},
 	}
 }
@@ -43,7 +43,7 @@ func newState() *state {
 // save, saves/updates the current state for cursor checkpoint
 func (s *state) save(name string, lastModifiedOn *time.Time) {
 	s.mu.Lock()
-	if s.cp.FailedJobs[name] == nil {
+	if _, ok := s.cp.FailedJobs[name]; !ok {
 		if len(s.cp.ObjectName) == 0 {
 			s.cp.ObjectName = name
 		} else if strings.ToLower(name) > strings.ToLower(s.cp.ObjectName) {
@@ -69,10 +69,10 @@ func (s *state) save(name string, lastModifiedOn *time.Time) {
 // entry is removed from the map
 func (s *state) updateFailedJobs(jobName string) {
 	s.mu.Lock()
-	if s.cp.FailedJobs[jobName] == nil {
+	if _, ok := s.cp.FailedJobs[jobName]; !ok {
 		s.cp.FailedJobs[jobName] = 0
 	} else {
-		count := s.cp.FailedJobs[jobName].(int)
+		count := s.cp.FailedJobs[jobName]
 		count++
 		if count > maxFailedJobRetries {
 			delete(s.cp.FailedJobs, jobName)

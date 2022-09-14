@@ -20,13 +20,13 @@ import (
 
 // limiter, is used to limit the number of goroutines from blowing up the stack
 type limiter struct {
-	ctx context.Context
-	wg  sync.WaitGroup
+	wg sync.WaitGroup
 	// limit specifies the maximum number
 	// of concurrent jobs to perform.
 	limit chan struct{}
 }
 type scheduler struct {
+	parentCtx context.Context
 	publisher cursor.Publisher
 	bucket    *storage.BucketHandle
 	src       *Source
@@ -37,10 +37,11 @@ type scheduler struct {
 }
 
 // newScheduler, returns a new scheduler instance
-func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
+func newScheduler(ctx context.Context, publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
 	state *state, log *logp.Logger,
 ) *scheduler {
 	return &scheduler{
+		parentCtx: ctx,
 		publisher: publisher,
 		bucket:    bucket,
 		src:       src,
@@ -52,16 +53,15 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 }
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
-func (s *scheduler) schedule(ctx context.Context) error {
-	s.limiter.ctx = ctx
+func (s *scheduler) schedule() error {
 	if !s.src.Poll {
-		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
+		ctxWithTimeout, cancel := context.WithTimeout(s.parentCtx, s.src.BucketTimeOut)
 		defer cancel()
 		return s.scheduleOnce(ctxWithTimeout)
 	}
 
 	for {
-		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
+		ctxWithTimeout, cancel := context.WithTimeout(s.parentCtx, s.src.BucketTimeOut)
 		defer cancel()
 
 		err := s.scheduleOnce(ctxWithTimeout)
@@ -69,7 +69,7 @@ func (s *scheduler) schedule(ctx context.Context) error {
 			return err
 		}
 
-		err = timed.Wait(ctx, s.src.PollInterval)
+		err = timed.Wait(s.parentCtx, s.src.PollInterval)
 		if err != nil {
 			return err
 		}
@@ -92,9 +92,9 @@ func (l *limiter) release() {
 	l.wg.Done()
 }
 
-func (s *scheduler) scheduleOnce(ctx context.Context) error {
+func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
 	defer s.limiter.wait()
-	pager := s.fetchObjectPager(ctx, s.src.MaxWorkers)
+	pager := s.fetchObjectPager(ctxWithTimeout, s.src.MaxWorkers)
 	for {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
@@ -107,7 +107,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		if s.state.checkpoint().LatestEntryTime != nil {
 			jobs = s.moveToLastSeenJob(jobs)
 			if len(s.state.checkpoint().FailedJobs) > 0 {
-				jobs = s.addFailedJobs(ctx, jobs)
+				jobs = s.addFailedJobs(ctxWithTimeout, jobs)
 			}
 		}
 
@@ -118,7 +118,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			s.limiter.acquire()
 			go func() {
 				defer s.limiter.release()
-				job.do(s.limiter.ctx, id)
+				job.do(s.parentCtx, id)
 			}()
 		}
 
@@ -217,7 +217,7 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		if !jobMap[name] {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {
-				s.log.Errorf("adding failed job %s to job list caused an error : %w", err)
+				s.log.Errorf("adding failed job %s to job list caused an error: %w", err)
 			}
 
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name

@@ -45,7 +45,6 @@ func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
 // Run starts the input and blocks until it ends the execution.
 // It will return on context cancellation, any other error will be retried.
 func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher, client *storage.Client) error {
-
 	pub := statelessPublisher{wrapped: publisher}
 	var source cursor.Source
 	for _, b := range in.config.Buckets {
@@ -80,9 +79,9 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			storage.WithPolicy(storage.RetryAlways),
 		)
 
-		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, log)
+		scheduler := newScheduler(ctx, pub, bkt, currentSource, &in.config, st, log)
 
-		return scheduler.schedule(ctx)
+		return scheduler.schedule()
 	}
 	return nil
 }

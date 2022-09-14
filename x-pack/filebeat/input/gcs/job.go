@@ -128,12 +128,12 @@ func (j *job) extractData(ctx context.Context) (*bytes.Buffer, error) {
 	obj := j.bucket.Object(j.object.Name)
 	reader, err := obj.NewReader(ctxWithTimeout)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read data from object with error : %w", err)
+		return nil, fmt.Errorf("failed to read data from object with error: %w", err)
 	}
 	defer func() {
 		err = reader.Close()
 		if err != nil {
-			err = fmt.Errorf("failed to close object reader with error : %w", err)
+			j.log.Errorf("failed to close object reader with error: %w", err)
 		}
 	}()
 
@@ -141,14 +141,14 @@ func (j *job) extractData(ctx context.Context) (*bytes.Buffer, error) {
 
 	_, err = data.ReadFrom(reader)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read data from object reader with error : %w", err)
+		return nil, fmt.Errorf("failed to read data from object reader with error: %w", err)
 	}
 
 	return data, err
 }
 
 func (j *job) createEventFields(message string, data []mapstr.M) mapstr.M {
-	fields := mapstr.M{
+	return mapstr.M{
 		"message": message, // original stringified data
 		"log": mapstr.M{
 			"file": mapstr.M{
@@ -174,6 +174,4 @@ func (j *job) createEventFields(message string, data []mapstr.M) mapstr.M {
 			"kind": "publish_data",
 		},
 	}
-
-	return fields
 }
