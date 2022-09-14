@@ -62,6 +62,20 @@ stages:
                 - "macosTest"
             tags: true         ## for all the tags
         stage: extended
+      # Ignore as long as there are test failures, see https://github.com/elastic/beats/issues/33036
+#     macosM1:
+#         mage: "mage build unitTest"
+#         platforms:             ## override default label in this specific stage.
+#           - "orka && darwin && aarch64"
+#         when:                  ## Override the top-level when.
+#             comments:
+#                 - "/test metricbeat for macos-m1"
+#             labels:
+#                 - "macos-m1"
+#             parameters:
+#                 - "macosM1Test"
+#             tags: false         ## for all the tags
+#         stage: extended
     windows-2022:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
