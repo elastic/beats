@@ -20,11 +20,11 @@ type Query struct {
 	ECSMapping map[string]interface{} `config:"ecs_mapping" json:"-"`
 
 	// A boolean to set 'snapshot' mode, default true
-	// This is different from the default osquery behavour where the missing value defaults to false
+	// This is different from the default osquery behavior where the missing value defaults to false
 	Snapshot *bool `config:"snapshot,omitempty" json:"snapshot,omitempty"`
 
 	// A boolean to determine if "removed" actions should be logged, default true
-	// This is the same as osquery behavour
+	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
 }
 
