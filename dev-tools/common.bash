@@ -71,7 +71,7 @@ setup_go_path() {
   export GOPATH="${gopath}"
 
   # Add GOPATH to PATH.
-  export PATH="${GOPATH}/bin:${PATH}"
+  export PATH="${GOPATH}/bin:${GOPATH}/go/bin:${PATH}"
 
   debug "GOPATH=${GOPATH}"
 }
