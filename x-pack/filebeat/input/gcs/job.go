@@ -48,7 +48,7 @@ func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI
 
 const jobErrString = "job with jobId %s encountered an error : %w"
 
-func (j *job) Do(ctx context.Context, id string) {
+func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
 
 	if allowedContentTypes[j.object.ContentType] {

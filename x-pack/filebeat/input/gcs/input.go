@@ -158,5 +158,5 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	)
 	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, log)
 
-	return scheduler.Schedule(ctx)
+	return scheduler.schedule(ctx)
 }

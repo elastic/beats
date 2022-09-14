@@ -52,7 +52,7 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 }
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
-func (s *scheduler) Schedule(ctx context.Context) error {
+func (s *scheduler) schedule(ctx context.Context) error {
 	s.limiter.ctx = ctx
 	if !s.src.Poll {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
@@ -118,7 +118,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			s.limiter.acquire()
 			go func() {
 				defer s.limiter.release()
-				job.Do(s.limiter.ctx, id)
+				job.do(s.limiter.ctx, id)
 			}()
 		}
 

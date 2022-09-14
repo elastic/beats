@@ -82,7 +82,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 
 		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, log)
 
-		return scheduler.Schedule(ctx)
+		return scheduler.schedule(ctx)
 	}
 	return nil
 }
