@@ -492,7 +492,7 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 	case EvtVarTypeEvtHandle:
 		return EvtHandle(v.ValueAsUintPtr()), nil
 	default:
-		return nil, errors.Errorf("unhandled type: %d", typ)
+		return nil, fmt.Errorf("unhandled type: %d", typ)
 	}
 }
 
