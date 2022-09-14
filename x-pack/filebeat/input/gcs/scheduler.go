@@ -129,6 +129,13 @@ func (l *limiter) scheduleOnce(ctx context.Context, s *scheduler) error {
 	return nil
 }
 
+// fetchJobID returns a job id which is a combination of worker id, bucket name and object name
+func fetchJobID(workerId int, bucketName string, objectName string) string {
+	jobID := fmt.Sprintf("%s-%s-worker-%d", bucketName, objectName, workerId)
+
+	return jobID
+}
+
 func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []*job {
 	var jobs []*job
 
@@ -219,11 +226,4 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		}
 	}
 	return jobs
-}
-
-// fetchJobID returns a job id which is a combination of worker id, bucket name and object name
-func fetchJobID(workerId int, bucketName string, objectName string) string {
-	jobID := fmt.Sprintf("%s-%s-worker-%d", bucketName, objectName, workerId)
-
-	return jobID
 }
