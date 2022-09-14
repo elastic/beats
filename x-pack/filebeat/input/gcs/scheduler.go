@@ -18,15 +18,6 @@ import (
 	"github.com/elastic/go-concert/timed"
 )
 
-type scheduler struct {
-	publisher cursor.Publisher
-	bucket    *storage.BucketHandle
-	src       *Source
-	cfg       *config
-	state     *state
-	log       *logp.Logger
-}
-
 // limiter, is used to limit the number of goroutines from blowing up the stack
 type limiter struct {
 	ctx context.Context
@@ -34,6 +25,15 @@ type limiter struct {
 	// limit specifies the maximum number
 	// of concurrent jobs to perform.
 	limit chan struct{}
+}
+type scheduler struct {
+	publisher cursor.Publisher
+	bucket    *storage.BucketHandle
+	src       *Source
+	cfg       *config
+	state     *state
+	log       *logp.Logger
+	limiter   *limiter
 }
 
 // newScheduler, returns a new scheduler instance
@@ -47,25 +47,26 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 		cfg:       cfg,
 		state:     state,
 		log:       log,
+		limiter:   &limiter{limit: make(chan struct{}, src.MaxWorkers)},
 	}
 }
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
 func (s *scheduler) Schedule(ctx context.Context) error {
 
-	lmtr := &limiter{limit: make(chan struct{}, s.src.MaxWorkers), ctx: ctx}
-	defer lmtr.wait()
+	s.limiter.ctx = ctx
+	defer s.limiter.wait()
 	if !s.src.Poll {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
 		defer cancel()
-		return lmtr.scheduleOnce(ctxWithTimeout, s)
+		return s.scheduleOnce(ctxWithTimeout)
 	}
 
 	for {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, s.src.BucketTimeOut)
 		defer cancel()
 
-		err := lmtr.scheduleOnce(ctxWithTimeout, s)
+		err := s.scheduleOnce(ctxWithTimeout)
 		if err != nil {
 			return err
 		}
@@ -93,7 +94,8 @@ func (l *limiter) release() {
 	l.wg.Done()
 }
 
-func (l *limiter) scheduleOnce(ctx context.Context, s *scheduler) error {
+func (s *scheduler) scheduleOnce(ctx context.Context) error {
+	defer s.limiter.wait()
 	pager := s.fetchObjectPager(ctx, s.src.MaxWorkers)
 	for {
 		var objects []*storage.ObjectAttrs
@@ -115,10 +117,10 @@ func (l *limiter) scheduleOnce(ctx context.Context, s *scheduler) error {
 		for i, job := range jobs {
 			id := fetchJobID(i, s.src.BucketName, job.Name())
 			job := job
-			l.acquire()
+			s.limiter.acquire()
 			go func() {
-				defer l.release()
-				job.Do(l.ctx, id)
+				defer s.limiter.release()
+				job.Do(s.limiter.ctx, id)
 			}()
 		}
 
