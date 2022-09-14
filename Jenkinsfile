@@ -86,9 +86,19 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
+<<<<<<< HEAD
         withGithubNotify(context: "Checks") {
           stageStatusCache(id: 'Checks'){
             withBeatsEnv(archive: false, id: "checks") {
+=======
+        withGithubNotify(context: "Lint") {
+          stageStatusCache(id: 'Lint'){
+            // test the ./dev-tools/run_with_go_ver used by the Unified Release process
+            dir("${BASE_DIR}") {
+              sh "HOME=${WORKSPACE} GO_VERSION=${GO_VERSION} ./dev-tools/run_with_go_ver make test-mage"
+            }
+            withBeatsEnv(archive: false, id: "lint") {
+>>>>>>> 5385fd2387 (fix: mage installation with go1.18 (#33083))
               dumpVariables()
               whenTrue(env.ONLY_DOCS == 'false') {
                 runChecks()
