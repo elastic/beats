@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
@@ -67,36 +68,46 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwatch.GetMetricDataAPIClient, startTime time.Time, endTime time.Time) ([]types.MetricDataResult, error) {
-	maxQuerySize := 100
-	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
+	maxQuerySize := 500
 
-	// Split metricDataQueries into smaller slices that length no longer than 100.
-	// 100 is defined in maxQuerySize.
-	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
-	for i := 0; i < len(metricDataQueries); i += maxQuerySize {
-		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
-		if len(metricDataQueriesPartial) == 0 {
-			return getMetricDataOutput.MetricDataResults, nil
-		}
+	// Split metricDataQueries into smaller slices that length no longer than 500.
+	// 500 is defined in maxQuerySize.
+	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 500.
+	sliceLength := len(metricDataQueries)/maxQuerySize + 1
+	var metricDataResults []types.MetricDataResult
+	var err error
+	var wg sync.WaitGroup
+	wg.Add(sliceLength)
 
-		getMetricDataInput := &cloudwatch.GetMetricDataInput{
-			StartTime:         &startTime,
-			EndTime:           &endTime,
-			MetricDataQueries: metricDataQueriesPartial,
-		}
-
-		paginator := cloudwatch.NewGetMetricDataPaginator(svc, getMetricDataInput)
-		var err error
-		var page *cloudwatch.GetMetricDataOutput
-		for paginator.HasMorePages() {
-			if page, err = paginator.NextPage(context.TODO()); err != nil {
-				return getMetricDataOutput.MetricDataResults, fmt.Errorf("error GetMetricData with Paginator: %w", err)
+	for i := 0; i < sliceLength; i++ {
+		go func(i int) {
+			defer wg.Done()
+			metricDataQueriesPartial := metricDataQueries[i*maxQuerySize : int(math.Min(float64((i+1)*maxQuerySize), float64(len(metricDataQueries))))]
+			if len(metricDataQueriesPartial) == 0 {
+				return
 			}
-			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, page.MetricDataResults...)
-		}
-	}
 
-	return getMetricDataOutput.MetricDataResults, nil
+			getMetricDataInput := &cloudwatch.GetMetricDataInput{
+				StartTime:         &startTime,
+				EndTime:           &endTime,
+				MetricDataQueries: metricDataQueriesPartial,
+			}
+
+			paginator := cloudwatch.NewGetMetricDataPaginator(svc, getMetricDataInput)
+			for paginator.HasMorePages() {
+				page, err := paginator.NextPage(context.TODO())
+				if err != nil {
+					err = fmt.Errorf("error GetMetricData with Paginator: %w", err)
+					return
+				}
+				metricDataResults = append(metricDataResults, page.MetricDataResults...)
+				err = nil
+			}
+		}(i)
+	}
+	wg.Wait()
+	fmt.Println("------------ Finished for loop ------------")
+	return metricDataResults, err
 }
 
 // CheckTimestampInArray checks if input timestamp exists in timestampArray and if it exists, return the position.
@@ -111,19 +122,22 @@ func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (boo
 
 // FindTimestamp function checks MetricDataResults and find the timestamp to collect metrics from.
 // For example, MetricDataResults might look like:
-// metricDataResults =  [{
-//	 Id: "sqs0",
-//   Label: "testName SentMessageSize",
-//   StatusCode: Complete,
-//   Timestamps: [2019-03-11 17:45:00 +0000 UTC],
-//   Values: [981]
-// } {
-//	 Id: "sqs1",
-//	 Label: "testName NumberOfMessagesSent",
-//	 StatusCode: Complete,
-//	 Timestamps: [2019-03-11 17:45:00 +0000 UTC,2019-03-11 17:40:00 +0000 UTC],
-//	 Values: [0.5,0]
-// }]
+//
+//	metricDataResults =  [{
+//		 Id: "sqs0",
+//	  Label: "testName SentMessageSize",
+//	  StatusCode: Complete,
+//	  Timestamps: [2019-03-11 17:45:00 +0000 UTC],
+//	  Values: [981]
+//	} {
+//
+//		 Id: "sqs1",
+//		 Label: "testName NumberOfMessagesSent",
+//		 StatusCode: Complete,
+//		 Timestamps: [2019-03-11 17:45:00 +0000 UTC,2019-03-11 17:40:00 +0000 UTC],
+//		 Values: [0.5,0]
+//	}]
+//
 // This case, we are collecting values for both metrics from timestamp 2019-03-11 17:45:00 +0000 UTC.
 func FindTimestamp(getMetricDataResults []types.MetricDataResult) time.Time {
 	timestamp := time.Time{}
