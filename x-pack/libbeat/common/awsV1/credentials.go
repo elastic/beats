@@ -1,0 +1,148 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package awsV1
+
+import (
+	"crypto/tls"
+	"net/http"
+	"net/url"
+
+	"github.com/aws/aws-sdk-go/aws/session"
+
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+
+	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+)
+
+// OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.
+// These services follow the standard <service name>-fips.<region>.amazonaws.com format.
+var OptionalGovCloudFIPS = map[string]bool{
+	"s3": true,
+}
+
+// ConfigAWS is a structure defined for AWS credentials
+type ConfigAWS struct {
+	AccessKeyID          string            `config:"access_key_id"`
+	SecretAccessKey      string            `config:"secret_access_key"`
+	SessionToken         string            `config:"session_token"`
+	ProfileName          string            `config:"credential_profile_name"`
+	SharedCredentialFile string            `config:"shared_credential_file"`
+	Endpoint             string            `config:"endpoint"`
+	RoleArn              string            `config:"role_arn"`
+	ProxyUrl             string            `config:"proxy_url"`
+	FIPSEnabled          bool              `config:"fips_enabled"`
+	TLS                  *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
+	DefaultRegion        string            `config:"default_region"`
+}
+
+// InitializeAWSConfig function creates the awssdk.Config object from the provided config
+func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
+	awsConfig, _ := GetAWSCredentials(beatsConfig)
+	if awsConfig.Region == nil || *awsConfig.Region == "" {
+		if beatsConfig.DefaultRegion != "" {
+			awsConfig.Region = &beatsConfig.DefaultRegion
+		} else {
+			usEast1 := "us-east-1"
+			awsConfig.Region = &usEast1
+		}
+	}
+
+	// Assume IAM role if iam_role config parameter is given
+	if beatsConfig.RoleArn != "" {
+		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig)
+	}
+
+	var proxy func(*http.Request) (*url.URL, error)
+	if beatsConfig.ProxyUrl != "" {
+		proxyUrl, err := httpcommon.NewProxyURIFromString(beatsConfig.ProxyUrl)
+		if err != nil {
+			return awsConfig, err
+		}
+		proxy = http.ProxyURL(proxyUrl.URI())
+	}
+	var tlsConfig *tls.Config
+	if beatsConfig.TLS != nil {
+		TLSConfig, _ := tlscommon.LoadTLSConfig(beatsConfig.TLS)
+		tlsConfig = TLSConfig.ToConfig()
+	}
+	awsConfig.HTTPClient = &http.Client{
+		Transport: &http.Transport{
+			Proxy:           proxy,
+			TLSClientConfig: tlsConfig,
+		},
+	}
+	return awsConfig, nil
+}
+
+// GetAWSCredentials function gets aws credentials from the config.
+// If access keys given, use them as credentials.
+// If access keys are not given, then load from AWS config file. If credential_profile_name is not
+// given, default profile will be used.
+// If role_arn is given, assume the IAM role either with access keys or default profile.
+func GetAWSCredentials(beatsConfig ConfigAWS) (awssdk.Config, error) {
+	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
+	if beatsConfig.AccessKeyID != "" || beatsConfig.SecretAccessKey != "" || beatsConfig.SessionToken != "" {
+		return getConfigForKeys(beatsConfig), nil
+	}
+
+	return getConfigSharedCredentialProfile(beatsConfig)
+}
+
+// getConfigForKeys creates a default AWS config and adds a CredentialsProvider using the provided Beats config.
+// Provided config must contain an accessKeyID, secretAccessKey and sessionToken to generate a valid CredentialsProfile
+func getConfigForKeys(beatsConfig ConfigAWS) awssdk.Config {
+	config := awssdk.NewConfig()
+	// awsCredentials := awssdk.Credentials{
+	// 	AccessKeyID:     beatsConfig.AccessKeyID,
+	// 	SecretAccessKey: beatsConfig.SecretAccessKey,
+	// }
+
+	// if beatsConfig.SessionToken != "" {
+	// 	awsCredentials.SessionToken = beatsConfig.SessionToken
+	// }
+
+	addStaticCredentialsProviderToAwsConfig(beatsConfig, config)
+
+	return *config
+}
+
+// getConfigSharedCredentialProfile If accessKeyID, secretAccessKey or sessionToken is not given,
+// then load from default config // Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
+//	with more details. If credential_profile_name is empty, then default profile is used.
+func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, error) {
+	var config awssdk.Config
+	if beatsConfig.ProfileName != "" {
+		config = *awssdk.NewConfig().WithCredentials(credentials.NewSharedCredentials(beatsConfig.SharedCredentialFile, beatsConfig.ProfileName))
+	} else {
+		config = *awssdk.NewConfig().WithCredentials(credentials.NewStaticCredentials(beatsConfig.AccessKeyID, beatsConfig.SecretAccessKey, beatsConfig.SessionToken))
+	}
+
+	return config, nil
+}
+
+// addAssumeRoleProviderToAwsConfig adds the credentials provider to the current AWS config by using the role ARN stored in Beats config
+func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config) {
+	logger := logp.NewLogger("addAssumeRoleProviderToAwsConfig")
+	logger.Debug("Switching credentials provider to AssumeRoleProvider")
+	mySession := session.Must(session.NewSession())
+	awsConfig.Credentials = stscreds.NewCredentials(mySession, config.RoleArn)
+}
+
+// addStaticCredentialsProviderToAwsConfig adds a static credentials provider to the current AWS config by using the keys stored in Beats config
+func addStaticCredentialsProviderToAwsConfig(beatsConfig ConfigAWS, awsConfig *awssdk.Config) {
+	logger := logp.NewLogger("addStaticCredentialsProviderToAwsConfig")
+	logger.Debug("Switching credentials provider to AssumeRoleProvider")
+	staticCredentials := credentials.NewStaticCredentials(
+		beatsConfig.AccessKeyID,
+		beatsConfig.SecretAccessKey,
+		beatsConfig.SessionToken)
+
+	awsConfig.Credentials = staticCredentials
+}

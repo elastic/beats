@@ -17,6 +17,7 @@ import (
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -232,6 +233,11 @@ func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
 
 	switch tags := tags.(type) {
 	case []resourcegroupstaggingapitypes.Tag:
+		for _, tag := range tags {
+			tagKeys = append(tagKeys, *tag.Key)
+			tagValues = append(tagValues, *tag.Value)
+		}
+	case []resourcegroupstaggingapi.Tag:
 		for _, tag := range tags {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)

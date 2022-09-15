@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-airflow>>
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
+* <<exported-fields-awsV1>>
 * <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
@@ -1735,6 +1736,104 @@ The namespace specified when query cloudwatch api.
 
 
 type: keyword
+
+--
+
+[float]
+=== cloudwatchsynthetics
+
+cloudwatchsynthetics
+
+
+
+
+*`aws.cloudwatchsynthetics.metrics.SuccessPercent.avg`*::
++
+--
+The percentage of the runs of this canary that succeed and find no failures.
+
+
+type: double
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.Duration.avg`*::
++
+--
+The duration in milliseconds of the canary run.
+
+
+type: double
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.VisualMonitoringSuccessPercent.avg`*::
++
+--
+The percentage of visual comparisons that successfully matched the baseline screenshots during a canary run.
+
+
+type: double
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.2xx.sum`*::
++
+--
+The number of network requests performed by the canary that returned OK responses, with response codes between 200 and 299.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.4xx.sum`*::
++
+--
+The number of network requests performed by the canary that returned Error responses, with response codes between 400 and 499.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.5xx.sum`*::
++
+--
+The number of network requests performed by the canary that returned Fault responses, with response codes between 500 and 599.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.Failed.sum`*::
++
+--
+The number of canary runs that failed to execute. These failures are related to the canary itself.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.Failed requests.sum`*::
++
+--
+The number of HTTP requests executed by the canary on the target website that failed with no response.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.VisualMonitoringTotalComparisons`*::
++
+--
+The total number of visual comparisons that happened during a canary run.
+
+
+type: long
 
 --
 
@@ -4875,6 +4974,80 @@ type: double
 The bytes sent through the VPN tunnel.
 
 type: double
+
+--
+
+[[exported-fields-awsV1]]
+== AWSV1 fields
+
+`awsV1` module collects AWS monitoring metrics from AWS CloudwatchSynthetics.
+
+
+
+[float]
+=== awsV1
+
+
+
+
+*`awsV1.tags.*`*::
++
+--
+Tag key value pairs from aws resources.
+
+
+type: object
+
+--
+
+*`awsV1.s3.bucket.name`*::
++
+--
+Name of a S3 bucket.
+
+
+type: keyword
+
+--
+
+*`awsV1.dimensions.*`*::
++
+--
+Metric dimensions.
+
+
+type: object
+
+--
+
+*`awsV1.*.metrics.*.*`*::
++
+--
+Metrics that returned from Cloudwatch API query.
+
+
+type: object
+
+--
+
+
+*`awsV1.linked_account.id`*::
++
+--
+ID used to identify linked account.
+
+
+type: keyword
+
+--
+
+*`awsV1.linked_account.name`*::
++
+--
+Name or alias used to identify linked account.
+
+
+type: keyword
 
 --
 

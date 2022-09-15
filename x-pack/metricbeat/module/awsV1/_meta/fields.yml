@@ -1,0 +1,43 @@
+- key: awsV1
+  title: "AWSV1"
+  description: >
+    `awsV1` module collects AWS monitoring metrics from AWS CloudwatchSynthetics.
+  release: ga
+  fields:
+    - name: awsV1
+      type: group
+      description: >
+      fields:
+        - name: tags.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Tag key value pairs from aws resources.
+        - name: s3.bucket.name
+          type: keyword
+          description: >
+            Name of a S3 bucket.
+        - name: dimensions.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Metric dimensions.
+        - name: '*.metrics.*.*'
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
+          description: >
+            Metrics that returned from Cloudwatch API query.
+        - name: linked_account
+          type: group
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                ID used to identify linked account.
+            - name: name
+              type: keyword
+              description: >
+                Name or alias used to identify linked account.

@@ -1,0 +1,9 @@
+- module: aws
+  period: 1m
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+  aws_session_token: ""
+  credential_profile_name: ""
+  role_arn: ""
+  metricsets:
+    - cloudwatchsynthetics
