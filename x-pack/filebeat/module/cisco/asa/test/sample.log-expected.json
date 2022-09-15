@@ -3986,7 +3986,7 @@
         "destination.geo.region_name": "Aargau",
         "destination.ip": "85.0.0.1",
         "destination.user.name": "USER001",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -3999,7 +3999,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -4060,7 +4060,7 @@
         "destination.ip": "85.0.0.1",
         "destination.user.domain": "domain.tld",
         "destination.user.name": "user",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -4073,7 +4073,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -4138,7 +4138,7 @@
         "destination.ip": "85.0.0.1",
         "destination.user.domain": "AD",
         "destination.user.name": "USER002",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -4151,7 +4151,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "input.type": "log",
