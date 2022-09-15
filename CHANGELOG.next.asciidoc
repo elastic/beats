@@ -115,6 +115,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Improve performance of disk queue by coalescing writes. {pull}31935[31935]
 - Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
+- Added `--enable-all-filesets` to the `setup` command. {issue}30916[30916] {pull}33114[33114]
 
 *Auditbeat*
 
