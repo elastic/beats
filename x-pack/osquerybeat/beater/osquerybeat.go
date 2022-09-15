@@ -280,8 +280,8 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	cache.Resize(configPlugin.Count())
 
 	// Create osquery logger plugin
-	loggerPlugin := NewLoggerPlugin(bt.log, func(res SnapshotResult) {
-		bt.handleSnapshotResult(ctx, cli, configPlugin, res)
+	loggerPlugin := NewLoggerPlugin(bt.log, func(res QueryResult) {
+		bt.handleQueryResult(ctx, cli, configPlugin, res)
 	})
 
 	// Run main loop
@@ -360,7 +360,7 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	return g.Wait()
 }
 
-func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res SnapshotResult) {
+func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
 	ns, ok := configPlugin.LookupNamespace(res.Name)
 	if !ok {
 		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
@@ -375,14 +375,59 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Cl
 		return
 	}
 
-	hits, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
-	if err != nil {
-		bt.log.Errorf("failed to resolve query result types: %s", res.Name)
-		return
-	}
+	var (
+		hits []map[string]interface{}
+	)
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.pub.Publish(config.Datastream(ns), res.Name, responseID, hits, qi.ECSMapping, nil)
+
+	if res.Action == "snapshot" {
+		snapshot, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
+		if err != nil {
+			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
+			return
+		}
+		hits = append(hits, snapshot...)
+		meta := queryResultMeta("snapshot", "", res)
+		bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+	} else {
+		if len(res.DiffResults.Added) > 0 {
+			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
+			if err != nil {
+				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
+				return
+			}
+			hits = append(hits, added...)
+			meta := queryResultMeta("diff", "added", res)
+			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+		}
+		if len(res.DiffResults.Removed) > 0 {
+			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
+			if err != nil {
+				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
+				return
+			}
+			hits = append(hits, removed...)
+			meta := queryResultMeta("diff", "removed", res)
+			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+		}
+	}
+
+}
+
+func queryResultMeta(typ, action string, res QueryResult) map[string]interface{} {
+	m := map[string]interface{}{
+		"type":          typ,
+		"calendar_type": res.CalendarTime,
+		"unix_time":     res.UnixTime,
+		"epoch":         res.Epoch,
+		"counter":       res.Counter,
+	}
+
+	if action != "" {
+		m["action"] = action
+	}
+	return m
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
