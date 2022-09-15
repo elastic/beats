@@ -69,16 +69,9 @@ func (s *state) save(name string, lastModifiedOn *time.Time) {
 // entry is removed from the map
 func (s *state) updateFailedJobs(jobName string) {
 	s.mu.Lock()
-	if _, ok := s.cp.FailedJobs[jobName]; !ok {
-		s.cp.FailedJobs[jobName] = 0
-	} else {
-		count := s.cp.FailedJobs[jobName]
-		count++
-		if count > maxFailedJobRetries {
-			delete(s.cp.FailedJobs, jobName)
-		} else {
-			s.cp.FailedJobs[jobName] = count
-		}
+	s.cp.FailedJobs[jobName]++
+	if s.cp.FailedJobs[jobName] > maxFailedJobRetries {
+		delete(s.cp.FailedJobs, jobName)
 	}
 	s.mu.Unlock()
 }
