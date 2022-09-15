@@ -74,18 +74,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
-- sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
-- Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
-- Fix type mapping of client.as.number in okta module. {pull}31676[31676]
-- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
-- If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
-- Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]xs
-- Fix deduplication in Google workspace module by changing fingerprint processor target field from `@metadata.id` to `@metadata._id`. {pull}31898[31898]
-- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
-- Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
-- Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
-- cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
 - Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
 - Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
