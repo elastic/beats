@@ -14,17 +14,19 @@ import (
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metadataPrefix = "aws.ec2.instance."
 
 // AddMetadata adds metadata for EC2 instances from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
-	ec2ServiceName := awscommon.CreateServiceName("ec2", fips_enabled, regionName)
-	svcEC2 := ec2.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
-		endpoint, ec2ServiceName, regionName, awsConfig))
+func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
+	svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
+		if fips_enabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+
+	})
 
 	instancesOutputs, err := getInstancesPerRegion(svcEC2)
 	if err != nil {

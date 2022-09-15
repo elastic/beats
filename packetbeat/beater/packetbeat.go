@@ -58,7 +58,7 @@ var cmdLineArgs = flags{
 	loop:       flag.Int("l", 1, "Loop file. 0 - loop forever"),
 	oneAtAtime: flag.Bool("O", false, "Read packets one at a time (press Enter)"),
 	topSpeed:   flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
-	dumpfile:   flag.String("dump", "", "Write all captured packets to this libpcap file"),
+	dumpfile:   flag.String("dump", "", "Write all captured packets to libpcap files with this prefix - a timestamp and pcap extension are added"),
 }
 
 func initialConfig() config.Config {

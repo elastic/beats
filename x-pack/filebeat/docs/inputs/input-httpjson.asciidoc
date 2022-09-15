@@ -1011,11 +1011,11 @@ See <<request-parameters,request parameters>>. Required.
 
 Example:
 
-First call: https://example.com/services/data/v1.0/
+First call: \https://example.com/services/data/v1.0/
 
-Second call: https://example.com/services/data/v1.0/1/export_ids
+Second call: \https://example.com/services/data/v1.0/1/export_ids
 
-Third call: https://example.com/services/data/v1.0/export_ids/file_1/info
+Third call: \https://example.com/services/data/v1.0/export_ids/file_1/info
 
 [float]
 ==== `chain[].step.response.split`
@@ -1031,15 +1031,15 @@ A link:https://goessner.net/articles/JsonPath/index.html#e2[JSONPath] string to 
 
 Example:
 
-- First call: https://example.com/services/data/v1.0/
+- First call: \https://example.com/services/data/v1.0/
 +
 <<response-json1,response>>
 
-- Second call: https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
+- Second call: \https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
 +
 <<response-json2,response>>
 
-- Third call: https://example.com/services/data/v1.0/export_ids`/`$.file_name`/info
+- Third call: \https://example.com/services/data/v1.0/export_ids/`$.file_name`/info
 
 ["source","yaml",subs="attributes"]
 ----
@@ -1067,7 +1067,7 @@ Example:
 - First call to collect record ids
 
 +
-request_url: https://example.com/services/data/v1.0/records
+request_url: \https://example.com/services/data/v1.0/records
 
 +
 response_json:
@@ -1094,7 +1094,7 @@ response_json:
 - Second call to collect `file_name` using collected ids from first call.
 
 +
-request_url using id as '1': https://example.com/services/data/v1.0/1/export_ids
+request_url using id as '1': \https://example.com/services/data/v1.0/1/export_ids
 
 +
 response_json using id as '1':
@@ -1109,7 +1109,7 @@ response_json using id as '1':
 ----
 
 +
-request_url using id as '2': https://example.com/services/data/v1.0/2/export_ids
+request_url using id as '2': \https://example.com/services/data/v1.0/2/export_ids
 
 +
 response_json using id as '2':
@@ -1125,10 +1125,10 @@ response_json using id as '2':
 - Third call to collect `files` using collected `file_name` from second call.
 
 +
-request_url using file_name as 'file_1': https://example.com/services/data/v1.0/export_ids/file_1/info
+request_url using file_name as 'file_1': \https://example.com/services/data/v1.0/export_ids/file_1/info
 
 +
-request_url using file_name as 'file_2': https://example.com/services/data/v1.0/export_ids/file_2/info
+request_url using file_name as 'file_2': \https://example.com/services/data/v1.0/export_ids/file_2/info
 
 +
 Collect and make events from response in any format supported by httpjson for all calls.
@@ -1149,11 +1149,11 @@ See  <<request-parameters,request parameters>> .
 
 Example:
 
-First call: http://example.com/services/data/v1.0/exports
+First call: \http://example.com/services/data/v1.0/exports
 
-Second call: http://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+Second call: \http://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
 
-Third call: http://example.com/services/data/v1.0/export_ids/1/info
+Third call: \http://example.com/services/data/v1.0/export_ids/1/info
 
 [float]
 ==== `chain[].while.response.split`
@@ -1167,15 +1167,15 @@ See  <<chain-step-replace, chain[].step.replace>> .
 
 Example:
 
-- First call: http://example.com/services/data/v1.0/exports
+- First call: \http://example.com/services/data/v1.0/exports
 +
 <<response-json1-while,response>>
 
-- Second call: http://example.com/services/data/v1.0/`$.exportId`/export_ids/status
+- Second call: \http://example.com/services/data/v1.0/`$.exportId`/export_ids/status
 +
 <<response-json2-while,response>>
 
-- Third call: http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
+- Third call: \http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
 +
 <<response-json3-while,response 1>> , <<response-json4-while,response 2>>
 
@@ -1209,7 +1209,7 @@ Example:
 - First call to collect export ids
 
 +
-request_url: https://example.com/services/data/v1.0/exports
+request_url: \https://example.com/services/data/v1.0/exports
 
 +
 response_json:
@@ -1226,7 +1226,7 @@ response_json:
 - Second call to collect `file_ids` using collected id from first call when `response.body.sataus == "completed"`. This call continues until the condition is satisfied or the maximum number of attempts gets exhausted.
 
 +
-request_url using id as '9ef0e6a5': https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+request_url using id as '9ef0e6a5': \https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
 
 +
 response_json using id as '9ef0e6a5':
@@ -1254,10 +1254,10 @@ response_json using id as '9ef0e6a5':
 - Third call to collect `files` using collected `file_id` from second call.
 
 +
-request_url using file_id as '1': https://example.com/services/data/v1.0/export_ids/1/info
+request_url using file_id as '1': \https://example.com/services/data/v1.0/export_ids/1/info
 
 +
-request_url using file_id as '2': https://example.com/services/data/v1.0/export_ids/2/info
+request_url using file_id as '2': \https://example.com/services/data/v1.0/export_ids/2/info
 
 +
 response_json using id as '1':

@@ -5,9 +5,12 @@
 package billing
 
 import (
+	"time"
+
 	"github.com/stretchr/testify/mock"
 
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -27,10 +30,10 @@ func NewMockClient() *Client {
 	}
 }
 
-// GetForcast is a mock function for the billing service
-func (service *MockService) GetForecast(filter string) ([]consumption.Forecast, error) {
-	args := service.Called(filter)
-	return args.Get(0).([]consumption.Forecast), args.Error(1)
+// GetForecast is a mock function for the billing service
+func (service *MockService) GetForecast(scope string, startTime, endTime time.Time) (costmanagement.QueryResult, error) {
+	args := service.Called(scope, startTime, endTime)
+	return args.Get(0).(costmanagement.QueryResult), args.Error(1)
 }
 
 // GetUsageDetails is a mock function for the billing service

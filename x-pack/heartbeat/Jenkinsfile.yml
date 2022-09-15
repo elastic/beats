@@ -13,14 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    checks:
-        make: |
-          make -C x-pack/heartbeat check;
-          make -C x-pack/heartbeat update;
-          make -C heartbeat check;
-          make -C heartbeat update;
-          make check-no-changes;
-        stage: checks
     unitTest:
         mage: "mage build unitTest"
         withNodejs: true
@@ -70,6 +62,19 @@ stages:
 #        platforms:             ## override default labels in this specific stage.
 #            - "windows-8"
 #        stage: extended_win
+    macosM1:
+        mage: "mage build unitTest"
+        platforms:             ## override default label in this specific stage.
+          - "orka && darwin && aarch64"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test heartbeat for macos-m1"
+            labels:
+                - "macos-m1"
+            parameters:
+                - "macosM1Test"
+            tags: false         ## for all the tags
+        stage: extended
     packaging-linux:
         packaging-linux: "mage package"
         e2e:

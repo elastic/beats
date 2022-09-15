@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
@@ -78,7 +79,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, nil)
+	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
 
 	return err
 }
@@ -90,9 +91,10 @@ func newMonitor(
 	registrar *plugin.PluginsReg,
 	pubClient pipeline.ISyncClient,
 	taskAdder scheduler.AddTask,
+	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, onStop)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -106,6 +108,7 @@ func newMonitorUnsafe(
 	registrar *plugin.PluginsReg,
 	pubClient pipeline.ISyncClient,
 	addTask scheduler.AddTask,
+	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
@@ -170,7 +173,7 @@ func newMonitorUnsafe(
 		}}
 	}
 
-	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
+	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
 	m.endpoints = p.Endpoints
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
