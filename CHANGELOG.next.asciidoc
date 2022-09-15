@@ -43,6 +43,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
 - Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
 - Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+- Import dashboards from CEF integration. {pull}32766[32766]
+- Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
 
 *Heartbeat*
 
