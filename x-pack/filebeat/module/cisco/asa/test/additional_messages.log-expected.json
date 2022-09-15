@@ -128,7 +128,7 @@
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -141,7 +141,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -265,7 +265,7 @@
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -278,7 +278,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -741,7 +741,7 @@
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -754,7 +754,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -791,7 +791,7 @@
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -804,7 +804,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
