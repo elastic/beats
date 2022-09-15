@@ -28,13 +28,13 @@ type azurebsInput struct {
 }
 
 const (
-	inputName string = "azureblobstorage"
+	inputName string = "azure-blob-storage"
 )
 
 func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Beta,
 		Deprecated: false,
 		Info:       "Azure Blob Storage logs",
 		Doc:        "Collect logs from Azure Blob Storage Service",
@@ -98,7 +98,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if c.PollInterval == nil && cfg.PollInterval != nil {
 		c.PollInterval = cfg.PollInterval
 	} else if c.PollInterval == nil && cfg.PollInterval == nil {
-		interval := time.Second * 120
+		interval := time.Second * 300
 		c.PollInterval = &interval
 	}
 
@@ -114,13 +114,13 @@ func (input *azurebsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor.Cursor, publisher cursor.Publisher) error {
-	var cp *state.Checkpoint
-	st := state.NewState()
 	currentSource := src.(*types.Source)
 
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 
+	var cp *state.Checkpoint
+	st := state.NewState()
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
 			return err
@@ -129,13 +129,10 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 		st.SetCheckpoint(cp)
 	}
 
-	ctx, cancelInputCtx := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		defer cancelInputCtx()
-		select {
-		case <-inputCtx.Cancelation.Done():
-		case <-ctx.Done():
-		}
+		<-inputCtx.Cancelation.Done()
+		cancel()
 	}()
 
 	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)

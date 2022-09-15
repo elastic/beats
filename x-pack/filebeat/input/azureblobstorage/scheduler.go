@@ -63,7 +63,14 @@ func (ais *azureInputScheduler) Schedule(ctx context.Context) error {
 	workerPool.Start()
 
 	if !ais.src.Poll {
-		availableWorkers = workerPool.AvailableWorkers()
+		for {
+			availableWorkers = workerPool.AvailableWorkers()
+			if availableWorkers == 0 {
+				continue
+			} else if availableWorkers > 0 {
+				break
+			}
+		}
 		pager = ais.fetchBlobPager(availableWorkers)
 		return ais.scheduleOnce(ctx, pager, workerPool)
 	}
@@ -107,7 +114,8 @@ func (ais *azureInputScheduler) scheduleOnce(ctx context.Context, pager *azblob.
 			workerPool.Submit(job)
 		}
 	}
-	return nil
+
+	return pager.Err()
 }
 
 func (ais *azureInputScheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]job.Job, error) {

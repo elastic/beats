@@ -72,19 +72,7 @@ func (aij *AzureInputJob) Do(ctx context.Context, id string) error {
 			}
 		}()
 
-		var blobData []mapstr.M
-		switch *aij.blob.Properties.ContentType {
-		case types.Json:
-			blobData, _, _, err = httpReadJSON(reader)
-			if err != nil {
-				return err
-			}
-			// Support for more types will be added here, in the future.
-		default:
-			return fmt.Errorf("job with jobId %s encountered an unexpected error", id)
-		}
-
-		fields = aij.createEventFields(data.String(), blobData)
+		fields = aij.createEventFields(data.String())
 
 	} else {
 		err := fmt.Errorf("job with jobId %s encountered an error : content-type %s not supported", id, *aij.blob.Properties.ContentType)
@@ -147,8 +135,8 @@ func (aij *AzureInputJob) extractData(ctx context.Context) (*bytes.Buffer, error
 	return downloadedData, err
 }
 
-func (aij *AzureInputJob) createEventFields(message string, data []mapstr.M) mapstr.M {
-	fields := mapstr.M{
+func (aij *AzureInputJob) createEventFields(message string) mapstr.M {
+	return mapstr.M{
 		"message": message, // original stringified data
 		"log": mapstr.M{
 			"file": mapstr.M{
@@ -156,14 +144,13 @@ func (aij *AzureInputJob) createEventFields(message string, data []mapstr.M) map
 			},
 		},
 		"azure": mapstr.M{
-			"blob": mapstr.M{
+			"storage": mapstr.M{
 				"container": mapstr.M{
 					"name": aij.src.ContainerName,
 				},
-				"object": mapstr.M{
+				"blob": mapstr.M{
 					"name":         aij.blob.Name,
 					"content_type": aij.blob.Properties.ContentType,
-					"data":         data, // objectified data
 				},
 			},
 		},
@@ -174,6 +161,4 @@ func (aij *AzureInputJob) createEventFields(message string, data []mapstr.M) map
 			"kind": "publish_data",
 		},
 	}
-
-	return fields
 }

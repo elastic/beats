@@ -9,22 +9,25 @@ package azureblobstorage
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/types"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"gotest.tools/gotestsum/log"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
-	bucketGcsTestNew    = "gcs-test-new"
-	bucketGcsTestLatest = "gcs-test-latest"
+	beatsContainer   = "beatscontainer"
+	beatsContainer_2 = "beatscontainer2"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -33,170 +36,293 @@ func Test_StorageClient(t *testing.T) {
 		baseConfig      map[string]interface{}
 		mockHandler     func() http.Handler
 		expected        map[string]bool
-		checkJSON       bool
 		isError         error
 		unexpectedError error
 	}{
 		{
-			name: "Test1_SingleBucketWithPoll_NoErr",
+			name: "Test1_SingleContainerWithPoll_NoErr",
 			baseConfig: map[string]interface{}{
-				"project_id":                 "elastic-sa",
-				"auth.credentials_file.path": "/gcs_creds.json",
-				"max_workers":                2,
-				"poll":                       true,
-				"poll_interval":              "5s",
-				"parse_json":                 false,
-				"buckets": []map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
 					{
-						"name": "gcs-test-new",
+						"name": beatsContainer,
 					},
 				},
 			},
-			mockHandler: mock.GCSServer,
+			mockHandler: mock.AzureStorageServer,
 			expected: map[string]bool{
-				mock.Gcs_test_new_object_ata_json:      true,
-				mock.Gcs_test_new_object_data3_json:    true,
-				mock.Gcs_test_new_object_docs_ata_json: true,
+				mock.Beatscontainer_blob_ata_json:      true,
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
 			},
 			unexpectedError: context.Canceled,
+		},
+		{
+			name: "Test2_SingleContainerWithoutPoll_NoErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_ata_json:      true,
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+			unexpectedError: nil,
+		},
+		{
+			name: "Test3_TwoContainersWithPoll_NoErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+					{
+						"name": beatsContainer_2,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_ata_json:      true,
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+				mock.Beatscontainer_2_blob_ata_json:    true,
+				mock.Beatscontainer_2_blob_data3_json:  true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "Test4_TwoContainersWithoutPoll_NoErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+					{
+						"name": beatsContainer_2,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_ata_json:      true,
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+				mock.Beatscontainer_2_blob_ata_json:    true,
+				mock.Beatscontainer_2_blob_data3_json:  true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "Test5_SingleContainerPoll_InvalidContainerErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": "azuretest",
+					},
+				},
+			},
+			mockHandler:     mock.AzureStorageServer,
+			expected:        map[string]bool{},
+			isError:         mock.NotFoundErr,
+			unexpectedError: nil,
+		},
+		{
+			name: "Test6_SingleContainerWithoutPoll_InvalidBucketErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": "azuretest",
+					},
+				},
+			},
+			mockHandler:     mock.AzureStorageServer,
+			expected:        map[string]bool{},
+			isError:         mock.NotFoundErr,
+			unexpectedError: nil,
+		},
+		{
+			name: "Test7_TwoContainersWithPoll_InvalidBucketErr",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": "azurenew",
+					},
+					{
+						"name": "azurelatest",
+					},
+				},
+			},
+			mockHandler:     mock.AzureStorageServer,
+			expected:        map[string]bool{},
+			isError:         mock.NotFoundErr,
+			unexpectedError: nil,
+		},
+		{
+			name: "Test8_SingleBucketWithPoll_InvalidConfigValue",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         5100,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler:     mock.AzureStorageServer,
+			expected:        map[string]bool{},
+			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
+			unexpectedError: nil,
+		},
+		{
+			name: "Test9_TwoBucketWithPoll_InvalidConfigValue",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         5100,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+					{
+						"name": beatsContainer_2,
+					},
+				},
+			},
+			mockHandler:     mock.AzureStorageServer,
+			expected:        map[string]bool{},
+			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
+			unexpectedError: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			serv := httptest.NewServer(tt.mockHandler())
-			// httpclient := http.Client{
-			// 	Transport: &http.Transport{
-			// 		TLSClientConfig: &tls.Config{
-			// 			InsecureSkipVerify: true, //nolint:gosec // We can ignore as this is just for testing
-			// 		},
-			// 	},
-			// }
 			t.Cleanup(serv.Close)
-			fetchdata(serv)
-			// 	client, _ := storage.NewClient(context.Background(), option.WithEndpoint(serv.URL), option.WithoutAuthentication(), option.WithHTTPClient(&httpclient))
-			// 	cfg := conf.MustNewConfigFrom(tt.baseConfig)
-			// 	conf := config{}
-			// 	err := cfg.Unpack(&conf)
-			// 	if err != nil {
-			// 		assert.EqualError(t, err, tt.isError.Error())
-			// 		return
-			// 	}
-			// 	input := newStatelessInput(conf)
 
-			// 	assert.Equal(t, "gcs-stateless", input.Name())
-			// 	assert.NoError(t, input.Test(v2.TestContext{}))
+			cfg := conf.MustNewConfigFrom(tt.baseConfig)
+			conf := config{}
+			err := cfg.Unpack(&conf)
+			if err != nil {
+				assert.EqualError(t, err, tt.isError.Error())
+				return
+			}
+			input := newStatelessInput(conf, serv.URL+"/")
 
-			// 	chanClient := beattest.NewChanClient(len(tt.expected))
-			// 	t.Cleanup(func() { _ = chanClient.Close() })
+			assert.Equal(t, "azure-blob-storage-stateless", input.Name())
+			assert.NoError(t, input.Test(v2.TestContext{}))
 
-			// 	ctx, cancel := newV2Context()
-			// 	t.Cleanup(cancel)
+			chanClient := beattest.NewChanClient(len(tt.expected))
+			t.Cleanup(func() { _ = chanClient.Close() })
 
-			// 	var g errgroup.Group
-			// 	g.Go(func() error {
-			// 		return input.Run(ctx, chanClient, client)
-			// 	})
+			ctx, cancel := newV2Context()
+			t.Cleanup(cancel)
 
-			// 	var timeout *time.Timer
-			// 	if conf.PollInterval != nil {
-			// 		timeout = time.NewTimer(1*time.Second + *conf.PollInterval)
-			// 	} else {
-			// 		timeout = time.NewTimer(5 * time.Second)
-			// 	}
-			// 	t.Cleanup(func() { _ = timeout.Stop() })
+			var g errgroup.Group
+			g.Go(func() error {
+				return input.Run(ctx, chanClient)
+			})
 
-			// 	if len(tt.expected) == 0 {
-			// 		if tt.isError != nil && g.Wait() != nil {
-			// 			assert.EqualError(t, g.Wait(), tt.isError.Error())
-			// 			cancel()
-			// 		} else {
-			// 			assert.NoError(t, g.Wait())
-			// 			cancel()
-			// 		}
-			// 		return
-			// 	}
+			var timeout *time.Timer
+			if conf.PollInterval != nil {
+				timeout = time.NewTimer(1*time.Second + *conf.PollInterval)
+			} else {
+				timeout = time.NewTimer(5 * time.Second)
+			}
+			t.Cleanup(func() { _ = timeout.Stop() })
 
-			// 	var receivedCount int
-			// wait:
-			// 	for {
-			// 		select {
-			// 		case <-timeout.C:
-			// 			t.Errorf("timed out waiting for %d events", len(tt.expected))
-			// 			cancel()
-			// 			return
-			// 		case got := <-chanClient.Channel:
-			// 			var val interface{}
-			// 			var err error
-			// 			if !tt.checkJSON {
-			// 				val, err = got.Fields.GetValue("message")
-			// 				assert.NoError(t, err)
-			// 				assert.True(t, tt.expected[val.(string)])
-			// 			} else {
-			// 				val, err = got.Fields.GetValue("gcs.storage.object.json_data")
-			// 				fVal := fmt.Sprintf("%v", val)
-			// 				assert.NoError(t, err)
-			// 				assert.True(t, tt.expected[fVal])
-			// 			}
-			// 			assert.Equal(t, tt.isError, err)
-			// 			receivedCount += 1
-			// 			if receivedCount == len(tt.expected) {
-			// 				cancel()
-			// 				break wait
-			// 			}
-			// 		}
-			// 	}
-			// 	assert.ErrorIs(t, tt.unexpectedError, g.Wait())
-		})
-	}
-}
-
-func fetchdata(serv *httptest.Server) {
-	credential, err := azblob.NewSharedKeyCredential("xyz", "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==")
-	if err != nil {
-		log.Errorf("Invalid credentials with error: %v", err)
-	}
-
-	client, err := azblob.NewServiceClientWithSharedKey(serv.URL, credential, nil)
-	if err != nil {
-		log.Errorf("Invalid credentials with error: %v", err)
-	}
-
-	containerClient, err := client.NewContainerClient("beatscontainer")
-	if err != nil {
-		log.Errorf("Error fetching container client for container : %s, error : %v", "beatscontainer", err)
-	}
-
-	pager := containerClient.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{
-		Include: []azblob.ListBlobsIncludeItem{
-			azblob.ListBlobsIncludeItemMetadata,
-			azblob.ListBlobsIncludeItemTags,
-		},
-	})
-	ctx := context.Background()
-	for pager.NextPage(ctx) {
-		for _, v := range pager.PageResponse().Segment.BlobItems {
-			blobURL := serv.URL + "beatscontainer" + "/" + *v.Name
-			blobCreds := &types.BlobCredentials{
-				ServiceCreds:  ais.credential,
-				BlobName:      *v.Name,
-				ContainerName: ais.src.ContainerName,
+			if len(tt.expected) == 0 {
+				if tt.isError != nil && g.Wait() != nil {
+					if tt.isError == mock.NotFoundErr {
+						arr := strings.Split(g.Wait().Error(), "\n")
+						errStr := strings.Join(arr[1:], "\n")
+						assert.Equal(t, tt.isError.Error(), errStr)
+					} else {
+						assert.EqualError(t, g.Wait(), tt.isError.Error())
+					}
+					cancel()
+				} else {
+					assert.NoError(t, g.Wait())
+					cancel()
+				}
+				return
 			}
 
-			fmt.Println("NAME : ", *v.Name)
-
-			// blobClient, err := fetchBlobClient(blobURL, blobCreds, ais.log)
-			// if err != nil {
-			// 	return nil, err
-			// }
-
-		}
+			var receivedCount int
+		wait:
+			for {
+				select {
+				case <-timeout.C:
+					t.Errorf("timed out waiting for %d events", len(tt.expected))
+					cancel()
+					return
+				case got := <-chanClient.Channel:
+					var val interface{}
+					var err error
+					val, err = got.Fields.GetValue("message")
+					assert.NoError(t, err)
+					assert.True(t, tt.expected[val.(string)])
+					assert.Equal(t, tt.isError, err)
+					receivedCount += 1
+					if receivedCount == len(tt.expected) {
+						cancel()
+						break wait
+					}
+				}
+			}
+			assert.ErrorIs(t, tt.unexpectedError, g.Wait())
+		})
 	}
 }
 
 func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:      logp.NewLogger("gcs_test"),
+		Logger:      logp.NewLogger("azure-blob-storage_test"),
 		ID:          "test_id",
 		Cancelation: ctx,
 	}, cancel

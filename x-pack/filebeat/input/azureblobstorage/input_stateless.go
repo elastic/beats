@@ -24,11 +24,11 @@ type statelessInput struct {
 }
 
 func (statelessInput) Name() string {
-	return "azureblobstorage-stateless"
+	return "azure-blob-storage-stateless"
 }
 
-func newStatelessInput(config config) *statelessInput {
-	return &statelessInput{config: config}
+func newStatelessInput(config config, url string) *statelessInput {
+	return &statelessInput{config: config, serviceURL: url}
 }
 
 func (in *statelessInput) Test(v2.TestContext) error {
@@ -47,7 +47,6 @@ func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
 // Run starts the input and blocks until it ends the execution.
 // It will return on context cancellation, any other error will be retried.
 func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher) error {
-
 	pub := statelessPublisher{wrapped: publisher}
 	var source cursor.Source
 	for _, c := range in.config.Containers {
