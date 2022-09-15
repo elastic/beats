@@ -1,3 +1,10 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+//go:build !aix
+// +build !aix
+
 package mock
 
 const (
@@ -288,3 +295,64 @@ var Gcs_test_latest_object_data3_json = `{
 //nolint:stylecheck // required for edge case test scenario
 var Gcs_test_latest_object_ata_json_parsed = `[{"brand":"Apple","category":"smartphones","description":"An apple mobile which is nothing like apple","discountPercentage":12.96,"id":1,"images":["https://dummyjson.com/image/i/products/1/1.jpg","https://dummyjson.com/image/i/products/1/2.jpg","https://dummyjson.com/image/i/products/1/3.jpg","https://dummyjson.com/image/i/products/1/4.jpg","https://dummyjson.com/image/i/products/1/thumbnail.jpg"],"price":549,"rating":4.69,"stock":94,"thumbnail":"https://dummyjson.com/image/i/products/1/thumbnail.jpg","title":"iPhone 9"}]`
 var Gcs_test_latest_object_data3_json_parsed = `[{"brand":"Samsung","category":"smartphones","description":"Samsung's new variant which goes beyond Galaxy to the Universe","discountPercentage":15.46,"id":3,"images":["https://dummyjson.com/image/i/products/3/1.jpg"],"price":1249,"rating":4.09,"stock":36,"thumbnail":"https://dummyjson.com/image/i/products/3/thumbnail.jpg","title":"Samsung Universe 9"}]`
+
+var data = `<?xml version="1.0" encoding="utf-8"?>
+<EnumerationResults ServiceEndpoint="https://beatsblobnew.blob.core.windows.net/" ContainerName="beatscontainer">
+    <Blobs>
+        <Blob>
+            <Name>ata.json</Name>
+            <Properties>
+                <Last-Modified>Wed, 14 Sep 2022 12:12:28 GMT</Last-Modified>
+                <Etag>0x8DA964A64516C82</Etag>
+                <Content-Length>643</Content-Length>
+                <Content-Type>application/json</Content-Type>
+                <Content-Encoding />
+                <Content-Language />
+                <Content-MD5>UjQX73kQRTHx+UyXZDvVkg==</Content-MD5>
+                <Cache-Control />
+                <Content-Disposition />
+                <BlobType>BlockBlob</BlobType>
+                <LeaseStatus>unlocked</LeaseStatus>
+                <LeaseState>available</LeaseState>
+            </Properties>
+            <Metadata />
+        </Blob>
+        <Blob>
+            <Name>data_3.json</Name>
+            <Properties>
+                <Last-Modified>Wed, 14 Sep 2022 12:12:44 GMT</Last-Modified>
+                <Etag>0x8DA964A6DE60497</Etag>
+                <Content-Length>434</Content-Length>
+                <Content-Type>application/json</Content-Type>
+                <Content-Encoding />
+                <Content-Language />
+                <Content-MD5>eOXjYygu6k6687Uf3vPtKQ==</Content-MD5>
+                <Cache-Control />
+                <Content-Disposition />
+                <BlobType>BlockBlob</BlobType>
+                <LeaseStatus>unlocked</LeaseStatus>
+                <LeaseState>available</LeaseState>
+            </Properties>
+            <Metadata />
+        </Blob>
+        <Blob>
+            <Name>docs/ata.json</Name>
+            <Properties>
+                <Last-Modified>Wed, 14 Sep 2022 12:13:07 GMT</Last-Modified>
+                <Etag>0x8DA964A7B8D8862</Etag>
+                <Content-Length>643</Content-Length>
+                <Content-Type>application/json</Content-Type>
+                <Content-Encoding />
+                <Content-Language />
+                <Content-MD5>UjQX73kQRTHx+UyXZDvVkg==</Content-MD5>
+                <Cache-Control />
+                <Content-Disposition />
+                <BlobType>BlockBlob</BlobType>
+                <LeaseStatus>unlocked</LeaseStatus>
+                <LeaseState>available</LeaseState>
+            </Properties>
+            <Metadata />
+        </Blob>
+    </Blobs>
+    <NextMarker />
+</EnumerationResults>`

@@ -2,10 +2,14 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !aix
+// +build !aix
+
 package azureblobstorage
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,6 +17,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"gotest.tools/gotestsum/log"
 )
@@ -169,22 +174,22 @@ func fetchdata(serv *httptest.Server) {
 	})
 	ctx := context.Background()
 	for pager.NextPage(ctx) {
-		// for _, v := range pager.PageResponse().Segment.BlobItems {
-		// 	// blobURL := ais.serviceURL + ais.src.ContainerName + "/" + *v.Name
-		// 	// blobCreds := &types.BlobCredentials{
-		// 	// 	ServiceCreds:  ais.credential,
-		// 	// 	BlobName:      *v.Name,
-		// 	// 	ContainerName: ais.src.ContainerName,
-		// 	// }
+		for _, v := range pager.PageResponse().Segment.BlobItems {
+			blobURL := serv.URL + "beatscontainer" + "/" + *v.Name
+			blobCreds := &types.BlobCredentials{
+				ServiceCreds:  ais.credential,
+				BlobName:      *v.Name,
+				ContainerName: ais.src.ContainerName,
+			}
 
-		// 	fmt.Println("NAME : ", *v.Name)
+			fmt.Println("NAME : ", *v.Name)
 
-		// 	// blobClient, err := fetchBlobClient(blobURL, blobCreds, ais.log)
-		// 	// if err != nil {
-		// 	// 	return nil, err
-		// 	// }
+			// blobClient, err := fetchBlobClient(blobURL, blobCreds, ais.log)
+			// if err != nil {
+			// 	return nil, err
+			// }
 
-		// }
+		}
 	}
 }
 

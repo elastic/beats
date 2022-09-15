@@ -28,7 +28,7 @@ type azurebsInput struct {
 }
 
 const (
-	inputName string = "azure-blob-storage"
+	inputName string = "azureblobstorage"
 )
 
 func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
