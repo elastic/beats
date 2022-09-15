@@ -711,7 +711,7 @@
         "cisco.asa.mapped_source_ip": "81.2.69.192",
         "cisco.asa.message_id": "302020",
         "destination.domain": "eth0_fw",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -724,7 +724,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "81.2.69.142",
@@ -766,7 +766,7 @@
         "cisco.asa.mapped_source_ip": "81.2.69.192",
         "cisco.asa.message_id": "302020",
         "destination.domain": "eth0_fw",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -779,7 +779,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "81.2.69.142",
