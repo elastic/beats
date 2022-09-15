@@ -12,10 +12,11 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 )
 
 // These constants define all known synthetics event types
@@ -95,7 +96,7 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 	if se.URL != "" {
 		u, e := url.Parse(se.URL)
 		if e != nil {
-			logp.Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
+			logp.L().Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
 			_, _ = m.Put("url", wrappers.URLFields(u))
 		}
@@ -149,8 +150,8 @@ func (se *SynthError) toECSErr() *ecserr.ECSErr {
 		stack = &se.Stack
 	}
 	return ecserr.NewECSErrWithStack(
-		t,
-		se.Code,
+		ecserr.EType(t),
+		ecserr.ECode(se.Code),
 		se.Message,
 		stack,
 	)
@@ -164,8 +165,8 @@ func ECSErrToSynthError(ee *ecserr.ECSErr) *SynthError {
 		stack = *ee.StackTrace
 	}
 	return &SynthError{
-		Type:    ee.Type,
-		Code:    ee.Code,
+		Type:    string(ee.Type),
+		Code:    string(ee.Code),
 		Message: ee.Message,
 		Stack:   stack,
 	}

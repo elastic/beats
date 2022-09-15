@@ -1,0 +1,20 @@
+---
+- job:
+    name: Beats/Release/beats-release-minor-major-project
+    display-name: 'Prepare Major/minor Release for the given project'
+    description: 'Automate the steps to prepare a new Release branch for the given project'
+    view: Beats
+    project-type: pipeline
+    pipeline-scm:
+        script-path: release_scripts/pipeline-release-minor-major-project.groovy
+        scm:
+        - git:
+            url: git@github.com:elastic/ingest-dev.git
+            refspec: +refs/heads/*:refs/remotes/origin/* +refs/pull/*/head:refs/remotes/origin/pr/*
+            wipe-workspace: 'True'
+            name: origin
+            shallow-clone: true
+            credentials-id: f6c7695a-671e-4f4f-a331-acdce44ff9ba
+            reference-repo: /var/lib/jenkins/.git-references/ingest-dev.git
+            branches:
+                - main

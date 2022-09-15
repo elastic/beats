@@ -23,6 +23,8 @@ import (
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 )
 
 func init() {
@@ -38,6 +40,7 @@ type StorageClassMetricSet struct {
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
 	mod        k8smod.Module
+	enricher   util.Enricher
 }
 
 // NewStorageClassMetricSet returns a prometheus based metricset for Storage classes
@@ -54,6 +57,7 @@ func NewStorageClassMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.StorageClass{}, mod.GetMetricsRepo(), false),
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_storageclass_info": p.InfoMetric(),
@@ -66,10 +70,12 @@ func NewStorageClassMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"kube_storageclass_created": p.Metric("created", p.OpUnixTimestampValue()),
 			},
 			Labels: map[string]p.LabelMap{
-				"storageclass":      p.KeyLabel("name"),
-				"provisioner":       p.Label("provisioner"),
-				"reclaimPolicy":     p.Label("reclaim_policy"),
-				"volumeBindingMode": p.Label("volume_binding_mode"),
+				"storageclass":        p.KeyLabel("name"),
+				"provisioner":         p.Label("provisioner"),
+				"reclaimPolicy":       p.Label("reclaim_policy"),
+				"reclaim_policy":      p.Label("reclaim_policy"),
+				"volumeBindingMode":   p.Label("volume_binding_mode"),
+				"volume_binding_mode": p.Label("volume_binding_mode"),
 			},
 		},
 	}, nil
@@ -78,6 +84,8 @@ func NewStorageClassMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
 func (m *StorageClassMetricSet) Fetch(reporter mb.ReporterV2) {
+	m.enricher.Start()
+
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		m.Logger().Error(err)
@@ -91,12 +99,24 @@ func (m *StorageClassMetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
+	m.enricher.Enrich(events)
+
 	for _, event := range events {
-		event[mb.NamespaceKey] = "storageclass"
-		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
-		if !reported {
+
+		e, err := util.CreateEvent(event, "kubernetes.storageclass")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}
 	}
+}
+
+// Close stops this metricset
+func (m *StorageClassMetricSet) Close() error {
+	m.enricher.Stop()
+	return nil
 }

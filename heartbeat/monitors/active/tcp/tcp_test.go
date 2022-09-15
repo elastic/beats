@@ -28,14 +28,16 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	btesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	btesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
@@ -130,7 +132,7 @@ func TestConnectionRefusedEndpointJob(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
-			hbtest.ErrorChecks(dialErr, "io"),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, dialErr),
 		)),
 		event.Fields,
 	)
@@ -148,7 +150,7 @@ func TestUnreachableEndpointJob(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
-			hbtest.ErrorChecks(dialErr, "io"),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, dialErr),
 		)),
 		event.Fields,
 	)

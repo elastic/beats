@@ -12,11 +12,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 
 	"github.com/stretchr/testify/require"
 )
@@ -62,7 +63,7 @@ func TestToMap(t *testing.T) {
 		{
 			"root fields, step metadata",
 			mapstr.M{
-				"type":            "step/start",
+				"type":            StepStart,
 				"package_version": "1.2.3",
 				"journey":         mapstr.M{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
 				"step":            mapstr.M{"name": "MyStep", "status": "success", "index": 42, "duration": mapstr.M{"us": int64(1232131)}},
@@ -75,7 +76,7 @@ func TestToMap(t *testing.T) {
 			},
 			mapstr.M{
 				"synthetics": mapstr.M{
-					"type":            "step/start",
+					"type":            StepStart,
 					"package_version": "1.2.3",
 					"nested":          "v1",
 					"journey":         mapstr.M{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
@@ -141,15 +142,15 @@ func TestToMap(t *testing.T) {
 }
 
 func TestSynthErrConversion(t *testing.T) {
-	name := "myname"
+	name := ecserr.EType("TEST_TYPE")
 	message := "mymessage"
 	stack := "mystack"
-	code := "mycode"
+	code := ecserr.ECode("TEST_CODE")
 
 	t.Run("SynthErr -> ECS", func(t *testing.T) {
 		se := &SynthError{
-			Name:    name,
-			Code:    code,
+			Name:    string(name),
+			Code:    string(code),
 			Message: message,
 			Stack:   stack,
 		}
@@ -164,8 +165,8 @@ func TestSynthErrConversion(t *testing.T) {
 	t.Run("ECS Err -> SynthErr", func(t *testing.T) {
 		ecse := ecserr.NewECSErrWithStack(name, code, message, &stack)
 		se := ECSErrToSynthError(ecse)
-		require.Equal(t, name, se.Type)
-		require.Equal(t, code, se.Code)
+		require.Equal(t, name, ecserr.EType(se.Type))
+		require.Equal(t, code, ecserr.ECode(se.Code))
 		require.Equal(t, message, se.Message)
 		require.Equal(t, stack, se.Stack)
 	})

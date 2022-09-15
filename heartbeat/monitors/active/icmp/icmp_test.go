@@ -25,6 +25,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
+
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -32,8 +35,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
 )
 
 func TestICMPFields(t *testing.T) {
@@ -71,7 +72,7 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	require.Equal(t, 1, p.Endpoints)
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
-	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1})
+	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1}, nil)
 	_, _ = wrapped[0](e)
 	return tl, e
 }

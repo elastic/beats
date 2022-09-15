@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -218,10 +217,10 @@ func eventsWithType(typ string, synthEvents []*SynthEvent) (matched []*SynthEven
 
 func TestProjectCommandFactory(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
-	origPath := path.Join(filepath.Dir(filename), "../source/fixtures/todos")
+	origPath := filepath.Join(filepath.Dir(filename), "..", "source", "fixtures", "todos")
 	projectPath, err := filepath.Abs(origPath)
 	require.NoError(t, err)
-	binPath := path.Join(projectPath, "node_modules/.bin/elastic-synthetics")
+	binPath := filepath.Join(projectPath, "node_modules", ".bin", "elastic-synthetics")
 
 	tests := []struct {
 		name        string

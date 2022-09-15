@@ -150,27 +150,12 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
 		}
 
-		if r.config.Region != "" {
-			f = fmt.Sprintf(
-				"%s AND %s = starts_with(\"%s\")",
-				f,
-				gcp.ComputeResourceLabelZone,
-				strings.TrimSuffix(r.config.Region, "*"),
-			)
-			break
-		}
-
-		if r.config.Zone != "" {
-			f = fmt.Sprintf(
-				"%s AND %s = starts_with(\"%s\")",
-				f,
-				gcp.ComputeResourceLabelZone,
-				strings.TrimSuffix(r.config.Zone, "*"),
-			)
-			break
-		}
-
-		if len(r.config.Regions) != 0 {
+		switch {
+		case r.config.Region != "":
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabelZone, strings.TrimSuffix(r.config.Region, "*"))
+		case r.config.Zone != "":
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabelZone, strings.TrimSuffix(r.config.Zone, "*"))
+		case len(r.config.Regions) != 0:
 			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.ComputeResourceLabelZone)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
@@ -180,27 +165,14 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 				"both are provided, only use region", r.config.Region, r.config.Zone)
 		}
 
-		region := r.config.Region
-		if region != "" {
-			// if strings.HasSuffix(region, "*") {
-			// region = strings.TrimSuffix(region, "*")
-			// }
-			region = strings.TrimSuffix(region, "*")
-
+		switch {
+		case r.config.Region != "":
+			region := strings.TrimSuffix(r.config.Region, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, region)
-			break
-		}
-		zone := r.config.Zone
-		if zone != "" {
-			// if strings.HasSuffix(zone, "*") {
-			// zone = strings.TrimSuffix(zone, "*")
-			// }
-			zone = strings.TrimSuffix(zone, "*")
+		case r.config.Zone != "":
+			zone := strings.TrimSuffix(r.config.Zone, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
-			break
-		}
-
-		if len(r.config.Regions) != 0 {
+		case len(r.config.Regions) != 0:
 			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.GKEResourceLabelLocation)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
@@ -228,20 +200,13 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 			r.logger.Warnf("when region %s and zone %s config parameter "+
 				"both are provided, only use region", r.config.Region, r.config.Zone)
 		}
-		if r.config.Region != "" {
-			// region := r.config.Region
-			// if strings.HasSuffix(r.config.Region, "*") {
-			// region = strings.TrimSuffix(r.config.Region, "*")
-			// }
 
+		switch {
+		case r.config.Region != "":
 			// FIXME: using resource.labels.zone but should use region.
 			region := strings.TrimSuffix(r.config.Region, "*")
 			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, region)
-		} else if r.config.Zone != "" {
-			// zone := r.config.Zone
-			// if strings.HasSuffix(r.config.Zone, "*") {
-			// zone = strings.TrimSuffix(r.config.Zone, "*")
-			// }
+		case r.config.Zone != "":
 			zone := strings.TrimSuffix(r.config.Zone, "*")
 			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, zone)
 		}
