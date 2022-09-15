@@ -1838,11 +1838,8 @@ processors:
           kind: event
           category:
             - network
-<<<<<<< HEAD
           type:
             - info
-=======
-          type: []
         flow-creation:
           kind: event
           category:
@@ -1850,7 +1847,6 @@ processors:
           type:
             - connection
             - start
->>>>>>> 2a4f234715 (x-pack/filebeat/module/cisco: fix handling of 302020 messages (#33089))
         flow-expiration:
           kind: event
           category:
