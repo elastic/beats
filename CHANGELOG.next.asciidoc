@@ -68,6 +68,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
 - Import dashboards from CEF integration. {pull}32766[32766]
 - Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
 
 *Auditbeat*
 
