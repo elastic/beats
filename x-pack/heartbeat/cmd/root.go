@@ -5,16 +5,39 @@
 package cmd
 
 import (
+	"fmt"
+
 	heartbeatCmd "github.com/elastic/beats/v7/heartbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 )
 
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
+// packetbeatCfg is a callback registered via SetTransform that returns a packetbeat Elastic Agent client.Unit
+// configuration generated from a raw Elastic Agent config
+func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
+	//grab and properly format the input streams
+	inputStreams, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
+	if err != nil {
+		return nil, fmt.Errorf("error generating new stream config: %w", err)
+	}
+
+	configList, err := management.CreateReloadConfigFromInputs(inputStreams)
+	if err != nil {
+		return nil, fmt.Errorf("error creating reloader config: %w", err)
+	}
+	return configList, nil
+}
+
 func init() {
+	management.ConfigTransform.SetTransform(packetbeatCfg)
 	settings := heartbeatCmd.HeartbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = heartbeatCmd.Initialize(settings)
