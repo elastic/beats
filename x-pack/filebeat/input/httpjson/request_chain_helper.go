@@ -7,14 +7,22 @@ package httpjson
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
+	"strings"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+)
+
+const (
+	lastResponse  = "last_response"
+	firstResponse = "first_response"
 )
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {
@@ -68,9 +76,10 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 	}
 	tr := transformable{}
 	paramCtx := &transformContext{
-		firstEvent:   &mapstr.M{},
-		lastEvent:    &mapstr.M{},
-		lastResponse: &response{body: dataMap},
+		firstEvent:    &mapstr.M{},
+		lastEvent:     &mapstr.M{},
+		firstResponse: &response{},
+		lastResponse:  &response{body: dataMap},
 	}
 
 	val, err := expression.Execute(paramCtx, tr, nil, log)
@@ -83,6 +92,92 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 	}
 
 	return result, nil
+}
+
+func fetchValueFromContext(trCtx *transformContext, expression string) (string, error) {
+	var val interface{}
+
+	keys := strings.Split(expression, ".")
+	if keys[0] == lastResponse {
+		respMap, err := responseToMap(trCtx.lastResponse)
+		if err != nil {
+			return "", err
+		}
+		val, err = iterateRecursive(respMap, keys[1:], 0)
+		if err != nil {
+			return "", err
+		}
+	} else if keys[0] == firstResponse {
+		respMap, err := responseToMap(trCtx.firstResponse)
+		if err != nil {
+			return "", err
+		}
+		val, err = iterateRecursive(respMap, keys[1:], 0)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	returnVal := fmt.Sprintf("%v", val)
+
+	return returnVal, nil
+}
+
+func responseToMap(r *response) (mapstr.M, error) {
+	respMap := map[string]interface{}{
+		"header": make(mapstr.M),
+		"body":   make(mapstr.M),
+	}
+
+	for key, value := range r.header {
+		respMap["header"] = mapstr.M{
+			key: value,
+		}
+	}
+	// store first response in transform context
+	var bodyMap mapstr.M
+	err := json.Unmarshal(r.body.([]byte), &bodyMap)
+	if err != nil {
+		return nil, err
+	}
+	respMap["body"] = bodyMap
+
+	return respMap, nil
+}
+
+func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error) {
+	if m[keys[depth]] == nil {
+		return nil, errors.New("value of expression could not be determined")
+	}
+
+	val := m[keys[depth]]
+
+	v := reflect.ValueOf(val)
+	switch v.Kind() {
+	case reflect.Bool:
+		return v.Bool(), nil
+	case reflect.Int, reflect.Int8, reflect.Int32, reflect.Int64:
+		return v.Int(), nil
+	case reflect.Uint, reflect.Uint8, reflect.Uint32, reflect.Uint64:
+		return v.Uint(), nil
+	case reflect.Float32, reflect.Float64:
+		return v.Float(), nil
+	case reflect.String:
+		return v.String(), nil
+	case reflect.Map:
+		nextMap, ok := v.Interface().(mapstr.M)
+		if !ok {
+			return nil, errors.New("unable to parse the value of the given expression")
+		}
+		depth = depth + 1
+		if len(keys) == depth {
+			return nil, errors.New("value of expression could not be determined")
+		}
+		return iterateRecursive(nextMap, keys, depth)
+	default:
+		return nil, errors.New("unable to parse the value of the given expression")
+	}
+
 }
 
 func tryAssignAuth(parentConfig *authConfig, childConfig *authConfig) *authConfig {

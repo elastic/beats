@@ -25,19 +25,21 @@ type transformsConfig []*conf.C
 type transforms []transform
 
 type transformContext struct {
-	lock         sync.RWMutex
-	cursor       *cursor
-	firstEvent   *mapstr.M
-	lastEvent    *mapstr.M
-	lastResponse *response
+	lock          sync.RWMutex
+	cursor        *cursor
+	firstEvent    *mapstr.M
+	lastEvent     *mapstr.M
+	lastResponse  *response
+	firstResponse *response
 }
 
 func emptyTransformContext() *transformContext {
 	return &transformContext{
-		cursor:       &cursor{},
-		lastEvent:    &mapstr.M{},
-		firstEvent:   &mapstr.M{},
-		lastResponse: &response{},
+		cursor:        &cursor{},
+		lastEvent:     &mapstr.M{},
+		firstEvent:    &mapstr.M{},
+		lastResponse:  &response{},
+		firstResponse: &response{},
 	}
 }
 
@@ -61,6 +63,12 @@ func (ctx *transformContext) firstEventClone() *mapstr.M {
 	return &clone
 }
 
+func (ctx *transformContext) firstResponseClone() *response {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+	return ctx.firstResponse.clone()
+}
+
 func (ctx *transformContext) lastResponseClone() *response {
 	ctx.lock.RLock()
 	defer ctx.lock.RUnlock()
@@ -76,8 +84,23 @@ func (ctx *transformContext) updateCursor() {
 	newCtx.lastEvent = ctx.lastEvent
 	newCtx.firstEvent = ctx.firstEvent
 	newCtx.lastResponse = ctx.lastResponse
+	newCtx.firstResponse = ctx.firstResponse
 
 	ctx.cursor.update(newCtx)
+}
+
+func (ctx *transformContext) clone() *transformContext {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+
+	newCtx := emptyTransformContext()
+	newCtx.lastEvent = ctx.lastEvent
+	newCtx.firstEvent = ctx.firstEvent
+	newCtx.lastResponse = ctx.lastResponse
+	newCtx.firstResponse = ctx.firstResponse
+	newCtx.cursor = ctx.cursor
+
+	return newCtx
 }
 
 func (ctx *transformContext) updateLastEvent(e mapstr.M) {
@@ -96,6 +119,12 @@ func (ctx *transformContext) updateLastResponse(r response) {
 	ctx.lock.Lock()
 	defer ctx.lock.Unlock()
 	*ctx.lastResponse = r
+}
+
+func (ctx *transformContext) updateFirstResponse(r response) {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+	*ctx.firstResponse = r
 }
 
 func (ctx *transformContext) clearIntervalData() {

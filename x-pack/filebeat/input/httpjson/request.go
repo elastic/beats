@@ -101,6 +101,7 @@ type requestFactory struct {
 	log                    *logp.Logger
 	encoder                encoderFunc
 	replace                string
+	replaceWith            string
 	isChain                bool
 	until                  *valueTpl
 	chainHTTPClient        *httpClient
@@ -148,6 +149,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				log:                    log,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.Step.Replace,
+				replaceWith:            ch.Step.ReplaceWith,
 				isChain:                true,
 				chainHTTPClient:        httpClient,
 				chainResponseProcessor: responseProcessor,
@@ -173,6 +175,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				log:                    log,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.While.Replace,
+				replaceWith:            ch.While.ReplaceWith,
 				until:                  ch.While.Until,
 				isChain:                true,
 				chainHTTPClient:        httpClient,
@@ -300,6 +303,19 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
+			// store first response in transform context
+			body, err := io.ReadAll(httpResp.Body)
+			if err != nil {
+				return fmt.Errorf("failed ro read http response body: %w", err)
+			}
+			httpResp.Body = io.NopCloser(bytes.NewReader(body))
+			firstResponse := response{
+				url:    *httpResp.Request.URL,
+				header: httpResp.Header.Clone(),
+				body:   body,
+			}
+			trCtx.updateFirstResponse(firstResponse)
+
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
 				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
@@ -340,12 +356,20 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			// new transform context for every chain step , derived from parent transform context
 			var chainTrCtx *transformContext
 			if rf.isChain {
-				chainTrCtx = emptyTransformContext()
-				chainTrCtx.cursor = trCtx.cursor
+				chainTrCtx = trCtx.clone()
 			}
 
 			// perform request over collected ids
 			for _, id := range ids {
+				if len(rf.replaceWith) != 0 {
+					replaceArr := strings.Split(rf.replaceWith, ",")
+					val, err := fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+					if err != nil {
+						fmt.Printf("ERROR : %v\n", err)
+					} else {
+						fmt.Printf("VALUE : %v\n", val)
+					}
+				}
 				// reformat urls of requestFactory using ids
 				rf.url, err = generateNewUrl(rf.replace, urlString, id)
 				if err != nil {
@@ -525,6 +549,7 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 }
 
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
+//
 //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
 	var (
@@ -559,8 +584,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 		// new transform context for every chain step , derived from parent transform context
 		var chainTrCtx *transformContext
 		if rf.isChain {
-			chainTrCtx = emptyTransformContext()
-			chainTrCtx.cursor = trCtx.cursor
+			chainTrCtx = trCtx.clone()
 		}
 
 		// perform request over collected ids

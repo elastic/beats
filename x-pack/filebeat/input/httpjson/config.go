@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -39,6 +40,12 @@ func (c config) Validate() error {
 	for _, v := range c.Chain {
 		if v.Step == nil && v.While == nil {
 			return errors.New("both step & while blocks in a chain cannot be empty")
+		}
+		if v.Step != nil && len(v.Step.ReplaceWith) != 0 && len(strings.Split(v.Step.ReplaceWith, ",")) > 2 {
+			return errors.New("invalid number of parameters inside replaceWith")
+		}
+		if v.While != nil && len(v.While.ReplaceWith) != 0 && len(strings.Split(v.While.ReplaceWith, ",")) > 2 {
+			return errors.New("invalid number of parameters inside replaceWith")
 		}
 	}
 	return nil

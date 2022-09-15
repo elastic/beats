@@ -115,6 +115,7 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 	data.Put("cursor", trCtx.cursorMap())
 	data.Put("first_event", trCtx.firstEventClone())
 	data.Put("last_event", trCtx.lastEventClone())
+	data.Put("last_response", trCtx.firstResponseClone().templateValues())
 	data.Put("last_response", trCtx.lastResponseClone().templateValues())
 
 	if err := t.Template.Execute(buf, data); err != nil {
@@ -444,7 +445,7 @@ func urlEncode(value string) string {
 // make pipelining more ergonomic. This allows s to be piped in because it is
 // the final argument. For example,
 //
-//   [[ "some value" | replaceAll "some" "my" ]]  // == "my value"
+//	[[ "some value" | replaceAll "some" "my" ]]  // == "my value"
 func replaceAll(old, new, s string) string {
 	return strings.ReplaceAll(s, old, new)
 }
