@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package mock
 
 import (
@@ -17,7 +14,6 @@ func AzureStorageServer() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
 		w.Header().Set("Content-Type", "application/json")
-		//fmt.Println("PATH : ", path, len(path))
 		if r.Method == http.MethodGet {
 			switch len(path) {
 			case 1:

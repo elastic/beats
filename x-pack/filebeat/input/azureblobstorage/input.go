@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package azureblobstorage
 
 import (
@@ -16,8 +13,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/state"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/types"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -56,7 +51,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	var sources []cursor.Source
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
-		sources = append(sources, &types.Source{
+		sources = append(sources, &Source{
 			AccountName:   config.AccountName,
 			ContainerName: c.Name,
 			MaxWorkers:    *container.MaxWorkers,
@@ -77,31 +72,33 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	return sources, &azurebsInput{config: config, serviceURL: urL}, nil
 }
 
-// tryOverrideOrDefault , overrides global values with local
+// tryOverrideOrDefault, overrides global values with local
 // container level values present. If both global & local values
-// are absent , assigns default values
+// are absent, assigns default values
 func tryOverrideOrDefault(cfg config, c container) container {
-	if c.MaxWorkers == nil && cfg.MaxWorkers != nil {
-		c.MaxWorkers = cfg.MaxWorkers
-	} else if c.MaxWorkers == nil && cfg.MaxWorkers == nil {
-		workers := 1
-		c.MaxWorkers = &workers
+	if c.MaxWorkers == nil {
+		maxWorkers := 1
+		if cfg.MaxWorkers != nil {
+			maxWorkers = *cfg.MaxWorkers
+		}
+		c.MaxWorkers = &maxWorkers
 	}
 
-	if c.Poll == nil && cfg.Poll != nil {
-		c.Poll = cfg.Poll
-	} else if c.Poll == nil && cfg.Poll == nil {
-		poll := false
+	if c.Poll == nil {
+		var poll bool
+		if cfg.Poll != nil {
+			poll = *cfg.Poll
+		}
 		c.Poll = &poll
 	}
 
-	if c.PollInterval == nil && cfg.PollInterval != nil {
-		c.PollInterval = cfg.PollInterval
-	} else if c.PollInterval == nil && cfg.PollInterval == nil {
+	if c.PollInterval == nil {
 		interval := time.Second * 300
+		if cfg.PollInterval != nil {
+			interval = *cfg.PollInterval
+		}
 		c.PollInterval = &interval
 	}
-
 	return c
 }
 
@@ -114,19 +111,19 @@ func (input *azurebsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor.Cursor, publisher cursor.Publisher) error {
-	currentSource := src.(*types.Source)
+	currentSource := src.(*Source)
 
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 
-	var cp *state.Checkpoint
-	st := state.NewState()
+	var cp *Checkpoint
+	st := newState()
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
 			return err
 		}
 
-		st.SetCheckpoint(cp)
+		st.setCheckpoint(cp)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -144,8 +141,8 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 		return err
 	}
 
-	scheduler := NewAzureInputScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
-	err = scheduler.Schedule(ctx)
+	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
+	err = scheduler.schedule(ctx)
 	if err != nil {
 		return err
 	}

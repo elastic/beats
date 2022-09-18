@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package azureblobstorage
 
 import (
@@ -16,13 +13,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/sync/errgroup"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -277,6 +275,7 @@ func Test_StorageClient(t *testing.T) {
 
 			if len(tt.expected) == 0 {
 				if tt.isError != nil && g.Wait() != nil {
+					//nolint:errorlint // This will never be a wrapped error
 					if tt.isError == mock.NotFoundErr {
 						arr := strings.Split(g.Wait().Error(), "\n")
 						errStr := strings.Join(arr[1:], "\n")
