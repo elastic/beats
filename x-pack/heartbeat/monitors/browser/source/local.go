@@ -34,7 +34,7 @@ func ErrInvalidPath(path string) error {
 }
 
 func (l *LocalSource) Validate() error {
-	logp.L().Warn("local browser monitors are now deprecated! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html")
+	logp.L().Warn("local browser monitors are now deprecated! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project")
 	if l.OrigPath == "" {
 		return ErrNoPath
 	}
