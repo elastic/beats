@@ -1,0 +1,112 @@
+[[processor-move-fields]]
+=== Move fields
+
+++++
+<titleabbrev>move-fields</titleabbrev>
+++++
+
+The `move-fields` processor allow you to arrange your message fields from a object into another object.
+
+The processor first extract fields from `parent_path` from message then use `from` and `exclude` as filter to choose which fields we should move into `to` field.
+
+For example, you got a message below:
+[source,json]
+----
+{
+  "app": {
+    "method": "a",
+    "elapsed_time": 100,
+    "user_id": 100,
+    "message": "i'm a message"
+  }
+}
+----
+
+Therefore, you may want split field `method` and field `elapsed_time` into another field because they are rpc fields(or some reason).
+
+The message after we arrange. this is better to understand and structure to store and analyze in elasticsearch.
+
+[source,json]
+----
+{
+  "app": {
+    "user_id": 100,
+    "message": "i'm a message"
+  },
+  "app.rpc": {
+    "method": "a",
+    "elapsed_time": 100
+  }
+}
+----
+
+Or you can do more thing like this. rename field into a object.
+[source,json]
+----
+{
+  "app.method": "a",
+  "app.cost": 100
+}
+----
+
+transform to
+[source,json]
+----
+{
+  "app": { "method": "a", "cost": 100 }
+}
+----
+
+with this config
+[source,yaml]
+----
+processors:
+  - move_fields:
+      from: [ "app.method", "app.cost" ]
+----
+
+For add what you want prefix to whole message.
+[source,json]
+----
+{
+  "app": { "method": "a"},
+  "cost": 100
+}
+----
+
+config by this
+[source,yaml]
+----
+processors:
+  - move_fields:
+      to: "my_prefix_"
+----
+
+then you got message
+[source,json]
+----
+{
+  "my_prefix_app": { "method": "a"},
+  "my_prefix_cost": 100
+}
+----
+
+
+.Move-fields options
+[options="header"]
+|======
+| Name                   | Required | Default                  | Description                                                                                           |
+| `parent_path`          | no       |                          | Which field you want extract. these field will be moved into `to`. empty indicate message root.       |
+| `from`                 | no       |                          | filter out which fields from `parent_path` moving to `to`                                             |
+| `exclude`              | no       |                          | filter out which fields from `parent_path` NOT moving to `to`                                         |
+| `to`                   | no       |                          | These fields extract from `parent_path` destination field prefix the `to` will base on fields root.   |
+|======
+
+[source,yaml]
+----
+processors:
+  - move_fields:
+      parent_path: "app"
+      from: [ "method", "elapsed_time" ]
+      to: "app.rpc."
+----
