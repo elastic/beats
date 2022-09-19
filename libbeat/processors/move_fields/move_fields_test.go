@@ -67,11 +67,12 @@ func TestMoveFields(t *testing.T) {
 			mapstr.M{"app.version": 1, "other": 3},
 			mapstr.M{"app": mapstr.M{"version": 1}, "other": 3},
 			&moveFields{config: moveFieldsConfig{
-				ParentPath: "",
-				From:       []string{"app.version"},
-				To:         "",
-				Exclude:    nil,
-				excludeMap: nil,
+				ParentPath:         "",
+				From:               []string{"app.version", "xxx"},
+				IgnoreFromNotFound: true,
+				To:                 "",
+				Exclude:            nil,
+				excludeMap:         nil,
 			}},
 		},
 		{

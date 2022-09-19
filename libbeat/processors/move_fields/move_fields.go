@@ -18,6 +18,7 @@
 package move_fields
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -30,15 +31,18 @@ import (
 
 func init() {
 	processors.RegisterPlugin("move_fields",
-		checks.ConfigChecked(NewMoveFields, checks.AllowedFields("parent_path", "from", "to", "exclude")))
+		checks.ConfigChecked(NewMoveFields, checks.AllowedFields(
+			"parent_path", "from", "to", "exclude", "ignore_from_not_found",
+		)))
 	jsprocessor.RegisterPlugin("MoveFields", NewMoveFields)
 }
 
 type moveFieldsConfig struct {
-	ParentPath string   `config:"parent_path"`
-	From       []string `config:"from"`
-	To         string   `config:"to"`
-	Exclude    []string `config:"exclude"`
+	ParentPath         string   `config:"parent_path"`
+	From               []string `config:"from"`
+	IgnoreFromNotFound bool     `config:"ignore_from_not_found"`
+	To                 string   `config:"to"`
+	Exclude            []string `config:"exclude"`
 
 	excludeMap map[string]bool
 }
@@ -75,6 +79,9 @@ func (u moveFields) Run(event *beat.Event) (*beat.Event, error) {
 			continue
 		}
 		v, err := parent.GetValue(k)
+		if u.config.IgnoreFromNotFound && errors.Is(err, mapstr.ErrKeyNotFound) {
+			continue
+		}
 		if err != nil {
 			return nil, fmt.Errorf("move field read field from parent, sub key: %s, failed: %w", k, err)
 		}

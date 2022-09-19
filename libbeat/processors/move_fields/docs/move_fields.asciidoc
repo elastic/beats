@@ -95,11 +95,12 @@ then you got message
 .Move-fields options
 [options="header"]
 |======
-| Name                   | Required | Default                  | Description                                                                                           |
-| `parent_path`          | no       |                          | Which field you want extract. these field will be moved into `to`. empty indicate message root.       |
-| `from`                 | no       |                          | filter out which fields from `parent_path` moving to `to`                                             |
-| `exclude`              | no       |                          | filter out which fields from `parent_path` NOT moving to `to`                                         |
-| `to`                   | no       |                          | These fields extract from `parent_path` destination field prefix the `to` will base on fields root.   |
+| Name                    | Required | Default                  | Description                                                                                           |
+| `parent_path`           | no       |                          | Which field you want extract. these field will be moved into `to`. empty indicate message root.       |
+| `from`                  | no       |                          | filter out which fields from `parent_path` moving to `to`.                                            |
+| `ignore_from_not_found` | no       |                          | indicate ignore not found error when extract field from `from` list.                                  |
+| `exclude`               | no       |                          | filter out which fields from `parent_path` NOT moving to `to`.                                        |
+| `to`                    | no       |                          | These fields extract from `parent_path` destination field prefix the `to` will base on fields root.   |
 |======
 
 [source,yaml]
