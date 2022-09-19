@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
 
 *Heartbeat*
+- Deprecate zip_url and local monitor options. {pull}33123[33123]
 
 *Metricbeat*
 
