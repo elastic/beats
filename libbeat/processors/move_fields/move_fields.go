@@ -1,13 +1,31 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package move_fields
 
 import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -38,7 +56,7 @@ func (u moveFields) Run(event *beat.Event) (*beat.Event, error) {
 			return nil, fmt.Errorf("move field read parent path field failed: %w", err)
 		}
 		var ok bool
-		parent, ok = parentValue.(common.MapStr)
+		parent, ok = parentValue.(mapstr.M)
 		if !ok {
 			return nil, fmt.Errorf("move field parent is not message map")
 		}
@@ -77,7 +95,7 @@ func (u moveFields) String() string {
 	return "move_fields"
 }
 
-func NewMoveFields(c *common.Config) (processors.Processor, error) {
+func NewMoveFields(c *config.C) (processors.Processor, error) {
 	fc := moveFieldsConfig{}
 	err := c.Unpack(&fc)
 	if err != nil {
