@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 - Change max query size for GetMetricData API to 500 {pull}33105[33105]
+- Add GCP CloudSQL region filter {pull}32943[32943]
 
 *Packetbeat*
 

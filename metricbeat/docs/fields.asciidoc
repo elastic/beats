@@ -10337,7 +10337,7 @@ type: float
 [[exported-fields-cockroachdb]]
 == CockroachDB fields
 
-CockroachDB module
+CockroachDB module scrape metrics using Prometheus endpoint.
 
 
 
@@ -35408,15 +35408,6 @@ type: long
 
 Google Cloud Dataproc metrics
 
-
-*`gcp.dataproc.batch.spark.executors.count`*::
-+
---
-Indicates the number of Batch Spark executors.
-
-type: long
-
---
 
 *`gcp.dataproc.cluster.hdfs.datanodes.count`*::
 +
