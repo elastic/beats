@@ -26,29 +26,33 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader) []jobs.Job {
+	// flapping is disabled by default until we sort out how it should work
+	mst := monitorstate.NewTracker(stateLoader, false)
 	if stdMonFields.Type == "browser" {
-		return WrapBrowser(js, stdMonFields)
+		return WrapBrowser(js, stdMonFields, mst)
 	} else {
-		return WrapLightweight(js, stdMonFields)
+		return WrapLightweight(js, stdMonFields, mst)
 	}
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
-func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
@@ -60,21 +64,52 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 		),
 		func() jobs.JobWrapper {
 			return makeAddSummary()
-		})
+		},
+		func() jobs.JobWrapper {
+			return addMonitorState(stdMonFields, mst)
+		},
+	)
+
 }
 
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
-func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, false),
 		addMonitorStatus(true),
+		addMonitorState(stdMonFields, mst),
 		logJourneySummaries,
 	)
+}
+
+// addMonitorState computes the various state fields
+func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) jobs.JobWrapper {
+	return func(job jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, err := job(event)
+
+			hasSummary, _ := event.Fields.HasKey("summary.up")
+			if !hasSummary {
+				return cont, err
+			}
+
+			status, err := event.GetValue("monitor.status")
+			if err != nil {
+				return nil, fmt.Errorf("could not wrap state for '%s', no status assigned: %w", sf.ID, err)
+			}
+
+			ms := mst.RecordStatus(sf, monitorstate.StateStatus(status.(string)))
+
+			eventext.MergeEventFields(event, mapstr.M{"state": ms})
+
+			return cont, nil
+		}
+	}
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.

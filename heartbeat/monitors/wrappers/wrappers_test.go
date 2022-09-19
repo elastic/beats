@@ -30,6 +30,13 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
+
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
@@ -38,12 +45,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/testslike"
-	"github.com/elastic/go-lookslike/validator"
 )
 
 type testDef struct {
@@ -71,7 +72,7 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.sFields)
+		wrapped := WrapCommon(tt.jobs, tt.sFields, nil)
 
 		core, observedLogs := observer.New(zapcore.InfoLevel)
 		logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
@@ -121,6 +122,7 @@ func TestSimpleJob(t *testing.T) {
 					},
 				}),
 				hbtestllext.MonitorTimespanValidator,
+				stateValidator(),
 				summaryValidator(1, 0),
 			)},
 		nil,
@@ -193,6 +195,7 @@ func TestAdditionalStdFields(t *testing.T) {
 								"check_group": isdef.IsString,
 							},
 						}),
+						stateValidator(),
 						hbtestllext.MonitorTimespanValidator,
 						summaryValidator(1, 0),
 					)},
@@ -210,6 +213,7 @@ func TestErrorJob(t *testing.T) {
 	}
 
 	errorJobValidator := lookslike.Compose(
+		stateValidator(),
 		lookslike.MustCompile(map[string]interface{}{"error": map[string]interface{}{"message": "myerror", "type": "io"}}),
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
@@ -254,6 +258,7 @@ func TestMultiJobNoConts(t *testing.T) {
 					"check_group": uniqScope.IsUniqueTo("check_group"),
 				},
 			}),
+			stateValidator(),
 			hbtestllext.MonitorTimespanValidator,
 			summaryValidator(1, 0),
 		)
@@ -301,6 +306,7 @@ func TestMultiJobConts(t *testing.T) {
 					"status":      "up",
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
+				"state": isdef.Optional(hbtestllext.IsMonitorState),
 			}),
 			hbtestllext.MonitorTimespanValidator,
 		)
@@ -360,6 +366,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 					"status":      "up",
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
+				"state": isdef.Optional(hbtestllext.IsMonitorState),
 			}),
 			hbtestllext.MonitorTimespanValidator,
 		)
@@ -409,6 +416,12 @@ func urlValidator(t *testing.T, u string) validator.Validator {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return lookslike.MustCompile(map[string]interface{}{"url": map[string]interface{}(URLFields(parsed))})
+}
+
+func stateValidator() validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"state": hbtestllext.IsMonitorState,
+	})
 }
 
 // This duplicates hbtest.SummaryChecks to avoid an import cycle.
@@ -595,21 +608,24 @@ func TestProjectBrowserJob(t *testing.T) {
 	urlStr := "http://foo.com"
 	urlU, _ := url.Parse(urlStr)
 
-	expectedMonFields := lookslike.MustCompile(map[string]interface{}{
-		"monitor": map[string]interface{}{
-			"type":        "browser",
-			"id":          projectMonitorValues.id,
-			"name":        projectMonitorValues.name,
-			"duration":    mapstr.M{"us": time.Second.Microseconds()},
-			"origin":      "my-origin",
-			"check_group": projectMonitorValues.checkGroup,
-			"timespan": mapstr.M{
-				"gte": hbtestllext.IsTime,
-				"lt":  hbtestllext.IsTime,
+	expectedMonFields := lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"state": isdef.Optional(hbtestllext.IsMonitorState),
+			"monitor": map[string]interface{}{
+				"type":        "browser",
+				"id":          projectMonitorValues.id,
+				"name":        projectMonitorValues.name,
+				"duration":    mapstr.M{"us": time.Second.Microseconds()},
+				"origin":      "my-origin",
+				"check_group": projectMonitorValues.checkGroup,
+				"timespan": mapstr.M{
+					"gte": hbtestllext.IsTime,
+					"lt":  hbtestllext.IsTime,
+				},
 			},
-		},
-		"url": URLFields(urlU),
-	})
+			"url": URLFields(urlU),
+		}),
+	)
 
 	testCommonWrap(t, testDef{
 		"simple", // has no summary fields!
@@ -711,7 +727,7 @@ func TestECSErrors(t *testing.T) {
 		wrappedEcsErr.Error(),
 	)
 
-	j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", true, wrappedEcsErr, projectMonitorValues)}, testBrowserMonFields)
+	j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", true, wrappedEcsErr, projectMonitorValues)}, testBrowserMonFields, nil)
 	event := &beat.Event{}
 	_, err := j[0](event)
 	require.NoError(t, err)

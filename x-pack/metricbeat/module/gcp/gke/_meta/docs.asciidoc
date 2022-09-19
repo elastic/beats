@@ -1,14 +1,9 @@
-`gke` metricset is designed for collecting metrics from https://cloud.google.com/kubernetes-engine[Google Kubernetes
-Engine].
-Google Cloud Monitoring supports Google Kubernetes Engine metrics, as listed in
-https://cloud.google.com/monitoring/api/metrics_kubernetes[Google Cloud Monitoring Kubernetes metrics].
+`gke` metricset is designed for collecting metrics from https://cloud.google.com/kubernetes-engine[Google Kubernetes Engine].
+Google Cloud Monitoring supports Google Kubernetes Engine metrics, as listed in https://cloud.google.com/monitoring/api/metrics_kubernetes[Google Cloud Monitoring Kubernetes metrics].
 
-This metricset collects all GA Kubernetes metrics from Google Cloud Monitoring
-APIs. It leverages under the hood the `metrics` metricset.
+This metricset collects all GA Kubernetes metrics from Google Cloud Monitoring APIs. It leverages under the hood the `metrics` metricset. The field names are aligned to {beats-devguide}/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
 
-We recommend users to define `period: 1m` for this metricset because in Google
-Cloud, GKE monitoring metrics are sampled every 60 seconds.
-Some of the metrics have an ingest delay up to 240 seconds.
+We recommend users to define `period: 1m` for this metricset because in Google Cloud, GKE monitoring metrics are sampled every 60 seconds. Some of the metrics have an ingest delay up to 240 seconds.
 
 [float]
 === Metricset-specific configuration notes
