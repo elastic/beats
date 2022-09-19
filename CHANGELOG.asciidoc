@@ -3044,6 +3044,7 @@ present. {pull}16116[16116]
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Release the azure module as GA. {pull}17319[17319]
 - In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
+- Release the CockroachDB module as GA. {pull}32527[32527]
 
 *Packetbeat*
 
