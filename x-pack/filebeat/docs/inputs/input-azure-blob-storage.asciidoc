@@ -119,9 +119,9 @@ As we can see from the response above, the `message` field contains the original
 
     1. *message* : Original stringified blob data.
     2. *log.file.path* : Path of the blob in azure cloud.
-    3. *azure.blob.container.name* : Name of the container from which the file has been read.
-    4. *azure.blob.object.name* : Name of the file/blob which has been read.
-    5. *azure.blob.object.content_type* : Content type of the file/blob. You can find the supported content types <<supported-types,here>>.
+    3. *azure.storage.blob.container.name* : Name of the container from which the file has been read.
+    4. *azure.storage.blob.object.name* : Name of the file/blob which has been read.
+    5. *azure.storage.blob.object.content_type* : Content type of the file/blob. You can find the supported content types <<supported-types,here>>.
 
 Now let's explore the configuration attributes a bit more elaborately.
 

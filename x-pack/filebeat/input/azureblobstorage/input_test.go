@@ -24,8 +24,8 @@ import (
 )
 
 const (
-	beatsContainer   = "beatscontainer"
-	beatsContainer_2 = "beatscontainer2"
+	beatsContainer  = "beatscontainer"
+	beatsContainer2 = "beatscontainer2"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -38,7 +38,7 @@ func Test_StorageClient(t *testing.T) {
 		unexpectedError error
 	}{
 		{
-			name: "Test1_SingleContainerWithPoll_NoErr",
+			name: "SingleContainerWithPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -60,7 +60,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: context.Canceled,
 		},
 		{
-			name: "Test2_SingleContainerWithoutPoll_NoErr",
+			name: "SingleContainerWithoutPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -82,7 +82,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test3_TwoContainersWithPoll_NoErr",
+			name: "TwoContainersWithPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -94,7 +94,7 @@ func Test_StorageClient(t *testing.T) {
 						"name": beatsContainer,
 					},
 					{
-						"name": beatsContainer_2,
+						"name": beatsContainer2,
 					},
 				},
 			},
@@ -109,7 +109,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: context.Canceled,
 		},
 		{
-			name: "Test4_TwoContainersWithoutPoll_NoErr",
+			name: "TwoContainersWithoutPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -121,7 +121,7 @@ func Test_StorageClient(t *testing.T) {
 						"name": beatsContainer,
 					},
 					{
-						"name": beatsContainer_2,
+						"name": beatsContainer2,
 					},
 				},
 			},
@@ -136,7 +136,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: context.Canceled,
 		},
 		{
-			name: "Test5_SingleContainerPoll_InvalidContainerErr",
+			name: "SingleContainerPoll_InvalidContainerErr",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -155,7 +155,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test6_SingleContainerWithoutPoll_InvalidBucketErr",
+			name: "SingleContainerWithoutPoll_InvalidBucketErr",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -174,7 +174,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test7_TwoContainersWithPoll_InvalidBucketErr",
+			name: "TwoContainersWithPoll_InvalidBucketErr",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -196,7 +196,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test8_SingleBucketWithPoll_InvalidConfigValue",
+			name: "SingleBucketWithPoll_InvalidConfigValue",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -215,7 +215,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test9_TwoBucketWithPoll_InvalidConfigValue",
+			name: "TwoBucketWithPoll_InvalidConfigValue",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -227,7 +227,7 @@ func Test_StorageClient(t *testing.T) {
 						"name": beatsContainer,
 					},
 					{
-						"name": beatsContainer_2,
+						"name": beatsContainer2,
 					},
 				},
 			},
@@ -271,7 +271,7 @@ func Test_StorageClient(t *testing.T) {
 			} else {
 				timeout = time.NewTimer(5 * time.Second)
 			}
-			t.Cleanup(func() { _ = timeout.Stop() })
+			t.Cleanup(func() { timeout.Stop() })
 
 			if len(tt.expected) == 0 {
 				if tt.isError != nil && g.Wait() != nil {

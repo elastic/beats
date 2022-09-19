@@ -7,13 +7,13 @@ package mock
 import "errors"
 
 const (
-	beatsContainer   = "beatscontainer"
-	beatsContainer_2 = "beatscontainer2"
+	beatsContainer  = "beatscontainer"
+	beatsContainer2 = "beatscontainer2"
 )
 
 var containers = map[string]bool{
-	beatsContainer:   true,
-	beatsContainer_2: true,
+	beatsContainer:  true,
+	beatsContainer2: true,
 }
 
 var availableBlobs = map[string]map[string]bool{
@@ -22,7 +22,7 @@ var availableBlobs = map[string]map[string]bool{
 		"data_3.json":   true,
 		"docs/ata.json": true,
 	},
-	beatsContainer_2: {
+	beatsContainer2: {
 		"ata.json":    true,
 		"data_3.json": true,
 	},
@@ -34,7 +34,7 @@ var blobs = map[string]map[string]string{
 		"data_3.json":   Beatscontainer_blob_data3_json,
 		"docs/ata.json": Beatscontainer_blob_docs_ata_json,
 	},
-	beatsContainer_2: {
+	beatsContainer2: {
 		"ata.json":    Beatscontainer_2_blob_ata_json,
 		"data_3.json": Beatscontainer_2_blob_data3_json,
 	},
@@ -102,7 +102,7 @@ var fetchContainer = map[string]string{
 		<NextMarker />
 	</EnumerationResults>`,
 
-	beatsContainer_2: `<?xml version="1.0" encoding="utf-8"?>
+	beatsContainer2: `<?xml version="1.0" encoding="utf-8"?>
 	<EnumerationResults ServiceEndpoint="https://127.0.0.1/" ContainerName="beatscontainer2">
 		<Blobs>
 			<Blob>

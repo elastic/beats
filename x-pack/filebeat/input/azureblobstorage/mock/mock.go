@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-//nolint:errcheck // We can ignore as this is just for testing
+//nolint:errcheck // We can ignore as response writer errors cannot be handled in this scenario
 func AzureStorageServer() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")

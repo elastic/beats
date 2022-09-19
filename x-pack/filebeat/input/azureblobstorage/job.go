@@ -19,7 +19,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const jobErrString = "job with jobId %s encountered an error : %w"
+const jobErrString = "job with jobId %s encountered an error: %w"
 
 type job struct {
 	client    *azblob.BlobClient
@@ -60,14 +60,14 @@ func (j *job) do(ctx context.Context, id string) {
 		defer func() {
 			err = reader.Close()
 			if err != nil {
-				j.log.Errorf("failed to close io reader with error : %w", err)
+				j.log.Errorf("failed to close io reader with error: %w", err)
 			}
 		}()
 
 		fields = j.createEventFields(data.String())
 
 	} else {
-		err := fmt.Errorf("job with jobId %s encountered an error : content-type %s not supported", id, *j.blob.Properties.ContentType)
+		err := fmt.Errorf("job with jobId %s encountered an error: content-type %s not supported", id, *j.blob.Properties.ContentType)
 		fields = mapstr.M{
 			"message": err.Error(),
 			"event": mapstr.M{
@@ -102,7 +102,7 @@ func (j *job) extractData(ctx context.Context) (*bytes.Buffer, error) {
 
 	get, err := j.client.Download(ctx, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to download data from blob with error : %w", err)
+		return nil, fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
 
 	downloadedData := &bytes.Buffer{}
@@ -110,13 +110,13 @@ func (j *job) extractData(ctx context.Context) (*bytes.Buffer, error) {
 	defer func() {
 		err = reader.Close()
 		if err != nil {
-			err = fmt.Errorf("failed to close blob reader with error : %w", err)
+			err = fmt.Errorf("failed to close blob reader with error: %w", err)
 		}
 	}()
 
 	_, err = downloadedData.ReadFrom(reader)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read data from blob with error : %w", err)
+		return nil, fmt.Errorf("failed to read data from blob with error: %w", err)
 	}
 
 	return downloadedData, err

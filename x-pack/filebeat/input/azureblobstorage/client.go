@@ -61,7 +61,7 @@ func fetchBlobClient(url string, credential *blobCredentials, log *logp.Logger) 
 	case connectionStringType:
 		return fetchBlobClientWithConnectionString(credential.serviceCreds.connectionStrCreds, credential.containerName, credential.blobName, log)
 	default:
-		return nil, fmt.Errorf("no valid service credential 'type' found")
+		return nil, fmt.Errorf("no valid service credential 'type' found: %s", credential.serviceCreds.cType)
 	}
 }
 
