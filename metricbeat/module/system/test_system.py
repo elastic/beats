@@ -59,11 +59,12 @@ SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
 
 SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
-                            "used.pct"]
+                            "used.pct", "options"]
 
 SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "free",
                                     "mount_point", "total", "used.bytes",
                                     "used.pct"]
+
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
@@ -71,7 +72,7 @@ SYSTEM_MEMORY_FIELDS_LINUX = ["swap", "actual.free", "free", "total", "cached", 
                               "actual.used.pct", "hugepages", "page_stats"]
 
 SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
-                                "actual.used.pct", "hugepages", "page_stats"]
+                        "actual.used.pct", "hugepages", "page_stats"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
@@ -92,7 +93,7 @@ SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
 
 class Test(metricbeat.BaseTest):
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):
         """
         Test cpu system output.
@@ -128,7 +129,7 @@ class Test(metricbeat.BaseTest):
             self.assertCountEqual(self.de_dot(
                 SYSTEM_CPU_HOST_FIELDS), host_cpu.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu_ticks_option(self):
         """
         Test cpu_ticks configuration option.
@@ -162,7 +163,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CPU_FIELDS_DARWIN_ALL), cpuStats.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core(self):
         """
         Test core system output.
@@ -193,7 +194,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CORE_FIELDS_DARWIN), core_stats.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_core_with_cpu_ticks(self):
         """
         Test core system output.
@@ -227,7 +228,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_CORE_FIELDS_DARWIN_ALL), core_stats.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_load(self):
         """
         Test system load.
@@ -250,7 +251,7 @@ class Test(metricbeat.BaseTest):
         cpu = evt["system"]["load"]
         self.assertCountEqual(self.de_dot(SYSTEM_LOAD_FIELDS), cpu.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|freebsd", sys.platform), "os")
     def test_diskio(self):
         """
         Test system/diskio output.
@@ -280,7 +281,7 @@ class Test(metricbeat.BaseTest):
                     self.assertCountEqual(
                         SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_diskio_linux(self):
         """
         Test system/diskio output on linux.
@@ -309,7 +310,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(
                     SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
         """
         Test system/filesystem output.
@@ -337,7 +338,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_FILESYSTEM_FIELDS), filesystem.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_fsstat(self):
         """
         Test system/fsstat output.
@@ -360,7 +361,7 @@ class Test(metricbeat.BaseTest):
         fsstat = evt["system"]["fsstat"]
         self.assertCountEqual(SYSTEM_FSSTAT_FIELDS, fsstat.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_memory(self):
         """
         Test system memory output.
@@ -406,7 +407,7 @@ class Test(metricbeat.BaseTest):
             used_p = float(swap["used"]["bytes"]) / swap["total"]
             self.assertAlmostEqual(swap["used"]["pct"], used_p, places=4)
 
-    @unittest.skipUnless(re.match("(?i)darwin|win|linux|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)darwin|win|linux|freebsd", sys.platform), "os")
     def test_network(self):
         """
         Test system/network output.
@@ -435,7 +436,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(self.de_dot(
                     SYSTEM_NETWORK_HOST_FIELDS), host_network.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_summary(self):
         """
         Test system/process_summary output.
@@ -474,7 +475,7 @@ class Test(metricbeat.BaseTest):
                 assert summary["total"] == summary["sleeping"] + \
                     summary["running"] + summary["unknown"]
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
         """
         Test system/process output.
@@ -518,7 +519,7 @@ class Test(metricbeat.BaseTest):
             self.assertTrue(
                 found_cmdline, "cmdline not found in any process events")
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
         """
         Test system/process output for fields specific of unix systems.
@@ -582,7 +583,7 @@ class Test(metricbeat.BaseTest):
         self.assertTrue(
             found_cwd, "working_directory not found in any process events")
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):
         """
         Checks that the per proc stats are found in the output and
@@ -611,7 +612,7 @@ class Test(metricbeat.BaseTest):
             output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["user.name"])
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_socket_summary(self):
         """
         Test system/socket_summary output.
@@ -648,7 +649,7 @@ class Test(metricbeat.BaseTest):
 
             assert isinstance(udp["all"]["count"], int)
 
-    @unittest.skipIf(sys.platform == "win32", "Flaky test")
+    @ unittest.skipIf(sys.platform == "win32", "Flaky test")
     def check_username(self, observed, expected=None):
         if expected is None:
             expected = getpass.getuser()
