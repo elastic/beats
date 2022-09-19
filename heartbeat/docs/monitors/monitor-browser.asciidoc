@@ -41,6 +41,8 @@ Contains information on how to run synthetic tests.
 [[monitor-source-inline]]
 ===== `inline`
 
+NOTE: While `inline` browser monitors are still supported, we highly encourage trying project monitors instead. See the https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html[Elastic synthetics docs].
+
 Runs the Synthetic test scripts that are defined inline in the configuration.
 See {observability-guide}/synthetics-create-test.html[Synthetics syntax] for
 more information.
@@ -58,7 +60,9 @@ the inline journeys.
 
 [float]
 [[monitor-source-zipurl]]
-===== `Zip URL`
+===== `Zip URL` (Deprecated)
+
+NOTE: Zip URL monitors are now deprecated! Please use project monitors instead. See the https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html[Elastic synthetics docs].
 
 Remote zip endpoint configuration allows users to specify the location
 of a synthetics test project ZIP file.
@@ -96,7 +100,9 @@ Example configuration:
 
 [float]
 [[monitor-source-local]]
-===== `Local directory`
+===== `Local directory` (Deprecated)
+
+NOTE: Local browser monitors are now deprecated! Please use project monitors instead. See the https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html[Elastic synthetics docs].
 
 Local directory where the synthetic test files are located.
 

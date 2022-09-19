@@ -43,6 +43,7 @@ type ZipURLSource struct {
 var ErrNoEtag = fmt.Errorf("no ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
 
 func (z *ZipURLSource) Validate() (err error) {
+	logp.L().Warn("Zip URL browser monitors are now deprecated! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html")
 	if z.httpClient == nil {
 		z.httpClient, _ = z.Transport.Client()
 	}
