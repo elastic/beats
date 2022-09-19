@@ -15,7 +15,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
-- [Httpjson]- Fix for pagination at root level not working when used with chaining.
 
 *Heartbeat*
 
@@ -35,7 +34,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
 
 *Auditbeat*
 
@@ -49,9 +47,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 
 *Packetbeat*
 
@@ -88,8 +83,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Allow filtering on AWS tags by more than 1 value per key. {pull}32775[32775]
-- Azure Billing: switch to Cost Management API for forecast data {pull}32589[32589]
 
 *Packetbeat*
 
@@ -125,6 +118,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 

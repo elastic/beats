@@ -3,6 +3,31 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.4.2]]
+=== Beats version 8.4.2
+https://github.com/elastic/beats/compare/v8.4.1\...v8.4.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+
+*Filebeat*
+
+- Fix for pagination at root level not working when used with chaining. {pull}32722[32722]
+
+*Metricbeat*
+
+- Fix and improve AWS metric period calculation to avoid zero-length intervals. {pull}32724[32724]
+- Add missing cluster metadata to k8s module metricsets. {pull}32979[32979] {pull}33032[33032]
+
+==== Added
+
+*Metricbeat*
+
+- Allow filtering on AWS tags by more than 1 value per key. {pull}32775[32775]
+- Azure Billing: switch to Cost Management API for forecast data. {pull}32589[32589]
+
 [[release-notes-8.4.1]]
 === Beats version 8.4.1
 https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
