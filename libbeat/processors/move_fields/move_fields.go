@@ -30,7 +30,7 @@ import (
 
 func init() {
 	processors.RegisterPlugin("move_fields",
-		checks.ConfigChecked(NewMoveFields, checks.AllowedFields("from", "to")))
+		checks.ConfigChecked(NewMoveFields, checks.AllowedFields("parent_path", "from", "to", "exclude")))
 	jsprocessor.RegisterPlugin("MoveFields", NewMoveFields)
 }
 
