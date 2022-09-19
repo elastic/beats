@@ -3,6 +3,107 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
+=======
+[[release-notes-8.4.2]]
+=== Beats version 8.4.2
+https://github.com/elastic/beats/compare/v8.4.1\...v8.4.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+
+*Filebeat*
+
+- Fix for pagination at root level not working when used with chaining. {pull}32722[32722]
+
+*Metricbeat*
+
+- Fix and improve AWS metric period calculation to avoid zero-length intervals. {pull}32724[32724]
+- Add missing cluster metadata to k8s module metricsets. {pull}32979[32979] {pull}33032[33032]
+
+==== Added
+
+*Metricbeat*
+
+- Allow filtering on AWS tags by more than 1 value per key. {pull}32775[32775]
+- Azure Billing: switch to Cost Management API for forecast data. {pull}32589[32589]
+
+[[release-notes-8.4.1]]
+=== Beats version 8.4.1
+https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
+
+==== Known Issue 
+
+// tag::credentials-error[]
+
+*Filebeat*
+
+Filebeat agents configured to read from AWS inputs may return an error similar to the following:
+
+[source,shell]
+----
+sqs ReceiveMessage failed: operation error SQS: ReceiveMessage, https response
+error StatusCode: 403, RequestID: cb57783a-505f-5099-9160-23b8eea8ddbb,
+api error SignatureDoesNotMatch: Credential should be scoped to a valid region. 
+----
+
+This error was introduced by a breaking change in the AWS library.
+
+IMPORTANT: This issue also affects FIPS-enabled endpoints. **If you rely on FIPS,
+do not upgrade until version 8.4.2 of the {stack} is available.** The workaround
+documented here will not resolve this problem.
+
+Suggested resolution: In the Filebeat configuration, if an AWS input or module
+configuration sets `endpoint` to a non empty string, set it to an empty string
+instead. Also make sure the default AWS region is set in an environment
+variable, credentials or instance profile, or in the `default_region` setting in
+the configuration. For example:
+
+[source,yaml]
+----
+filebeat.inputs:
+- type: aws-s3
+...
+  endpoint: "" <1>
+  default_region: us-east-1
+----
+<1> You can set this value to an empty string or remove the configuration setting.
+
+Or for modules:
+
+[source,yaml]
+----
+s3access:
+    enabled: false
+...
+    var.endpoint: "" <1>
+    var.default_region: us-east-1
+----
+<1> You can set this value to an empty string or remove the configuration setting
+
+// end::credentials-error[]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Fixes a bug with the auditd module where data is corrupted because it was not copied before the byte slice was reused. {issue}32818[32818] {pull}32823[32823]
+
+*Filebeat*
+
+- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
+- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
+- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
+
+==== Added
+
+*Filebeat*
+
+- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
+
+>>>>>>> bd3a3c786d (docs: Prepare Changelog for 8.4.2 (#33122))
 [[release-notes-8.4.0]]
 === Beats version 8.4.0
 https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
