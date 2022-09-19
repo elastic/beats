@@ -1,0 +1,26 @@
+[[decode-duration]]
+=== Decode duration
+
+++++
+<titleabbrev>decode-duration</titleabbrev>
+++++
+
+The `decode_duration` processor decode Go style duration string into specific `format`.
+
+For more information about Go `time.Duration` string style please visit https://pkg.go.dev/time#Duration[Reference of Go time.Duration]
+
+.Decode-Duration options
+[options="header"]
+|======
+| Name             | Required | Default                  | Description                                                   |
+| `field`          | yes      |                          | Which field of event needs to be decoded as `time.Duration`   |
+| `format`         | yes      | `milliseconds`           | Supported formats: `milliseconds`/`seconds`/`minutes`/`hours` |
+|======
+
+[source,yaml]
+----
+processors:
+  - decode_duration:
+      field: "app.rpc.cost"
+      format: "milliseconds"
+----

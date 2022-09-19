@@ -1,0 +1,101 @@
+[[move-fields]]
+=== Move fields
+
+++++
+<titleabbrev>move-fields</titleabbrev>
+++++
+
+The `move_fields` processor allows to rearrange event fields from a object into another.
+
+The processor first extract fields from `from`, then use `fields` and `exclude` as filter to choose which fields should be moved into the `to` field.
+
+For example, given the event below:
+
+[source,json]
+----
+{
+  "app": {
+    "method": "a",
+    "elapsed_time": 100,
+    "user_id": 100,
+    "message": "i'm a message"
+  }
+}
+----
+
+If, you want move `method` and `elapsed_time` into another object, use this configuration:
+
+[source,yaml]
+----
+processors:
+  - move_fields:
+      from: "app"
+      fields: ["method", "elapsed_time"],
+      to: "rpc."
+----
+
+then your final event will be:
+
+[source,json]
+----
+{
+  "app": {
+    "user_id": 100,
+    "message": "i'm a message",
+    "rpc": {
+      "method": "a",
+      "elapsed_time": 100
+    }
+  }
+}
+----
+
+
+To add a prefix to the whole event:
+
+[source,json]
+----
+{
+  "app": { "method": "a"},
+  "cost": 100
+}
+----
+
+use this configuration:
+
+[source,yaml]
+----
+processors:
+  - move_fields:
+      to: "my_prefix_"
+----
+
+then your final event will be:
+
+[source,json]
+----
+{
+  "my_prefix_app": { "method": "a"},
+  "my_prefix_cost": 100
+}
+----
+
+.Move-fields options
+[options="header"]
+|======
+| Name                    | Required | Default                  | Description                                                                                           |
+| `from`                  | no       |                          | Which field you want extract. these field will be moved into `to`. empty indicate event root.         |
+| `fields`                | no       |                          | filter out which fields from `from` moving to `to`. empty list indicate all fields.                   |
+| `ignore_missing`        | no       | false                    | indicate ignore not found error when extract field from `fields` list.                                |
+| `exclude`               | no       |                          | filter out which fields from `from` NOT moving to `to`.                                               |
+| `to`                    | yes      |                          | These fields extract from `from` destination field prefix the `to` will base on fields root.          |
+|======
+
+[source,yaml]
+----
+processors:
+  - move_fields:
+      from: "app"
+      fields: [ "method", "elapsed_time" ]
+      to: "rpc."
+----
