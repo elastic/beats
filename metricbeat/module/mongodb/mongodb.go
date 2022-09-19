@@ -153,8 +153,14 @@ func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (
 		if config.Credentials.AuthMechanismProperties != nil {
 			clientOptions.Auth.AuthMechanismProperties = config.Credentials.AuthMechanismProperties
 		}
+		/*if len(config.Hosts) > 1 {
+			clientOptions.SetHosts(config.Hosts)
+			println("--lenth of the array--", len(config.Hosts))
+		}*/
 		clientOptions.SetHosts(config.Hosts)
 	}
+
+	//clientOptions.SetHosts(config.Hosts)
 
 	if mode == 0 {
 		mode = readpref.NearestMode
@@ -165,7 +171,12 @@ func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (
 		return nil, err
 	}
 	clientOptions.SetReadPreference(readPreference)
-	clientOptions.SetDirect(false)
+	if len(config.Hosts) == 1 && !strings.Contains(config.Hosts[0], "mongodb://") {
+		clientOptions.SetHosts(config.Hosts)
+		clientOptions.SetDirect(true)
+	}
+
+	//clientOptions.SetDirect(true)
 	clientOptions.SetConnectTimeout(timeout)
 
 	if config.TLS.IsEnabled() {
