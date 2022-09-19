@@ -4,6 +4,8 @@
 TIP: Want to get started with synthetic monitoring?
 See the {observability-guide}/synthetics-quickstart.html[quick start guide].
 
+NOTE: While it is possible to configure browser monitors via the heartbeat YAML config files, we highly recommend using project monitors instead! See the https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html[Elastic synthetics docs].
+
 beta[] The options described here configure {beatname_uc} to run the synthetic
 monitoring test projects via Synthetic Agent on the Chromium browser.
 Additional shared options are defined in <<monitor-options>>.
