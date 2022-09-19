@@ -6,7 +6,6 @@ input:
     metrics:
       - service: dataproc
         metric_types:
-          - "batch/spark/executors"
           - "cluster/hdfs/datanodes"
           - "cluster/hdfs/storage_capacity"
           - "cluster/hdfs/storage_utilization"

@@ -176,8 +176,20 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.GKEResourceLabelLocation)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
-	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore, gcp.ServiceDataproc:
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
 		return f
+	case gcp.ServiceDataproc:
+		if r.config.Region != "" && len(r.config.Regions) != 0 {
+			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
+		}
+
+		switch {
+		case r.config.Region != "":
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.DataprocResourceLabelLocation, strings.TrimSuffix(r.config.Region, "*"))
+		case len(r.config.Regions) != 0:
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.DataprocResourceLabelLocation)
+			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
+		}
 	case gcp.ServiceStorage:
 		if r.config.Region != "" && len(r.config.Regions) != 0 {
 			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
