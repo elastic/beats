@@ -216,13 +216,13 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	resourceTypeFiltersEC2RDSWithTag["ec2:instance"] = []aws.Tag{
 		{
 			Key:   "name",
-			Value: "test",
+			Value: []string{"test"},
 		},
 	}
 	resourceTypeFiltersEC2RDSWithTag["rds"] = []aws.Tag{
 		{
 			Key:   "name",
-			Value: "test",
+			Value: []string{"test"},
 		},
 	}
 	expectedListMetricWithDetailEC2RDSWithTag := listMetricWithDetail{
@@ -313,7 +313,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			tags: []aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 		},
@@ -326,7 +326,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			tags: []aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 		},
@@ -337,7 +337,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			tags: []aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 		},
@@ -350,7 +350,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			tags: []aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 		},
@@ -363,7 +363,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			tags: []aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 		},
@@ -374,7 +374,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			tags: []aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 		},
@@ -641,7 +641,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 			listMetricWithDetail{
@@ -699,7 +699,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 			expectedListMetricWithDetailEC2RDSWithTag,
@@ -793,7 +793,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]aws.Tag{
 				{
 					Key:   "name",
-					Value: "test",
+					Value: []string{"test"},
 				},
 			},
 			expectedListMetricWithDetailEC2sRDSWithTag,
@@ -997,11 +997,11 @@ func TestConstructTagsFilters(t *testing.T) {
 	expectedResourceTypeTagFiltersELB["elasticloadbalancing"] = []aws.Tag{
 		{
 			Key:   "name",
-			Value: "test-elb1",
+			Value: []string{"test-elb1"},
 		},
 		{
 			Key:   "name",
-			Value: "test-elb2",
+			Value: []string{"test-elb2"},
 		},
 	}
 
@@ -1009,13 +1009,13 @@ func TestConstructTagsFilters(t *testing.T) {
 	expectedResourceTypeTagFiltersELBEC2["elasticloadbalancing"] = []aws.Tag{
 		{
 			Key:   "name",
-			Value: "test-elb",
+			Value: []string{"test-elb"},
 		},
 	}
 	expectedResourceTypeTagFiltersELBEC2["ec2:instance"] = []aws.Tag{
 		{
 			Key:   "name",
-			Value: "test-ec2",
+			Value: []string{"test-ec2"},
 		},
 	}
 
@@ -1050,7 +1050,7 @@ func TestConstructTagsFilters(t *testing.T) {
 					tags: []aws.Tag{
 						{
 							Key:   "name",
-							Value: "test-elb1",
+							Value: []string{"test-elb1"},
 						},
 					},
 				},
@@ -1061,7 +1061,7 @@ func TestConstructTagsFilters(t *testing.T) {
 					tags: []aws.Tag{
 						{
 							Key:   "name",
-							Value: "test-elb2",
+							Value: []string{"test-elb2"},
 						},
 					},
 				},
@@ -1078,7 +1078,7 @@ func TestConstructTagsFilters(t *testing.T) {
 					tags: []aws.Tag{
 						{
 							Key:   "name",
-							Value: "test-elb",
+							Value: []string{"test-elb"},
 						},
 					},
 				},
@@ -1089,7 +1089,7 @@ func TestConstructTagsFilters(t *testing.T) {
 					tags: []aws.Tag{
 						{
 							Key:   "name",
-							Value: "test-ec2",
+							Value: []string{"test-ec2"},
 						},
 					},
 				},
@@ -1389,10 +1389,10 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
 		{
 			Key:   "name",
-			Value: "test-ec2",
+			Value: []string{"test-ec2"},
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1432,7 +1432,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1474,11 +1474,11 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
 		{
 			Key:   "name",
-			Value: "test-ec2",
+			Value: []string{"test-ec2"},
 		},
 	}
 
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
@@ -1487,7 +1487,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
 		{
 			Key:   "name",
-			Value: "foo",
+			Value: []string{"foo"},
 		},
 	}
 
@@ -1630,7 +1630,7 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
 	cloudwatchMock := &MockCloudWatchClientWithoutDim{}
 	resGroupTaggingClientMock := &MockResourceGroupsTaggingClient{}
@@ -1644,6 +1644,6 @@ func TestGetStartTimeEndTime(t *testing.T) {
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
 	m.MetricSet = &aws.MetricSet{Period: 5 * time.Minute}
 	m.logger = logp.NewLogger("test")
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 	assert.Equal(t, 5*time.Minute, endTime.Sub(startTime))
 }

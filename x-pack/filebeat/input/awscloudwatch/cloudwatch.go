@@ -61,7 +61,7 @@ func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroup string, star
 	err := p.getLogEventsFromCloudWatch(svc, logGroup, startTime, endTime, logProcessor)
 	if err != nil {
 		var errRequestCanceled *awssdk.RequestCanceledError
-		if errors.As(errRequestCanceled, &err) {
+		if errors.As(err, &errRequestCanceled) {
 			p.log.Error("getLogEventsFromCloudWatch failed with RequestCanceledError: ", err)
 		}
 		p.log.Error("getLogEventsFromCloudWatch failed: ", err)

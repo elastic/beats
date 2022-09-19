@@ -4799,6 +4799,24 @@ type: long
 
 --
 
+*`aws.transitgateway.metrics.BytesDropCountNoRoute.sum`*::
++
+--
+The number of bytes dropped because they did not match a route.
+
+type: long
+
+--
+
+*`aws.transitgateway.metrics.BytesDropCountBlackhole.sum`*::
++
+--
+The number of bytes dropped because they matched a blackhole route.
+
+type: long
+
+--
+
 [float]
 === usage
 
@@ -8947,28 +8965,28 @@ type: long
 *`beat.stats.libbeat.config.running`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.starts`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.stops`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.reloads`*::
 +
 --
-type: short
+type: long
 
 --
 
@@ -36717,7 +36735,7 @@ type: long
 
 --
 
-*`gcp.storage.authz.acl_based_object_access_.ount`*::
+*`gcp.storage.authz.acl_based_object_access.count`*::
 +
 --
 Delta count of requests that result in an object being granted access solely due to object ACLs.
@@ -43244,7 +43262,7 @@ format: percent
 *`kubernetes.container.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
+CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited). If the container CPU limits are missing and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
 
 
 type: scaled_float
@@ -43372,7 +43390,7 @@ format: percent
 *`kubernetes.container.memory.usage.limit.pct`*::
 +
 --
-Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited). If the container Memory limits are missing and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
 
 
 type: scaled_float
@@ -44362,7 +44380,7 @@ format: percent
 *`kubernetes.pod.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited)
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited). If one or more containers of the pod is unlimited and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
 
 
 type: scaled_float
@@ -44400,7 +44418,7 @@ format: percent
 *`kubernetes.pod.memory.usage.limit.pct`*::
 +
 --
-Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited). If one or more containers of the pod is unlimited and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
 
 
 type: scaled_float

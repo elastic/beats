@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package synthexec
 
@@ -20,12 +22,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const debugSelector = "synthexec"
@@ -89,12 +92,18 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
 func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
+		senr := newStreamEnricher(sFields)
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
+			err := senr.enrich(event, &SynthEvent{
+				Type:  "cmd/could_not_start",
+				Error: ECSErrToSynthError(ecserr.NewSyntheticsCmdCouldNotStartErr(err)),
+			})
 			return nil, err
 		}
-		senr := newStreamEnricher(sFields)
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
+		// We don't just return the readResultsJob, otherwise we'd just send an empty event, execute it right away
+		// then it'll keep executing itself until we're truly done
+		return readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)(event)
 	}
 }
 
@@ -263,7 +272,7 @@ func runCmd(
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
 		err := <-cmdDone
-		jsonWriter.Close()
+		_ = jsonWriter.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 
 		var cmdError *SynthError = nil
@@ -297,7 +306,9 @@ func runCmd(
 // scanToSynthEvents takes a reader, a transform function, and a callback, and processes
 // each scanned line via the reader before invoking it with the callback.
 func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) (*SynthEvent, error), cb func(*SynthEvent)) error {
-	defer rdr.Close()
+	defer func() {
+		_ = rdr.Close()
+	}()
 	scanner := bufio.NewScanner(rdr)
 	buf := make([]byte, 1024*10)      // 10KiB initial buffer
 	scanner.Buffer(buf, 1024*1024*10) // Max 10MiB Buffer

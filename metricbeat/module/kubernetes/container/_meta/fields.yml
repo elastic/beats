@@ -36,7 +36,7 @@
               type: scaled_float
               format: percent
               description: >
-                CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
+                CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited). If the container CPU limits are missing and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
     - name: logs
       type: group
       description: >
@@ -109,7 +109,7 @@
               type: scaled_float
               format: percent
               description: >
-                Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+                Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited). If the container Memory limits are missing and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
         - name: rss
           type: group
           fields:

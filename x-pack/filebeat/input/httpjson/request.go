@@ -92,18 +92,19 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 }
 
 type requestFactory struct {
-	url             url.URL
-	method          string
-	body            *mapstr.M
-	transforms      []basicTransform
-	user            string
-	password        string
-	log             *logp.Logger
-	encoder         encoderFunc
-	replace         string
-	isChain         bool
-	until           *valueTpl
-	chainHTTPClient *httpClient
+	url                    url.URL
+	method                 string
+	body                   *mapstr.M
+	transforms             []basicTransform
+	user                   string
+	password               string
+	log                    *logp.Logger
+	encoder                encoderFunc
+	replace                string
+	isChain                bool
+	until                  *valueTpl
+	chainHTTPClient        *httpClient
+	chainResponseProcessor *responseProcessor
 }
 
 func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]*requestFactory, error) {
@@ -130,7 +131,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 		if ch.Step != nil {
 			ts, _ := newBasicTransformsFromConfig(ch.Step.Request.Transforms, requestNamespace, log)
 			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
-			httpClient, err := newChainHTTPClient(ctx, ch.Step.Auth, &ch.Step.Request, log)
+			httpClient, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, log)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
 			}
@@ -138,22 +139,24 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				rf.user = ch.Step.Auth.Basic.User
 				rf.password = ch.Step.Auth.Basic.Password
 			}
+			responseProcessor := newChainResponseProcessor(ch, httpClient, log)
 			rf = &requestFactory{
-				url:             *ch.Step.Request.URL.URL,
-				method:          ch.Step.Request.Method,
-				body:            ch.Step.Request.Body,
-				transforms:      ts,
-				log:             log,
-				encoder:         registeredEncoders[config.Request.EncodeAs],
-				replace:         ch.Step.Replace,
-				isChain:         true,
-				chainHTTPClient: httpClient,
+				url:                    *ch.Step.Request.URL.URL,
+				method:                 ch.Step.Request.Method,
+				body:                   ch.Step.Request.Body,
+				transforms:             ts,
+				log:                    log,
+				encoder:                registeredEncoders[config.Request.EncodeAs],
+				replace:                ch.Step.Replace,
+				isChain:                true,
+				chainHTTPClient:        httpClient,
+				chainResponseProcessor: responseProcessor,
 			}
 		} else if ch.While != nil {
 			ts, _ := newBasicTransformsFromConfig(ch.While.Request.Transforms, requestNamespace, log)
 			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, log)
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
-			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, &ch.While.Request, log, policy)
+			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, policy)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
 			}
@@ -161,17 +164,19 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				rf.user = ch.While.Auth.Basic.User
 				rf.password = ch.While.Auth.Basic.Password
 			}
+			responseProcessor := newChainResponseProcessor(ch, httpClient, log)
 			rf = &requestFactory{
-				url:             *ch.While.Request.URL.URL,
-				method:          ch.While.Request.Method,
-				body:            ch.While.Request.Body,
-				transforms:      ts,
-				log:             log,
-				encoder:         registeredEncoders[config.Request.EncodeAs],
-				replace:         ch.While.Replace,
-				until:           ch.While.Until,
-				isChain:         true,
-				chainHTTPClient: httpClient,
+				url:                    *ch.While.Request.URL.URL,
+				method:                 ch.While.Request.Method,
+				body:                   ch.While.Request.Body,
+				transforms:             ts,
+				log:                    log,
+				encoder:                registeredEncoders[config.Request.EncodeAs],
+				replace:                ch.While.Replace,
+				until:                  ch.While.Until,
+				isChain:                true,
+				chainHTTPClient:        httpClient,
+				chainResponseProcessor: responseProcessor,
 			}
 		}
 		rfs = append(rfs, rf)
@@ -225,7 +230,8 @@ func newRequester(
 	client *httpClient,
 	requestFactory []*requestFactory,
 	responseProcessor []*responseProcessor,
-	log *logp.Logger) *requester {
+	log *logp.Logger,
+) *requester {
 	return &requester{
 		log:                log,
 		client:             client,
@@ -268,6 +274,7 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 	return *newUrl, nil
 }
 
+//nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
 	var (
 		n                 int
@@ -276,30 +283,52 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		urlCopy           url.URL
 		urlString         string
 		httpResp          *http.Response
+		initialResponse   []*http.Response
 		intermediateResps []*http.Response
 		finalResps        []*http.Response
+		isChainExpected   bool
+		chainIndex        int
 	)
+
 	for i, rf := range r.requestFactories {
 		finalResps = nil
 		intermediateResps = nil
 		// iterate over collected ids from last response
 		if i == 0 {
 			// perform and store regular call responses
-			httpResp, err = rf.collectResponse(stdCtx, trCtx, r) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+			httpResp, err = rf.collectResponse(stdCtx, trCtx, r)
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			if len(r.requestFactories) == 1 {
-				finalResps = append(finalResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
-				n = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true, i)
+				finalResps = append(finalResps, httpResp)
+				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
+				n = processAndPublishEvents(trCtx, events, publisher, true, r.log)
 				continue
 			}
-			intermediateResps = append(intermediateResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+
+			// if flow of control reaches here, that means there are more than 1 request factories
+			// if a pagination request factory at the root level and a chain step exists, only then we will initialize flags & variables
+			// which are required for chaining with pagination
+			if r.requestFactories[i+1].isChain && r.responseProcessors[i].pagination.requestFactory != nil {
+				isChainExpected = true
+				chainIndex = i + 1
+				resp, err := cloneResponse(httpResp)
+				if err != nil {
+					return err
+				}
+				initialResponse = append(initialResponse, resp)
+			}
+			intermediateResps = append(intermediateResps, httpResp)
 			ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
 			if err != nil {
 				return err
 			}
-			n = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false, i)
+			// we will only processAndPublishEvents here if chains do not exist, inorder to avoid unnecessary pagination
+			if !isChainExpected {
+				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
+				n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
+			}
 		} else {
 			if len(ids) == 0 {
 				n = 0
@@ -307,6 +336,14 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			urlCopy = rf.url
 			urlString = rf.url.String()
+
+			// new transform context for every chain step , derived from parent transform context
+			var chainTrCtx *transformContext
+			if rf.isChain {
+				chainTrCtx = emptyTransformContext()
+				chainTrCtx.cursor = trCtx.cursor
+			}
+
 			// perform request over collected ids
 			for _, id := range ids {
 				// reformat urls of requestFactory using ids
@@ -316,15 +353,15 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 
 				// collect data from new urls
-				httpResp, err = rf.collectResponse(stdCtx, trCtx, r) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+				httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
 				if err != nil {
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
 				// store data according to response type
 				if i == len(r.requestFactories)-1 && len(ids) != 0 {
-					finalResps = append(finalResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+					finalResps = append(finalResps, httpResp)
 				} else {
-					intermediateResps = append(intermediateResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+					intermediateResps = append(intermediateResps, httpResp)
 				}
 			}
 			rf.url = urlCopy
@@ -341,11 +378,22 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 				resps = intermediateResps
 			}
-			n += r.processAndPublishEvents(stdCtx, trCtx, publisher, resps, i < len(r.requestFactories), i)
+
+			var events <-chan maybeMsg
+			if rf.isChain {
+				events = rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps)
+			} else {
+				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps)
+			}
+			n += processAndPublishEvents(trCtx, events, publisher, i < len(r.requestFactories), r.log)
 		}
 	}
 
 	defer httpResp.Body.Close()
+
+	if isChainExpected {
+		n += r.processRemainingChainEvents(stdCtx, trCtx, publisher, initialResponse, chainIndex)
+	}
 	r.log.Infof("request finished: %d events published", n)
 
 	return nil
@@ -358,12 +406,16 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 	var err error
 	// collect ids from all responses
 	for _, resp := range intermediateResps {
-		defer resp.Body.Close()
 		if resp.Body != nil {
 			b, err = io.ReadAll(resp.Body)
 			if err != nil {
 				return nil, fmt.Errorf("error while reading response body: %w", err)
 			}
+		}
+		// gracefully close response
+		err = resp.Body.Close()
+		if err != nil {
+			return nil, fmt.Errorf("error closing response body: %w", err)
 		}
 
 		// get replace values from collected json
@@ -396,26 +448,24 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 	return ids, nil
 }
 
-// processAndPublishEvents process and publish events based on response type
-func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool, i int) int {
-	events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
-
+// processAndPublishEvents process and publish events based on event type
+func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, publisher inputcursor.Publisher, publish bool, log *logp.Logger) int {
 	var n int
 	for maybeMsg := range events {
 		if maybeMsg.failed() {
-			r.log.Errorf("error processing response: %v", maybeMsg)
+			log.Errorf("error processing response: %v", maybeMsg)
 			continue
 		}
 
 		if publish {
 			event, err := makeEvent(maybeMsg.msg)
 			if err != nil {
-				r.log.Errorf("error creating event: %v", maybeMsg)
+				log.Errorf("error creating event: %v", maybeMsg)
 				continue
 			}
 
 			if err := publisher.Publish(event, trCtx.cursorMap()); err != nil {
-				r.log.Errorf("error publishing event: %v", err)
+				log.Errorf("error publishing event: %v", err)
 				continue
 			}
 		}
@@ -424,9 +474,155 @@ func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *trans
 		}
 		trCtx.updateLastEvent(maybeMsg.msg)
 		trCtx.updateCursor()
+
 		n++
 	}
 	return n
+}
+
+// processRemainingChainEvents , processes the remaining pagination events for chain blocks
+func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
+	// we start from 0, and skip the 1st event since we have already processed it
+	events := r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp)
+
+	var n int
+	var eventCount int
+	for maybeMsg := range events {
+		if maybeMsg.failed() {
+			r.log.Errorf("error processing response: %v", maybeMsg)
+			continue
+		}
+
+		if n >= 1 { // skip 1st event as it has already ben processed before
+			var response http.Response
+			response.StatusCode = 200
+			body := new(bytes.Buffer)
+			// we construct a new response here from each of the pagination events
+			err := json.NewEncoder(body).Encode(maybeMsg.msg)
+			if err != nil {
+				r.log.Errorf("error processing chain event: %w", err)
+				continue
+			}
+			response.Body = io.NopCloser(body)
+
+			// for each pagination response , we repeat all the chain steps / blocks
+			count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)
+			if err != nil {
+				r.log.Errorf("error processing chain event: %w", err)
+				continue
+			}
+			eventCount += count
+
+			err = response.Body.Close()
+			if err != nil {
+				r.log.Errorf("error closing http response body : %w", err)
+			}
+		}
+
+		n++
+	}
+	return eventCount
+}
+
+// processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
+//nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
+func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
+	var (
+		n                 int
+		ids               []string
+		err               error
+		urlCopy           url.URL
+		urlString         string
+		httpResp          *http.Response
+		intermediateResps []*http.Response
+		finalResps        []*http.Response
+	)
+
+	intermediateResps = append(intermediateResps, response)
+	ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[chainIndex].replace)
+	if err != nil {
+		return -1, err
+	}
+
+	for i := chainIndex; i < len(r.requestFactories); i++ {
+		finalResps = nil
+		intermediateResps = nil
+		rf := r.requestFactories[i]
+
+		if len(ids) == 0 {
+			n = 0
+			continue
+		}
+		urlCopy = rf.url
+		urlString = rf.url.String()
+
+		// new transform context for every chain step , derived from parent transform context
+		var chainTrCtx *transformContext
+		if rf.isChain {
+			chainTrCtx = emptyTransformContext()
+			chainTrCtx.cursor = trCtx.cursor
+		}
+
+		// perform request over collected ids
+		for _, id := range ids {
+			// reformat urls of requestFactory using ids
+			rf.url, err = generateNewUrl(rf.replace, urlString, id)
+			if err != nil {
+				return -1, fmt.Errorf("failed to generate new URL: %w", err)
+			}
+
+			// collect data from new urls
+			httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
+			if err != nil {
+				return -1, fmt.Errorf("failed to execute rf.collectResponse: %w", err)
+			}
+			// store data according to response type
+			if i == len(r.requestFactories)-1 && len(ids) != 0 {
+				finalResps = append(finalResps, httpResp)
+			} else {
+				intermediateResps = append(intermediateResps, httpResp)
+			}
+		}
+		rf.url = urlCopy
+
+		var resps []*http.Response
+		if i == len(r.requestFactories)-1 {
+			resps = finalResps
+		} else {
+			// The if comdition (i < len(r.requestFactories)) ensures this branch never runs to the last element
+			// of r.requestFactories, therefore r.requestFactories[i+1] will never be out of bounds.
+			ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
+			if err != nil {
+				return -1, err
+			}
+			resps = intermediateResps
+		}
+		events := rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps)
+		n += processAndPublishEvents(trCtx, events, publisher, i < len(r.requestFactories), r.log)
+	}
+
+	defer httpResp.Body.Close()
+	return n, nil
+}
+
+// cloneResponse clones required http response attributes
+func cloneResponse(source *http.Response) (*http.Response, error) {
+	var resp http.Response
+
+	body, err := io.ReadAll(source.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed ro read http response body: %w", err)
+	}
+
+	source.Body = io.NopCloser(bytes.NewReader(body))
+	resp.Body = io.NopCloser(bytes.NewReader(body))
+	resp.ContentLength = source.ContentLength
+	resp.Header = source.Header
+	resp.Trailer = source.Trailer
+	resp.StatusCode = source.StatusCode
+	resp.Request = source.Request.Clone(source.Request.Context())
+
+	return &resp, nil
 }
 
 // drainBody reads all of b to memory and then returns a equivalent

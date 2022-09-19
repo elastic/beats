@@ -69,10 +69,10 @@ type chainConfig struct {
 // will contain replace string with original URL to make a skeleton for the
 // call request.
 type stepConfig struct {
-	Auth     *authConfig         `config:"auth"`
-	Request  requestConfig       `config:"request" validate:"required"`
-	Response responseChainConfig `config:"response,omitempty"`
-	Replace  string              `config:"replace,omitempty"`
+	Auth     *authConfig          `config:"auth"`
+	Request  *requestConfig       `config:"request" validate:"required"`
+	Response *responseChainConfig `config:"response,omitempty"`
+	Replace  string               `config:"replace,omitempty"`
 }
 
 // whileConfig will contain basic properties like auth parameters, request parameters,
@@ -82,11 +82,11 @@ type stepConfig struct {
 // expression is evaluated to "true" or request.retry.max_attempts is exhausted. If
 // request.retry.max_attempts is not specified , the max_attempts is always 1.
 type whileConfig struct {
-	Auth     *authConfig         `config:"auth"`
-	Request  requestConfig       `config:"request" validate:"required"`
-	Response responseChainConfig `config:"response,omitempty"`
-	Replace  string              `config:"replace,omitempty"`
-	Until    *valueTpl           `config:"until" validate:"required"`
+	Auth     *authConfig          `config:"auth"`
+	Request  *requestConfig       `config:"request" validate:"required"`
+	Response *responseChainConfig `config:"response,omitempty"`
+	Replace  string               `config:"replace,omitempty"`
+	Until    *valueTpl            `config:"until" validate:"required"`
 }
 
 type responseChainConfig struct {
@@ -100,13 +100,13 @@ func defaultChainConfig() config {
 		{
 			While: &whileConfig{
 				Auth:     chaincfg.Auth,
-				Request:  *chaincfg.Request,
-				Response: responseChainConfig{},
+				Request:  chaincfg.Request,
+				Response: &responseChainConfig{},
 			},
 			Step: &stepConfig{
 				Auth:     chaincfg.Auth,
-				Request:  *chaincfg.Request,
-				Response: responseChainConfig{},
+				Request:  chaincfg.Request,
+				Response: &responseChainConfig{},
 			},
 		},
 	}

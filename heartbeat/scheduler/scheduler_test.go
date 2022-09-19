@@ -245,10 +245,10 @@ func TestSchedTaskLimits(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var jobConfigByType = map[string]config.JobLimit{}
+			var jobConfigByType = map[string]*config.JobLimit{}
 			jobType := "http"
 			if tt.limit > 0 {
-				jobConfigByType = map[string]config.JobLimit{
+				jobConfigByType = map[string]*config.JobLimit{
 					jobType: {Limit: tt.limit},
 				}
 			}

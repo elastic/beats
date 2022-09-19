@@ -22,7 +22,7 @@ var (
 )
 
 type publisher interface {
-	Publish(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+	Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
 }
 
 type queryExecutor interface {
@@ -104,7 +104,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", time.Since(start))
 
-	a.publisher.Publish(index, ac.ID, responseID, hits, ac.ECSMapping, req["data"])
+	a.publisher.Publish(index, ac.ID, responseID, nil, hits, ac.ECSMapping, req["data"])
 
 	return len(hits), nil
 }

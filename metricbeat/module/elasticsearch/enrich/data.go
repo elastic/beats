@@ -19,12 +19,13 @@ package enrich
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -73,7 +74,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Enrich Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch Enrich Stats API response: %w", err)
 	}
 
 	var errs multierror.Errors
@@ -82,27 +83,29 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event := mb.Event{}
 
 		event.ModuleFields = mapstr.M{}
-		event.ModuleFields.Put("cluster.name", info.ClusterName)
-		event.ModuleFields.Put("cluster.id", info.ClusterID)
+		_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+		_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		fields, err := schema.Apply(stat)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying enrich coordinator stats schema"))
+			errs = append(errs, fmt.Errorf("failure applying enrich coordinator stats schema: %w", err))
 			continue
 		}
 
 		nodeID, err := fields.GetValue("node_id")
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure retrieving node ID from Elasticsearch Enrich Stats API response"))
+			errs = append(errs, fmt.Errorf("failure retrieving node ID from Elasticsearch Enrich Stats API response: %w", err))
 		}
 
-		event.ModuleFields.Put("node.id", nodeID)
-		fields.Delete("node_id")
+		_, _ = event.ModuleFields.Put("node.id", nodeID)
+		_ = fields.Delete("node_id")
 
 		event.MetricSetFields = fields
 
-		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-		event.Index = index
+		if isXpack {
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = index
+		}
 
 		r.Event(event)
 	}
@@ -111,8 +114,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event := mb.Event{}
 
 		event.ModuleFields = mapstr.M{}
-		event.ModuleFields.Put("cluster.name", info.ClusterName)
-		event.ModuleFields.Put("cluster.id", info.ClusterID)
+		_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+		_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
 		event.MetricSetFields = mapstr.M{}
 
 		policyName, ok := policy["name"]
@@ -137,12 +140,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 		fields, err := task.Apply(taskMapstr)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying enrich coordinator stats schema"))
+			errs = append(errs, fmt.Errorf("failure applying enrich coordinator stats schema: %w", err))
 			continue
 		}
 
-		event.MetricSetFields.Put("executing_policy.name", policyName)
-		event.MetricSetFields.Put("executing_policy.task", fields)
+		_, _ = event.MetricSetFields.Put("executing_policy.name", policyName)
+		_, _ = event.MetricSetFields.Put("executing_policy.task", fields)
 
 		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 		// When using Agent, the index name is overwritten anyways.

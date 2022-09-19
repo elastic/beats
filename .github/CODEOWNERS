@@ -74,9 +74,12 @@ CHANGELOG*
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
+/x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
 /x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
+/x-pack/filebeat/input/lumberjack/ @elastic/security-external-integrations
 /x-pack/filebeat/input/netflow/ @elastic/security-external-integrations
 /x-pack/filebeat/input/o365audit/ @elastic/security-external-integrations
 /x-pack/filebeat/module/ @elastic/integrations
@@ -134,5 +137,6 @@ CHANGELOG*
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/ @elastic/integrations
 /x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application-backend
+/x-pack/osquerybeat/ @elastic/security-asset-management
 /x-pack/packetbeat/ @elastic/security-external-integrations
 /x-pack/winlogbeat/ @elastic/security-external-integrations

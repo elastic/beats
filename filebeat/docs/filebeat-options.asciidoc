@@ -69,6 +69,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-aws-cloudwatch>>
 * <<{beatname_lc}-input-aws-s3>>
 * <<{beatname_lc}-input-azure-eventhub>>
+* <<{beatname_lc}-input-azure-blob-storage>>
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-cometd>>
 * <<{beatname_lc}-input-container>>
@@ -87,6 +88,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-syslog>>
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-udp>>
+* <<{beatname_lc}-input-gcs>>
 
 include::multiline.asciidoc[]
 
@@ -95,6 +97,8 @@ include::../../x-pack/filebeat/docs/inputs/input-aws-cloudwatch.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-azure-blob-storage.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
 
@@ -133,3 +137,5 @@ include::inputs/input-tcp.asciidoc[]
 include::inputs/input-udp.asciidoc[]
 
 include::inputs/input-unix.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-gcs.asciidoc[]

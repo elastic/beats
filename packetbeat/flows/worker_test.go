@@ -20,7 +20,7 @@ package flows
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -37,7 +37,7 @@ import (
 var dataFlag = flag.Bool("data", false, "Write updated data.json files")
 
 func TestCreateEvent(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	// Build biflow event.
 	start := time.Unix(1542292881, 0)
@@ -70,14 +70,14 @@ func TestCreateEvent(t *testing.T) {
 	// Validate the contents of the event.
 	validate := lookslike.MustCompile(map[string]interface{}{
 		"source": map[string]interface{}{
-			"mac":     "01:02:03:04:05:06",
+			"mac":     "01-02-03-04-05-06",
 			"ip":      "203.0.113.3",
 			"port":    port1,
 			"bytes":   uint64(10),
 			"packets": uint64(1),
 		},
 		"destination": map[string]interface{}{
-			"mac":     "06:05:04:03:02:01",
+			"mac":     "06-05-04-03-02-01",
 			"ip":      "198.51.100.2",
 			"port":    port2,
 			"bytes":   uint64(460),
@@ -116,13 +116,13 @@ func TestCreateEvent(t *testing.T) {
 
 	// Write the event to disk if -data is used.
 	if *dataFlag {
-		event.Fields.Put("@timestamp", common.Time(end))
+		event.Fields.Put("@timestamp", common.Time(end)) //nolint:errcheck // Never fails.
 		output, err := json.MarshalIndent(&event.Fields, "", "  ")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if err := ioutil.WriteFile("../_meta/sample_outputs/flow.json", output, 0o644); err != nil {
+		if err := os.WriteFile("../_meta/sample_outputs/flow.json", output, 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

@@ -34,21 +34,28 @@ type Config struct {
 	// TLS/SSL configurationf or secure connection
 	TLS *tlscommon.Config `config:"ssl"`
 	// Timeout of a single batch publishing request
-	Timeout time.Duration `config:"timeout"             validate:"min=1"`
+	Timeout time.Duration `config:"timeout" validate:"min=1"`
 	// MaxRetries is how many times the same batch is attempted to be sent
-	MaxRetries int `config:"max_retries"         validate:"min=-1,nonzero"`
+	MaxRetries int `config:"max_retries" validate:"min=-1,nonzero"`
 	// BulkMaxSize max amount of events in a single batch
 	BulkMaxSize int `config:"bulk_max_size"`
+	// AckPollingInterval is a minimal interval for getting persisted index updates from the shipper server.
+	// Batches of events are acknowledged asynchronously in the background.
+	// If after the `AckPollingInterval` duration the persisted index value changed
+	// all batches pending acknowledgment will be checked against the new value
+	// and acknowledged if `persisted_index` >= `accepted_index`.
+	AckPollingInterval time.Duration `config:"ack_polling_interval" validate:"min=5ms"`
 	// Backoff strategy for the shipper output
 	Backoff backoffConfig `config:"backoff"`
 }
 
 func defaultConfig() Config {
 	return Config{
-		TLS:         nil,
-		Timeout:     30 * time.Second,
-		MaxRetries:  3,
-		BulkMaxSize: 50,
+		TLS:                nil,
+		Timeout:            30 * time.Second,
+		MaxRetries:         3,
+		BulkMaxSize:        50,
+		AckPollingInterval: 5 * time.Millisecond,
 		Backoff: backoffConfig{
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,

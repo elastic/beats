@@ -35,7 +35,7 @@ labels:
   ## This value can be "opensource" or "commercial"
   mil.dso.ironbank.image.type: "commercial"
   ## Product the image belongs to for grouping multiple images
-  mil.dso.ironbank.product.name: "beats"
+  mil.dso.ironbank.product.name: "metricbeat"
 
 # List of resources to make available to the offline build context
 resources:

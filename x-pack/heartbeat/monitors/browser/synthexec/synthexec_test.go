@@ -2,13 +2,16 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package synthexec
 
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -95,8 +98,20 @@ func TestJsonToSynthEvent(t *testing.T) {
 	}
 }
 
+func goCmd(args ...string) *exec.Cmd {
+	goBinary := "go" // relative by default
+	// GET the GOROOT if defined, this helps in scenarios where
+	// GOROOT is defined, but GOROOT/bin is not in the path
+	// This can happen when targeting WSL from intellij running on windows
+	goRoot := os.Getenv("GOROOT")
+	if goRoot != "" {
+		goBinary = filepath.Join(goRoot, "bin", "go")
+	}
+	return exec.Command(goBinary, args...)
+}
+
 func TestRunCmd(t *testing.T) {
-	cmd := exec.Command("go", "run", "./main.go")
+	cmd := goCmd("run", "./main.go")
 
 	stdinStr := "MY_STDIN"
 	synthEvents := runAndCollect(t, cmd, stdinStr, 15*time.Minute)
@@ -132,7 +147,7 @@ func TestRunCmd(t *testing.T) {
 }
 
 func TestRunBadExitCodeCmd(t *testing.T) {
-	cmd := exec.Command("go", "run", "./main.go", "exit")
+	cmd := goCmd("run", "./main.go", "exit")
 	synthEvents := runAndCollect(t, cmd, "", 15*time.Minute)
 
 	// go run outputs "exit status 123" to stderr so we have two messages
@@ -150,7 +165,7 @@ func TestRunBadExitCodeCmd(t *testing.T) {
 }
 
 func TestRunTimeoutExitCodeCmd(t *testing.T) {
-	cmd := exec.Command("go", "run", "./main.go")
+	cmd := goCmd("run", "./main.go")
 	synthEvents := runAndCollect(t, cmd, "", 0*time.Second)
 
 	// go run should not produce any additional stderr output in this case
@@ -164,8 +179,9 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 }
 
 func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time.Duration) []*SynthEvent {
-	_, filename, _, _ := runtime.Caller(0)
-	cmd.Dir = path.Join(filepath.Dir(filename), "testcmd")
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+	cmd.Dir = filepath.Join(cwd, "testcmd")
 	ctx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
 
 	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
@@ -201,10 +217,10 @@ func eventsWithType(typ string, synthEvents []*SynthEvent) (matched []*SynthEven
 
 func TestProjectCommandFactory(t *testing.T) {
 	_, filename, _, _ := runtime.Caller(0)
-	origPath := path.Join(filepath.Dir(filename), "../source/fixtures/todos")
+	origPath := filepath.Join(filepath.Dir(filename), "..", "source", "fixtures", "todos")
 	projectPath, err := filepath.Abs(origPath)
 	require.NoError(t, err)
-	binPath := path.Join(projectPath, "node_modules/.bin/elastic-synthetics")
+	binPath := filepath.Join(projectPath, "node_modules", ".bin", "elastic-synthetics")
 
 	tests := []struct {
 		name        string

@@ -230,7 +230,12 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("PYTEST_")...)
+
+	passThroughEnvVars := append(
+		[]string{"ELASTICSEARCH_VERSION", "KIBANA_VERSION", "BEAT_VERSION"},
+		devtools.ListMatchingEnvVars("PYTEST_")...,
+	)
+	runner, err := devtools.NewDockerIntegrationRunner(passThroughEnvVars...)
 	if err != nil {
 		return err
 	}

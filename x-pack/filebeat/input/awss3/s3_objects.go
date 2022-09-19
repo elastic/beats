@@ -153,7 +153,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 
 	// Process object content stream.
 	switch {
-	case contentType == contentTypeJSON || contentType == contentTypeNDJSON:
+	case strings.HasPrefix(contentType, contentTypeJSON) || strings.HasPrefix(contentType, contentTypeNDJSON):
 		err = p.readJSON(reader)
 	default:
 		err = p.readFile(reader)
