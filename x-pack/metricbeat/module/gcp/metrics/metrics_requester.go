@@ -211,7 +211,6 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 
 		switch {
 		case r.config.Region != "":
-			// FIXME: using resource.labels.zone but should use region.
 			region := strings.TrimSuffix(r.config.Region, "*")
 			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, region)
 		case r.config.Zone != "":
