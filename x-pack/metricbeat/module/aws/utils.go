@@ -67,14 +67,14 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwatch.GetMetricDataAPIClient, startTime time.Time, endTime time.Time) ([]types.MetricDataResult, error) {
-	maxQuerySize := 500
+	maxNumberOfMetricsRetrieved := 500
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 
 	// Split metricDataQueries into smaller slices that length no longer than 500.
-	// 500 is defined in maxQuerySize.
+	// 500 is defined in maxNumberOfMetricsRetrieved.
 	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 500.
-	for i := 0; i < len(metricDataQueries); i += maxQuerySize {
-		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
+	for i := 0; i < len(metricDataQueries); i += maxNumberOfMetricsRetrieved {
+		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxNumberOfMetricsRetrieved), float64(len(metricDataQueries))))]
 		if len(metricDataQueriesPartial) == 0 {
 			return getMetricDataOutput.MetricDataResults, nil
 		}
