@@ -3,8 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
-=======
 [[release-notes-8.4.2]]
 === Beats version 8.4.2
 https://github.com/elastic/beats/compare/v8.4.1\...v8.4.2[View commits]
@@ -103,7 +101,6 @@ s3access:
 
 - httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
 
->>>>>>> bd3a3c786d (docs: Prepare Changelog for 8.4.2 (#33122))
 [[release-notes-8.4.0]]
 === Beats version 8.4.0
 https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
