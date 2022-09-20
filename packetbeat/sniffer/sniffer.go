@@ -18,6 +18,7 @@
 package sniffer
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -40,7 +41,7 @@ import (
 // Sniffer provides packet sniffing capabilities, forwarding packets read
 // to a Worker.
 type Sniffer struct {
-	config config.InterfacesConfig
+	config []config.InterfacesConfig
 
 	state atomic.Int32  // store snifferState
 	done  chan struct{} // done is required to wire state into a select.
@@ -75,63 +76,100 @@ const (
 // New create a new Sniffer instance. Settings are validated in a best effort
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method.
-func New(testMode bool, filter string, decoders Decoders, interfaces config.InterfacesConfig) (*Sniffer, error) {
+func New(testMode bool, _ string, decoders Decoders, interfaces []config.InterfacesConfig) (*Sniffer, error) {
 	s := &Sniffer{
-		filter:        filter,
 		config:        interfaces,
 		decoders:      decoders,
 		state:         atomic.MakeInt32(snifferInactive),
-		followDefault: interfaces.PollDefaultRoute > 0 && strings.HasPrefix(interfaces.Device, "default_route"),
+		followDefault: interfaces[0].PollDefaultRoute > 0 && strings.HasPrefix(interfaces[0].Device, "default_route"),
 	}
 
-	logp.Debug("sniffer", "BPF filter: '%s'", filter)
+	for i, iface := range s.config {
+		logp.Debug("sniffer", "interface: %d, BPF filter: '%s'", i, iface.BpfFilter)
 
-	// pre-check and normalize configuration:
-	// - resolve potential device name
-	// - check for file output
-	// - set some defaults
-	if s.config.File != "" {
-		logp.Debug("sniffer", "Reading from file: %s", s.config.File)
+		// pre-check and normalize configuration:
+		// - resolve potential device name
+		// - check for file output
+		// - set some defaults
+		if iface.File != "" {
+			logp.Debug("sniffer", "Reading from file: %s", iface.File)
 
-		if s.config.BpfFilter != "" {
-			logp.Warn("Packet filters are not applied to pcap files.")
-		}
-
-		// we read file with the pcap provider
-		s.config.Type = "pcap"
-		s.config.Device = ""
-	} else {
-		// try to resolve device name (ignore error if testMode is enabled)
-		if name, err := resolveDeviceName(s.config.Device); err != nil {
-			if !testMode {
-				return nil, err
+			if iface.BpfFilter != "" {
+				logp.Warn("Packet filters are not applied to pcap files.")
 			}
+
+			// we read file with the pcap provider
+			s.config[i].Type = "pcap"
+			s.config[i].Device = ""
 		} else {
-			s.device = name
-			if name == "any" && !deviceAnySupported {
-				return nil, fmt.Errorf("any interface is not supported on %s", runtime.GOOS)
-			}
+			// try to resolve device name (ignore error if testMode is enabled)
+			if name, err := resolveDeviceName(iface.Device); err != nil {
+				if !testMode {
+					return nil, err
+				}
+			} else {
+				s.device = name
+				if name == "any" && !deviceAnySupported {
+					return nil, fmt.Errorf("any interface is not supported on %s", runtime.GOOS)
+				}
 
-			if s.config.Snaplen == 0 {
-				s.config.Snaplen = 65535
-			}
-			if s.config.BufferSizeMb <= 0 {
-				s.config.BufferSizeMb = 24
-			}
+				if iface.Snaplen == 0 {
+					s.config[i].Snaplen = 65535
+				}
+				if iface.BufferSizeMb <= 0 {
+					s.config[i].BufferSizeMb = 24
+				}
 
-			if t := s.config.Type; t == "autodetect" || t == "" {
-				s.config.Type = "pcap"
+				if t := iface.Type; t == "autodetect" || t == "" {
+					s.config[i].Type = "pcap"
+				}
+				logp.Debug("sniffer", "Sniffer type: %s device: %s", iface.Type, s.device)
 			}
-			logp.Debug("sniffer", "Sniffer type: %s device: %s", s.config.Type, s.device)
 		}
-	}
+		iface = s.config[i]
 
-	err := validateConfig(filter, &s.config)
-	if err != nil {
-		return nil, err
+		err := validateConfig(iface.BpfFilter, &iface) //nolint:gosec // Bad linter! validateConfig completes before the next iteration.
+		if err != nil {
+			cfg, _ := json.Marshal(iface)
+			return nil, fmt.Errorf("validate: %w: %s", err, cfg)
+		}
 	}
 
 	return s, nil
+}
+
+func validateConfig(filter string, cfg *config.InterfacesConfig) error {
+	if cfg.File == "" {
+		if err := validatePcapFilter(filter); err != nil {
+			return err
+		}
+	}
+
+	switch cfg.Type {
+	case "pcap":
+		return validatePcapConfig(cfg)
+	case "af_packet":
+		return validateAfPacketConfig(cfg)
+	default:
+		return fmt.Errorf("unknown sniffer type for %s: %q", cfg.Device, cfg.Type)
+	}
+}
+
+func validatePcapFilter(expr string) error {
+	if expr == "" {
+		return nil
+	}
+	_, err := pcap.NewBPF(layers.LinkTypeEthernet, 65535, expr)
+	return err
+}
+
+func validatePcapConfig(cfg *config.InterfacesConfig) error {
+	return nil
+}
+
+func validateAfPacketConfig(cfg *config.InterfacesConfig) error {
+	_, _, _, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
+	return err
 }
 
 // Run opens the sniffing device and processes packets being read from that device.
@@ -168,7 +206,7 @@ func (s *Sniffer) pollDefaultRoute(device chan<- string, refresh <-chan struct{}
 		device <- current
 		defaultRouteMetric.Set(current)
 
-		tick := time.NewTicker(s.config.PollDefaultRoute)
+		tick := time.NewTicker(s.config[0].PollDefaultRoute)
 		for {
 			select {
 			case <-tick.C:
@@ -198,7 +236,7 @@ func (s *Sniffer) pollDefaultRoute(device chan<- string, refresh <-chan struct{}
 // if it has change from the old default route interface. If device resolution
 // fails, the default route interface is left unchanged.
 func (s *Sniffer) poll(old string, device chan<- string) (current string) {
-	current, err := resolveDeviceName(s.config.Device)
+	current, err := resolveDeviceName(s.config[0].Device)
 	if err != nil {
 		logp.Warn("sniffer failed to poll default route device: %v", err)
 		return old
@@ -273,9 +311,9 @@ func (s *Sniffer) sniffOneDynamic(device string, last layers.LinkType, dec *deco
 // sniff performs the sniffing work and writing dump files if requested.
 func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder, refresh chan<- struct{}) error {
 	var w *pcapgo.Writer
-	if s.config.Dumpfile != "" {
+	if s.config[0].Dumpfile != "" {
 		const timeSuffixFormat = "20060102150405"
-		filename := fmt.Sprintf("%s-%s.pcap", s.config.Dumpfile, time.Now().Format(timeSuffixFormat))
+		filename := fmt.Sprintf("%s-%s.pcap", s.config[0].Dumpfile, time.Now().Format(timeSuffixFormat))
 		logp.Info("creating new dump file %s", filename)
 		f, err := os.Create(filename)
 		if err != nil {
@@ -286,7 +324,7 @@ func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder, refres
 		w = pcapgo.NewWriterNanos(f)
 		err = w.WriteFileHeader(65535, handle.LinkType())
 		if err != nil {
-			return fmt.Errorf("failed to write dump file header to %s: %w", s.config.Dumpfile, err)
+			return fmt.Errorf("failed to write dump file header to %s: %w", s.config[0].Dumpfile, err)
 		}
 	}
 
@@ -303,7 +341,7 @@ func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder, refres
 		timeouts int
 	)
 	for s.state.Load() == snifferActive {
-		if s.config.OneAtATime {
+		if s.config[0].OneAtATime {
 			fmt.Fprintln(os.Stdout, "Press enter to read packet")
 			fmt.Scanln()
 		}
@@ -330,7 +368,7 @@ func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder, refres
 
 		if err != nil {
 			// ignore EOF, if sniffer was driven from file
-			if err == io.EOF && s.config.File != "" { //nolint:errorlint // io.EOF should never be wrapped.
+			if err == io.EOF && s.config[0].File != "" { //nolint:errorlint // io.EOF should never be wrapped.
 				return nil
 			}
 
@@ -372,17 +410,17 @@ func (s *Sniffer) sniffHandle(handle snifferHandle, dec *decoder.Decoder, refres
 }
 
 func (s *Sniffer) open(device string) (snifferHandle, error) {
-	if s.config.File != "" {
-		return newFileHandler(s.config.File, s.config.TopSpeed, s.config.Loop)
+	if s.config[0].File != "" {
+		return newFileHandler(s.config[0].File, s.config[0].TopSpeed, s.config[0].Loop)
 	}
 
-	switch s.config.Type {
+	switch s.config[0].Type {
 	case "pcap":
-		return openPcap(device, s.filter, &s.config)
+		return openPcap(device, s.filter, &s.config[0])
 	case "af_packet":
-		return openAFPacket(device, s.filter, &s.config)
+		return openAFPacket(device, s.filter, &s.config[0])
 	default:
-		return nil, fmt.Errorf("unknown sniffer type: %s", s.config.Type)
+		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config[0].Type)
 	}
 }
 
@@ -393,40 +431,6 @@ func (s *Sniffer) Stop() {
 	if s.done != nil {
 		close(s.done)
 	}
-}
-
-func validateConfig(filter string, cfg *config.InterfacesConfig) error {
-	if cfg.File == "" {
-		if err := validatePcapFilter(filter); err != nil {
-			return err
-		}
-	}
-
-	switch cfg.Type {
-	case "pcap":
-		return validatePcapConfig(cfg)
-	case "af_packet":
-		return validateAfPacketConfig(cfg)
-	default:
-		return fmt.Errorf("unknown sniffer type: %s", cfg.Type)
-	}
-}
-
-func validatePcapConfig(cfg *config.InterfacesConfig) error {
-	return nil
-}
-
-func validateAfPacketConfig(cfg *config.InterfacesConfig) error {
-	_, _, _, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
-	return err
-}
-
-func validatePcapFilter(expr string) error {
-	if expr == "" {
-		return nil
-	}
-	_, err := pcap.NewBPF(layers.LinkTypeEthernet, 65535, expr)
-	return err
 }
 
 func openPcap(device, filter string, cfg *config.InterfacesConfig) (snifferHandle, error) {

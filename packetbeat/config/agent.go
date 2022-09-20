@@ -114,13 +114,10 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 // agent semantics
 func NewAgentConfig(cfg *conf.C) (Config, error) {
 	logp.Debug("agent", "Normalizing agent configuration")
-	var input agentInput
-	config := Config{
-		Interfaces: InterfacesConfig{
-			// TODO: make this configurable rather than just using the default device
-			Device: defaultDevice(),
-		},
-	}
+	var (
+		input  agentInput
+		config Config
+	)
 	if err := cfg.Unpack(&input); err != nil {
 		return config, err
 	}
@@ -132,9 +129,11 @@ func NewAgentConfig(cfg *conf.C) (Config, error) {
 			if err != nil {
 				return config, err
 			}
-			if err := cfg.Unpack(&config.Interfaces); err != nil {
+			var iface InterfacesConfig
+			if err := cfg.Unpack(&iface); err != nil {
 				return config, err
 			}
+			config.Interfaces = append(config.Interfaces, iface)
 		}
 
 		if procsOverride, ok := stream["procs"]; ok {
@@ -171,6 +170,12 @@ func NewAgentConfig(cfg *conf.C) (Config, error) {
 			default:
 				config.ProtocolsList = append(config.ProtocolsList, cfg)
 			}
+		}
+	}
+	if len(config.Interfaces) == 0 {
+		config.Interfaces = []InterfacesConfig{
+			// TODO: Make this configurable rather than just using the default device.
+			{Device: defaultDevice()},
 		}
 	}
 	return config, nil
