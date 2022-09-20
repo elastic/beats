@@ -1,3 +1,15 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: aws
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/aws/_meta/docs.asciidoc
+
+
+[[metricbeat-module-aws]]
+[role="xpack"]
+== AWS module
+
 :libbeat-xpack-dir: ../../../x-pack/libbeat
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
@@ -320,3 +332,145 @@ to the IRSA:
     }
 
 In this case there's no need to add `role_arn` to modules config.
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The AWS module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: aws
+  period: 300s
+  credential_profile_name: test-mb
+  metricsets:
+    - ec2
+  tags_filter:
+    - key: "Organization"
+      value: "Engineering"
+- module: aws
+  period: 300s
+  credential_profile_name: test-mb
+  metricsets:
+    - sqs
+  regions:
+    - us-west-1
+- module: aws
+  period: 86400s
+  metricsets:
+    - s3_request
+    - s3_daily_storage
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+- module: aws
+  period: 300s
+  credential_profile_name: test-mb
+  metricsets:
+    - cloudwatch
+  metrics:
+    - namespace: AWS/EC2
+      name: ["CPUUtilization"]
+      dimensions:
+        - name: InstanceId
+          value: i-0686946e22cf9494a
+    - namespace: AWS/EBS
+    - namespace: AWS/ELB
+      resource_type: elasticloadbalancing
+      tags:
+        - key: "Organization"
+          value: "Engineering"
+- module: aws
+  period: 60s
+  credential_profile_name: test-mb
+  tags_filter:
+    - key: "dept"
+      value: "eng"
+  metricsets:
+    - elb
+    - natgateway
+    - rds
+    - transitgateway
+    - usage
+    - vpn
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-aws-billing,billing>>
+
+* <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
+
+* <<metricbeat-metricset-aws-dynamodb,dynamodb>>
+
+* <<metricbeat-metricset-aws-ebs,ebs>>
+
+* <<metricbeat-metricset-aws-ec2,ec2>>
+
+* <<metricbeat-metricset-aws-elb,elb>>
+
+* <<metricbeat-metricset-aws-kinesis,kinesis>>
+
+* <<metricbeat-metricset-aws-lambda,lambda>>
+
+* <<metricbeat-metricset-aws-natgateway,natgateway>>
+
+* <<metricbeat-metricset-aws-rds,rds>>
+
+* <<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>
+
+* <<metricbeat-metricset-aws-s3_request,s3_request>>
+
+* <<metricbeat-metricset-aws-sns,sns>>
+
+* <<metricbeat-metricset-aws-sqs,sqs>>
+
+* <<metricbeat-metricset-aws-transitgateway,transitgateway>>
+
+* <<metricbeat-metricset-aws-usage,usage>>
+
+* <<metricbeat-metricset-aws-vpn,vpn>>
+
+include::aws/billing.asciidoc[]
+
+include::aws/cloudwatch.asciidoc[]
+
+include::aws/dynamodb.asciidoc[]
+
+include::aws/ebs.asciidoc[]
+
+include::aws/ec2.asciidoc[]
+
+include::aws/elb.asciidoc[]
+
+include::aws/kinesis.asciidoc[]
+
+include::aws/lambda.asciidoc[]
+
+include::aws/natgateway.asciidoc[]
+
+include::aws/rds.asciidoc[]
+
+include::aws/s3_daily_storage.asciidoc[]
+
+include::aws/s3_request.asciidoc[]
+
+include::aws/sns.asciidoc[]
+
+include::aws/sqs.asciidoc[]
+
+include::aws/transitgateway.asciidoc[]
+
+include::aws/usage.asciidoc[]
+
+include::aws/vpn.asciidoc[]
+
+:edit_url!:

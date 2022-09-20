@@ -310,7 +310,7 @@ func constructTagsFilters(namespaceDetails []namespaceDetail) map[string][]aws.T
 func (m *MetricSet) checkStatistics() error {
 	for _, config := range m.CloudwatchConfigs {
 		for _, stat := range config.Statistic {
-			if _, ok := StatisticLookup(stat); !ok {
+			if _, ok := statisticLookup(stat); !ok {
 				return fmt.Errorf("statistic method specified is not valid: %s", stat)
 			}
 		}
@@ -423,7 +423,7 @@ func constructLabel(metric types.Metric, statistic string) string {
 	return label
 }
 
-func StatisticLookup(stat string) (string, bool) {
+func statisticLookup(stat string) (string, bool) {
 	statisticLookupTable := map[string]string{
 		"Average":     "avg",
 		"Sum":         "sum",
@@ -439,25 +439,25 @@ func StatisticLookup(stat string) (string, bool) {
 	return statMethod, ok
 }
 
-func GenerateFieldName(namespace string, labels []string) string {
+func generateFieldName(namespace string, labels []string) string {
 	stat := labels[statisticIdx]
 	// Check if statistic method is one of Sum, SampleCount, Minimum, Maximum, Average
 	// With checkStatistics function, no need to check bool return value here
-	statMethod, _ := StatisticLookup(stat)
+	statMethod, _ := statisticLookup(stat)
 	// By default, replace dot "." using underscore "_" for metric names
-	return "aws." + StripNamespace(namespace) + ".metrics." + common.DeDot(labels[metricNameIdx]) + "." + statMethod
+	return "aws." + stripNamespace(namespace) + ".metrics." + common.DeDot(labels[metricNameIdx]) + "." + statMethod
 }
 
 // stripNamespace converts Cloudwatch namespace into the root field we will use for metrics
 // example AWS/EC2 -> ec2
-func StripNamespace(namespace string) string {
+func stripNamespace(namespace string) string {
 	parts := strings.Split(namespace, "/")
 	return strings.ToLower(parts[len(parts)-1])
 }
 
-func InsertRootFields(event mb.Event, metricValue float64, labels []string) mb.Event {
+func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.Event {
 	namespace := labels[namespaceIdx]
-	_, _ = event.RootFields.Put(GenerateFieldName(namespace, labels), metricValue)
+	_, _ = event.RootFields.Put(generateFieldName(namespace, labels), metricValue)
 	_, _ = event.RootFields.Put("aws.cloudwatch.namespace", namespace)
 	if len(labels) == 3 {
 		return event
@@ -511,7 +511,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					if _, ok := events[identifier]; !ok {
 						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
 					}
-					events[identifier] = InsertRootFields(events[identifier], metricDataResult.Values[timestampIdx], labels)
+					events[identifier] = insertRootFields(events[identifier], metricDataResult.Values[timestampIdx], labels)
 					continue
 				}
 
@@ -519,7 +519,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				if _, ok := events[identifierValue]; !ok {
 					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
 				}
-				events[identifierValue] = InsertRootFields(events[identifierValue], metricDataResult.Values[timestampIdx], labels)
+				events[identifierValue] = insertRootFields(events[identifierValue], metricDataResult.Values[timestampIdx], labels)
 			}
 		}
 		return events, nil
@@ -568,7 +568,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					if _, ok := events[identifier]; !ok {
 						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
 					}
-					events[identifier] = InsertRootFields(events[identifier], output.Values[timestampIdx], labels)
+					events[identifier] = insertRootFields(events[identifier], output.Values[timestampIdx], labels)
 					continue
 				}
 
@@ -582,7 +582,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					}
 					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
 				}
-				events[identifierValue] = InsertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
+				events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 
 				// add tags to event based on identifierValue
 				insertTags(events, identifierValue, resourceTagMap)

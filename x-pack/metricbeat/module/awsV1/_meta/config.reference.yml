@@ -1,4 +1,0 @@
-- module: aws
-  period: 300s
-  metricsets:
-    - cloudwatchsynthetics

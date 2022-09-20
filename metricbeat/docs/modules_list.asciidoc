@@ -16,9 +16,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-aws,AWS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.18+| .18+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
+.17+| .17+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
-|<<metricbeat-metricset-aws-cloudwatchsynthetics,cloudwatchsynthetics>> beta[]  
 |<<metricbeat-metricset-aws-dynamodb,dynamodb>> beta[]  
 |<<metricbeat-metricset-aws-ebs,ebs>>   
 |<<metricbeat-metricset-aws-ec2,ec2>>   
@@ -34,8 +33,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-transitgateway,transitgateway>> beta[]  
 |<<metricbeat-metricset-aws-usage,usage>> beta[]  
 |<<metricbeat-metricset-aws-vpn,vpn>> beta[]  
-|<<metricbeat-module-awsV1,AWSV1>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.0+| .0+|  |<<metricbeat-module-awsfargate,AWS Fargate>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+|<<metricbeat-module-awsfargate,AWS Fargate>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-awsfargate-task_stats,task_stats>> beta[]  
 |<<metricbeat-module-azure,Azure>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .11+| .11+|  |<<metricbeat-metricset-azure-app_insights,app_insights>> beta[]  
@@ -329,7 +327,6 @@ include::modules/aerospike.asciidoc[]
 include::modules/airflow.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/aws.asciidoc[]
-include::modules/awsV1.asciidoc[]
 include::modules/awsfargate.asciidoc[]
 include::modules/azure.asciidoc[]
 include::modules/beat.asciidoc[]

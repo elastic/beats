@@ -1,7 +1,0 @@
-# Module: awsV1
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-awsV1.html
-
-- module: aws
-  period: 1m
-  metricsets:
-    - cloudwatchsynthetics

@@ -238,12 +238,6 @@ metricbeat.modules:
     - usage
     - vpn
 
-#-------------------------------- AWSV1 Module --------------------------------
-- module: aws
-  period: 300s
-  metricsets:
-    - cloudwatchsynthetics
-
 #----------------------------- AWS Fargate Module -----------------------------
 - module: awsfargate
   period: 10s
