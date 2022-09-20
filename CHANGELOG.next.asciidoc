@@ -15,7 +15,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
-- [Httpjson]- Fix for pagination at root level not working when used with chaining.
 
 *Heartbeat*
 
@@ -35,42 +34,21 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
-- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
-- Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
-- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
-- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
-- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
-- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
-- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
-- Import dashboards from CEF integration. {pull}32766[32766]
-- Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
 - Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
-- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
+
 
 *Heartbeat*
 
 
 *Metricbeat*
 
-- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 
 *Packetbeat*
 
@@ -107,8 +85,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Allow filtering on AWS tags by more than 1 value per key. {pull}32775[32775]
-- Azure Billing: switch to Cost Management API for forecast data {pull}32589[32589]
 
 *Packetbeat*
 
@@ -144,6 +120,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
