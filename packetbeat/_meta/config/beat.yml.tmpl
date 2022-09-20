@@ -12,7 +12,19 @@
 # Select the network interface to sniff the data. On Linux, you can use the
 # "any" keyword to sniff on all connected interfaces. On all platforms, you
 # can use "default_route", "default_route_ipv4" or "default_route_ipv6"
-# to sniff on the device carrying the default route.
+# to sniff on the device carrying the default route. If you wish to sniff
+# on multiple network interfaces you may specify an array of distinct interfaces
+# as a YAML array with each device's configuration specified individually.
+# Each device may only appear once in the array of interfaces.
+#
+# packetbeat.interfaces:
+# - device: en0
+#   internal_networks:
+#   - private
+# - device: en1
+#   internal_networks:
+#   - private
+#
 packetbeat.interfaces.device: {{ call .device .GOOS }}
 
 # Specify the amount of time between polling for changes in the default
