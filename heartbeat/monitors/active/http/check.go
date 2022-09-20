@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
@@ -120,7 +121,7 @@ func checkStatus(status []uint16) respValidator {
 
 func checkStatusOK(r *http.Response) error {
 	if r.StatusCode >= 400 {
-		return errors.New(r.Status)
+		return ecserr.NewBadHTTPStatusErr(r.StatusCode)
 	}
 	return nil
 }

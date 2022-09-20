@@ -20,7 +20,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
- - [Httpjson]- Fix for pagination at root level not working when used with chaining.
+- [Httpjson]- Fix for pagination at root level not working when used with chaining.
+- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
 
 *Heartbeat*
 
@@ -67,6 +68,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
 - Import dashboards from CEF integration. {pull}32766[32766]
 - Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
 
 *Auditbeat*
 
@@ -74,6 +76,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Filebeat*
 
 - Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
 
 *Heartbeat*
 
@@ -132,6 +136,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
+- Add new states field for internal use by new synthetics app. {pull}30632[30632]
 
 
 *Metricbeat*
@@ -141,6 +146,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
 
 *Functionbeat*
 

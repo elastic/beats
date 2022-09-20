@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package azureblobstorage
 
 import (
@@ -12,11 +9,10 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func fetchServiceClientAndCreds(cfg config, url string, log *logp.Logger) (*azblob.ServiceClient, *types.ServiceCredentials, error) {
+func fetchServiceClientAndCreds(cfg config, url string, log *logp.Logger) (*azblob.ServiceClient, *serviceCredentials, error) {
 	if cfg.Auth.SharedCredentials != nil {
 		return fetchServiceClientWithSharedKeyCreds(url, cfg.AccountName, cfg.Auth.SharedCredentials, log)
 	} else if cfg.Auth.ConnectionString != nil {
@@ -26,7 +22,7 @@ func fetchServiceClientAndCreds(cfg config, url string, log *logp.Logger) (*azbl
 	return nil, nil, fmt.Errorf("no valid auth specified")
 }
 
-func fetchServiceClientWithSharedKeyCreds(url string, accountName string, cfg *sharedKeyConfig, log *logp.Logger) (*azblob.ServiceClient, *types.ServiceCredentials, error) {
+func fetchServiceClientWithSharedKeyCreds(url string, accountName string, cfg *sharedKeyConfig, log *logp.Logger) (*azblob.ServiceClient, *serviceCredentials, error) {
 	// Creates a default request pipeline using your storage account name and account key.
 	credential, err := azblob.NewSharedKeyCredential(accountName, cfg.AccountKey)
 	if err != nil {
@@ -39,10 +35,10 @@ func fetchServiceClientWithSharedKeyCreds(url string, accountName string, cfg *s
 		log.Errorf("Invalid credentials with error: %v", err)
 		return nil, nil, err
 	}
-	return client, &types.ServiceCredentials{SharedKeyCreds: credential, Ctype: types.SharedKeyType}, nil
+	return client, &serviceCredentials{sharedKeyCreds: credential, cType: sharedKeyType}, nil
 }
 
-func fetchServiceClientWithConnectionString(connectionString *connectionStringConfig, log *logp.Logger) (*azblob.ServiceClient, *types.ServiceCredentials, error) {
+func fetchServiceClientWithConnectionString(connectionString *connectionStringConfig, log *logp.Logger) (*azblob.ServiceClient, *serviceCredentials, error) {
 	// Creates a default request pipeline using your connection string.
 	serviceClient, err := azblob.NewServiceClientFromConnectionString(connectionString.URI, nil)
 	if err != nil {
@@ -50,22 +46,22 @@ func fetchServiceClientWithConnectionString(connectionString *connectionStringCo
 		return nil, nil, err
 	}
 
-	return serviceClient, &types.ServiceCredentials{ConnectionStrCreds: connectionString.URI, Ctype: types.ConnectionStringType}, nil
+	return serviceClient, &serviceCredentials{connectionStrCreds: connectionString.URI, cType: connectionStringType}, nil
 }
 
-// fetchBlobClient , generic function that returns a BlobClient based on the credential type
-func fetchBlobClient(url string, credential *types.BlobCredentials, log *logp.Logger) (*azblob.BlobClient, error) {
+// fetchBlobClient, generic function that returns a BlobClient based on the credential type
+func fetchBlobClient(url string, credential *blobCredentials, log *logp.Logger) (*azblob.BlobClient, error) {
 	if credential == nil {
 		return nil, fmt.Errorf("no valid blob credentials found")
 	}
 
-	switch credential.ServiceCreds.Ctype {
-	case types.SharedKeyType:
-		return fetchBlobClientWithSharedKey(url, credential.ServiceCreds.SharedKeyCreds, log)
-	case types.ConnectionStringType:
-		return fetchBlobClientWithConnectionString(credential.ServiceCreds.ConnectionStrCreds, credential.ContainerName, credential.BlobName, log)
+	switch credential.serviceCreds.cType {
+	case sharedKeyType:
+		return fetchBlobClientWithSharedKey(url, credential.serviceCreds.sharedKeyCreds, log)
+	case connectionStringType:
+		return fetchBlobClientWithConnectionString(credential.serviceCreds.connectionStrCreds, credential.containerName, credential.blobName, log)
 	default:
-		return nil, fmt.Errorf("no valid service credential 'type' found")
+		return nil, fmt.Errorf("no valid service credential 'type' found: %s", credential.serviceCreds.cType)
 	}
 }
 

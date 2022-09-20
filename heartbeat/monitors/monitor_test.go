@@ -24,7 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -32,6 +31,8 @@ import (
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
+
+	"github.com/elastic/beats/v7/heartbeat/scheduler"
 )
 
 // TestMonitorBasic tests a basic config
@@ -68,7 +69,7 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	mon, err := newMonitor(conf, reg, pipel.ConnectSync(), sched.Add, nil)
+	mon, err := newMonitor(conf, reg, pipel.ConnectSync(), sched.Add, nil, nil)
 	require.NoError(t, err)
 
 	mon.Start()
@@ -115,7 +116,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	m, err := newMonitor(serverMonConf, reg, pipel.ConnectSync(), sched.Add, nil)
+	m, err := newMonitor(serverMonConf, reg, pipel.ConnectSync(), sched.Add, nil, nil)
 	require.Error(t, err)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
