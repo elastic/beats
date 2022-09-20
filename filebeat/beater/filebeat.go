@@ -179,7 +179,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 			if enableAllFilesets {
 				//All module configs need to be loaded to enable all the filesets
 				//contained in the modules.  The default glob just loads the enabled
-				//ones.  Swithching the glob pattern from *.yml to * achieves this.
+				//ones.  Switching the glob pattern from *.yml to * achieves this.
 				origPath, _ := fb.config.ConfigModules.String("path", -1)
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
