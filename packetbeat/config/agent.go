@@ -129,7 +129,7 @@ func NewAgentConfig(cfg *conf.C) (Config, error) {
 			if err != nil {
 				return config, err
 			}
-			var iface InterfacesConfig
+			var iface InterfaceConfig
 			if err := cfg.Unpack(&iface); err != nil {
 				return config, err
 			}
@@ -173,7 +173,7 @@ func NewAgentConfig(cfg *conf.C) (Config, error) {
 		}
 	}
 	if len(config.Interfaces) == 0 {
-		config.Interfaces = []InterfacesConfig{
+		config.Interfaces = []InterfaceConfig{
 			// TODO: Make this configurable rather than just using the default device.
 			{Device: defaultDevice()},
 		}
