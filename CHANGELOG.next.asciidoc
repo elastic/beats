@@ -41,6 +41,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Filebeat*
 
 - Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+
 
 *Heartbeat*
 
