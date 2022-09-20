@@ -3963,7 +3963,7 @@
         "destination.as.organization.name": "Telstra Pty Ltd",
         "destination.ip": "1.128.3.4",
         "destination.user.name": "USER001",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -3976,7 +3976,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -4029,7 +4029,7 @@
         "destination.ip": "1.128.3.4",
         "destination.user.domain": "domain.tld",
         "destination.user.name": "user",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -4042,7 +4042,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -4099,7 +4099,7 @@
         "destination.ip": "1.128.3.4",
         "destination.user.domain": "AD",
         "destination.user.name": "USER002",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -4112,7 +4112,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "input.type": "log",

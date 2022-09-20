@@ -68,6 +68,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
 - Import dashboards from CEF integration. {pull}32766[32766]
 - Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
 
 *Auditbeat*
 
@@ -76,6 +77,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
 - Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
 
 *Heartbeat*
 
@@ -87,6 +89,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 - Fix multiple host support for mongodb module. {pull}33100[33100]
+- Add GCP CloudSQL region filter {pull}32943[32943]
 
 *Packetbeat*
 
@@ -146,6 +149,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Packetbeat*
 
 - Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
+- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
 
 *Functionbeat*
 

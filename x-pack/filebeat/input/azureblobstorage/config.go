@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
 package azureblobstorage
 
 import (
@@ -12,7 +9,7 @@ import (
 )
 
 // MaxWorkers, Poll & PollInterval can be configured at a global level,
-// which applies to all containers , as well as at the container level.
+// which applies to all containers, as well as at the container level.
 // Container level configurations will always override global level values.
 type config struct {
 	AccountName  string         `config:"account_name" validate:"required"`

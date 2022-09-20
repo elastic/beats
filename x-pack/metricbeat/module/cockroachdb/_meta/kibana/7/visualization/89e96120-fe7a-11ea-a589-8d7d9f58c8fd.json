@@ -37,7 +37,7 @@
                         "metrics": [
                             {
                                 "agg_with": "avg",
-                                "field": null,
+                                "field": "prometheus.metrics.raft_process_logcommit_latency_count",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "order": "desc",
                                 "size": 1,
@@ -50,7 +50,7 @@
                                 "unit": ""
                             },
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.raft_process_logcommit_latency_sum",
                                 "id": "4a430120-976f-11e9-b3d5-07b0ab7d6354",
                                 "type": "max",
                                 "unit": ""
