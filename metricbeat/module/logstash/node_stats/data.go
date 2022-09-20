@@ -77,6 +77,7 @@ type cgroup struct {
 	CPU     struct {
 		Stat         map[string]interface{} `json:"stat"`
 		ControlGroup string                 `json:"control_group"`
+		CFSQuotaMicros int64                `json:"cfs_quota_micros"`
 	} `json:"cpu"`
 }
 
