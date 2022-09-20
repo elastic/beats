@@ -69,7 +69,7 @@ func NewLogHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false)
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false, false)
 	if err != nil {
 		return nil, err
 	}

@@ -34,6 +34,8 @@ const (
 	PipelineKey = "pipelines"
 	//IndexManagementKey used for loading all components related to ES index management in setup cmd
 	IndexManagementKey = "index-management"
+	//EnableAllFilesetsKey enables all modules and filesets regardless of config
+	EnableAllFilesetsKey = "enable-all-filesets"
 )
 
 func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command {
@@ -55,9 +57,10 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 			}
 
 			var registeredFlags = map[string]bool{
-				DashboardKey:       false,
-				PipelineKey:        false,
-				IndexManagementKey: false,
+				DashboardKey:         false,
+				PipelineKey:          false,
+				IndexManagementKey:   false,
+				EnableAllFilesetsKey: false,
 			}
 			var setupAll = true
 
@@ -88,6 +91,8 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 						s.Pipeline = true
 					case IndexManagementKey:
 						s.IndexManagement = true
+					case EnableAllFilesetsKey:
+						s.EnableAllFilesets = true
 					}
 				}
 			}
@@ -102,6 +107,7 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 	setup.Flags().Bool(PipelineKey, false, "Setup Ingest pipelines")
 	setup.Flags().Bool(IndexManagementKey, false,
 		"Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
+	setup.Flags().Bool("enable-all-filesets", false, "Behave as if all modules and filesets had been enabled")
 
 	return &setup
 }
