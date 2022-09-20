@@ -1739,6 +1739,104 @@ type: keyword
 --
 
 [float]
+=== cloudwatchsynthetics
+
+cloudwatchsynthetics
+
+
+
+
+*`aws.cloudwatchsynthetics.metrics.SuccessPercent.avg`*::
++
+--
+The percentage of the runs of this canary that succeed and find no failures.
+
+
+type: double
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.Duration.avg`*::
++
+--
+The duration in milliseconds of the canary run.
+
+
+type: double
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.VisualMonitoringSuccessPercent.avg`*::
++
+--
+The percentage of visual comparisons that successfully matched the baseline screenshots during a canary run.
+
+
+type: double
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.2xx.sum`*::
++
+--
+The number of network requests performed by the canary that returned OK responses, with response codes between 200 and 299.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.4xx.sum`*::
++
+--
+The number of network requests performed by the canary that returned Error responses, with response codes between 400 and 499.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.5xx.sum`*::
++
+--
+The number of network requests performed by the canary that returned Fault responses, with response codes between 500 and 599.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.Failed.sum`*::
++
+--
+The number of canary runs that failed to execute. These failures are related to the canary itself.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.Failed requests.sum`*::
++
+--
+The number of HTTP requests executed by the canary on the target website that failed with no response.
+
+
+type: long
+
+--
+
+*`aws.cloudwatchsynthetics.metrics.VisualMonitoringTotalComparisons`*::
++
+--
+The total number of visual comparisons that happened during a canary run.
+
+
+type: long
+
+--
+
+[float]
 === dynamodb
 
 `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.

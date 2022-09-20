@@ -13,6 +13,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatchsynthetics"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate/task_stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"

@@ -1,0 +1,46 @@
+The `cloudwatchsynthetics` metricset of aws module allows you to monitor your AWS CloudWatchSynthetics Canaries. `cloudwatchsynthetics` metricset fetches a set of values from
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Synthetics_Canaries_metrics.html[Amazon CloudWatchSynthetics Metrics].
+CloudWatch metrics for Amazon CloudWatchSynthetics topics are automatically collected and pushed to CloudWatch every five minutes.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS CloudWatchSynthetics metrics.
+----
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+ec2:DescribeRegions
+synthetics:DescribeCanaries
+synthetics:ListTagsForResource
+sts:GetCallerIdentity
+iam:ListAccountAliases
+----
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - cloudwatchsynthetics
+  # This module uses the aws CloudWatchSynthetics metricset, all
+  # the options for this metricset are also available here.
+----
+
+[float]
+=== Metrics
+Please see more details for each metric in
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Synthetics_Canaries_metrics.html[Amazon CloudWatchSynthetics Metrics].
+
+|===
+|Metric Name|Statistic Method
+|SuccessPercent | Average
+|Duration | Average
+|VisualMonitoringSuccessPercent | Average
+|2xx | Sum
+|4xx | Sum
+|5xx | Sum
+|Failed | Sum
+|Failed requests | Sum
+|VisualMonitoringTotalComparisons |
+|===

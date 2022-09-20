@@ -158,6 +158,17 @@ func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resour
 		return map[string][]resourcegroupstaggingapitypes.Tag{}, nil
 	}
 
+	// the cloudwatchsynthetics namespace for cloudwatch metrics uses the synthetics namespace to fetch tags
+	index := -1
+	for i, resourceTypeFilter := range resourceTypeFilters {
+		if resourceTypeFilter == "cloudwatchsynthetics" {
+			index = i
+		}
+	}
+	if index > -1 {
+		resourceTypeFilters[index] = "synthetics"
+	}
+
 	resourceTagMap := make(map[string][]resourcegroupstaggingapitypes.Tag)
 	getResourcesInput := &resourcegroupstaggingapi.GetResourcesInput{
 		PaginationToken:     nil,

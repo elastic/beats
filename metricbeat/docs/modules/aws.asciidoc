@@ -409,6 +409,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
 
+* <<metricbeat-metricset-aws-cloudwatchsynthetics,cloudwatchsynthetics>>
+
 * <<metricbeat-metricset-aws-dynamodb,dynamodb>>
 
 * <<metricbeat-metricset-aws-ebs,ebs>>
@@ -442,6 +444,8 @@ The following metricsets are available:
 include::aws/billing.asciidoc[]
 
 include::aws/cloudwatch.asciidoc[]
+
+include::aws/cloudwatchsynthetics.asciidoc[]
 
 include::aws/dynamodb.asciidoc[]
 
