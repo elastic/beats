@@ -51,22 +51,24 @@ func TestFetch(t *testing.T) {
 		assert.True(t, collections > 0)
 
 		objects := metricsetFields["objects"].(int32)
-		assert.True(t, objects > 0)
+		assert.True(t, objects >= 0)
 
 		avgObjSize, err := metricsetFields.GetValue("avg_obj_size.bytes")
 		assert.NoError(t, err)
-		assert.True(t, avgObjSize.(float64) > 0)
+		assert.True(t, avgObjSize.(float64) >= 0)
 
 		dataSize, err := metricsetFields.GetValue("data_size.bytes")
 		assert.NoError(t, err)
-		assert.True(t, dataSize.(float64) > 0)
+		assert.True(t, dataSize.(float64) >= 0)
 
 		storageSize, err := metricsetFields.GetValue("storage_size.bytes")
 		assert.NoError(t, err)
-		assert.True(t, storageSize.(float64) > 0)
+		assert.True(t, storageSize.(float64) >= 0)
 
-		numExtents := metricsetFields["num_extents"].(int32)
-		assert.True(t, numExtents >= 0)
+		if metricsetFields["num_extents"] != nil {
+			numExtents := metricsetFields["num_extents"].(int32)
+			assert.True(t, numExtents >= 0)
+		}
 
 		indexes := metricsetFields["indexes"].(int32)
 		assert.True(t, indexes >= 0)
