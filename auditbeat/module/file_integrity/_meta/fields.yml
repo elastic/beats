@@ -178,6 +178,13 @@
         ignore_above: 1024
         description: Mach-O Section List name.
         default_field: false
+      - name: sections.physical_size
+        level: extended
+        type: long
+        format: string
+        ignore_above: 1024
+        description: Mach-O Section List physical size.
+        default_field: false
       - name: sections.virtual_size
         level: extended
         type: long
@@ -292,6 +299,13 @@
         type: keyword
         ignore_above: 1024
         description: PE Section List name.
+        default_field: false
+      - name: sections.physical_size
+        level: extended
+        type: long
+        format: string
+        ignore_above: 1024
+        description: PE Section List physical size.
         default_field: false
       - name: sections.virtual_size
         level: extended

@@ -124,6 +124,7 @@ auditbeat.modules:
   # file_parsers:
   # - file.elf.sections
   # - file.elf.sections.name
+  # - file.elf.sections.physical_size
   # - file.elf.sections.virtual_size
   # - file.elf.sections.entropy
   # - file.elf.sections.var_entropy
@@ -138,6 +139,7 @@ auditbeat.modules:
   # - file.elf.go_stripped
   # - file.macho.sections
   # - file.macho.sections.name
+  # - file.macho.sections.physical_size
   # - file.macho.sections.virtual_size
   # - file.macho.sections.entropy
   # - file.macho.sections.var_entropy
@@ -153,6 +155,7 @@ auditbeat.modules:
   # - file.macho.go_stripped
   # - file.pe.sections
   # - file.pe.sections.name
+  # - file.pe.sections.physical_size
   # - file.pe.sections.virtual_size
   # - file.pe.sections.entropy
   # - file.pe.sections.var_entropy

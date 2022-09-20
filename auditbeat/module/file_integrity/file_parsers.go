@@ -92,6 +92,7 @@ func unquoteRegexp(s string) (pat string, ok bool) {
 var fileParserFor = map[string]string{
 	"file.elf.sections":                     "executable_object",
 	"file.elf.sections.name":                "executable_object",
+	"file.elf.sections.physical_size":       "executable_object",
 	"file.elf.sections.virtual_size":        "executable_object",
 	"file.elf.sections.entropy":             "executable_object",
 	"file.elf.sections.var_entropy":         "executable_object",
@@ -107,6 +108,7 @@ var fileParserFor = map[string]string{
 
 	"file.macho.sections":                     "executable_object",
 	"file.macho.sections.name":                "executable_object",
+	"file.macho.sections.physical_size":       "executable_object",
 	"file.macho.sections.virtual_size":        "executable_object",
 	"file.macho.sections.entropy":             "executable_object",
 	"file.macho.sections.var_entropy":         "executable_object",
@@ -123,6 +125,7 @@ var fileParserFor = map[string]string{
 
 	"file.pe.sections":                     "executable_object",
 	"file.pe.sections.name":                "executable_object",
+	"file.pe.sections.physical_size":       "executable_object",
 	"file.pe.sections.virtual_size":        "executable_object",
 	"file.pe.sections.entropy":             "executable_object",
 	"file.pe.sections.var_entropy":         "executable_object",

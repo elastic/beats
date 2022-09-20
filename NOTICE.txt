@@ -12988,11 +12988,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/toutoumomoma
-Version: v0.0.0-20220824212313-806aa932168a
+Version: v0.0.0-20220921114644-2d19714c7ab1
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/toutoumomoma@v0.0.0-20220824212313-806aa932168a/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/toutoumomoma@v0.0.0-20220921114644-2d19714c7ab1/LICENSE:
 
 Copyright ©2022 Elastic N.V. All rights reserved.
 Copyright ©2021 Dan Kortschak. All rights reserved.
@@ -21831,11 +21831,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/tools
-Version: v0.1.11-0.20220509190205-b87ceec0dd4d
+Version: v0.1.12
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.11-0.20220509190205-b87ceec0dd4d/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.12/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -45108,11 +45108,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/exp
-Version: v0.0.0-20220602145555-4a0574d9293f
+Version: v0.0.0-20220921023135-46d9e7742f1e
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/exp@v0.0.0-20220602145555-4a0574d9293f/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/exp@v0.0.0-20220921023135-46d9e7742f1e/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 

@@ -58,7 +58,7 @@ func (rcv *Section) Name() []byte {
 	return nil
 }
 
-func (rcv *Section) VirtualSize() uint64 {
+func (rcv *Section) PhysicalSize() uint64 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		return rcv._tab.GetUint64(o + rcv._tab.Pos)
@@ -66,12 +66,24 @@ func (rcv *Section) VirtualSize() uint64 {
 	return 0
 }
 
-func (rcv *Section) MutateVirtualSize(n uint64) bool {
+func (rcv *Section) MutatePhysicalSize(n uint64) bool {
 	return rcv._tab.MutateUint64Slot(6, n)
 }
 
-func (rcv *Section) Entropy() float64 {
+func (rcv *Section) VirtualSize() uint64 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	if o != 0 {
+		return rcv._tab.GetUint64(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *Section) MutateVirtualSize(n uint64) bool {
+	return rcv._tab.MutateUint64Slot(8, n)
+}
+
+func (rcv *Section) Entropy() float64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		return rcv._tab.GetFloat64(o + rcv._tab.Pos)
 	}
@@ -79,20 +91,38 @@ func (rcv *Section) Entropy() float64 {
 }
 
 func (rcv *Section) MutateEntropy(n float64) bool {
-	return rcv._tab.MutateFloat64Slot(8, n)
+	return rcv._tab.MutateFloat64Slot(10, n)
+}
+
+func (rcv *Section) VarEntropy() float64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
+	if o != 0 {
+		return rcv._tab.GetFloat64(o + rcv._tab.Pos)
+	}
+	return 0.0
+}
+
+func (rcv *Section) MutateVarEntropy(n float64) bool {
+	return rcv._tab.MutateFloat64Slot(12, n)
 }
 
 func SectionStart(builder *flatbuffers.Builder) {
-	builder.StartObject(3)
+	builder.StartObject(5)
 }
 func SectionAddName(builder *flatbuffers.Builder, name flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(name), 0)
 }
+func SectionAddPhysicalSize(builder *flatbuffers.Builder, physicalSize uint64) {
+	builder.PrependUint64Slot(1, physicalSize, 0)
+}
 func SectionAddVirtualSize(builder *flatbuffers.Builder, virtualSize uint64) {
-	builder.PrependUint64Slot(1, virtualSize, 0)
+	builder.PrependUint64Slot(2, virtualSize, 0)
 }
 func SectionAddEntropy(builder *flatbuffers.Builder, entropy float64) {
-	builder.PrependFloat64Slot(2, entropy, 0.0)
+	builder.PrependFloat64Slot(3, entropy, 0.0)
+}
+func SectionAddVarEntropy(builder *flatbuffers.Builder, varEntropy float64) {
+	builder.PrependFloat64Slot(4, varEntropy, 0.0)
 }
 func SectionEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

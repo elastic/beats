@@ -45,6 +45,7 @@ func TestFileParsers(t *testing.T) {
 		"file.elf.sections":                    true,
 		"file.pe.sections":                     true,
 		"file.pe.sections.name":                true,
+		"file.pe.sections.physical_size":       true,
 		"file.pe.sections.virtual_size":        true,
 		"file.pe.sections.entropy":             true,
 		"file.pe.sections.var_entropy":         true,

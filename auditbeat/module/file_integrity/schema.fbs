@@ -63,8 +63,10 @@ table Hash {
 
 table Section {
   name:string;
+  physical_size:ulong;
   virtual_size:ulong;
   entropy:float64;
+  var_entropy:float64;
 }
 
 table ExecutableObject {

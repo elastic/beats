@@ -37,6 +37,7 @@ import (
 //  {elf,macho,pe}:
 //    sections:
 //      - name
+//        physical_size
 //        virtual_size
 //        entropy
 //        var_entropy
@@ -103,6 +104,7 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 	if all := wantFields(fields, "file."+typ+".sections"); all || wantFields(fields,
 		"file."+typ+".sections.name",
 		"file."+typ+".sections.virtual_size",
+		"file."+typ+".sections.physical_size",
 		"file."+typ+".sections.entropy",
 		"file."+typ+".sections.var_entropy",
 	) {
@@ -113,14 +115,16 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 		var (
 			name       *string
 			size       *uint64
+			fileSize   *uint64
 			entropy    *float64
 			varEntropy *float64
 
-			wantName, wantSize, wantEntropy, wantVariance bool
+			wantName, wantSize, wantFileSize, wantEntropy, wantVariance bool
 		)
 		if !all {
 			wantName = wantFields(fields, "file."+typ+".sections.name")
 			wantSize = wantFields(fields, "file."+typ+".sections.virtual_size")
+			wantFileSize = wantFields(fields, "file."+typ+".sections.physical_size")
 			wantEntropy = wantFields(fields, "file."+typ+".sections.entropy")
 			wantVariance = wantFields(fields, "file."+typ+".sections.var_entropy")
 		}
@@ -142,6 +146,9 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 					if wantSize {
 						size = &s.Size
 					}
+					if wantFileSize {
+						fileSize = &s.FileSize
+					}
 					if wantEntropy {
 						entropy = &s.Entropy
 					}
@@ -152,6 +159,7 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 				stats[i] = objSection{
 					Name:       name,
 					Size:       size,
+					FileSize:   fileSize,
 					Entropy:    entropy,
 					VarEntropy: varEntropy,
 				}
@@ -252,6 +260,7 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 type objSection struct {
 	Name       *string  `json:"name,omitempty"`
 	Size       *uint64  `json:"virtual_size,omitempty"`
+	FileSize   *uint64  `json:"physical_size,omitempty"`
 	Entropy    *float64 `json:"entropy,omitempty"`
 	VarEntropy *float64 `json:"var_entropy,omitempty"`
 }

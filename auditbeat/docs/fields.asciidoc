@@ -18229,6 +18229,17 @@ type: keyword
 
 --
 
+*`file.macho.sections.physical_size`*::
++
+--
+Mach-O Section List physical size.
+
+type: long
+
+format: string
+
+--
+
 *`file.macho.sections.virtual_size`*::
 +
 --
@@ -18387,6 +18398,17 @@ format: number
 PE Section List name.
 
 type: keyword
+
+--
+
+*`file.pe.sections.physical_size`*::
++
+--
+PE Section List physical size.
+
+type: long
+
+format: string
 
 --
 
