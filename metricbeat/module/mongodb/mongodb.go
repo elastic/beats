@@ -153,10 +153,6 @@ func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (
 		if config.Credentials.AuthMechanismProperties != nil {
 			clientOptions.Auth.AuthMechanismProperties = config.Credentials.AuthMechanismProperties
 		}
-		/*if len(config.Hosts) > 1 {
-			clientOptions.SetHosts(config.Hosts)
-			println("--lenth of the array--", len(config.Hosts))
-		}*/
 		clientOptions.SetHosts(config.Hosts)
 	}
 
