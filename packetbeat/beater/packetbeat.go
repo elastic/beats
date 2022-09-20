@@ -62,15 +62,17 @@ var cmdLineArgs = flags{
 }
 
 func initialConfig() config.Config {
-	return config.Config{
-		Interfaces: config.InterfacesConfig{
+	c := config.Config{
+		Interfaces: []config.InterfacesConfig{{
 			File:       *cmdLineArgs.file,
 			Loop:       *cmdLineArgs.loop,
 			TopSpeed:   *cmdLineArgs.topSpeed,
 			OneAtATime: *cmdLineArgs.oneAtAtime,
 			Dumpfile:   *cmdLineArgs.dumpfile,
-		},
+		}},
 	}
+	c.Interface = &c.Interfaces[0]
+	return c
 }
 
 // Beater object. Contains all objects needed to run the beat
