@@ -59,6 +59,8 @@ func newModuleRegistry(modulesPath string,
 	}
 
 	for _, mcfg := range moduleConfigs {
+		// an empty ModuleConfig can reach this so we only force enable a
+		// config if the Module name is set and Enabled pointer is valid.
 		if enableAllFilesets && mcfg.Module != "" && mcfg.Enabled != nil {
 			*mcfg.Enabled = true
 		}
@@ -85,6 +87,8 @@ func newModuleRegistry(modulesPath string,
 				return nil, fmt.Errorf("error applying overrides on fileset %s/%s: %w", mcfg.Module, filesetName, err)
 			}
 
+			// ModuleConfig can have empty Filesets so we only force
+			// enable if the Enabled pointer is valid
 			if enableAllFilesets && fcfg.Enabled != nil {
 				*fcfg.Enabled = true
 			}
