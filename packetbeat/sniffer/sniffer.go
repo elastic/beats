@@ -47,7 +47,7 @@ type Sniffer struct {
 }
 
 type sniffer struct {
-	config config.InterfacesConfig
+	config config.InterfaceConfig
 
 	state atomic.Int32  // store snifferState
 	done  chan struct{} // done is required to wire state into a select.
@@ -82,7 +82,7 @@ const (
 // New create a new Sniffer instance. Settings are validated in a best effort
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method.
-func New(testMode bool, _ string, decoders Decoders, interfaces []config.InterfacesConfig) (*Sniffer, error) {
+func New(testMode bool, _ string, decoders Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
 	s := &Sniffer{sniffers: make([]sniffer, len(interfaces))}
 
 	for i, iface := range interfaces {
@@ -147,7 +147,7 @@ func New(testMode bool, _ string, decoders Decoders, interfaces []config.Interfa
 	return s, nil
 }
 
-func validateConfig(filter string, cfg *config.InterfacesConfig) error {
+func validateConfig(filter string, cfg *config.InterfaceConfig) error {
 	if cfg.File == "" {
 		if err := validatePcapFilter(filter); err != nil {
 			return err
@@ -172,11 +172,11 @@ func validatePcapFilter(expr string) error {
 	return err
 }
 
-func validatePcapConfig(cfg *config.InterfacesConfig) error {
+func validatePcapConfig(cfg *config.InterfaceConfig) error {
 	return nil
 }
 
-func validateAfPacketConfig(cfg *config.InterfacesConfig) error {
+func validateAfPacketConfig(cfg *config.InterfaceConfig) error {
 	_, _, _, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
 	return err
 }
@@ -467,7 +467,7 @@ func (s *Sniffer) Stop() {
 	}
 }
 
-func openPcap(device, filter string, cfg *config.InterfacesConfig) (snifferHandle, error) {
+func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
 	snaplen := int32(cfg.Snaplen)
 	timeout := 500 * time.Millisecond
 	h, err := pcap.OpenLive(device, snaplen, true, timeout)
@@ -484,7 +484,7 @@ func openPcap(device, filter string, cfg *config.InterfacesConfig) (snifferHandl
 	return h, nil
 }
 
-func openAFPacket(device, filter string, cfg *config.InterfacesConfig) (snifferHandle, error) {
+func openAFPacket(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
 	szFrame, szBlock, numBlocks, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
 	if err != nil {
 		return nil, err
