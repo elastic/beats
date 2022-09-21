@@ -235,3 +235,7 @@ beats-dashboards: mage update
 build/distributions/dependencies.csv: $(PYTHON)
 	@mkdir -p build/distributions
 	$(PYTHON) dev-tools/dependencies-report --csv $@
+
+## test-mage : Test the mage installation used by the Unified Release process
+test-mage: mage
+	@mage dumpVariables
