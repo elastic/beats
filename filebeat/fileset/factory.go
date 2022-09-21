@@ -129,7 +129,7 @@ func (f *Factory) CheckConfig(c *conf.C) error {
 // createRegistry starts a registry for a set of filesets, it returns the registry and
 // its input configurations
 func (f *Factory) createRegistry(c *conf.C) (*ModuleRegistry, []*conf.C, error) {
-	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false)
+	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -168,7 +168,7 @@ func (p *inputsRunner) Start() {
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)
 		if err != nil {
-			p.log.Errorf("Error registering connect callback for Elasticsearch to load pipelines: %v", err)
+			p.log.Errorf("Error registering connect callback for Elasticsearch to load pipelines: %w", err)
 		}
 	}
 
