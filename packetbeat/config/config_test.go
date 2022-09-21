@@ -54,7 +54,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{{
+			Interfaces: []InterfaceConfig{{
 				Device:           "default_route",
 				PollDefaultRoute: time.Minute,
 				InternalNetworks: []string{"private"},
@@ -94,7 +94,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{{
+			Interfaces: []InterfaceConfig{{
 				Device:           "default_route",
 				File:             "input.pcap",
 				TopSpeed:         true,
@@ -130,7 +130,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{{
+			Interfaces: []InterfaceConfig{{
 				File:       "input.pcap",
 				TopSpeed:   true,
 				OneAtATime: true,
@@ -169,7 +169,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{{
+			Interfaces: []InterfaceConfig{{
 				Device:           "default_route",
 				PollDefaultRoute: time.Minute,
 				InternalNetworks: []string{"private"},
@@ -208,7 +208,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{{
+			Interfaces: []InterfaceConfig{{
 				Device:           "default_route",
 				File:             "input.pcap",
 				TopSpeed:         true,
@@ -254,7 +254,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{
+			Interfaces: []InterfaceConfig{
 				{
 					Device:           "en0",
 					BpfFilter:        "foo",
@@ -304,7 +304,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{
+			Interfaces: []InterfaceConfig{
 				{
 					Device:           "en0",
 					File:             "input.pcap",
@@ -355,7 +355,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{{
+			Interfaces: []InterfaceConfig{{
 				Device:           "default_route",
 				File:             "input.pcap",
 				TopSpeed:         true,
@@ -398,7 +398,7 @@ protocols:
   ports: [5672]
 `,
 		want: Config{
-			Interfaces: []InterfacesConfig{{
+			Interfaces: []InterfaceConfig{{
 				Device:           "default_route",
 				File:             "input.pcap",
 				TopSpeed:         true,
@@ -489,7 +489,7 @@ func sameErr(a, b error) bool {
 // keep this in sync with packetbeat/beater.initialConfig()
 func cliOptions(file string, loop int, topSpeed, step bool, dump string) Config {
 	c := Config{
-		Interfaces: []InterfacesConfig{{
+		Interfaces: []InterfaceConfig{{
 			File:       file,
 			Loop:       loop,
 			TopSpeed:   topSpeed,

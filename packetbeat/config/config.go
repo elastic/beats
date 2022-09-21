@@ -31,8 +31,8 @@ import (
 )
 
 type Config struct {
-	Interface       *InterfacesConfig  `config:"interfaces"`
-	Interfaces      []InterfacesConfig `config:"interfaces"`
+	Interface       *InterfaceConfig   `config:"interfaces"`
+	Interfaces      []InterfaceConfig  `config:"interfaces"`
 	Flows           *Flows             `config:"flows"`
 	Protocols       map[string]*conf.C `config:"protocols"`
 	ProtocolsList   []*conf.C          `config:"protocols"`
@@ -50,7 +50,7 @@ func (c Config) FromStatic(cfg *conf.C) (Config, error) {
 	iface, err := cfg.Child("interfaces", -1)
 	if err == nil {
 		if !iface.IsArray() {
-			c.Interfaces = []InterfacesConfig{*c.Interface}
+			c.Interfaces = []InterfaceConfig{*c.Interface}
 		}
 	}
 	c.Interface = nil
@@ -113,7 +113,7 @@ func (c Config) ICMP() (*conf.C, error) {
 	return icmp, nil
 }
 
-type InterfacesConfig struct {
+type InterfaceConfig struct {
 	Device                string        `config:"device"`
 	PollDefaultRoute      time.Duration `config:"poll_default_route"`
 	Type                  string        `config:"type"`
