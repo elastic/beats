@@ -168,7 +168,7 @@ func (p *inputsRunner) Start() {
 		}
 		p.pipelineCallbackID, err = elasticsearch.RegisterConnectCallback(callback)
 		if err != nil {
-			p.log.Errorf("Error registering connect callback for Elasticsearch to load pipelines: %v", err)
+			p.log.Errorf("Error registering connect callback for Elasticsearch to load pipelines: %w", err)
 		}
 	}
 

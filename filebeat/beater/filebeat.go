@@ -18,12 +18,11 @@
 package beater
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
@@ -47,8 +46,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
-
-	_ "github.com/elastic/beats/v7/filebeat/include"
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
@@ -91,7 +88,7 @@ func New(plugins PluginFactory) beat.Creator {
 func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("Error reading config file: %w", err)
 	}
 
 	if err := cfgwarn.CheckRemoved6xSettings(
@@ -300,7 +297,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	var inputTaskGroup unison.TaskGroup
-	defer inputTaskGroup.Stop()
+	defer func() {
+		_ = inputTaskGroup.Stop()
+	}()
 	if err := v2InputLoader.Init(&inputTaskGroup, v2.ModeRun); err != nil {
 		logp.Err("Failed to initialize the input managers: %v", err)
 		return err
@@ -325,7 +324,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the registrar
 	err = registrar.Start()
 	if err != nil {
-		return fmt.Errorf("Could not start registrar: %v", err)
+		return fmt.Errorf("Could not start registrar: %w", err)
 	}
 
 	// Stopping registrar will write last state
@@ -349,7 +348,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	err = crawler.Start(fb.pipeline, config.ConfigInput, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()
-		return fmt.Errorf("Failed to start crawler: %+v", err)
+		return fmt.Errorf("Failed to start crawler: %w", err)
 	}
 
 	// If run once, add crawler completion check as alternative to done signal
@@ -442,7 +441,7 @@ func newPipelineLoaderFactory(esConfig *conf.C) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
 		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
-			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
+			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err)
 		}
 		return esClient, nil
 	}

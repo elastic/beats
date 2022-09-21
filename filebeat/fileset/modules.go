@@ -135,7 +135,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, e
 	if err != nil || !stat.IsDir() {
 		log := logp.NewLogger(logName)
 		log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
-		return &ModuleRegistry{log: log}, nil // empty registry, no error
+		return &ModuleRegistry{log: log}, nil //nolint: nilerr // empty registry, no error
 	}
 
 	var modulesCLIList []string
