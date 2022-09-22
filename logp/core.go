@@ -50,6 +50,7 @@ func init() {
 		selectors:    map[string]struct{}{},
 		rootLogger:   zap.NewNop(),
 		globalLogger: zap.NewNop(),
+		level:        zap.NewAtomicLevel(),
 		logger:       newLogger(zap.NewNop(), ""),
 	})
 }
@@ -59,6 +60,7 @@ type coreLogger struct {
 	rootLogger   *zap.Logger            // Root logger without any options configured.
 	globalLogger *zap.Logger            // Logger used by legacy global functions (e.g. logp.Info).
 	logger       *Logger                // Logger that is the basis for all logp.Loggers.
+	level        zap.AtomicLevel        // The minimum level being printed
 	observedLogs *observer.ObservedLogs // Contains events generated while in observation mode (a testing mode).
 }
 
@@ -75,13 +77,15 @@ func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {
 		sink         zapcore.Core
 		observedLogs *observer.ObservedLogs
 		err          error
+		level        zap.AtomicLevel
 	)
 
+	level = zap.NewAtomicLevelAt(cfg.Level.ZapLevel())
 	// Build a single output (stderr has priority if more than one are enabled).
 	if cfg.toObserver {
-		sink, observedLogs = observer.New(cfg.Level.ZapLevel())
+		sink, observedLogs = observer.New(level)
 	} else {
-		sink, err = createLogOutput(cfg)
+		sink, err = createLogOutput(cfg, level)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to build log output: %w", err)
@@ -121,32 +125,33 @@ func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {
 		rootLogger:   root,
 		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
 		logger:       newLogger(root, ""),
+		level:        level,
 		observedLogs: observedLogs,
 	})
 	return nil
 }
 
-func createLogOutput(cfg Config) (zapcore.Core, error) {
+func createLogOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, error) {
 	switch {
 	case cfg.toIODiscard:
-		return makeDiscardOutput(cfg)
+		return makeDiscardOutput(cfg, enab)
 	case cfg.ToStderr:
-		return makeStderrOutput(cfg)
+		return makeStderrOutput(cfg, enab)
 	case cfg.ToSyslog:
-		return makeSyslogOutput(cfg)
+		return makeSyslogOutput(cfg, enab)
 	case cfg.ToEventLog:
-		return makeEventLogOutput(cfg)
+		return makeEventLogOutput(cfg, enab)
 	case cfg.ToFiles:
-		return makeFileOutput(cfg)
+		return makeFileOutput(cfg, enab)
 	}
 
 	switch cfg.environment {
 	case SystemdEnvironment, ContainerEnvironment:
-		return makeStderrOutput(cfg)
+		return makeStderrOutput(cfg, enab)
 	case MacOSServiceEnvironment, WindowsServiceEnvironment:
 		fallthrough
 	default:
-		return makeFileOutput(cfg)
+		return makeFileOutput(cfg, enab)
 	}
 }
 
@@ -205,26 +210,26 @@ func makeOptions(cfg Config) []zap.Option {
 	return options
 }
 
-func makeStderrOutput(cfg Config) (zapcore.Core, error) {
+func makeStderrOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, error) {
 	stderr := zapcore.Lock(os.Stderr)
-	return newCore(buildEncoder(cfg), stderr, cfg.Level.ZapLevel()), nil
+	return newCore(buildEncoder(cfg), stderr, enab), nil
 }
 
-func makeDiscardOutput(cfg Config) (zapcore.Core, error) {
+func makeDiscardOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, error) {
 	discard := zapcore.AddSync(ioutil.Discard)
-	return newCore(buildEncoder(cfg), discard, cfg.Level.ZapLevel()), nil
+	return newCore(buildEncoder(cfg), discard, enab), nil
 }
 
-func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
-	core, err := newSyslog(buildEncoder(cfg), cfg.Level.ZapLevel())
+func makeSyslogOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, error) {
+	core, err := newSyslog(buildEncoder(cfg), enab)
 	if err != nil {
 		return nil, err
 	}
 	return wrappedCore(core), nil
 }
 
-func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
-	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.ZapLevel())
+func makeEventLogOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, error) {
+	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), enab)
 	// nolint: staticcheck,nolintlint // the implementation is OS-specific and some implementations always return errors
 	if err != nil {
 		return nil, err
@@ -232,7 +237,7 @@ func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
 	return wrappedCore(core), nil
 }
 
-func makeFileOutput(cfg Config) (zapcore.Core, error) {
+func makeFileOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, error) {
 	filename := paths.Resolve(paths.Logs, filepath.Join(cfg.Files.Path, cfg.LogFilename()))
 
 	rotator, err := file.NewFileRotator(filename,
@@ -247,7 +252,7 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		return nil, fmt.Errorf("failed to create file rotator: %w", err)
 	}
 
-	return newCore(buildEncoder(cfg), rotator, cfg.Level.ZapLevel()), nil
+	return newCore(buildEncoder(cfg), rotator, enab), nil
 }
 
 func newCore(enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core {
@@ -271,6 +276,14 @@ func storeLogger(l *coreLogger) {
 		_ = old.rootLogger.Sync()
 	}
 	atomic.StorePointer(&_log, unsafe.Pointer(l))
+}
+
+func SetLevel(lvl zapcore.Level) {
+	loadLogger().level.SetLevel(lvl)
+}
+
+func GetLevel() zapcore.Level {
+	return loadLogger().level.Level()
 }
 
 // newMultiCore creates a sink that sends to multiple cores.

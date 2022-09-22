@@ -57,7 +57,7 @@ func TestLogger(t *testing.T) {
 
 func TestLoggerLevel(t *testing.T) {
 	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
-		t.Fatal(err)
+		t.Fatalf("cannot initialise logger on development mode: %+v", err)
 	}
 
 	const loggerName = "tester"
@@ -94,6 +94,36 @@ func TestLoggerLevel(t *testing.T) {
 		assert.Equal(t, loggerName, logs[0].LoggerName)
 		assert.Equal(t, "error", logs[0].Message)
 	}
+}
+
+func TestLoggerSetLevel(t *testing.T) {
+	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
+		t.Fatal(err)
+	}
+
+	const loggerName = "tester"
+	logger := NewLogger(loggerName)
+
+	logger.Debug("debug")
+	logs := ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		assert.Equal(t, zap.DebugLevel, logs[0].Level)
+		assert.Equal(t, loggerName, logs[0].LoggerName)
+		assert.Equal(t, "debug", logs[0].Message)
+	}
+
+	SetLevel(zap.InfoLevel)
+	logger.Info("info")
+	logs = ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		assert.Equal(t, zap.InfoLevel, logs[0].Level)
+		assert.Equal(t, loggerName, logs[0].LoggerName)
+		assert.Equal(t, "info", logs[0].Message)
+	}
+
+	logger.Debug("debug")
+	logs = ObserverLogs().TakeAll()
+	assert.Empty(t, logs, 1)
 }
 
 func TestL(t *testing.T) {
