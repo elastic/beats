@@ -44,7 +44,8 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
-		NextToken: nextToken,
+		NextToken:      nextToken,
+		RecentlyActive: "PT3H",
 	}
 
 	if namespace != "*" {
