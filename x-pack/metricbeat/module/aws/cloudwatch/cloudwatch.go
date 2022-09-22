@@ -489,37 +489,29 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 		return events, fmt.Errorf("getMetricDataResults failed: %w", err)
 	}
 
-	// Find a timestamp for all metrics in output
-	timestamp := aws.FindTimestamp(metricDataResults)
-	if timestamp.IsZero() {
-		return nil, nil
-	}
-
 	// Create events when there is no tags_filter or resource_type specified.
 	if len(resourceTypeTagFilters) == 0 {
 		for _, metricDataResult := range metricDataResults {
 			if len(metricDataResult.Values) == 0 {
 				continue
 			}
-
-			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, metricDataResult.Timestamps)
-			if exists {
+			for valI, metricDataResultValue := range metricDataResult.Values {
 				labels := strings.Split(*metricDataResult.Label, labelSeparator)
 				if len(labels) != 5 {
 					// when there is no identifier value in label, use region+accountID+namespace instead
 					identifier := regionName + m.AccountID + labels[namespaceIdx]
 					if _, ok := events[identifier]; !ok {
-						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, metricDataResult.Timestamps[valI])
 					}
-					events[identifier] = insertRootFields(events[identifier], metricDataResult.Values[timestampIdx], labels)
+					events[identifier] = insertRootFields(events[identifier], metricDataResultValue, labels)
 					continue
 				}
 
 				identifierValue := labels[identifierValueIdx]
 				if _, ok := events[identifierValue]; !ok {
-					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+					events[identifierValue+fmt.Sprint(valI)] = aws.InitEvent(regionName, m.AccountName, m.AccountID, metricDataResult.Timestamps[valI])
 				}
-				events[identifierValue] = insertRootFields(events[identifierValue], metricDataResult.Values[timestampIdx], labels)
+				events[identifierValue+fmt.Sprint(valI)] = insertRootFields(events[identifierValue], metricDataResultValue, labels)
 			}
 		}
 		return events, nil
@@ -554,8 +546,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				continue
 			}
 
-			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-			if exists {
+			for valI, metricDataResultValue := range output.Values {
 				labels := strings.Split(*output.Label, labelSeparator)
 				if len(labels) != 5 {
 					// if there is no tag in labels but there is a tagsFilter, then no event should be reported.
@@ -566,23 +557,23 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					// when there is no identifier value in label, use region+accountID+namespace instead
 					identifier := regionName + m.AccountID + labels[namespaceIdx]
 					if _, ok := events[identifier]; !ok {
-						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+						events[identifier+fmt.Sprint(valI)] = aws.InitEvent(regionName, m.AccountName, m.AccountID, output.Timestamps[valI])
 					}
-					events[identifier] = insertRootFields(events[identifier], output.Values[timestampIdx], labels)
+					events[identifier+fmt.Sprint(valI)] = insertRootFields(events[identifier], metricDataResultValue, labels)
 					continue
 				}
 
 				identifierValue := labels[identifierValueIdx]
-				if _, ok := events[identifierValue]; !ok {
+				if _, ok := events[identifierValue+fmt.Sprint(valI)]; !ok {
 					// when tagsFilter is not empty but no entry in
 					// resourceTagMap for this identifier, do not initialize
 					// an event for this identifier.
 					if len(tagsFilter) != 0 && resourceTagMap[identifierValue] == nil {
 						continue
 					}
-					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+					events[identifierValue+fmt.Sprint(valI)] = aws.InitEvent(regionName, m.AccountName, m.AccountID, output.Timestamps[valI])
 				}
-				events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
+				events[identifierValue+fmt.Sprint(valI)] = insertRootFields(events[identifierValue], metricDataResultValue, labels)
 
 				// add tags to event based on identifierValue
 				insertTags(events, identifierValue, resourceTagMap)
