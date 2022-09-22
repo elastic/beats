@@ -108,7 +108,7 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 
 	if accessor.GetNamespace() != "" {
 		// TODO make this namespace.name in 8.0
-		safemapstr.Put(meta, "namespace", accessor.GetNamespace())
+		_ = safemapstr.Put(meta, "namespace", accessor.GetNamespace())
 	}
 
 	// Add controller metadata if present
@@ -122,18 +122,18 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 					"StatefulSet",
 					"DaemonSet",
 					"Job":
-					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
+					_ = safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
 				}
 			}
 		}
 	}
 
 	if len(labelMap) != 0 {
-		safemapstr.Put(meta, "labels", labelMap)
+		_ = safemapstr.Put(meta, "labels", labelMap)
 	}
 
 	if len(annotationsMap) != 0 {
-		safemapstr.Put(meta, "annotations", annotationsMap)
+		_ = safemapstr.Put(meta, "annotations", annotationsMap)
 	}
 
 	for _, option := range options {
@@ -156,7 +156,7 @@ func generateMapSubset(input map[string]string, keys []string, dedot bool) commo
 				dedotKey := common.DeDot(key)
 				_, _ = output.Put(dedotKey, value)
 			} else {
-				safemapstr.Put(output, key, value)
+				_ = safemapstr.Put(output, key, value)
 			}
 		}
 	}
@@ -175,7 +175,7 @@ func GenerateMap(input map[string]string, dedot bool) common.MapStr {
 			label := common.DeDot(k)
 			_, _ = output.Put(label, v)
 		} else {
-			safemapstr.Put(output, k, v)
+			_ = safemapstr.Put(output, k, v)
 		}
 	}
 

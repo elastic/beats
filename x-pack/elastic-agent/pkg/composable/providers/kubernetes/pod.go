@@ -394,7 +394,7 @@ func podNamespaceAnnotations(pod *kubernetes.Pod, watcher kubernetes.Watcher) co
 
 	annotations := common.MapStr{}
 	for k, v := range namespace.GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		_ = safemapstr.Put(annotations, k, v)
 	}
 	return annotations
 }
