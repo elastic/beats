@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-terraform init
-
 set -exuo pipefail
 
 DIRECTORY=${1:-.}
