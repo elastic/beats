@@ -29,11 +29,12 @@ import (
 )
 
 type pod struct {
-	store     cache.Store
-	client    k8s.Interface
-	node      MetaGen
-	namespace MetaGen
-	resource  *Resource
+	store               cache.Store
+	client              k8s.Interface
+	node                MetaGen
+	namespace           MetaGen
+	resource            *Resource
+	addResourceMetadata *AddResourceMetadataConfig
 }
 
 // NewPodMetadataGenerator creates a metagen for pod resources
@@ -42,13 +43,19 @@ func NewPodMetadataGenerator(
 	pods cache.Store,
 	client k8s.Interface,
 	node MetaGen,
-	namespace MetaGen) MetaGen {
+	namespace MetaGen,
+	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
+
+	if addResourceMetadata == nil {
+		addResourceMetadata = GetDefaultResourceMetadataConfig()
+	}
 	return &pod{
-		resource:  NewResourceMetadataGenerator(cfg, client),
-		store:     pods,
-		node:      node,
-		namespace: namespace,
-		client:    client,
+		resource:            NewResourceMetadataGenerator(cfg, client),
+		store:               pods,
+		node:                node,
+		namespace:           namespace,
+		client:              client,
+		addResourceMetadata: addResourceMetadata,
 	}
 }
 
