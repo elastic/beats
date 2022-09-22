@@ -19,6 +19,9 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -28,7 +31,8 @@ import (
 )
 
 type Config struct {
-	Interfaces      InterfacesConfig   `config:"interfaces"`
+	Interface       *InterfaceConfig   `config:"interfaces"`
+	Interfaces      []InterfaceConfig  `config:"interfaces"`
 	Flows           *Flows             `config:"flows"`
 	Protocols       map[string]*conf.C `config:"protocols"`
 	ProtocolsList   []*conf.C          `config:"protocols"`
@@ -43,8 +47,39 @@ func (c Config) FromStatic(cfg *conf.C) (Config, error) {
 	if err != nil {
 		return c, err
 	}
-	if 0 < c.Interfaces.PollDefaultRoute && c.Interfaces.PollDefaultRoute < time.Second {
-		c.Interfaces.PollDefaultRoute = time.Second
+	iface, err := cfg.Child("interfaces", -1)
+	if err == nil {
+		if !iface.IsArray() {
+			c.Interfaces = []InterfaceConfig{*c.Interface}
+		}
+	}
+	c.Interface = nil
+	counts := make(map[string]int)
+	for i, iface := range c.Interfaces {
+		name := iface.Device
+		if name == "" {
+			if runtime.GOOS == "linux" {
+				name = "any"
+			} else {
+				name = "default_route"
+			}
+		}
+		counts[name]++
+		if 0 < c.Interfaces[i].PollDefaultRoute && c.Interfaces[i].PollDefaultRoute < time.Second {
+			c.Interfaces[i].PollDefaultRoute = time.Second
+		}
+	}
+	for n, c := range counts {
+		if c == 1 {
+			delete(counts, n)
+		}
+	}
+	if len(counts) != 0 {
+		dups := make([]string, 0, len(counts))
+		for n := range counts {
+			dups = append(dups, n)
+		}
+		return c, fmt.Errorf("duplicated device configurations: %s", strings.Join(dups, ", "))
 	}
 	return c, nil
 }
@@ -78,7 +113,7 @@ func (c Config) ICMP() (*conf.C, error) {
 	return icmp, nil
 }
 
-type InterfacesConfig struct {
+type InterfaceConfig struct {
 	Device                string        `config:"device"`
 	PollDefaultRoute      time.Duration `config:"poll_default_route"`
 	Type                  string        `config:"type"`

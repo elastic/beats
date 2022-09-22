@@ -121,8 +121,8 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		p.beat.Info.Name,
 		p.beat.Publisher,
 		config.IgnoreOutgoing,
-		config.Interfaces.File == "",
-		config.Interfaces.InternalNetworks,
+		config.Interfaces[0].File == "",
+		config.Interfaces[0].InternalNetworks,
 	)
 	if err != nil {
 		return nil, err
@@ -130,7 +130,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 
 	watcher := procs.ProcessesWatcher{}
 	// Enable the process watcher only if capturing live traffic
-	if config.Interfaces.File == "" {
+	if config.Interfaces[0].File == "" {
 		err = watcher.Init(config.Procs)
 		if err != nil {
 			logp.Critical(err.Error())
@@ -195,12 +195,14 @@ func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, decoders
 		return nil, err
 	}
 
-	filter := cfg.Interfaces.BpfFilter
-	if filter == "" && !cfg.Flows.IsEnabled() {
-		filter = protocols.BpfFilter(cfg.Interfaces.WithVlans, icmp.Enabled())
+	for i, iface := range cfg.Interfaces {
+		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
+			continue
+		}
+		cfg.Interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(false, filter, decoders, cfg.Interfaces)
+	return sniffer.New(false, "", decoders, cfg.Interfaces)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
