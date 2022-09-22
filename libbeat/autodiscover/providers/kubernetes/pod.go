@@ -458,7 +458,7 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, in
 func podAnnotations(pod *kubernetes.Pod) common.MapStr {
 	annotations := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		_ = safemapstr.Put(annotations, k, v)
 	}
 	return annotations
 }
@@ -481,7 +481,7 @@ func podNamespaceAnnotations(pod *kubernetes.Pod, watcher kubernetes.Watcher) co
 
 	annotations := common.MapStr{}
 	for k, v := range namespace.GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		_ = safemapstr.Put(annotations, k, v)
 	}
 	return annotations
 }
