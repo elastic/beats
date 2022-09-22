@@ -110,7 +110,7 @@ func GetPodMetaGen(
 func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
 	// try with kube config file
 	var config Config
-	config.Unmarshal(cfg)
+	_ = config.Unmarshal(cfg)
 	clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
 	if err == nil {
 		return clusterInfo, nil
@@ -130,7 +130,7 @@ func getClusterInfoFromKubeadmConfigMap(client k8sclient.Interface) (ClusterInfo
 	}
 	cm, err := client.CoreV1().ConfigMaps("kube-system").Get(context.TODO(), "kubeadm-config", metav1.GetOptions{})
 	if err != nil {
-		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config: %+v", err)
+		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config: %w", err)
 	}
 	p, ok := cm.Data["ClusterConfiguration"]
 	if !ok {
@@ -163,7 +163,7 @@ func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
 
 	cfg, err := kubernetes.BuildConfig(kubeconfig)
 	if err != nil {
-		return ClusterInfo{}, fmt.Errorf("unable to build kube config due to error: %+v", err)
+		return ClusterInfo{}, fmt.Errorf("unable to build kube config due to error: %w", err)
 	}
 
 	kube_cfg, err := clientcmd.LoadFromFile(kubeconfig)

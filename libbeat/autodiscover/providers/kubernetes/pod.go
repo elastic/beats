@@ -86,7 +86,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
 
 	options := kubernetes.WatchOptions{
@@ -392,7 +392,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 	var events []bus.Event
 	portsMap := common.MapStr{}
 
-	meta.Put("container", cmeta)
+	_, _ = meta.Put("container", cmeta)
 
 	for _, port := range ports {
 		event := bus.Event{

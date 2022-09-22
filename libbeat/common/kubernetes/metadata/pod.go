@@ -95,19 +95,19 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	if rsName, ok := rsName.(string); ok {
 		dep := p.getRSDeployment(rsName, po.GetNamespace())
 		if dep != "" {
-			out.Put("deployment.name", dep)
+			_, _ = out.Put("deployment.name", dep)
 		}
 	}
 
 	if p.node != nil {
 		meta := p.node.GenerateFromName(po.Spec.NodeName, WithMetadata("node"))
 		if meta != nil {
-			out.Put("node", meta["node"])
+			_, _ = out.Put("node", meta["node"])
 		} else {
-			out.Put("node.name", po.Spec.NodeName)
+			_, _ = out.Put("node.name", po.Spec.NodeName)
 		}
 	} else {
-		out.Put("node.name", po.Spec.NodeName)
+		_, _ = out.Put("node.name", po.Spec.NodeName)
 	}
 
 	if p.namespace != nil {

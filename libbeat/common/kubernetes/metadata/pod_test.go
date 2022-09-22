@@ -550,7 +550,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 		})
 		assert.Nil(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
-		pods.Add(test.input)
+		_ = pods.Add(test.input)
 		metagen := NewPodMetadataGenerator(config, pods, client, nil, nil, nil)
 
 		accessor, err := meta.Accessor(test.input)

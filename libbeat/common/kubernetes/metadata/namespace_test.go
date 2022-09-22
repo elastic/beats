@@ -165,7 +165,7 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 		}
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
-		namespaces.Add(test.input)
+		_ = namespaces.Add(test.input)
 		metagen := NewNamespaceMetadataGenerator(cfg, namespaces, client)
 
 		accessor, err := meta.Accessor(test.input)
