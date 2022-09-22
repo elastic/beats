@@ -9,22 +9,22 @@
 <titleabbrev>Azure Blob Storage</titleabbrev>
 ++++
 
-Beta[Experimental]
+Beta[Input]
 
 Use the `azure blob storage input` to read content from files stored in containers which reside on your Azure Cloud.
-The input can be configured to work with and without polling , though currently, if polling is disabled it will only 
+The input can be configured to work with and without polling, though currently, if polling is disabled it will only 
 perform a one time passthrough, list the file contents and end the process. Polling is generally recommented for most cases
 even though it can get expensive with dealing with a very large number of files.
 
 *To mitigate errors and ensure a stable processing environment, this input employs the following features :* 
 
-1.  When processing azure blob containers , if suddenly there is any outage , the process will be able to resume post the last file it processed 
+1.  When processing azure blob containers, if suddenly there is any outage, the process will be able to resume post the last file it processed 
     and was successfully able to save the state for. 
 
-2.  If any errors occur for certain files , they will be logged appropriately , but the rest of the 
+2.  If any errors occur for certain files, they will be logged appropriately, but the rest of the 
     files will continue to be processed normally. 
 
-3.  If any major error occurs which stops the main thread , the logs will be appropriately generated,
+3.  If any major error occurs which stops the main thread, the logs will be appropriately generated,
     describing said error.
 
 [id="supported-types"]
@@ -54,24 +54,24 @@ filebeat.inputs:
 
 *Explanation :*
 This `configuration` given above describes a basic blob storage config having two containers named `container_1` and `container_2`. 
-Each of these containers have their own attributes such as `name` , `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations 
+Each of these containers have their own attributes such as `name`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations 
 given <<supported-attributes,below>>. For now lets try to understand how this config works. 
 
-For azure blob storage input to identify the files it needs to read and process , it will require the container names to be specified. We can have as
-many containers as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level , which will
+For azure blob storage input to identify the files it needs to read and process, it will require the container names to be specified. We can have as
+many containers as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will
 then be applied to all containers which do not specify any of these attributes explicitly. 
 
 NOTE: If the attributes `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the container level with 
-different values , thus offering extensive flexibility and customization. Examples <<container-overrides,below>> show this behaviour.
+different values, thus offering extensive flexibility and customization. Examples <<container-overrides,below>> show this behaviour.
 
 On receiving this config the azure blob storage input will connect to the service and retrieve a `ServiceClient` using the given `account_name` and 
-`auth.shared_credentials.account_key` , then it will spawn two main go-routines , one for each container . After this each of these routines (threads) will initialize a scheduler 
+`auth.shared_credentials.account_key`, then it will spawn two main go-routines, one for each container. After this each of these routines (threads) will initialize a scheduler 
 which will in turn use the `max_workers` value to initialize an in-memory worker pool (thread pool) with `3` `workers` available. Basically that equates to two instances of a worker pool,
 one per container, each having 3 workers. These `workers` will be responsible if performing `jobs` that process a file (in this case read and output the contents of a file).
 
-NOTE: The scheduler is responsible for scheduling jobs , and uses the `maximum available workers` in the pool, at each iteration , to decide the number of files to retrieve and 
+NOTE: The scheduler is responsible for scheduling jobs, and uses the `maximum available workers` in the pool, at each iteration, to decide the number of files to retrieve and 
 process. This keeps work distribution efficient. The scheduler uses `poll_interval` attribute value to decide how long to wait after each iteration. Each iteration consists of 
-processing a certain number of files , decided by the `maximum available workers` value.
+processing a certain number of files, decided by the `maximum available workers` value.
 
 *A Sample Response :-*
 ["source","json"]
@@ -97,29 +97,12 @@ processing a certain number of files , decided by the `maximum available workers
         }
     },
     "azure": {
-        "blob": {
+        "storage": {
             "container": {
                 "name": "beatscontainer"
             },
-            "object": {
+            "blob": {
                 "content_type": "application/json",
-                "data": [
-                    {
-                        "description": "Samsung's new variant which goes beyond Galaxy to the Universe",
-                        "price": 1249,
-                        "thumbnail": "https://dummyjson.com/image/i/products/3/thumbnail.jpg",
-                        "discountPercentage": 15.46,
-                        "brand": "Samsung",
-                        "title": "Samsung Universe 9",
-                        "id": 3,
-                        "images": [
-                            "https://dummyjson.com/image/i/products/3/1.jpg"
-                        ],
-                        "stock": 36,
-                        "category": "smartphones",
-                        "rating": 4.09
-                    }
-                ],
                 "name": "data_3.json"
             }
         }
@@ -130,16 +113,15 @@ processing a certain number of files , decided by the `maximum available workers
 }
 ----
 
-As we can see from the response above, the `message` field contains the original stringified data while the `azure.blob.object.data` contains the objectified data. 
+As we can see from the response above, the `message` field contains the original stringified data. 
     
 *Some of the key attributes are as follows :-* 
 
     1. *message* : Original stringified blob data.
     2. *log.file.path* : Path of the blob in azure cloud.
-    3. *azure.blob.container.name* : Name of the container from which the file has been read.
-    4. *azure.blob.object.name* : Name of the file/blob which has been read.
-    5. *azure.blob.object.content_type* : Content type of the file/blob. You can find the supported content types <<supported-types,here>> .
-    6. *azure.blob.object.data* :  Objectified blob data , representing the contents of the file.
+    3. *azure.storage.blob.container.name* : Name of the container from which the file has been read.
+    4. *azure.storage.blob.object.name* : Name of the file/blob which has been read.
+    5. *azure.storage.blob.object.content_type* : Content type of the file/blob. You can find the supported content types <<supported-types,here>>.
 
 Now let's explore the configuration attributes a bit more elaborately.
 
@@ -168,15 +150,15 @@ for various processing purposes.
 [float]
 ==== `auth.shared_credentials.account_key`
 
-This attribute contains the *access key* , found under the `Access keys` section on Azure Clound , under the respective storage account. A single storage account
-can contain multiple containers , and they will all use this common access key. 
+This attribute contains the *access key*, found under the `Access keys` section on Azure Clound, under the respective storage account. A single storage account
+can contain multiple containers, and they will all use this common access key. 
 
 [id="attrib-auth-connection-string"]
 [float]
 ==== `auth.connection_string.uri`
 
-This attribute contains the *connection string* , found under the `Access keys` section on Azure Clound , under the respective storage account. A single storage account
-can contain multiple containers , and they will all use this common connection string. 
+This attribute contains the *connection string*, found under the `Access keys` section on Azure Clound, under the respective storage account. A single storage account
+can contain multiple containers, and they will all use this common connection string. 
 
 NOTE: We require only either of `auth.shared_credentials.account_key` or `auth.connection_string.uri` to be specified for authentication purposes. If both attributes are
 specified, then the one that occurs first in the configuration will be used.
@@ -194,9 +176,9 @@ different environment where blob storage is available.
 [float]
 ==== `containers`
 
-This attribute contains the details about a specific container like `name` , `max_workers`, `poll` and `poll_interval` . The attribute `name` is specific to a 
+This attribute contains the details about a specific container like `name`, `max_workers`, `poll` and `poll_interval`. The attribute `name` is specific to a 
 container as it describes the container name, while the fields `max_workers`, `poll` and `poll_interval` can exist both at the container level and the root level.
-This attribute is internally represented as an array , so we can add as many containers as we require.
+This attribute is internally represented as an array, so we can add as many containers as we require.
 
 [id="attrib-container-name"]
 [float]
@@ -217,7 +199,7 @@ The container level values will always take priority and override the root level
 [float]
 ==== `poll`
 
-This attribute informs the scheduler whether to keep polling for new files or not. Default value of this is `false` , so it will not keep polling if not explicitly 
+This attribute informs the scheduler whether to keep polling for new files or not. Default value of this is `false`, so it will not keep polling if not explicitly 
 specified. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always 
 take priority and override the root level values if both are specified.
 
@@ -226,8 +208,8 @@ take priority and override the root level values if both are specified.
 ==== `poll_interval`
 
 This attribute defines the maximum amount of time after which the internal scheduler will make the polling call for the next set of blobs/files. It can be 
-defined in the following formats : `{{x}}s` , `{{x}}m` , `{{x}}h` , here `s = seconds`, `m = minutes` and `h = hours`. The value `{{x}}` can be anything we wish.
-Example : `10s` would mean we would like the polling to occur every 10 seconds. If no value is specified for this , by default its initialized to `120 seconds`. 
+defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here `s = seconds`, `m = minutes` and `h = hours`. The value `{{x}}` can be anything we wish.
+Example : `10s` would mean we would like the polling to occur every 10 seconds. If no value is specified for this, by default its initialized to `300 seconds`. 
 This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always 
 take priority and override the root level values if both are specified.
 
@@ -260,7 +242,7 @@ filebeat.inputs:
 
 *Explanation :*
 In this configuration `container_1` has no sub attributes in `max_workers`, `poll` and `poll_interval` defined. It inherits the values for these fileds from the root 
-level , which is `max_workers = 10`, `poll = true` and `poll_interval = 15 seconds`. However `container_2` has these fields defined and it will use those values instead 
+level, which is `max_workers = 10`, `poll = true` and `poll_interval = 15 seconds`. However `container_2` has these fields defined and it will use those values instead 
 of using the root values.
 
 *CASE - 2 :*
@@ -290,8 +272,8 @@ filebeat.inputs:
 ----
 
 *Explanation :*
-In this configuration even though we have specified `max_workers = 10`, `poll = true` and `poll_interval = 15s` at the root level , both the containers
+In this configuration even though we have specified `max_workers = 10`, `poll = true` and `poll_interval = 15s` at the root level, both the containers
 will override these values with their own respective values which are defined as part of their sub attibutes.
 
 
-NOTE: Since this is an experimental (beta) input , any feedback is welcome , which will help us optimise and make it better going forward. 
+NOTE: Since this is a beta input, any feedback is welcome, which will help us optimise and make it better going forward. 

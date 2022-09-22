@@ -3,9 +3,6 @@
   release: beta
   type: group
   fields:
-    - name: batch.spark.executors.count
-      type: long
-      description: Indicates the number of Batch Spark executors.
     - name: cluster.hdfs.datanodes.count
       type: long
       description: Indicates the number of HDFS DataNodes that are running inside a cluster.

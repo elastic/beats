@@ -198,3 +198,16 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.5 branch
+    conditions:
+      - merged
+      - label=backport-v8.5.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.5"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
