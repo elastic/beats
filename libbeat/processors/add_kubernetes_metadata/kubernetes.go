@@ -123,7 +123,7 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
+		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %w", err)
 	}
 
 	//Load and append default indexer configs
@@ -277,7 +277,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	metaClone := metadata.Clone()
-	metaClone.Delete("kubernetes.container.name")
+	_ = metaClone.Delete("kubernetes.container.name")
 	containerImage, err := metadata.GetValue("kubernetes.container.image")
 	if err == nil {
 		metaClone.Delete("kubernetes.container.image")

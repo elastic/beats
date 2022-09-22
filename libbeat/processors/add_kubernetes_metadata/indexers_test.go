@@ -230,7 +230,7 @@ func TestContainerIndexer(t *testing.T) {
 	assert.Equal(t, indices[1], "fghij")
 	assert.Equal(t, indices[2], "klmno")
 
-	expected.Put("kubernetes.container",
+	_, _ = expected.Put("kubernetes.container",
 		common.MapStr{
 			"name":    container,
 			"image":   containerImage,
@@ -239,7 +239,7 @@ func TestContainerIndexer(t *testing.T) {
 		})
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
-	expected.Put("kubernetes.container",
+	_, _ = expected.Put("kubernetes.container",
 		common.MapStr{
 			"name":    initContainer,
 			"image":   initContainerImage,
@@ -248,7 +248,7 @@ func TestContainerIndexer(t *testing.T) {
 		})
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
 
-	expected.Put("kubernetes.container",
+	_, _ = expected.Put("kubernetes.container",
 		common.MapStr{
 			"name":    ephemeralContainer,
 			"image":   ephemeralContainerImage,
