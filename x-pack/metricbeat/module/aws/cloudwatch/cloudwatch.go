@@ -378,20 +378,20 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 	return listMetricDetailTotal, namespaceDetailTotal
 }
 
-func createMetricDataQueries(listMetricsTotal []metricsWithStatistics, period time.Duration) []types.MetricDataQuery {
+func createMetricDataQueries(listMetricsTotal []metricsWithStatistics, dataGranularity time.Duration) []types.MetricDataQuery {
 	var metricDataQueries []types.MetricDataQuery
 	for i, listMetric := range listMetricsTotal {
 		for j, statistic := range listMetric.statistic {
 			stat := statistic
 			metric := listMetric.cloudwatchMetric
 			label := constructLabel(listMetric.cloudwatchMetric, statistic)
-			periodInSec := int32(period.Seconds())
+			dataGranularityInSec := int32(dataGranularity.Seconds())
 
 			id := "cw" + strconv.Itoa(i) + "stats" + strconv.Itoa(j)
 			metricDataQueries = append(metricDataQueries, types.MetricDataQuery{
 				Id: &id,
 				MetricStat: &types.MetricStat{
-					Period: &periodInSec,
+					Period: &dataGranularityInSec,
 					Stat:   &stat,
 					Metric: &metric,
 				},
@@ -476,7 +476,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 	events := map[string]mb.Event{}
 
 	// Construct metricDataQueries
-	metricDataQueries := createMetricDataQueries(listMetricWithStatsTotal, m.Period)
+	metricDataQueries := createMetricDataQueries(listMetricWithStatsTotal, m.DataGranularity)
 	m.logger.Debugf("Number of MetricDataQueries = %d", len(metricDataQueries))
 	if len(metricDataQueries) == 0 {
 		return events, nil
