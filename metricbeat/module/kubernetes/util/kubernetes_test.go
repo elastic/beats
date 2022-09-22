@@ -128,9 +128,9 @@ func (f *mockFuncs) update(m map[string]common.MapStr, obj kubernetes.Resource) 
 		},
 	}
 	for k, v := range accessor.GetLabels() {
-		meta.Put(fmt.Sprintf("kubernetes.%v", k), v)
+		_, _ = meta.Put(fmt.Sprintf("kubernetes.%v", k), v)
 	}
-	meta.Put("orchestrator.cluster.name", "gke-4242")
+	_, _ = meta.Put("orchestrator.cluster.name", "gke-4242")
 	m[accessor.GetName()] = meta
 }
 

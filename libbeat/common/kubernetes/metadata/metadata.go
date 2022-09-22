@@ -68,7 +68,7 @@ type ClusterConfiguration struct {
 // WithFields FieldOption allows adding specific fields into the generated metadata
 func WithFields(key string, value interface{}) FieldOptions {
 	return func(meta common.MapStr) {
-		safemapstr.Put(meta, key, value)
+		_ = safemapstr.Put(meta, key, value)
 	}
 }
 
@@ -77,10 +77,10 @@ func WithFields(key string, value interface{}) FieldOptions {
 func WithMetadata(kind string) FieldOptions {
 	return func(meta common.MapStr) {
 		if meta["labels"] != nil {
-			safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
+			_ = safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
 		}
 		if meta["annotations"] != nil {
-			safemapstr.Put(meta, strings.ToLower(kind)+".annotations", meta["annotations"])
+			_ = safemapstr.Put(meta, strings.ToLower(kind)+".annotations", meta["annotations"])
 		}
 	}
 }

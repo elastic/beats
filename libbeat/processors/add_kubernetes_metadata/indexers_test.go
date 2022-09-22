@@ -475,7 +475,7 @@ func TestIpPortIndexer(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
-	expected.Put("kubernetes.container",
+	_, _ = expected.Put("kubernetes.container",
 		common.MapStr{
 			"name":    container,
 			"image":   containerImage,

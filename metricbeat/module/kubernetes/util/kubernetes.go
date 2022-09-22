@@ -438,7 +438,7 @@ func (m *enricher) Enrich(events []common.MapStr) {
 				delete(k8sMeta, "pod")
 			}
 			ecsMeta := meta.Clone()
-			ecsMeta.Delete("kubernetes")
+			_ = ecsMeta.Delete("kubernetes")
 			event.DeepUpdate(common.MapStr{
 				mb.ModuleDataKey: k8sMeta,
 				"meta":           ecsMeta,
