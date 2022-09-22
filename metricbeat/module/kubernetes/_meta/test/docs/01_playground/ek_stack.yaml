@@ -42,6 +42,9 @@ data:
   xpack.security.authc.api_key.enabled: 'true'
   ELASTIC_USERNAME: "elastic"
   ELASTIC_PASSWORD: "changeme"
+  # ELASTIC_SEARCH_* variables are used by kibana to connect to ELASTICSEARCH.
+  ELASTICSEARCH_USERNAME: "kibana_system"
+  ELASTICSEARCH_PASSWORD: "kibanapassword"
 ---
 apiVersion: v1
 kind: Service
@@ -84,12 +87,38 @@ spec:
       labels:
         app: kibana
     spec:
+      initContainers:
+        - image: docker.elastic.co/kibana/kibana:8.0.0-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          name: set-kibana-passwd
+          command:
+          - /bin/bash
+          - -c
+          - |
+            #!/bin/bash
+            set -x
+            retries=0
+            while [[ ! $(curl -u "${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}" 'http://elasticsearch:9200/') ]]; do
+                echo "Unable to connect to elastic, retrying in 10 seconds"
+                retries=$(( ${retries} + 1 ))
+                if [[ ${retries} == 10 ]]; then
+                    echo "Unable to connect to elastic. Exiting with code 1"
+                    exit 1
+                fi
+                sleep 10
+            done
+
+            curl -u "${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}" \
+                -XPOST "http://elasticsearch:9200/_security/user/${ELASTICSEARCH_USERNAME}/_password" \
+                -H 'Content-Type: application/json' \
+                -d  "{\"password\": \"${ELASTICSEARCH_PASSWORD}\"}"
+          envFrom:
+            - configMapRef:
+                name: elasticsearch-config
       containers:
         - image: docker.elastic.co/kibana/kibana:8.0.0-SNAPSHOT
           imagePullPolicy: IfNotPresent
           name: kibana
-          env:
-          - name: ELASTICSEARCH_USERNAME
-            value: elastic
-          - name: ELASTICSEARCH_PASSWORD
-            value: changeme
+          envFrom:
+            - configMapRef:
+                name: elasticsearch-config
