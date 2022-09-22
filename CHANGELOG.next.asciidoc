@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
 
 *Heartbeat*
+- Deprecate zip_url and local monitor options. {pull}33123[33123]
 
 *Metricbeat*
 
@@ -88,6 +89,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
+- Add GCP CloudSQL region filter {pull}32943[32943]
 
 *Packetbeat*
 
@@ -115,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Improve performance of disk queue by coalescing writes. {pull}31935[31935]
 - Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
+- Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
 
 *Auditbeat*
 
@@ -141,12 +144,11 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Allow filtering on AWS tags by more than 1 value per key. {pull}32775[32775]
-- Azure Billing: switch to Cost Management API for forecast data {pull}32589[32589]
 
 *Packetbeat*
 
 - Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
+- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
 
 *Functionbeat*
 
@@ -179,6 +181,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
+
 
 
 
