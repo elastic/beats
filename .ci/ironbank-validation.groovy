@@ -68,7 +68,13 @@ pipeline {
       steps {
         withMageEnv(){
           dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
-            sh(label: 'make validate-ironbank', script: "make -C ironbank validate-ironbank")
+            // Interacts with the docker registry, it might be flaky in some cases, to avoid
+            // the chances of those failures let's retry a few times, though it might somehow
+            // rerun genuine failures, which will take up to 3 times to be reported, but it can
+            // reduce the overhead for flakiness in the infrastructure side.
+            retryWithSleep(retries: 3, seconds: 30, backoff: true) {
+              sh(label: 'make validate-ironbank', script: "make -C ironbank validate-ironbank")
+            }
           }
         }
       }
