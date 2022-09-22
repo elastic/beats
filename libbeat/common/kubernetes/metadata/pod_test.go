@@ -663,14 +663,14 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 		})
 		assert.Nil(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
-		pods.Add(test.input)
+		_ = pods.Add(test.input)
 
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
-		nodes.Add(test.node)
+		_ = nodes.Add(test.node)
 		nodeMeta := NewNodeMetadataGenerator(config, nodes, client)
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
-		namespaces.Add(test.namespace)
+		_ = namespaces.Add(test.namespace)
 		nsMeta := NewNamespaceMetadataGenerator(config, namespaces, client)
 
 		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta, nil)
@@ -811,14 +811,14 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 		}
 
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
-		pods.Add(test.input)
+		_ = pods.Add(test.input)
 
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
-		nodes.Add(test.node)
+		_ = nodes.Add(test.node)
 		nodeMeta := NewNodeMetadataGenerator(nodeConfig, nodes, client)
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
-		namespaces.Add(test.namespace)
+		_ = namespaces.Add(test.namespace)
 		nsMeta := NewNamespaceMetadataGenerator(namespaceConfig, namespaces, client)
 
 		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta, &metaConfig)

@@ -120,7 +120,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	}
 
 	if po.Status.PodIP != "" {
-		out.Put("pod.ip", po.Status.PodIP)
+		_, _ = out.Put("pod.ip", po.Status.PodIP)
 	}
 
 	return out

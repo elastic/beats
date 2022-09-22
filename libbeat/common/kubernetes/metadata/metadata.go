@@ -168,7 +168,7 @@ func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
 
 	kube_cfg, err := clientcmd.LoadFromFile(kubeconfig)
 	if err != nil {
-		return ClusterInfo{}, fmt.Errorf("unable to load kube_config due to error: %+v", err)
+		return ClusterInfo{}, fmt.Errorf("unable to load kube_config due to error: %w", err)
 	}
 
 	for key, element := range kube_cfg.Clusters {

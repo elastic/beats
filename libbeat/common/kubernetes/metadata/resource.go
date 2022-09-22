@@ -37,7 +37,7 @@ type Resource struct {
 // NewResourceMetadataGenerator creates a metadata generator for a generic resource
 func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Resource {
 	var config Config
-	config.Unmarshal(cfg)
+	_ = config.Unmarshal(cfg)
 
 	r := &Resource{
 		config: &config,

@@ -2040,7 +2040,7 @@ func getNestedAnnotations(in common.MapStr) common.MapStr {
 	out := common.MapStr{}
 
 	for k, v := range in {
-		out.Put(k, v)
+		_, _ = out.Put(k, v)
 	}
 	return out
 }
