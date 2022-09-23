@@ -154,6 +154,7 @@ packetbeat.protocols:
 
 - type: sip
   ports: [{{ sip_ports|default([5060])|join(", ") }}]
+  transport_protocol: {{transport_protocol}}
 
 
 {% if procs_enabled %}

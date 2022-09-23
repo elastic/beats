@@ -41,6 +41,9 @@ data:
                     - state_resourcequota
                     - state_statefulset
                     - state_service
+                    - state_persistentvolume
+                    - state_persistentvolumeclaim
+                    - state_storageclass
                   # If `https` is used to access `kube-state-metrics`, uncomment following settings:
                   # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                   # ssl.certificate_authorities:
@@ -156,7 +159,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:8.4.0
+        image: docker.elastic.co/beats/metricbeat:8.6.0
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -302,6 +305,10 @@ rules:
   resources:
   - jobs
   - cronjobs
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["storage.k8s.io"]
+  resources:
+    - storageclasses
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""

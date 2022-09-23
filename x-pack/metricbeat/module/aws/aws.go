@@ -7,22 +7,25 @@ package aws
 import (
 	"context"
 	"fmt"
-	"strings"
+
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
-	"github.com/aws/aws-sdk-go-v2/service/iam/iamiface"
-	"github.com/aws/aws-sdk-go-v2/service/rds"
-	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
+	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+type describeRegionsClient interface {
+	DescribeRegions(ctx context.Context, params *ec2.DescribeRegionsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeRegionsOutput, error)
+}
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
@@ -48,8 +51,8 @@ type MetricSet struct {
 
 // Tag holds a configuration specific for ec2 and cloudwatch metricset.
 type Tag struct {
-	Key   string `config:"key"`
-	Value string `config:"value"`
+	Key   string   `config:"key"`
+	Value []string `config:"value"`
 }
 
 // ModuleName is the name of this module.
@@ -106,34 +109,35 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		awsConfig.Region = config.Regions[0]
 	}
 
-	stsServiceName := awscommon.CreateServiceName("sts", config.AWSConfig.FIPSEnabled, awsConfig.Region)
-	iamServiceName := awscommon.CreateServiceName("iam", config.AWSConfig.FIPSEnabled, awsConfig.Region)
-
 	// Get IAM account id
-	svcSts := sts.New(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, stsServiceName, "", awsConfig))
-	reqIdentity := svcSts.GetCallerIdentityRequest(&sts.GetCallerIdentityInput{})
-	outputIdentity, err := reqIdentity.Send(context.TODO())
+	svcSts := sts.NewFromConfig(awsConfig, func(o *sts.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+	})
+	outputIdentity, err := svcSts.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
 	if err != nil {
 		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
 	} else {
 		metricSet.AccountID = *outputIdentity.Account
 		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.AccountID)
 	}
-	iamRegion := ""
-	if strings.HasPrefix(awsConfig.Region, "us-gov-") {
-		iamRegion = "us-gov"
-	}
 	// Get account name/alias
-	svcIam := iam.New(awscommon.EnrichAWSConfigWithEndpoint(
-		config.AWSConfig.Endpoint, iamServiceName, iamRegion, awsConfig))
+	svcIam := iam.NewFromConfig(awsConfig, func(o *iam.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+
+	})
 	metricSet.AccountName = getAccountName(svcIam, base, metricSet)
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
-		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsConfig.Region)
-		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, ec2ServiceName, "", awsConfig))
+		svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
+			if config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		})
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
 			return nil, err
@@ -150,23 +154,22 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &metricSet, nil
 }
 
-func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error) {
+func getRegions(svc describeRegionsClient) ([]string, error) {
+	completeRegionsList := make([]string, 0)
 	input := &ec2.DescribeRegionsInput{}
-	req := svc.DescribeRegionsRequest(input)
-	output, err := req.Send(context.TODO())
+	output, err := svc.DescribeRegions(context.TODO(), input)
 	if err != nil {
 		err = fmt.Errorf("failed DescribeRegions: %w", err)
-		return
+		return completeRegionsList, err
 	}
 	for _, region := range output.Regions {
 		completeRegionsList = append(completeRegionsList, *region.RegionName)
 	}
-	return
+	return completeRegionsList, err
 }
 
-func getAccountName(svc iamiface.ClientAPI, base mb.BaseMetricSet, metricSet MetricSet) string {
-	req := svc.ListAccountAliasesRequest(&iam.ListAccountAliasesInput{})
-	output, err := req.Send(context.TODO())
+func getAccountName(svc *iam.Client, base mb.BaseMetricSet, metricSet MetricSet) string {
+	output, err := svc.ListAccountAliases(context.TODO(), &iam.ListAccountAliasesInput{})
 
 	accountName := metricSet.AccountID
 	if err != nil {
@@ -208,15 +211,15 @@ func InitEvent(regionName string, accountName string, accountID string, timestam
 		RootFields:      mapstr.M{},
 	}
 
-	event.RootFields.Put("cloud.provider", "aws")
+	_, _ = event.RootFields.Put("cloud.provider", "aws")
 	if regionName != "" {
-		event.RootFields.Put("cloud.region", regionName)
+		_, _ = event.RootFields.Put("cloud.region", regionName)
 	}
 	if accountName != "" {
-		event.RootFields.Put("cloud.account.name", accountName)
+		_, _ = event.RootFields.Put("cloud.account.name", accountName)
 	}
 	if accountID != "" {
-		event.RootFields.Put("cloud.account.id", accountID)
+		_, _ = event.RootFields.Put("cloud.account.id", accountID)
 	}
 	return event
 }
@@ -227,29 +230,31 @@ func CheckTagFiltersExist(tagsFilter []Tag, tags interface{}) bool {
 	var tagKeys []string
 	var tagValues []string
 
-	switch tags.(type) {
-	case []resourcegroupstaggingapi.Tag:
-		tagsResource := tags.([]resourcegroupstaggingapi.Tag)
-		for _, tag := range tagsResource {
+	switch tags := tags.(type) {
+	case []resourcegroupstaggingapitypes.Tag:
+		for _, tag := range tags {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)
 		}
-	case []ec2.Tag:
-		tagsEC2 := tags.([]ec2.Tag)
-		for _, tag := range tagsEC2 {
+	case []ec2types.Tag:
+		for _, tag := range tags {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)
 		}
-	case []rds.Tag:
-		tagsRDS := tags.([]rds.Tag)
-		for _, tag := range tagsRDS {
+	case []rdstypes.Tag:
+		for _, tag := range tags {
 			tagKeys = append(tagKeys, *tag.Key)
 			tagValues = append(tagValues, *tag.Value)
 		}
 	}
 
 	for _, tagFilter := range tagsFilter {
-		if exists, idx := StringInSlice(tagFilter.Key, tagKeys); !exists || tagValues[idx] != tagFilter.Value {
+		if exists, idx := StringInSlice(tagFilter.Key, tagKeys); exists {
+			valueExists, _ := StringInSlice(tagValues[idx], tagFilter.Value)
+			if !valueExists {
+				return false
+			}
+		} else {
 			return false
 		}
 	}

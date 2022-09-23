@@ -19,12 +19,18 @@ package ecserr
 
 import (
 	"fmt"
+	"net/http"
+	"time"
 )
+
+type EType string
+
+type ECode string
 
 // ECSErr represents an error per the ECS specification
 type ECSErr struct {
-	Type    string `json:"type"`
-	Code    string `json:"code"`
+	Type    EType  `json:"type"`
+	Code    ECode  `json:"code"`
 	Message string `json:"message"`
 	// StackTrace is optional, since it's more rare, it's nicer to
 	// have it JSON serialize to null.
@@ -33,11 +39,11 @@ type ECSErr struct {
 	StackTrace *string `json:"stack_trace"`
 }
 
-func NewECSErr(typ string, code string, message string) *ECSErr {
+func NewECSErr(typ EType, code ECode, message string) *ECSErr {
 	return NewECSErrWithStack(typ, code, message, nil)
 }
 
-func NewECSErrWithStack(typ string, code string, message string, stackTrace *string) *ECSErr {
+func NewECSErrWithStack(typ EType, code ECode, message string, stackTrace *string) *ECSErr {
 	return &ECSErr{
 		Type:       typ,
 		Code:       code,
@@ -60,15 +66,57 @@ func (e *ECSErr) String() string {
 }
 
 const (
-	ETYPE_IO = "io"
+	TYPE_IO = "io"
 )
 
 type SynthErrType string
 
 func NewBadCmdStatusErr(exitCode int, cmd string) *ECSErr {
 	return NewECSErr(
-		ETYPE_IO,
+		TYPE_IO,
 		"BAD_CMD_STATUS",
 		fmt.Sprintf("command '%s' exited unexpectedly with code: %d", cmd, exitCode),
+	)
+}
+
+func NewCmdTimeoutStatusErr(timeout time.Duration, cmd string) *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		"CMD_TIMEOUT",
+		fmt.Sprintf("command '%s' did not exit before extended timeout: %s", cmd, timeout.String()),
+	)
+}
+
+func NewSyntheticsCmdCouldNotStartErr(reason error) *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		"SYNTHETICS_CMD_COULD_NOT_START",
+		fmt.Sprintf("could not start command not found: %s", reason),
+	)
+}
+
+func NewBadHTTPStatusErr(httpCode int) *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		"BAD_HTTP_STATUS",
+		fmt.Sprintf("Bad HTTP status %s encountered", http.StatusText(httpCode)),
+	)
+}
+
+func NewDNSLookupFailedErr(host string, err error) *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		"DNS_LOOKUP_FAILED",
+		fmt.Sprintf(`DNS lookup failure "%s": %s`, host, err.Error()),
+	)
+}
+
+const CODE_NET_COULD_NOT_CONNECT = "NET_COULD_NOT_CONNECT"
+
+func NewCouldNotConnectErr(host, port string, err error) *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		CODE_NET_COULD_NOT_CONNECT,
+		fmt.Sprintf("Could not connect to '%s:%s' with error: %s", host, port, err),
 	)
 }

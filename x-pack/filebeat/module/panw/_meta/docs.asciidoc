@@ -103,8 +103,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Protocol | network.transport |
 | Action | event.outcome |
 | Bytes | network.bytes |
-| Bytes Sent | client.bytes destination.bytes |
-| Bytes Received | server.bytes source.bytes |
+| Bytes Sent | client.bytes source.bytes |
+| Bytes Received | server.bytes destination.bytes |
 | Packets | network.packets |
 | Start Time | event.start |
 | Elapsed Time | event.duration |

@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package source
 
 import (
@@ -31,6 +34,7 @@ func ErrInvalidPath(path string) error {
 }
 
 func (l *LocalSource) Validate() error {
+	logp.L().Warn("local browser monitors are now deprecated! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project")
 	if l.OrigPath == "" {
 		return ErrNoPath
 	}
@@ -56,7 +60,7 @@ func (l *LocalSource) Fetch() (err error) {
 	if l.workingPath != "" {
 		return nil
 	}
-	l.workingPath, err = ioutil.TempDir("/tmp", "elastic-synthetics-")
+	l.workingPath, err = ioutil.TempDir(os.TempDir(), "elastic-synthetics-")
 	if err != nil {
 		return fmt.Errorf("could not create tmp dir: %w", err)
 	}

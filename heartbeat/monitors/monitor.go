@@ -21,7 +21,13 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+
 	"github.com/mitchellh/hashstructure"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -29,9 +35,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
@@ -42,12 +45,6 @@ const (
 	MON_STARTED
 	MON_STOPPED
 )
-
-type WrappedClient struct {
-	Publish func(event beat.Event)
-	Close   func() error
-	wait    func()
-}
 
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
@@ -66,13 +63,13 @@ type Monitor struct {
 	internalsMtx sync.Mutex
 	close        func() error
 
-	pipelineConnector beat.PipelineConnector
+	// pubClient accepts an ISyncClient as the lowest common denominator of client
+	// since async clients are a subset of sync clients
+	pubClient pipeline.ISyncClient
 
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
 	stats plugin.RegistryRecorder
-
-	runOnce bool
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -82,7 +79,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, nil, false)
+	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
 
 	return err
 }
@@ -92,12 +89,12 @@ func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
 func newMonitor(
 	config *conf.C,
 	registrar *plugin.PluginsReg,
-	pipelineConnector beat.PipelineConnector,
+	pubClient pipeline.ISyncClient,
 	taskAdder scheduler.AddTask,
+	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
-	runOnce bool,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, taskAdder, onStop, runOnce)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -109,10 +106,10 @@ func newMonitor(
 func newMonitorUnsafe(
 	config *conf.C,
 	registrar *plugin.PluginsReg,
-	pipelineConnector beat.PipelineConnector,
+	pubClient pipeline.ISyncClient,
 	addTask scheduler.AddTask,
+	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
-	runOnce bool,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -122,26 +119,21 @@ func newMonitorUnsafe(
 		return nil, err
 	}
 
-	if !config.Enabled() {
-		return nil, fmt.Errorf("monitor '%s' with id '%s' skipped: %w", standardFields.Name, standardFields.ID, ErrMonitorDisabled)
-	}
-
 	pluginFactory, found := registrar.Get(standardFields.Type)
 	if !found {
 		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", standardFields.Type, registrar.MonitorNames())
 	}
 
 	m := &Monitor{
-		stdFields:         standardFields,
-		pluginName:        pluginFactory.Name,
-		addTask:           addTask,
-		configuredJobs:    []*configuredJob{},
-		pipelineConnector: pipelineConnector,
-		internalsMtx:      sync.Mutex{},
-		config:            config,
-		stats:             pluginFactory.Stats,
-		state:             MON_INIT,
-		runOnce:           runOnce,
+		stdFields:      standardFields,
+		pluginName:     pluginFactory.Name,
+		addTask:        addTask,
+		configuredJobs: []*configuredJob{},
+		pubClient:      pubClient,
+		internalsMtx:   sync.Mutex{},
+		config:         config,
+		stats:          pluginFactory.Stats,
+		state:          MON_INIT,
 	}
 
 	if m.stdFields.ID == "" {
@@ -181,7 +173,7 @@ func newMonitorUnsafe(
 		}}
 	}
 
-	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
+	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
 	m.endpoints = p.Endpoints
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
@@ -227,31 +219,7 @@ func (m *Monitor) Start() {
 	defer m.internalsMtx.Unlock()
 
 	for _, t := range m.configuredJobs {
-		if m.runOnce {
-			client, err := pipeline.NewSyncClient(logp.L(), t.monitor.pipelineConnector, beat.ClientConfig{})
-			if err != nil {
-				logp.L().Errorf("could not start monitor: %v", err)
-				continue
-			}
-			t.Start(&WrappedClient{
-				Publish: func(event beat.Event) {
-					_ = client.Publish(event)
-				},
-				Close: client.Close,
-				wait:  client.Wait,
-			})
-		} else {
-			client, err := m.pipelineConnector.Connect()
-			if err != nil {
-				logp.L().Errorf("could not start monitor: %v", err)
-				continue
-			}
-			t.Start(&WrappedClient{
-				Publish: client.Publish,
-				Close:   client.Close,
-				wait:    func() {},
-			})
-		}
+		t.Start(m.pubClient)
 	}
 
 	m.stats.StartMonitor(int64(m.endpoints))

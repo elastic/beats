@@ -71,10 +71,7 @@ const (
 	seqGT seqCompare = 1
 )
 
-var (
-	debugf  = logp.MakeDebug("tcp")
-	isDebug = false
-)
+var isDebug = false
 
 func (tcp *TCP) getID() uint32 {
 	tcp.id++
@@ -132,7 +129,7 @@ func (stream *TCPStream) addPacket(pkt *protos.Packet, tcphdr *layers.TCP) {
 	if mod == nil {
 		if isDebug {
 			protocol := conn.protocol
-			debugf("Ignoring protocol for which we have no module loaded: %s",
+			logp.Debug("tcp", "Ignoring protocol for which we have no module loaded: %s",
 				protocol)
 		}
 		return
@@ -172,7 +169,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	}
 
 	if isDebug {
-		debugf("tcp flow id: %p", id)
+		logp.Debug("tcp", "tcp flow id: %p", id)
 	}
 
 	if len(pkt.Payload) == 0 && !tcphdr.FIN {
@@ -185,14 +182,14 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	tcpSeq := tcpStartSeq + uint32(len(pkt.Payload))
 	lastSeq := conn.lastSeq[stream.dir]
 	if isDebug {
-		debugf("pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
+		logp.Debug("tcp", "pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
 			tcpStartSeq, tcpSeq, lastSeq, len(pkt.Payload))
 	}
 
 	if len(pkt.Payload) > 0 && lastSeq != 0 {
 		if tcpSeqBeforeEq(tcpSeq, lastSeq) {
 			if isDebug {
-				debugf("Ignoring retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
+				logp.Debug("tcp", "Ignoring retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
 					tcphdr.Seq, len(pkt.Payload), lastSeq)
 			}
 			return
@@ -205,11 +202,11 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			}
 
 			gap := int(tcpStartSeq - lastSeq)
-			debugf("Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
+			logp.Debug("tcp", "Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
 			drop := stream.gapInStream(gap)
 			if drop {
 				if isDebug {
-					debugf("Dropping connection state because of gap")
+					logp.Debug("tcp", "Dropping connection state because of gap")
 				}
 				droppedBecauseOfGaps.Add(1)
 
@@ -224,7 +221,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			delta := lastSeq - tcpStartSeq
 
 			if isDebug {
-				debugf("Overlapping tcp segment. last_seq %d, seq: %d, delta: %d",
+				logp.Debug("tcp", "Overlapping tcp segment. last_seq %d, seq: %d, delta: %d",
 					lastSeq, tcpStartSeq, delta)
 			}
 
@@ -260,7 +257,7 @@ func (tcp *TCP) getStream(pkt *protos.Packet) (stream TCPStream, created bool) {
 
 	if isDebug {
 		t := pkt.Tuple
-		debugf("Connection src[%s:%d] dst[%s:%d] doesn't exist, creating new",
+		logp.Debug("tcp", "Connection src[%s:%d] dst[%s:%d] doesn't exist, creating new",
 			t.SrcIP.String(), t.SrcPort,
 			t.DstIP.String(), t.DstPort)
 	}
@@ -332,7 +329,7 @@ func NewTCP(p protos.Protocols) (*TCP, error) {
 
 	tcp.streams.StartJanitor(protos.DefaultTransactionExpiration)
 	if isDebug {
-		debugf("tcp", "Port map: %v", portMap)
+		logp.Debug("tcp", "Port map: %v", portMap)
 	}
 
 	return tcp, nil

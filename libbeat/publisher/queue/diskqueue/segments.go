@@ -155,8 +155,9 @@ const currentSegmentVersion = 2
 const segmentHeaderSize = 12
 
 const (
-	ENABLE_ENCRYPTION  uint32 = 0x1
-	ENABLE_COMPRESSION uint32 = 0x2
+	ENABLE_ENCRYPTION  uint32 = 1 << iota // 0x1
+	ENABLE_COMPRESSION                    // 0x2
+	ENABLE_PROTOBUF                       // 0x4
 )
 
 // Sort order: we store loaded segments in ascending order by their id.
@@ -219,14 +220,6 @@ func (segment *queueSegment) headerSize() uint64 {
 	return segmentHeaderSize
 }
 
-// The initial release of the disk queue used JSON to encode events
-// on disk. Since then, we have switched to CBOR to address issues
-// with encoding multi-byte characters, and for lower encoding
-// overhead.
-func (segment *queueSegment) shouldUseJSON() bool {
-	return segment.schemaVersion != nil && *segment.schemaVersion == 0
-}
-
 // getReader sets up the segmentReader.  The order of encryption and
 // compression is important.  If both options are enabled we want
 // encrypted compressed data not compressed encrypted data.  This is
@@ -250,6 +243,20 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 
 	sr := &segmentReader{}
 	sr.src = file
+
+	if header.version == 0 {
+		sr.serializationFormat = SerializationJSON
+	}
+
+	// Version 1 is CBOR, Version 2 could be CBOR or ProtoBuf, the
+	// options control which
+	if header.version > 0 {
+		if (header.options & ENABLE_PROTOBUF) == ENABLE_PROTOBUF {
+			sr.serializationFormat = SerializationProtobuf
+		} else {
+			sr.serializationFormat = SerializationCBOR
+		}
+	}
 
 	if (header.options & ENABLE_ENCRYPTION) == ENABLE_ENCRYPTION {
 		sr.er, err = NewEncryptionReader(sr.src, queueSettings.EncryptionKey)
@@ -288,6 +295,10 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 
 	if queueSettings.UseCompression {
 		options = options | ENABLE_COMPRESSION
+	}
+
+	if queueSettings.UseProtobuf {
+		options = options | ENABLE_PROTOBUF
 	}
 
 	sw := &segmentWriter{}
@@ -468,9 +479,10 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 // the purpose of compression since encryption will make the data
 // less compressable.
 type segmentReader struct {
-	src io.ReadSeekCloser
-	er  *EncryptionReader
-	cr  *CompressionReader
+	src                 io.ReadSeekCloser
+	er                  *EncryptionReader
+	cr                  *CompressionReader
+	serializationFormat SerializationFormat
 }
 
 func (r *segmentReader) Read(p []byte) (int, error) {

@@ -13,12 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    checks:
-        make: |
-          make -C x-pack/osquerybeat check;
-          make -C x-pack/osquerybeat update;
-          make check-no-changes;
-        stage: checks
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
@@ -37,6 +31,19 @@ stages:
             parameters:
                 - "macosTest"
             tags: true         ## for all the tags
+        stage: extended
+    macosM1:
+        mage: "mage build unitTest"
+        platforms:             ## override default label in this specific stage.
+          - "orka && darwin && aarch64"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test osquerybeat for macos-m1"
+            labels:
+                - "macos-m1"
+            parameters:
+                - "macosM1Test"
+            tags: false         ## for all the tags
         stage: extended
     windows-2022:
         mage: "mage build unitTest"
@@ -57,6 +64,11 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
+        stage: extended_win
+    windows-11:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-11"
         stage: extended_win
     windows-10:
         mage: "mage build unitTest"

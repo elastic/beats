@@ -91,3 +91,12 @@ May  5 19:02:25 dev01: %ASA-4-733100: [ Scanning] drop rate-2 exceeded. Current 
 May  5 19:02:25 dev01: %ASA-4-733100: [   192.168.0.1] drop rate-1 exceeded. Current burst rate is 0 per second, max configured rate is 10; Current average rate is 5 per second, max configured rate is 5; Cumulative total count is 6018
 May  5 19:02:25 dev01: %ASA-4-733100: [     Port-5432 5432] drop rate-1 exceeded. Current burst rate is 8 per second, max configured rate is 10; Current average rate is 20 per second, max configured rate is 5; Cumulative total count is 12466
 May  5 19:02:25 dev01: %ASA-4-733100: [           RDP 3389] drop rate-1 exceeded. Current burst rate is 63 per second, max configured rate is 10; Current average rate is 5 per second, max configured rate is 5; Cumulative total count is 3054
+May  5 19:02:25 dev01: %ASA-6-113004: AAA user authentication Successful: server = 81.2.69.144 , User = alice
+May  5 19:02:25 dev01: %ASA-6-113004: AAA user authorization Successful: server = 81.2.69.144 , User = alice
+May  5 19:02:25 dev01: %ASA-6-113005: AAA user authentication Rejected: reason = AAA failure: server = 81.2.69.144 : user = *****: user IP = 172.31.98.44
+May  5 19:02:25 dev01: %ASA-6-113012: AAA user authentication Successful: local database: user = alice
+May  5 19:02:25 dev01: %ASA-3-113021: Attempted console login failed. User eve did NOT have appropriate Admin Rights.
+May  5 19:02:25 dev01: %ASA-6-716039: Authentication: rejected, group = malcorp user = eve , Session Type: admin
+May  5 19:02:25 dev01: %ASA-6-716039: Authentication: rejected, group = malcorp user = malory , Session Type: WebVPN
+May  5 19:02:25 dev01: %ASA-6-716039: Group <malcorp> User <eve> IP <172.31.98.44> Authentication: rejected, Session Type: Admin.
+May  5 19:02:25 dev01: %ASA-6-716039: Group <malcorp> User <malory> IP <172.31.98.44> Authentication: rejected, Session Type: WebVPN.

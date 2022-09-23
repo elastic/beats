@@ -20,17 +20,19 @@ package monitors
 import (
 	"regexp"
 	"testing"
-	"time"
+
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-lookslike"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/beats/v7/libbeat/processors/util"
 )
 
 var binfo = beat.Info{
@@ -42,14 +44,16 @@ var binfo = beat.Info{
 func TestPreProcessors(t *testing.T) {
 	tests := map[string]struct {
 		settings           publishSettings
+		location           *hbconfig.LocationWithID
 		expectedIndex      string
 		expectedDatastream *add_data_stream.DataStream
 		monitorType        string
-		wantProc           bool
+		wantIndexChange    bool
 		wantErr            bool
 	}{
 		"no settings should yield no processor for lightweight monitor": {
 			publishSettings{},
+			nil,
 			"",
 			nil,
 			"http",
@@ -58,6 +62,7 @@ func TestPreProcessors(t *testing.T) {
 		},
 		"no settings should yield a data stream processor for browsers": {
 			publishSettings{},
+			nil,
 			"synthetics-browser-default",
 			&add_data_stream.DataStream{
 				Namespace: "default",
@@ -70,6 +75,7 @@ func TestPreProcessors(t *testing.T) {
 		},
 		"exact index should be used exactly": {
 			publishSettings{Index: *fmtstr.MustCompileEvent("test")},
+			nil,
 			"test",
 			nil,
 			"http",
@@ -84,6 +90,7 @@ func TestPreProcessors(t *testing.T) {
 					Type:      "myType",
 				},
 			},
+			nil,
 			"myType-myDataset-myNamespace",
 			&add_data_stream.DataStream{
 				Namespace: "myNamespace",
@@ -98,6 +105,7 @@ func TestPreProcessors(t *testing.T) {
 			publishSettings{
 				DataStream: &add_data_stream.DataStream{},
 			},
+			nil,
 			"synthetics-browser-default",
 			&add_data_stream.DataStream{
 				Namespace: "default",
@@ -108,32 +116,70 @@ func TestPreProcessors(t *testing.T) {
 			true,
 			false,
 		},
+		"with location": {
+			publishSettings{},
+			&hbconfig.LocationWithID{
+				ID: "TestID",
+				Geo: util.GeoConfig{
+					Name:     "geo name",
+					Location: "38.889722, -77.008889",
+				},
+			},
+			"",
+			nil,
+			"http",
+			false,
+			false,
+		},
 	}
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			e := beat.Event{Meta: mapstr.M{}, Fields: mapstr.M{}}
-			procs, err := preProcessors(binfo, tt.settings, tt.monitorType)
+			procs, err := preProcessors(binfo, tt.location, tt.settings, tt.monitorType)
 			if tt.wantErr == true {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			// If we're just setting event.dataset we only get the 1
-			// otherwise we get a second add_data_stream processor
-			if !tt.wantProc {
-				require.Len(t, procs.List, 1)
-				return
+			expectedProcs := 1
+			if tt.location != nil {
+				expectedProcs++
 			}
-			require.Len(t, procs.List, 2)
+			if tt.wantIndexChange {
+				expectedProcs++
+			}
+
+			require.Len(t, procs.List, expectedProcs)
 
 			_, err = procs.Run(&e)
 
 			t.Run("index name should be set", func(t *testing.T) {
 				require.NoError(t, err)
-				require.Equal(t, tt.expectedIndex, e.Meta[events.FieldMetaRawIndex])
+				if tt.expectedIndex == "" {
+					require.Nil(t, e.Meta[events.FieldMetaRawIndex])
+				} else {
+					require.Equal(t, tt.expectedIndex, e.Meta[events.FieldMetaRawIndex])
+				}
 			})
+
+			if tt.location == nil {
+				t.Run("observer location data should not be set", func(t *testing.T) {
+					ok, _ := e.Fields.HasKey("observer")
+					require.False(t, ok)
+				})
+			} else {
+				t.Run("observer location data should be set", func(t *testing.T) {
+					geoM, _ := util.GeoConfigToMap(tt.location.Geo)
+					lookslike.MustCompile(map[string]interface{}{
+						"observer": map[string]interface{}{
+							"name": tt.location.ID,
+							"geo":  geoM,
+						},
+					})
+				})
+			}
 
 			eventDs, err := e.GetValue("event.dataset")
 			require.NoError(t, err)
@@ -160,18 +206,39 @@ func TestPreProcessors(t *testing.T) {
 	}
 }
 
+func TestDisabledMonitor(t *testing.T) {
+	confMap := map[string]interface{}{
+		"type":    "test",
+		"enabled": "false",
+	}
+
+	conf, err := config.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	reg, built, closed := mockPluginsReg()
+	f, sched, fClose := makeMockFactory(reg)
+	defer fClose()
+	defer sched.Stop()
+	runner, err := f.Create(&MockPipeline{}, conf)
+	require.NoError(t, err)
+	require.IsType(t, runner, NoopRunner{})
+
+	require.Equal(t, 0, built.Load())
+	require.Equal(t, 0, closed.Load())
+}
+
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
 	badConf := mockBadPluginConf(t, "custom")
 	reg, built, closed := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
+	mockPipeline := &MockPipeline{}
 
-	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
+	f, sched, fClose := makeMockFactory(reg)
+	defer fClose()
 	defer sched.Stop()
 
-	f := NewFactory(binfo, sched.Add, reg, false)
 	makeTestMon := func() (*Monitor, error) {
-		mIface, err := f.Create(pipelineConnector, serverMonConf)
+		mIface, err := f.Create(mockPipeline, serverMonConf)
 		if mIface == nil {
 			return nil, err
 		} else {
@@ -180,7 +247,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	}
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched.Add, nil, false)
+	_, m0Err := newMonitor(badConf, reg, mockPipeline.ConnectSync(), sched.Add, nil, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

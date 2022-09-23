@@ -1,6 +1,3 @@
-# DO NOT EDIT!
-# This file is a rendered template, the source can be found in "./dev-tools/templates/.golangci.yml"
-#
 # options for analysis running
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
@@ -105,7 +102,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.12"
+    go: "1.18.6"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -125,19 +122,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.12"
+    go: "1.18.6"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.12"
+    go: "1.18.6"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17.12"
+    go: "1.18.6"
 
   gosec:
     excludes:

@@ -47,7 +47,7 @@
           "packet_total_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.99.130.239",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 65105,
           "type": "netflow_flow"
         },
@@ -72,7 +72,7 @@
           "bytes": 0,
           "ip": "10.99.130.239",
           "locality": "internal",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 0,
           "port": 65105
         }
@@ -126,7 +126,7 @@
           "packet_total_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.99.252.50",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 53,
           "type": "netflow_flow"
         },
@@ -151,7 +151,7 @@
           "bytes": 81,
           "ip": "10.99.252.50",
           "locality": "internal",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 1,
           "port": 53
         }
@@ -205,7 +205,7 @@
           "packet_total_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.99.130.239",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 65105,
           "type": "netflow_flow"
         },
@@ -230,7 +230,7 @@
           "bytes": 0,
           "ip": "10.99.130.239",
           "locality": "internal",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 0,
           "port": 65105
         }
@@ -284,7 +284,7 @@
           "packet_total_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.98.243.20",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 53,
           "type": "netflow_flow"
         },
@@ -309,7 +309,7 @@
           "bytes": 81,
           "ip": "10.98.243.20",
           "locality": "internal",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 1,
           "port": 53
         }
@@ -363,7 +363,7 @@
           "packet_total_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.99.168.140",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 52344,
           "type": "netflow_flow"
         },
@@ -388,7 +388,7 @@
           "bytes": 0,
           "ip": "10.99.168.140",
           "locality": "internal",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 0,
           "port": 52344
         }
@@ -442,7 +442,7 @@
           "packet_total_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.98.243.20",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 53,
           "type": "netflow_flow"
         },
@@ -467,7 +467,7 @@
           "bytes": 113,
           "ip": "10.98.243.20",
           "locality": "internal",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 1,
           "port": 53
         }
@@ -521,7 +521,7 @@
           "packet_total_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.99.168.140",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 50294,
           "type": "netflow_flow"
         },
@@ -546,7 +546,7 @@
           "bytes": 0,
           "ip": "10.99.168.140",
           "locality": "internal",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 0,
           "port": 50294
         }
@@ -600,7 +600,7 @@
           "packet_total_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.98.243.20",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 53,
           "type": "netflow_flow"
         },
@@ -625,7 +625,7 @@
           "bytes": 113,
           "ip": "10.98.243.20",
           "locality": "internal",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 1,
           "port": 53
         }

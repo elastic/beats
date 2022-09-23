@@ -82,7 +82,7 @@ func TestNewModuleRegistry(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -149,7 +149,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -175,7 +175,7 @@ func TestMovedModule(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }
@@ -446,7 +446,7 @@ func TestMissingModuleFolder(t *testing.T) {
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
-	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0"}, true)
+	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0"}, true, false)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 

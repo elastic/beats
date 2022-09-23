@@ -6,11 +6,11 @@ package compute
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
@@ -26,11 +26,12 @@ const (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(projectID, zone string, region string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:     projectID,
 		zone:          zone,
 		region:        region,
+		regions:       regions,
 		opt:           opt,
 		instanceCache: common.NewCache(cacheTTL, initialCacheSize),
 		logger:        logp.NewLogger("metrics-compute"),
@@ -40,12 +41,12 @@ func NewMetadataService(projectID, zone string, region string, opt ...option.Cli
 // computeMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
 // reading and writing in the same method)
 type computeMetadata struct {
-	projectID   string
+	// projectID   string
 	zone        string
 	instanceID  string
 	machineType string
 
-	ts *monitoringpb.TimeSeries
+	// ts *monitoringpb.TimeSeries
 
 	User     map[string]string
 	Metadata map[string]string
@@ -57,6 +58,7 @@ type metadataCollector struct {
 	projectID     string
 	zone          string
 	region        string
+	regions       []string
 	opt           []option.ClientOption
 	instanceCache *common.Cache
 	logger        *logp.Logger
@@ -75,16 +77,16 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	}
 
 	if resp.Resource != nil && resp.Resource.Labels != nil {
-		metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
 	}
 
 	if resp.Metric.Labels != nil {
-		metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
 	}
 
 	if computeMetadata.machineType != "" {
 		lastIndex := strings.LastIndex(computeMetadata.machineType, "/")
-		metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, computeMetadata.machineType[lastIndex+1:])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, computeMetadata.machineType[lastIndex+1:])
 	}
 
 	computeMetadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
@@ -109,7 +111,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zone string) (*computeMetadata, error) {
 	instance, err := s.instance(ctx, instanceID)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to get data from instance '%s'", instanceID)
+		return nil, fmt.Errorf("error trying to get data from instance '%s' %w", instanceID, err)
 	}
 
 	computeMetadata := &computeMetadata{

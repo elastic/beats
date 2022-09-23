@@ -18,51 +18,67 @@
 package memqueue
 
 import (
-	"fmt"
-	"math"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // directEventLoop implements the broker main event loop. It buffers events,
 // but tries to forward events as early as possible.
 type directEventLoop struct {
-	broker *broker
-	buf    ringBuffer
+	broker     *broker
+	buf        ringBuffer
+	deleteChan chan int
 
 	// pendingACKs aggregates a list of ACK channels for batches that have been sent
 	// to consumers, which is then sent to the broker's scheduledACKs channel.
 	pendingACKs chanList
+
+	nextEntryID queue.EntryID
 }
 
 // bufferingEventLoop implements the broker main event loop.
 // Events in the buffer are forwarded to consumers only if the buffer is full or on flush timeout.
 type bufferingEventLoop struct {
-	broker *broker
+	broker     *broker
+	deleteChan chan int
 
-	buf       *batchBuffer
+	// The current buffer that incoming events are appended to. When it gets
+	// full enough, or enough time has passed, it is added to flushList.
+	// Events will still be added to buf even after it is in flushList, until
+	// either it reaches minEvents or a consumer requests it.
+	buf *batchBuffer
+
+	// flushList is the list of buffers that are ready to be sent to consumers.
 	flushList flushList
-
-	// The number of events currently waiting in the queue, including
-	// those that have not yet been acked.
-	eventCount int
-
-	// The number of events that have been read by a consumer but not yet acked
-	unackedEventCount int
-
-	minEvents    int
-	maxEvents    int
-	flushTimeout time.Duration
 
 	// pendingACKs aggregates a list of ACK channels for batches that have been sent
 	// to consumers, which is then sent to the broker's scheduledACKs channel.
 	pendingACKs chanList
 
+	// The number of events currently waiting in the queue, including
+	// those that have not yet been acked.
+	eventCount int
+
+	// The next entry ID that will be read by a consumer, and the next
+	// entry ID that has been consumed and is waiting for acknowledgment.
+	// We need to track these here because bufferingEventLoop discards
+	// its event buffers when they are sent to consumers, so we can't
+	// look directly at the event itself to get the current id like we
+	// do in the unbuffered loop.
+	nextConsumedID queue.EntryID
+	nextACKedID    queue.EntryID
+
+	minEvents    int
+	maxEvents    int
+	flushTimeout time.Duration
+
 	// buffer flush timer state
 	timer *time.Timer
 	idleC <-chan time.Time
+
+	nextEntryID queue.EntryID
 }
 
 type flushList struct {
@@ -73,7 +89,8 @@ type flushList struct {
 
 func newDirectEventLoop(b *broker, size int) *directEventLoop {
 	l := &directEventLoop{
-		broker: b,
+		broker:     b,
+		deleteChan: make(chan int),
 	}
 	l.buf.init(b.logger, size)
 
@@ -114,8 +131,7 @@ func (l *directEventLoop) run() {
 		case req := <-pushChan: // producer pushing new event
 			l.insert(&req)
 
-		case count := <-l.broker.ackChan:
-			// Events have been ACKed, remove them from the internal buffer.
+		case count := <-l.deleteChan:
 			l.buf.removeEntries(count)
 
 		case req := <-l.broker.cancelChan: // producer cancelling active events
@@ -136,23 +152,34 @@ func (l *directEventLoop) run() {
 }
 
 func (l *directEventLoop) handleMetricsRequest(req *metricsRequest) {
-	req.responseChan <- memQueueMetrics{currentQueueSize: l.buf.Items(), occupiedRead: l.buf.reserved}
+	// If the queue is empty, we report the "oldest" ID as the next
+	// one that will be assigned. Otherwise, we report the ID attached
+	// to the oldest queueEntry.
+	oldestEntryID := l.nextEntryID
+	if oldestEntry := l.buf.OldestEntry(); oldestEntry != nil {
+		oldestEntryID = oldestEntry.id
+	}
+
+	req.responseChan <- memQueueMetrics{
+		currentQueueSize: l.buf.Items(),
+		occupiedRead:     l.buf.reserved,
+		oldestEntryID:    oldestEntryID,
+	}
 }
 
-// Returns true if the queue is full after handling the insertion request.
 func (l *directEventLoop) insert(req *pushRequest) {
 	log := l.broker.logger
 
-	st := req.state
-	if st == nil {
-		l.buf.insert(req.event, clientState{})
-	} else if st.cancelled {
+	if req.producer != nil && req.producer.state.cancelled {
 		reportCancelledState(log, req)
 	} else {
-		l.buf.insert(req.event, clientState{
-			seq:   req.seq,
-			state: st,
-		})
+		req.resp <- l.nextEntryID
+		l.buf.insert(queueEntry{
+			event:      req.event,
+			id:         l.nextEntryID,
+			producer:   req.producer,
+			producerID: req.producerID})
+		l.nextEntryID++
 	}
 }
 
@@ -162,9 +189,9 @@ func (l *directEventLoop) handleCancel(req *producerCancelRequest) {
 
 	var removed int
 
-	if st := req.state; st != nil {
-		st.cancelled = true
-		removed = l.buf.cancel(st)
+	if producer := req.producer; producer != nil {
+		producer.state.cancelled = true
+		removed = l.buf.cancel(producer)
 	}
 
 	// signal cancel request being finished
@@ -203,55 +230,46 @@ func (l *directEventLoop) processACK(lst chanList, N int) {
 	entries := l.buf.entries
 
 	firstIndex := lst.front().start
-	// Position the index at the end of the block of ACKed events
-	idx := (firstIndex + N - 1) % len(entries)
 
-	total := 0
+	// We want to acknowledge N events starting at position firstIndex
+	// in the entries array.
+	// We iterate over the events from last to first, so we encounter the
+	// highest producer IDs first and can skip subsequent callbacks to the
+	// same producer.
+	producerCallbacks := []func(){}
 	for i := N - 1; i >= 0; i-- {
-		if idx < 0 {
-			idx = len(entries) - 1
-		}
+		// idx is the index in entries of the i-th event after firstIndex, wrapping
+		// around the end of the array.
+		idx := (firstIndex + i) % len(entries)
+		entry := &entries[idx]
 
-		client := &entries[idx].client
-		log.Debugf("try ack index: (idx=%v, i=%v, seq=%v)\n", idx, i, client.seq)
+		producer := entry.producer
 
-		idx--
-		if client.state == nil {
-			log.Debug("no state set")
+		// Set the producer in the entires array to nil to mark it as visited; a nil
+		// producer indicates that an entry requires no more ack processing (either
+		// because it has already been ACKed, or because its producer does not listen to ACKs).
+		entry.producer = nil
+		if producer == nil || entry.producerID <= producer.state.lastACK {
+			// This has a lower index than the previous ACK for this producer,
+			// so it was covered in the previous call and we can skip it.
 			continue
 		}
+		// This update is safe because lastACK is only used from the event loop.
+		count := int(entry.producerID - producer.state.lastACK)
+		producer.state.lastACK = entry.producerID
 
-		count := (client.seq - client.state.lastACK)
-		if count == 0 || count > math.MaxUint32/2 {
-			// seq number comparison did underflow. This happens only if st.seq has
-			// already been acknowledged
-			// log.Debug("seq number already acked: ", st.seq)
-
-			client.state = nil
-			continue
-		}
-
-		log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
-			count,
-			client.state.lastACK+1,
-			client.seq,
-		)
-
-		total += int(count)
-		if total > N {
-			panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
-				N, total,
-			))
-		}
-		client.state.cb(int(count))
-		client.state.lastACK = client.seq
-		client.state = nil
+		producerCallbacks = append(producerCallbacks, func() { producer.state.cb(count) })
+	}
+	l.deleteChan <- N
+	for _, f := range producerCallbacks {
+		f()
 	}
 }
 
 func newBufferingEventLoop(b *broker, size int, minEvents int, flushTimeout time.Duration) *bufferingEventLoop {
 	l := &bufferingEventLoop{
 		broker:       b,
+		deleteChan:   make(chan int),
 		maxEvents:    size,
 		minEvents:    minEvents,
 		flushTimeout: flushTimeout,
@@ -306,8 +324,8 @@ func (l *bufferingEventLoop) run() {
 		case schedACKs <- l.pendingACKs:
 			l.pendingACKs = chanList{}
 
-		case count := <-l.broker.ackChan:
-			l.handleACK(count)
+		case count := <-l.deleteChan:
+			l.handleDelete(count)
 
 		case req := <-l.broker.metricChan: // broker asking for queue metrics
 			l.handleMetricsRequest(&req)
@@ -323,11 +341,19 @@ func (l *bufferingEventLoop) run() {
 }
 
 func (l *bufferingEventLoop) handleMetricsRequest(req *metricsRequest) {
-	req.responseChan <- memQueueMetrics{currentQueueSize: l.eventCount, occupiedRead: l.unackedEventCount}
+	req.responseChan <- memQueueMetrics{
+		currentQueueSize: l.eventCount,
+		occupiedRead:     int(l.nextConsumedID - l.nextACKedID),
+		oldestEntryID:    l.nextACKedID,
+	}
 }
 
 func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
-	if l.insert(req) {
+	if l.insert(req, l.nextEntryID) {
+		// Send back the new event id.
+		req.resp <- l.nextEntryID
+
+		l.nextEntryID++
 		l.eventCount++
 
 		L := l.buf.length()
@@ -339,45 +365,39 @@ func (l *bufferingEventLoop) handleInsert(req *pushRequest) {
 				l.flushBuffer()
 				l.buf = newBatchBuffer(l.minEvents)
 			}
-		} else {
-			if L >= l.minEvents {
-				l.buf = newBatchBuffer(l.minEvents)
-			}
+		} else if L >= l.minEvents {
+			l.buf = newBatchBuffer(l.minEvents)
 		}
 	}
 }
 
-func (l *bufferingEventLoop) insert(req *pushRequest) bool {
-	if req.state == nil {
-		l.buf.add(req.event, clientState{})
-		return true
-	}
-
-	st := req.state
-	if st.cancelled {
+func (l *bufferingEventLoop) insert(req *pushRequest, id queue.EntryID) bool {
+	if req.producer != nil && req.producer.state.cancelled {
 		reportCancelledState(l.broker.logger, req)
 		return false
 	}
 
-	l.buf.add(req.event, clientState{
-		seq:   req.seq,
-		state: st,
+	l.buf.add(queueEntry{
+		event:      req.event,
+		id:         id,
+		producer:   req.producer,
+		producerID: req.producerID,
 	})
 	return true
 }
 
 func (l *bufferingEventLoop) handleCancel(req *producerCancelRequest) {
 	removed := 0
-	if st := req.state; st != nil {
+	if producer := req.producer; producer != nil {
 		// remove from actively flushed buffers
 		for buf := l.flushList.head; buf != nil; buf = buf.next {
-			removed += buf.cancel(st)
+			removed += buf.cancel(producer)
 		}
 		if !l.buf.flushed {
-			removed += l.buf.cancel(st)
+			removed += l.buf.cancel(producer)
 		}
 
-		st.cancelled = true
+		producer.state.cancelled = true
 	}
 
 	if req.resp != nil {
@@ -425,15 +445,15 @@ func (l *bufferingEventLoop) handleGetRequest(req *getRequest) {
 	req.responseChan <- getResponse{acker.doneChan, entries}
 	l.pendingACKs.append(acker)
 
-	l.unackedEventCount += len(entries)
+	l.nextConsumedID += queue.EntryID(len(entries))
 	buf.entries = buf.entries[count:]
 	if buf.length() == 0 {
 		l.advanceFlushList()
 	}
 }
 
-func (l *bufferingEventLoop) handleACK(count int) {
-	l.unackedEventCount -= count
+func (l *bufferingEventLoop) handleDelete(count int) {
+	l.nextACKedID += queue.EntryID(count)
 	l.eventCount -= count
 }
 
@@ -462,56 +482,47 @@ func (l *bufferingEventLoop) advanceFlushList() {
 
 func (l *bufferingEventLoop) flushBuffer() {
 	l.buf.flushed = true
-
-	if l.buf.length() == 0 {
-		panic("flushing empty buffer")
-	}
-
 	l.flushList.add(l.buf)
 }
 
+// Called by ackLoop. This function exists to decouple the work of collecting
+// and running producer callbacks from logical deletion of the events, so
+// input callbacks can't block the main queue goroutine.
 func (l *bufferingEventLoop) processACK(lst chanList, N int) {
-	log := l.broker.logger
-
-	total := 0
+	ackCallbacks := []func(){}
+	// First we traverse the entries we're about to remove, collecting any callbacks
+	// we need to run.
 	lst.reverse()
 	for !lst.empty() {
 		current := lst.pop()
 		entries := current.entries
 
+		// Traverse entries from last to first, so we can acknowledge the most recent
+		// ones first and skip subsequent producer callbacks.
 		for i := len(entries) - 1; i >= 0; i-- {
-			st := &entries[i].client
-			if st.state == nil {
+			entry := &entries[i]
+			if entry.producer == nil {
 				continue
 			}
 
-			count := st.seq - st.state.lastACK
-			if count == 0 || count > math.MaxUint32/2 {
-				// seq number comparison did underflow. This happens only if st.seq has
-				// already been acknowledged
-				// log.Debug("seq number already acked: ", st.seq)
-
-				st.state = nil
+			if entry.producerID <= entry.producer.state.lastACK {
+				// This index was already acknowledged on a previous iteration, skip.
+				entry.producer = nil
 				continue
 			}
-
-			log.Debugf("broker ACK events: count=%v, start-seq=%v, end-seq=%v\n",
-				count,
-				st.state.lastACK+1,
-				st.seq,
-			)
-
-			total += int(count)
-			if total > N {
-				panic(fmt.Sprintf("Too many events acked (expected=%v, total=%v)",
-					N, total,
-				))
-			}
-
-			st.state.cb(int(count))
-			st.state.lastACK = st.seq
-			st.state = nil
+			producerState := entry.producer.state
+			count := int(entry.producerID - producerState.lastACK)
+			ackCallbacks = append(ackCallbacks, func() { producerState.cb(count) })
+			entry.producer.state.lastACK = entry.producerID
+			entry.producer = nil
 		}
+	}
+	// Signal the queue to delete the events
+	l.deleteChan <- N
+
+	// The events have been removed; notify their listeners.
+	for _, f := range ackCallbacks {
+		f()
 	}
 }
 
@@ -542,15 +553,8 @@ func (l *flushList) add(b *batchBuffer) {
 }
 
 func reportCancelledState(log *logp.Logger, req *pushRequest) {
-	log.Debugf("cancelled producer - ignore event: %v\t%v\t%p", req.event, req.seq, req.state)
-
 	// do not add waiting events if producer did send cancel signal
-
-	st := req.state
-	if cb := st.dropCB; cb != nil {
-		if event, ok := req.event.(publisher.Event); ok {
-			cb(event.Content)
-		}
+	if cb := req.producer.state.dropCB; cb != nil {
+		cb(req.event)
 	}
-
 }
