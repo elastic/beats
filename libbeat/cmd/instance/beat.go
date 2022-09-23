@@ -174,47 +174,6 @@ func Run(settings Settings, bt beat.Creator) error {
 		if err != nil {
 			return err
 		}
-
-<<<<<<< HEAD
-		// Add basic info
-		registry := monitoring.GetNamespace("info").GetRegistry()
-		monitoring.NewString(registry, "version").Set(b.Info.Version)
-		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
-		monitoring.NewString(registry, "name").Set(b.Info.Name)
-		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
-
-		// Add more beat metadata
-		monitoring.NewString(registry, "binary_arch").Set(runtime.GOARCH)
-		monitoring.NewString(registry, "build_commit").Set(version.Commit())
-		monitoring.NewTimestamp(registry, "build_time").Set(version.BuildTime())
-		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
-
-		if u, err := user.Current(); err != nil {
-			if _, ok := err.(user.UnknownUserIdError); ok {
-				// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
-				// if the user set securityContext.runAsUser to an arbitrary value.
-				monitoring.NewString(registry, "uid").Set(strconv.Itoa(os.Getuid()))
-				monitoring.NewString(registry, "gid").Set(strconv.Itoa(os.Getgid()))
-			} else {
-				return err
-			}
-		} else {
-			monitoring.NewString(registry, "username").Set(u.Username)
-			monitoring.NewString(registry, "uid").Set(u.Uid)
-			monitoring.NewString(registry, "gid").Set(u.Gid)
-		}
-
-		// Add additional info to state registry. This is also reported to monitoring
-		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-		serviceRegistry := stateRegistry.NewRegistry("service")
-		monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
-		monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
-		beatRegistry := stateRegistry.NewRegistry("beat")
-		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
-		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
-
-=======
->>>>>>> e36ae71968 ([libbeat] Register uid/gid monitoring metrics asychronously (#31835))
 		return b.launch(settings, bt)
 	}())
 }
