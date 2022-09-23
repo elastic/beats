@@ -27,6 +27,7 @@ import (
 	"github.com/gofrs/flock"
 	"github.com/shirou/gopsutil/process"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 	metricproc "github.com/elastic/elastic-agent-system-metrics/metric/system/process"
@@ -34,10 +35,11 @@ import (
 )
 
 type Locker struct {
-	fileLock *flock.Flock
-	logger   *logp.Logger
-	beatName string
-	filePath string
+	fileLock  *flock.Flock
+	logger    *logp.Logger
+	beatName  string
+	filePath  string
+	beatStart time.Time
 }
 
 type pidfile struct {
@@ -54,19 +56,21 @@ var (
 
 // New returns a new pid-aware file locker
 // all logic, including checking for existing locks, is performed lazily
-func New(beatname string) *Locker {
-	lockfilePath := paths.Resolve(paths.Data, beatname+".lock")
+func New(beatInfo beat.Info) *Locker {
+	lockfilePath := paths.Resolve(paths.Data, beatInfo.Name+".lock")
 	return &Locker{
-		fileLock: flock.New(lockfilePath),
-		logger:   logp.L(),
-		beatName: beatname,
-		filePath: lockfilePath,
+		fileLock:  flock.New(lockfilePath),
+		logger:    logp.L(),
+		beatName:  beatInfo.Name,
+		filePath:  lockfilePath,
+		beatStart: beatInfo.StartTime,
 	}
 }
 
-// Cock attempts to acquire a lock on the data path for the currently-running
+// Lock attempts to acquire a lock on the data path for the currently-running
 // Beat instance. If another Beats instance already has a lock on the same data path
 // an ErrAlreadyLocked error is returned.
+// This lock is pid-aware, and will attempt to recover if the lockfile is taken by a PID that no longer exists.
 func (lock *Locker) Lock() error {
 	// create the pid file that will be used as the lock
 	noFile, err := lock.createPidfile(os.Getpid())
@@ -150,7 +154,13 @@ func (lock *Locker) handleFailedLock() error {
 	// Case: the lockfile is locked, but by us. Probably a coding error,
 	// and probably hard to do
 	if pf.Pid == os.Getpid() {
-		return fmt.Errorf("lockfile for beat has been locked twice by the same PID, potential bug.")
+		// the lockfile was written before the beat started, meaning we restarted and somehow got the same pid
+		// in which case, continue
+		if lock.beatStart.Before(pf.WriteTime) {
+			return fmt.Errorf("lockfile for beat has been locked twice by the same PID, potential bug.")
+		}
+		lock.logger.Debugf("Metricbeat has started with the same PID, continuing")
+		return lock.recoverLockfile()
 	}
 
 	// Check to see if the PID found in the pidfile exists.
@@ -171,7 +181,7 @@ func (lock *Locker) handleFailedLock() error {
 		// Above call is is auxiliary debug data, so we don't care too much if it fails
 		debugString := fmt.Sprintf("process with PID %d", pf.Pid)
 		if err == nil {
-			debugString = fmt.Sprintf("process '%s' with pid %d", state.Name, pf.Pid)
+			debugString = fmt.Sprintf("process '%s' with PID %d", state.Name, pf.Pid)
 		}
 		return fmt.Errorf("connot start, data directory belongs to %s", debugString)
 	}
@@ -180,10 +190,14 @@ func (lock *Locker) handleFailedLock() error {
 	// this was presumably due to the dirty shutdown.
 	// Try to reset the lockfile and continue.
 	lock.logger.Infof("%s shut down without removing previous lockfile, continuing", lock.beatName)
+	return lock.recoverLockfile()
+}
 
-	// try to remove the lockfile
-	// May or may not work, depending on os-specific details with lockfiles
-	err = os.Remove(lock.fileLock.Path())
+// recoverLockfile attempts to remove the lockfile and continue running
+// This should only be called after we're sure it's safe to ignore a pre-existing locfile
+func (lock *Locker) recoverLockfile() error {
+	// File remove or may not work, depending on os-specific details with lockfiles
+	err := os.Remove(lock.fileLock.Path())
 	if err != nil {
 		lockfilePath := paths.Resolve(paths.Data, fmt.Sprintf("%s_%d.lock", lock.beatName, os.Getpid()))
 		lock.logger.Warnf("failed to reset lockfile, cannot remove %s, continuing on with new lockfile name %s",

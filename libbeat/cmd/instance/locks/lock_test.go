@@ -21,14 +21,17 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-const beatName = "testbeat"
+var beatName = "testbeat"
 
 func TestMain(m *testing.M) {
 	err := logp.DevelopmentSetup()
@@ -54,7 +57,8 @@ func TestMain(m *testing.M) {
 
 func TestLockWithDeadPid(t *testing.T) {
 	// create old lockfile
-	locker := New(beatName)
+	testBeat := beat.Info{Name: mustNewUUID(t), StartTime: time.Now()}
+	locker := New(testBeat)
 	_, err := locker.createPidfile(8888)
 	require.NoError(t, err)
 
@@ -62,14 +66,15 @@ func TestLockWithDeadPid(t *testing.T) {
 	require.NoError(t, err)
 
 	// create new locker
-	newLocker := New(beatName)
+	newLocker := New(testBeat)
 	err = newLocker.Lock()
 	require.NoError(t, err)
 }
 
 func TestLockWithTwoBeats(t *testing.T) {
+	testBeat := beat.Info{Name: mustNewUUID(t), StartTime: time.Now()}
 	// emulate two beats trying to run from the same data path
-	locker := New(beatName)
+	locker := New(testBeat)
 	// use pid 1 as another beat
 	_, err := locker.createPidfile(1)
 	require.NoError(t, err)
@@ -77,29 +82,51 @@ func TestLockWithTwoBeats(t *testing.T) {
 	require.NoError(t, err)
 
 	// create new locker
-	newLocker := New(beatName)
+	newLocker := New(testBeat)
 	err = newLocker.Lock()
 	require.Error(t, err)
 	t.Logf("Got desired error: %s", err)
 }
 
 func TestDoubleLock(t *testing.T) {
-	// emulate two beats trying to run from the same data path
-	locker := New(beatName)
+	testBeat := beat.Info{Name: mustNewUUID(t), StartTime: time.Now()}
+	locker := New(testBeat)
 	err := locker.Lock()
 	require.NoError(t, err)
 
-	newLocker := New(beatName)
+	newLocker := New(testBeat)
 	err = newLocker.Lock()
 	require.Error(t, err)
 	t.Logf("Got desired error: %s", err)
 }
 
 func TestUnlock(t *testing.T) {
-	locker := New(beatName)
+	testBeat := beat.Info{Name: mustNewUUID(t), StartTime: time.Now()}
+	locker := New(testBeat)
 	err := locker.Lock()
 	require.NoError(t, err)
 
 	err = locker.Unlock()
 	require.NoError(t, err)
+}
+
+func TestRestartWithSamePID(t *testing.T) {
+	// create old lockfile
+	testBeatName := mustNewUUID(t)
+	testBeat := beat.Info{Name: testBeatName, StartTime: time.Now().Add(-time.Second * 20)}
+	locker := New(testBeat)
+	err := locker.Lock()
+	require.NoError(t, err)
+	// create new lockfile with the same PID but a newer time
+	// create old lockfile
+	testNewBeat := beat.Info{Name: testBeatName, StartTime: time.Now()}
+	lockerNew := New(testNewBeat)
+	err = lockerNew.Lock()
+	require.NoError(t, err)
+}
+
+func mustNewUUID(t *testing.T) string {
+	uuid, err := uuid.NewV4()
+	require.NoError(t, err)
+	return uuid.String()
 }

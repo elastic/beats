@@ -384,7 +384,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// This must be the first deferred cleanup task (last to execute).
 	defer svc.NotifyTermination()
 
-	bl := locks.New(b.Info.Beat)
+	// Try to acquire exclusive lock on data path to prevent another beat instance
+	// sharing same data path.
+	bl := locks.New(b.Info)
 	err := bl.Lock()
 	if err != nil {
 		return err
