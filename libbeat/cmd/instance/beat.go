@@ -37,7 +37,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -159,8 +158,8 @@ func initRand() {
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
 	err := setUmaskWithSettings(settings)
-	if err != nil && err != errNotImplemented {
-		return errw.Wrap(err, "could not set umask")
+	if err != nil && !errors.Is(err, errNotImplemented) {
+		return fmt.Errorf("could not set umask: %w", err)
 	}
 
 	return handleError(func() error {
@@ -345,7 +344,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		publisher, err = pipeline.Load(b.Info, monitors, b.Config.Pipeline, b.processing, outputFactory)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("error initializing publisher: %+v", err)
+		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
 	reload.Register.MustRegister("output", b.makeOutputReloader(publisher.OutputReloader()))
@@ -364,7 +363,9 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 }
 
 func (b *Beat) launch(settings Settings, bt beat.Creator) error {
-	defer logp.Sync()
+	defer func() {
+		_ = logp.Sync()
+	}()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
 	defer func() {
@@ -386,7 +387,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if err != nil {
 		return err
 	}
-	defer bl.unlock()
+	defer func() {
+		_ = bl.unlock()
+	}()
 
 	svc.BeforeRun()
 	defer svc.Cleanup()
@@ -402,7 +405,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 			return errw.Wrap(err, "could not start the HTTP server for the API")
 		}
 		s.Start()
-		defer s.Stop()
+		defer func() {
+			_ = s.Stop()
+		}()
 		if b.Config.HTTPPprof.Enabled() {
 			s.AttachPprof()
 		}
@@ -514,7 +519,7 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 			return err
 		}
 
-		fmt.Println("Config OK")
+		fmt.Println("Config OK") //nolint:forbidigo // required to give feedback to user
 		return beat.GracefulExit
 	}())
 }
@@ -573,7 +578,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if err = m.Setup(loadTemplate, loadILM); err != nil {
 				return err
 			}
-			fmt.Println("Index setup finished.")
+			fmt.Println("Index setup finished.") //nolint:forbidigo // required to give feedback to user
 		}
 
 		if setup.Dashboard && settings.HasDashboards {
@@ -581,10 +586,10 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			err = b.loadDashboards(context.Background(), true)
 
 			if err != nil {
-				switch err := errw.Cause(err).(type) {
-				case *dashboards.ErrNotFound:
+				var notFoundErr *dashboards.ErrNotFound
+				if errors.As(err, &notFoundErr) {
 					fmt.Printf("Skipping loading dashboards, %+v\n", err)
-				default:
+				} else {
 					return err
 				}
 			} else {
