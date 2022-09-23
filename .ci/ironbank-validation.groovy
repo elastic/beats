@@ -63,18 +63,26 @@ pipeline {
         }
       }
     }
+    stage('Pre-flight'){
+      options { skipDefaultCheckout() }
+      environment {
+        DOCKER_ELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
+        DOCKER_REGISTRY = 'docker.elastic.co'
+      }
+      steps {
+        // verify if the docker registry is available by using the dockerLogin step
+        // if so then run the validation which interacts with third party systems
+        retryWithSleep(retries: 3, seconds: 10, backoff: true) {
+          dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+        }
+      }
+    }
     stage('Validate'){
       options { skipDefaultCheckout() }
       steps {
         withMageEnv(){
           dir("${env.BASE_DIR}/${env.BEATS_FOLDER}") {
-            // Interacts with the docker registry, it might be flaky in some cases, to avoid
-            // the chances of those failures let's retry a few times, though it might somehow
-            // rerun genuine failures, which will take up to 3 times to be reported, but it can
-            // reduce the overhead for flakiness in the infrastructure side.
-            retryWithSleep(retries: 3, seconds: 30, backoff: true) {
-              sh(label: 'make validate-ironbank', script: "make -C ironbank validate-ironbank")
-            }
+            sh(label: 'make validate-ironbank', script: "make -C ironbank validate-ironbank")
           }
         }
       }
