@@ -590,7 +590,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if err != nil {
 				var notFoundErr *dashboards.ErrNotFound
 				if errors.As(err, &notFoundErr) {
-					fmt.Printf("Skipping loading dashboards, %+v\n", err)
+					fmt.Printf("Skipping loading dashboards, %+v\n", err) //nolint:forbidigo // required to give feedback to user
 				} else {
 					return err
 				}
@@ -760,7 +760,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
+		if err := json.NewDecoder(f).Decode(&m); err != nil && !errors.Is(err, io.EOF) {
 			f.Close()
 			return fmt.Errorf("Beat meta file reading error: %w", err)
 		}
@@ -1017,7 +1017,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 // error. If the err is nil or is a GracefulExit error then the method will
 // return nil without logging anything.
 func handleError(err error) error {
-	if err == nil || err == beat.GracefulExit {
+	if err == nil || errors.Is(err, beat.GracefulExit) {
 		return nil
 	}
 
@@ -1142,13 +1142,13 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 		api_key, _ := esConfig.String("api_key", -1)
 
 		if !kibanaConfig.HasField("username") && username != "" {
-			kibanaConfig.SetString("username", -1, username)
+			_ = kibanaConfig.SetString("username", -1, username)
 		}
 		if !kibanaConfig.HasField("password") && password != "" {
-			kibanaConfig.SetString("password", -1, password)
+			_ = kibanaConfig.SetString("password", -1, password)
 		}
 		if !kibanaConfig.HasField("api_key") && api_key != "" {
-			kibanaConfig.SetString("api_key", -1, api_key)
+			_ = kibanaConfig.SetString("api_key", -1, api_key)
 		}
 	}
 	return kibanaConfig, nil
