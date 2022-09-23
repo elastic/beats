@@ -402,7 +402,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if b.Config.HTTP.Enabled() {
 		s, err := api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
-			return errw.Wrap(err, "could not start the HTTP server for the API")
+			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
 		s.Start()
 		defer func() {
@@ -871,7 +871,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
 			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
-			return errw.Wrap(err, "Error importing Kibana dashboards")
+			return fmt.Errorf("Error importing Kibana dashboards: %w", err)
 		}
 		logp.Info("Kibana dashboards successfully loaded.")
 	}
@@ -953,7 +953,7 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 
 		status, body, err := esClient.Request("GET", "/", "", nil, nil)
 		if err != nil {
-			return errw.Wrap(err, "error querying /")
+			return fmt.Errorf("error querying /: %w", err)
 		}
 		if status > 299 {
 			return fmt.Errorf("Error querying /. Status: %d. Response body: %s", status, body)
