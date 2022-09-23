@@ -38,6 +38,8 @@ import (
 
 	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
@@ -573,7 +575,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			}
 			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
-				fmt.Println(warn)
+				fmt.Println(warn) //nolint:forbidigo // required to give feedback to user
 			}
 			if err = m.Setup(loadTemplate, loadILM); err != nil {
 				return err
@@ -582,7 +584,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 		}
 
 		if setup.Dashboard && settings.HasDashboards {
-			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
+			fmt.Println("Loading dashboards (Kibana must be running and reachable)") //nolint:forbidigo // required to give feedback to user
 			err = b.loadDashboards(context.Background(), true)
 
 			if err != nil {
@@ -593,14 +595,15 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 					return err
 				}
 			} else {
-				fmt.Println("Loaded dashboards")
+				fmt.Println("Loaded dashboards") //nolint:forbidigo // required to give feedback to user
 			}
 		}
 
 		if setup.MachineLearning && b.SetupMLCallback != nil {
-			cfgwarn.Deprecate("8.0.0", "Setting up ML using %v is going to be removed. Please use the ML app to setup jobs.", strings.Title(b.Info.Beat))
-			fmt.Println("Setting up ML using setup --machine-learning is going to be removed in 8.0.0. Please use the ML app instead.\nSee more: https://www.elastic.co/guide/en/machine-learning/current/index.html")
-			fmt.Println("It is not possble to load ML jobs into an Elasticsearch 8.0.0 or newer using the Beat.")
+			c := cases.Title(language.English)
+			cfgwarn.Deprecate("8.0.0", "Setting up ML using %v is going to be removed. Please use the ML app to setup jobs.", c.String(b.Info.Beat))
+			fmt.Println("Setting up ML using setup --machine-learning is going to be removed in 8.0.0. Please use the ML app instead.\nSee more: https://www.elastic.co/guide/en/machine-learning/current/index.html") //nolint:forbidigo // required to give feedback to user
+			fmt.Println("It is not possble to load ML jobs into an Elasticsearch 8.0.0 or newer using the Beat.")                                                                                                      //nolint:forbidigo // required to give feedback to user
 
 			err = b.SetupMLCallback(&b.Beat, !setup.SetupAll, b.Config.Kibana)
 			if err != nil {
@@ -615,7 +618,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				return err
 			}
 
-			fmt.Println("Loaded Ingest pipelines")
+			fmt.Println("Loaded Ingest pipelines") //nolint:forbidigo // required to give feedback to user
 		}
 
 		return nil
@@ -639,7 +642,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
-		return fmt.Errorf("error loading config file: %v", err)
+		return fmt.Errorf("error loading config file: %w", err)
 	}
 
 	if err := initPaths(cfg); err != nil {
@@ -650,7 +653,7 @@ func (b *Beat) configure(settings Settings) error {
 	// options.
 	store, err := LoadKeystore(cfg, b.Info.Beat)
 	if err != nil {
-		return fmt.Errorf("could not initialize the keystore: %v", err)
+		return fmt.Errorf("could not initialize the keystore: %w", err)
 	}
 
 	if settings.DisableConfigResolver {
@@ -676,7 +679,7 @@ func (b *Beat) configure(settings Settings) error {
 	b.RawConfig = cfg
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
-		return fmt.Errorf("error unpacking config data: %v", err)
+		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
 	b.Beat.Config = &b.Config.BeatConfig
@@ -686,7 +689,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
-		return fmt.Errorf("error initializing logging: %v", err)
+		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
 	// log paths values to help with troubleshooting
@@ -751,15 +754,15 @@ func (b *Beat) loadMeta(metaPath string) error {
 	logp.Debug("beat", "Beat metadata path: %v", metaPath)
 
 	f, err := openRegular(metaPath)
-	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("Beat meta file failed to open: %s", err)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("Beat meta file failed to open: %w", err)
 	}
 
 	if err == nil {
 		m := meta{}
 		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
-			return fmt.Errorf("Beat meta file reading error: %v", err)
+			return fmt.Errorf("Beat meta file reading error: %w", err)
 		}
 
 		f.Close()
@@ -783,22 +786,22 @@ func (b *Beat) loadMeta(metaPath string) error {
 	tempFile := metaPath + ".new"
 	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return fmt.Errorf("Failed to create Beat meta file: %s", err)
+		return fmt.Errorf("Failed to create Beat meta file: %w", err)
 	}
 
 	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
 	err = f.Sync()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", err)
+		return fmt.Errorf("Beat meta file failed to write: %w", err)
 	}
 
 	err = f.Close()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", err)
+		return fmt.Errorf("Beat meta file failed to write: %w", err)
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("Beat meta file failed to write: %s", encodeErr)
+		return fmt.Errorf("Beat meta file failed to write: %w", encodeErr)
 	}
 
 	// move temporary file into final location
@@ -837,7 +840,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		}
 		err := b.Config.Dashboards.SetBool("enabled", -1, true)
 		if err != nil {
-			return fmt.Errorf("Error setting dashboard.enabled=true: %v", err)
+			return fmt.Errorf("Error setting dashboard.enabled=true: %w", err)
 		}
 	}
 
@@ -847,12 +850,12 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
 		kibanaConfig, err := initKibanaConfig(b.Config)
 		if err != nil {
-			return fmt.Errorf("error initKibanaConfig: %v", err)
+			return fmt.Errorf("error initKibanaConfig: %w", err)
 		}
 
 		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
 		if err != nil {
-			return fmt.Errorf("error connecting to Kibana: %v", err)
+			return fmt.Errorf("error connecting to Kibana: %w", err)
 		}
 		// This fetches the version for Kibana. For the alias feature the version of ES would be needed
 		// but it's assumed that KB and ES have the same minor version.
@@ -860,12 +863,12 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, b.Config.Migration.Enabled())
 		if err != nil {
-			return fmt.Errorf("error creating index pattern generator: %v", err)
+			return fmt.Errorf("error creating index pattern generator: %w", err)
 		}
 
 		pattern, err := indexPattern.Generate()
 		if err != nil {
-			return fmt.Errorf("error generating index pattern: %v", err)
+			return fmt.Errorf("error generating index pattern: %w", err)
 		}
 
 		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
@@ -889,7 +892,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 	_, err := elasticsearch.RegisterConnectCallback(b.indexSetupCallback())
 	if err != nil {
-		return fmt.Errorf("failed to register index management with elasticsearch: %+v", err)
+		return fmt.Errorf("failed to register index management with elasticsearch: %w", err)
 	}
 	return nil
 }
@@ -935,7 +938,7 @@ func (b *Beat) registerClusterUUIDFetching() error {
 		if err != nil {
 			return err
 		}
-		elasticsearch.RegisterConnectCallback(callback)
+		_, _ = elasticsearch.RegisterConnectCallback(callback)
 	}
 	return nil
 }
@@ -1166,7 +1169,7 @@ func initPaths(cfg *common.Config) error {
 	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
-		return fmt.Errorf("error extracting default paths: %+v", err)
+		return fmt.Errorf("error extracting default paths: %w", err)
 	}
 
 	// Read the value for hostfs as `system.hostfs`
@@ -1174,7 +1177,7 @@ func initPaths(cfg *common.Config) error {
 	partialConfig.Path.Hostfs = partialConfig.Hostfs
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %+v", err)
+		return fmt.Errorf("error setting default paths: %w", err)
 	}
 	return nil
 }
