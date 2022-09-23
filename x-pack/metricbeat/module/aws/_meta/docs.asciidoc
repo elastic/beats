@@ -39,10 +39,12 @@ latency amount.
 
 * *data_granularity*
 
-This module accepts an optional `data_granularity` setting which sets the granularity of the returned data points.
-For example the period (how often the cloudwatch API is called) can be set to 1h with a `data_granularity` of 5m and the result will contain 12 metrics.
-This enables less API calls which lowers the cost of the module while maintaining the same level of details in the metrics.
-The only difference is the delay in ingesting the metrics data due to the larger period.  If no value is specified, the value is set to the `period`.
+This module accepts an optional `data_granularity` parameter which sets the granularity of the returned data points.
+This parameter can be used to decouple how frequently metricbeat would collect data from AWS, from how granular this data should be.
+This would helpful to reduce the cost incurred in calling AWS Cloudwatch, in cases where highly-granular data is required,
+but a delay in collecting and ingesting the metrics can be tolerated.
+
+If no value is specified, the value is set to the `period`.
 
 * *endpoint*
 
