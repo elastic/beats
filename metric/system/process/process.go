@@ -21,11 +21,14 @@
 package process
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
 	"strings"
 	"time"
+
+	psutil "github.com/shirou/gopsutil/process"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
@@ -54,6 +57,27 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 	}
 
 	return plist, nil
+}
+
+// GetPIDState returns the state of a given PID
+// It will return ProcNotExist if the process was not found.
+func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
+	// This library still doesn't have a good cross-platform way to distinguish between "does not eixst" and other process errors.
+	// This is a fairly difficult problem to solve in a cross-platform way
+	exists, err := psutil.PidExistsWithContext(context.Background(), int32(pid))
+	if err != nil {
+		return "", fmt.Errorf("Error truing to find process: %d: %w", pid, err)
+	}
+	if !exists {
+		return "", ProcNotExist
+	}
+	//GetInfoForPid will return the smallest possible dataset for a PID
+	procState, err := GetInfoForPid(hostfs, pid)
+	if err != nil {
+		return "", fmt.Errorf("error getting state info for pid %d: %w", pid, err)
+	}
+
+	return procState.State, nil
 }
 
 // Get fetches the configured processes and returns a list of formatted events and root ECS fields

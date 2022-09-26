@@ -38,6 +38,13 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
+func TestGetState(t *testing.T) {
+	// Getpid is really the only way to test this in a cross-platform way
+	state, err := GetPIDState(resolve.NewTestResolver("/"), os.Getpid())
+	require.NoError(t, err)
+	require.Equal(t, Running, state)
+}
+
 func TestGetOne(t *testing.T) {
 	testConfig := Stats{
 		Procs:        []string{".*"},
