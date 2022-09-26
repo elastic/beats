@@ -63,6 +63,20 @@ pipeline {
         }
       }
     }
+    stage('Pre-flight'){
+      options { skipDefaultCheckout() }
+      environment {
+        DOCKER_ELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
+        DOCKER_REGISTRY = 'docker.elastic.co'
+      }
+      steps {
+        // verify if the docker registry is available by using the dockerLogin step
+        // if so then run the validation which interacts with third party systems
+        retryWithSleep(retries: 3, seconds: 10, backoff: true) {
+          dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+        }
+      }
+    }
     stage('Validate'){
       options { skipDefaultCheckout() }
       steps {
