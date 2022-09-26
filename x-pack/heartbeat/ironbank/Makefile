@@ -38,7 +38,7 @@ download-hardening-manifest-artifacts: setup-yq ## Parse hardening_manifest.yaml
 
 .PHONY: prepare
 prepare: download-hardening-manifest-artifacts ## Download container dependencies.
-	cp ../build/distributions/heartbeat-$(BEAT_VERSION)-linux-x86_64.tar.gz $(LOCATION)/
+	cp -f ../build/distributions/heartbeat-$(BEAT_VERSION)-linux-x86_64.tar.gz $(LOCATION)/
 
 package: ## Package heartbeat for the artifacts consumed by the ironbank docker context.
 	cd ../ ; \
