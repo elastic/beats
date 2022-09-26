@@ -389,6 +389,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if err != nil {
 		return err
 	}
+
 	defer func() {
 		_ = bl.unlock()
 	}()
