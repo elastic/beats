@@ -28,9 +28,16 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
+
+/*
+#include <procinfo.h>
+#include <sys/types.h>
+*/
+import "C"
 
 // FetchPids returns a map and array of pids
 func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
@@ -164,7 +171,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 
 	bbuf = bytes.NewBuffer(buf)
 	delim := []byte{61} // "="
-	vars := map[string]string{}
+	vars := mapstr.M{}
 	for {
 		line, err := bbuf.ReadBytes(0)
 		if errors.Is(err, io.EOF) || line[0] == 0 {
