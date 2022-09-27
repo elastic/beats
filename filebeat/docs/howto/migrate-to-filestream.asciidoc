@@ -14,11 +14,11 @@ The following example shows three `log` inputs:
 [source,yaml]
 ----
 filebeat.inputs:
- - type: log
-   enabled: true
-   paths:
-     - /var/log/java-exceptions*.log
-   multiline:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/java-exceptions*.log
+  multiline:
     pattern: '^\['
     negate: true
     match: after
@@ -98,11 +98,11 @@ you can delete the `log` inputs and the `exlude_files` settings from `filestream
 [source,yaml]
 ----
 filebeat.inputs:
- - type: log
-   enabled: true
-   paths:
-     - /var/log/java-exceptions*.log
-   multiline:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/java-exceptions*.log
+  multiline:
     pattern: '^\['
     negate: true
     match: after
