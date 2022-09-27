@@ -138,7 +138,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 	info.pi_pid = C.pid_t(pid)
 
 	if _, err := C.getargs(unsafe.Pointer(&info), C.sizeof_struct_procsinfo64, (*C.char)(&buf[0]), 8192); err != nil {
-		return state, fmt.Errorf("error in gitargs: %w", err)
+		return state, fmt.Errorf("error in getargs: %w", err)
 	}
 
 	bbuf := bytes.NewBuffer(buf)
