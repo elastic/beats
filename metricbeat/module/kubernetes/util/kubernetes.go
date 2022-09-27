@@ -155,6 +155,8 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate("persistentvolume", r)
 			case *kubernetes.PersistentVolumeClaim:
 				m[id] = metaGen.Generate("persistentvolumeclaim", r)
+			case *kubernetes.StorageClass:
+				m[id] = metaGen.Generate("storageclass", r)
 			default:
 				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
@@ -565,4 +567,25 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 		ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
 	}
 	return ecsClusterMeta, nil
+}
+
+// AddClusterECSMeta adds ECS orchestrator fields
+func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
+		logp.Info("could not retrieve validated config")
+		return nil
+	}
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+	if err != nil {
+		logp.Err("fail to get kubernetes client: %s", err)
+		return nil
+	}
+	cfg, _ := conf.NewConfigFrom(&config)
+	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
+	if err != nil {
+		logp.Info("could not retrieve cluster metadata: %s", err)
+		return nil
+	}
+	return ecsClusterMeta
 }

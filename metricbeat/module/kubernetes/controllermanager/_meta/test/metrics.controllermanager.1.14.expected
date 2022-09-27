@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "garbage_collector_attempt_to_delete",
@@ -34,7 +34,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "job",
@@ -68,7 +68,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "garbage_collector_graph_changes",
@@ -102,7 +102,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -126,7 +126,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "noexec_taint_pod",
@@ -157,7 +157,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "replicationmanager",
@@ -191,7 +191,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -215,7 +215,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "ClusterRoleAggregator",
@@ -249,7 +249,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "claims",
@@ -280,7 +280,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "bootstrap_signer_queue",
@@ -314,7 +314,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -338,7 +338,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "serviceaccount_tokens_secret",
@@ -372,7 +372,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "disruption_recheck",
@@ -406,7 +406,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "disruption",
@@ -440,7 +440,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -464,7 +464,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "pvcs",
@@ -498,7 +498,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "deployment",
@@ -532,7 +532,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "noexec_taint_node",
@@ -563,7 +563,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "endpoint",
@@ -597,7 +597,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"leader": {
@@ -617,7 +617,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "statefulset",
@@ -651,7 +651,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "resource_quota_controller_resource_changes",
@@ -685,7 +685,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "service",
@@ -719,7 +719,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -743,7 +743,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "garbage_collector_attempt_to_orphan",
@@ -777,7 +777,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "horizontalpodautoscaler",
@@ -811,7 +811,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "namespace",
@@ -845,7 +845,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"node": {
@@ -896,7 +896,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "serviceaccount_tokens_service",
@@ -930,7 +930,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -954,7 +954,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "replicaset",
@@ -988,7 +988,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "daemonset",
@@ -1022,7 +1022,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -1046,7 +1046,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "ttlcontroller",
@@ -1080,7 +1080,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "pvprotection",
@@ -1114,7 +1114,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "serviceaccount",
@@ -1148,7 +1148,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "volumes",
@@ -1179,7 +1179,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "certificate",
@@ -1213,7 +1213,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"code": "200",
@@ -1237,7 +1237,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "node_lifecycle_controller",
@@ -1268,7 +1268,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "resourcequota_primary",
@@ -1302,7 +1302,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "pvcprotection",
@@ -1336,7 +1336,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "token_cleaner",
@@ -1370,7 +1370,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "resourcequota_priority",
@@ -1404,7 +1404,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -1428,7 +1428,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"handler": "prometheus",

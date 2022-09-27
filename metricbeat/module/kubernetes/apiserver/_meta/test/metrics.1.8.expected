@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -25,7 +25,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -50,7 +50,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -75,7 +75,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -101,7 +101,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -126,7 +126,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -151,7 +151,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -176,7 +176,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -201,7 +201,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -226,7 +226,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -251,7 +251,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -277,7 +277,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -312,7 +312,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -337,7 +337,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -362,7 +362,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -397,7 +397,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -422,7 +422,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -447,7 +447,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -482,7 +482,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -517,7 +517,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -542,7 +542,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -567,7 +567,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -592,7 +592,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -627,7 +627,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -662,7 +662,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -688,7 +688,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -713,7 +713,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -738,7 +738,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -764,7 +764,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -799,7 +799,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -824,7 +824,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -859,7 +859,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -884,7 +884,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -909,7 +909,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -934,7 +934,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -959,7 +959,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -994,7 +994,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1019,7 +1019,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1044,7 +1044,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1079,7 +1079,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1104,7 +1104,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1139,7 +1139,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1164,7 +1164,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1189,7 +1189,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1214,7 +1214,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1239,7 +1239,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1264,7 +1264,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1299,7 +1299,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1324,7 +1324,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1349,7 +1349,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1374,7 +1374,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1409,7 +1409,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1444,7 +1444,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1479,7 +1479,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1514,7 +1514,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1549,7 +1549,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1574,7 +1574,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -1600,7 +1600,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1625,7 +1625,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1650,7 +1650,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1675,7 +1675,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1700,7 +1700,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1725,7 +1725,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1760,7 +1760,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1795,7 +1795,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1820,7 +1820,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -1846,7 +1846,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1881,7 +1881,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1906,7 +1906,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1941,7 +1941,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1966,7 +1966,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -1991,7 +1991,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2016,7 +2016,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2041,7 +2041,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2076,7 +2076,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2101,7 +2101,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2126,7 +2126,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2161,7 +2161,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2186,7 +2186,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2211,7 +2211,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2236,7 +2236,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2262,7 +2262,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2287,7 +2287,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2312,7 +2312,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2337,7 +2337,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2362,7 +2362,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2387,7 +2387,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2412,7 +2412,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2437,7 +2437,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2473,7 +2473,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2498,7 +2498,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2523,7 +2523,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2548,7 +2548,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2573,7 +2573,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2598,7 +2598,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2623,7 +2623,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2648,7 +2648,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2673,7 +2673,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2698,7 +2698,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2723,7 +2723,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2748,7 +2748,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2773,7 +2773,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2798,7 +2798,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2833,7 +2833,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2868,7 +2868,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2893,7 +2893,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2928,7 +2928,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2953,7 +2953,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -2988,7 +2988,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3013,7 +3013,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3038,7 +3038,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3063,7 +3063,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -3089,7 +3089,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3114,7 +3114,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3149,7 +3149,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3174,7 +3174,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3199,7 +3199,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3224,7 +3224,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3249,7 +3249,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3284,7 +3284,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3309,7 +3309,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3334,7 +3334,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3369,7 +3369,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3394,7 +3394,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3419,7 +3419,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3454,7 +3454,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3489,7 +3489,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3524,7 +3524,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3559,7 +3559,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3584,7 +3584,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3609,7 +3609,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3644,7 +3644,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3669,7 +3669,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3694,7 +3694,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"http": {
@@ -3720,7 +3720,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3745,7 +3745,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3770,7 +3770,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3795,7 +3795,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3830,7 +3830,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3855,7 +3855,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3880,7 +3880,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3915,7 +3915,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3940,7 +3940,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3965,7 +3965,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -3990,7 +3990,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4025,7 +4025,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4050,7 +4050,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4075,7 +4075,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4100,7 +4100,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4125,7 +4125,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4150,7 +4150,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4185,7 +4185,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4210,7 +4210,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4235,7 +4235,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4260,7 +4260,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4284,7 +4284,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4309,7 +4309,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4334,7 +4334,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4359,7 +4359,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4384,7 +4384,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4419,7 +4419,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4455,7 +4455,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4490,7 +4490,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4515,7 +4515,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4550,7 +4550,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4576,7 +4576,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4601,7 +4601,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4635,7 +4635,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4660,7 +4660,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4685,7 +4685,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4710,7 +4710,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4735,7 +4735,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4770,7 +4770,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4805,7 +4805,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4840,7 +4840,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4875,7 +4875,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4900,7 +4900,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4925,7 +4925,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4961,7 +4961,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -4986,7 +4986,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5021,7 +5021,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5046,7 +5046,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5071,7 +5071,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5096,7 +5096,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5131,7 +5131,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5156,7 +5156,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5181,7 +5181,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5206,7 +5206,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5242,7 +5242,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5267,7 +5267,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5302,7 +5302,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5327,7 +5327,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5353,7 +5353,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5378,7 +5378,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5403,7 +5403,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5438,7 +5438,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5473,7 +5473,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5509,7 +5509,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5544,7 +5544,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5569,7 +5569,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5594,7 +5594,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5619,7 +5619,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5644,7 +5644,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5669,7 +5669,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5694,7 +5694,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5729,7 +5729,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5754,7 +5754,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5789,7 +5789,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5814,7 +5814,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5839,7 +5839,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5874,7 +5874,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5899,7 +5899,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5934,7 +5934,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5959,7 +5959,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -5984,7 +5984,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -6010,7 +6010,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6035,7 +6035,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6070,7 +6070,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6095,7 +6095,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6120,7 +6120,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6146,7 +6146,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6171,7 +6171,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6196,7 +6196,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6222,7 +6222,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6257,7 +6257,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6282,7 +6282,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6317,7 +6317,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6342,7 +6342,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6367,7 +6367,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6392,7 +6392,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6417,7 +6417,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6442,7 +6442,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6467,7 +6467,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6492,7 +6492,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6517,7 +6517,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6542,7 +6542,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6577,7 +6577,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6602,7 +6602,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6637,7 +6637,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6662,7 +6662,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6687,7 +6687,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6721,7 +6721,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6746,7 +6746,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6771,7 +6771,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6796,7 +6796,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6821,7 +6821,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6856,7 +6856,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6881,7 +6881,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6906,7 +6906,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6931,7 +6931,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6966,7 +6966,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -6991,7 +6991,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7016,7 +7016,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -7042,7 +7042,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7067,7 +7067,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7092,7 +7092,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7127,7 +7127,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7152,7 +7152,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7177,7 +7177,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7202,7 +7202,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7237,7 +7237,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7272,7 +7272,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7297,7 +7297,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7322,7 +7322,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7347,7 +7347,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7372,7 +7372,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7397,7 +7397,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7422,7 +7422,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7447,7 +7447,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7472,7 +7472,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7507,7 +7507,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7532,7 +7532,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7558,7 +7558,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7584,7 +7584,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7609,7 +7609,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7634,7 +7634,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7659,7 +7659,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7684,7 +7684,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7719,7 +7719,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7744,7 +7744,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7769,7 +7769,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7804,7 +7804,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7829,7 +7829,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7864,7 +7864,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7889,7 +7889,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7924,7 +7924,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7949,7 +7949,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7974,7 +7974,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -7999,7 +7999,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8024,7 +8024,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8059,7 +8059,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8084,7 +8084,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8109,7 +8109,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8134,7 +8134,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8159,7 +8159,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8184,7 +8184,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8209,7 +8209,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8244,7 +8244,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8269,7 +8269,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8294,7 +8294,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8329,7 +8329,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8354,7 +8354,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8379,7 +8379,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8404,7 +8404,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8429,7 +8429,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8454,7 +8454,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8489,7 +8489,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8524,7 +8524,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8549,7 +8549,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8574,7 +8574,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8609,7 +8609,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8645,7 +8645,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8670,7 +8670,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8705,7 +8705,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -8731,7 +8731,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8767,7 +8767,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8792,7 +8792,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8817,7 +8817,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8852,7 +8852,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8887,7 +8887,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8922,7 +8922,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8947,7 +8947,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8972,7 +8972,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -8997,7 +8997,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9022,7 +9022,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9047,7 +9047,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9082,7 +9082,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9107,7 +9107,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9131,7 +9131,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9156,7 +9156,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9191,7 +9191,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9226,7 +9226,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9251,7 +9251,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9276,7 +9276,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9301,7 +9301,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9326,7 +9326,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9351,7 +9351,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9376,7 +9376,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9401,7 +9401,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9436,7 +9436,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9461,7 +9461,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9486,7 +9486,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9511,7 +9511,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9536,7 +9536,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9561,7 +9561,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9586,7 +9586,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9611,7 +9611,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9636,7 +9636,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9671,7 +9671,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9696,7 +9696,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9720,7 +9720,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9745,7 +9745,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9770,7 +9770,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9805,7 +9805,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9830,7 +9830,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9865,7 +9865,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9890,7 +9890,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9915,7 +9915,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9940,7 +9940,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9965,7 +9965,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -9990,7 +9990,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10015,7 +10015,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10040,7 +10040,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10075,7 +10075,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10110,7 +10110,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10135,7 +10135,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10160,7 +10160,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10182,7 +10182,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10207,7 +10207,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10232,7 +10232,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10267,7 +10267,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10292,7 +10292,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10327,7 +10327,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10352,7 +10352,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -10378,7 +10378,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10413,7 +10413,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10438,7 +10438,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10463,7 +10463,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10497,7 +10497,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10522,7 +10522,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10558,7 +10558,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10583,7 +10583,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10608,7 +10608,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10633,7 +10633,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10658,7 +10658,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10693,7 +10693,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10719,7 +10719,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10744,7 +10744,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10769,7 +10769,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10794,7 +10794,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10819,7 +10819,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10854,7 +10854,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10879,7 +10879,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10904,7 +10904,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10929,7 +10929,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10954,7 +10954,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -10979,7 +10979,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11004,7 +11004,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11029,7 +11029,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11054,7 +11054,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11089,7 +11089,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11124,7 +11124,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11159,7 +11159,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11194,7 +11194,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11218,7 +11218,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11243,7 +11243,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11268,7 +11268,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11293,7 +11293,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11318,7 +11318,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11343,7 +11343,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11368,7 +11368,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11403,7 +11403,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11428,7 +11428,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11454,7 +11454,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11479,7 +11479,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11514,7 +11514,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -11540,7 +11540,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11565,7 +11565,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11590,7 +11590,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11615,7 +11615,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11640,7 +11640,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11665,7 +11665,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11690,7 +11690,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11725,7 +11725,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11750,7 +11750,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11775,7 +11775,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11800,7 +11800,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11835,7 +11835,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11860,7 +11860,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11885,7 +11885,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11911,7 +11911,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11937,7 +11937,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11962,7 +11962,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -11987,7 +11987,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12012,7 +12012,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12037,7 +12037,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12072,7 +12072,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12097,7 +12097,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12122,7 +12122,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12158,7 +12158,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12183,7 +12183,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12208,7 +12208,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12233,7 +12233,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12258,7 +12258,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12283,7 +12283,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12308,7 +12308,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12333,7 +12333,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12358,7 +12358,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12393,7 +12393,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12428,7 +12428,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12453,7 +12453,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12478,7 +12478,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12503,7 +12503,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12528,7 +12528,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12553,7 +12553,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12588,7 +12588,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12614,7 +12614,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12639,7 +12639,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12664,7 +12664,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12689,7 +12689,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12714,7 +12714,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12739,7 +12739,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12774,7 +12774,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12799,7 +12799,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12834,7 +12834,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12859,7 +12859,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12884,7 +12884,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12909,7 +12909,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12935,7 +12935,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12971,7 +12971,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -12996,7 +12996,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13031,7 +13031,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13056,7 +13056,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13081,7 +13081,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13116,7 +13116,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13141,7 +13141,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13166,7 +13166,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13191,7 +13191,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13216,7 +13216,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13241,7 +13241,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13267,7 +13267,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13292,7 +13292,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13317,7 +13317,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13352,7 +13352,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13377,7 +13377,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13402,7 +13402,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13438,7 +13438,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13474,7 +13474,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13499,7 +13499,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13534,7 +13534,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13559,7 +13559,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13584,7 +13584,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13609,7 +13609,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13644,7 +13644,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13669,7 +13669,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13694,7 +13694,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13719,7 +13719,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13744,7 +13744,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13779,7 +13779,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13804,7 +13804,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13829,7 +13829,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13854,7 +13854,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13879,7 +13879,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13904,7 +13904,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13929,7 +13929,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -13964,7 +13964,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"client": {
@@ -13990,7 +13990,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14026,7 +14026,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14051,7 +14051,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14076,7 +14076,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14101,7 +14101,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14136,7 +14136,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14161,7 +14161,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14186,7 +14186,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14211,7 +14211,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14246,7 +14246,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14271,7 +14271,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14297,7 +14297,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14332,7 +14332,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14357,7 +14357,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14393,7 +14393,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14428,7 +14428,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14453,7 +14453,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14478,7 +14478,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14504,7 +14504,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14529,7 +14529,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14564,7 +14564,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14589,7 +14589,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14614,7 +14614,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14639,7 +14639,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14664,7 +14664,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14699,7 +14699,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14724,7 +14724,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14749,7 +14749,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14784,7 +14784,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14810,7 +14810,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14835,7 +14835,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14860,7 +14860,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14885,7 +14885,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14910,7 +14910,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14935,7 +14935,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -14971,7 +14971,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15006,7 +15006,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15031,7 +15031,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15056,7 +15056,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15081,7 +15081,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15106,7 +15106,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15141,7 +15141,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15165,7 +15165,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15190,7 +15190,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15225,7 +15225,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15260,7 +15260,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15285,7 +15285,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15311,7 +15311,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15346,7 +15346,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15371,7 +15371,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15396,7 +15396,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15421,7 +15421,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15446,7 +15446,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15481,7 +15481,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15506,7 +15506,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15531,7 +15531,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15556,7 +15556,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15591,7 +15591,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15616,7 +15616,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15641,7 +15641,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15676,7 +15676,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15701,7 +15701,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15726,7 +15726,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15762,7 +15762,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15787,7 +15787,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15822,7 +15822,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15847,7 +15847,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15882,7 +15882,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15907,7 +15907,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15942,7 +15942,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -15967,7 +15967,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16002,7 +16002,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16037,7 +16037,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16061,7 +16061,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16086,7 +16086,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16111,7 +16111,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16136,7 +16136,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16171,7 +16171,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16196,7 +16196,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16221,7 +16221,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"audit": {
@@ -16263,7 +16263,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16298,7 +16298,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16333,7 +16333,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16358,7 +16358,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16394,7 +16394,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16429,7 +16429,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16464,7 +16464,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16499,7 +16499,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16524,7 +16524,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16549,7 +16549,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16584,7 +16584,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16619,7 +16619,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16645,7 +16645,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16680,7 +16680,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16715,7 +16715,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16740,7 +16740,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16765,7 +16765,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16790,7 +16790,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16815,7 +16815,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16840,7 +16840,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16875,7 +16875,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16900,7 +16900,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16926,7 +16926,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16951,7 +16951,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -16976,7 +16976,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17001,7 +17001,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17026,7 +17026,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17061,7 +17061,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17096,7 +17096,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17121,7 +17121,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17146,7 +17146,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17171,7 +17171,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17206,7 +17206,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17231,7 +17231,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17256,7 +17256,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17281,7 +17281,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17306,7 +17306,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17331,7 +17331,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17356,7 +17356,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17381,7 +17381,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17416,7 +17416,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17451,7 +17451,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17476,7 +17476,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17501,7 +17501,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17536,7 +17536,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17571,7 +17571,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17596,7 +17596,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17621,7 +17621,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17656,7 +17656,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17681,7 +17681,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17707,7 +17707,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17742,7 +17742,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"http": {
@@ -17800,7 +17800,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17825,7 +17825,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17850,7 +17850,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17885,7 +17885,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17920,7 +17920,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17945,7 +17945,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17970,7 +17970,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -17995,7 +17995,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18020,7 +18020,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18045,7 +18045,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18070,7 +18070,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18095,7 +18095,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18120,7 +18120,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18145,7 +18145,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18170,7 +18170,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18205,7 +18205,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18230,7 +18230,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18255,7 +18255,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18280,7 +18280,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18305,7 +18305,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18341,7 +18341,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18366,7 +18366,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18391,7 +18391,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18417,7 +18417,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18442,7 +18442,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18477,7 +18477,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18512,7 +18512,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18538,7 +18538,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18563,7 +18563,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18598,7 +18598,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18623,7 +18623,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18649,7 +18649,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18674,7 +18674,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18709,7 +18709,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18734,7 +18734,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18759,7 +18759,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18781,7 +18781,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18806,7 +18806,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18832,7 +18832,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18867,7 +18867,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18892,7 +18892,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18917,7 +18917,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18952,7 +18952,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -18977,7 +18977,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19002,7 +19002,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19027,7 +19027,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19052,7 +19052,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19087,7 +19087,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19112,7 +19112,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19138,7 +19138,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19163,7 +19163,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19198,7 +19198,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19233,7 +19233,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19258,7 +19258,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19293,7 +19293,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19318,7 +19318,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19344,7 +19344,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19369,7 +19369,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19404,7 +19404,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19439,7 +19439,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19474,7 +19474,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19499,7 +19499,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19524,7 +19524,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
@@ -19559,7 +19559,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": null,
+		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"request": {
