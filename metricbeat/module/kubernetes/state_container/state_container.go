@@ -176,7 +176,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// remove ECS container fields from kubernetes.container.* since they will be set through alias
 			event.Delete("image")
 		}
-
+		m.Logger().Info("Hi")
 		e, err := util.CreateEvent(event, "kubernetes.container")
 		if err != nil {
 			m.Logger().Error(err)
