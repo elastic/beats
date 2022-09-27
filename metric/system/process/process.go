@@ -66,7 +66,7 @@ func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
 	// This is a fairly difficult problem to solve in a cross-platform way
 	exists, err := psutil.PidExistsWithContext(context.Background(), int32(pid))
 	if err != nil {
-		return "", fmt.Errorf("Error truing to find process: %d: %w", pid, err)
+		return "", fmt.Errorf("Error trying to find process: %d: %w", pid, err)
 	}
 	if !exists {
 		return "", ProcNotExist
