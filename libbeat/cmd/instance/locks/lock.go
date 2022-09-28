@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/gofrs/flock"
@@ -109,7 +110,15 @@ func (lock *Locker) Unlock() error {
 
 	err = os.Remove(lock.fileLock.Path())
 	if err != nil {
-		return fmt.Errorf("unable to unlock data path: %w", err)
+		// Per @leehinman, on windows the lock release can be dependent on OS resources. Retry.
+		if runtime.GOOS == "windows" {
+			time.Sleep(time.Second)
+			err = os.Remove(lock.fileLock.Path())
+			if err != nil {
+				return fmt.Errorf("tried twice to remove lockfile %s on windows, failed: %w", lock.fileLock.Path(), err)
+			}
+		}
+		return fmt.Errorf("unable to unlock data path file %s: %w", lock.fileLock.Path(), err)
 	}
 	return nil
 }
@@ -181,9 +190,8 @@ func (lock *Locker) handleFailedLock() error {
 		}
 		// Case: we've gotten a lock file for another process that's already running
 		// This is the "base" lockfile case, which is two beats running from the same directory
-		// This will make debugging easier for someone.
 		state, err := metricproc.GetInfoForPid(resolve.NewTestResolver("/"), pf.Pid)
-		// Above call is is auxiliary debug data, so we don't care too much if it fails
+		// Above call is auxiliary debug data, so we don't care too much if it fails
 		debugString := fmt.Sprintf("process with PID %d", pf.Pid)
 		if err == nil {
 			debugString = fmt.Sprintf("process '%s' with PID %d", state.Name, pf.Pid)
