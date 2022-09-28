@@ -147,13 +147,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, event := range events {
 		if request, err := event.GetValue("cpu.request.cores"); err == nil {
 			if requestCores, ok := request.(float64); ok {
-				event.Put("cpu.request.nanocores", requestCores*nanocores)
+				_, _ = event.Put("cpu.request.nanocores", requestCores*nanocores)
 			}
 		}
 
 		if limit, err := event.GetValue("cpu.limit.cores"); err == nil {
 			if limitCores, ok := limit.(float64); ok {
-				event.Put("cpu.limit.nanocores", limitCores*nanocores)
+				_, _ = event.Put("cpu.limit.nanocores", limitCores*nanocores)
 			}
 		}
 
@@ -166,15 +166,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			cID := (containerID).(string)
 			split := strings.Index(cID, "://")
 			if split != -1 {
-				containerFields.Put("runtime", cID[:split])
-				containerFields.Put("id", cID[split+3:])
+				_, _ = containerFields.Put("runtime", cID[:split])
+				_, _ = containerFields.Put("id", cID[split+3:])
 			}
 		}
 		if containerImage, ok := event["image"]; ok {
 			cImage := (containerImage).(string)
-			containerFields.Put("image.name", cImage)
+			_, _ = containerFields.Put("image.name", cImage)
 			// remove ECS container fields from kubernetes.container.* since they will be set through alias
-			event.Delete("image")
+			_ = event.Delete("image")
 		}
 		m.Logger().Info("Hi")
 		e, err := util.CreateEvent(event, "kubernetes.container")
