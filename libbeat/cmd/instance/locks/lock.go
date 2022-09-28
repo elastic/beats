@@ -110,14 +110,6 @@ func (lock *Locker) Unlock() error {
 
 	err = os.Remove(lock.fileLock.Path())
 	if err != nil {
-		// Per @leehinman, on windows the lock release can be dependent on OS resources. Retry.
-		if runtime.GOOS == "windows" {
-			time.Sleep(time.Second)
-			err = os.Remove(lock.fileLock.Path())
-			if err != nil {
-				return fmt.Errorf("tried twice to remove lockfile %s on windows, failed: %w", lock.fileLock.Path(), err)
-			}
-		}
 		return fmt.Errorf("unable to unlock data path file %s: %w", lock.fileLock.Path(), err)
 	}
 	return nil
@@ -199,10 +191,6 @@ func (lock *Locker) handleFailedLock() error {
 		return fmt.Errorf("connot start, data directory belongs to %s", debugString)
 	}
 
-	// Case: we have a lockfile, but the pid from the pidfile no longer exists
-	// this was presumably due to the dirty shutdown.
-	// Try to reset the lockfile and continue.
-
 }
 
 // recoverLockfile attempts to remove the lockfile and continue running
@@ -212,9 +200,21 @@ func (lock *Locker) recoverLockfile() error {
 	err := os.Remove(lock.fileLock.Path())
 	if err != nil {
 		lockfilePath := paths.Resolve(paths.Data, fmt.Sprintf("%s_%d.lock", lock.beatName, os.Getpid()))
-		lock.logger.Warnf("failed to reset lockfile, cannot remove %s, continuing on with new lockfile name %s",
-			lock.fileLock.Path(), lockfilePath)
-		lock.filePath = lockfilePath
+		// Per @leehinman, on windows the lock release can be dependent on OS resources. Retry.
+		if runtime.GOOS == "windows" {
+			time.Sleep(time.Second)
+			err = os.Remove(lock.fileLock.Path())
+			if err != nil {
+				lock.logger.Warnf("tried twice to remove lockfile %s on windows, continuing on with new lockfile name %s",
+					lockfilePath, err)
+				lock.filePath = lockfilePath
+			}
+		} else {
+			lock.logger.Warnf("failed to reset lockfile, cannot remove %s, continuing on with new lockfile name %s",
+				lock.fileLock.Path(), lockfilePath)
+			lock.filePath = lockfilePath
+		}
+
 	}
 
 	// reset the lockfile handler
