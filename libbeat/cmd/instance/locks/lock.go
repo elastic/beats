@@ -18,14 +18,13 @@
 package locks
 
 import (
-	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/gofrs/flock"
-	"github.com/shirou/gopsutil/process"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -164,18 +163,24 @@ func (lock *Locker) handleFailedLock() error {
 	}
 
 	// Check to see if the PID found in the pidfile exists.
-	// Checking if the pid exists in a cross-platform way is more fraught than it looks.
-	// we have internal metrics libraries we can use for this, but all those will use APIs
-	// dedicated to gathering extended process info and metrics, which can come with extra permissions hurdles,
-	// making those methods more likely to return an error.
-	exists, err := process.PidExistsWithContext(context.Background(), int32(pf.Pid))
-	if err != nil {
+	existsState, err := metricproc.GetPIDState(resolve.NewTestResolver("/"), pf.Pid)
+	// Case: we have a lockfile, but the pid from the pidfile no longer exists
+	// this was presumably due to the dirty shutdown.
+	// Try to reset the lockfile and continue.
+	if errors.Is(err, metricproc.ProcNotExist) {
+		lock.logger.Infof("%s shut down without removing previous lockfile, continuing", lock.beatName)
+		return lock.recoverLockfile()
+	} else if err != nil {
 		return fmt.Errorf("error looking up status for pid %d: %w", pf.Pid, err)
-	}
-
-	// Case: we've gotten a lock file for another process that's already running
-	// This is the "base" lockfile case, which is two beats running from the same directory
-	if exists {
+	} else {
+		// Case: the PID exists, but it's attached to a zombie process
+		// In this case...we should be okay to restart?
+		if existsState == metricproc.Zombie {
+			lock.logger.Infof("%s shut down without removing previous lockfile and is currently in a zombie state, continuing", lock.beatName)
+			return lock.recoverLockfile()
+		}
+		// Case: we've gotten a lock file for another process that's already running
+		// This is the "base" lockfile case, which is two beats running from the same directory
 		// This will make debugging easier for someone.
 		state, err := metricproc.GetInfoForPid(resolve.NewTestResolver("/"), pf.Pid)
 		// Above call is is auxiliary debug data, so we don't care too much if it fails
@@ -189,8 +194,7 @@ func (lock *Locker) handleFailedLock() error {
 	// Case: we have a lockfile, but the pid from the pidfile no longer exists
 	// this was presumably due to the dirty shutdown.
 	// Try to reset the lockfile and continue.
-	lock.logger.Infof("%s shut down without removing previous lockfile, continuing", lock.beatName)
-	return lock.recoverLockfile()
+
 }
 
 // recoverLockfile attempts to remove the lockfile and continue running
