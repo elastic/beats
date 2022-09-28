@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -134,11 +132,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
-		return errors.Wrap(err, "error getting families")
+		return fmt.Errorf("error getting families: %w", err)
 	}
 	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting event")
+		return fmt.Errorf("error getting event: %w", err)
 	}
 
 	m.enricher.Enrich(events)
