@@ -56,11 +56,11 @@ var (
 // New returns a new pid-aware file locker
 // all logic, including checking for existing locks, is performed lazily
 func New(beatInfo beat.Info) *Locker {
-	lockfilePath := paths.Resolve(paths.Data, beatInfo.Name+".lock")
+	lockfilePath := paths.Resolve(paths.Data, beatInfo.Beat+".lock")
 	return &Locker{
 		fileLock:  flock.New(lockfilePath),
 		logger:    logp.L(),
-		beatName:  beatInfo.Name,
+		beatName:  beatInfo.Beat,
 		filePath:  lockfilePath,
 		beatStart: beatInfo.StartTime,
 	}
