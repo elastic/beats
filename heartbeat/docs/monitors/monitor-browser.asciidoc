@@ -4,6 +4,8 @@
 TIP: Want to get started with synthetic monitoring?
 See the {observability-guide}/synthetics-quickstart.html[quick start guide].
 
+NOTE: While it is possible to configure browser monitors via the heartbeat YAML config files, we highly recommend using project monitors instead! See the https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project[Elastic synthetics docs].
+
 beta[] The options described here configure {beatname_uc} to run the synthetic
 monitoring test projects via Synthetic Agent on the Chromium browser.
 Additional shared options are defined in <<monitor-options>>.
@@ -41,6 +43,8 @@ Contains information on how to run synthetic tests.
 [[monitor-source-inline]]
 ===== `inline`
 
+NOTE: While `inline` browser monitors are still supported, we highly encourage trying project monitors instead. See the https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project[Elastic synthetics docs].
+
 Runs the Synthetic test scripts that are defined inline in the configuration.
 See {observability-guide}/synthetics-create-test.html[Synthetics syntax] for
 more information.
@@ -58,7 +62,9 @@ the inline journeys.
 
 [float]
 [[monitor-source-zipurl]]
-===== `Zip URL`
+===== `Zip URL` (Deprecated)
+
+NOTE: Zip URL monitors are now deprecated! Please use project monitors instead. See the https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project[Elastic synthetics docs].
 
 Remote zip endpoint configuration allows users to specify the location
 of a synthetics test project ZIP file.
@@ -96,7 +102,9 @@ Example configuration:
 
 [float]
 [[monitor-source-local]]
-===== `Local directory`
+===== `Local directory` (Deprecated)
+
+NOTE: Local browser monitors are now deprecated! Please use project monitors instead. See the https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project[Elastic synthetics docs].
 
 Local directory where the synthetic test files are located.
 
