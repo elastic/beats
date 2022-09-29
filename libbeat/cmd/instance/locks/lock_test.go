@@ -57,31 +57,30 @@ func TestMain(m *testing.M) {
 
 func TestLockWithDeadPid(t *testing.T) {
 	// create old lockfile
-	testBeat := beat.Info{Name: mustNewUUID(t), StartTime: time.Now()}
+	pidFetch = fakeDeadPid
+	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now()}
 	locker := New(testBeat)
-	_, err := locker.createPidfile(8888)
-	require.NoError(t, err)
-
-	_, err = locker.fileLock.TryRLock()
+	err := locker.Lock()
 	require.NoError(t, err)
 
 	// create new locker
+	pidFetch = os.Getpid
 	newLocker := New(testBeat)
 	err = newLocker.Lock()
 	require.NoError(t, err)
 }
 
 func TestLockWithTwoBeats(t *testing.T) {
-	testBeat := beat.Info{Name: mustNewUUID(t), StartTime: time.Now()}
+	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now()}
 	// emulate two beats trying to run from the same data path
 	locker := New(testBeat)
-	// use pid 1 as another beat
-	_, err := locker.createPidfile(1)
-	require.NoError(t, err)
-	_, err = locker.fileLock.TryRLock()
+	// use the parent process as another random beat
+	pidFetch = os.Getppid
+	err := locker.Lock()
 	require.NoError(t, err)
 
-	// create new locker
+	// create new locker for this beat
+	pidFetch = os.Getpid
 	newLocker := New(testBeat)
 	err = newLocker.Lock()
 	require.Error(t, err)
@@ -89,7 +88,7 @@ func TestLockWithTwoBeats(t *testing.T) {
 }
 
 func TestDoubleLock(t *testing.T) {
-	testBeat := beat.Info{Name: mustNewUUID(t), StartTime: time.Now()}
+	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now()}
 	locker := New(testBeat)
 	err := locker.Lock()
 	require.NoError(t, err)
@@ -101,7 +100,7 @@ func TestDoubleLock(t *testing.T) {
 }
 
 func TestUnlock(t *testing.T) {
-	testBeat := beat.Info{Name: mustNewUUID(t), StartTime: time.Now()}
+	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now()}
 	locker := New(testBeat)
 	err := locker.Lock()
 	require.NoError(t, err)
@@ -113,7 +112,7 @@ func TestUnlock(t *testing.T) {
 func TestRestartWithSamePID(t *testing.T) {
 	// create old lockfile
 	testBeatName := mustNewUUID(t)
-	testBeat := beat.Info{Name: testBeatName, StartTime: time.Now().Add(-time.Second * 20)}
+	testBeat := beat.Info{Beat: testBeatName, StartTime: time.Now().Add(-time.Second * 20)}
 	locker := New(testBeat)
 	err := locker.Lock()
 	require.NoError(t, err)
@@ -125,8 +124,27 @@ func TestRestartWithSamePID(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestEmptyLockfile(t *testing.T) {
+	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now().Add(-time.Second * 1)}
+	deadLock := New(testBeat)
+	// Create an empty lockfile
+	// Might happen in cases where a beat shut down at *just* the right time.
+	fh, err := os.Create(deadLock.filePath)
+	require.NoError(t, err)
+	fh.Close()
+
+	newBeat := New(testBeat)
+	err = newBeat.Lock()
+	require.NoError(t, err)
+
+}
+
 func mustNewUUID(t *testing.T) string {
 	uuid, err := uuid.NewV4()
 	require.NoError(t, err)
 	return uuid.String()
+}
+
+func fakeDeadPid() int {
+	return 99999
 }

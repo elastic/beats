@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 	"runtime"
 	"time"
@@ -54,6 +55,9 @@ var (
 	ErrAlreadyLocked = fmt.Errorf("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data).")
 )
 
+// a little wrapper for the gitpid function to make testing easier.
+var pidFetch = os.Getpid
+
 // New returns a new pid-aware file locker
 // all logic, including checking for existing locks, is performed lazily
 func New(beatInfo beat.Info) *Locker {
@@ -72,16 +76,28 @@ func New(beatInfo beat.Info) *Locker {
 // an ErrAlreadyLocked error is returned.
 // This lock is pid-aware, and will attempt to recover if the lockfile is taken by a PID that no longer exists.
 func (lock *Locker) Lock() error {
-	// create the pid file that will be used as the lock
-	noFile, err := lock.createPidfile(os.Getpid())
+	new := pidfile{Pid: pidFetch(), WriteTime: time.Now()}
+	encoded, err := json.Marshal(&new)
 	if err != nil {
-		return fmt.Errorf("error creating pidfile for lock: %w", err)
+		return fmt.Errorf("error encoding json for pidfile: %w", err)
 	}
-	if !noFile {
-		err := lock.handleFailedLock()
+
+	// The combination of O_CREATE and O_EXCL will ensure we return an error if we don't
+	// manage to create the file
+	fh, openErr := os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0600)
+	if os.IsExist(openErr) {
+		err = lock.handleFailedLock()
 		if err != nil {
-			return fmt.Errorf("lock file already existed, error recovering: %w", err)
+			return fmt.Errorf("cannot obtain lockfile: %w", err)
 		}
+		// At this point, the filepath should be unique to a given pid, and not just a beatname
+		// If something fails here, it's probably unrecoverable
+		fh, err = os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0600)
+		if err != nil {
+			return fmt.Errorf("cannot re-obtain lockfile %s: %w", lock.filePath, err)
+		}
+	} else if openErr != nil {
+		return fmt.Errorf("error creating lockfile %s: %w", lock.filePath, err)
 	}
 
 	// This will be a shared/read lock,
@@ -91,11 +107,16 @@ func (lock *Locker) Lock() error {
 	if err != nil {
 		return fmt.Errorf("unable to lock data path: %w", err)
 	}
-
 	// case: lock could not be obtained.
 	if !isLocked {
 		// if we're here, things are probably unrecoverable, as we've previously checked for a lockfile. Exit.
 		return ErrAlreadyLocked
+	}
+
+	// write after we have the lock
+	_, err = fh.Write(encoded)
+	if err != nil {
+		return fmt.Errorf("error writing pidfile to %s: %w", lock.filePath, err)
 	}
 
 	return nil
@@ -117,38 +138,31 @@ func (lock *Locker) Unlock() error {
 
 // ******* private helpers
 
-// createPidfile creates the underling pidfile used by the lock
-// This assumes that no previous lockfile should exist.
-// returns a bool indicating if the file was created, and an error
-func (lock *Locker) createPidfile(pid int) (bool, error) {
-	_, err := os.Stat(lock.filePath)
-	//file already exists, go into repair/handle fail mode
-	if !os.IsNotExist(err) {
-		return false, nil
-	}
-
-	new := pidfile{Pid: pid, WriteTime: time.Now()}
-	encoded, err := json.Marshal(&new)
-	if err != nil {
-		return false, fmt.Errorf("error encoding json for pidfile: %w", err)
-	}
-
-	err = os.WriteFile(lock.filePath, encoded, os.FileMode(0600))
-	if err != nil {
-		return false, fmt.Errorf("error writing pidfile to %s: %w", lock.filePath, err)
-	}
-	return true, nil
-}
-
 // handleFailedLock will attempt to recover from a failed lock operation in a pid-aware way.
 // The point of this is to deal with instances where an improper beat shutdown left us with
 // a pre-existing pidfile for a beat process that no longer exists.
 // The one argument tells the method if a pre-existing lockfile was already found.
 func (lock *Locker) handleFailedLock() error {
 	// read in whatever existing lockfile caused us to fail
-	pf, err := lock.readExistingPidfile()
+	gotData, pf, err := lock.readExistingPidfile()
 	if err != nil {
 		return fmt.Errorf("error reading existing lockfile: %w", err)
+	}
+
+	// Case: two beats start up simultaniously, there's a chance we could could "see" the pidfile before the other process writes to it
+	// or, the other beat died before it could write the pidfile.
+	// Sleep, read again. If we still don't have anything, assume the other PID is dead, continue.
+	if !gotData {
+		lock.logger.Debugf("Found other pidfile, but no data. Retrying.")
+		time.Sleep(time.Millisecond * 500)
+		gotData, pf, err = lock.readExistingPidfile()
+		if err != nil {
+			return fmt.Errorf("error re-reading existing lockfile: %w", err)
+		}
+		if !gotData {
+			lock.logger.Debugf("No PID found in other lockfile, continuing")
+			return lock.recoverLockfile()
+		}
 	}
 
 	// Case: the lockfile is locked, but by us. Probably a coding error,
@@ -159,7 +173,7 @@ func (lock *Locker) handleFailedLock() error {
 		if lock.beatStart.Before(pf.WriteTime) {
 			return fmt.Errorf("lockfile for beat has been locked twice by the same PID, potential bug.")
 		}
-		lock.logger.Debugf("Metricbeat has started with the same PID, continuing")
+		lock.logger.Debugf("Beat has started with the same PID, continuing")
 		return lock.recoverLockfile()
 	}
 
@@ -169,7 +183,7 @@ func (lock *Locker) handleFailedLock() error {
 	// this was presumably due to the dirty shutdown.
 	// Try to reset the lockfile and continue.
 	if errors.Is(err, metricproc.ProcNotExist) {
-		lock.logger.Infof("%s shut down without removing previous lockfile, continuing", lock.beatName)
+		lock.logger.Debugf("%s shut down without removing previous lockfile, continuing", lock.beatName)
 		return lock.recoverLockfile()
 	} else if err != nil {
 		return fmt.Errorf("error looking up status for pid %d: %w", pf.Pid, err)
@@ -177,29 +191,24 @@ func (lock *Locker) handleFailedLock() error {
 		// Case: the PID exists, but it's attached to a zombie process
 		// In this case...we should be okay to restart?
 		if existsState == metricproc.Zombie {
-			lock.logger.Infof("%s shut down without removing previous lockfile and is currently in a zombie state, continuing", lock.beatName)
+			lock.logger.Debugf("%s shut down without removing previous lockfile and is currently in a zombie state, continuing", lock.beatName)
 			return lock.recoverLockfile()
 		}
 		// Case: we've gotten a lock file for another process that's already running
 		// This is the "base" lockfile case, which is two beats running from the same directory
-		state, err := metricproc.GetInfoForPid(resolve.NewTestResolver("/"), pf.Pid)
-		// Above call is auxiliary debug data, so we don't care too much if it fails
-		debugString := fmt.Sprintf("process with PID %d", pf.Pid)
-		if err == nil {
-			debugString = fmt.Sprintf("process '%s' with PID %d", state.Name, pf.Pid)
-		}
-		return fmt.Errorf("connot start, data directory belongs to %s", debugString)
+		return fmt.Errorf("connot start, data directory belongs to process with pid %d", pf.Pid)
 	}
-
 }
 
 // recoverLockfile attempts to remove the lockfile and continue running
 // This should only be called after we're sure it's safe to ignore a pre-existing locfile
+// This will reset the internal lockfile path when it's successful.
 func (lock *Locker) recoverLockfile() error {
 	// File remove or may not work, depending on os-specific details with lockfiles
 	err := os.Remove(lock.fileLock.Path())
 	if err != nil {
-		lockfilePath := paths.Resolve(paths.Data, fmt.Sprintf("%s_%d.lock", lock.beatName, os.Getpid()))
+		rname := rand.New(rand.NewSource(time.Now().UnixNano()))
+		lockfilePath := paths.Resolve(paths.Data, fmt.Sprintf("%s_%d.lock", lock.beatName, rname.Int()))
 		// Per @leehinman, on windows the lock release can be dependent on OS resources. Retry.
 		if runtime.GOOS == "windows" {
 			time.Sleep(time.Second)
@@ -216,26 +225,24 @@ func (lock *Locker) recoverLockfile() error {
 		}
 
 	}
-
-	// reset the lockfile handler
-	_, err = lock.createPidfile(os.Getpid())
-	if err != nil {
-		return fmt.Errorf("error creating new lockfile while recovering: %w", err)
-	}
 	lock.fileLock = flock.New(lock.filePath)
 	return nil
 }
 
 // readExistingPidfile will read the contents of an existing pidfile
-func (lock *Locker) readExistingPidfile() (pidfile, error) {
+// Will return false,pidfile{},nil if no data is found in the lockfile
+func (lock *Locker) readExistingPidfile() (bool, pidfile, error) {
 	rawPidfile, err := os.ReadFile(lock.filePath)
 	if err != nil {
-		return pidfile{}, fmt.Errorf("error reading pidfile from path %s", lock.filePath)
+		return false, pidfile{}, fmt.Errorf("error reading pidfile from path %s", lock.filePath)
+	}
+	if len(rawPidfile) == 0 {
+		return false, pidfile{}, nil
 	}
 	foundPidFile := pidfile{}
 	err = json.Unmarshal(rawPidfile, &foundPidFile)
 	if err != nil {
-		return pidfile{}, fmt.Errorf("error reading JSON from pid file %s: %w", lock.filePath, err)
+		return false, pidfile{}, fmt.Errorf("error reading JSON from pid file %s: %w", lock.filePath, err)
 	}
-	return foundPidFile, nil
+	return true, foundPidFile, nil
 }
