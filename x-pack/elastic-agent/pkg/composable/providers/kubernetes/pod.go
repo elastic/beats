@@ -89,9 +89,7 @@ func NewPodEventer(
 		Node:        cfg.Node,
 	}
 	metaConf := cfg.AddResourceMetadata
-	if metaConf == nil {
-		metaConf = metadata.GetDefaultResourceMetadataConfig()
-	}
+
 	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
@@ -171,7 +169,7 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
 	// get Pod metadata (not specific to any container)
-	p.comm.AddOrUpdate(data.uid, PodPriority, data.mapping, data.processors)
+	_ = p.comm.AddOrUpdate(data.uid, PodPriority, data.mapping, data.processors)
 
 	// Emit all containers in the pod
 	// TODO: deal with init containers stopping after initialization
@@ -259,7 +257,7 @@ func generatePodData(
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		_ = safemapstr.Put(annotations, k, v)
 	}
 	k8sMapping["annotations"] = annotations
 
@@ -295,7 +293,7 @@ func generateContainerData(
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		_ = safemapstr.Put(annotations, k, v)
 	}
 
 	for _, c := range containers {
@@ -366,14 +364,14 @@ func generateContainerData(
 		}
 		if len(c.spec.Ports) > 0 {
 			for _, port := range c.spec.Ports {
-				containerMeta.Put("port", fmt.Sprintf("%v", port.ContainerPort))
-				containerMeta.Put("port_name", port.Name)
+				_, _ = containerMeta.Put("port", fmt.Sprintf("%v", port.ContainerPort))
+				_, _ = containerMeta.Put("port_name", port.Name)
 				k8sMapping["container"] = containerMeta
-				comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
+				_ = comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
 			}
 		} else {
 			k8sMapping["container"] = containerMeta
-			comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
+			_ = comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
 		}
 	}
 }
@@ -396,7 +394,7 @@ func podNamespaceAnnotations(pod *kubernetes.Pod, watcher kubernetes.Watcher) co
 
 	annotations := common.MapStr{}
 	for k, v := range namespace.GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		_ = safemapstr.Put(annotations, k, v)
 	}
 	return annotations
 }

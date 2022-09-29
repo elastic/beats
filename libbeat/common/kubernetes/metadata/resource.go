@@ -37,7 +37,7 @@ type Resource struct {
 // NewResourceMetadataGenerator creates a metadata generator for a generic resource
 func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Resource {
 	var config Config
-	config.Unmarshal(cfg)
+	_ = config.Unmarshal(cfg)
 
 	r := &Resource{
 		config: &config,
@@ -70,10 +70,10 @@ func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldO
 func (r *Resource) GenerateECS(obj kubernetes.Resource) common.MapStr {
 	ecsMeta := common.MapStr{}
 	if r.clusterInfo.Url != "" {
-		ecsMeta.Put("orchestrator.cluster.url", r.clusterInfo.Url)
+		_, _ = ecsMeta.Put("orchestrator.cluster.url", r.clusterInfo.Url)
 	}
 	if r.clusterInfo.Name != "" {
-		ecsMeta.Put("orchestrator.cluster.name", r.clusterInfo.Name)
+		_, _ = ecsMeta.Put("orchestrator.cluster.name", r.clusterInfo.Name)
 	}
 	return ecsMeta
 }
@@ -85,7 +85,7 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 		return nil
 	}
 
-	labelMap := common.MapStr{}
+	var labelMap common.MapStr
 	if len(r.config.IncludeLabels) == 0 {
 		labelMap = GenerateMap(accessor.GetLabels(), r.config.LabelsDedot)
 	} else {
@@ -94,7 +94,7 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 
 	// Exclude any labels that are present in the exclude_labels config
 	for _, label := range r.config.ExcludeLabels {
-		labelMap.Delete(label)
+		_ = labelMap.Delete(label)
 	}
 
 	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, r.config.AnnotationsDedot)
@@ -108,7 +108,7 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 
 	if accessor.GetNamespace() != "" {
 		// TODO make this namespace.name in 8.0
-		safemapstr.Put(meta, "namespace", accessor.GetNamespace())
+		_ = safemapstr.Put(meta, "namespace", accessor.GetNamespace())
 	}
 
 	// Add controller metadata if present
@@ -122,18 +122,18 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 					"StatefulSet",
 					"DaemonSet",
 					"Job":
-					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
+					_ = safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
 				}
 			}
 		}
 	}
 
 	if len(labelMap) != 0 {
-		safemapstr.Put(meta, "labels", labelMap)
+		_ = safemapstr.Put(meta, "labels", labelMap)
 	}
 
 	if len(annotationsMap) != 0 {
-		safemapstr.Put(meta, "annotations", annotationsMap)
+		_ = safemapstr.Put(meta, "annotations", annotationsMap)
 	}
 
 	for _, option := range options {
@@ -154,9 +154,9 @@ func generateMapSubset(input map[string]string, keys []string, dedot bool) commo
 		if ok {
 			if dedot {
 				dedotKey := common.DeDot(key)
-				output.Put(dedotKey, value)
+				_, _ = output.Put(dedotKey, value)
 			} else {
-				safemapstr.Put(output, key, value)
+				_ = safemapstr.Put(output, key, value)
 			}
 		}
 	}
@@ -173,9 +173,9 @@ func GenerateMap(input map[string]string, dedot bool) common.MapStr {
 	for k, v := range input {
 		if dedot {
 			label := common.DeDot(k)
-			output.Put(label, v)
+			_, _ = output.Put(label, v)
 		} else {
-			safemapstr.Put(output, k, v)
+			_ = safemapstr.Put(output, k, v)
 		}
 	}
 

@@ -80,7 +80,7 @@ func (k *kubeAnnotatorConfig) Validate() error {
 
 				err := matcherCfg.Unpack(&logsPathMatcher)
 				if err != nil {
-					return fmt.Errorf("fail to unpack the `logs_path` matcher configuration: %s", err)
+					return fmt.Errorf("fail to unpack the `logs_path` matcher configuration: %w", err)
 				}
 				if logsPathMatcher.LogsPath == "" {
 					return fmt.Errorf("invalid logs_path matcher configuration: when resource_type is defined, logs_path must be set as well")
