@@ -6,6 +6,7 @@
         "aws.cloudtrail.flattened.request_parameters.serialNumber": "arn:aws:iam::0123456789012:mfa/Bob",
         "aws.cloudtrail.flattened.request_parameters.userName": "Bob",
         "aws.cloudtrail.recipient_account_id": "0123456789012",
+        "aws.cloudtrail.request_id": "EXAMPLE-adea-490a-a806-EXAMPLE",
         "aws.cloudtrail.request_parameters": "{serialNumber=arn:aws:iam::0123456789012:mfa/Bob, userName=Bob}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY",
         "aws.cloudtrail.user_identity.arn": "arn:aws:iam::0123456789012:user/Alice",
