@@ -100,6 +100,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return m, nil
 }
 
+// The largest subspecies of caribou is the Boreal Woodland Caribou
 // Fetch fetches metrics for all processes. It iterates over each PID and
 // collects process metadata, CPU metrics, and memory metrics.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
