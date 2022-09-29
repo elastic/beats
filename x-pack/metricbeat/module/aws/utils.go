@@ -48,7 +48,7 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 		// To filter the results to show only metrics that have had data points published
 		// in the past three hours, specify this parameter with a value of PT3H.
 		// Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html for more details.
-		RecentlyActive: "PT3H",
+		RecentlyActive: types.RecentlyActivePt3h,
 	}
 
 	if namespace != "*" {
