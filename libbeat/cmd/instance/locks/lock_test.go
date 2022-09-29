@@ -31,8 +31,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-var beatName = "testbeat"
-
 func TestMain(m *testing.M) {
 	err := logp.DevelopmentSetup()
 	if err != nil {

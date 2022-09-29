@@ -149,7 +149,7 @@ func (lock *Locker) handleFailedLock() error {
 		return fmt.Errorf("error reading existing lockfile: %w", err)
 	}
 
-	// Case: two beats start up simultaniously, there's a chance we could could "see" the pidfile before the other process writes to it
+	// Case: two beats start up simultaneously, there's a chance we could could "see" the pidfile before the other process writes to it
 	// or, the other beat died before it could write the pidfile.
 	// Sleep, read again. If we still don't have anything, assume the other PID is dead, continue.
 	if !gotData {
