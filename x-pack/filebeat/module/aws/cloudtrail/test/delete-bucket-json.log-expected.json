@@ -5,6 +5,7 @@
         "aws.cloudtrail.event_version": "1.04",
         "aws.cloudtrail.flattened.request_parameters.bucketName": "my-test-bucket-cross-account",
         "aws.cloudtrail.recipient_account_id": "777788889999",
+        "aws.cloudtrail.request_id": "EXAMPLE463D56D4C",
         "aws.cloudtrail.request_parameters": "{bucketName=my-test-bucket-cross-account}",
         "aws.cloudtrail.user_identity.access_key_id": "AKIAQRSTUVWXYZEXAMPLE",
         "aws.cloudtrail.user_identity.arn": "arn:aws:sts::777788889999:assumed-role/AssumeNothing/devdsk",
