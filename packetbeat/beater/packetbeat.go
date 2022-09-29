@@ -63,7 +63,7 @@ var cmdLineArgs = flags{
 
 func initialConfig() config.Config {
 	c := config.Config{
-		Interfaces: []config.InterfacesConfig{{
+		Interfaces: []config.InterfaceConfig{{
 			File:       *cmdLineArgs.file,
 			Loop:       *cmdLineArgs.loop,
 			TopSpeed:   *cmdLineArgs.topSpeed,
