@@ -56,18 +56,6 @@
             - name: cpu
               type: group
               fields:
-                - name: stat
-                  type: group
-                  fields:
-                    - name: number_of_elapsed_periods
-                      type: alias
-                      path: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
-                    - name: time_throttled_nanos
-                      type: alias
-                      path: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
-                    - name: number_of_times_throttled
-                      type: alias
-                      path: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
                 - name: load_average
                   type: group
                   fields:
@@ -86,6 +74,24 @@
                 - name: cpuacct.usage_nanos
                   type: alias
                   path: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
+                - name: cpu
+                  type: group
+                  fields:
+                    - name: cfs_quota_micros
+                      type: alias
+                      path: logstash.node.stats.os.cgroup.cpu.cfs_quota_micros
+                    - name: stat
+                      type: group
+                      fields:
+                        - name: number_of_elapsed_periods
+                          type: alias
+                          path: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+                        - name: time_throttled_nanos
+                          type: alias
+                          path: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+                        - name: number_of_times_throttled
+                          type: alias
+                          path: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
         - name: process.cpu.percent
           type: alias
           path: logstash.node.stats.process.cpu.percent
