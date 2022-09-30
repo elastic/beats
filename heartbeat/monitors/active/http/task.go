@@ -251,7 +251,9 @@ func execPing(
 		} else if errors.As(errReason.Unwrap(), &urlError) {
 			var certErr x509.CertificateInvalidError
 			if errors.As(urlError, &certErr) {
-				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+				tlsFields, _ := tlsmeta.CertFields(certErr.Cert)
+				event.Fields.DeepUpdate(mapstr.M{"tls": tlsFields})
+
 			}
 		}
 

@@ -232,7 +232,8 @@ func (jf *jobFactory) execDialer(
 		debugf("dial failed with: %v", err)
 		var certErr x509.CertificateInvalidError
 		if errors.As(err, &certErr) {
-			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+			tlsFields, _ := tlsmeta.CertFields(certErr.Cert)
+			event.Fields.DeepUpdate(mapstr.M{"tls": tlsFields})
 		}
 		return reason.IOFailed(err)
 	}

@@ -54,15 +54,40 @@ func AddTLSMetadata(fields mapstr.M, connState cryptoTLS.ConnectionState, durati
 	}
 	_, _ = fields.Put("tls.cipher", tlscommon.ResolveCipherSuite(connState.CipherSuite))
 
-	AddCertMetadata(fields, connState.PeerCertificates)
+	tlsFields, x509Fields := CertFields(connState.PeerCertificates[0])
+
+	// If we have at least one fully verified chain use that
+	// to compute the soonest point at which this cert chain will become invalid
+	// this only happens when strict verification is enabled
+	// due to the implementation in elastic-agent-libs
+	// https://github.com/elastic/elastic-agent-libs/blob/main/transport/tlscommon/tls_config.go#L240
+	var maxNotAfterFloor time.Time
+	for _, chain := range connState.VerifiedChains {
+		chainNotBefore, chainNotAfter := calculateCertTimestamps(chain)
+
+		// If this chain expires sooner than a previously seen chain we don't
+		// set any fields
+		if chainNotAfter.Before(maxNotAfterFloor) {
+			continue
+		}
+
+		// Legacy non-ECS field
+		_, _ = tlsFields.Put("certificate_not_valid_before", chainNotBefore)
+		_, _ = x509Fields.Put("not_before", chainNotBefore)
+		if chainNotAfter != nil {
+			// Legacy non-ECS field
+			_, _ = tlsFields.Put("certificate_not_valid_after", *chainNotAfter)
+			_, _ = x509Fields.Put("not_after", *chainNotAfter)
+		}
+	}
+
+	fields.DeepUpdate(mapstr.M{"tls": tlsFields})
 }
 
-func AddCertMetadata(fields mapstr.M, certs []*x509.Certificate) {
-	hostCert := certs[0]
-
-	x509Fields := mapstr.M{}
+func CertFields(hostCert *x509.Certificate) (tlsFields mapstr.M, x509Fields mapstr.M) {
+	x509Fields = mapstr.M{}
 	serverFields := mapstr.M{"x509": x509Fields}
-	tlsFields := mapstr.M{"server": serverFields}
+	tlsFields = mapstr.M{"server": serverFields}
 
 	_, _ = serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
 	_, _ = serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
@@ -88,17 +113,7 @@ func AddCertMetadata(fields mapstr.M, certs []*x509.Certificate) {
 		_, _ = x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
 	}
 
-	chainNotBefore, chainNotAfter := calculateCertTimestamps(certs)
-	// Legacy non-ECS field
-	_, _ = tlsFields.Put("certificate_not_valid_before", chainNotBefore)
-	_, _ = x509Fields.Put("not_before", chainNotBefore)
-	if chainNotAfter != nil {
-		// Legacy non-ECS field
-		_, _ = tlsFields.Put("certificate_not_valid_after", *chainNotAfter)
-		_, _ = x509Fields.Put("not_after", *chainNotAfter)
-	}
-
-	fields.DeepUpdate(mapstr.M{"tls": tlsFields})
+	return tlsFields, x509Fields
 }
 
 func calculateCertTimestamps(certs []*x509.Certificate) (chainNotBefore time.Time, chainNotAfter *time.Time) {
