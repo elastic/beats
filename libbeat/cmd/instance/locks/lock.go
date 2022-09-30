@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 	metricproc "github.com/elastic/elastic-agent-system-metrics/metric/system/process"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 type Locker struct {
@@ -178,7 +177,7 @@ func (lock *Locker) handleFailedLock() error {
 	}
 
 	// Check to see if the PID found in the pidfile exists.
-	existsState, err := metricproc.GetPIDState(resolve.NewTestResolver("/"), pf.Pid)
+	existsState, err := findMatchingPID(pf.Pid)
 	// Case: we have a lockfile, but the pid from the pidfile no longer exists
 	// this was presumably due to the dirty shutdown.
 	// Try to reset the lockfile and continue.

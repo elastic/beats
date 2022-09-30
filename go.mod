@@ -194,7 +194,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.3.0
 	github.com/elastic/elastic-agent-libs v0.2.11
 	github.com/elastic/elastic-agent-shipper-client v0.4.0
-	github.com/elastic/elastic-agent-system-metrics v0.4.5-0.20220929185205-8b2e387cd113
+	github.com/elastic/elastic-agent-system-metrics v0.4.5-0.20220927192933-25a985b07d51
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/googleapis/gax-go/v2 v2.5.1
 	github.com/pierrec/lz4/v4 v4.1.15
