@@ -42,16 +42,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
 - Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
-- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
-
 
 *Heartbeat*
 
