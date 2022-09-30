@@ -5,10 +5,5 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 
-json.keys_under_root: false
+json.keys_under_root: true
 json.add_error_key: true
-processors:
-  - add_fields:
-      target: ''
-      fields:
-        ecs.version: 1.12.0

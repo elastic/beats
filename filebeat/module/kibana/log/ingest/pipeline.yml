@@ -1,12 +1,28 @@
-description: Pipeline for parsing Kibana logs
+description: Pipeline for parsing Kibana ecs logs
 on_failure:
-- set:
-    field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'
 processors:
-- pipeline:
-    if: 'ctx?.json?.ecs?.version == null'
-    name: '{< IngestPipeline "pipeline-7" >}'
-- pipeline:
-    if: 'ctx?.json?.ecs?.version != null'
-    name: '{< IngestPipeline "pipeline-ecs" >}'
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - set:
+      copy_from: '@timestamp'
+      field: event.created
+  - rename:
+      field: http.request.headers
+      target_field: kibana.log.meta.req.headers
+      ignore_missing: true
+  - rename:
+      field: http.response.headers
+      target_field: kibana.log.meta.res.headers
+      ignore_missing: true
+  - set:
+      field: event.outcome
+      value: success
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400'
+  - set:
+      field: event.outcome
+      value: failure
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
