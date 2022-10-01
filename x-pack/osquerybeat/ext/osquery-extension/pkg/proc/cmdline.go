@@ -6,14 +6,20 @@ package proc
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io/fs"
+	"os"
 	"strings"
 )
 
+// ReadCmdLine Reads process CmdLine from <root>/proc/<pid>/cmdline
 func ReadCmdLine(root string, pid string) (string, error) {
-	fn := getProcAttr(root, pid, "cmdline")
+	return ReadCmdLineFS(os.DirFS(root), pid)
+}
 
-	b, err := ioutil.ReadFile(fn)
+func ReadCmdLineFS(sysfs fs.FS, pid string) (string, error) {
+	fn := getProcAttr(pid, "cmdline")
+
+	b, err := fs.ReadFile(sysfs, fn)
 	if err != nil {
 		return "", err
 	}

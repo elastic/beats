@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventTypeHttpAccess(t *testing.T) {
@@ -74,34 +74,34 @@ func TestEventTypeHttpAccess(t *testing.T) {
 	assert.Equal(t, int32(1), evt.InstanceIndex())
 	assert.Equal(t, []string{"forwarded"}, evt.Forwarded())
 
-	assert.Equal(t, common.MapStr{
-		"cloudfoundry": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"cloudfoundry": mapstr.M{
 			"type": "access",
-			"envelope": common.MapStr{
+			"envelope": mapstr.M{
 				"origin":     "origin",
 				"deployment": "deployment",
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
 			},
-			"app": common.MapStr{
+			"app": mapstr.M{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
-			"tags": common.MapStr{
+			"tags": mapstr.M{
 				"tag": "value",
 			},
 		},
-		"http": common.MapStr{
-			"response": common.MapStr{
+		"http": mapstr.M{
+			"response": mapstr.M{
 				"status_code": int32(200),
 				"method":      "GET",
 				"bytes":       int64(128),
 			},
 		},
-		"user_agent": common.MapStr{
+		"user_agent": mapstr.M{
 			"original": "user_agent",
 		},
-		"url": common.MapStr{
+		"url": mapstr.M{
 			"original": "https://uri.full-domain.com:8443/subpath",
 			"scheme":   "https",
 			"port":     "8443",
@@ -145,26 +145,26 @@ func TestEventTypeLog(t *testing.T) {
 	assert.Equal(t, "source_type", evt.SourceType())
 	assert.Equal(t, "source_instance", evt.SourceID())
 
-	assert.Equal(t, common.MapStr{
-		"cloudfoundry": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"cloudfoundry": mapstr.M{
 			"type": "log",
-			"log": common.MapStr{
-				"source": common.MapStr{
+			"log": mapstr.M{
+				"source": mapstr.M{
 					"instance": evt.SourceID(),
 					"type":     evt.SourceType(),
 				},
 			},
-			"envelope": common.MapStr{
+			"envelope": mapstr.M{
 				"origin":     "origin",
 				"deployment": "deployment",
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
 			},
-			"app": common.MapStr{
+			"app": mapstr.M{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
-			"tags": common.MapStr{
+			"tags": mapstr.M{
 				"tag": "value",
 			},
 		},
@@ -199,22 +199,22 @@ func TestEventCounter(t *testing.T) {
 	assert.Equal(t, uint64(10), evt.Delta())
 	assert.Equal(t, uint64(999), evt.Total())
 
-	assert.Equal(t, common.MapStr{
-		"cloudfoundry": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"cloudfoundry": mapstr.M{
 			"type": "counter",
-			"counter": common.MapStr{
+			"counter": mapstr.M{
 				"name":  "name",
 				"delta": uint64(10),
 				"total": uint64(999),
 			},
-			"envelope": common.MapStr{
+			"envelope": mapstr.M{
 				"origin":     "origin",
 				"deployment": "deployment",
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
 			},
-			"tags": common.MapStr{
+			"tags": mapstr.M{
 				"tag": "value",
 			},
 		},
@@ -247,22 +247,22 @@ func TestEventValueMetric(t *testing.T) {
 	assert.Equal(t, 10.1, evt.Value())
 	assert.Equal(t, "unit", evt.Unit())
 
-	assert.Equal(t, common.MapStr{
-		"cloudfoundry": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"cloudfoundry": mapstr.M{
 			"type": "value",
-			"value": common.MapStr{
+			"value": mapstr.M{
 				"name":  "name",
 				"value": 10.1,
 				"unit":  "unit",
 			},
-			"envelope": common.MapStr{
+			"envelope": mapstr.M{
 				"origin":     "origin",
 				"deployment": "deployment",
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
 			},
-			"tags": common.MapStr{
+			"tags": mapstr.M{
 				"tag": "value",
 			},
 		},
@@ -307,10 +307,10 @@ func TestEventContainerMetric(t *testing.T) {
 	assert.Equal(t, uint64(2048), evt.MemoryBytesQuota())
 	assert.Equal(t, uint64(4096), evt.DiskBytesQuota())
 
-	assert.Equal(t, common.MapStr{
-		"cloudfoundry": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"cloudfoundry": mapstr.M{
 			"type": "container",
-			"container": common.MapStr{
+			"container": mapstr.M{
 				"instance_index":     int32(1),
 				"cpu.pct":            0.2,
 				"memory.bytes":       uint64(1024),
@@ -318,17 +318,17 @@ func TestEventContainerMetric(t *testing.T) {
 				"disk.bytes":         uint64(2048),
 				"disk.quota.bytes":   uint64(4096),
 			},
-			"envelope": common.MapStr{
+			"envelope": mapstr.M{
 				"origin":     "origin",
 				"deployment": "deployment",
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
 			},
-			"app": common.MapStr{
+			"app": mapstr.M{
 				"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 			},
-			"tags": common.MapStr{
+			"tags": mapstr.M{
 				"tag": "value",
 			},
 		},
@@ -361,20 +361,20 @@ func TestEventError(t *testing.T) {
 	assert.Equal(t, int32(100), evt.Code())
 	assert.Equal(t, "source", evt.Source())
 
-	assert.Equal(t, common.MapStr{
-		"cloudfoundry": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"cloudfoundry": mapstr.M{
 			"type": "error",
-			"error": common.MapStr{
+			"error": mapstr.M{
 				"source": "source",
 			},
-			"envelope": common.MapStr{
+			"envelope": mapstr.M{
 				"origin":     "origin",
 				"deployment": "deployment",
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
 			},
-			"tags": common.MapStr{
+			"tags": mapstr.M{
 				"tag": "value",
 			},
 		},
@@ -427,35 +427,35 @@ func TestEventTagsWithMetadata(t *testing.T) {
 	assert.Equal(t, "source_type", evt.SourceType())
 	assert.Equal(t, "source_instance", evt.SourceID())
 
-	assert.Equal(t, common.MapStr{
-		"cloudfoundry": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"cloudfoundry": mapstr.M{
 			"type": "log",
-			"log": common.MapStr{
-				"source": common.MapStr{
+			"log": mapstr.M{
+				"source": mapstr.M{
 					"instance": evt.SourceID(),
 					"type":     evt.SourceType(),
 				},
 			},
-			"envelope": common.MapStr{
+			"envelope": mapstr.M{
 				"origin":     "origin",
 				"deployment": "deployment",
 				"ip":         "ip",
 				"job":        "job",
 				"index":      "index",
 			},
-			"app": common.MapStr{
+			"app": mapstr.M{
 				"id":   "f47ac10b-58cc-4372-a567-0e02b2c3d479",
 				"name": "some-app",
 			},
-			"space": common.MapStr{
+			"space": mapstr.M{
 				"id":   "e1114e92-155c-11eb-ada9-27b81025a657",
 				"name": "some-space",
 			},
-			"org": common.MapStr{
+			"org": mapstr.M{
 				"id":   "baeef1ba-155c-11eb-a1af-8f14964c35d2",
 				"name": "some-org",
 			},
-			"tags": common.MapStr{
+			"tags": mapstr.M{
 				"custom_tag": "foo",
 			},
 		},

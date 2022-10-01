@@ -20,7 +20,7 @@ package add_kubernetes_metadata
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Indexing is the singleton Register instance where all Indexers and Matchers
@@ -33,8 +33,8 @@ type Register struct {
 	indexers map[string]IndexerConstructor
 	matchers map[string]MatcherConstructor
 
-	defaultIndexerConfigs map[string]common.Config
-	defaultMatcherConfigs map[string]common.Config
+	defaultIndexerConfigs map[string]config.C
+	defaultMatcherConfigs map[string]config.C
 }
 
 // NewRegister creates and returns a new Register.
@@ -43,8 +43,8 @@ func NewRegister() *Register {
 		indexers: make(map[string]IndexerConstructor, 0),
 		matchers: make(map[string]MatcherConstructor, 0),
 
-		defaultIndexerConfigs: make(map[string]common.Config, 0),
-		defaultMatcherConfigs: make(map[string]common.Config, 0),
+		defaultIndexerConfigs: make(map[string]config.C, 0),
+		defaultMatcherConfigs: make(map[string]config.C, 0),
 	}
 }
 
@@ -63,14 +63,14 @@ func (r *Register) AddMatcher(name string, matcher MatcherConstructor) {
 }
 
 // AddDefaultIndexerConfig to the register
-func (r *Register) AddDefaultIndexerConfig(name string, config common.Config) {
+func (r *Register) AddDefaultIndexerConfig(name string, config config.C) {
 	r.Lock()
 	defer r.Unlock()
 	r.defaultIndexerConfigs[name] = config
 }
 
 // AddDefaultMatcherConfig to the register
-func (r *Register) AddDefaultMatcherConfig(name string, config common.Config) {
+func (r *Register) AddDefaultMatcherConfig(name string, config config.C) {
 	r.Lock()
 	defer r.Unlock()
 	r.defaultMatcherConfigs[name] = config
@@ -108,7 +108,7 @@ func (r *Register) GetDefaultIndexerConfigs() PluginConfig {
 
 	configs := make(PluginConfig, 0, len(r.defaultIndexerConfigs))
 	for key, cfg := range r.defaultIndexerConfigs {
-		configs = append(configs, map[string]common.Config{key: cfg})
+		configs = append(configs, map[string]config.C{key: cfg})
 	}
 
 	return configs
@@ -122,7 +122,7 @@ func (r *Register) GetDefaultMatcherConfigs() PluginConfig {
 
 	configs := make(PluginConfig, 0, len(r.defaultMatcherConfigs))
 	for key, cfg := range r.defaultMatcherConfigs {
-		configs = append(configs, map[string]common.Config{key: cfg})
+		configs = append(configs, map[string]config.C{key: cfg})
 	}
 
 	return configs

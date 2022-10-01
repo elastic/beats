@@ -202,8 +202,7 @@ var ciscoIOS = (function() {
 
     var setECSCategorization = function(event) {
         event.Put("event.kind", "event");
-        event.AppendTo("event.category", "network");
-        event.AppendTo("event.category", "network_traffic");
+        event.Put("event.category", ["network"]);
         event.AppendTo("event.type", "connection");
         event.AppendTo("event.type", "firewall");
     };

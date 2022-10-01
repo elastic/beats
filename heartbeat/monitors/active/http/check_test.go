@@ -166,10 +166,11 @@ func TestCheckBody(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			res, err := http.Get(ts.URL)
+			res, err := http.Get(ts.URL) //nolint:noctx // fine for tests
 			if err != nil {
 				log.Fatal(err)
 			}
+			defer res.Body.Close()
 
 			var positivePatterns []match.Matcher
 			var negativePatterns []match.Matcher
@@ -235,10 +236,11 @@ func TestCheckStatus(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			res, err := http.Get(ts.URL)
+			res, err := http.Get(ts.URL) //nolint:noctx // fine for tests
 			if err != nil {
 				log.Fatal(err)
 			}
+			defer res.Body.Close()
 
 			check := checkStatus(test.status)(res)
 

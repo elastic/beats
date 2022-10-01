@@ -1,0 +1,1105 @@
+{
+    "attributes": {
+        "description": "Kubernetes API server metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "metricset.name",
+                            "negate": false,
+                            "params": {
+                                "query": "apiserver"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "metricset.name": "apiserver"
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9": {
+                                            "columnOrder": [
+                                                "ed3c7efa-0467-4a57-8d06-0f4775906cc5",
+                                                "35a11916-4ca3-421b-9df2-521f52f21fbb",
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46",
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X0",
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X1",
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X2"
+                                            ],
+                                            "columns": {
+                                                "35a11916-4ca3-421b-9df2-521f52f21fbb": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.apiserver.request.resource",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.apiserver.request.resource"
+                                                },
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Request Latency in Milliseconds",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "(sum(kubernetes.apiserver.request.duration.us.sum)/ sum(kubernetes.apiserver.request.duration.us.count))/1000",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X2"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Request Latency in Milliseconds",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.request.duration.us.sum"
+                                                },
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Request Latency in Milliseconds",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.request.duration.us.count"
+                                                },
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Request Latency in Milliseconds",
+                                                    "operationType": "math",
+                                                    "params": {
+                                                        "tinymathAst": {
+                                                            "args": [
+                                                                {
+                                                                    "args": [
+                                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X0",
+                                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X1"
+                                                                    ],
+                                                                    "location": {
+                                                                        "max": 103,
+                                                                        "min": 1
+                                                                    },
+                                                                    "name": "divide",
+                                                                    "text": "sum(kubernetes.apiserver.request.duration.us.sum)/ sum(kubernetes.apiserver.request.duration.us.count)",
+                                                                    "type": "function"
+                                                                },
+                                                                1000
+                                                            ],
+                                                            "location": {
+                                                                "max": 109,
+                                                                "min": 0
+                                                            },
+                                                            "name": "divide",
+                                                            "text": "(sum(kubernetes.apiserver.request.duration.us.sum)/ sum(kubernetes.apiserver.request.duration.us.count))/1000",
+                                                            "type": "function"
+                                                        }
+                                                    },
+                                                    "references": [
+                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X0",
+                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X1"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "ed3c7efa-0467-4a57-8d06-0f4775906cc5": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "NOT (kubernetes.apiserver.request.verb: WATCH or kubernetes.apiserver.request.verb: CONNECT)"
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "43097f7a-e478-47bc-81c1-7541bd899d46"
+                                        ],
+                                        "layerId": "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "35a11916-4ca3-421b-9df2-521f52f21fbb",
+                                        "xAccessor": "ed3c7efa-0467-4a57-8d06-0f4775906cc5"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "ce79d5a9-9a4c-45e1-b3e5-a31efe05a6f5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "ce79d5a9-9a4c-45e1-b3e5-a31efe05a6f5",
+                "title": "Average Apiserver Request Latency per Resource [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-8df21ece-205d-4542-bec9-e381eca92895",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "8df21ece-205d-4542-bec9-e381eca92895": {
+                                            "columnOrder": [
+                                                "cff4229b-4050-47ef-bb61-9790c5596064",
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1",
+                                                "20b53c0c-0338-468b-9254-4918ddb4438b"
+                                            ],
+                                            "columns": {
+                                                "20b53c0c-0338-468b-9254-4918ddb4438b": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of kubernetes.apiserver.request.count",
+                                                    "operationType": "max",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.request.count"
+                                                },
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Rate of Apiserver Requests",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "20b53c0c-0338-468b-9254-4918ddb4438b"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                },
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.apiserver.request.resource",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.apiserver.request.resource"
+                                                },
+                                                "cff4229b-4050-47ef-bb61-9790c5596064": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "2e2bcfec-99ac-47fd-b901-bab26b32b3d1"
+                                        ],
+                                        "layerId": "8df21ece-205d-4542-bec9-e381eca92895",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "42b0785e-95e8-4538-8cc5-b1771f663c0c",
+                                        "xAccessor": "cff4229b-4050-47ef-bb61-9790c5596064"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "9db496f9-079b-4ddd-b517-cec815a7e9cb",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "9db496f9-079b-4ddd-b517-cec815a7e9cb",
+                "title": "Apiserver Requests Rate per Resource [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-8df21ece-205d-4542-bec9-e381eca92895",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "8df21ece-205d-4542-bec9-e381eca92895": {
+                                            "columnOrder": [
+                                                "cff4229b-4050-47ef-bb61-9790c5596064",
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X2"
+                                            ],
+                                            "columns": {
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Watch Events Size in Bytes",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        },
+                                                        "formula": "sum(kubernetes.apiserver.watch.events.size.bytes.sum)/sum(kubernetes.apiserver.watch.events.size.bytes.count)",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X2"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Rate of Apiserver Requests",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.watch.events.size.bytes.sum"
+                                                },
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Rate of Apiserver Requests",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.watch.events.size.bytes.count"
+                                                },
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Rate of Apiserver Requests",
+                                                    "operationType": "math",
+                                                    "params": {
+                                                        "tinymathAst": {
+                                                            "args": [
+                                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0",
+                                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1"
+                                                            ],
+                                                            "location": {
+                                                                "max": 109,
+                                                                "min": 0
+                                                            },
+                                                            "name": "divide",
+                                                            "text": "sum(kubernetes.apiserver.watch.events.size.bytes.sum)/sum(kubernetes.apiserver.watch.events.size.bytes.count)",
+                                                            "type": "function"
+                                                        }
+                                                    },
+                                                    "references": [
+                                                        "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0",
+                                                        "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.apiserver.watch.events.kind",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.apiserver.watch.events.kind"
+                                                },
+                                                "cff4229b-4050-47ef-bb61-9790c5596064": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "2e2bcfec-99ac-47fd-b901-bab26b32b3d1"
+                                        ],
+                                        "layerId": "8df21ece-205d-4542-bec9-e381eca92895",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "42b0785e-95e8-4538-8cc5-b1771f663c0c",
+                                        "xAccessor": "cff4229b-4050-47ef-bb61-9790c5596064"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "97d844d4-e990-444a-8b94-34aa4dcd64cc",
+                    "w": 24,
+                    "x": 24,
+                    "y": 21
+                },
+                "panelIndex": "97d844d4-e990-444a-8b94-34aa4dcd64cc",
+                "title": "Average Apiserver Watch Events Size per Kind [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-8df21ece-205d-4542-bec9-e381eca92895",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "8df21ece-205d-4542-bec9-e381eca92895": {
+                                            "columnOrder": [
+                                                "cff4229b-4050-47ef-bb61-9790c5596064",
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1",
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X2"
+                                            ],
+                                            "columns": {
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Response Size in Bytes",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        },
+                                                        "formula": "sum(kubernetes.apiserver.response.size.bytes.sum)/sum(kubernetes.apiserver.response.size.bytes.count)",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X2"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Response Size.bytes in Bytes",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.response.size.bytes.sum"
+                                                },
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Response Size.bytes in Bytes",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.response.size.bytes.count"
+                                                },
+                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Response Size.bytes in Bytes",
+                                                    "operationType": "math",
+                                                    "params": {
+                                                        "tinymathAst": {
+                                                            "args": [
+                                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0",
+                                                                "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1"
+                                                            ],
+                                                            "location": {
+                                                                "max": 101,
+                                                                "min": 0
+                                                            },
+                                                            "name": "divide",
+                                                            "text": "sum(kubernetes.apiserver.response.size.bytes.sum)/sum(kubernetes.apiserver.response.size.bytes.count)",
+                                                            "type": "function"
+                                                        }
+                                                    },
+                                                    "references": [
+                                                        "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X0",
+                                                        "2e2bcfec-99ac-47fd-b901-bab26b32b3d1X1"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "42b0785e-95e8-4538-8cc5-b1771f663c0c": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.apiserver.request.resource",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "secondaryFields": [],
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.apiserver.request.resource"
+                                                },
+                                                "cff4229b-4050-47ef-bb61-9790c5596064": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "2e2bcfec-99ac-47fd-b901-bab26b32b3d1"
+                                        ],
+                                        "layerId": "8df21ece-205d-4542-bec9-e381eca92895",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "42b0785e-95e8-4538-8cc5-b1771f663c0c",
+                                        "xAccessor": "cff4229b-4050-47ef-bb61-9790c5596064"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "4b0b7368-a3ea-44ca-8c2e-ca55f7cc38da",
+                    "w": 24,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "4b0b7368-a3ea-44ca-8c2e-ca55f7cc38da",
+                "title": "Average Apiserver Response Size per Resource [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-aba71622-b1dc-4b3c-b7c0-c9212af90472",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "aba71622-b1dc-4b3c-b7c0-c9212af90472": {
+                                            "columnOrder": [
+                                                "f66894ae-0dbb-4132-838b-04725a5ae7bf",
+                                                "cad0c9f5-09c6-405b-8801-5177891c830a"
+                                            ],
+                                            "columns": {
+                                                "cad0c9f5-09c6-405b-8801-5177891c830a": {
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.apiserver.etcd.object.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Last value of kubernetes.apiserver.etcd.object.count",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.etcd.object.count"
+                                                },
+                                                "f66894ae-0dbb-4132-838b-04725a5ae7bf": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 10 values of kubernetes.apiserver.request.resource",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "cad0c9f5-09c6-405b-8801-5177891c830a",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.apiserver.request.resource"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "categoryDisplay": "default",
+                                        "groups": [
+                                            "f66894ae-0dbb-4132-838b-04725a5ae7bf"
+                                        ],
+                                        "layerId": "aba71622-b1dc-4b3c-b7c0-c9212af90472",
+                                        "layerType": "data",
+                                        "legendDisplay": "default",
+                                        "metric": "cad0c9f5-09c6-405b-8801-5177891c830a",
+                                        "nestedLegend": false,
+                                        "numberDisplay": "value"
+                                    }
+                                ],
+                                "shape": "pie"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsPie"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 23,
+                    "i": "481678b8-e443-4433-ad15-b55eaab7c8f4",
+                    "w": 24,
+                    "x": 24,
+                    "y": 40
+                },
+                "panelIndex": "481678b8-e443-4433-ad15-b55eaab7c8f4",
+                "title": "Apiserver Stored Objects per Resource [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-fc6561f2-f85f-4096-86df-ef5dcb95627c",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "fc6561f2-f85f-4096-86df-ef5dcb95627c": {
+                                            "columnOrder": [
+                                                "2a873e10-31f0-4b48-abc0-5c2c0efa8aed",
+                                                "a5d3264f-b070-4a5e-a62c-659c410e9a64",
+                                                "414b7d77-a53c-4043-9690-4e3b000980be"
+                                            ],
+                                            "columns": {
+                                                "2a873e10-31f0-4b48-abc0-5c2c0efa8aed": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 5 values of kubernetes.apiserver.request.subresource",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "414b7d77-a53c-4043-9690-4e3b000980be",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 5
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.apiserver.request.subresource"
+                                                },
+                                                "414b7d77-a53c-4043-9690-4e3b000980be": {
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.apiserver.request.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Last value of kubernetes.apiserver.request.count",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.apiserver.request.count"
+                                                },
+                                                "a5d3264f-b070-4a5e-a62c-659c410e9a64": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 10 values of kubernetes.apiserver.request.resource",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "414b7d77-a53c-4043-9690-4e3b000980be",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.apiserver.request.resource"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "categoryDisplay": "default",
+                                        "groups": [
+                                            "2a873e10-31f0-4b48-abc0-5c2c0efa8aed",
+                                            "a5d3264f-b070-4a5e-a62c-659c410e9a64"
+                                        ],
+                                        "layerId": "fc6561f2-f85f-4096-86df-ef5dcb95627c",
+                                        "layerType": "data",
+                                        "legendDisplay": "default",
+                                        "metric": "414b7d77-a53c-4043-9690-4e3b000980be",
+                                        "nestedLegend": false,
+                                        "numberDisplay": "percent"
+                                    }
+                                ],
+                                "shape": "treemap"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsPie"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 23,
+                    "i": "9f255e7f-b213-4719-9c00-eedc2a919e2c",
+                    "w": 24,
+                    "x": 0,
+                    "y": 40
+                },
+                "panelIndex": "9f255e7f-b213-4719-9c00-eedc2a919e2c",
+                "title": "Apiserver Requests per Resource and SubResource [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] API server",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "e706b4a0-ee30-11ec-bb3e-1bec5bcfeb8c",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "ce79d5a9-9a4c-45e1-b3e5-a31efe05a6f5:indexpattern-datasource-layer-f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "9db496f9-079b-4ddd-b517-cec815a7e9cb:indexpattern-datasource-layer-8df21ece-205d-4542-bec9-e381eca92895",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "97d844d4-e990-444a-8b94-34aa4dcd64cc:indexpattern-datasource-layer-8df21ece-205d-4542-bec9-e381eca92895",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "4b0b7368-a3ea-44ca-8c2e-ca55f7cc38da:indexpattern-datasource-layer-8df21ece-205d-4542-bec9-e381eca92895",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "481678b8-e443-4433-ad15-b55eaab7c8f4:indexpattern-datasource-layer-aba71622-b1dc-4b3c-b7c0-c9212af90472",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "9f255e7f-b213-4719-9c00-eedc2a919e2c:indexpattern-datasource-layer-fc6561f2-f85f-4096-86df-ef5dcb95627c",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-06-28T06:54:10.210Z",
+    "version": "WzU5OTgsM10="
+}

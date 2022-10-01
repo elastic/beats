@@ -9,9 +9,9 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type osqueryRunner struct {
@@ -56,7 +56,11 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 
 	errCh := make(chan error, 1)
 
+	// lastKnownInputs is used for recovery after "broken pipe" error
+	var lastKnownInputs []config.InputConfig
+
 	process := func(inputs []config.InputConfig) {
+		lastKnownInputs = inputs
 		newFlags := config.GetOsqueryOptions(inputs)
 
 		// If Osqueryd is running and flags are different: stop osquery
@@ -88,10 +92,8 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				cancel()
 
 				// Forward error to main loop
-				select {
-				case errCh <- err:
-				case <-ctx.Done():
-				}
+				r.log.Debugf("Forward osquery run error to the main runner loop: %v", err)
+				errCh <- err
 			}()
 		}
 
@@ -111,7 +113,18 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 				r.log.Info("Osquery exited: ", err)
 			} else {
 				r.log.Error("Failed to run osquery:", err)
-				return err
+				if isBrokenPipeOrEOFError(err) {
+					r.log.Infof("Recover osquery after broken pipe error")
+					if lastKnownInputs != nil {
+						select {
+						case r.inputCh <- lastKnownInputs:
+						case <-parentCtx.Done():
+							return parentCtx.Err()
+						}
+					}
+				} else {
+					return err
+				}
 			}
 		case <-parentCtx.Done():
 			return parentCtx.Err()

@@ -64,13 +64,18 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains(
             "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
-        tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
-                              ca_certs=CERTIFICATE1, do_handshake_on_connect=True)
+        context = ssl.create_default_context()
+        context.load_verify_locations(cafile=CERTIFICATE1)
+        context.options = ssl.CERT_REQUIRED
+        context.check_hostname = False
+
+        tls = context.wrap_socket(sock, do_handshake_on_connect=True)
         tls.connect((config.get('host'), config.get('port')))
 
         for n in range(0, NUMBER_OF_EVENTS):
@@ -116,14 +121,18 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains(
             "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
-        tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
-                              ca_certs=CERTIFICATE2, do_handshake_on_connect=True)
+        context = ssl.create_default_context()
+        context.load_verify_locations(capath=CERTIFICATE2)
+        context.options = ssl.CERT_REQUIRED
+        context.check_hostname = False
 
+        tls = context.wrap_socket(sock, do_handshake_on_connect=True, server_hostname=None)
         with pytest.raises(ssl.SSLError):
             tls.connect((config.get('host'), config.get('port')))
 
@@ -157,13 +166,19 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains(
             "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        tls = ssl.wrap_socket(sock, cert_reqs=ssl.CERT_REQUIRED,
-                              ca_certs=CERTIFICATE1, do_handshake_on_connect=True)
+
+        context = ssl.create_default_context()
+        context.load_verify_locations(capath=CERTIFICATE1)
+        context.options = ssl.CERT_REQUIRED
+        context.check_hostname = False
+
+        tls = context.wrap_socket(sock, do_handshake_on_connect=True, server_hostname=None)
 
         with pytest.raises(ssl.SSLError):
             tls.connect((config.get('host'), config.get('port')))
@@ -204,16 +219,18 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains(
             "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         context.verify_mode = ssl.CERT_REQUIRED
         context.load_verify_locations(CACERT)
         context.load_cert_chain(certfile=CLIENT2, keyfile=CLIENTKEY2)
+        context.check_hostname = False
 
         tls = context.wrap_socket(sock, server_side=False)
 
@@ -262,6 +279,7 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains(
             "Start accepting connections"))
@@ -315,18 +333,20 @@ class Test(BaseTest):
         )
 
         filebeat = self.start_beat()
+        self.addCleanup(filebeat.kill_and_wait)
 
         self.wait_until(lambda: self.log_contains(
             "Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         context.verify_mode = ssl.CERT_REQUIRED
         context.load_verify_locations(CACERT)
         context.load_cert_chain(certfile=CLIENT2, keyfile=CLIENTKEY2)
+        context.check_hostname = False
 
-        tls = context.wrap_socket(sock, server_side=False)
+        tls = context.wrap_socket(sock)
 
         tls.connect((config.get('host'), config.get('port')))
 

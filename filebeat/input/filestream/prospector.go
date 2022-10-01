@@ -26,7 +26,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -60,8 +60,31 @@ type fileProspector struct {
 	stateChangeCloser   stateChangeCloserConfig
 }
 
-func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
+func (p *fileProspector) Init(
+	cleaner,
+	globalCleaner loginp.ProspectorCleaner,
+	newID func(loginp.Source) string,
+) error {
 	files := p.filewatcher.GetFiles()
+
+	// If this fileProspector belongs to an input that did not have an ID
+	// this will find its files in the registry and update them to use the
+	// new ID.
+	globalCleaner.FixUpIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+		var fm fileMeta
+		err := v.UnpackCursorMeta(&fm)
+		if err != nil {
+			return "", nil
+		}
+
+		fi, ok := files[fm.Source]
+		if !ok {
+			return "", fm
+		}
+
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}))
+		return newKey, fm
+	})
 
 	if p.cleanRemoved {
 		cleaner.CleanIf(func(v loginp.Value) bool {
@@ -101,6 +124,7 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 	return nil
 }
 
+//nolint: dupl // Different prospectors have a similar run method
 // Run starts the fileProspector which accepts FS events from a file watcher.
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
@@ -162,6 +186,10 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
+			err := updater.ResetCursor(src, state{Offset: event.Info.Size()})
+			if err != nil {
+				log.Errorf("setting cursor for ignored file: %v", err)
+			}
 			return
 		}
 
@@ -170,7 +198,10 @@ func (p *fileProspector) onFSEvent(
 	case loginp.OpTruncate:
 		log.Debugf("File %s has been truncated", event.NewPath)
 
-		updater.ResetCursor(src, state{Offset: 0})
+		err := updater.ResetCursor(src, state{Offset: 0})
+		if err != nil {
+			log.Errorf("resetting cursor on truncated file: %v", err)
+		}
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
@@ -184,7 +215,7 @@ func (p *fileProspector) onFSEvent(
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unkown return value %v", event.Op)
+		log.Error("Unknown return value %v", event.Op)
 	}
 }
 
@@ -260,7 +291,7 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
 	err := hg.StopGroup()
 	if err != nil {
-		log.Errorf("Error while stopping harverster group: %v", err)
+		log.Errorf("Error while stopping harvester group: %v", err)
 	}
 }
 

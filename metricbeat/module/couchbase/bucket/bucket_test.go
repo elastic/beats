@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -67,25 +67,25 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "membase", event["type"])
 	assert.EqualValues(t, "beer-sample", event["name"])
 
-	data := event["data"].(common.MapStr)
-	data_used := data["used"].(common.MapStr)
+	data := event["data"].(mapstr.M)
+	data_used := data["used"].(mapstr.M)
 	assert.EqualValues(t, 12597731, data_used["bytes"])
 
-	disk := event["disk"].(common.MapStr)
+	disk := event["disk"].(mapstr.M)
 	assert.EqualValues(t, 0, disk["fetches"])
 
-	disk_used := disk["used"].(common.MapStr)
+	disk_used := disk["used"].(mapstr.M)
 	assert.EqualValues(t, 16369008, disk_used["bytes"])
 
-	memory := event["memory"].(common.MapStr)
-	memory_used := memory["used"].(common.MapStr)
+	memory := event["memory"].(mapstr.M)
+	memory_used := memory["used"].(mapstr.M)
 	assert.EqualValues(t, 53962160, memory_used["bytes"])
 
-	quota := event["quota"].(common.MapStr)
-	quota_ram := quota["ram"].(common.MapStr)
+	quota := event["quota"].(mapstr.M)
+	quota_ram := quota["ram"].(mapstr.M)
 	assert.EqualValues(t, 104857600, quota_ram["bytes"])
 
-	quota_use := quota["use"].(common.MapStr)
+	quota_use := quota["use"].(mapstr.M)
 	assert.EqualValues(t, 51.46232604980469, quota_use["pct"])
 
 	assert.EqualValues(t, 7303, event["item_count"])

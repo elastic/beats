@@ -22,8 +22,8 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var flagUpdateGob = flag.Bool("update-gob", false, "update persisted gob testdata")

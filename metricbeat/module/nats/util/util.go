@@ -25,7 +25,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // convertUptimeToSeconds converts uptime from formatted string to seconds
@@ -91,8 +91,8 @@ func convertUptimeToSeconds(uptime string) (seconds int64, err error) {
 	return
 }
 
-// UpdateDuration updates a duration in a common.MapStr from formatted string to seconds
-func UpdateDuration(event common.MapStr, key string) error {
+// UpdateDuration updates a duration in a mapstr.M from formatted string to seconds
+func UpdateDuration(event mapstr.M, key string) error {
 	item, err := event.GetValue(key)
 	if err != nil {
 		return nil
@@ -109,7 +109,7 @@ func UpdateDuration(event common.MapStr, key string) error {
 }
 
 // GetNatsTimestamp gets the timestamp of base level metrics NATS server returns
-func GetNatsTimestamp(event common.MapStr) (time.Time, error) {
+func GetNatsTimestamp(event mapstr.M) (time.Time, error) {
 	var timeStamp time.Time
 	timestamp, _ := event.GetValue("server.time")
 	timestampString := timestamp.(string)

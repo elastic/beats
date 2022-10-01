@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/threatintel/_meta/docs.asciidoc
+
 [[filebeat-module-threatintel]]
 [role="xpack"]
 
@@ -9,7 +11,14 @@ This file is generated! See scripts/docs_collector.py
 :has-dashboards: true
 
 == Threat Intel module
-beta[]
+
+//temporarily override modulename to create working link
+:modulename: ti_abusech
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: threatintel
 
 This module ingests data from a collection of different threat intelligence
 sources. The ingested data is meant to be used with
@@ -219,8 +228,8 @@ reference the MISP fields located on the MISP server itself.
     var.url: https://SERVER/events/restSearch
     var.api_token: xVfaM3DSt8QEwO2J1ix00V4ZHJs14nq5GMsHcK6Z
     var.filters:
-      - type: ["md5", "sha256", "url", "ip-src"]
-      - threat_level: 4
+      type: ["md5", "sha256", "url", "ip-src"]
+      threat_level: 4
     var.first_interval: 24h
     var.interval: 60m
 ----
@@ -243,8 +252,8 @@ from the last response as the filter when retrieving new events.
 
 *`var.filters`*::
 
-List of filters to apply when retrieving new events from the MISP server, this
-field is optional and defaults to all events.
+Dictionary of filters to apply when retrieving new events from the MISP server, this
+field is optional and defaults to all events. A list of available options is located at https://www.circl.lu/doc/misp/automation/#search
 
 *`var.proxy_url`*::
 
@@ -606,7 +615,7 @@ Optional URL to use as HTTP proxy.
 Optional value to override the default HTTP timeout of 30 seconds.
 
 
-Recorded Future fields are mapped to the following ECS fields:
+ThreatQ fields are mapped to the following ECS fields:
 
 [options="header"]
 |=============================================================
@@ -677,3 +686,4 @@ Overview of the information provided by the ThreatQuotient feed.
 For a description of each field in the module, see the
 <<exported-fields-threatintel,exported fields>> section.
 
+:edit_url!:

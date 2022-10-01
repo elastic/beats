@@ -80,11 +80,11 @@
               type: double
               format: bytes
               description: >
-                Received bytes
+                Received bytes on the default interface. If default interface is not defined, will be reported not correct value `0`
             - name: errors
               type: double
               description: >
-                Rx errors
+                Rx errors on the default interface. If default interface is not defined, will be reported not correct value `0`
         - name: tx
           type: group
           fields:
@@ -92,11 +92,11 @@
               type: double
               format: bytes
               description: >
-                Transmitted bytes
+                Transmitted bytes on the default interface. If default interface is not defined, will be reported not correct value `0`
             - name: errors
               type: double
               description: >
-                Tx errors
+                Tx errors on the default interface. If default interface is not defined, will be reported not correct value `0`
     - name: fs
       type: group
       fields:

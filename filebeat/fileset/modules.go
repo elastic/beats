@@ -19,19 +19,19 @@ package fileset
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const logName = "modules"
@@ -51,12 +51,19 @@ func newModuleRegistry(modulesPath string,
 	moduleConfigs []*ModuleConfig,
 	overrides *ModuleOverrides,
 	beatInfo beat.Info,
+	enableAllFilesets bool,
 ) (*ModuleRegistry, error) {
 	reg := ModuleRegistry{
 		registry: []Module{},
 		log:      logp.NewLogger(logName),
 	}
+
 	for _, mcfg := range moduleConfigs {
+		// an empty ModuleConfig can reach this so we only force enable a
+		// config if the Module name is set and Enabled pointer is valid.
+		if enableAllFilesets && mcfg.Module != "" && mcfg.Enabled != nil {
+			*mcfg.Enabled = true
+		}
 		if mcfg.Module == "" || (mcfg.Enabled != nil && !(*mcfg.Enabled)) {
 			continue
 		}
@@ -67,7 +74,7 @@ func newModuleRegistry(modulesPath string,
 		}
 		moduleFilesets, err := getModuleFilesets(modulesPath, mcfg.Module)
 		if err != nil {
-			return nil, fmt.Errorf("error getting filesets for module %s: %v", mcfg.Module, err)
+			return nil, fmt.Errorf("error getting filesets for module %s: %w", mcfg.Module, err)
 		}
 		module := Module{
 			config:   *mcfg,
@@ -77,9 +84,14 @@ func newModuleRegistry(modulesPath string,
 
 			fcfg, err = applyOverrides(fcfg, mcfg.Module, filesetName, overrides)
 			if err != nil {
-				return nil, fmt.Errorf("error applying overrides on fileset %s/%s: %v", mcfg.Module, filesetName, err)
+				return nil, fmt.Errorf("error applying overrides on fileset %s/%s: %w", mcfg.Module, filesetName, err)
 			}
 
+			// ModuleConfig can have empty Filesets so we only force
+			// enable if the Enabled pointer is valid
+			if enableAllFilesets && fcfg.Enabled != nil {
+				*fcfg.Enabled = true
+			}
 			if fcfg.Enabled != nil && !(*fcfg.Enabled) {
 				continue
 			}
@@ -98,7 +110,7 @@ func newModuleRegistry(modulesPath string,
 				return nil, err
 			}
 			if err = fileset.Read(beatInfo); err != nil {
-				return nil, fmt.Errorf("error reading fileset %s/%s: %v", mcfg.Module, filesetName, err)
+				return nil, fmt.Errorf("error reading fileset %s/%s: %w", mcfg.Module, filesetName, err)
 			}
 			module.filesets = append(module.filesets, *fileset)
 		}
@@ -109,14 +121,14 @@ func newModuleRegistry(modulesPath string,
 	for _, mod := range reg.registry {
 		filesets := reg.ModuleConfiguredFilesets(mod)
 		if len(filesets) == 0 {
-			return nil, errors.Errorf("module %s is configured but has no enabled filesets", mod.config.Module)
+			return nil, fmt.Errorf("module %s is configured but has no enabled filesets", mod.config.Module)
 		}
 	}
 	return &reg, nil
 }
 
 // NewModuleRegistry reads and loads the configured module into the registry.
-func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init bool) (*ModuleRegistry, error) {
+func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, enableAllFilesets bool) (*ModuleRegistry, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 
 	stat, err := os.Stat(modulesPath)
@@ -143,7 +155,7 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init 
 
 		moduleConfig, err := mcfgFromConfig(cfg)
 		if err != nil {
-			return nil, errors.Wrap(err, "error unpacking module config")
+			return nil, fmt.Errorf("error unpacking module config :%w", err)
 		}
 		mcfgs = append(mcfgs, moduleConfig)
 	}
@@ -154,7 +166,7 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init 
 	}
 
 	enableFilesetsFromOverrides(mcfgs, modulesOverrides)
-	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo)
+	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo, enableAllFilesets)
 }
 
 // enableFilesetsFromOverrides enables in mcfgs the filesets mentioned in overrides,
@@ -177,7 +189,7 @@ func enableFilesetsFromOverrides(mcfgs []*ModuleConfig, overrides *ModuleOverrid
 	}
 }
 
-func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
+func mcfgFromConfig(cfg *conf.C) (*ModuleConfig, error) {
 	var mcfg ModuleConfig
 
 	err := cfg.Unpack(&mcfg)
@@ -189,7 +201,7 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 	err = cfg.Unpack(&dict)
 	if err != nil {
-		return nil, fmt.Errorf("error unpacking module %s in a dict: %v", mcfg.Module, err)
+		return nil, fmt.Errorf("error unpacking module %s in a dict: %w", mcfg.Module, err)
 	}
 
 	mcfg.Filesets = map[string]*FilesetConfig{}
@@ -203,16 +215,16 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 			continue
 		}
 
-		filesetConfig, _ := dict[name] // Nil config if name is not present.
+		filesetConfig := dict[name] // Nil config if name is not present.
 
-		tmpCfg, err := common.NewConfigFrom(filesetConfig)
+		tmpCfg, err := conf.NewConfigFrom(filesetConfig)
 		if err != nil {
-			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+			return nil, fmt.Errorf("error creating config from fileset %s/%s: %w", mcfg.Module, name, err)
 		}
 
 		fcfg, err := NewFilesetConfig(tmpCfg)
 		if err != nil {
-			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+			return nil, fmt.Errorf("error creating config from fileset %s/%s: %w", mcfg.Module, name, err)
 		}
 		mcfg.Filesets[name] = fcfg
 	}
@@ -272,22 +284,22 @@ func applyOverrides(fcfg *FilesetConfig,
 		return fcfg, nil
 	}
 
-	config, err := common.NewConfigFrom(fcfg)
+	config, err := conf.NewConfigFrom(fcfg)
 	if err != nil {
-		return nil, fmt.Errorf("error creating vars config object: %v", err)
+		return nil, fmt.Errorf("error creating vars config object: %w", err)
 	}
 
-	toMerge := []*common.Config{config}
+	toMerge := []*conf.C{config}
 	toMerge = append(toMerge, overridesConfigs...)
 
-	resultConfig, err := common.MergeConfigs(toMerge...)
+	resultConfig, err := conf.MergeConfigs(toMerge...)
 	if err != nil {
-		return nil, fmt.Errorf("error merging configs: %v", err)
+		return nil, fmt.Errorf("error merging configs: %w", err)
 	}
 
 	res, err := NewFilesetConfig(resultConfig)
 	if err != nil {
-		return nil, fmt.Errorf("error unpacking configs: %v", err)
+		return nil, fmt.Errorf("error unpacking configs: %w", err)
 	}
 
 	return res, nil
@@ -318,13 +330,13 @@ func appendWithoutDuplicates(moduleConfigs []*ModuleConfig, modules []string) ([
 	return moduleConfigs, nil
 }
 
-func (reg *ModuleRegistry) GetInputConfigs() ([]*common.Config, error) {
-	var result []*common.Config
+func (reg *ModuleRegistry) GetInputConfigs() ([]*conf.C, error) {
+	var result []*conf.C
 	for _, module := range reg.registry {
 		for _, fileset := range module.filesets {
 			fcfg, err := fileset.getInputConfig()
 			if err != nil {
-				return result, fmt.Errorf("error getting config for fileset %s/%s: %v", module.config.Module, fileset.name, err)
+				return result, fmt.Errorf("error getting config for fileset %s/%s: %w", module.config.Module, fileset.name, err)
 			}
 			result = append(result, fcfg)
 		}
@@ -367,7 +379,7 @@ func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []Proc
 	}
 	status, body, err := esClient.Request("GET", "/_nodes/ingest", "", nil, nil)
 	if err != nil {
-		return fmt.Errorf("error querying _nodes/ingest: %v", err)
+		return fmt.Errorf("error querying _nodes/ingest: %w", err)
 	}
 	if status > 299 {
 		return fmt.Errorf("error querying _nodes/ingest. Status: %d. Response body: %s", status, body)

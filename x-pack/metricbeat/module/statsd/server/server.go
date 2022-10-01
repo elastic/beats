@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/helper/server/udp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -169,12 +169,12 @@ func (m *MetricSet) getEvents() []*mb.Event {
 
 	for idx, tagGroup := range groups {
 
-		mapstrTags := common.MapStr{}
+		mapstrTags := mapstr.M{}
 		for k, v := range tagGroup.tags {
 			mapstrTags[k] = v
 		}
 
-		sanitizedMetrics := common.MapStr{}
+		sanitizedMetrics := mapstr.M{}
 		for k, v := range tagGroup.metrics {
 			eventMapping(k, v, sanitizedMetrics, m.mappings)
 		}
@@ -185,7 +185,7 @@ func (m *MetricSet) getEvents() []*mb.Event {
 
 		events[idx] = &mb.Event{
 			MetricSetFields: sanitizedMetrics,
-			RootFields:      common.MapStr{"labels": mapstrTags},
+			RootFields:      mapstr.M{"labels": mapstrTags},
 			Namespace:       m.Module().Name(),
 		}
 	}

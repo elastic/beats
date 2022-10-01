@@ -24,26 +24,26 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConversionWithMapStr(t *testing.T) {
-	t.Run("from MapStr", func(t *testing.T) {
+	t.Run("from mapstr.M", func(t *testing.T) {
 		type testStruct struct {
 			A int
 			B int
 		}
 
 		var v testStruct
-		Convert(&v, &common.MapStr{"a": 1})
+		Convert(&v, &mapstr.M{"a": 1})
 		assert.Equal(t, testStruct{1, 0}, v)
 	})
 
-	t.Run("to MapStr", func(t *testing.T) {
-		var m common.MapStr
+	t.Run("to mapstr.M", func(t *testing.T) {
+		var m mapstr.M
 		err := Convert(&m, struct{ A string }{"test"})
 		require.NoError(t, err)
-		assert.Equal(t, common.MapStr{"a": "test"}, m)
+		assert.Equal(t, mapstr.M{"a": "test"}, m)
 	})
 }
 
@@ -86,8 +86,8 @@ func TestConversionBetweenGoTypes(t *testing.T) {
 }
 
 func TestTimestamps(t *testing.T) {
-	t.Run("timestamp to MapStr", func(t *testing.T) {
-		var m common.MapStr
+	t.Run("timestamp to mapstr.M", func(t *testing.T) {
+		var m mapstr.M
 		ts := time.Unix(1234, 5678).UTC()
 
 		off := int16(-1)
@@ -95,17 +95,17 @@ func TestTimestamps(t *testing.T) {
 
 		err := Convert(&m, struct{ Timestamp time.Time }{ts})
 		require.NoError(t, err)
-		assert.Equal(t, common.MapStr{"timestamp": expected}, m)
+		assert.Equal(t, mapstr.M{"timestamp": expected}, m)
 	})
 
-	t.Run("timestamp from encoded MapStr", func(t *testing.T) {
+	t.Run("timestamp from encoded mapstr.M", func(t *testing.T) {
 		type testStruct struct {
 			Timestamp time.Time
 		}
 
 		var v testStruct
 		off := int16(-1)
-		err := Convert(&v, common.MapStr{
+		err := Convert(&v, mapstr.M{
 			"timestamp": []uint64{5678 | (uint64(uint16(off)))<<32, 1234},
 		})
 		require.NoError(t, err)
@@ -120,7 +120,7 @@ func TestTimestamps(t *testing.T) {
 
 		var v testStruct
 		ts := time.Now()
-		err := Convert(&v, common.MapStr{
+		err := Convert(&v, mapstr.M{
 			"timestamp": ts.Format(time.RFC3339Nano),
 		})
 		require.NoError(t, err)
@@ -148,13 +148,13 @@ func TestComplexExampleWithIntermediateConversion(t *testing.T) {
 		}
 	)
 
-	input := common.MapStr{
+	input := mapstr.M{
 		"_key": "test",
-		"internal": common.MapStr{
+		"internal": mapstr.M{
 			"ttl":     float64(1800000000000),
 			"updated": []interface{}{float64(515579904576), float64(1588432943)},
 		},
-		"cursor": common.MapStr{
+		"cursor": mapstr.M{
 			"monotonictimestamp": float64(24881645756),
 			"position":           "s=86a99d3589f54f01804e844bebd787d5;i=4d19f;b=9c5d2b320b7946b4be53c0940a5b1289;m=5cb0fc8bc;t=5a488aeaa1130;x=ccbe23f507e8d0a4",
 			"realtimetimestamp":  float64(1588281836441904),

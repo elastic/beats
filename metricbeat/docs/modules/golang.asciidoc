@@ -3,12 +3,16 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: golang
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/golang/_meta/docs.asciidoc
+
 
 [[metricbeat-module-golang]]
 == Golang module
 
 The golang module collects metrics by submitting HTTP GET requests to https://golang.org/pkg/expvar/[golang-expvar-api].
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -47,3 +51,4 @@ include::golang/expvar.asciidoc[]
 
 include::golang/heap.asciidoc[]
 
+:edit_url!:

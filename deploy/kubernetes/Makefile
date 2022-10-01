@@ -1,4 +1,4 @@
-ALL=filebeat metricbeat auditbeat heartbeat elastic-agent-standalone elastic-agent-managed
+ALL=filebeat metricbeat auditbeat heartbeat
 BEAT_VERSION=$(shell head -n 1 ../../libbeat/docs/version.asciidoc | cut -c 17- )
 
 .PHONY: all $(ALL)

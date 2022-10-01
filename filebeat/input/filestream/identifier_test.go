@@ -26,12 +26,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type testFileIdentifierConfig struct {
-	Identifier *common.ConfigNamespace `config:"identifier"`
+	Identifier *conf.Namespace `config:"identifier"`
 }
 
 func TestFileIdentifier(t *testing.T) {
@@ -84,7 +84,7 @@ func TestFileIdentifier(t *testing.T) {
 	})
 
 	t.Run("path identifier", func(t *testing.T) {
-		c := common.MustNewConfigFrom(map[string]interface{}{
+		c := conf.MustNewConfigFrom(map[string]interface{}{
 			"identifier": map[string]interface{}{
 				"path": nil,
 			},

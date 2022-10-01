@@ -23,8 +23,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -124,51 +124,51 @@ func TestTimesSeriesHashes(t *testing.T) {
 
 	for _, test := range []struct {
 		name     string
-		in       common.MapStr
-		expected common.MapStr
+		in       mapstr.M
+		expected mapstr.M
 	}{
 		{
 			name: "simple fields",
-			in: common.MapStr{
-				"context": common.MapStr{
+			in: mapstr.M{
+				"context": mapstr.M{
 					"first":  1,
 					"second": "word2",
 					"third":  "word3",
 				},
 			},
-			expected: common.MapStr{
-				"context": common.MapStr{
+			expected: mapstr.M{
+				"context": mapstr.M{
 					"first":  1,
 					"second": "word2",
 					"third":  "word3",
 				},
-				"timeseries": common.MapStr{"instance": uint64(10259802856000774733)},
+				"timeseries": mapstr.M{"instance": uint64(10259802856000774733)},
 			},
 		},
 		{
 			name: "simple field - with one ignored field",
-			in: common.MapStr{
-				"context": common.MapStr{
+			in: mapstr.M{
+				"context": mapstr.M{
 					"first":  1,
 					"second": "word2",
 					"third":  "word3",
 				},
 				"not-a-dimension": 1000,
 			},
-			expected: common.MapStr{
-				"context": common.MapStr{
+			expected: mapstr.M{
+				"context": mapstr.M{
 					"first":  1,
 					"second": "word2",
 					"third":  "word3",
 				},
 				"not-a-dimension": 1000,
-				"timeseries":      common.MapStr{"instance": uint64(10259802856000774733)}, // same as above
+				"timeseries":      mapstr.M{"instance": uint64(10259802856000774733)}, // same as above
 			},
 		},
 		{
 			name: "simple fields and one ignored and one by default",
-			in: common.MapStr{
-				"context": common.MapStr{
+			in: mapstr.M{
+				"context": mapstr.M{
 					"first":  1,
 					"second": "word2",
 					"third":  "word3",
@@ -176,15 +176,15 @@ func TestTimesSeriesHashes(t *testing.T) {
 				"not-a-dimension":      1000,
 				"dimension-by-default": "dimension1",
 			},
-			expected: common.MapStr{
-				"context": common.MapStr{
+			expected: mapstr.M{
+				"context": mapstr.M{
 					"first":  1,
 					"second": "word2",
 					"third":  "word3",
 				},
 				"not-a-dimension":      1000,
 				"dimension-by-default": "dimension1",
-				"timeseries":           common.MapStr{"instance": uint64(17933311421196639387)},
+				"timeseries":           mapstr.M{"instance": uint64(17933311421196639387)},
 			},
 		},
 	} {

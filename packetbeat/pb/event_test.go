@@ -25,26 +25,26 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMarshalMapStr(t *testing.T) {
 	f := NewFields()
 	f.Source = &ecs.Source{IP: "127.0.0.1"}
 
-	m := common.MapStr{}
+	m := mapstr.M{}
 	if err := f.MarshalMapStr(m); err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, common.MapStr{
-		"event": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"event": mapstr.M{
 			"kind":     "event",
 			"category": []string{"network"},
 			"type":     []string{"connection", "protocol"},
 		},
-		"source": common.MapStr{"ip": "127.0.0.1"},
+		"source": mapstr.M{"ip": "127.0.0.1"},
 	}, m)
 }
 
@@ -76,7 +76,7 @@ func TestIsEmptyValue(t *testing.T) {
 }
 
 func TestSkipFields(t *testing.T) {
-	m := common.MapStr{}
+	m := mapstr.M{}
 	if err := MarshalStruct(m, "test", &struct {
 		Field1 string `ecs:"field1"`
 		Field2 string
@@ -88,8 +88,8 @@ func TestSkipFields(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, common.MapStr{
-		"test": common.MapStr{
+	assert.Equal(t, mapstr.M{
+		"test": mapstr.M{
 			"field1": "field1",
 			"field3": "field3",
 		},

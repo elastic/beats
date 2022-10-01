@@ -95,7 +95,7 @@ class IdxMgmt(unittest.TestCase):
     def assert_policy_created(self, policy):
         resp = self._client.transport.perform_request('GET', '/_ilm/policy/' + policy)
         assert policy in resp
-        assert resp[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb"
+        assert resp[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_primary_shard_size"] == "50gb"
         assert resp[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d"
 
     def assert_docs_written_to_data_stream(self, data_stream):

@@ -34,11 +34,11 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/auparse"
 )
@@ -72,15 +72,51 @@ var (
 	}
 )
 
-func TestData(t *testing.T) {
-	logp.TestingSetup()
+func TestImmutable(t *testing.T) {
+	_ = logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
 		// Get Status response for initClient
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
-		returnACK().returnACK().returnACK().returnACK().returnACK().
+		// With one extra for SetImmutable
+		returnACK().returnStatus().returnACK().returnACK().
+		returnACK().returnACK().returnACK().returnACK().
+		// Send one auditd message.
+		returnMessage(userLoginFailMsg)
+
+	// Replace the default AuditClient with a mock.
+	config := getConfig()
+	config["immutable"] = true
+
+	ms := mbtest.NewPushMetricSetV2(t, config)
+	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet.client.Close()
+	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
+
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
+	if len(events) != 1 {
+		t.Fatalf("expected 1 events, but received %d", len(events))
+	}
+	assertNoErrors(t, events)
+
+	assertFieldsAreDocumented(t, events)
+
+	beatEvent := mbtest.StandardizeEvent(ms, events[0], core.AddDatasetToEvent)
+	mbtest.WriteEventToDataJSON(t, beatEvent, "")
+}
+
+func TestData(t *testing.T) {
+	_ = logp.TestingSetup()
+
+	// Create a mock netlink client that provides the expected responses.
+	mock := NewMock().
+		// Get Status response for initClient
+		returnACK().returnStatus().
+		// Send expected ACKs for initialization
+		returnACK().returnStatus().returnACK().returnACK().
+		returnACK().returnACK().returnACK().
 		// Send three auditd messages.
 		returnMessage(userLoginFailMsg).
 		returnMessage(execveMsgs...).
@@ -93,10 +129,10 @@ func TestData(t *testing.T) {
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	assertNoErrors(t, events)
 	if len(events) != 3 {
 		t.Fatalf("expected 3 events, but received %d", len(events))
 	}
-	assertNoErrors(t, events)
 
 	assertFieldsAreDocumented(t, events)
 
@@ -105,14 +141,15 @@ func TestData(t *testing.T) {
 }
 
 func TestLoginType(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
 		// Get Status response for initClient
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
-		returnACK().returnACK().returnACK().returnACK().returnACK().
+		returnACK().returnStatus().returnACK().returnACK().
+		returnACK().returnACK().returnACK().
 		// Send an authentication failure and a success.
 		returnMessage(userLoginFailMsg).
 		returnMessage(userLoginSuccessMsg).
@@ -138,7 +175,7 @@ func TestLoginType(t *testing.T) {
 			return events[i].ModuleFields["sequence"].(uint32) < events[j].ModuleFields["sequence"].(uint32)
 		})
 
-	for idx, expected := range []common.MapStr{
+	for idx, expected := range []mapstr.M{
 		{
 			"event.category":      []string{"authentication"},
 			"event.type":          []string{"start"},
@@ -175,7 +212,7 @@ func TestLoginType(t *testing.T) {
 				assert.Equal(t, v, cur, msg)
 			} else {
 				_, err := beatEvent.GetValue(k)
-				assert.Equal(t, common.ErrKeyNotFound, err, msg)
+				assert.Equal(t, mapstr.ErrKeyNotFound, err, msg)
 			}
 		}
 	}
@@ -223,7 +260,7 @@ func TestUnicastClient(t *testing.T) {
 		t.Skip("-audit was not specified")
 	}
 
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -236,7 +273,7 @@ func TestUnicastClient(t *testing.T) {
 
 	// Any commands executed by this process will generate events due to the
 	// PPID filter we applied to the rule.
-	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
+	time.AfterFunc(time.Second, func() { _, _ = exec.Command("cat", "/proc/self/status").Output() })
 
 	ms := mbtest.NewPushMetricSetV2(t, c)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
@@ -253,7 +290,7 @@ func TestMulticastClient(t *testing.T) {
 		t.Skip("no multicast support")
 	}
 
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -266,7 +303,7 @@ func TestMulticastClient(t *testing.T) {
 
 	// Any commands executed by this process will generate events due to the
 	// PPID filter we applied to the rule.
-	time.AfterFunc(time.Second, func() { exec.Command("cat", "/proc/self/status").Output() })
+	time.AfterFunc(time.Second, func() { _, _ = exec.Command("cat", "/proc/self/status").Output() })
 
 	ms := mbtest.NewPushMetricSetV2(t, c)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)

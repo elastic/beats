@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: rabbitmq
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/rabbitmq/_meta/docs.asciidoc
+
 
 [[metricbeat-module-rabbitmq]]
 == RabbitMQ module
@@ -13,7 +15,7 @@ include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 The RabbitMQ module uses http://www.rabbitmq.com/management.html[HTTP API] created by the management plugin to collect metrics.
 
-The default metricsets are `connection`, `node`, `queue` and `exchange`.
+The default metricsets are `connection`, `node`, `queue`, `exchange` and `shovel`.
 
 If `management.path_prefix` is set in RabbitMQ configuration, `management_path_prefix` has to be set to the same value in this module configuration.
 
@@ -22,6 +24,8 @@ If `management.path_prefix` is set in RabbitMQ configuration, `management_path_p
 
 The rabbitmq module is fully tested with RabbitMQ 3.7.4 and it should be compatible with any version supporting the management plugin (which needs to be installed and enabled). Exchange metricset is also tested with 3.6.0, 3.6.5 and 3.7.14
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -33,7 +37,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: rabbitmq
-  metricsets: ["node", "queue", "connection"]
+  metricsets: ["node", "queue", "connection", "exchange", "shovel"]
   enabled: true
   period: 10s
   hosts: ["localhost:15672"]
@@ -62,6 +66,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-rabbitmq-queue,queue>>
 
+* <<metricbeat-metricset-rabbitmq-shovel,shovel>>
+
 include::rabbitmq/connection.asciidoc[]
 
 include::rabbitmq/exchange.asciidoc[]
@@ -70,3 +76,6 @@ include::rabbitmq/node.asciidoc[]
 
 include::rabbitmq/queue.asciidoc[]
 
+include::rabbitmq/shovel.asciidoc[]
+
+:edit_url!:

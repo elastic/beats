@@ -319,6 +319,10 @@ functionbeat.provider.aws.functions:
 # sub-dictionary. Default is false.
 #fields_under_root: false
 
+# Configure the precision of all timestamps in Functionbeat.
+# Available options: millisecond, microsecond, nanosecond
+#timestamp.precision: millisecond
+
 # Internal queue configuration for buffering events to be published.
 #queue:
   # Queue type by name (default 'mem')
@@ -981,6 +985,9 @@ output.elasticsearch:
 
 # Name under which the template is stored in Elasticsearch
 #setup.template.json.name: ""
+
+# Set this option if the JSON template is a data stream.
+#setup.template.json.data_stream: false
 
 # Overwrite existing template
 # Do not enable this option for more than one instance of functionbeat as it might

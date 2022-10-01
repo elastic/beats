@@ -21,9 +21,9 @@ import (
 	"github.com/dop251/goja"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // chainBuilder builds a new processor chain.
@@ -134,20 +134,20 @@ type nativeProcessor struct {
 }
 
 func newNativeProcessor(constructor processors.Constructor, call gojaCall) (processor, error) {
-	var config *common.Config
+	var cfg *config.C
 
 	if a0 := call.Argument(0); !goja.IsUndefined(a0) {
 		var err error
-		config, err = common.NewConfigFrom(a0.Export())
+		cfg, err = config.NewConfigFrom(a0.Export())
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		// No config so use an empty config.
-		config = common.NewConfig()
+		cfg = config.NewConfig()
 	}
 
-	p, err := constructor(config)
+	p, err := constructor(cfg)
 	if err != nil {
 		return nil, err
 	}

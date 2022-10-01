@@ -1,0 +1,1292 @@
+{
+    "attributes": {
+        "description": "Kubernetes Controller Manager metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "kubernetes.controllermanager"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": {
+                                    "query": "kubernetes.controllermanager"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9": {
+                                            "columnOrder": [
+                                                "35a11916-4ca3-421b-9df2-521f52f21fbb",
+                                                "ed3c7efa-0467-4a57-8d06-0f4775906cc5",
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46",
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X0",
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X1",
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X2"
+                                            ],
+                                            "columns": {
+                                                "35a11916-4ca3-421b-9df2-521f52f21fbb": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.controllermanager.url",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "secondaryFields": [],
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.controllermanager.url"
+                                                },
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Request Latency in Milliseconds",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "(sum(kubernetes.controllermanager.client.request.duration.us.sum)/ sum(kubernetes.controllermanager.client.request.duration.us.count))/1000",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X2"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Request Latency in Milliseconds",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.client.request.duration.us.sum"
+                                                },
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Request Latency in Milliseconds",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.client.request.duration.us.count"
+                                                },
+                                                "43097f7a-e478-47bc-81c1-7541bd899d46X2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Request Latency in Milliseconds",
+                                                    "operationType": "math",
+                                                    "params": {
+                                                        "tinymathAst": {
+                                                            "args": [
+                                                                {
+                                                                    "args": [
+                                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X0",
+                                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X1"
+                                                                    ],
+                                                                    "location": {
+                                                                        "max": 133,
+                                                                        "min": 1
+                                                                    },
+                                                                    "name": "divide",
+                                                                    "text": "sum(kubernetes.controllermanager.client.request.duration.us.sum)/ sum(kubernetes.controllermanager.client.request.duration.us.count)",
+                                                                    "type": "function"
+                                                                },
+                                                                1000
+                                                            ],
+                                                            "location": {
+                                                                "max": 139,
+                                                                "min": 0
+                                                            },
+                                                            "name": "divide",
+                                                            "text": "(sum(kubernetes.controllermanager.client.request.duration.us.sum)/ sum(kubernetes.controllermanager.client.request.duration.us.count))/1000",
+                                                            "type": "function"
+                                                        }
+                                                    },
+                                                    "references": [
+                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X0",
+                                                        "43097f7a-e478-47bc-81c1-7541bd899d46X1"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "ed3c7efa-0467-4a57-8d06-0f4775906cc5": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "43097f7a-e478-47bc-81c1-7541bd899d46"
+                                        ],
+                                        "layerId": "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "35a11916-4ca3-421b-9df2-521f52f21fbb",
+                                        "xAccessor": "ed3c7efa-0467-4a57-8d06-0f4775906cc5"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "valuesInLegend": true
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "1bd24fa1-319e-4cae-9d45-d821b06a8034",
+                    "w": 32,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "1bd24fa1-319e-4cae-9d45-d821b06a8034",
+                "title": "Average Request Latency per Url [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-d3be0fa3-c7a4-49ba-b8cf-ab79f477f332",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "d3be0fa3-c7a4-49ba-b8cf-ab79f477f332": {
+                                            "columnOrder": [
+                                                "236eb2de-d45f-43f2-83f4-5a1d7355132b",
+                                                "301759e0-f73e-4e6d-a7c5-d0938024e989",
+                                                "2213a6be-29f5-4326-b74c-a64611d111bb"
+                                            ],
+                                            "columns": {
+                                                "2213a6be-29f5-4326-b74c-a64611d111bb": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Average of kubernetes.controllermanager.process.cpu.sec",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.process.cpu.sec"
+                                                },
+                                                "236eb2de-d45f-43f2-83f4-5a1d7355132b": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "301759e0-f73e-4e6d-a7c5-d0938024e989": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Differences of Average of kubernetes.controllermanager.process.cpu.sec",
+                                                    "operationType": "differences",
+                                                    "references": [
+                                                        "2213a6be-29f5-4326-b74c-a64611d111bb"
+                                                    ],
+                                                    "scale": "ratio"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "301759e0-f73e-4e6d-a7c5-d0938024e989"
+                                        ],
+                                        "layerId": "d3be0fa3-c7a4-49ba-b8cf-ab79f477f332",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "xAccessor": "236eb2de-d45f-43f2-83f4-5a1d7355132b"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yTitle": "CPU time"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1604f0de-edd6-456e-8670-ab9b33988abb",
+                    "w": 24,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "1604f0de-edd6-456e-8670-ab9b33988abb",
+                "title": "Controller CPU [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-77da5988-3f03-4e8f-b1e4-39a94d8bec07",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "77da5988-3f03-4e8f-b1e4-39a94d8bec07": {
+                                            "columnOrder": [
+                                                "d523e6d2-50f3-4b45-8815-8259df43850c",
+                                                "066b6737-af97-420e-aa79-dec27b76747d",
+                                                "2dde42be-cbda-4eb9-9b21-897ad18d9a63"
+                                            ],
+                                            "columns": {
+                                                "066b6737-af97-420e-aa79-dec27b76747d": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Resident Memory",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true,
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.process.memory.resident.bytes"
+                                                },
+                                                "2dde42be-cbda-4eb9-9b21-897ad18d9a63": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Virtual Memory",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true,
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.process.memory.virtual.bytes"
+                                                },
+                                                "d523e6d2-50f3-4b45-8815-8259df43850c": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "066b6737-af97-420e-aa79-dec27b76747d",
+                                            "2dde42be-cbda-4eb9-9b21-897ad18d9a63"
+                                        ],
+                                        "layerId": "77da5988-3f03-4e8f-b1e4-39a94d8bec07",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "xAccessor": "d523e6d2-50f3-4b45-8815-8259df43850c"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "303702e1-ba33-49f2-b337-4cc7d7305606",
+                    "w": 24,
+                    "x": 24,
+                    "y": 14
+                },
+                "panelIndex": "303702e1-ba33-49f2-b337-4cc7d7305606",
+                "title": "Controller Memory in Bytes [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-3334c868-1314-4b93-9742-06a9b35bfc64",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "3334c868-1314-4b93-9742-06a9b35bfc64": {
+                                            "columnOrder": [
+                                                "84cda27c-e360-4a81-91ae-b2d461b9a621",
+                                                "91ca7bd7-d555-4898-979e-1634ed879d99",
+                                                "9b324bf8-2f01-45a5-b829-4dc27248fb8a",
+                                                "b11209b9-d0e5-495c-ac8c-2da8641969b1"
+                                            ],
+                                            "columns": {
+                                                "84cda27c-e360-4a81-91ae-b2d461b9a621": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.controllermanager.name",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.controllermanager.name"
+                                                },
+                                                "91ca7bd7-d555-4898-979e-1634ed879d99": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "9b324bf8-2f01-45a5-b829-4dc27248fb8a": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Counter rate of kubernetes.controllermanager.workqueue.adds.count per second",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "b11209b9-d0e5-495c-ac8c-2da8641969b1"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                },
+                                                "b11209b9-d0e5-495c-ac8c-2da8641969b1": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of kubernetes.controllermanager.workqueue.adds.count",
+                                                    "operationType": "max",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.workqueue.adds.count"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "9b324bf8-2f01-45a5-b829-4dc27248fb8a"
+                                        ],
+                                        "layerId": "3334c868-1314-4b93-9742-06a9b35bfc64",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "84cda27c-e360-4a81-91ae-b2d461b9a621",
+                                        "xAccessor": "91ca7bd7-d555-4898-979e-1634ed879d99"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right",
+                                    "showSingleSeries": false
+                                },
+                                "preferredSeriesType": "area",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "74dcc137-b625-44d5-ae91-072040ef4b0a",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "74dcc137-b625-44d5-ae91-072040ef4b0a",
+                "title": "Controller Workqueue adds [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-3334c868-1314-4b93-9742-06a9b35bfc64",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "3334c868-1314-4b93-9742-06a9b35bfc64": {
+                                            "columnOrder": [
+                                                "84cda27c-e360-4a81-91ae-b2d461b9a621",
+                                                "91ca7bd7-d555-4898-979e-1634ed879d99",
+                                                "b51e00f3-b536-405f-abfd-e2f7b142a48e",
+                                                "80fa08bf-5868-4d15-975c-a08c51090ff2"
+                                            ],
+                                            "columns": {
+                                                "80fa08bf-5868-4d15-975c-a08c51090ff2": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of kubernetes.controllermanager.workqueue.retries.count",
+                                                    "operationType": "max",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.workqueue.retries.count"
+                                                },
+                                                "84cda27c-e360-4a81-91ae-b2d461b9a621": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.controllermanager.name",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.controllermanager.name"
+                                                },
+                                                "91ca7bd7-d555-4898-979e-1634ed879d99": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "b51e00f3-b536-405f-abfd-e2f7b142a48e": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Counter rate of kubernetes.controllermanager.workqueue.retries.count per second",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "80fa08bf-5868-4d15-975c-a08c51090ff2"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "b51e00f3-b536-405f-abfd-e2f7b142a48e"
+                                        ],
+                                        "layerId": "3334c868-1314-4b93-9742-06a9b35bfc64",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "84cda27c-e360-4a81-91ae-b2d461b9a621",
+                                        "xAccessor": "91ca7bd7-d555-4898-979e-1634ed879d99"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right",
+                                    "showSingleSeries": true
+                                },
+                                "preferredSeriesType": "area",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "d680bbc4-b3dd-4237-9825-5394ff9d402c",
+                    "w": 24,
+                    "x": 24,
+                    "y": 29
+                },
+                "panelIndex": "d680bbc4-b3dd-4237-9825-5394ff9d402c",
+                "title": "Controller Workqueue retries [Metricbeat Kubernetes] ",
+                "type": "lens",
+                "version": "8.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-dc84d4db-4cef-465b-9db9-5074b7e03b66",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "dc84d4db-4cef-465b-9db9-5074b7e03b66": {
+                                            "columnOrder": [
+                                                "3e32b007-d17f-4e29-98ea-ea584077b5a9",
+                                                "406857c9-b533-48ab-ae75-4de5403549e1",
+                                                "78428d7b-5d49-4b51-aef2-729a76603e24"
+                                            ],
+                                            "columns": {
+                                                "3e32b007-d17f-4e29-98ea-ea584077b5a9": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.controllermanager.name",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "78428d7b-5d49-4b51-aef2-729a76603e24",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.controllermanager.name"
+                                                },
+                                                "406857c9-b533-48ab-ae75-4de5403549e1": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "78428d7b-5d49-4b51-aef2-729a76603e24": {
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.controllermanager.workqueue.longestrunning.sec: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Last value of kubernetes.controllermanager.workqueue.longestrunning.sec",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.workqueue.longestrunning.sec"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "78428d7b-5d49-4b51-aef2-729a76603e24"
+                                        ],
+                                        "layerId": "dc84d4db-4cef-465b-9db9-5074b7e03b66",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "3e32b007-d17f-4e29-98ea-ea584077b5a9",
+                                        "xAccessor": "406857c9-b533-48ab-ae75-4de5403549e1"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "0be041d4-096a-4131-ab5b-f9ae02eb685a",
+                    "w": 24,
+                    "x": 0,
+                    "y": 44
+                },
+                "panelIndex": "0be041d4-096a-4131-ab5b-f9ae02eb685a",
+                "title": "Controller Longest running processor [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-dc84d4db-4cef-465b-9db9-5074b7e03b66",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "dc84d4db-4cef-465b-9db9-5074b7e03b66": {
+                                            "columnOrder": [
+                                                "3e32b007-d17f-4e29-98ea-ea584077b5a9",
+                                                "406857c9-b533-48ab-ae75-4de5403549e1",
+                                                "a7ebcc49-4ff6-4c92-a7cf-3c3fb0c7688b"
+                                            ],
+                                            "columns": {
+                                                "3e32b007-d17f-4e29-98ea-ea584077b5a9": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 50 values of kubernetes.controllermanager.name",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "a7ebcc49-4ff6-4c92-a7cf-3c3fb0c7688b",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 50
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.controllermanager.name"
+                                                },
+                                                "406857c9-b533-48ab-ae75-4de5403549e1": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "a7ebcc49-4ff6-4c92-a7cf-3c3fb0c7688b": {
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.controllermanager.workqueue.unfinished.sec: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Last value of kubernetes.controllermanager.workqueue.unfinished.sec",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.workqueue.unfinished.sec"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "a7ebcc49-4ff6-4c92-a7cf-3c3fb0c7688b"
+                                        ],
+                                        "layerId": "dc84d4db-4cef-465b-9db9-5074b7e03b66",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "3e32b007-d17f-4e29-98ea-ea584077b5a9",
+                                        "xAccessor": "406857c9-b533-48ab-ae75-4de5403549e1"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a015a089-006e-4eb8-ad45-7f9d5f16eecb",
+                    "w": 24,
+                    "x": 24,
+                    "y": 44
+                },
+                "panelIndex": "a015a089-006e-4eb8-ad45-7f9d5f16eecb",
+                "title": "Controller Unfinished jobs sec [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-c46cb227-5f12-45ee-a3f0-58f837655aeb",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "c46cb227-5f12-45ee-a3f0-58f837655aeb": {
+                                            "columnOrder": [
+                                                "630b8963-a216-4c85-8a25-4a4a5e27fa75",
+                                                "55bdc1db-cab9-4ae6-b81e-3461c9fd0adc",
+                                                "84334806-6865-466a-aa66-23137db2e788",
+                                                "81b26618-20bb-462e-8401-e644d94cc83f",
+                                                "f45caf7a-e3d9-45ec-8995-66cc032a8b74"
+                                            ],
+                                            "columns": {
+                                                "55bdc1db-cab9-4ae6-b81e-3461c9fd0adc": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.controllermanager.node.collector.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Nodes",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.node.collector.count"
+                                                },
+                                                "630b8963-a216-4c85-8a25-4a4a5e27fa75": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "81b26618-20bb-462e-8401-e644d94cc83f": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.controllermanager.node.collector.eviction.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Node Eviction since NodeController Start",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.node.collector.eviction.count"
+                                                },
+                                                "84334806-6865-466a-aa66-23137db2e788": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.controllermanager.node.collector.unhealthy.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Unhealthy Nodes",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.node.collector.unhealthy.count"
+                                                },
+                                                "f45caf7a-e3d9-45ec-8995-66cc032a8b74": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.controllermanager.node.collector.health.pct: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Healthy Nodes Pct",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true,
+                                                        "format": {
+                                                            "id": "number",
+                                                            "params": {
+                                                                "decimals": 0,
+                                                                "suffix": "%"
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.node.collector.health.pct"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "55bdc1db-cab9-4ae6-b81e-3461c9fd0adc",
+                                            "84334806-6865-466a-aa66-23137db2e788",
+                                            "81b26618-20bb-462e-8401-e644d94cc83f",
+                                            "f45caf7a-e3d9-45ec-8995-66cc032a8b74"
+                                        ],
+                                        "layerId": "c46cb227-5f12-45ee-a3f0-58f837655aeb",
+                                        "layerType": "data",
+                                        "seriesType": "area",
+                                        "xAccessor": "630b8963-a216-4c85-8a25-4a4a5e27fa75"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "legendSize": "large",
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "bf28ccd1-0c7a-4672-9c32-0576e8b0c67f",
+                    "w": 24,
+                    "x": 0,
+                    "y": 59
+                },
+                "panelIndex": "bf28ccd1-0c7a-4672-9c32-0576e8b0c67f",
+                "title": "NodeController Informations [Metricbeat Kubernetes]",
+                "type": "lens",
+                "version": "8.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "b5aa99d0-ac4d-4706-af16-057fa5260467",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "b5aa99d0-ac4d-4706-af16-057fa5260467",
+                "panelRefName": "panel_b5aa99d0-ac4d-4706-af16-057fa5260467",
+                "type": "visualization",
+                "version": "8.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] Controller Manager",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "2ec26ce0-f5f1-11ec-8853-8b596bddf5f9",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "1bd24fa1-319e-4cae-9d45-d821b06a8034:indexpattern-datasource-layer-f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "1604f0de-edd6-456e-8670-ab9b33988abb:indexpattern-datasource-layer-d3be0fa3-c7a4-49ba-b8cf-ab79f477f332",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "303702e1-ba33-49f2-b337-4cc7d7305606:indexpattern-datasource-layer-77da5988-3f03-4e8f-b1e4-39a94d8bec07",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "74dcc137-b625-44d5-ae91-072040ef4b0a:indexpattern-datasource-layer-3334c868-1314-4b93-9742-06a9b35bfc64",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "d680bbc4-b3dd-4237-9825-5394ff9d402c:indexpattern-datasource-layer-3334c868-1314-4b93-9742-06a9b35bfc64",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "0be041d4-096a-4131-ab5b-f9ae02eb685a:indexpattern-datasource-layer-dc84d4db-4cef-465b-9db9-5074b7e03b66",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "a015a089-006e-4eb8-ad45-7f9d5f16eecb:indexpattern-datasource-layer-dc84d4db-4cef-465b-9db9-5074b7e03b66",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "bf28ccd1-0c7a-4672-9c32-0576e8b0c67f:indexpattern-datasource-layer-c46cb227-5f12-45ee-a3f0-58f837655aeb",
+            "type": "index-pattern"
+        },
+        {
+            "id": "2d866300-0cb1-11ed-b5e5-a774dc3eeaba",
+            "name": "b5aa99d0-ac4d-4706-af16-057fa5260467:panel_b5aa99d0-ac4d-4706-af16-057fa5260467",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-07-26T07:04:32.144Z",
+    "version": "WzEzODcsMV0="
+}

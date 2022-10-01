@@ -21,17 +21,17 @@
 package wineventlog
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 	"text/template"
 
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -299,7 +299,7 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 	// publisher metadata is unavailable or is out of sync with the events.
 	event, err := winevent.UnmarshalXML([]byte(xml))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal XML")
+		return nil, fmt.Errorf("failed to unmarshal XML: %w", err)
 	}
 
 	em := &EventMetadata{
@@ -404,8 +404,7 @@ func (em *EventMetadata) initEventMessage(itr *EventMetadataIterator, publisher 
 
 	msg, err := getMessageString(publisher, NilHandle, messageID, templateInserts.Slice())
 	if err != nil {
-		return errors.Wrapf(err, "failed to get message string using message "+
-			"ID %v for for event ID %v", messageID, em.EventID)
+		return fmt.Errorf("failed to get message string using message ID %v for for event ID %v: %w", messageID, em.EventID, err)
 	}
 
 	return em.setMessage(msg)
@@ -419,8 +418,7 @@ func (em *EventMetadata) setMessage(msg string) error {
 		Delims(leftTemplateDelim, rightTemplateDelim).
 		Funcs(eventMessageTemplateFuncs).Parse(msg)
 	if err != nil {
-		return errors.Wrapf(err, "failed to parse message template for "+
-			"event ID %v (template='%v')", em.EventID, msg)
+		return fmt.Errorf("failed to parse message template for event ID %v (template='%v'): %w", em.EventID, msg, err)
 	}
 
 	// One node means there were no parameters so this will optimize that case

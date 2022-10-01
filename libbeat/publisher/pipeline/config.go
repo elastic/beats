@@ -22,18 +22,19 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Config object for loading a pipeline instance via Load.
 type Config struct {
 	// Event processing configurations
-	common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
+	mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 	Processors           processors.PluginConfig `config:"processors"`
 
 	// Event queue
-	Queue common.ConfigNamespace `config:"queue"`
+	Queue config.Namespace `config:"queue"`
 }
 
 // validateClientConfig checks a ClientConfig can be used with (*Pipeline).ConnectWith.

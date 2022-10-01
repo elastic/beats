@@ -1,5 +1,5 @@
 # Module: prometheus
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-prometheus.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-prometheus.html
 
 - module: prometheus
   period: 10s

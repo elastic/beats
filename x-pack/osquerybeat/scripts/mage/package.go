@@ -35,5 +35,17 @@ func CustomizePackaging() {
 			Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), distFile),
 		}
 		args.Spec.Files[distFile] = packFile
+
+		// Skip packaging certs.pem for darwin
+		if args.OS == "darwin" {
+			continue
+		}
+
+		// Certs
+		certsFile := devtools.PackageFile{
+			Mode:   0640,
+			Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), "certs", "certs.pem"),
+		}
+		args.Spec.Files[filepath.Join("certs", "certs.pem")] = certsFile
 	}
 }

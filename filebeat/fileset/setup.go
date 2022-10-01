@@ -20,8 +20,8 @@ package fileset
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // SetupFactory is for loading module assets when running setup subcommand.
@@ -29,20 +29,22 @@ type SetupFactory struct {
 	beatInfo              beat.Info
 	pipelineLoaderFactory PipelineLoaderFactory
 	overwritePipelines    bool
+	enableAllFilesets     bool
 }
 
 // NewSetupFactory creates a SetupFactory
-func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFactory) *SetupFactory {
+func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFactory, enableAllFilesets bool) *SetupFactory {
 	return &SetupFactory{
 		beatInfo:              beatInfo,
 		pipelineLoaderFactory: pipelineLoaderFactory,
 		overwritePipelines:    true,
+		enableAllFilesets:     enableAllFilesets,
 	}
 }
 
 // Create creates a new SetupCfgRunner to setup module configuration.
-func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
-	m, err := NewModuleRegistry([]*common.Config{c}, sf.beatInfo, false)
+func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
+	m, err := NewModuleRegistry([]*conf.C{c}, sf.beatInfo, false, sf.enableAllFilesets)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +56,7 @@ func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *common.Config) (cfgf
 	}, nil
 }
 
-func (sf *SetupFactory) CheckConfig(c *common.Config) error {
+func (sf *SetupFactory) CheckConfig(c *conf.C) error {
 	_, err := sf.Create(pubpipeline.NewNilPipeline(), c)
 	return err
 }

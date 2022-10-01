@@ -144,6 +144,21 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+[[monitor-data-stream]]
+==== `data_stream`
+
+Contains options pertaining to data stream naming, following the conventions followed by {fleet-guide}/data-streams.html[Fleet Data Streams]. By default Heartbeat will
+write to a datastream named `heartbeat-VERSION` except in the case of `browser` monitors, which will
+always follow the Fleet convention of `type-dataset-namespace`, where the type is always synthetics
+unless overriden.
+
+
+```yaml
+# To enable data streams with the default namespace
+data_stream.namespace: default
+```
+
+[float]
 [[monitor-pipeline]]
 ===== `pipeline`
 
@@ -156,8 +171,9 @@ input is used.
 
 [float]
 [[monitor-index]]
-===== `index`
+===== `index` (deprecated)
 
+This setting is now deprecated in favor of the `data_stream` option.
 If present, this formatted string overrides the index for events from this input
 (for elasticsearch outputs), or sets the `raw_index` field of the event's
 metadata (for other outputs). This string can only refer to the agent name and

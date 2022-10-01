@@ -1,0 +1,6 @@
+boxht = 0.25
+VERSION: box "version (uint32)" wid 4;
+COUNT: box "count (uint32)" wid 4 with .nw at VERSION.sw;
+OPTIONS: box "options (uint32)" wid 4 with .nw at COUNT.sw;
+IV: box "initialization vector (128 bits)" wid 4 ht 1 with .nw at OPTIONS.sw
+FRAME: box "Encrypted Frames" dashed wid 4 ht 2 with .nw at IV.sw;

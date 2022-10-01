@@ -12,6 +12,8 @@ rules:
   - events
   - pods
   - services
+  - persistentvolumes
+  - persistentvolumeclaims
   verbs: ["get", "list", "watch"]
 # Enable this rule only if planing to use Kubernetes keystore
 #- apiGroups: [""]
@@ -27,11 +29,16 @@ rules:
   - statefulsets
   - deployments
   - replicasets
+  - daemonsets
   verbs: ["get", "list", "watch"]
 - apiGroups: ["batch"]
   resources:
   - jobs
   - cronjobs
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["storage.k8s.io"]
+  resources:
+    - storageclasses
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""

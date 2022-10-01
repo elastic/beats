@@ -20,8 +20,8 @@ package status
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -79,7 +79,7 @@ func TestConfigValidation(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		c, err := common.NewConfigFrom(test.in)
+		c, err := conf.NewConfigFrom(test.in)
 		if err != nil {
 			t.Fatal(err)
 		}

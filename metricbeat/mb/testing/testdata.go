@@ -33,10 +33,10 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/asset"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
@@ -178,7 +178,7 @@ func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config Data
 
 // TestMetricsetFieldsDocumented checks metricset fields are documented from metricsets that cannot run `TestDataFiles` test which contains this check
 func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events []mb.Event) {
-	var data []common.MapStr
+	var data []mapstr.M
 	for _, e := range events {
 		beatEvent := StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
 		data = append(data, beatEvent.Fields)
@@ -220,7 +220,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		events = append(events, mb.Event{Error: e})
 	}
 
-	var data []common.MapStr
+	var data []mapstr.M
 
 	for _, e := range events {
 		beatEvent := StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
@@ -259,7 +259,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		t.Fatalf("could not read file: %s", err)
 	}
 
-	expectedMap := []common.MapStr{}
+	expectedMap := []mapstr.M{}
 	if err := json.Unmarshal(expected, &expectedMap); err != nil {
 		t.Fatal(err)
 	}
@@ -311,7 +311,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 	}
 }
 
-func writeDataJSON(t *testing.T, data common.MapStr, path string) {
+func writeDataJSON(t *testing.T, data mapstr.M, path string) {
 	// Add hardcoded timestamp
 	data.Put("@timestamp", "2019-03-01T08:05:34.853Z")
 	output, err := json.MarshalIndent(&data, "", "    ")
@@ -321,7 +321,7 @@ func writeDataJSON(t *testing.T, data common.MapStr, path string) {
 }
 
 // checkDocumented checks that all fields which show up in the events are documented
-func checkDocumented(data []common.MapStr, omitFields []string) error {
+func checkDocumented(data []mapstr.M, omitFields []string) error {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
 		return err
@@ -348,7 +348,7 @@ func checkDocumented(data []common.MapStr, omitFields []string) error {
 	return nil
 }
 
-func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interface{}, omitFields []string) error {
+func documentedFieldCheck(foundKeys mapstr.M, knownKeys map[string]interface{}, omitFields []string) error {
 	// Sort all found keys to guarantee consistent validation messages
 	sortedFoundKeys := make([]string, 0, len(foundKeys))
 	for k := range foundKeys {

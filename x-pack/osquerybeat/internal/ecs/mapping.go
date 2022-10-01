@@ -60,7 +60,7 @@ func (d Doc) Get(key string) (val interface{}, ok bool) {
 	if node != nil {
 		val, ok = node[keys[len(keys)-1]]
 	}
-	return
+	return val, ok
 }
 
 func (d Doc) Set(key string, val interface{}) {

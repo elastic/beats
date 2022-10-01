@@ -35,22 +35,21 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 const (
-	testDir       = "testdata"
-	testExt       = ".log"
-	testPattern   = "*" + testExt
-	goldenSuffix  = "-expected.json"
-	goldenPattern = testPattern + goldenSuffix
-	fileTimeout   = 3 * time.Minute
-	terminator    = "type=TEST msg=audit(0.0:585): msg=\"terminate\""
+	testDir      = "testdata"
+	testExt      = ".log"
+	testPattern  = "*" + testExt
+	goldenSuffix = "-expected.json"
+	fileTimeout  = 3 * time.Minute
+	terminator   = "type=TEST msg=audit(0.0:585): msg=\"terminate\""
 )
 
 var (
@@ -88,7 +87,7 @@ func readLines(path string) (lines []string, err error) {
 	return lines, scanner.Err()
 }
 
-func readGoldenFile(t testing.TB, path string) (events []common.MapStr) {
+func readGoldenFile(t testing.TB, path string) (events []mapstr.M) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		t.Fatalf("can't read golden file '%s': %v", path, err)
@@ -96,17 +95,17 @@ func readGoldenFile(t testing.TB, path string) (events []common.MapStr) {
 	if err = json.Unmarshal(data, &events); err != nil {
 		t.Fatalf("error decoding JSON from golden file '%s': %v", path, err)
 	}
-	return
+	return events
 }
 
-func normalize(t testing.TB, events []mb.Event) (norm []common.MapStr) {
+func normalize(t testing.TB, events []mb.Event) (norm []mapstr.M) {
 	for _, ev := range events {
-		var output common.MapStr
+		var output mapstr.M
 		data, err := json.Marshal(ev.BeatEvent(moduleName, metricsetName).Fields)
 		if err != nil {
 			t.Fatal(err)
 		}
-		json.Unmarshal(data, &output)
+		_ = json.Unmarshal(data, &output)
 		norm = append(norm, output)
 	}
 	return norm
@@ -197,7 +196,8 @@ func TestGoldenFiles(t *testing.T) {
 				// Get Status response for initClient
 				returnACK().returnStatus().
 				// Send expected ACKs for initialization
-				returnACK().returnACK().returnACK().returnACK().returnACK().
+				returnACK().returnStatus().returnACK().returnACK().
+				returnACK().returnACK().returnACK().
 				// Send audit messages
 				returnMessage(lines...).
 				// Send stream terminator

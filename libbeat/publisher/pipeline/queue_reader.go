@@ -18,7 +18,8 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -30,7 +31,7 @@ type queueReader struct {
 }
 
 type queueReaderRequest struct {
-	consumer   queue.Consumer
+	queue      queue.Queue
 	retryer    retryer
 	batchSize  int
 	timeToLive int
@@ -53,11 +54,19 @@ func (qr *queueReader) run(logger *logp.Logger) {
 			logger.Debug("pipeline event consumer queue reader: stop")
 			return
 		}
-		queueBatch, _ := req.consumer.Get(req.batchSize)
+		queueBatch, _ := req.queue.Get(req.batchSize)
 		var batch *ttlBatch
 		if queueBatch != nil {
 			batch = newBatch(req.retryer, queueBatch, req.timeToLive)
 		}
-		qr.resp <- batch
+		select {
+		case qr.resp <- batch:
+		case <-qr.req:
+			// If the request channel unblocks before we've sent our response,
+			// it means we're shutting down and the pending request can be
+			// discarded.
+			logger.Debug("pipeline event consumer queue reader: stop")
+			return
+		}
 	}
 }

@@ -13,7 +13,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -45,7 +44,7 @@
           "packet_delta_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.0.111",
-          "source_mac_address": "ec:1f:72:11:9f:c1",
+          "source_mac_address": "EC-1F-72-11-9F-C1",
           "source_transport_port": 37301,
           "tcp_control_bits": 0,
           "type": "netflow_flow"
@@ -71,7 +70,7 @@
           "bytes": 75,
           "ip": "192.168.0.111",
           "locality": "internal",
-          "mac": "ec:1f:72:11:9f:c1",
+          "mac": "EC-1F-72-11-9F-C1",
           "packets": 1,
           "port": 37301
         }
@@ -91,7 +90,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -123,7 +121,7 @@
           "packet_delta_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.0.111",
-          "source_mac_address": "ec:1f:72:11:9f:c1",
+          "source_mac_address": "EC-1F-72-11-9F-C1",
           "source_transport_port": 58411,
           "tcp_control_bits": 0,
           "type": "netflow_flow"
@@ -149,7 +147,7 @@
           "bytes": 75,
           "ip": "192.168.0.111",
           "locality": "internal",
-          "mac": "ec:1f:72:11:9f:c1",
+          "mac": "EC-1F-72-11-9F-C1",
           "packets": 1,
           "port": 58411
         }
@@ -169,7 +167,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -201,7 +198,7 @@
           "packet_delta_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.0.111",
-          "source_mac_address": "ec:1f:72:11:9f:c1",
+          "source_mac_address": "EC-1F-72-11-9F-C1",
           "source_transport_port": 37661,
           "tcp_control_bits": 0,
           "type": "netflow_flow"
@@ -227,7 +224,7 @@
           "bytes": 75,
           "ip": "192.168.0.111",
           "locality": "internal",
-          "mac": "ec:1f:72:11:9f:c1",
+          "mac": "EC-1F-72-11-9F-C1",
           "packets": 1,
           "port": 37661
         }
@@ -247,7 +244,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -279,7 +275,7 @@
           "packet_delta_count": 1,
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.0.111",
-          "source_mac_address": "ec:1f:72:11:9f:c1",
+          "source_mac_address": "EC-1F-72-11-9F-C1",
           "source_transport_port": 60212,
           "tcp_control_bits": 0,
           "type": "netflow_flow"
@@ -305,7 +301,7 @@
           "bytes": 75,
           "ip": "192.168.0.111",
           "locality": "internal",
-          "mac": "ec:1f:72:11:9f:c1",
+          "mac": "EC-1F-72-11-9F-C1",
           "packets": 1,
           "port": 60212
         }
@@ -325,7 +321,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -357,7 +352,7 @@
           "packet_delta_count": 10,
           "protocol_identifier": 6,
           "source_ipv4_address": "158.85.58.115",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 5222,
           "tcp_control_bits": 29,
           "type": "netflow_flow"
@@ -383,7 +378,7 @@
           "bytes": 964,
           "ip": "158.85.58.115",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 10,
           "port": 5222
         }
@@ -403,7 +398,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -435,7 +429,7 @@
           "packet_delta_count": 8,
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.0.88",
-          "source_mac_address": "a4:d1:8c:e9:30:2c",
+          "source_mac_address": "A4-D1-8C-E9-30-2C",
           "source_transport_port": 61490,
           "tcp_control_bits": 0,
           "type": "netflow_flow"
@@ -461,7 +455,7 @@
           "bytes": 2748,
           "ip": "192.168.0.88",
           "locality": "internal",
-          "mac": "a4:d1:8c:e9:30:2c",
+          "mac": "A4-D1-8C-E9-30-2C",
           "packets": 8,
           "port": 61490
         }
@@ -481,7 +475,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -513,7 +506,7 @@
           "packet_delta_count": 9,
           "protocol_identifier": 17,
           "source_ipv4_address": "216.58.212.195",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 0,
           "type": "netflow_flow"
@@ -539,7 +532,7 @@
           "bytes": 2023,
           "ip": "216.58.212.195",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 9,
           "port": 443
         }
@@ -559,7 +552,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -591,7 +583,7 @@
           "packet_delta_count": 9,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.1.201",
-          "source_mac_address": "98:01:a7:9f:8d:5f",
+          "source_mac_address": "98-01-A7-9F-8D-5F",
           "source_transport_port": 50299,
           "tcp_control_bits": 24,
           "type": "netflow_flow"
@@ -617,7 +609,7 @@
           "bytes": 2180,
           "ip": "192.168.1.201",
           "locality": "internal",
-          "mac": "98:01:a7:9f:8d:5f",
+          "mac": "98-01-A7-9F-8D-5F",
           "packets": 9,
           "port": 50299
         }
@@ -637,7 +629,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -669,7 +660,7 @@
           "packet_delta_count": 9,
           "protocol_identifier": 6,
           "source_ipv4_address": "216.58.201.106",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
           "type": "netflow_flow"
@@ -695,7 +686,7 @@
           "bytes": 700,
           "ip": "216.58.201.106",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 9,
           "port": 443
         }
@@ -715,7 +706,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -747,7 +737,7 @@
           "packet_delta_count": 2,
           "protocol_identifier": 6,
           "source_ipv4_address": "52.236.33.163",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
           "type": "netflow_flow"
@@ -773,7 +763,7 @@
           "bytes": 161,
           "ip": "52.236.33.163",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 2,
           "port": 443
         }
@@ -793,7 +783,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -825,7 +814,7 @@
           "packet_delta_count": 21,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.3.34",
-          "source_mac_address": "1c:5c:f2:07:0f:2a",
+          "source_mac_address": "1C-5C-F2-07-0F-2A",
           "source_transport_port": 61674,
           "tcp_control_bits": 27,
           "type": "netflow_flow"
@@ -851,7 +840,7 @@
           "bytes": 1764,
           "ip": "192.168.3.34",
           "locality": "internal",
-          "mac": "1c:5c:f2:07:0f:2a",
+          "mac": "1C-5C-F2-07-0F-2A",
           "packets": 21,
           "port": 61674
         }
@@ -871,7 +860,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -903,7 +891,7 @@
           "packet_delta_count": 30,
           "protocol_identifier": 6,
           "source_ipv4_address": "209.197.3.19",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 31,
           "type": "netflow_flow"
@@ -929,7 +917,7 @@
           "bytes": 13811,
           "ip": "209.197.3.19",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 30,
           "port": 443
         }
@@ -949,7 +937,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -981,7 +968,7 @@
           "packet_delta_count": 16,
           "protocol_identifier": 6,
           "source_ipv4_address": "52.216.130.237",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 27,
           "type": "netflow_flow"
@@ -1007,7 +994,7 @@
           "bytes": 4717,
           "ip": "52.216.130.237",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 16,
           "port": 443
         }
@@ -1027,7 +1014,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1059,7 +1045,7 @@
           "packet_delta_count": 13,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.157",
-          "source_mac_address": "b0:34:95:0d:d2:5d",
+          "source_mac_address": "B0-34-95-0D-D2-5D",
           "source_transport_port": 51209,
           "tcp_control_bits": 26,
           "type": "netflow_flow"
@@ -1085,7 +1071,7 @@
           "bytes": 2419,
           "ip": "192.168.0.157",
           "locality": "internal",
-          "mac": "b0:34:95:0d:d2:5d",
+          "mac": "B0-34-95-0D-D2-5D",
           "packets": 13,
           "port": 51209
         }
@@ -1105,7 +1091,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1137,7 +1122,7 @@
           "packet_delta_count": 10,
           "protocol_identifier": 6,
           "source_ipv4_address": "172.217.23.232",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
           "type": "netflow_flow"
@@ -1163,7 +1148,7 @@
           "bytes": 5551,
           "ip": "172.217.23.232",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 10,
           "port": 443
         }
@@ -1183,7 +1168,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1215,7 +1199,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "107.21.232.174",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 25,
           "type": "netflow_flow"
@@ -1241,7 +1225,7 @@
           "bytes": 187,
           "ip": "107.21.232.174",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 3,
           "port": 443
         }
@@ -1261,7 +1245,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1293,7 +1276,7 @@
           "packet_delta_count": 2,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.3.178",
-          "source_mac_address": "dc:ef:ca:4c:da:57",
+          "source_mac_address": "DC-EF-CA-4C-DA-57",
           "source_transport_port": 45584,
           "tcp_control_bits": 17,
           "type": "netflow_flow"
@@ -1319,7 +1302,7 @@
           "bytes": 104,
           "ip": "192.168.3.178",
           "locality": "internal",
-          "mac": "dc:ef:ca:4c:da:57",
+          "mac": "DC-EF-CA-4C-DA-57",
           "packets": 2,
           "port": 45584
         }
@@ -1339,7 +1322,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1371,7 +1353,7 @@
           "packet_delta_count": 72,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.2.118",
-          "source_mac_address": "70:18:8b:5c:c9:b5",
+          "source_mac_address": "70-18-8B-5C-C9-B5",
           "source_transport_port": 64233,
           "tcp_control_bits": 27,
           "type": "netflow_flow"
@@ -1397,7 +1379,7 @@
           "bytes": 4050,
           "ip": "192.168.2.118",
           "locality": "internal",
-          "mac": "70:18:8b:5c:c9:b5",
+          "mac": "70-18-8B-5C-C9-B5",
           "packets": 72,
           "port": 64233
         }
@@ -1417,7 +1399,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1449,7 +1430,7 @@
           "packet_delta_count": 72,
           "protocol_identifier": 6,
           "source_ipv4_address": "95.0.145.242",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 2222,
           "tcp_control_bits": 27,
           "type": "netflow_flow"
@@ -1475,7 +1456,7 @@
           "bytes": 3719,
           "ip": "95.0.145.242",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 72,
           "port": 2222
         }
@@ -1495,7 +1476,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1527,7 +1507,7 @@
           "packet_delta_count": 16,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.79",
-          "source_mac_address": "8c:29:37:7a:28:c0",
+          "source_mac_address": "8C-29-37-7A-28-C0",
           "source_transport_port": 54275,
           "tcp_control_bits": 26,
           "type": "netflow_flow"
@@ -1553,7 +1533,7 @@
           "bytes": 1402,
           "ip": "192.168.0.79",
           "locality": "internal",
-          "mac": "8c:29:37:7a:28:c0",
+          "mac": "8C-29-37-7A-28-C0",
           "packets": 16,
           "port": 54275
         }
@@ -1573,7 +1553,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1605,7 +1584,7 @@
           "packet_delta_count": 17,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.79",
-          "source_mac_address": "8c:29:37:7a:28:c0",
+          "source_mac_address": "8C-29-37-7A-28-C0",
           "source_transport_port": 54276,
           "tcp_control_bits": 26,
           "type": "netflow_flow"
@@ -1631,7 +1610,7 @@
           "bytes": 1538,
           "ip": "192.168.0.79",
           "locality": "internal",
-          "mac": "8c:29:37:7a:28:c0",
+          "mac": "8C-29-37-7A-28-C0",
           "packets": 17,
           "port": 54276
         }
@@ -1651,7 +1630,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1683,7 +1661,7 @@
           "packet_delta_count": 14,
           "protocol_identifier": 6,
           "source_ipv4_address": "23.5.100.66",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
           "type": "netflow_flow"
@@ -1709,7 +1687,7 @@
           "bytes": 13002,
           "ip": "23.5.100.66",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 14,
           "port": 443
         }
@@ -1729,7 +1707,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1761,7 +1738,7 @@
           "packet_delta_count": 4,
           "protocol_identifier": 6,
           "source_ipv4_address": "170.251.180.15",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
           "type": "netflow_flow"
@@ -1787,7 +1764,7 @@
           "bytes": 1194,
           "ip": "170.251.180.15",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 4,
           "port": 443
         }
@@ -1807,7 +1784,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1839,7 +1815,7 @@
           "packet_delta_count": 2,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.61",
-          "source_mac_address": "90:61:ae:76:e5:e9",
+          "source_mac_address": "90-61-AE-76-E5-E9",
           "source_transport_port": 57007,
           "tcp_control_bits": 24,
           "type": "netflow_flow"
@@ -1865,7 +1841,7 @@
           "bytes": 682,
           "ip": "192.168.0.61",
           "locality": "internal",
-          "mac": "90:61:ae:76:e5:e9",
+          "mac": "90-61-AE-76-E5-E9",
           "packets": 2,
           "port": 57007
         }
@@ -1885,7 +1861,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1917,7 +1892,7 @@
           "packet_delta_count": 11,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.3.34",
-          "source_mac_address": "1c:5c:f2:07:0f:2a",
+          "source_mac_address": "1C-5C-F2-07-0F-2A",
           "source_transport_port": 61694,
           "tcp_control_bits": 26,
           "type": "netflow_flow"
@@ -1943,7 +1918,7 @@
           "bytes": 1804,
           "ip": "192.168.3.34",
           "locality": "internal",
-          "mac": "1c:5c:f2:07:0f:2a",
+          "mac": "1C-5C-F2-07-0F-2A",
           "packets": 11,
           "port": 61694
         }
@@ -1963,7 +1938,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -1995,7 +1969,7 @@
           "packet_delta_count": 9,
           "protocol_identifier": 6,
           "source_ipv4_address": "185.60.218.19",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
           "type": "netflow_flow"
@@ -2021,7 +1995,7 @@
           "bytes": 4774,
           "ip": "185.60.218.19",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 9,
           "port": 443
         }
@@ -2041,7 +2015,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -2073,7 +2046,7 @@
           "packet_delta_count": 2,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.3.200",
-          "source_mac_address": "18:20:32:bb:1d:62",
+          "source_mac_address": "18-20-32-BB-1D-62",
           "source_transport_port": 64493,
           "tcp_control_bits": 24,
           "type": "netflow_flow"
@@ -2099,7 +2072,7 @@
           "bytes": 135,
           "ip": "192.168.3.200",
           "locality": "internal",
-          "mac": "18:20:32:bb:1d:62",
+          "mac": "18-20-32-BB-1D-62",
           "packets": 2,
           "port": 64493
         }
@@ -2119,7 +2092,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -2151,7 +2123,7 @@
           "packet_delta_count": 2,
           "protocol_identifier": 6,
           "source_ipv4_address": "185.60.218.15",
-          "source_mac_address": "00:23:04:18:ef:40",
+          "source_mac_address": "00-23-04-18-EF-40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
           "type": "netflow_flow"
@@ -2177,7 +2149,7 @@
           "bytes": 135,
           "ip": "185.60.218.15",
           "locality": "external",
-          "mac": "00:23:04:18:ef:40",
+          "mac": "00-23-04-18-EF-40",
           "packets": 2,
           "port": 443
         }
@@ -2197,7 +2169,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event",
@@ -2229,7 +2200,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.95",
-          "source_mac_address": "a0:39:f7:4d:49:d5",
+          "source_mac_address": "A0-39-F7-4D-49-D5",
           "source_transport_port": 35053,
           "tcp_control_bits": 24,
           "type": "netflow_flow"
@@ -2255,7 +2226,7 @@
           "bytes": 194,
           "ip": "192.168.0.95",
           "locality": "internal",
-          "mac": "a0:39:f7:4d:49:d5",
+          "mac": "A0-39-F7-4D-49-D5",
           "packets": 3,
           "port": 35053
         }

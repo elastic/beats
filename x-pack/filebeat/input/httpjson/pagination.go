@@ -6,12 +6,13 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const paginationNamespace = "pagination"
@@ -44,11 +45,11 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace, log)
 
-	body := func() *common.MapStr {
+	body := func() *mapstr.M {
 		if config.Response.RequestBodyOnPagination {
 			return config.Request.Body
 		}
-		return &common.MapStr{}
+		return &mapstr.M{}
 	}()
 
 	requestFactory := newPaginationRequestFactory(
@@ -64,7 +65,7 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 	return pagination
 }
 
-func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *common.MapStr, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
+func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *mapstr.M, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{
 		url:        url,
@@ -123,23 +124,24 @@ func (iter *pageIterator) next() (*response, bool, error) {
 	}
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
-	if err != nil {
-		if err == errNewURLValueNotSet ||
-			err == errEmptyTemplateResult ||
-			err == errExecutingTemplate {
-			// if this error happens here it means a transform
-			// did not find any new value and we can stop paginating without error
-			iter.done = true
-			return nil, false, nil
-		}
+	switch {
+	case err == nil:
+		// OK
+	case errors.Is(err, errNewURLValueNotSet),
+		errors.Is(err, errEmptyTemplateResult),
+		errors.Is(err, errExecutingTemplate):
+		// If this error happens here it means a transform
+		// did not find any new value and we can stop paginating without error.
+		iter.done = true
+		return nil, false, nil
+	default:
 		return nil, false, err
 	}
 
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, iter.trCtx, httpReq)
+	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq) //nolint:bodyclose // Bad linter! The body is closed in the call.
 	if err != nil {
 		return nil, false, err
 	}
-
 	iter.resp = resp
 
 	r, err := iter.getPage()

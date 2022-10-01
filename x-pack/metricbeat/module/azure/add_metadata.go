@@ -5,11 +5,11 @@
 package azure
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func addHostMetadata(event *mb.Event, metricList common.MapStr) {
+func addHostMetadata(event *mb.Event, metricList mapstr.M) {
 	hostFieldTable := map[string]string{
 		"percentage_cpu.avg":      "host.cpu.usage",
 		"network_in_total.total":  "host.network.ingress.bytes",

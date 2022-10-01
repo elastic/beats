@@ -1,0 +1,168 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "ba7fdd7b-69d9-48d5-ac00-c5602e16ccd0": {
+                            "columnOrder": [
+                                "3d17c7ea-eb86-4234-9e24-9b304fc6da9b",
+                                "6f2b317a-fff1-4e00-81df-b3d9c05f8f54",
+                                "1e1cd98f-fe72-473f-86ab-e79a621f8527",
+                                "b5cfcf26-889f-4514-a8b6-57f68267cfd2"
+                            ],
+                            "columns": {
+                                "1e1cd98f-fe72-473f-86ab-e79a621f8527": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Free Inodes",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.volume.fs.inodes.free"
+                                },
+                                "3d17c7ea-eb86-4234-9e24-9b304fc6da9b": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Volume",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.volume.name"
+                                },
+                                "6f2b317a-fff1-4e00-81df-b3d9c05f8f54": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Number of Inodes",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        },
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.volume.fs.inodes.count"
+                                },
+                                "b5cfcf26-889f-4514-a8b6-57f68267cfd2": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Used Inodes",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.volume.fs.inodes.used"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "b8aadd2e-646e-4e58-9d8f-4f07f51031c7",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "volume"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "volume"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "3d17c7ea-eb86-4234-9e24-9b304fc6da9b",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "6f2b317a-fff1-4e00-81df-b3d9c05f8f54",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "1e1cd98f-fe72-473f-86ab-e79a621f8527",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "b5cfcf26-889f-4514-a8b6-57f68267cfd2",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "ba7fdd7b-69d9-48d5-ac00-c5602e16ccd0",
+                "layerType": "data",
+                "rowHeight": "single",
+                "rowHeightLines": 1
+            }
+        },
+        "title": "Filesystem Inodes Informations [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-48a93370-bcba-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-ba7fdd7b-69d9-48d5-ac00-c5602e16ccd0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "b8aadd2e-646e-4e58-9d8f-4f07f51031c7",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:01.240Z",
+    "version": "WzU3MTksM10="
+}

@@ -18,9 +18,9 @@
 package idxmgmt
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // ClientHandler defines the interface between a remote service and the Manager for ILM and templates.
@@ -38,13 +38,13 @@ type clientHandler struct {
 // prepare an index.
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
+	GetVersion() version.V
 }
 
 // FileClient defines the minimal interface required for the Loader to
 // prepare a policy and write alias.
 type FileClient interface {
-	GetVersion() common.Version
+	GetVersion() version.V
 	Write(component string, name string, body string) error
 }
 

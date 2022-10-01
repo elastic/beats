@@ -21,9 +21,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -36,7 +37,7 @@ func makeES(
 	im outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
-	cfg *common.Config,
+	cfg *config.C,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
 	if !cfg.HasField("bulk_max_size") {
@@ -65,6 +66,7 @@ func makeES(
 	}
 
 	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil && !config.Transport.Proxy.Disable {
+		log.Debugf("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
 		log.Infof("Using proxy URL: %s", proxyURL)
 	}
 
@@ -123,7 +125,7 @@ func makeES(
 func buildSelectors(
 	im outputs.IndexManager,
 	beat beat.Info,
-	cfg *common.Config,
+	cfg *config.C,
 ) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
 	index, err = im.BuildSelector(cfg)
 	if err != nil {
@@ -142,7 +144,7 @@ func buildSelectors(
 	return index, pipeline, err
 }
 
-func buildPipelineSelector(cfg *common.Config) (outil.Selector, error) {
+func buildPipelineSelector(cfg *config.C) (outil.Selector, error) {
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "pipeline",
 		MultiKey:         "pipelines",

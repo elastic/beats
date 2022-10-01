@@ -14,9 +14,9 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	xcollector "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestGenerateEventsCounter tests counter simple cases
@@ -30,7 +30,7 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 	g.counterCache.Start()
 	timestamp := model.Time(424242)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 	}
 	// first fetch
@@ -46,8 +46,8 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected := common.MapStr{
-		"net_conntrack_listener_conn_closed_total": common.MapStr{
+	expected := mapstr.M{
+		"net_conntrack_listener_conn_closed_total": mapstr.M{
 			"counter": float64(42),
 			"rate":    float64(0),
 		},
@@ -71,8 +71,8 @@ func TestGenerateEventsCounter(t *testing.T) {
 	}
 	events = g.GenerateEvents(metrics)
 
-	expected = common.MapStr{
-		"net_conntrack_listener_conn_closed_total": common.MapStr{
+	expected = mapstr.M{
+		"net_conntrack_listener_conn_closed_total": mapstr.M{
 			"counter": float64(45),
 			"rate":    float64(3),
 		},
@@ -96,7 +96,7 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 	}
 	g.counterCache.Start()
 	timestamp := model.Time(424242)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 	}
 
@@ -121,12 +121,12 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected := common.MapStr{
-		"net_conntrack_listener_conn_closed_total": common.MapStr{
+	expected := mapstr.M{
+		"net_conntrack_listener_conn_closed_total": mapstr.M{
 			"counter": float64(42),
 			"rate":    float64(0),
 		},
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(43),
 			"rate":    float64(0),
 		},
@@ -158,12 +158,12 @@ func TestGenerateEventsCounterSameLabels(t *testing.T) {
 	}
 	events = g.GenerateEvents(metrics)
 
-	expected = common.MapStr{
-		"net_conntrack_listener_conn_closed_total": common.MapStr{
+	expected = mapstr.M{
+		"net_conntrack_listener_conn_closed_total": mapstr.M{
 			"counter": float64(45),
 			"rate":    float64(3),
 		},
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(47),
 			"rate":    float64(4),
 		},
@@ -188,10 +188,10 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 	g.counterCache.Start()
 
 	timestamp := model.Time(424242)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 	}
-	labels2 := common.MapStr{
+	labels2 := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 		"device":        model.LabelValue("eth0"),
 	}
@@ -226,19 +226,19 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected1 := common.MapStr{
-		"net_conntrack_listener_conn_closed_total": common.MapStr{
+	expected1 := mapstr.M{
+		"net_conntrack_listener_conn_closed_total": mapstr.M{
 			"counter": float64(42),
 			"rate":    float64(0),
 		},
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(43),
 			"rate":    float64(0),
 		},
 		"labels": labels,
 	}
-	expected2 := common.MapStr{
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+	expected2 := mapstr.M{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(44),
 			"rate":    float64(0),
 		},
@@ -281,19 +281,19 @@ func TestGenerateEventsCounterDifferentLabels(t *testing.T) {
 	}
 	events = g.GenerateEvents(metrics)
 
-	expected1 = common.MapStr{
-		"net_conntrack_listener_conn_closed_total": common.MapStr{
+	expected1 = mapstr.M{
+		"net_conntrack_listener_conn_closed_total": mapstr.M{
 			"counter": float64(45),
 			"rate":    float64(3),
 		},
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(47),
 			"rate":    float64(4),
 		},
 		"labels": labels,
 	}
-	expected2 = common.MapStr{
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+	expected2 = mapstr.M{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(50),
 			"rate":    float64(6),
 		},
@@ -319,10 +319,10 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 	}
 	g.counterCache.Start()
 	timestamp := model.Time(424242)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 	}
-	labels2 := common.MapStr{
+	labels2 := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 		"device":        model.LabelValue("eth0"),
 	}
@@ -366,23 +366,23 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected1 := common.MapStr{
-		"net_conntrack_listener_conn_closed_total": common.MapStr{
+	expected1 := mapstr.M{
+		"net_conntrack_listener_conn_closed_total": mapstr.M{
 			"counter": float64(42),
 			"rate":    float64(0),
 		},
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(43),
 			"rate":    float64(0),
 		},
 		"labels": labels,
 	}
-	expected2 := common.MapStr{
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+	expected2 := mapstr.M{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(44),
 			"rate":    float64(0),
 		},
-		"net_conntrack_listener_conn_open": common.MapStr{
+		"net_conntrack_listener_conn_open": mapstr.M{
 			"value": float64(49),
 		},
 		"labels": labels2,
@@ -433,23 +433,23 @@ func TestGenerateEventsGaugeDifferentLabels(t *testing.T) {
 	}
 	events = g.GenerateEvents(metrics)
 
-	expected1 = common.MapStr{
-		"net_conntrack_listener_conn_closed_total": common.MapStr{
+	expected1 = mapstr.M{
+		"net_conntrack_listener_conn_closed_total": mapstr.M{
 			"counter": float64(45),
 			"rate":    float64(3),
 		},
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(47),
 			"rate":    float64(4),
 		},
 		"labels": labels,
 	}
-	expected2 = common.MapStr{
-		"net_conntrack_listener_conn_panic_total": common.MapStr{
+	expected2 = mapstr.M{
+		"net_conntrack_listener_conn_panic_total": mapstr.M{
 			"counter": float64(50),
 			"rate":    float64(6),
 		},
-		"net_conntrack_listener_conn_open": common.MapStr{
+		"net_conntrack_listener_conn_open": mapstr.M{
 			"value": float64(59),
 		},
 		"labels": labels2,
@@ -475,15 +475,15 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	g.counterCache.Start()
 
 	timestamp := model.Time(424242)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"runtime":  model.LabelValue("linux"),
 		"quantile": model.LabelValue("0.25"),
 	}
-	labels2 := common.MapStr{
+	labels2 := mapstr.M{
 		"runtime":  model.LabelValue("linux"),
 		"quantile": model.LabelValue("0.50"),
 	}
-	labels3 := common.MapStr{
+	labels3 := mapstr.M{
 		"runtime": model.LabelValue("linux"),
 	}
 
@@ -535,27 +535,27 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected := common.MapStr{
-		"go_gc_duration_seconds": common.MapStr{
+	expected := mapstr.M{
+		"go_gc_duration_seconds": mapstr.M{
 			"value": float64(42),
 		},
-		"go_gc_duration_seconds_2": common.MapStr{
+		"go_gc_duration_seconds_2": mapstr.M{
 			"value": float64(46),
 		},
 		"labels": labels,
 	}
-	expected2 := common.MapStr{
-		"go_gc_duration_seconds": common.MapStr{
+	expected2 := mapstr.M{
+		"go_gc_duration_seconds": mapstr.M{
 			"value": float64(43),
 		},
 		"labels": labels2,
 	}
-	expected3 := common.MapStr{
-		"go_gc_duration_seconds_count": common.MapStr{
+	expected3 := mapstr.M{
+		"go_gc_duration_seconds_count": mapstr.M{
 			"counter": float64(45),
 			"rate":    float64(0),
 		},
-		"go_gc_duration_seconds_sum": common.MapStr{
+		"go_gc_duration_seconds_sum": mapstr.M{
 			"counter": float64(44),
 			"rate":    float64(0),
 		},
@@ -618,27 +618,27 @@ func TestGenerateEventsQuantilesDifferentLabels(t *testing.T) {
 	}
 	events = g.GenerateEvents(metrics)
 
-	expected = common.MapStr{
-		"go_gc_duration_seconds": common.MapStr{
+	expected = mapstr.M{
+		"go_gc_duration_seconds": mapstr.M{
 			"value": float64(52),
 		},
-		"go_gc_duration_seconds_2": common.MapStr{
+		"go_gc_duration_seconds_2": mapstr.M{
 			"value": float64(56),
 		},
 		"labels": labels,
 	}
-	expected2 = common.MapStr{
-		"go_gc_duration_seconds": common.MapStr{
+	expected2 = mapstr.M{
+		"go_gc_duration_seconds": mapstr.M{
 			"value": float64(53),
 		},
 		"labels": labels2,
 	}
-	expected3 = common.MapStr{
-		"go_gc_duration_seconds_count": common.MapStr{
+	expected3 = mapstr.M{
+		"go_gc_duration_seconds_count": mapstr.M{
 			"counter": float64(55),
 			"rate":    float64(10),
 		},
-		"go_gc_duration_seconds_sum": common.MapStr{
+		"go_gc_duration_seconds_sum": mapstr.M{
 			"counter": float64(54),
 			"rate":    float64(10),
 		},
@@ -666,10 +666,10 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	}
 	g.counterCache.Start()
 	timestamp := model.Time(424242)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"runtime": model.LabelValue("linux"),
 	}
-	labels2 := common.MapStr{
+	labels2 := mapstr.M{
 		"runtime": model.LabelValue("darwin"),
 	}
 
@@ -809,49 +809,49 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected := common.MapStr{
-		"http_request_duration_seconds": common.MapStr{
-			"histogram": common.MapStr{
+	expected := mapstr.M{
+		"http_request_duration_seconds": mapstr.M{
+			"histogram": mapstr.M{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
 				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
 			},
 		},
-		"http_request_duration_seconds_sum": common.MapStr{
+		"http_request_duration_seconds_sum": mapstr.M{
 			"counter": float64(45),
 			"rate":    float64(0),
 		},
-		"http_request_duration_seconds_count": common.MapStr{
+		"http_request_duration_seconds_count": mapstr.M{
 			"counter": float64(46),
 			"rate":    float64(0),
 		},
-		"http_request_bytes": common.MapStr{
-			"histogram": common.MapStr{
+		"http_request_bytes": mapstr.M{
+			"histogram": mapstr.M{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
 				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
 			},
 		},
-		"http_request_bytes_sum": common.MapStr{
+		"http_request_bytes_sum": mapstr.M{
 			"counter": float64(55),
 			"rate":    float64(0),
 		},
-		"http_request_bytes_count": common.MapStr{
+		"http_request_bytes_count": mapstr.M{
 			"counter": float64(56),
 			"rate":    float64(0),
 		},
 		"labels": labels,
 	}
-	expected2 := common.MapStr{
-		"http_request_bytes": common.MapStr{
-			"histogram": common.MapStr{
+	expected2 := mapstr.M{
+		"http_request_bytes": mapstr.M{
+			"histogram": mapstr.M{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
 				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
 			},
 		},
-		"http_request_bytes_sum": common.MapStr{
+		"http_request_bytes_sum": mapstr.M{
 			"counter": float64(65),
 			"rate":    float64(0),
 		},
-		"http_request_bytes_count": common.MapStr{
+		"http_request_bytes_count": mapstr.M{
 			"counter": float64(66),
 			"rate":    float64(0),
 		},
@@ -1000,49 +1000,49 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	}
 	events = g.GenerateEvents(metrics)
 
-	expected = common.MapStr{
-		"http_request_duration_seconds": common.MapStr{
-			"histogram": common.MapStr{
+	expected = mapstr.M{
+		"http_request_duration_seconds": mapstr.M{
+			"histogram": mapstr.M{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
 				"counts": []uint64{uint64(100), uint64(0), uint64(0)},
 			},
 		},
-		"http_request_duration_seconds_sum": common.MapStr{
+		"http_request_duration_seconds_sum": mapstr.M{
 			"counter": float64(145),
 			"rate":    float64(100),
 		},
-		"http_request_duration_seconds_count": common.MapStr{
+		"http_request_duration_seconds_count": mapstr.M{
 			"counter": float64(146),
 			"rate":    float64(100),
 		},
-		"http_request_bytes": common.MapStr{
-			"histogram": common.MapStr{
+		"http_request_bytes": mapstr.M{
+			"histogram": mapstr.M{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
 				"counts": []uint64{uint64(200), uint64(0), uint64(0)},
 			},
 		},
-		"http_request_bytes_sum": common.MapStr{
+		"http_request_bytes_sum": mapstr.M{
 			"counter": float64(255),
 			"rate":    float64(200),
 		},
-		"http_request_bytes_count": common.MapStr{
+		"http_request_bytes_count": mapstr.M{
 			"counter": float64(256),
 			"rate":    float64(200),
 		},
 		"labels": labels,
 	}
-	expected2 = common.MapStr{
-		"http_request_bytes": common.MapStr{
-			"histogram": common.MapStr{
+	expected2 = mapstr.M{
+		"http_request_bytes": mapstr.M{
+			"histogram": mapstr.M{
 				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
 				"counts": []uint64{uint64(300), uint64(0), uint64(0)},
 			},
 		},
-		"http_request_bytes_sum": common.MapStr{
+		"http_request_bytes_sum": mapstr.M{
 			"counter": float64(365),
 			"rate":    float64(300),
 		},
-		"http_request_bytes_count": common.MapStr{
+		"http_request_bytes_count": mapstr.M{
 			"counter": float64(366),
 			"rate":    float64(300),
 		},
@@ -1074,7 +1074,7 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	g.counterCache.Start()
 
 	timestamp := model.Time(424242)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 	}
 
@@ -1091,8 +1091,8 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected := common.MapStr{
-		"net_conntrack_listener_conn_closed_mycounter": common.MapStr{
+	expected := mapstr.M{
+		"net_conntrack_listener_conn_closed_mycounter": mapstr.M{
 			"counter": float64(42),
 			"rate":    float64(0),
 		},
@@ -1116,8 +1116,8 @@ func TestGenerateEventsCounterWithDefinedPattern(t *testing.T) {
 	}
 	events = g.GenerateEvents(metrics)
 
-	expected = common.MapStr{
-		"net_conntrack_listener_conn_closed_mycounter": common.MapStr{
+	expected = mapstr.M{
+		"net_conntrack_listener_conn_closed_mycounter": mapstr.M{
 			"counter": float64(45),
 			"rate":    float64(3),
 		},
@@ -1147,7 +1147,7 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 
 	g.counterCache.Start()
 	timestamp := model.Time(424242)
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"listener_name": model.LabelValue("http"),
 	}
 
@@ -1165,9 +1165,9 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	}
 	events := g.GenerateEvents(metrics)
 
-	expected := common.MapStr{
-		"net_conntrack_listener_conn_closed_myhistogram": common.MapStr{
-			"histogram": common.MapStr{
+	expected := mapstr.M{
+		"net_conntrack_listener_conn_closed_myhistogram": mapstr.M{
+			"histogram": mapstr.M{
 				"values": []float64{float64(10)},
 				"counts": []uint64{uint64(0)},
 			},
@@ -1193,9 +1193,9 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	}
 	events = g.GenerateEvents(metrics)
 
-	expected = common.MapStr{
-		"net_conntrack_listener_conn_closed_myhistogram": common.MapStr{
-			"histogram": common.MapStr{
+	expected = mapstr.M{
+		"net_conntrack_listener_conn_closed_myhistogram": mapstr.M{
+			"histogram": mapstr.M{
 				"values": []float64{float64(10)},
 				"counts": []uint64{uint64(3)},
 			},

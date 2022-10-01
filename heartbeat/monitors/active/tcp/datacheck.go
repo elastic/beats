@@ -52,8 +52,6 @@ func makeDataCheck(config *config) dataCheck {
 	}
 }
 
-func checkOk(_ net.Conn) error { return nil }
-
 func checkAll(checks ...dataCheck) dataCheck {
 	return func(conn net.Conn) error {
 		for _, check := range checks {
@@ -78,7 +76,8 @@ func checkRecv(expected []byte) dataCheck {
 			return err
 		}
 		if !bytes.Equal(expected, buf) {
-			// TODO: report received value and expected value in event
+			//nolint:godox // old TODO
+			//TODO: report received value and expected value in event
 			return errRecvMismatch
 		}
 		return nil

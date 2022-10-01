@@ -8,13 +8,12 @@
         "destination": {
           "ip": "10.30.19.180",
           "locality": "internal",
-          "mac": "1c:df:0f:7e:c3:58",
+          "mac": "1C-DF-0F-7E-C3-58",
           "port": 2048
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -34,7 +33,7 @@
           "bgp_destination_as_number": 0,
           "bgp_source_as_number": 0,
           "destination_ipv4_address": "10.30.19.180",
-          "destination_mac_address": "1c:df:0f:7e:c3:58",
+          "destination_mac_address": "1C-DF-0F-7E-C3-58",
           "destination_transport_port": 2048,
           "egress_interface": 0,
           "exporter": {
@@ -58,7 +57,7 @@
           "source_ipv4_address": "10.30.18.62",
           "source_ipv4_prefix": "10.30.18.0",
           "source_ipv4_prefix_length": 23,
-          "source_mac_address": "00:50:56:91:56:86",
+          "source_mac_address": "00-50-56-91-56-86",
           "source_transport_port": 0,
           "tcp_source_port": 0,
           "type": "netflow_flow",
@@ -85,7 +84,7 @@
           "bytes": 44,
           "ip": "10.30.18.62",
           "locality": "internal",
-          "mac": "00:50:56:91:56:86",
+          "mac": "00-50-56-91-56-86",
           "packets": 1,
           "port": 0
         }
@@ -100,13 +99,12 @@
         "destination": {
           "ip": "10.30.19.180",
           "locality": "internal",
-          "mac": "1c:df:0f:7e:c3:58",
+          "mac": "1C-DF-0F-7E-C3-58",
           "port": 161
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -126,7 +124,7 @@
           "bgp_destination_as_number": 0,
           "bgp_source_as_number": 0,
           "destination_ipv4_address": "10.30.19.180",
-          "destination_mac_address": "1c:df:0f:7e:c3:58",
+          "destination_mac_address": "1C-DF-0F-7E-C3-58",
           "destination_transport_port": 161,
           "egress_interface": 0,
           "exporter": {
@@ -150,7 +148,7 @@
           "source_ipv4_address": "10.30.18.62",
           "source_ipv4_prefix": "10.30.18.0",
           "source_ipv4_prefix_length": 23,
-          "source_mac_address": "00:50:56:91:56:86",
+          "source_mac_address": "00-50-56-91-56-86",
           "source_transport_port": 34220,
           "tcp_source_port": 0,
           "type": "netflow_flow",
@@ -177,7 +175,7 @@
           "bytes": 106,
           "ip": "10.30.18.62",
           "locality": "internal",
-          "mac": "00:50:56:91:56:86",
+          "mac": "00-50-56-91-56-86",
           "packets": 1,
           "port": 34220
         }
@@ -192,13 +190,12 @@
         "destination": {
           "ip": "10.30.19.180",
           "locality": "internal",
-          "mac": "1c:df:0f:7e:c3:58",
+          "mac": "1C-DF-0F-7E-C3-58",
           "port": 2048
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -218,7 +215,7 @@
           "bgp_destination_as_number": 0,
           "bgp_source_as_number": 0,
           "destination_ipv4_address": "10.30.19.180",
-          "destination_mac_address": "1c:df:0f:7e:c3:58",
+          "destination_mac_address": "1C-DF-0F-7E-C3-58",
           "destination_transport_port": 2048,
           "egress_interface": 0,
           "exporter": {
@@ -242,7 +239,7 @@
           "source_ipv4_address": "10.10.172.60",
           "source_ipv4_prefix": "0.0.0.0",
           "source_ipv4_prefix_length": 0,
-          "source_mac_address": "00:18:19:9e:6c:01",
+          "source_mac_address": "00-18-19-9E-6C-01",
           "source_transport_port": 0,
           "tcp_source_port": 0,
           "type": "netflow_flow",
@@ -269,7 +266,7 @@
           "bytes": 44,
           "ip": "10.10.172.60",
           "locality": "internal",
-          "mac": "00:18:19:9e:6c:01",
+          "mac": "00-18-19-9E-6C-01",
           "packets": 1,
           "port": 0
         }
@@ -284,13 +281,12 @@
         "destination": {
           "ip": "10.30.19.180",
           "locality": "internal",
-          "mac": "1c:df:0f:7e:c3:58",
+          "mac": "1C-DF-0F-7E-C3-58",
           "port": 123
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -310,7 +306,7 @@
           "bgp_destination_as_number": 0,
           "bgp_source_as_number": 0,
           "destination_ipv4_address": "10.30.19.180",
-          "destination_mac_address": "1c:df:0f:7e:c3:58",
+          "destination_mac_address": "1C-DF-0F-7E-C3-58",
           "destination_transport_port": 123,
           "egress_interface": 0,
           "exporter": {
@@ -334,7 +330,7 @@
           "source_ipv4_address": "10.10.172.60",
           "source_ipv4_prefix": "0.0.0.0",
           "source_ipv4_prefix_length": 0,
-          "source_mac_address": "00:18:19:9e:6c:01",
+          "source_mac_address": "00-18-19-9E-6C-01",
           "source_transport_port": 123,
           "tcp_source_port": 0,
           "type": "netflow_flow",
@@ -361,7 +357,7 @@
           "bytes": 76,
           "ip": "10.10.172.60",
           "locality": "internal",
-          "mac": "00:18:19:9e:6c:01",
+          "mac": "00-18-19-9E-6C-01",
           "packets": 1,
           "port": 123
         }
@@ -376,13 +372,12 @@
         "destination": {
           "ip": "10.30.19.180",
           "locality": "internal",
-          "mac": "1c:df:0f:7e:c3:58",
+          "mac": "1C-DF-0F-7E-C3-58",
           "port": 161
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 72000000,
@@ -402,7 +397,7 @@
           "bgp_destination_as_number": 0,
           "bgp_source_as_number": 0,
           "destination_ipv4_address": "10.30.19.180",
-          "destination_mac_address": "1c:df:0f:7e:c3:58",
+          "destination_mac_address": "1C-DF-0F-7E-C3-58",
           "destination_transport_port": 161,
           "egress_interface": 0,
           "exporter": {
@@ -426,7 +421,7 @@
           "source_ipv4_address": "10.10.172.60",
           "source_ipv4_prefix": "0.0.0.0",
           "source_ipv4_prefix_length": 0,
-          "source_mac_address": "00:18:19:9e:6c:01",
+          "source_mac_address": "00-18-19-9E-6C-01",
           "source_transport_port": 45269,
           "tcp_source_port": 0,
           "type": "netflow_flow",
@@ -453,7 +448,7 @@
           "bytes": 2794,
           "ip": "10.10.172.60",
           "locality": "internal",
-          "mac": "00:18:19:9e:6c:01",
+          "mac": "00-18-19-9E-6C-01",
           "packets": 36,
           "port": 45269
         }

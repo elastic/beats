@@ -23,10 +23,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mime"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
@@ -42,7 +42,7 @@ type mimeTypeProcessor struct {
 }
 
 // NewDetectMimeType constructs a new mime processor.
-func NewDetectMimeType(cfg *common.Config) (processors.Processor, error) {
+func NewDetectMimeType(cfg *conf.C) (processors.Processor, error) {
 	mimeType := &mimeTypeProcessor{}
 	if err := cfg.Unpack(mimeType); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the detect_mime_type configuration")

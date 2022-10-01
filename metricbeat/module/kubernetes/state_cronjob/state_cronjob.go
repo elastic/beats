@@ -20,8 +20,8 @@ package state_cronjob
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -63,7 +63,7 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.CronJob{}, false),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.CronJob{}, mod.GetMetricsRepo(), false),
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_cronjob_info":                           p.InfoMetric(),
@@ -122,8 +122,6 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-
-	return
 }
 
 // Close stops this metricset

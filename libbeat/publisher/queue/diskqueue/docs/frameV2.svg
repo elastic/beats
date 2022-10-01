@@ -1,0 +1,11 @@
+<svg xmlns='http://www.w3.org/2000/svg' class="pikchr" viewBox="0 0 580.32 400.32">
+<path d="M2,38L578,38L578,2L2,2Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);" />
+<text x="290" y="20" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">size (uint32)</text>
+<path d="M2,326L578,326L578,38L2,38Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);stroke-dasharray:7.2,7.2;" />
+<text x="290" y="182" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">CBOR or Protobuf serialized data</text>
+<path d="M2,362L578,362L578,326L2,326Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);" />
+<text x="290" y="344" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">checksum (uint32)</text>
+<path d="M2,398L578,398L578,362L2,362Z"  style="fill:none;stroke-width:2.16;stroke:rgb(0,0,0);" />
+<text x="290" y="380" text-anchor="middle" fill="rgb(0,0,0)" dominant-baseline="central">size (uint32)</text>
+</svg>
+

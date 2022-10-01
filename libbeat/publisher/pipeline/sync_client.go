@@ -22,8 +22,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Client implements the interface used by all the functionbeat function, we only implement a synchronous
@@ -45,11 +45,6 @@ type ISyncClient interface {
 
 // SyncClient wraps an existing beat.Client and provide a sync interface.
 type SyncClient struct {
-	// Chain callbacks already defined in the original ClientConfig
-	ackCount     func(int)
-	ackEvents    func([]interface{})
-	ackLastEvent func(interface{})
-
 	client beat.Client
 	wg     sync.WaitGroup
 	log    *logp.Logger

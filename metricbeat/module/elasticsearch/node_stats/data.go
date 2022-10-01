@@ -22,11 +22,10 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -257,12 +256,66 @@ var (
 			"get":    c.Dict("get", threadPoolStatsSchema),
 			"search": c.Dict("search", threadPoolStatsSchema),
 		}),
+		"indexing_pressure": c.Dict("indexing_pressure", s.Schema{
+			"memory": c.Dict("memory", s.Schema{
+				"current":        c.Dict("current", currentMemoryPressureSchema),
+				"total":          c.Dict("total", totalMemoryPressureSchema),
+				"limit_in_bytes": c.Int("limit_in_bytes"),
+			}),
+		}, c.DictOptional),
+		"ingest": c.Dict("ingest", s.Schema{
+			"total": c.Dict("total", s.Schema{
+				"count":          c.Int("count"),
+				"time_in_millis": c.Int("time_in_millis"),
+				"current":        c.Int("current"),
+				"failed":         c.Int("failed"),
+			}),
+		}, c.DictOptional),
 	}
 
 	collectorSchema = s.Schema{
 		"collection": s.Object{
 			"count": c.Int("collection_count"),
 			"ms":    c.Int("collection_time_in_millis"),
+		},
+	}
+
+	currentMemoryPressureSchema = s.Schema{
+		"all": s.Object{
+			"bytes": c.Int("all_in_bytes"),
+		},
+		"primary": s.Object{
+			"bytes": c.Int("primary_in_bytes"),
+		},
+		"coordinating": s.Object{
+			"bytes": c.Int("coordinating_in_bytes"),
+		},
+		"replica": s.Object{
+			"bytes": c.Int("replica_in_bytes"),
+		},
+		"combined_coordinating_and_primary": s.Object{
+			"bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+		},
+	}
+
+	totalMemoryPressureSchema = s.Schema{
+		"primary": s.Object{
+			"rejections": c.Int("primary_rejections"),
+			"bytes":      c.Int("primary_in_bytes"),
+		},
+		"coordinating": s.Object{
+			"rejections": c.Int("coordinating_rejections"),
+			"bytes":      c.Int("coordinating_in_bytes"),
+		},
+		"replica": s.Object{
+			"rejections": c.Int("replica_rejections"),
+			"bytes":      c.Int("replica_in_bytes"),
+		},
+		"combined_coordinating_and_primary": s.Object{
+			"bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+		},
+		"all": s.Object{
+			"bytes": c.Int("all_in_bytes"),
 		},
 	}
 
@@ -284,7 +337,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch Node Stats API response: %w", err)
 	}
 
 	masterNodeID, err := m.GetMasterNodeID()
@@ -298,22 +351,26 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		mlockall, err := m.IsMLockAllEnabled(nodeID)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "error determining if mlockall is set on Elasticsearch node"))
+			errs = append(errs, fmt.Errorf("error determining if mlockall is set on Elasticsearch node: %w", err))
 			continue
 		}
 
 		event := mb.Event{}
 
-		event.RootFields = common.MapStr{}
-		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+		event.RootFields = mapstr.M{}
+		_, err = event.RootFields.Put("service.name", elasticsearch.ModuleName)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("unable to put field service.name: %w", err))
+			continue
+		}
 
-		event.ModuleFields = common.MapStr{
-			"node": common.MapStr{
+		event.ModuleFields = mapstr.M{
+			"node": mapstr.M{
 				"id":       nodeID,
 				"mlockall": mlockall,
 				"master":   isMaster,
 			},
-			"cluster": common.MapStr{
+			"cluster": mapstr.M{
 				"name": info.ClusterName,
 				"id":   info.ClusterID,
 			},
@@ -321,7 +378,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
+			errs = append(errs, fmt.Errorf("failure to apply node schema: %w", err))
 			continue
 		}
 
@@ -336,8 +393,16 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 			errs = append(errs, fmt.Errorf("name is not a string"))
 			continue
 		}
-		event.ModuleFields.Put("node.name", nameStr)
-		event.MetricSetFields.Delete("name")
+		_, err = event.ModuleFields.Put("node.name", nameStr)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("unable to put field node.name: %w", err))
+			continue
+		}
+		err = event.MetricSetFields.Delete("name")
+		if err != nil {
+			errs = append(errs, fmt.Errorf("unable to delete field name: %w", err))
+			continue
+		}
 
 		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 		// When using Agent, the index name is overwritten anyways.

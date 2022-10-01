@@ -24,9 +24,11 @@ import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestData(t *testing.T) {
+	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)

@@ -4,22 +4,27 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-- Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
+* Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
+
+
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix formatting of hardware addresses populated by the add-host-metadata processor. {issue}32264[32264] {pull}32265[32265]
 
 *Auditbeat*
 
 
 *Filebeat*
-
+- [Httpjson]- Fix for pagination at root level not working when used with chaining.
+- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
 
 *Heartbeat*
-
+- Deprecate zip_url and local monitor options. {pull}33123[33123]
 
 *Metricbeat*
 
@@ -38,46 +43,69 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
-- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
-- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
-- Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
-- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
-- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
-- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
-- Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
-- Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
-- Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
+- Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+
+*Auditbeat*
+
+- auditd module: Fix parsing of audit rules where arguments are quoted (like file paths containing spaces). {pull}32421[32421]
+- auditd module: Fix minimum AuditStatus length so that library can support kernels from 2.6.32. {pull}32421[32421]
+- system/socket: Reduce memory usage of the dataset. {issue}32191[32191] {pull}32192[32192]
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+- Fixes a bug with the auditd module where data is corrupted because it was not copied before the byte slice was reused. {issue}32818[32818] {pull}32823[32823]
+
+*Filebeat*
+
+- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
+- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
+- Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
+- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
+- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
+- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
+- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+- Import dashboards from CEF integration. {pull}32766[32766]
+- Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+- Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
-- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
-- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
-- Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
-- Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
-- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
-
-*Filebeat*
-
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
 
 *Heartbeat*
 
+
 *Metricbeat*
 
-- Enhance metricbeat on openshift documentation {pull}30054[30054]
-- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
-- Fix Docker module: rename fields on dashboards. {pull}30500[30500]
-- Add back missing metrics to system/linux. {pull}30774[30774]
+- Fix GCP storage field naming {pull}32806[32806]
+- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
+- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
+- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
+- Add GCP CloudSQL region filter {pull}32943[32943]
+- Fix logstash cgroup mappings {pull}33131[33131]
 
 *Packetbeat*
 
+- Fix formatting of debug logs. {pull}32698[32698]
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
 
 *Winlogbeat*
 
+- Powershell: Fix processing of parameter details. {pull}31833[31833]
+- Security: Fix processing of sidlist, access list and access mask. {pull}31833[31833]
+- Fix fatal invalid memory write on Windows 11. {issue}32469[32469] {pull}32519[32519]
+- Fix handling of event formatting when no metadata is available on Windows 11. {issue}32468[32468] {pull}32519[32519]
+- Reduce severity of message salvage failure logging. {pull}32697[32697]
 
 *Functionbeat*
 
@@ -90,58 +118,46 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
-- Add support for kafka message headers. {pull}29940[29940]
-- Add FIPS configuration option for all AWS API calls. {pull}[28899]
-- Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
-- Add action_input_type for the .fleet-actions-results {pull}30562[30562]
-- Add cronjob metadata by default {pull}30637[30637]
+- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
+- Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
+- Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
-- Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
-- Add pipeline in FB's supported hints. {pull}30212[30212]
+- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
+- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
+- Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
+- add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
+- httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
+- Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
+- Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Extend documentation about hints annotation for processors {pull}30561[30561]
 
 *Heartbeat*
-
+- Add new states field for internal use by new synthetics app. {pull}30632[30632]
 
 
 *Metricbeat*
 
-- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
-- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
-- Fix overflow in `iostat` metrics {pull}30679[30679]
-- Add `commandstats` field to Redis module {pull}29662[29662]
-
 
 *Packetbeat*
 
+- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
+- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
+- Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
 
 *Functionbeat*
 
 
 *Winlogbeat*
-
-- Improve the error message when the registry file content is invalid. {pull}30543[30543]
 
 
 *Elastic Log Driver*
@@ -157,6 +173,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+
 *Metricbeat*
 
 
@@ -164,7 +181,32 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
+
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

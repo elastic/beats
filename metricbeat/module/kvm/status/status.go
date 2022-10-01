@@ -27,9 +27,9 @@ import (
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -119,11 +119,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 		reported := report.Event(mb.Event{
-			ModuleFields: common.MapStr{
+			ModuleFields: mapstr.M{
 				"id":   d.ID,
 				"name": d.Name,
 			},
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"state": getDomainStateName(state),
 			},
 		})

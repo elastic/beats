@@ -1,0 +1,99 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Select Namespace and DaemonSet [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "orchestrator.cluster.name",
+                        "id": "1653381474364",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Cluster Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "kubernetes.namespace",
+                        "id": "1649326490068",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Namespace name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1653381474364",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "kubernetes.daemonset.name",
+                        "id": "1649326511591",
+                        "indexPatternRefName": "control_2_index_pattern",
+                        "label": "Daemonset  Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1649326490068",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": true,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": true
+            },
+            "title": "Select Namespace and DaemonSet [Metricbeat Kubernetes]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-5993d070-bcb3-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-05-24T16:22:52.326Z",
+    "version": "WzEwMzksMV0="
+}

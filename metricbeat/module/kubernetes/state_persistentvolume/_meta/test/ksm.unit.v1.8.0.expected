@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "test-pv-bound",
@@ -18,7 +18,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"capacity": {
@@ -38,7 +38,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "test-pv-pending",
@@ -56,7 +56,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "test-pv-available",
@@ -74,7 +74,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"capacity": {
@@ -95,7 +95,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "test-pv-released",
@@ -113,7 +113,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"name": "test-pv-failed",
@@ -131,7 +131,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"app": "mysql-server"

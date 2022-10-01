@@ -24,10 +24,10 @@ import (
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -137,7 +137,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	families, err := m.openmetrics.GetFamilies()
-	eventList := map[textparse.MetricType]map[string]common.MapStr{}
+	eventList := map[textparse.MetricType]map[string]mapstr.M{}
 	if err != nil {
 		// send up event only
 		families = append(families, m.upMetricFamily(0.0))
@@ -163,10 +163,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				labelsHash = openMetricEvent.LabelsHash()
 			}
 			if _, ok := eventList[openMetricEvent.Type]; !ok {
-				eventList[openMetricEvent.Type] = make(map[string]common.MapStr)
+				eventList[openMetricEvent.Type] = make(map[string]mapstr.M)
 			}
 			if _, ok := eventList[openMetricEvent.Type][labelsHash]; !ok {
-				eventList[openMetricEvent.Type][labelsHash] = common.MapStr{}
+				eventList[openMetricEvent.Type][labelsHash] = mapstr.M{}
 
 				// Add default instance label if not already there
 				if exists, _ := openMetricEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
@@ -206,7 +206,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, e := range eventList {
 		for _, ev := range e {
 			isOpen := reporter.Event(mb.Event{
-				RootFields: common.MapStr{m.namespace: ev},
+				RootFields: mapstr.M{m.namespace: ev},
 			})
 			if !isOpen {
 				break

@@ -16,14 +16,13 @@ import (
 
 	"github.com/cloudfoundry-community/go-cfclient"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetApps(t *testing.T) {
 	var conf Config
-	err := common.MustNewConfigFrom(cftest.GetConfigFromEnv(t)).Unpack(&conf)
+	err := conf.MustNewConfigFrom(cftest.GetConfigFromEnv(t)).Unpack(&conf)
 	require.NoError(t, err)
 
 	log := logp.NewLogger("cloudfoundry")

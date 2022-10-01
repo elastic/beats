@@ -20,7 +20,7 @@ package report
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Event is the format of monitoring events.
@@ -28,6 +28,6 @@ import (
 // The only difference between report.Event and beat.Event
 // is Timestamp is serialized as "timestamp" in monitoring.
 type Event struct {
-	Timestamp time.Time     `struct:"timestamp"`
-	Fields    common.MapStr `struct:",inline"`
+	Timestamp time.Time `struct:"timestamp"`
+	Fields    mapstr.M  `struct:",inline"`
 }

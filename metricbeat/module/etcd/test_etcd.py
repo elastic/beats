@@ -11,7 +11,7 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['etcd']
 
     @parameterized.expand([
-        "leader",
+        # "leader",
         "self",
         "store",
         "metrics",

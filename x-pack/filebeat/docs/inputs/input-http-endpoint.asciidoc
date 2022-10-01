@@ -11,9 +11,31 @@
 
 beta[]
 
-Use the `http_endpoint` input to create a HTTP listener that can receive incoming HTTP POST requests.
+The HTTP Endpoint input initializes a listening HTTP server that collects
+incoming HTTP POST requests containing a JSON body. The body must be either an
+object or an array of objects. Any other data types will result in an HTTP 400
+(Bad Request) response. For arrays, one document is created for each object in
+the array.
 
-This input can for example be used to receive incoming webhooks from a third-party application or service.
+gzip encoded request bodies are supported if a `Content-Encoding: gzip` header
+is sent with the request.
+
+This input can for example be used to receive incoming webhooks from a
+third-party application or service.
+
+These are the possible response codes from the server.
+
+[options="header"]
+|=========================================================================================================================================================
+| HTTP Response Code  | Name                    | Reason
+| 200                 | OK                      | Returned on success.
+| 400                 | Bad Request             | Returned if JSON body decoding fails.
+| 401                 | Unauthorized            | Returned when basic auth, secret header, or HMAC validation fails.
+| 405                 | Method Not Allowed      | Returned if methods other than POST are used.
+| 406                 | Not Acceptable          | Returned if the POST request does not contain a body.
+| 415                 | Unsupported Media Type  | Returned if the Content-Type is not application/json. Or if Content-Encoding is present and is not gzip.
+| 500                 | Internal Server Error   | Returned if an I/O error occurs reading the request.
+|=========================================================================================================================================================
 
 Example configurations:
 

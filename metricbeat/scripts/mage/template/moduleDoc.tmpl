@@ -4,6 +4,12 @@ This file is generated! See scripts/mage/docs_collector.go
 
 :modulename: {{.Base}}
 
+{{- if .IsXpack}}
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/{{.Base}}/_meta/docs.asciidoc
+{{ else }}
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/{{.Base}}/_meta/docs.asciidoc
+{{end}}
+
 [[{{getBeatName}}-module-{{.Base}}]]
 {{- if .IsXpack}}
 [role="xpack"]{{end}}
@@ -15,6 +21,8 @@ This file is generated! See scripts/mage/docs_collector.go
 {{end -}}
 
 {{.Asciidoc}}
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -48,4 +56,4 @@ include::{{$.Base}}/{{$metricset.Title}}.asciidoc[]
 
 {{end -}}
 
-
+:edit_url!:

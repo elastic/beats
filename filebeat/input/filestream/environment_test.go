@@ -36,12 +36,12 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -75,15 +75,29 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 }
 
 func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{}) v2.Input {
+	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
 	manager.Init(&e.grp, v2.ModeRun)
-	c := common.MustNewConfigFrom(config)
+	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
 		e.t.Fatalf("failed to create input using manager: %+v", err)
 	}
 	return inp
+}
+
+func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2.Input, error) {
+	e.grp = unison.TaskGroup{}
+	manager := e.getManager()
+	manager.Init(&e.grp, v2.ModeRun)
+	c := conf.MustNewConfigFrom(config)
+	inp, err := manager.Create(c)
+	if err != nil {
+		return nil, err
+	}
+
+	return inp, nil
 }
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
@@ -180,24 +194,30 @@ func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 }
 
 // requireOffsetInRegistry checks if the expected offset is set for a file.
-func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expectedOffset int) {
+func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID string, expectedOffset int) {
+	e.t.Helper()
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	id := getIDFromPath(filepath, fi)
-	entry, err := e.getRegistryState(id)
-	if err != nil {
-		e.t.Fatalf(err.Error())
-	}
+	id := getIDFromPath(filepath, inputID, fi)
+	var entry registryEntry
+	require.Eventually(e.t, func() bool {
+		entry, err = e.getRegistryState(id)
+		if err != nil {
+			return true
+		}
 
+		return expectedOffset == entry.Cursor.Offset
+	}, time.Second, time.Millisecond)
+	require.NoError(e.t, err)
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
-func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename string, expectedMeta fileMeta) {
+func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename, inputID string, expectedMeta fileMeta) {
 	for {
 		filepath := e.abspath(filename)
 		fi, err := os.Stat(filepath)
@@ -205,7 +225,7 @@ func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename string, expec
 			continue
 		}
 
-		id := getIDFromPath(filepath, fi)
+		id := getIDFromPath(filepath, inputID, fi)
 		entry, err := e.getRegistryState(id)
 		if err != nil {
 			continue
@@ -233,14 +253,14 @@ func requireMetadataEquals(one, other fileMeta) bool {
 }
 
 // waitUntilOffsetInRegistry waits for the expected offset is set for a file.
-func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename string, expectedOffset int) {
+func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID string, expectedOffset int) {
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	id := getIDFromPath(filepath, fi)
+	id := getIDFromPath(filepath, inputID, fi)
 	entry, err := e.getRegistryState(id)
 	for err != nil || entry.Cursor.Offset != expectedOffset {
 		entry, err = e.getRegistryState(id)
@@ -249,7 +269,7 @@ func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename string, exp
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
 
-func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
+func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID string) {
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
@@ -257,7 +277,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
 	}
 
 	inputStore, _ := e.stateStore.Access()
-	id := getIDFromPath(filepath, fi)
+	id := getIDFromPath(filepath, inputID, fi)
 
 	var entry registryEntry
 	err = inputStore.Get(id, &entry)
@@ -282,16 +302,23 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)
 	if err != nil {
+		keys := []string{}
+		inputStore.Each(func(key string, _ statestore.ValueDecoder) (bool, error) {
+			keys = append(keys, key)
+			return false, nil
+		})
+		e.t.Logf("keys in store: %v", keys)
+
 		return registryEntry{}, fmt.Errorf("error when getting expected key '%s' from store: %+v", key, err)
 	}
 
 	return entry, nil
 }
 
-func getIDFromPath(filepath string, fi os.FileInfo) string {
+func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 	identifier, _ := newINodeDeviceIdentifier(nil)
 	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
-	return "filestream::.global::" + src.Name()
+	return "filestream::" + inputID + "::" + src.Name()
 }
 
 // waitUntilEventCount waits until total count events arrive to the client.
@@ -303,6 +330,17 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 		}
 		if count < sum {
 			e.t.Fatalf("too many events; expected: %d, actual: %d", count, sum)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+// waitUntilAtLeastEventCount waits until at least count events arrive to the client.
+func (e *inputTestingEnvironment) waitUntilAtLeastEventCount(count int) {
+	for {
+		sum := len(e.pipeline.GetAllEvents())
+		if count <= sum {
+			return
 		}
 		time.Sleep(10 * time.Millisecond)
 	}

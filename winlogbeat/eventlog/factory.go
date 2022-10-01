@@ -23,7 +23,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // ConfigCommon is the common configuration data used to instantiate a new
@@ -40,7 +40,7 @@ type validator interface {
 	Validate() error
 }
 
-func readConfig(c *common.Config, config interface{}) error {
+func readConfig(c *conf.C, config interface{}) error {
 	if err := c.Unpack(config); err != nil {
 		return fmt.Errorf("failed unpacking config. %v", err)
 	}
@@ -55,7 +55,7 @@ func readConfig(c *common.Config, config interface{}) error {
 }
 
 // Producer produces a new event log instance for reading event log records.
-type producer func(*common.Config) (EventLog, error)
+type producer func(*conf.C) (EventLog, error)
 
 // Channels lists the available channels (event logs).
 type channels func() ([]string, error)
@@ -91,7 +91,7 @@ func Register(apiName string, priority int, producer producer, channels channels
 
 // New creates and returns a new EventLog instance based on the given config
 // and the registered EventLog producers.
-func New(options *common.Config) (EventLog, error) {
+func New(options *conf.C) (EventLog, error) {
 	if len(eventLogs) == 0 {
 		return nil, errors.New("No event log API is available on this system")
 	}

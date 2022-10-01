@@ -18,8 +18,6 @@
 package pipeline
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -29,7 +27,9 @@ type retryer interface {
 }
 
 type ttlBatch struct {
-	original queue.Batch
+	// The callback to inform the queue (and possibly the producer)
+	// that this batch has been acknowledged.
+	done func()
 
 	// The internal hook back to the eventConsumer, used to implement the
 	// publisher.Batch retry interface.
@@ -43,30 +43,30 @@ type ttlBatch struct {
 	events []publisher.Event
 }
 
-var batchPool = sync.Pool{
-	New: func() interface{} {
-		return &ttlBatch{}
-	},
-}
-
 func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	if original == nil {
 		panic("empty batch")
 	}
 
-	b := batchPool.Get().(*ttlBatch)
-	*b = ttlBatch{
-		original: original,
-		retryer:  retryer,
-		ttl:      ttl,
-		events:   original.Events(),
+	count := original.Count()
+	events := make([]publisher.Event, 0, count)
+	for i := 0; i < count; i++ {
+		event, ok := original.Entry(i).(publisher.Event)
+		if ok {
+			// In Beats this conversion will always succeed because only
+			// publisher.Event objects are inserted into the queue, but
+			// there's no harm in making sure.
+			events = append(events, event)
+		}
+	}
+
+	b := &ttlBatch{
+		done:    original.Done,
+		retryer: retryer,
+		ttl:     ttl,
+		events:  events,
 	}
 	return b
-}
-
-func releaseBatch(b *ttlBatch) {
-	*b = ttlBatch{} // clear batch
-	batchPool.Put(b)
 }
 
 func (b *ttlBatch) Events() []publisher.Event {
@@ -74,13 +74,11 @@ func (b *ttlBatch) Events() []publisher.Event {
 }
 
 func (b *ttlBatch) ACK() {
-	b.original.ACK()
-	releaseBatch(b)
+	b.done()
 }
 
 func (b *ttlBatch) Drop() {
-	b.original.ACK()
-	releaseBatch(b)
+	b.done()
 }
 
 func (b *ttlBatch) Retry() {

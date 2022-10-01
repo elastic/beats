@@ -85,7 +85,7 @@ processors:
       field: tmp_timestamp
       target_field: "@timestamp"
       formats:
-        - EEE MMM  d HH:mm:ss uuuu XXX
+        - EEE MMM [ d][dd] HH:mm:ss uuuu XXX
   - grok:
       field: tmp_timestamp
       patterns:

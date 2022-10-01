@@ -5,8 +5,7 @@
         "destination.address": "224.0.0.22",
         "destination.ip": "224.0.0.22",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGRP",
         "event.dataset": "cisco.ios",
@@ -50,8 +49,7 @@
         "destination.address": "224.0.0.2",
         "destination.ip": "224.0.0.2",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGSP",
         "event.dataset": "cisco.ios",
@@ -96,8 +94,7 @@
         "destination.address": "255.255.255.255",
         "destination.ip": "255.255.255.255",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGNP",
         "event.dataset": "cisco.ios",
@@ -142,8 +139,7 @@
         "destination.ip": "2001:DB8:1000::1",
         "destination.port": 22,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "ACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -189,8 +185,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -235,8 +230,7 @@
         "destination.address": "198.51.100.2",
         "destination.ip": "198.51.100.2",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGDP",
         "event.dataset": "cisco.ios",
@@ -283,8 +277,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -330,8 +323,7 @@
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -377,8 +369,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -424,8 +415,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -471,8 +461,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -518,8 +507,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -565,8 +553,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -612,8 +599,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -680,8 +666,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -727,8 +712,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -774,8 +758,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -821,8 +804,7 @@
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -868,8 +850,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -915,8 +896,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -962,8 +942,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1009,8 +988,7 @@
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1056,8 +1034,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1111,8 +1088,7 @@
         "destination.ip": "175.16.199.1",
         "destination.port": 53,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1158,8 +1134,7 @@
         "destination.ip": "198.51.100.195",
         "destination.port": 59415,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1233,8 +1208,7 @@
         "destination.address": "198.51.100.1",
         "destination.ip": "198.51.100.1",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGDP",
         "event.dataset": "cisco.ios",
@@ -1281,8 +1255,7 @@
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1328,8 +1301,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1375,8 +1347,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1422,8 +1393,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 138,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1469,8 +1439,7 @@
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
@@ -1516,8 +1485,7 @@
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",

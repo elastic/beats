@@ -16,15 +16,14 @@ import (
 	"github.com/awslabs/goformation/v4/cloudformation"
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
 	"github.com/awslabs/goformation/v4/cloudformation/lambda"
-	merrors "github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
 	fnaws "github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -71,21 +70,21 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	_, err = c.awsCfg.Credentials.Retrieve(context.Background())
 	if err != nil {
-		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
+		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %w", err)
 	}
 
-	svcCF := cf.New(c.awsCfg)
+	svcCF := cf.NewFromConfig(c.awsCfg)
 
 	executer := executor.NewExecutor(c.log)
-	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, c.bucket()))
-	executer.Add(newOpUploadToBucket(
+	_ = executer.Add(newOpEnsureBucket(c.log, c.awsCfg, c.bucket()))
+	_ = executer.Add(newOpUploadToBucket(
 		c.log,
 		c.awsCfg,
 		c.bucket(),
 		templateData.codeKey,
 		templateData.zip.content,
 	))
-	executer.Add(newOpUploadToBucket(
+	_ = executer.Add(newOpUploadToBucket(
 		c.log,
 		c.awsCfg,
 		c.bucket(),
@@ -93,14 +92,14 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		templateData.json,
 	))
 	if update {
-		executer.Add(newOpUpdateCloudFormation(
+		_ = executer.Add(newOpUpdateCloudFormation(
 			c.log,
 			svcCF,
 			templateData.url,
 			c.stackName(name),
 		))
 	} else {
-		executer.Add(newOpCreateCloudFormation(
+		_ = executer.Add(newOpCreateCloudFormation(
 			c.log,
 			svcCF,
 			templateData.url,
@@ -108,13 +107,13 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 		))
 	}
 
-	executer.Add(newOpWaitCloudFormation(c.log, cf.New(c.awsCfg)))
-	executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, c.bucket(), templateData.codeKey))
+	_ = executer.Add(newOpWaitCloudFormation(c.log, cf.NewFromConfig(c.awsCfg)))
+	_ = executer.Add(newOpDeleteFileBucket(c.log, c.awsCfg, c.bucket(), templateData.codeKey))
 
 	ctx := newStackContext()
 	if err := executer.Execute(ctx); err != nil {
 		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
-			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
+			return fmt.Errorf("could not rollback, error: %s, %w", rollbackErr, err)
 		}
 		return err
 	}
@@ -153,18 +152,18 @@ func (c *CLIManager) Remove(name string) error {
 
 	_, err := c.awsCfg.Credentials.Retrieve(context.Background())
 	if err != nil {
-		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
+		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %w", err)
 	}
 
-	svc := cf.New(c.awsCfg)
+	svc := cf.NewFromConfig(c.awsCfg)
 	executer := executor.NewExecutor(c.log)
-	executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
-	executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg))
+	_ = executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
+	_ = executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg))
 
 	ctx := newStackContext()
 	if err := executer.Execute(ctx); err != nil {
 		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
-			return merrors.Wrapf(err, "could not rollback, error: %s", rollbackErr)
+			return fmt.Errorf("could not rollback, error: %s, %w", rollbackErr, err)
 		}
 		return err
 	}
@@ -178,7 +177,7 @@ func (c *CLIManager) Export(name string) error {
 		return err
 	}
 
-	fmt.Println(tmpl)
+	fmt.Println(tmpl) //nolint:forbidigo // standalone tool
 
 	return nil
 }
@@ -197,7 +196,7 @@ func (c *CLIManager) Package(outputPattern string) error {
 		return err
 	}
 
-	fmt.Fprintf(os.Stderr, "Generated package for provider aws at: %s\n", output)
+	_, _ = fmt.Fprintf(os.Stderr, "Generated package for provider aws at: %s\n", output)
 	return nil
 }
 
@@ -208,7 +207,7 @@ func (c *CLIManager) bucket() string {
 // NewCLI returns the interface to manage function on Amazon lambda.
 func NewCLI(
 	log *logp.Logger,
-	cfg *common.Config,
+	cfg *conf.C,
 	provider provider.Provider,
 ) (provider.CLIManager, error) {
 	config := fnaws.DefaultConfig()
@@ -217,7 +216,7 @@ func NewCLI(
 	}
 	awsCfg, err := awscommon.InitializeAWSConfig(config.Credentials)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %+v", err)
+		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %w", err)
 	}
 	if config.Region != "" {
 		awsCfg.Region = config.Region

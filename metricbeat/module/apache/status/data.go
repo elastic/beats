@@ -22,9 +22,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -97,7 +97,7 @@ var (
 	}
 )
 
-func applySchema(event common.MapStr, fullEvent map[string]interface{}) error {
+func applySchema(event mapstr.M, fullEvent map[string]interface{}) error {
 	applicableSchema := schema
 	if _, found := fullEvent["ServerUptimeSeconds"]; !found {
 		applicableSchema = schemaOld
@@ -107,7 +107,7 @@ func applySchema(event common.MapStr, fullEvent map[string]interface{}) error {
 }
 
 // Map body to MapStr
-func eventMapping(scanner *bufio.Scanner, hostname string) (common.MapStr, error) {
+func eventMapping(scanner *bufio.Scanner, hostname string) (mapstr.M, error) {
 	var (
 		totalS          int
 		totalR          int
@@ -176,9 +176,9 @@ func eventMapping(scanner *bufio.Scanner, hostname string) (common.MapStr, error
 		}
 	}
 
-	event := common.MapStr{
+	event := mapstr.M{
 		"hostname": hostname,
-		"scoreboard": common.MapStr{
+		"scoreboard": mapstr.M{
 			"starting_up":            totalS,
 			"reading_request":        totalR,
 			"sending_reply":          totalW,

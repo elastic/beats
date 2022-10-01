@@ -21,17 +21,17 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	dto "github.com/prometheus/client_model/go"
 )
 
 // PromEvent stores a set of one or more metrics with the same labels
 type PromEvent struct {
-	Data   common.MapStr
-	Labels common.MapStr
+	Data   mapstr.M
+	Labels mapstr.M
 }
 
 // LabelsHash returns a repeatable string that is unique for the set of labels in this event
@@ -57,7 +57,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 	name := *mf.Name
 	metrics := mf.Metric
 	for _, metric := range metrics {
-		labels := common.MapStr{}
+		labels := mapstr.M{}
 
 		if len(metric.Label) != 0 {
 			for _, label := range metric.Label {
@@ -71,8 +71,8 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 		if counter != nil {
 			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
 				events = append(events, PromEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: counter.GetValue(),
 						},
 					},
@@ -85,8 +85,8 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 		if gauge != nil {
 			if !math.IsNaN(gauge.GetValue()) && !math.IsInf(gauge.GetValue(), 0) {
 				events = append(events, PromEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: gauge.GetValue(),
 						},
 					},
@@ -99,8 +99,8 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 		if summary != nil {
 			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 				events = append(events, PromEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name + "_sum":   summary.GetSampleSum(),
 							name + "_count": summary.GetSampleCount(),
 						},
@@ -117,8 +117,8 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 				quantileLabels := labels.Clone()
 				quantileLabels["quantile"] = strconv.FormatFloat(quantile.GetQuantile(), 'f', -1, 64)
 				events = append(events, PromEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: quantile.GetValue(),
 						},
 					},
@@ -131,8 +131,8 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 		if histogram != nil {
 			if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
 				events = append(events, PromEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name + "_sum":   histogram.GetSampleSum(),
 							name + "_count": histogram.GetSampleCount(),
 						},
@@ -150,8 +150,8 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 				bucketLabels["le"] = strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
 
 				events = append(events, PromEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name + "_bucket": bucket.GetCumulativeCount(),
 						},
 					},
@@ -164,8 +164,8 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 		if untyped != nil {
 			if !math.IsNaN(untyped.GetValue()) && !math.IsInf(untyped.GetValue(), 0) {
 				events = append(events, PromEvent{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							name: untyped.GetValue(),
 						},
 					},

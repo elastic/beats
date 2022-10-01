@@ -8,7 +8,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Service interface for the azure monitor service and mock for testing

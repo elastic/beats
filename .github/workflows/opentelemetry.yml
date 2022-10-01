@@ -1,0 +1,52 @@
+name: OpenTelemetry Export Trace
+
+on:
+  workflow_run:
+    workflows:
+      - check-auditbeat
+      - check-dev-tools
+      - check-filebeat
+      - check-heartbeat
+      - check-libbeat
+      - check-metricbeat
+      - check-packetbeat
+      - check-winlogbeat
+      - check-x-pack-auditbeat
+      - check-x-pack-dockerlogbeat
+      - check-x-pack-filebeat
+      - check-x-pack-functionbeat
+      - check-x-pack-heartbeat
+      - check-x-pack-libbeat
+      - check-x-pack-metricbeat
+      - check-x-pack-osquerybeat
+      - check-x-pack-packetbeat
+      - check-x-pack-winlogbeat
+      - golangci-lint
+      - auditbeat
+      - filebeat
+      - heartbeat
+      - metricbeat
+      - packetbeat
+      - x-pack-auditbeat
+      - x-pack-filebeat
+      - x-pack-functionbeat
+      - x-pack-heartbeat
+      - x-pack-metricbeat
+      - x-pack-osquerybeat
+      - x-pack-packetbeat
+      - check-default
+      - check-docs
+    types: [completed]
+
+jobs:
+  otel-export-trace:
+    name: OpenTelemetry Export Trace
+    runs-on: ubuntu-latest
+    steps:
+      - name: Export Workflow Trace
+        uses: inception-health/otel-export-trace-action@latest
+        with:
+          otlpEndpoint: "${{ secrets.APM_SERVER }}"
+          otlpHeaders: "Authorization=Bearer ${{ secrets.APM_TOKEN }}"
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          runId: ${{ github.event.workflow_run.id }}

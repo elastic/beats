@@ -1,0 +1,56 @@
+[
+  {
+    "@timestamp": "2020-08-19T06:07:08.801981Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "user-audit-policy-created",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": "4902",
+      "ingested": "2022-06-08T06:21:08.110215500Z",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "creation"
+      ]
+    },
+    "host": {
+      "name": "WIN-BVM4LI1L1Q6.TEST.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "The Per-user audit policy table was created.\n\nNumber of Elements:\t0\nPolicy ID:\t0x9FD2",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
+      "event_data": {
+        "PuaCount": "0",
+        "PuaPolicyId": "0x9fd2"
+      },
+      "event_id": "4902",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 784,
+        "thread": {
+          "id": 832
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "140273",
+      "task": "Audit Policy Change"
+    }
+  }
+]
