@@ -1344,6 +1344,33 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricData(context.Context, *cloudwa
 	}, nil
 }
 
+// MockCloudWatchClientWithDataGranularity struct is used for unit tests.
+type MockCloudWatchClientWithDataGranularity struct{}
+
+// GetMetricData implements cloudwatch.GetMetricDataAPIClient.
+func (m *MockCloudWatchClientWithDataGranularity) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
+	emptyString := ""
+	return &cloudwatch.GetMetricDataOutput{
+		Messages: nil,
+		MetricDataResults: []cloudwatchtypes.MetricDataResult{
+			{
+				Id:         &id1,
+				Label:      &label3,
+				Values:     []float64{value1, value1},
+				Timestamps: []time.Time{timestamp, timestamp},
+			},
+			{
+				Id:         &id2,
+				Label:      &label4,
+				Values:     []float64{value2, value2},
+				Timestamps: []time.Time{timestamp, timestamp},
+			},
+		},
+		NextToken:      &emptyString,
+		ResultMetadata: middleware.Metadata{},
+	}, nil
+}
+
 // MockResourceGroupsTaggingClient is used for unit tests.
 type MockResourceGroupsTaggingClient struct{}
 
@@ -1396,12 +1423,13 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
+	assert.Equal(t, 2, len(events))
 
-	metricValue, err := events["i-1"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	metricValue, err := events[label1+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value1, metricValue)
 
-	dimension, err := events["i-1"].RootFields.GetValue("aws.dimensions.InstanceId")
+	dimension, err := events[label2+"-0"].RootFields.GetValue("aws.dimensions.InstanceId")
 	assert.NoError(t, err)
 	assert.Equal(t, instanceID1, dimension)
 }
@@ -1437,14 +1465,58 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 
-	expectedID := regionName + accountID + namespace
-	metricValue, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	expectedID := regionName + accountID
+	metricValue, err := events[expectedID+label3+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value1, metricValue)
 
-	dimension, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	dimension, err := events[expectedID+label4+"-0"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value2, dimension)
+}
+
+func TestCreateEventsWithDataGranularity(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
+	m.MetricSet = &aws.MetricSet{Period: 10, AccountID: accountID, DataGranularity: 5}
+	m.logger = logp.NewLogger("test")
+
+	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
+	mockCloudwatchSvc := &MockCloudWatchClientWithDataGranularity{}
+	listMetricWithStatsTotal := []metricsWithStatistics{
+		{
+			cloudwatchtypes.Metric{
+				MetricName: awssdk.String("CPUUtilization"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+		},
+		{
+			cloudwatchtypes.Metric{
+				MetricName: awssdk.String("DiskReadOps"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+		},
+	}
+
+	resourceTypeTagFilters := map[string][]aws.Tag{}
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+
+	expectedID := regionName + accountID
+	metricValue, err := events[expectedID+label3+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	metricValue1, err := events[expectedID+label3+"-1"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	metricValue2, err := events[expectedID+label4+"-0"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	metricValue3, err := events[expectedID+label4+"-1"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	assert.NoError(t, err)
+	assert.Equal(t, value1, metricValue)
+	assert.Equal(t, value1, metricValue1)
+	assert.Equal(t, value2, metricValue2)
+	assert.Equal(t, value2, metricValue3)
+	assert.Equal(t, 4, len(events))
 }
 
 func TestCreateEventsWithTagsFilter(t *testing.T) {
@@ -1560,7 +1632,7 @@ func TestInsertTags(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			insertTags(events, c.identifier, resourceTagMap)
+			insertTags(events, c.identifier, c.identifier, resourceTagMap)
 			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)
 			assert.NoError(t, err)
 			assert.Equal(t, c.expectedTagValue, value)
