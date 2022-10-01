@@ -19,6 +19,7 @@
         "aws.cloudtrail.flattened.response_elements.trailARN": "arn:aws:cloudtrail:us-west-2:0123456789012:trail/TEST-trail",
         "aws.cloudtrail.read_only": false,
         "aws.cloudtrail.recipient_account_id": "0123456789012",
+        "aws.cloudtrail.request_id": "EXAMPLE-5149-4cf2-be99-EXAMPLE",
         "aws.cloudtrail.request_parameters": "{isMultiRegionTrail=true, s3BucketName=TEST-cloudtrail-bucket, name=TEST-trail, enableLogFileValidation=true, kmsKeyId=, isOrganizationTrail=false, includeGlobalServiceEvents=true}",
         "aws.cloudtrail.response_elements": "{logFileValidationEnabled=true, isMultiRegionTrail=true, s3BucketName=TEST-cloudtrail-bucket, name=TEST-trail, trailARN=arn:aws:cloudtrail:us-west-2:0123456789012:trail/TEST-trail, isOrganizationTrail=false, includeGlobalServiceEvents=true}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY",

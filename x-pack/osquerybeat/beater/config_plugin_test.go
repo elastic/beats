@@ -29,12 +29,13 @@ func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
 			Queries:   make(map[string]config.Query),
 		}
 		for _, stream := range input.Streams {
+			snapshot := true
 			query := config.Query{
 				Query:    stream.Query,
 				Interval: stream.Interval,
 				Platform: stream.Platform,
 				Version:  stream.Version,
-				Snapshot: true, // enforce snapshot for all queries
+				Snapshot: &snapshot, // enforce snapshot for all queries
 			}
 			pack.Queries[stream.ID] = query
 		}

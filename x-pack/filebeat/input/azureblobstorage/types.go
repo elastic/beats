@@ -2,11 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
-// +build !aix
-
-// Shared types are defined here in this package to make structuring better
-package types
+// Shared types are defined here to make structuring better
+package azureblobstorage
 
 import (
 	"time"
@@ -14,7 +11,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 )
 
-// Source , it is the cursor source
+// Source, it is the cursor source
 type Source struct {
 	ContainerName string
 	AccountName   string
@@ -28,24 +25,24 @@ func (s *Source) Name() string {
 }
 
 const (
-	SharedKeyType        string = "sharedKeyType"
-	ConnectionStringType string = "connectionStringType"
-	Json                 string = "application/json"
+	sharedKeyType        string = "sharedKeyType"
+	connectionStringType string = "connectionStringType"
+	json                 string = "application/json"
 )
 
 // currently only shared key & connection string types of credentials are supported
-type ServiceCredentials struct {
-	SharedKeyCreds     *azblob.SharedKeyCredential
-	ConnectionStrCreds string
-	Ctype              string
+type serviceCredentials struct {
+	sharedKeyCreds     *azblob.SharedKeyCredential
+	connectionStrCreds string
+	cType              string
 }
 
-type BlobCredentials struct {
-	ServiceCreds  *ServiceCredentials
-	BlobName      string
-	ContainerName string
+type blobCredentials struct {
+	serviceCreds  *serviceCredentials
+	blobName      string
+	containerName string
 }
 
-var AllowedContentTypes = map[string]bool{
-	Json: true,
+var allowedContentTypes = map[string]bool{
+	json: true,
 }

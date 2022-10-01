@@ -10337,7 +10337,7 @@ type: float
 [[exported-fields-cockroachdb]]
 == CockroachDB fields
 
-CockroachDB module
+CockroachDB module scrape metrics using Prometheus endpoint.
 
 
 
@@ -35409,15 +35409,6 @@ type: long
 Google Cloud Dataproc metrics
 
 
-*`gcp.dataproc.batch.spark.executors.count`*::
-+
---
-Indicates the number of Batch Spark executors.
-
-type: long
-
---
-
 *`gcp.dataproc.cluster.hdfs.datanodes.count`*::
 +
 --
@@ -47735,34 +47726,6 @@ type: nested
 
 
 
-*`logstash_stats.os.cpu.stat.number_of_elapsed_periods`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
-
---
-
-*`logstash_stats.os.cpu.stat.time_throttled_nanos`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
-
---
-
-*`logstash_stats.os.cpu.stat.number_of_times_throttled`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
-
---
-
-
 *`logstash_stats.os.cpu.load_average.15m`*::
 +
 --
@@ -47797,6 +47760,44 @@ alias to: logstash.node.stats.os.cpu.load_average.5m
 type: alias
 
 alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
+
+--
+
+
+*`logstash_stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.cfs_quota_micros
+
+--
+
+
+*`logstash_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+
+--
+
+*`logstash_stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+
+--
+
+*`logstash_stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
 
 --
 
@@ -48041,6 +48042,13 @@ type: long
 
 --
 
+
+*`logstash.node.stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: long
+
+--
 
 
 *`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
