@@ -41,6 +41,8 @@ metricbeat.modules:
   metricsets: ["server"]
   period: 10s
   hosts: ["localhost:5984"]
+  username: "admin"
+  password: "password"
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
