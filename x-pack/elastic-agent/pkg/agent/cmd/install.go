@@ -59,6 +59,10 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 		return fmt.Errorf("already installed at: %s", paths.InstallPath)
 	}
 
+	if status == install.PackageInstall {
+		fmt.Fprintf(streams.Out, "Installed as a system package, installation will not be altered.\n")
+	}
+
 	// check the lock to ensure that elastic-agent is not already running in this directory
 	locker := filelock.NewAppLocker(paths.Data(), paths.AgentLockFileName)
 	if err := locker.TryLock(); err != nil {
@@ -80,7 +84,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 				return fmt.Errorf("installation was cancelled by the user")
 			}
 		}
-	} else {
+	} else if status != install.PackageInstall {
 		if !force {
 			confirm, err := cli.Confirm(fmt.Sprintf("Elastic Agent will be installed at %s and will run as a service. Do you want to continue?", paths.InstallPath), true)
 			if err != nil {
@@ -141,30 +145,33 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 			}
 		}
 	}
+
 	cfgFile := paths.ConfigFile()
-	err = install.Install(cfgFile)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
+	if status != install.PackageInstall {
+		err = install.Install(cfgFile)
 		if err != nil {
-			install.Uninstall(cfgFile)
-		}
-	}()
-
-	if !delayEnroll {
-		err = install.StartService()
-		if err != nil {
-			fmt.Fprintf(streams.Out, "Installation failed to start Elastic Agent service.\n")
 			return err
 		}
 
 		defer func() {
 			if err != nil {
-				install.StopService()
+				install.Uninstall(cfgFile)
 			}
 		}()
+
+		if !delayEnroll {
+			err = install.StartService()
+			if err != nil {
+				fmt.Fprintf(streams.Out, "Installation failed to start Elastic Agent service.\n")
+				return err
+			}
+
+			defer func() {
+				if err != nil {
+					install.StopService()
+				}
+			}()
+		}
 	}
 
 	if enroll {
@@ -180,10 +187,12 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 		}
 		err = enrollCmd.Wait()
 		if err != nil {
-			install.Uninstall(cfgFile)
-			exitErr, ok := err.(*exec.ExitError)
-			if ok {
-				return fmt.Errorf("enroll command failed with exit code: %d", exitErr.ExitCode())
+			if status != install.PackageInstall {
+				install.Uninstall(cfgFile)
+				exitErr, ok := err.(*exec.ExitError)
+				if ok {
+					return fmt.Errorf("enroll command failed with exit code: %d", exitErr.ExitCode())
+				}
 			}
 			return fmt.Errorf("enroll command failed for unknown reason: %s", err)
 		}

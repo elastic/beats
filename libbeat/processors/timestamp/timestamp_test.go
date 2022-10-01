@@ -302,3 +302,38 @@ func TestTimezone(t *testing.T) {
 		})
 	}
 }
+
+func TestMetadataTarget(t *testing.T) {
+	datetime := "2006-01-02T15:04:05Z"
+	c := defaultConfig()
+	c.Field = "@metadata.time"
+	c.TargetField = "@metadata.ts"
+	c.Layouts = append(c.Layouts, time.RFC3339)
+	c.Timezone = cfgtype.MustNewTimezone("EST")
+
+	p, err := newFromConfig(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	evt := &beat.Event{
+		Meta: common.MapStr{
+			"time": datetime,
+		},
+	}
+
+	newEvt, err := p.Run(evt)
+	assert.NoError(t, err)
+
+	expTs, err := time.Parse(time.RFC3339, datetime)
+	assert.NoError(t, err)
+
+	expMeta := common.MapStr{
+		"time": datetime,
+		"ts":   expTs.UTC(),
+	}
+
+	assert.Equal(t, expMeta, newEvt.Meta)
+	assert.Equal(t, evt.Fields, newEvt.Fields)
+	assert.Equal(t, evt.Timestamp, newEvt.Timestamp)
+}

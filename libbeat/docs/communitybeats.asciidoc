@@ -15,7 +15,7 @@ Have a question about developing a community Beat? You can post questions and di
 https://discuss.elastic.co/tags/c/elastic-stack/beats/28/beats-development[Beats discussion forum].
 
 Have you created a Beat that's not listed? Add the name and description of your Beat to the source document for
-https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/announcements[announce] your new Beat in the Elastic
+https://github.com/elastic/beats/blob/main/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/announcements[announce] your new Beat in the Elastic
 discussion forum.
 
 ifndef::dev-guide[]

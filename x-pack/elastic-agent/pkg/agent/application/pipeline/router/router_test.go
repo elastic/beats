@@ -5,7 +5,6 @@
 package router
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -46,13 +45,12 @@ type notifyFunc func(pipeline.RoutingKey, rOp, ...interface{})
 
 func TestRouter(t *testing.T) {
 	programs := []program.Program{program.Program{Spec: program.Supported[1]}}
-	ctx := context.Background()
 
 	t.Run("create new and destroy unused stream", func(t *testing.T) {
 		recorder := &recorder{}
 		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Route(ctx, "hello", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 		})
 
@@ -64,7 +62,7 @@ func TestRouter(t *testing.T) {
 		recorder.reset()
 
 		nk := "NEW_KEY"
-		r.Route(ctx, "hello-2", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{
 			nk: programs,
 		})
 
@@ -82,7 +80,7 @@ func TestRouter(t *testing.T) {
 		recorder := &recorder{}
 		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Route(ctx, "hello", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 			k1:                 programs,
 			k2:                 programs,
@@ -102,7 +100,7 @@ func TestRouter(t *testing.T) {
 		recorder.reset()
 
 		nk := "SECOND_DISPATCH"
-		r.Route(ctx, "hello-2", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{
 			nk: programs,
 		})
 
@@ -120,7 +118,7 @@ func TestRouter(t *testing.T) {
 		recorder := &recorder{}
 		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Route(ctx, "hello", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 		})
 
@@ -131,7 +129,7 @@ func TestRouter(t *testing.T) {
 
 		recorder.reset()
 
-		r.Route(ctx, "hello-2", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 		})
 
@@ -147,7 +145,7 @@ func TestRouter(t *testing.T) {
 		recorder := &recorder{}
 		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Route(ctx, "hello", map[pipeline.RoutingKey][]program.Program{
+		r.Route("hello", map[pipeline.RoutingKey][]program.Program{
 			pipeline.DefaultRK: programs,
 			k1:                 programs,
 			k2:                 programs,
@@ -164,7 +162,7 @@ func TestRouter(t *testing.T) {
 
 		recorder.reset()
 
-		r.Route(ctx, "hello-2", map[pipeline.RoutingKey][]program.Program{})
+		r.Route("hello-2", map[pipeline.RoutingKey][]program.Program{})
 
 		assertOps(t, []event{
 			e(k1, closeOp),
@@ -203,7 +201,7 @@ func newMockStream(rk pipeline.RoutingKey, notify notifyFunc) *mockStream {
 	}
 }
 
-func (m *mockStream) Execute(_ context.Context, req configrequest.Request) error {
+func (m *mockStream) Execute(req configrequest.Request) error {
 	m.event(executeOp, req)
 	return nil
 }

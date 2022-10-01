@@ -76,7 +76,7 @@ func New(
 
 // Start starts the gateway.
 func (w *fleetServerWrapper) Start() error {
-	err := w.emitter(context.Background(), w.injectedCfg)
+	err := w.emitter(w.injectedCfg)
 	if err != nil {
 		return err
 	}

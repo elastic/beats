@@ -76,21 +76,12 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
-		case "journey/end":
+		case "journey/end", "cmd/status":
 			je.end = event.Timestamp
 		}
 	} else {
 		event.Timestamp = time.Now()
 	}
-
-	eventext.MergeEventFields(event, common.MapStr{
-		"event": common.MapStr{
-			"type": se.Type,
-		},
-		"monitor": common.MapStr{
-			"check_group": je.checkGroup,
-		},
-	})
 
 	// Id and name differs for inline and suite monitors
 	// - We use the monitor id and name for inline journeys ignoring the
@@ -104,9 +95,14 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 		name = fmt.Sprintf("%s - %s", name, je.journey.Name)
 	}
 	eventext.MergeEventFields(event, common.MapStr{
+		"event": common.MapStr{
+			"type": se.Type,
+		},
 		"monitor": common.MapStr{
-			"id":   id,
-			"name": name,
+			"check_group": je.checkGroup,
+			"id":          id,
+			"name":        name,
+			"type":        fields.Type,
 		},
 	})
 
@@ -138,7 +134,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		// when an `afterAll` hook fails, for example, we don't wan't to include
 		// a summary in the cmd/status event.
 		if !je.journeyComplete {
-			je.end = event.Timestamp
 			return je.createSummary(event)
 		}
 	case "journey/end":
@@ -185,16 +180,26 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		down = 0
 	}
 
+	// Incase of syntax errors or incorrect runner options, the Synthetics
+	// runner would exit immediately with exitCode 1 and we do not set the duration
+	// to inform the journey never ran
+	if !je.start.IsZero() {
+		eventext.MergeEventFields(event, common.MapStr{
+			"monitor": common.MapStr{
+				"duration": common.MapStr{
+					"us": int64(je.end.Sub(je.start) / time.Microsecond),
+				},
+			},
+		})
+	}
 	eventext.MergeEventFields(event, common.MapStr{
 		"url": je.urlFields,
+		"event": common.MapStr{
+			"type": "heartbeat/summary",
+		},
 		"synthetics": common.MapStr{
 			"type":    "heartbeat/summary",
 			"journey": je.journey,
-		},
-		"monitor": common.MapStr{
-			"duration": common.MapStr{
-				"us": int64(je.end.Sub(je.start) / time.Microsecond),
-			},
 		},
 		"summary": common.MapStr{
 			"up":   up,

@@ -1,0 +1,32 @@
+Dataproc metricset fetches metrics from https://cloud.google.com/dataproc/[Dataproc] in Google Cloud Platform.
+
+The `dataproc` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-dataproc[GCP Dataproc Monitoring API]. The field names have been left untouched for people already familiar with them.
+
+You can specify a single region to fetch metrics like `us-central1`. Be aware that GCP Storage does not use zones so `us-central1-a` will return nothing. If no region is specified, it will return metrics from all buckets.
+
+[float]
+=== Metrics
+Here is a list of metrics collected by `dataproc` metricset:
+
+- `dataproc.batch.spark.executors`: Indicates the number of Batch Spark executors.
+- `dataproc.cluster.hdfs.datanodes`: Indicates the number of HDFS DataNodes that are running inside a cluster.
+- `dataproc.cluster.hdfs.storage_capacity`: Indicates capacity of HDFS system running on cluster in GB.
+- `dataproc.cluster.hdfs.storage_utilization`: The percentage of HDFS storage currently used.
+- `dataproc.cluster.hdfs.unhealthy_blocks`: Indicates the number of unhealthy blocks inside the cluster.
+- `dataproc.cluster.job.completion_time`: The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
+- `dataproc.cluster.job.duration`: The time jobs have spent in a given state.
+- `dataproc.cluster.job.failed_count`: Indicates the number of jobs that have failed on a cluster.
+- `dataproc.cluster.job.running_count`: Indicates the number of jobs that are running on a cluster.
+- `dataproc.cluster.job.submitted_count`: Indicates the number of jobs that have been submitted to a cluster.
+- `dataproc.cluster.operation.completion_time`: The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+- `dataproc.cluster.operation.duration`: The time operations have spent in a given state.
+- `dataproc.cluster.operation.failed_count`: Indicates the number of operations that have failed on a cluster.
+- `dataproc.cluster.operation.running_count`: Indicates the number of operations that are running on a cluster.
+- `dataproc.cluster.operation.submitted_count`: Indicates the number of operations that have been submitted to a cluster.
+- `dataproc.cluster.yarn.allocated_memory_percentage`: The percentage of YARN memory is allocated.
+- `dataproc.cluster.yarn.apps`: Indicates the number of active YARN applications.
+- `dataproc.cluster.yarn.containers`: Indicates the number of YARN containers.
+- `dataproc.cluster.yarn.memory_size`: Indicates the YARN memory size in GB. Sampled every 60 seconds.
+- `dataproc.cluster.yarn.nodemanagers`: Indicates the number of YARN NodeManagers running inside cluster.
+- `dataproc.cluster.yarn.pending_memory_size`: The current memory request, in GB, that is pending to be fulfilled by the scheduler.
+- `dataproc.cluster.yarn.virtual_cores`: Indicates the number of virtual cores in YARN.

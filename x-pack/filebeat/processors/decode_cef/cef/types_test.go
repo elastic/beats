@@ -13,7 +13,7 @@ import (
 )
 
 func TestToTimestamp(t *testing.T) {
-	var times = []string{
+	times := []string{
 		// Unix epoch in milliseconds.
 		"1322004689000",
 
@@ -81,7 +81,7 @@ func TestToTimestampWithTimezone(t *testing.T) {
 }
 
 func TestToMACAddress(t *testing.T) {
-	var macs = []string{
+	macs := []string{
 		// EUI-48 (with and without separators).
 		"00:0D:60:AF:1B:61",
 		"00-0D-60-AF-1B-61",

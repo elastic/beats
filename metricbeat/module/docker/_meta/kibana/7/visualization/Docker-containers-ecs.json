@@ -49,7 +49,7 @@
                     "id": "4",
                     "params": {
                         "customLabel": "DiskIO",
-                        "field": "docker.diskio.total"
+                        "field": "docker.diskio.summary.bytes"
                     },
                     "schema": "metric",
                     "type": "max"

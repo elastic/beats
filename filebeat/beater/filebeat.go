@@ -63,9 +63,7 @@ const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for th
 	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
-var (
-	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
-)
+var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
@@ -381,6 +379,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	adiscover.Start()
 
+	// We start the manager when all the subsystem are initialized and ready to received events.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
@@ -410,6 +413,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			waitEvents.AddChan(fb.done)
 		}
 	}
+
+	// Stop the manager and stop the connection to any dependent services.
+	b.Manager.Stop()
 
 	return nil
 }

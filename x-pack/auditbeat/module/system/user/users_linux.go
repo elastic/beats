@@ -19,6 +19,7 @@ import "C"
 
 import (
 	"crypto/sha512"
+	"fmt"
 	"os/user"
 	"runtime"
 	"strconv"
@@ -27,12 +28,9 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 )
 
-var (
-	epoch = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
-)
+var epoch = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 
 // GetUsers retrieves a list of users using information from
 // /etc/passwd, /etc/group, and - if configured - /etc/shadow.
@@ -84,7 +82,7 @@ func readPasswdFile(readPasswords bool) ([]*User, error) {
 			// getpwent() can return ENOENT even when there is no error,
 			// see https://github.com/systemd/systemd/issues/9585.
 			if err != nil && err != syscall.ENOENT {
-				return users, errors.Wrap(err, "error getting user")
+				return users, fmt.Errorf("error getting user: %w", err)
 			}
 
 			// No more entries
@@ -135,7 +133,7 @@ func enrichWithGroups(users []*User) error {
 
 		groupIds, err := goUser.GroupIds()
 		if err != nil {
-			return errors.Wrapf(err, "error getting group IDs for user %v (UID: %v)", u.Name, u.UID)
+			return fmt.Errorf("error getting group IDs for user %v (UID: %v): %w", u.Name, u.UID, err)
 		}
 
 		for _, gid := range groupIds {
@@ -143,7 +141,7 @@ func enrichWithGroups(users []*User) error {
 			if !found {
 				group, err = user.LookupGroupId(gid)
 				if err != nil {
-					return errors.Wrapf(err, "error looking up group ID %v for user %v (UID: %v)", gid, u.Name, u.UID)
+					return fmt.Errorf("error looking up group ID %v for user %v (UID: %v): %w", gid, u.Name, u.UID, err)
 				}
 				gidCache[gid] = group
 			}
@@ -204,7 +202,7 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 
 		if spwd == nil {
 			if err != nil {
-				return shadowEntries, errors.Wrap(err, "error while reading shadow file")
+				return shadowEntries, fmt.Errorf("error while reading shadow file: %w", err)
 			}
 
 			// No more entries

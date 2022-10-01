@@ -552,3 +552,28 @@
       description: >
         Count of slow operations
 
+    - name: commandstats
+      type: group
+      description: >
+        Redis command statistics
+      fields:
+        - name: "*.calls"
+          type: long
+          description: >
+            The number of calls that reached command execution (not rejected).
+        - name: "*.usec"
+          type: long
+          description: >
+            The total CPU time consumed by these commands.
+        - name: "*.usec_per_call"
+          type: float
+          description: >
+            The average CPU consumed per command execution.
+        - name: "*.rejected_calls"
+          type: long
+          description: >
+            The number of rejected calls (on redis 6.2-rc2).
+        - name: "*.failed_calls"
+          type: long
+          description: >
+            The number of failed calls (on redis 6.2-rc2).

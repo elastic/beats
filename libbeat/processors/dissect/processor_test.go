@@ -152,6 +152,34 @@ func TestProcessor(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		e := &beat.Event{
+			Meta: common.MapStr{
+				"message": "hello world",
+			},
+		}
+		expMeta := common.MapStr{
+			"message": "hello world",
+			"key":     "world",
+		}
+
+		c := map[string]interface{}{
+			"tokenizer":     "hello %{key}",
+			"field":         "@metadata.message",
+			"target_prefix": "@metadata",
+		}
+		cfg, err := common.NewConfigFrom(c)
+		assert.NoError(t, err)
+
+		processor, err := NewProcessor(cfg)
+		assert.NoError(t, err)
+
+		newEvent, err := processor.Run(e)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvent.Meta)
+		assert.Equal(t, e.Fields, newEvent.Fields)
+	})
 }
 
 func TestFieldDoesntExist(t *testing.T) {

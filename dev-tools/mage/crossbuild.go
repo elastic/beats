@@ -43,7 +43,8 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// SelectedPackageTypes is the list of package types
+// SelectedPackageTypes is the list of package types. If empty, all packages types
+// are considered to be selected (see isPackageTypeSelected).
 var SelectedPackageTypes []PackageType
 
 func init() {
@@ -65,7 +66,7 @@ func init() {
 	}
 }
 
-// CrossBuildOption defines a option to the CrossBuild target.
+// CrossBuildOption defines an option to the CrossBuild target.
 type CrossBuildOption func(params *crossBuildParams)
 
 // ImageSelectorFunc returns the name of the builder image.

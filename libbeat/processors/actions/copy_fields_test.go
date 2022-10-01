@@ -168,4 +168,35 @@ func TestCopyFields(t *testing.T) {
 			assert.Equal(t, test.Expected, newEvent.Fields)
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		p := copyFields{
+			copyFieldsConfig{
+				Fields: []fromTo{
+					{
+						From: "@metadata.message",
+						To:   "@metadata.message_copied",
+					},
+				},
+			},
+			log,
+		}
+
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"message": "please copy this line",
+			},
+		}
+
+		expMeta := common.MapStr{
+			"message":        "please copy this line",
+			"message_copied": "please copy this line",
+		}
+
+		newEvent, err := p.Run(event)
+		assert.NoError(t, err)
+
+		assert.Equal(t, expMeta, newEvent.Meta)
+		assert.Equal(t, event.Fields, newEvent.Fields)
+	})
 }

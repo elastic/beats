@@ -22,7 +22,7 @@ package diskio
 
 import (
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 // NewDiskIOStat :init DiskIOStat object.

@@ -22,4 +22,4 @@ package npcap
 
 func loadWinPCAP() error { return nil }
 
-func reloadWinPCAP() error { return nil }
+func unloadWinPCAP() error { return nil }

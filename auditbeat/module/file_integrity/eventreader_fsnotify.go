@@ -21,12 +21,12 @@
 package file_integrity
 
 import (
+	"fmt"
 	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/monitor"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -57,7 +57,7 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	if err := r.watcher.Start(); err != nil {
 		// Ensure that watcher is closed so that we don't leak watchers
 		r.watcher.Close()
-		return nil, errors.Wrap(err, "unable to start watcher")
+		return nil, fmt.Errorf("unable to start watcher: %w", err)
 	}
 
 	queueDone := make(chan struct{})

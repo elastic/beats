@@ -15,15 +15,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	invalidConfig = azureInputConfig{
-		SAKey:            "invalid_key",
-		SAName:           "storage",
-		SAContainer:      ephContainerName,
-		ConnectionString: "invalid_connection_string",
-		ConsumerGroup:    "$Default",
-	}
-)
+var invalidConfig = azureInputConfig{
+	SAKey:            "invalid_key",
+	SAName:           "storage",
+	SAContainer:      ephContainerName,
+	ConnectionString: "invalid_connection_string",
+	ConsumerGroup:    "$Default",
+}
 
 func TestRunWithEPH(t *testing.T) {
 	input := azureInput{config: invalidConfig}

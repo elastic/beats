@@ -40,3 +40,9 @@ func (m Module) ResolveHostFS(path string) string {
 func (m Module) IsSet() bool {
 	return m.UserSetHostFS
 }
+
+func (m Module) Join(path ...string) string {
+	fullpath := append([]string{m.HostFS}, path...)
+	return filepath.Join(fullpath...)
+
+}

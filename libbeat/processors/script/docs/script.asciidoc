@@ -18,7 +18,6 @@ file or by pointing the processor at external file(s).
 processors:
   - script:
       lang: javascript
-      id: my_filter
       source: >
         function process(event) {
             event.Tag("js");
@@ -32,7 +31,6 @@ This loads `filter.js` from disk.
 processors:
   - script:
       lang: javascript
-      id: my_filter
       file: ${path.config}/filter.js
 ----
 
@@ -45,7 +43,7 @@ code must define a `register(params)` function to receive the parameters.
 processors:
   - script:
       lang: javascript
-      id: my_filter
+      tag: my_filter
       params:
         threshold: 15
       source: >

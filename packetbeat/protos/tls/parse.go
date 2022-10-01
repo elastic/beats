@@ -18,7 +18,7 @@
 package tls
 
 import (
-	"crypto/dsa"
+	"crypto/dsa" //lint:ignore SA1019 Deprecated, but still used. So we have to handle it.
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"

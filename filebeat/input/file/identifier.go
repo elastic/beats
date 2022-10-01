@@ -36,13 +36,11 @@ const (
 	identitySep           = "::"
 )
 
-var (
-	identifierFactories = map[string]IdentifierFactory{
-		nativeName:      newINodeDeviceIdentifier,
-		pathName:        newPathIdentifier,
-		inodeMarkerName: newINodeMarkerIdentifier,
-	}
-)
+var identifierFactories = map[string]IdentifierFactory{
+	nativeName:      newINodeDeviceIdentifier,
+	pathName:        newPathIdentifier,
+	inodeMarkerName: newINodeMarkerIdentifier,
+}
 
 type IdentifierFactory func(*common.Config) (StateIdentifier, error)
 

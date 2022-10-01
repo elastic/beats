@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/otiai10/copy"
-	"go.elastic.co/apm"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -108,15 +107,12 @@ func (u *Upgrader) Upgradeable() bool {
 // Upgrade upgrades running agent, function returns shutdown callback if some needs to be executed for cases when
 // reexec is called by caller.
 func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ reexec.ShutdownCallbackFn, err error) {
-	span, ctx := apm.StartSpan(ctx, "upgrade", "app.internal")
-	defer span.End()
 	// report failed
 	defer func() {
 		if err != nil {
 			if action := a.FleetAction(); action != nil {
 				u.reportFailure(ctx, action, err)
 			}
-			apm.CaptureError(ctx, err).Send()
 		}
 	}()
 

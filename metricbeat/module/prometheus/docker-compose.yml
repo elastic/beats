@@ -1,17 +1,20 @@
 version: '2.3'
 
 services:
-  prometheus:
+  prometheus_base:
     image: docker.elastic.co/integrations-ci/beats-prometheus:${PROMETHEUS_VERSION:-2.6.0}-2
     build:
       context: ./_meta
       args:
         PROMETHEUS_VERSION: ${PROMETHEUS_VERSION:-2.6.0}
+  prometheus:
+    extends:
+      service: prometheus_base
     ports:
       - 9090
   # this service is to be used by system-tests for remote_write metricset, so as
   # Prometheus service to send metrics to Metricbeat running on the host.
   prometheus-host-network:
     extends:
-      service: prometheus
+      service: prometheus_base
     network_mode: host

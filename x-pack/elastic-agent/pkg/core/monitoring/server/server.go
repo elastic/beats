@@ -13,12 +13,12 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"go.elastic.co/apm"
-	"go.elastic.co/apm/module/apmgorilla"
 
 	"github.com/elastic/beats/v7/libbeat/api"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report/buffer"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
@@ -30,7 +30,7 @@ func New(
 	ns func(string) *monitoring.Namespace,
 	routesFetchFn func() *sorted.Set,
 	enableProcessStats bool,
-	tracer *apm.Tracer,
+	enableBuffer bool,
 ) (*api.Server, error) {
 	if err := createAgentMonitoringDrop(endpointConfig.Host); err != nil {
 		// log but ignore
@@ -42,21 +42,11 @@ func New(
 		return nil, err
 	}
 
-	return exposeMetricsEndpoint(log, cfg, ns, routesFetchFn, enableProcessStats, tracer)
+	return exposeMetricsEndpoint(log, cfg, ns, routesFetchFn, enableProcessStats, enableBuffer)
 }
 
-func exposeMetricsEndpoint(
-	log *logger.Logger,
-	config *common.Config,
-	ns func(string) *monitoring.Namespace,
-	routesFetchFn func() *sorted.Set,
-	enableProcessStats bool,
-	tracer *apm.Tracer,
-) (*api.Server, error) {
+func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace, routesFetchFn func() *sorted.Set, enableProcessStats bool, enableBuffer bool) (*api.Server, error) {
 	r := mux.NewRouter()
-	if tracer != nil {
-		r.Use(apmgorilla.Middleware(apmgorilla.WithTracer(tracer)))
-	}
 	statsHandler := statsHandler(ns("stats"))
 	r.Handle("/stats", createHandler(statsHandler))
 
@@ -65,6 +55,14 @@ func exposeMetricsEndpoint(
 		r.Handle("/processes/{processID}", createHandler(processHandler(statsHandler)))
 		r.Handle("/processes/{processID}/", createHandler(processHandler(statsHandler)))
 		r.Handle("/processes/{processID}/{beatsPath}", createHandler(processHandler(statsHandler)))
+	}
+
+	if enableBuffer {
+		bufferReporter, err := buffer.MakeReporter(beat.Info{}, config) // beat.Info is not used by buffer reporter
+		if err != nil {
+			return nil, fmt.Errorf("unable to create buffer reporter for elastic-agent: %w", err)
+		}
+		r.Handle("/buffer", bufferReporter)
 	}
 
 	mux := http.NewServeMux()

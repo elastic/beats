@@ -3,16 +3,25 @@ queue_rules:
     conditions:
       - check-success=beats-ci/pr-merge
 pull_request_rules:
-  - name: forward-port patches to master branch
+  - name: self-assign PRs
+    conditions:
+      - -merged
+      - -closed
+      - "#assignee=0"
+    actions:
+      assign:
+        add_users:
+          - "{{ author }}"
+  - name: forward-port patches to main branch
     conditions:
       - merged
-      - label=forwardport-master
+      - label=forwardport-main
     actions:
       backport:
         assignees:
           - "{{ author }}"
         branches:
-          - "master"
+          - "main"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
@@ -135,7 +144,7 @@ pull_request_rules:
   - name: notify the backport policy
     conditions:
       - -label~=^backport
-      - base=master
+      - base=main
       - -merged
       - -closed
     actions:
@@ -221,6 +230,19 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "8.0"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.1 branch
+    conditions:
+      - merged
+      - label=backport-v8.1.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.1"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

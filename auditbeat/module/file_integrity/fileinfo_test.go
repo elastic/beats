@@ -86,7 +86,7 @@ func TestNewMetadata(t *testing.T) {
 		assert.Equal(t, group.Name, meta.Group)
 		assert.Empty(t, meta.SID)
 
-		assert.EqualValues(t, 0600, meta.Mode)
+		assert.EqualValues(t, 0o600, meta.Mode)
 	}
 
 	assert.EqualValues(t, len("metadata test"), meta.Size, "size")
@@ -127,9 +127,9 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 	}
 
 	for _, flags := range []os.FileMode{
-		0600 | os.ModeSetuid,
-		0600 | os.ModeSetgid,
-		0600 | os.ModeSetuid | os.ModeSetuid,
+		0o600 | os.ModeSetuid,
+		0o600 | os.ModeSetgid,
+		0o600 | os.ModeSetuid | os.ModeSetuid,
 	} {
 		msg := fmt.Sprintf("checking flags %04o", flags)
 		if err = os.Chmod(f.Name(), flags); err != nil {

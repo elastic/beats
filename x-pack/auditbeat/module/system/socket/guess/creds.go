@@ -57,9 +57,7 @@ func init() {
 	}
 }
 
-type guessStructCreds struct {
-	ctx Context
-}
+type guessStructCreds struct{}
 
 // Name of this guess.
 func (g *guessStructCreds) Name() string {
@@ -100,7 +98,7 @@ func (g *guessStructCreds) Probes() ([]helper.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessStructCreds) Prepare(ctx Context) error {
+func (g *guessStructCreds) Prepare(Context) error {
 	return nil
 }
 

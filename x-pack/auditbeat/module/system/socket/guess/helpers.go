@@ -9,10 +9,10 @@ package guess
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"math/rand"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -29,17 +29,17 @@ func createSocketWithProto(proto int, bindAddr unix.SockaddrInet4) (fd int, addr
 	}
 	if err = unix.Bind(fd, &bindAddr); err != nil {
 		unix.Close(fd)
-		return -1, addr, errors.Wrap(err, "bind failed")
+		return -1, addr, fmt.Errorf("bind failed: %w", err)
 	}
 	sa, err := unix.Getsockname(fd)
 	if err != nil {
 		unix.Close(fd)
-		return -1, addr, errors.Wrap(err, "getsockname failed")
+		return -1, addr, fmt.Errorf("getsockname failed: %w", err)
 	}
 	addrptr, ok := sa.(*unix.SockaddrInet4)
 	if !ok {
 		unix.Close(fd)
-		return -1, addr, errors.Wrap(err, "getsockname didn't return a struct sockaddr_in")
+		return -1, addr, errors.New("getsockname didn't return a struct sockaddr_in")
 	}
 	return fd, *addrptr, nil
 }
@@ -56,15 +56,15 @@ func createSocket6WithProto(proto int, bindAddr unix.SockaddrInet6) (fd int, add
 		}
 	}()
 	if err = unix.Bind(fd, &bindAddr); err != nil {
-		return -1, addr, errors.Wrap(err, "bind failed")
+		return -1, addr, fmt.Errorf("bind failed: %w", err)
 	}
 	sa, err := unix.Getsockname(fd)
 	if err != nil {
-		return -1, addr, errors.Wrap(err, "getsockname failed")
+		return -1, addr, fmt.Errorf("getsockname failed: %w", err)
 	}
 	addrptr, ok := sa.(*unix.SockaddrInet6)
 	if !ok {
-		return -1, addr, errors.Wrap(err, "getsockname didn't return a struct sockaddr_in")
+		return -1, addr, errors.New("getsockname didn't return a struct sockaddr_in")
 	}
 	return fd, *addrptr, nil
 }

@@ -191,7 +191,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		"multibad": {Enabled: &disabled},
 	}
 	configs := []*ModuleConfig{
-		&ModuleConfig{"foo", &enabled, filesetConfigs},
+		{"foo", &enabled, filesetConfigs},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))

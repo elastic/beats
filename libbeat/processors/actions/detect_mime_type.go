@@ -54,7 +54,7 @@ func NewDetectMimeType(cfg *common.Config) (processors.Processor, error) {
 func (m *mimeTypeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	valI, err := event.GetValue(m.Field)
 	if err != nil {
-		// doesn't have the required fieldd value to analyze
+		// doesn't have the required field value to analyze
 		return event, nil
 	}
 	val, _ := valI.(string)
@@ -63,11 +63,9 @@ func (m *mimeTypeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 	if mimeType := mime.Detect(val); mimeType != "" {
-		event.Fields.DeepUpdate(common.MapStr{
-			m.Target: mimeType,
-		})
+		_, err = event.PutValue(m.Target, mimeType)
 	}
-	return event, nil
+	return event, err
 }
 
 func (m *mimeTypeProcessor) String() string {

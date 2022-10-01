@@ -17,8 +17,11 @@ import (
 
 // LogPathMatcherName is the name of LogPathMatcher
 const LogPathMatcherName = "logs_path"
-const pathSeparator = string(os.PathSeparator)
-const allocIDRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+
+const (
+	pathSeparator = string(os.PathSeparator)
+	allocIDRegex  = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+)
 
 // const allocIDTypeRegex = "([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}).*(stdout|stderr)"
 
@@ -26,11 +29,11 @@ func init() {
 	add_nomad_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
 	cfg := common.NewConfig()
 
-	//Add a container indexer config by default.
+	// Add a container indexer config by default.
 	add_nomad_metadata.Indexing.AddDefaultIndexerConfig(add_nomad_metadata.AllocationNameIndexerName, *cfg)
 	add_nomad_metadata.Indexing.AddDefaultIndexerConfig(add_nomad_metadata.AllocationUUIDIndexerName, *cfg)
 
-	//Add a log path matcher which can extract container ID from the "source" field.
+	// Add a log path matcher which can extract container ID from the "source" field.
 	add_nomad_metadata.Indexing.AddDefaultMatcherConfig(LogPathMatcherName, *cfg)
 }
 

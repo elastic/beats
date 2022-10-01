@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/go-libaudit/v2"
@@ -69,13 +68,13 @@ func init() {
 func showAuditdRules() error {
 	client, err := libaudit.NewAuditClient(nil)
 	if err != nil {
-		return errors.Wrap(err, "failed to create audit client")
+		return fmt.Errorf("failed to create audit client: %w", err)
 	}
 	defer client.Close()
 
 	rules, err := client.GetRules()
 	if err != nil {
-		return errors.Wrap(err, "failed to list existing rules")
+		return fmt.Errorf("failed to list existing rules: %w", err)
 	}
 
 	for idx, raw := range rules {
@@ -96,13 +95,13 @@ func showAuditdRules() error {
 func showAuditdStatus() error {
 	client, err := libaudit.NewAuditClient(nil)
 	if err != nil {
-		return errors.Wrap(err, "failed to create audit client")
+		return fmt.Errorf("failed to create audit client: %w", err)
 	}
 	defer client.Close()
 
 	status, err := client.GetStatus()
 	if err != nil {
-		return errors.Wrap(err, "failed to get audit status")
+		return fmt.Errorf("failed to get audit status: %w", err)
 	}
 
 	if status.FeatureBitmap == libaudit.AuditFeatureBitmapBacklogWaitTime {

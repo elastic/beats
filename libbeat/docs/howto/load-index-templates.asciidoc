@@ -133,12 +133,6 @@ ifdef::mac_os[]
 ./{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 
-*brew:*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
-----
 endif::mac_os[]
 
 ifdef::linux_os[]
@@ -257,12 +251,6 @@ ifdef::mac_os[]
 ./{beatname_lc} export template > {beatname_lc}.template.json
 ----
 
-*brew:*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} export template > {beatname_lc}.template.json
-----
 endif::mac_os[]
 
 ifdef::linux_os[]

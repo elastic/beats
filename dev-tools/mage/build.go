@@ -70,6 +70,8 @@ func DefaultBuildArgs() BuildArgs {
 	} else {
 		// Strip all debug symbols from binary (does not affect Go stack traces).
 		args.LDFlags = append(args.LDFlags, "-s")
+		// Remove all file system paths from the compiled executable, to improve build reproducibility
+		args.ExtraFlags = append(args.ExtraFlags, "-trimpath")
 	}
 
 	return args

@@ -14,9 +14,9 @@ Note: This changelog documents the current changes which are not yet present in
 an actual release.
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-rc2..master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-rc2..main[Check the HEAD diff]
 
-The list below covers the major changes between 7.0.0-rc2 and master only.
+The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Breaking changes
 
@@ -59,6 +59,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Removed Beat generators. {pull}28816[28816]
 - libbeat.logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
 - Removed deprecated disk spool from Beats. Use disk queue instead. {pull}28869[28869]
+- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
 
 ==== Bugfixes
 
@@ -132,6 +133,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add support for `credentials_json` in `gcp` module, all metricsets {pull}29584[29584]
 - Add gcp firestore metricset. {pull}29918[29918]
 - Added TESTING_FILEBEAT_FILEPATTERN option for filebeat module pytests {pull}30103[30103]
+- Add gcp dataproc metricset. {pull}30008[30008]
 
 ==== Deprecated
 

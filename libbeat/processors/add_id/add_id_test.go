@@ -63,3 +63,25 @@ func TestNonDefaultTargetField(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Empty(t, v)
 }
+
+func TestNonDefaultMetadataTarget(t *testing.T) {
+	cfg := common.MustNewConfigFrom(common.MapStr{
+		"target_field": "@metadata.foo",
+	})
+	p, err := New(cfg)
+	assert.NoError(t, err)
+
+	testEvent := &beat.Event{
+		Meta: common.MapStr{},
+	}
+
+	newEvent, err := p.Run(testEvent)
+	assert.NoError(t, err)
+
+	v, err := newEvent.Meta.GetValue("foo")
+	assert.NoError(t, err)
+	assert.NotEmpty(t, v)
+
+	v, err = newEvent.GetValue("@metadata._id")
+	assert.Error(t, err)
+}

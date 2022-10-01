@@ -129,7 +129,6 @@ func NewHarvester(
 	publishState func(file.State) bool,
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
-
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, err
@@ -306,7 +305,7 @@ func (h *Harvester) Run() error {
 		}
 	}(h.state.Source)
 
-	logger.Info("Harvester started for file.")
+	logger.Infof("Harvester started for paths: %v", h.config.Paths)
 
 	h.doneWg.Add(1)
 	go func() {

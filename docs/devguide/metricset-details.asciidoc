@@ -315,7 +315,7 @@ TODO: The following parts should be added as soon as the content exists or the i
 
 [float]
 == Field naming
-https://github.com/elastic/beats/blob/master/metricbeat/module/doc.go
+https://github.com/elastic/beats/blob/main/metricbeat/module/doc.go
 
 [float]
 == Dashboards

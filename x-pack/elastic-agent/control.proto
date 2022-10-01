@@ -167,6 +167,19 @@ message PprofResponse {
 	repeated PprofResult results = 1;
 }
 
+// MetricsResponse is the result of a request for the metrics buffer endpoint for a application/route key
+message MetricsResponse {
+	string appName = 1;
+	string routeKey = 2;
+	bytes result = 3;
+	string error = 4;
+}
+
+// ProcMetricsResponse is a wrapper to return all metrics buffer responses
+message ProcMetricsResponse {
+	repeated MetricsResponse result = 1;
+}
+
 service ElasticAgentControl {
   // Fetches the currently running version of the Elastic Agent.
   rpc Version(Empty) returns (VersionResponse);
@@ -185,4 +198,7 @@ service ElasticAgentControl {
 
   // Gather requested pprof data from specified applications.
   rpc Pprof(PprofRequest) returns (PprofResponse);
+
+  // Gather all running process metrics.
+  rpc ProcMetrics(Empty) returns (ProcMetricsResponse);
 }

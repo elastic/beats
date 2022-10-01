@@ -25,27 +25,6 @@
         "url.original": "/"
     },
     {
-        "@timestamp": "2019-06-11T15:03:32.777Z",
-        "elasticsearch.audit.component": "o.e.x.s.a.AuthenticationService",
-        "elasticsearch.audit.message": "Authentication of [elastic] was terminated by realm [reserved] - failed to authenticate user [elastic]",
-        "elasticsearch.cluster.name": "docker-cluster",
-        "elasticsearch.cluster.uuid": "xEiKc6ipRiyzU8_8czXrJw",
-        "elasticsearch.node.id": "Xaq2BFVcQ1OhyMrjL8gNOg",
-        "elasticsearch.node.name": "dff7befc418f",
-        "event.category": "database",
-        "event.dataset": "elasticsearch.audit",
-        "event.kind": "event",
-        "event.module": "elasticsearch",
-        "event.outcome": "failure",
-        "fileset.name": "audit",
-        "host.id": "Xaq2BFVcQ1OhyMrjL8gNOg",
-        "input.type": "log",
-        "log.level": "INFO",
-        "log.offset": 299,
-        "message": "{\"type\": \"server\", \"timestamp\": \"2019-06-11T15:03:32,777+0000\", \"level\": \"INFO\", \"component\": \"o.e.x.s.a.AuthenticationService\", \"cluster.name\": \"docker-cluster\", \"node.name\": \"dff7befc418f\", \"cluster.uuid\": \"xEiKc6ipRiyzU8_8czXrJw\", \"node.id\": \"Xaq2BFVcQ1OhyMrjL8gNOg\",  \"message\": \"Authentication of [elastic] was terminated by realm [reserved] - failed to authenticate user [elastic]\"  }",
-        "service.type": "elasticsearch"
-    },
-    {
         "@timestamp": "2019-06-11T15:03:32.778Z",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",

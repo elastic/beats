@@ -3,7 +3,7 @@
 The source files for the general Elastic Agent documentation are currently stored
 in the [observability-docs](https://github.com/elastic/observability-docs) repo. The following docs are only focused on getting developers started building code for Elastic Agent.
 
-## Testing 
+## Testing
 
 Prerequisites:
 - installed [mage](https://github.com/magefile/mage)
@@ -29,10 +29,10 @@ for the standard variant.
 ### Testing Elastic Agent on Kubernetes
 
 #### Prerequisites
-- create kubernetes cluster using kind, check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
-- deploy kube-state-metrics, check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
+- create kubernetes cluster using kind, check [here](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
+- deploy kube-state-metrics, check [here](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
 - deploy required infrastructure:
-  - for elastic agent in standalone mode: EK stack or use [elastic cloud](https://cloud.elastic.co), check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
+  - for elastic agent in standalone mode: EK stack or use [elastic cloud](https://cloud.elastic.co), check [here](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
   - for managed mode: use [elastic cloud](https://cloud.elastic.co) or bring up the stack on docker and then connect docker network with kubernetes kind nodes:
   ```
   elastic-package stack up -d -v
@@ -67,7 +67,7 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/${ELASTIC_AGENT_VERSI
       - name: elastic-agent
         image: custom-agent-image:latest
         imagePullPolicy: Never
-    ``` 
+    ```
     - set environment variables accordingly to the used setup.
 
     Elastic-agent in standalone mode: set `ES_USERNAME`, `ES_PASSWORD`,`ES_HOST`.

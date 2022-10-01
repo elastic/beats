@@ -25,7 +25,7 @@ import (
 	"math/bits"
 	"strings"
 
-	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/v3/host"
 )
 
 func CheckNativePlatformCompat() error {

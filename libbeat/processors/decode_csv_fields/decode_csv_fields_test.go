@@ -338,6 +338,37 @@ func TestDecodeCSVField(t *testing.T) {
 			assert.NoError(t, err)
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		config := common.MapStr{
+			"fields": common.MapStr{
+				"@metadata": common.MapStr{
+					"field": "@metadata.message",
+				},
+			},
+		}
+
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"field": "17,192.168.33.1,8.8.8.8",
+			},
+			Fields: common.MapStr{},
+		}
+		expMeta := common.MapStr{
+			"field":   "17,192.168.33.1,8.8.8.8",
+			"message": []string{"17", "192.168.33.1", "8.8.8.8"},
+		}
+
+		processor, err := NewDecodeCSVField(common.MustNewConfigFrom(config))
+		if err != nil {
+			t.Fatal(err)
+		}
+		result, err := processor.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, result.Meta)
+		assert.Equal(t, event.Fields, result.Fields)
+	})
+
 }
 
 func TestDecodeCSVField_String(t *testing.T) {

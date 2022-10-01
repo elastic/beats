@@ -40,7 +40,6 @@ func (conf *azureInputConfig) Validate() error {
 	}
 	if conf.SAContainer == "" {
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
-
 	}
 	err := storageContainerValidate(conf.SAContainer)
 	if err != nil {

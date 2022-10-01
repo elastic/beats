@@ -354,18 +354,36 @@ endif::serverless[]
 ifdef::export_pipeline[]
 [[pipeline-subcommand]]
 *`pipeline`*::
-Exports the ingest piplines.  You must specify the `--es.version` to which
-the pipelines should be exported.  You can optionally specify `--dir` to control
-where the pipelines are written.
+
+Exports the ingest piplines.  You must specify the `--es.version` to
+specify which version of {es} the pipelines should be compatible with.
+You can optionally specify `--dir` to control where the pipelines are
+written.
+
 endif::export_pipeline[]
 
 *FLAGS*
 
+ifdef::export_pipeline[]
 *`--es.version VERSION`*::
+
 When used with <<template-subcommand,`template`>>, exports an index
-template that is compatible with the specified version.
-When used with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy
-if the specified ES version is enabled for ILM.
+template that is compatible with the specified version.  When used
+with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy if
+the specified ES version is enabled for ILM.  When used with
+<<pipeline-subcommand, `pipeline`>>, exports versions of the pipeline
+that is compatible with the specified version.
+endif::export_pipeline[]
+
+ifndef::export_pipeline[]
+*`--es.version VERSION`*::
+
+When used with <<template-subcommand,`template`>>, exports an index
+template that is compatible with the specified version.  When used
+with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy if
+the specified ES version is enabled for ILM.
+endif::export_pipeline[]
+
 
 *`-h, --help`*::
 Shows help for the `export` command.
@@ -376,8 +394,9 @@ the index template. If this flag is not specified, the default base name is
 +{beatname_lc}+.
 
 *`--dir DIRNAME`*::
-Define a directory to which the template and ILM policy should be exported to
-as files instead of printing them to `stdout`.
+
+Define a directory to which the template, pipelines, and ILM policy
+should be exported to as files instead of printing them to `stdout`.
 
 ifndef::no_dashboards[]
 *`--id DASHBOARD_ID`*::

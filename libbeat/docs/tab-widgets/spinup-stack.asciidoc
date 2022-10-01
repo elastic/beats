@@ -5,5 +5,5 @@ available on AWS, GCP, and Azure. {ess-trial}[Try it out for free].
 // end::cloud[]
 
 // tag::self-managed[]
-See {stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}].
+To install and run {es} and {kib}, see {stack-ref}/installing-elastic-stack.html[Installing the {stack}].
 // end::self-managed[]

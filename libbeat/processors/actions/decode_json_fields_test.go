@@ -257,6 +257,46 @@ func TestTargetRootOption(t *testing.T) {
 	assert.Equal(t, expected.String(), actual.String())
 }
 
+func TestTargetMetadata(t *testing.T) {
+	event := &beat.Event{
+		Fields: common.MapStr{
+			"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
+			"pipeline": "us1",
+		},
+		Meta: common.MapStr{},
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"process_array": false,
+		"max_depth":     2,
+		"target":        "@metadata.json",
+	})
+
+	log := logp.NewLogger("decode_json_fields_test")
+
+	p, err := NewDecodeJSONFields(testConfig)
+	if err != nil {
+		log.Error("Error initializing decode_json_fields")
+		t.Fatal(err)
+	}
+
+	actual, _ := p.Run(event)
+
+	expectedMeta := common.MapStr{
+		"json": map[string]interface{}{
+			"log": map[string]interface{}{
+				"level": "info",
+			},
+			"stream": "stderr",
+			"count":  int64(3),
+		},
+	}
+
+	assert.Equal(t, expectedMeta, actual.Meta)
+	assert.Equal(t, event.Fields, actual.Fields)
+}
+
 func TestNotJsonObjectOrArray(t *testing.T) {
 	var cases = []struct {
 		MaxDepth int

@@ -132,7 +132,7 @@ func TestCreateDir(t *testing.T) {
 		fileInfo, err := os.Stat(stateDir)
 		if assert.NoError(t, err) {
 			assert.Equal(t, true, fileInfo.IsDir())
-			assert.Equal(t, os.FileMode(0750), fileInfo.Mode().Perm())
+			assert.Equal(t, os.FileMode(0o750), fileInfo.Mode().Perm())
 		}
 	}
 }

@@ -271,60 +271,6 @@ func (t Type) String() string {
 	}
 }
 
-const (
-	apacheCassandraTypePrefix = "org.apache.cassandra.db.marshal."
-)
-
-// get Apache Cassandra types
-func getApacheCassandraType(class string) Type {
-	switch strings.TrimPrefix(class, apacheCassandraTypePrefix) {
-	case "AsciiType":
-		return TypeASCII
-	case "LongType":
-		return TypeBigInt
-	case "BytesType":
-		return TypeBlob
-	case "BooleanType":
-		return TypeBoolean
-	case "CounterColumnType":
-		return TypeCounter
-	case "DecimalType":
-		return TypeDecimal
-	case "DoubleType":
-		return TypeDouble
-	case "FloatType":
-		return TypeFloat
-	case "Int32Type":
-		return TypeInt
-	case "ShortType":
-		return TypeSmallInt
-	case "ByteType":
-		return TypeTinyInt
-	case "DateType", "TimestampType":
-		return TypeTimestamp
-	case "UUIDType", "LexicalUUIDType":
-		return TypeUUID
-	case "UTF8Type":
-		return TypeVarchar
-	case "IntegerType":
-		return TypeVarint
-	case "TimeUUIDType":
-		return TypeTimeUUID
-	case "InetAddressType":
-		return TypeInet
-	case "MapType":
-		return TypeMap
-	case "ListType":
-		return TypeList
-	case "SetType":
-		return TypeSet
-	case "TupleType":
-		return TypeTuple
-	default:
-		return TypeCustom
-	}
-}
-
 // error Types
 type ErrType int
 
@@ -564,15 +510,6 @@ const (
 	flagGlobalTableSpec int = 0x01
 	flagHasMorePages    int = 0x02
 	flagNoMetaData      int = 0x04
-
-	// query flags
-	flagValues                byte = 0x01
-	flagSkipMetaData          byte = 0x02
-	flagPageSize              byte = 0x04
-	flagWithPagingState       byte = 0x08
-	flagWithSerialConsistency byte = 0x10
-	flagDefaultTimestamp      byte = 0x20
-	flagWithNameValues        byte = 0x40
 
 	// header flags
 	flagDefault       byte = 0x00

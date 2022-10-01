@@ -9,6 +9,7 @@ package socket
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -17,7 +18,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -228,6 +228,9 @@ type process struct {
 	// populated by state from created
 	createdTime time.Time
 
+	// populated after createdTime is adjusted.
+	entityID string
+
 	// populated by DNS enrichment.
 	resolvedDomains map[string]string
 }
@@ -435,8 +438,10 @@ func (s *state) DoneFlows() linkedList {
 	return r
 }
 
-var lastEvents uint64
-var lastTime time.Time
+var (
+	lastEvents uint64
+	lastTime   time.Time
+)
 
 func (s *state) logState() {
 	s.Lock()
@@ -467,7 +472,6 @@ func (s *state) logState() {
 	} else {
 		s.log.Warnf("%s. Warnings: %v", msg, errs)
 	}
-
 }
 
 func (s *state) reapLoop() {
@@ -1031,6 +1035,9 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			process["executable"] = f.process.path
 			if f.process.createdTime != (time.Time{}) {
 				process["created"] = f.process.createdTime
+			}
+			if f.process.entityID != "" {
+				process["entity_id"] = f.process.entityID
 			}
 
 			if f.process.hasCreds {

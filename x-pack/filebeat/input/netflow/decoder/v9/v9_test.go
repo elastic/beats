@@ -153,7 +153,7 @@ func TestSessionReset(t *testing.T) {
 	flowsPacket := []uint16{
 		// Header
 		// Version, Count, Uptime, Ts, SeqNo, Source
-		9, 1, 11, 11, 22, 22, 00, 33, 0, 1234,
+		9, 1, 11, 11, 22, 22, 0o0, 33, 0, 1234,
 		// Set #1 (template)
 		999, 16, /*len of set*/
 		1, 1,

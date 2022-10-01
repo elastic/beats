@@ -99,19 +99,6 @@ ifndef::win_only[]
 
 endif::win_only[]
 
-ifdef::mac_os[]
-===== brew
-[cols="<h,<,<m",options="header",]
-|=======================================================================
-| Type   | Description | Location
-| home   | Home of the {beatname_uc} installation. | /usr/local/var/homebrew/linked/{beatname_lc}-full
-| bin    | The location for the binary files. | /usr/local/var/homebrew/linked/{beatname_lc}-full/bin
-| config | The location for configuration files. | /usr/local/etc/{beatname_lc}
-| data   | The location for persistent data files. | /usr/local/var/lib/{beatname_lc}
-| logs   | The location for the logs created by {beatname_uc}. | /usr/local/var/log/{beatname_lc}
-|=======================================================================
-endif::mac_os[]
-
 ifdef::win_only[]
 
 ["source","sh",subs="attributes"]

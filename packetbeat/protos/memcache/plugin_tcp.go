@@ -152,7 +152,7 @@ func (mc *memcache) memcacheParseTCP(
 		debug("stream(%p) try to content", stream)
 		msg, err := stream.parse(pkt.Ts)
 		if err != nil {
-			// parsing error, drop tcp stream and retry with next segement
+			// parsing error, drop tcp stream and retry with next segment
 			debug("Ignore Memcache message, drop tcp stream: %v", err)
 			mc.pushAllTCPTrans(conn)
 			tcpConn.drop(dir)
@@ -372,7 +372,7 @@ func (mc *memcache) GapInStream(
 		parser.state == parseStateIncompleteData
 	if inData {
 		if msg == nil {
-			logp.WTF("parser message is nil on data load")
+			logp.NewLogger("memcache").DPanic("parser message is nil on data load")
 			return private, true
 		}
 

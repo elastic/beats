@@ -8,8 +8,6 @@ import (
 	"context"
 	"fmt"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
@@ -41,14 +39,7 @@ type upgraderControl interface {
 }
 
 // New creates a new Agent and bootstrap the required subsystem.
-func New(
-	log *logger.Logger,
-	reexec reexecManager,
-	statusCtrl status.Controller,
-	uc upgraderControl,
-	agentInfo *info.AgentInfo,
-	tracer *apm.Tracer,
-) (Application, error) {
+func New(log *logger.Logger, reexec reexecManager, statusCtrl status.Controller, uc upgraderControl, agentInfo *info.AgentInfo) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
@@ -62,7 +53,7 @@ func New(
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo, tracer)
+	return createApplication(log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
 }
 
 func createApplication(
@@ -73,7 +64,6 @@ func createApplication(
 	statusCtrl status.Controller,
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
-	tracer *apm.Tracer,
 ) (Application, error) {
 	log.Info("Detecting execution mode")
 	ctx := context.Background()
@@ -84,7 +74,7 @@ func createApplication(
 
 	if configuration.IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, paths.ConfigFile(), rawConfig, reexec, statusCtrl, uc, agentInfo, tracer)
+		return newLocal(ctx, log, paths.ConfigFile(), rawConfig, reexec, statusCtrl, uc, agentInfo)
 	}
 
 	// not in standalone; both modes require reading the fleet.yml configuration file
@@ -96,11 +86,11 @@ func createApplication(
 
 	if configuration.IsFleetServerBootstrap(cfg.Fleet) {
 		log.Info("Agent is in Fleet Server bootstrap mode")
-		return newFleetServerBootstrap(ctx, log, pathConfigFile, rawConfig, statusCtrl, agentInfo, tracer)
+		return newFleetServerBootstrap(ctx, log, pathConfigFile, rawConfig, statusCtrl, agentInfo)
 	}
 
 	log.Info("Agent is managed by Fleet")
-	return newManaged(ctx, log, store, cfg, rawConfig, reexec, statusCtrl, agentInfo, tracer)
+	return newManaged(ctx, log, store, cfg, rawConfig, reexec, statusCtrl, agentInfo)
 }
 
 func mergeFleetConfig(rawConfig *config.Config) (storage.Store, *configuration.Configuration, error) {

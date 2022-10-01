@@ -11,8 +11,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
@@ -29,11 +27,12 @@ type AckEvent struct {
 	Message   string `json:"message,omitempty"` // : 'hello2',
 	Payload   string `json:"payload,omitempty"` // : 'payload2',
 
-	ActionData     json.RawMessage        `json:"action_data,omitempty"`     // copy of original action data
-	ActionResponse map[string]interface{} `json:"action_response,omitempty"` // custom (per beat) response payload
-	StartedAt      string                 `json:"started_at,omitempty"`      // time action started
-	CompletedAt    string                 `json:"completed_at,omitempty"`    // time action completed
-	Error          string                 `json:"error,omitempty"`           // optional action error
+	ActionInputType string                 `json:"action_input_type,omitempty"` // copy of original action input_type
+	ActionData      json.RawMessage        `json:"action_data,omitempty"`       // copy of original action data
+	ActionResponse  map[string]interface{} `json:"action_response,omitempty"`   // custom (per beat) response payload
+	StartedAt       string                 `json:"started_at,omitempty"`        // time action started
+	CompletedAt     string                 `json:"completed_at,omitempty"`      // time action completed
+	Error           string                 `json:"error,omitempty"`             // optional action error
 }
 
 // AckRequest consists of multiple actions acked to fleet ui.
@@ -81,29 +80,24 @@ func NewAckCmd(info agentInfo, client client.Sender) *AckCmd {
 
 // Execute ACK of actions to the Fleet.
 func (e *AckCmd) Execute(ctx context.Context, r *AckRequest) (*AckResponse, error) {
-	var err error
-	span, ctx := apm.StartSpan(ctx, "execute", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
-	if err = r.Validate(); err != nil {
+	if err := r.Validate(); err != nil {
 		return nil, err
 	}
 
-	b, mErr := json.Marshal(r)
-	if mErr != nil {
-		err = errors.New(mErr, "fail to encode the ack request", errors.TypeUnexpected)
-		return nil, err
+	b, err := json.Marshal(r)
+	if err != nil {
+		return nil, errors.New(err,
+			"fail to encode the ack request",
+			errors.TypeUnexpected)
 	}
 
 	ap := fmt.Sprintf(ackPath, e.info.AgentID())
-	resp, mErr := e.client.Send(ctx, "POST", ap, nil, nil, bytes.NewBuffer(b))
-	if mErr != nil {
-		err = errors.New(mErr, "fail to ack to fleet", errors.TypeNetwork, errors.M(errors.MetaKeyURI, ap))
-		return nil, err
+	resp, err := e.client.Send(ctx, "POST", ap, nil, nil, bytes.NewBuffer(b))
+	if err != nil {
+		return nil, errors.New(err,
+			"fail to ack to fleet",
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, ap))
 	}
 	defer resp.Body.Close()
 
@@ -113,15 +107,14 @@ func (e *AckCmd) Execute(ctx context.Context, r *AckRequest) (*AckResponse, erro
 
 	ackResponse := &AckResponse{}
 	decoder := json.NewDecoder(resp.Body)
-	if err = decoder.Decode(ackResponse); err != nil {
-		err = errors.New(err,
+	if err := decoder.Decode(ackResponse); err != nil {
+		return nil, errors.New(err,
 			"fail to decode ack response",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, ap))
-		return nil, err
 	}
 
-	if err = ackResponse.Validate(); err != nil {
+	if err := ackResponse.Validate(); err != nil {
 		return nil, err
 	}
 

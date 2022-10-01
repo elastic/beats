@@ -12,7 +12,7 @@ from os.path import expanduser
 usage = """
 Example usage:
 
-Open PR against master, with the review label:
+Open PR against main, with the review label:
 
 ./dev-tools/open_pr --remote tsg
 
@@ -36,7 +36,7 @@ def main():
 
     parser.add_argument("--remote", default="origin",
                         help="Your git remote to push the branch to.")
-    parser.add_argument("--branch", default="master",
+    parser.add_argument("--branch", default="main",
                         help="Remote branch to open PR against (e.g 5.0)")
     parser.add_argument("--wip", action="store_true",
                         help="Add the `in progress` label")

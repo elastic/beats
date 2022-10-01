@@ -264,7 +264,7 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 	ps := &PersistedState{}
 	err = yaml.Unmarshal(contents, ps)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read persisted state: %w", err)
 	}
 
 	return ps, nil
@@ -275,5 +275,5 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 func (c *Checkpoint) createDir() error {
 	dir := filepath.Dir(c.file)
 	logp.Info("Creating %s if it does not exist.", dir)
-	return os.MkdirAll(dir, os.FileMode(0750))
+	return os.MkdirAll(dir, os.FileMode(0o750))
 }

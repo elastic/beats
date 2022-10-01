@@ -146,6 +146,30 @@ func TestConvert(t *testing.T) {
 			`"Tag":"convert_ip","IgnoreMissing":false,"FailOnError":true,"Mode":"copy"}`,
 			p.String())
 	})
+
+	t.Run("metadata as a target", func(t *testing.T) {
+		c := defaultConfig()
+		c.Tag = "convert_ip"
+		c.Fields = append(c.Fields, field{From: "@metadata.source", To: "@metadata.dest", Type: Integer})
+
+		evt := &beat.Event{
+			Meta: common.MapStr{
+				"source": "1",
+			},
+		}
+		expMeta := common.MapStr{
+			"source": "1",
+			"dest":   int32(1),
+		}
+
+		p, err := newConvert(c)
+		assert.NoError(t, err)
+
+		newEvt, err := p.Run(evt)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvt.Meta)
+		assert.Equal(t, evt.Fields, newEvt.Fields)
+	})
 }
 
 func TestConvertRun(t *testing.T) {

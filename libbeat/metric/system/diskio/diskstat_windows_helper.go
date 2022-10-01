@@ -26,7 +26,7 @@ import (
 	"unsafe"
 
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/v3/disk"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 

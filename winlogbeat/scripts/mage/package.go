@@ -72,7 +72,7 @@ func customizePackaging() {
 	mg.Deps(prepareModulePackaging)
 
 	moduleDir := devtools.PackageFile{
-		Mode:    0644,
+		Mode:    0o644,
 		Source:  dirModuleGenerated,
 		Config:  true,
 		Modules: true,
@@ -83,7 +83,7 @@ func customizePackaging() {
 			switch pkgType {
 			case devtools.TarGz, devtools.Zip, devtools.Docker:
 				args.Spec.Files["module"] = moduleDir
-			case devtools.Deb, devtools.RPM, devtools.DMG:
+			case devtools.Deb, devtools.RPM:
 				args.Spec.Files["/etc/{{.BeatName}}/module"] = moduleDir
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
@@ -102,8 +102,8 @@ func prepareModulePackaging() error {
 	return (&devtools.CopyTask{
 		Source:  devtools.XPackBeatDir("module"),
 		Dest:    dirModuleGenerated,
-		Mode:    0644,
-		DirMode: 0755,
+		Mode:    0o644,
+		DirMode: 0o755,
 		Exclude: []string{
 			"/_meta",
 			"/test",

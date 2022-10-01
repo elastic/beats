@@ -38,7 +38,7 @@ func DirExists(dir string) bool {
 func CreateDirectories(baseDir string, directories ...string) error {
 	for _, d := range directories {
 		p := path.Join(baseDir, d)
-		err := os.MkdirAll(p, 0750)
+		err := os.MkdirAll(p, 0o750)
 		if err != nil {
 			return err
 		}
@@ -66,7 +66,7 @@ func AppendTemplate(template, dest string, replace map[string]string) error {
 		return err
 	}
 
-	f, err := os.OpenFile(dest, os.O_WRONLY|os.O_APPEND, 0644)
+	f, err := os.OpenFile(dest, os.O_WRONLY|os.O_APPEND, 0o644)
 	if err == nil {
 		_, err = f.Write(c)
 	}
@@ -83,7 +83,7 @@ func copyTemplate(template, dest string, replace map[string]string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(dest, c, 0644)
+	err = ioutil.WriteFile(dest, c, 0o644)
 	if err != nil {
 		return fmt.Errorf("cannot copy template: %v", err)
 	}

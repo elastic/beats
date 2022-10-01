@@ -94,7 +94,6 @@ func TestReaderGroup(t *testing.T) {
 		ctx, cf, err = rg.newContext("test-id", context.Background())
 		requireGroupError(t, ctx, cf, err)
 	})
-
 }
 
 func TestDefaultHarvesterGroup(t *testing.T) {

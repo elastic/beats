@@ -6,6 +6,13 @@ artifact: beats/osquerybeat
 action_input_types:
 - osquery
 
+check_install:
+- exec_file:
+    path: "osquerybeat"
+    args:
+    - "verify"
+    timeout: 10
+
 rules:
 - fix_stream: {}
 - inject_index:

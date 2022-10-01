@@ -123,7 +123,7 @@ func (e *inputTestingEnvironment) abspath(filename string) string {
 func (e *inputTestingEnvironment) mustWriteFile(filename string, lines []byte) {
 	e.t.Helper()
 	path := e.abspath(filename)
-	if err := os.WriteFile(path, lines, 0644); err != nil {
+	if err := os.WriteFile(path, lines, 0o644); err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
 }
@@ -246,7 +246,6 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
-
 }
 
 func (pc *mockPipelineConnector) cancelAllClients() {
@@ -275,7 +274,6 @@ func newMockACKHandler(starter context.Context, blocking bool, config beat.Clien
 	}
 
 	return acker.Combine(blockingACKer(starter), config.ACKHandler)
-
 }
 
 func blockingACKer(starter context.Context) beat.ACKer {

@@ -12,7 +12,7 @@ import (
 )
 
 func TestStorageContainerValidate(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		input    string
 		errIsNil bool
 	}{

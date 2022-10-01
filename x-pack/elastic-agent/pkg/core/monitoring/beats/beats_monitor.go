@@ -23,8 +23,8 @@ import (
 const httpPlusPrefix = "http+"
 const defaultMonitoringNamespace = "default"
 
-// Monitor is a monitoring interface providing information about the way
-// how beat is monitored
+// Monitor implements the monitoring.Monitor interface providing information
+// about beats.
 type Monitor struct {
 	operatingSystem string
 	config          *monitoringConfig.MonitoringConfig
@@ -36,6 +36,7 @@ func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig
 	if monitoringCfg == nil {
 		monitoringCfg = monitoringConfig.DefaultConfig()
 		monitoringCfg.Pprof = &monitoringConfig.PprofConfig{Enabled: false}
+		monitoringCfg.HTTP.Buffer = &monitoringConfig.BufferConfig{Enabled: false}
 	}
 	monitoringCfg.LogMetrics = logMetrics
 
@@ -58,6 +59,9 @@ func (b *Monitor) Reload(rawConfig *config.Config) error {
 	} else {
 		if cfg.Settings.MonitoringConfig.Pprof == nil {
 			cfg.Settings.MonitoringConfig.Pprof = b.config.Pprof
+		}
+		if cfg.Settings.MonitoringConfig.HTTP.Buffer == nil {
+			cfg.Settings.MonitoringConfig.HTTP.Buffer = b.config.HTTP.Buffer
 		}
 		b.config = cfg.Settings.MonitoringConfig
 		logMetrics := true
@@ -130,6 +134,11 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 		if b.config.Pprof != nil && b.config.Pprof.Enabled {
 			appendix = append(appendix,
 				"-E", "http.pprof.enabled=true",
+			)
+		}
+		if b.config.HTTP.Buffer != nil && b.config.HTTP.Buffer.Enabled {
+			appendix = append(appendix,
+				"-E", "http.buffer.enabled=true",
 			)
 		}
 	}
@@ -209,7 +218,7 @@ func (b *Monitor) Prepare(spec program.Spec, pipelineID string, uid, gid int) er
 }
 
 // LogPath describes a path where application stores logs. Empty if
-// application is not monitorable
+// application is not monitorable.
 func (b *Monitor) LogPath(spec program.Spec, pipelineID string) string {
 	if !b.WatchLogs() {
 		return ""

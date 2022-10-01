@@ -90,7 +90,7 @@ func isRequest(tuple *icmpTuple, msg *icmpMessage) bool {
 	if tuple.icmpVersion == 6 {
 		return !icmp6ResponseTypes[msg.Type]
 	}
-	logp.WTF("Invalid ICMP version[%d]", tuple.icmpVersion)
+	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
 	return true
 }
 
@@ -101,7 +101,7 @@ func isError(tuple *icmpTuple, msg *icmpMessage) bool {
 	if tuple.icmpVersion == 6 {
 		return icmp6ErrorTypes[msg.Type]
 	}
-	logp.WTF("Invalid ICMP version[%d]", tuple.icmpVersion)
+	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
 	return true
 }
 
@@ -112,7 +112,7 @@ func requiresCounterpart(tuple *icmpTuple, msg *icmpMessage) bool {
 	if tuple.icmpVersion == 6 {
 		return icmp6PairTypes[msg.Type]
 	}
-	logp.WTF("Invalid ICMP version[%d]", tuple.icmpVersion)
+	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
 	return false
 }
 
@@ -133,7 +133,7 @@ func extractTrackingData(icmpVersion uint8, msgType uint8, baseLayer *layers.Bas
 		}
 		return 0, 0
 	}
-	logp.WTF("Invalid ICMP version[%d]", icmpVersion)
+	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", icmpVersion)
 	return 0, 0
 }
 
@@ -144,6 +144,6 @@ func humanReadable(tuple *icmpTuple, msg *icmpMessage) string {
 	if tuple.icmpVersion == 6 {
 		return layers.ICMPv6TypeCode(binary.BigEndian.Uint16([]byte{msg.Type, msg.code})).String()
 	}
-	logp.WTF("Invalid ICMP version[%d]", tuple.icmpVersion)
+	logp.NewLogger("icmp").DPanic("Invalid ICMP version[%d]", tuple.icmpVersion)
 	return ""
 }

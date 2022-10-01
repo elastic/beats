@@ -18,6 +18,7 @@
 package eventlog
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -92,7 +93,7 @@ func Register(apiName string, priority int, producer producer, channels channels
 // and the registered EventLog producers.
 func New(options *common.Config) (EventLog, error) {
 	if len(eventLogs) == 0 {
-		return nil, fmt.Errorf("No event log API is available on this system")
+		return nil, errors.New("No event log API is available on this system")
 	}
 
 	var config ConfigCommon

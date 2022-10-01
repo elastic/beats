@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/net"
+	"github.com/shirou/gopsutil/v3/net"
 )
 
 var debugf = logp.MakeDebug("system-network")

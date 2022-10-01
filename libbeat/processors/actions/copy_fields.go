@@ -69,18 +69,18 @@ func NewCopyFields(c *common.Config) (processors.Processor, error) {
 }
 
 func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
-	var backup common.MapStr
+	var backup *beat.Event
 	if f.config.FailOnError {
-		backup = event.Fields.Clone()
+		backup = event.Clone()
 	}
 
 	for _, field := range f.config.Fields {
-		err := f.copyField(field.From, field.To, event.Fields)
+		err := f.copyField(field.From, field.To, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to copy fields in copy_fields processor: %s", err)
 			f.logger.Debug(errMsg.Error())
 			if f.config.FailOnError {
-				event.Fields = backup
+				event = backup
 				event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
@@ -90,13 +90,13 @@ func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *copyFields) copyField(from string, to string, fields common.MapStr) error {
-	exists, _ := fields.HasKey(to)
-	if exists {
+func (f *copyFields) copyField(from string, to string, event *beat.Event) error {
+	_, err := event.GetValue(to)
+	if err == nil {
 		return fmt.Errorf("target field %s already exists, drop or rename this field first", to)
 	}
 
-	value, err := fields.GetValue(from)
+	value, err := event.GetValue(from)
 	if err != nil {
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
 			return nil
@@ -104,7 +104,7 @@ func (f *copyFields) copyField(from string, to string, fields common.MapStr) err
 		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)
 	}
 
-	_, err = fields.Put(to, cloneValue(value))
+	_, err = event.PutValue(to, cloneValue(value))
 	if err != nil {
 		return fmt.Errorf("could not copy value to %s: %v, %+v", to, value, err)
 	}
