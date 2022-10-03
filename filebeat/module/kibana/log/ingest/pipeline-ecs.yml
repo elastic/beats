@@ -1,29 +1,35 @@
-description: Pipeline for parsing Kibana ecs logs
+description: Pipeline for parsing Kibana logs
 processors:
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- set:
-    copy_from: '@timestamp'
-    field: event.created
-- script:
-    lang: painless
-    inline: 'ctx.json.keySet().each (key -> ctx[key] = ctx.json.get(key))'
-- remove:
-    field: json
-- rename:
-    field: http.request.headers
-    target_field: kibana.log.meta.req.headers
-    ignore_missing: true
-- rename:
-    field: http.response.headers
-    target_field: kibana.log.meta.res.headers
-    ignore_missing: true
-- set:
-    field: event.outcome
-    value: success
-    if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400'
-- set:
-    field: event.outcome
-    value: failure
-    if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - set:
+      copy_from: '@timestamp'
+      field: event.created
+  - set:
+      copy_from: 'json.@timestamp'
+      field: '@timestamp'
+      override: true
+  - set:
+      copy_from: json.message
+      field: message
+      override: true
+  - rename:
+      field: http.request.headers
+      target_field: kibana.log.meta.req.headers
+      ignore_missing: true
+  - rename:
+      field: http.response.headers
+      target_field: kibana.log.meta.res.headers
+      ignore_missing: true
+  - set:
+      field: event.outcome
+      value: success
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400'
+  - set:
+      field: event.outcome
+      value: failure
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
+  - remove:
+      field: json
+      ignore_missing: true

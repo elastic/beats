@@ -7,4 +7,6 @@ var:
 
 ingest_pipeline:
   - ingest/pipeline.yml
+  - ingest/pipeline-7.yml
+  - ingest/pipeline-ecs.yml
 input: config/log.yml
