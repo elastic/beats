@@ -73,7 +73,6 @@ func New(beatInfo beat.Info) *Locker {
 // Lock attempts to acquire a lock on the data path for the currently-running
 // Beat instance. If another Beats instance already has a lock on the same data path
 // an ErrAlreadyLocked error is returned.
-// This lock is pid-aware, and will attempt to recover if the lockfile is taken by a PID that no longer exists.
 func (lock *Locker) Lock() error {
 	new := pidfile{Pid: pidFetch(), WriteTime: time.Now()}
 	encoded, err := json.Marshal(&new)
@@ -199,10 +198,10 @@ func (lock *Locker) handleFailedLock() error {
 }
 
 // recoverLockfile attempts to remove the lockfile and continue running
-// This should only be called after we're sure it's safe to ignore a pre-existing locfile
+// This should only be called after we're sure it's safe to ignore a pre-existing lockfile
 // This will reset the internal lockfile path when it's successful.
 func (lock *Locker) recoverLockfile() error {
-	// File remove or may not work, depending on os-specific details with lockfiles
+	// File remove may or not work, depending on os-specific details with lockfiles
 	err := os.Remove(lock.fileLock.Path())
 	if err != nil {
 		lock.logger.Debugf("Could not remove old lockfile, got error %s. Attempting to fix.")
