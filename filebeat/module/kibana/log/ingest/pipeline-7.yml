@@ -6,9 +6,6 @@ processors:
   - set:
       copy_from: '@timestamp'
       field: event.created
-  - remove:
-      field: message
-      ignore_missing: true
   # basically removes every property that exists in the json object from the root
   - script:
       lang: painless

@@ -1,4 +1,4 @@
-description: Pipeline for parsing Kibana logs
+description: Pipeline for parsing Kibana ECS logs
 processors:
   - set:
       field: event.ingested
