@@ -7,61 +7,12 @@
 === Beats version 8.4.3
 https://github.com/elastic/beats/compare/v8.4.2\...v8.4.3[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -69,86 +20,6 @@ https://github.com/elastic/beats/compare/v8.4.2\...v8.4.3[View commits]
 
 - Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
 - Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 [[release-notes-8.4.2]]
 === Beats version 8.4.2
@@ -179,7 +50,7 @@ https://github.com/elastic/beats/compare/v8.4.1\...v8.4.2[View commits]
 === Beats version 8.4.1
 https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 
-==== Known Issue 
+==== Known Issue
 
 // tag::credentials-error[]
 
@@ -191,7 +62,7 @@ Filebeat agents configured to read from AWS inputs may return an error similar t
 ----
 sqs ReceiveMessage failed: operation error SQS: ReceiveMessage, https response
 error StatusCode: 403, RequestID: cb57783a-505f-5099-9160-23b8eea8ddbb,
-api error SignatureDoesNotMatch: Credential should be scoped to a valid region. 
+api error SignatureDoesNotMatch: Credential should be scoped to a valid region.
 ----
 
 This error was introduced by a breaking change in the AWS library.
@@ -252,14 +123,14 @@ s3access:
 === Beats version 8.4.0
 https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
-==== Known Issues 
+==== Known Issues
 
-*Auditbeat* 
+*Auditbeat*
 
 Auditbeat/auditd integration will send malformed data and may crash in version 8.4.0. {issue}32818[32818]
 
 Suggested resolution:
-Do not start Auditbeat or auditd integration on Elastic Agent at version 8.4.0. Skip 8.4.0 and upgrade directly to 8.4.1. 
+Do not start Auditbeat or auditd integration on Elastic Agent at version 8.4.0. Skip 8.4.0 and upgrade directly to 8.4.1.
 
 This issue is resolved in 8.4.1 and later.
 
