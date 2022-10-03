@@ -39,16 +39,19 @@ func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Durat
 // GetListMetricsOutput function gets listMetrics results from cloudwatch ~~per namespace~~ for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
-func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]types.Metric, error) {
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]types.Metric, error) {
 	var metricsTotal []types.Metric
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
 		NextToken: nextToken,
-		// To filter the results to show only metrics that have had data points published
-		// in the past three hours, specify this parameter with a value of PT3H.
-		// Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html for more details.
-		RecentlyActive: types.RecentlyActivePt3h,
+	}
+
+	// To filter the results to show only metrics that have had data points published
+	// in the past three hours, specify this parameter with a value of PT3H.
+	// Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html for more details.
+	if period <= time.Hour*3 {
+		listMetricsInput.RecentlyActive = types.RecentlyActivePt3h
 	}
 
 	if namespace != "*" {
