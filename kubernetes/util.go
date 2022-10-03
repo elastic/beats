@@ -271,6 +271,15 @@ func GetContainersInPod(pod *Pod) []*ContainerInPod {
 	return containers
 }
 
+// PodLabels returns the labels in a pod
+func PodLabels(pod *Pod) mapstr.M {
+	labels := mapstr.M{}
+	for k, v := range pod.GetObjectMeta().GetLabels() {
+		_ = safemapstr.Put(labels, k, v)
+	}
+	return labels
+}
+
 // PodAnnotations returns the annotations in a pod
 func PodAnnotations(pod *Pod) mapstr.M {
 	annotations := mapstr.M{}
