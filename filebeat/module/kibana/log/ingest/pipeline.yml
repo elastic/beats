@@ -2,7 +2,7 @@ description: Pipeline for parsing Kibana logs
 on_failure:
   - set:
       field: error.message
-      value: "{{ _ingest.on_failure_message }}"
+      value: '{{ _ingest.on_failure_message }}'
 processors:
   - pipeline:
       if: 'ctx?.json?.ecs?.version == null'
