@@ -18,7 +18,6 @@ https://github.com/elastic/beats/compare/v8.4.2\...v8.4.3[View commits]
 
 *Affecting all Beats*
 
-- Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
 - Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
 
 [[release-notes-8.4.2]]
