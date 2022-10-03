@@ -122,8 +122,6 @@ s3access:
 === Beats version 8.4.0
 https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
 
-<<<<<<< HEAD
-=======
 ==== Known Issues
 
 *Auditbeat*
@@ -138,7 +136,6 @@ This issue is resolved in 8.4.1 and later.
 //include credentials error from 8.4.1 section
 include::CHANGELOG.asciidoc[tag=credentials-error]
 
->>>>>>> bd7b90bb62 (docs: Prepare Changelog for 8.4.3 (#33242))
 ==== Breaking changes
 
 *Heartbeat*
