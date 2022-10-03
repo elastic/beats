@@ -280,6 +280,15 @@ func PodAnnotations(pod *Pod) mapstr.M {
 	return annotations
 }
 
+// PodLabels returns the labels in a pod
+func PodLabels(pod *Pod) mapstr.M {
+	labels := mapstr.M{}
+	for k, v := range pod.GetObjectMeta().GetLabels() {
+		_ = safemapstr.Put(labels, k, v)
+	}
+	return labels
+}
+
 // PodNamespaceAnnotations returns the annotations of the namespace of the pod
 func PodNamespaceAnnotations(pod *Pod, watcher Watcher) mapstr.M {
 	if watcher == nil {
