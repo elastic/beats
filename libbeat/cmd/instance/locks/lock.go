@@ -99,6 +99,11 @@ func (lock *Locker) Lock() error {
 		return fmt.Errorf("error creating lockfile %s: %w", lock.filePath, err)
 	}
 
+	_, err = fh.Write(encoded)
+	if err != nil {
+		return fmt.Errorf("error writing pidfile to %s: %w", lock.filePath, err)
+	}
+
 	// This will be a shared/read lock,
 	// if we need to manage a previous lock from another beat instance,
 	// we'll need to read from the pid file
@@ -110,12 +115,6 @@ func (lock *Locker) Lock() error {
 	if !isLocked {
 		// if we're here, things are probably unrecoverable, as we've previously checked for a lockfile. Exit.
 		return ErrAlreadyLocked
-	}
-
-	// write after we have the lock
-	_, err = fh.Write(encoded)
-	if err != nil {
-		return fmt.Errorf("error writing pidfile to %s: %w", lock.filePath, err)
 	}
 
 	return nil
@@ -206,6 +205,7 @@ func (lock *Locker) recoverLockfile() error {
 	// File remove or may not work, depending on os-specific details with lockfiles
 	err := os.Remove(lock.fileLock.Path())
 	if err != nil {
+		lock.logger.Debugf("Could not remove old lockfile, got error %s. Attempting to fix.")
 		rname := rand.New(rand.NewSource(time.Now().UnixNano()))
 		lockfilePath := paths.Resolve(paths.Data, fmt.Sprintf("%s_%d.lock", lock.beatName, rname.Int()))
 		// Per @leehinman, on windows the lock release can be dependent on OS resources. Retry.
@@ -213,12 +213,12 @@ func (lock *Locker) recoverLockfile() error {
 			time.Sleep(time.Second)
 			err = os.Remove(lock.fileLock.Path())
 			if err != nil {
-				lock.logger.Warnf("tried twice to remove lockfile %s on windows, continuing on with new lockfile name %s",
+				lock.logger.Infof("tried twice to remove lockfile %s on windows, continuing on with new lockfile name %s",
 					lockfilePath, err)
 				lock.filePath = lockfilePath
 			}
 		} else {
-			lock.logger.Warnf("failed to reset lockfile, cannot remove %s, continuing on with new lockfile name %s",
+			lock.logger.Infof("failed to reset lockfile, cannot remove %s, continuing on with new lockfile name %s",
 				lock.fileLock.Path(), lockfilePath)
 			lock.filePath = lockfilePath
 		}
