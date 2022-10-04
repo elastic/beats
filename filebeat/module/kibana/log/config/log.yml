@@ -6,19 +6,14 @@ paths:
 exclude_files: [".gz$"]
 
 processors:
-  # ECS: Same as json.keys_under_root: true. But here, overwrite_keys: false works, allowing module input fields to override the ingested log field values
-  - decode_json_fields:
-      fields: [message]
-      target: ""
-      overwrite_keys: false
-  # non-ECS: same as json.keys_under_root: false, allows compatibility with non-ecs logs. It also allows to store the orignal message in a separate field
-  - decode_json_fields:
-      fields: [message]
-      target: "json"
-  - add_fields:
-      target: ''
-      fields:
-        ecs.version: 1.12.0
-      when:
-        not:
-          has_fields: ['ecs.version']
+  # non-ECS: same as json.keys_under_root: false, allows compatibility with non-ecs logs.
+- decode_json_fields:
+    fields: [message]
+    target: 'json'
+- add_fields:
+    target: ""
+    fields:
+      ecs.version: 1.12.0
+    when:
+      not:
+        has_fields: ['ecs.version']
