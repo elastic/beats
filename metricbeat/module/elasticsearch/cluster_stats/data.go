@@ -42,6 +42,7 @@ var (
 			"versions": c.Ifc("versions"),
 			"count":    c.Int("count.total"),
 			"master":   c.Int("count.master"),
+			"data":     c.Int("count.data"),
 			"fs": c.Dict("fs", s.Schema{
 				"total": s.Object{
 					"bytes": c.Int("total_in_bytes"),
@@ -93,6 +94,9 @@ var (
 				"enabled":   c.Bool("enabled"),
 				"available": c.Bool("available"),
 			}),
+		}),
+		"apm": c.Dict("apm", s.Schema{
+			"found": c.Bool("found"),
 		}),
 	}
 )
