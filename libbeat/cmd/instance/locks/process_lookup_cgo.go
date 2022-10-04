@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build (darwin && cgo) || freebsd || linux || windows || aix
-// +build darwin,cgo freebsd linux windows aix
 
 package locks
 

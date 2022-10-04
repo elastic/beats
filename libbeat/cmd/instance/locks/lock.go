@@ -82,7 +82,7 @@ func (lock *Locker) Lock() error {
 
 	// The combination of O_CREATE and O_EXCL will ensure we return an error if we don't
 	// manage to create the file
-	fh, openErr := os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0600)
+	fh, openErr := os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0o600)
 	if os.IsExist(openErr) {
 		err = lock.handleFailedLock()
 		if err != nil {
@@ -90,7 +90,7 @@ func (lock *Locker) Lock() error {
 		}
 		// At this point, the filepath should be unique to a given pid, and not just a beatname
 		// If something fails here, it's probably unrecoverable
-		fh, err = os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0600)
+		fh, err = os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0o600)
 		if err != nil {
 			return fmt.Errorf("cannot re-obtain lockfile %s: %w", lock.filePath, err)
 		}
