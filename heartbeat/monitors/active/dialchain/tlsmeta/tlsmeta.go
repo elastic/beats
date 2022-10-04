@@ -54,15 +54,55 @@ func AddTLSMetadata(fields mapstr.M, connState cryptoTLS.ConnectionState, durati
 	}
 	_, _ = fields.Put("tls.cipher", tlscommon.ResolveCipherSuite(connState.CipherSuite))
 
-	tlsFields, x509Fields := CertFields(connState.PeerCertificates[0])
+	tlsFields := CertFields(connState.PeerCertificates[0], connState.VerifiedChains)
 
-	// If we have at least one fully verified chain use that
-	// to compute the soonest point at which this cert chain will become invalid
+	fields.DeepUpdate(mapstr.M{"tls": tlsFields})
+}
+
+func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate) (tlsFields mapstr.M) {
+	x509Fields := mapstr.M{}
+	serverFields := mapstr.M{"x509": x509Fields}
+	tlsFields = mapstr.M{"server": serverFields}
+
+	_, _ = serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
+	_, _ = serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
+
+	_, _ = x509Fields.Put("issuer.common_name", hostCert.Issuer.CommonName)
+	_, _ = x509Fields.Put("issuer.distinguished_name", hostCert.Issuer.String())
+	_, _ = x509Fields.Put("subject.common_name", hostCert.Subject.CommonName)
+	_, _ = x509Fields.Put("subject.distinguished_name", hostCert.Subject.String())
+	_, _ = x509Fields.Put("serial_number", hostCert.SerialNumber.String())
+	_, _ = x509Fields.Put("signature_algorithm", hostCert.SignatureAlgorithm.String())
+	_, _ = x509Fields.Put("public_key_algorithm", hostCert.PublicKeyAlgorithm.String())
+	_, _ = x509Fields.Put("not_before", hostCert.NotBefore)
+	_, _ = tlsFields.Put("certificate_not_valid_before", hostCert.NotBefore)
+	_, _ = x509Fields.Put("not_after", hostCert.NotAfter)
+	_, _ = tlsFields.Put("certificate_not_valid_after", hostCert.NotAfter)
+	if rsaKey, ok := hostCert.PublicKey.(*rsa.PublicKey); ok {
+		sizeInBits := rsaKey.Size() * 8
+		_, _ = x509Fields.Put("public_key_size", sizeInBits)
+		_, _ = x509Fields.Put("public_key_exponent", rsaKey.E)
+	} else if dsaKey, ok := hostCert.PublicKey.(*dsa2.PublicKey); ok {
+		if dsaKey.Parameters.P != nil {
+			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
+		} else {
+			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
+		}
+	} else if ecdsa, ok := hostCert.PublicKey.(*ecdsa.PublicKey); ok {
+		_, _ = x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
+	}
+
+	// If we have fully verified cert chains, use those for the
+	// not_before / not_after timestamps
+	//
+	// we compute the soonest point at which this cert chain will become invalid
 	// this only happens when strict verification is enabled
 	// due to the implementation in elastic-agent-libs
+	// which only gives us the chain metadata in that scenario, unlike
+	// the go stdlib
 	// https://github.com/elastic/elastic-agent-libs/blob/main/transport/tlscommon/tls_config.go#L240
 	var maxNotAfterFloor time.Time
-	for _, chain := range connState.VerifiedChains {
+	for _, chain := range verifiedChains {
 		chainNotBefore, chainNotAfter := calculateCertTimestamps(chain)
 
 		// If this chain expires sooner than a previously seen chain we don't
@@ -81,39 +121,7 @@ func AddTLSMetadata(fields mapstr.M, connState cryptoTLS.ConnectionState, durati
 		}
 	}
 
-	fields.DeepUpdate(mapstr.M{"tls": tlsFields})
-}
-
-func CertFields(hostCert *x509.Certificate) (tlsFields mapstr.M, x509Fields mapstr.M) {
-	x509Fields = mapstr.M{}
-	serverFields := mapstr.M{"x509": x509Fields}
-	tlsFields = mapstr.M{"server": serverFields}
-
-	_, _ = serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
-	_, _ = serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
-
-	_, _ = x509Fields.Put("issuer.common_name", hostCert.Issuer.CommonName)
-	_, _ = x509Fields.Put("issuer.distinguished_name", hostCert.Issuer.String())
-	_, _ = x509Fields.Put("subject.common_name", hostCert.Subject.CommonName)
-	_, _ = x509Fields.Put("subject.distinguished_name", hostCert.Subject.String())
-	_, _ = x509Fields.Put("serial_number", hostCert.SerialNumber.String())
-	_, _ = x509Fields.Put("signature_algorithm", hostCert.SignatureAlgorithm.String())
-	_, _ = x509Fields.Put("public_key_algorithm", hostCert.PublicKeyAlgorithm.String())
-	if rsaKey, ok := hostCert.PublicKey.(*rsa.PublicKey); ok {
-		sizeInBits := rsaKey.Size() * 8
-		_, _ = x509Fields.Put("public_key_size", sizeInBits)
-		_, _ = x509Fields.Put("public_key_exponent", rsaKey.E)
-	} else if dsaKey, ok := hostCert.PublicKey.(*dsa2.PublicKey); ok {
-		if dsaKey.Parameters.P != nil {
-			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
-		} else {
-			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
-		}
-	} else if ecdsa, ok := hostCert.PublicKey.(*ecdsa.PublicKey); ok {
-		_, _ = x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
-	}
-
-	return tlsFields, x509Fields
+	return tlsFields
 }
 
 func calculateCertTimestamps(certs []*x509.Certificate) (chainNotBefore time.Time, chainNotAfter *time.Time) {

@@ -40,8 +40,7 @@ func TestAddTLSMetadata(t *testing.T) {
 	// We always test with this one cert because addCertificateMetadata
 	// is tested in detail elsewhere
 	certs := []*x509.Certificate{parseCert(t, elasticCert)}
-	certMetadata := mapstr.M{}
-	AddCertMetadata(certMetadata, certs)
+	certMetadata := CertFields(certs[0], nil)
 
 	scenarios := []struct {
 		name      string
@@ -95,7 +94,7 @@ func TestAddTLSMetadata(t *testing.T) {
 			expected := mapstr.M{"tls": s.expected}
 
 			// Always add in the cert metadata since we test that in other test funcs, not here
-			expected.DeepUpdate(certMetadata)
+			expected.DeepUpdate(mapstr.M{"tls": certMetadata})
 
 			fields := mapstr.M{}
 			AddTLSMetadata(fields, s.connState, s.duration)
@@ -104,7 +103,7 @@ func TestAddTLSMetadata(t *testing.T) {
 	}
 }
 
-func TestAddCertMetadata(t *testing.T) {
+func TestCertFields(t *testing.T) {
 	cert := parseCert(t, elasticCert)
 	chainCert := parseCert(t, elasticChainCert)
 	certNotBefore, err := time.Parse(time.RFC3339, "2019-08-16T01:40:25Z")
@@ -142,23 +141,29 @@ func TestAddCertMetadata(t *testing.T) {
 
 	scenarios := []struct {
 		name  string
-		certs []*x509.Certificate
+		cert  *x509.Certificate
+		chain [][]*x509.Certificate
 	}{
 		{
 			"single cert fields should all be present",
-			[]*x509.Certificate{cert},
+			cert,
+			nil,
 		},
 		{
 			"cert chain should still show single cert fields",
-			[]*x509.Certificate{cert, chainCert},
+			cert,
+			[][]*x509.Certificate{{cert, chainCert}},
+		},
+		{
+			"reversed cert should expire at same time",
+			cert,
+			[][]*x509.Certificate{{chainCert, cert}},
 		},
 	}
 
 	for _, scenario := range scenarios {
 		t.Run(scenario.name, func(t *testing.T) {
-			fields := mapstr.M{}
-			AddCertMetadata(fields, scenario.certs)
-			tls, err := fields.GetValue("tls")
+			tls := CertFields(scenario.cert, scenario.chain)
 			require.NoError(t, err)
 			testslike.Test(t, expectedFields, tls)
 		})

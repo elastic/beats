@@ -159,7 +159,7 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 }
 
 func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
-	tlsFields, _ := tlsmeta.CertFields(certificate)
+	tlsFields := tlsmeta.CertFields(certificate, nil)
 	return lookslike.MustCompile(mapstr.M{"tls": tlsFields})
 }
 
