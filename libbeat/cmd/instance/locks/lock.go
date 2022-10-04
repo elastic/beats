@@ -83,8 +83,9 @@ func (lock *Locker) Lock() error {
 	// The combination of O_CREATE and O_EXCL will ensure we return an error if we don't
 	// manage to create the file
 	fh, openErr := os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0o600)
-	if os.IsExist(openErr) {
-		err = lock.handleFailedLock()
+	// Don't trust different OSes to report the errors we expect, just try to recover regardless
+	if openErr != nil {
+		err = lock.handleFailedCreate()
 		if err != nil {
 			return fmt.Errorf("cannot obtain lockfile: %w", err)
 		}
@@ -94,19 +95,16 @@ func (lock *Locker) Lock() error {
 		if err != nil {
 			return fmt.Errorf("cannot re-obtain lockfile %s: %w", lock.filePath, err)
 		}
-	} else if openErr != nil {
-		return fmt.Errorf("error creating lockfile %s: %w", lock.filePath, err)
 	}
 
+	// a Process can't write to its own locked file on all platforms, write first
 	_, err = fh.Write(encoded)
 	if err != nil {
 		return fmt.Errorf("error writing pidfile to %s: %w", lock.filePath, err)
 	}
 
-	// This will be a shared/read lock,
-	// if we need to manage a previous lock from another beat instance,
-	// we'll need to read from the pid file
-	isLocked, err := lock.fileLock.TryRLock()
+	// Exclusive lock
+	isLocked, err := lock.fileLock.TryLock()
 	if err != nil {
 		return fmt.Errorf("unable to lock data path: %w", err)
 	}
@@ -135,11 +133,33 @@ func (lock *Locker) Unlock() error {
 
 // ******* private helpers
 
-// handleFailedLock will attempt to recover from a failed lock operation in a pid-aware way.
+// handleFailedCreate will attempt to recover from a failed lock operation in a pid-aware way.
 // The point of this is to deal with instances where an improper beat shutdown left us with
 // a pre-existing pidfile for a beat process that no longer exists.
 // The one argument tells the method if a pre-existing lockfile was already found.
-func (lock *Locker) handleFailedLock() error {
+func (lock *Locker) handleFailedCreate() error {
+	// Try to lock the file.
+	// Not all OSes will fail on this.
+	_, err := lock.fileLock.TryLock()
+	// Case: the file already locked, and in use by another process.
+	if err != nil {
+		if runtime.GOOS == "windows" {
+			// on windows, locks from dead PIDs will be auto-released, but it might take the OS a while.
+			time.Sleep(time.Second)
+			_, err := lock.fileLock.TryLock()
+			if err != nil {
+				return fmt.Errorf("The lockfile %s is locked after a retry, another beat is probably running", lock.fileLock)
+			}
+		}
+		return fmt.Errorf("The lockfile %s is already locked by another beat", lock.fileLock)
+	}
+	// if we're here, we've locked the file
+	// unlock so we can continue
+	err = lock.fileLock.Unlock()
+	if err != nil {
+		return fmt.Errorf("error unlocking a previously found file %s after a temporary lock", lock.filePath)
+	}
+
 	// read in whatever existing lockfile caused us to fail
 	gotData, pf, err := lock.readExistingPidfile()
 	if err != nil {
@@ -193,6 +213,7 @@ func (lock *Locker) handleFailedLock() error {
 		}
 		// Case: we've gotten a lock file for another process that's already running
 		// This is the "base" lockfile case, which is two beats running from the same directory
+		// This is where we'll catch this particular case on Linux, due to Linux's advisory-style locks.
 		return fmt.Errorf("connot start, data directory belongs to process with pid %d", pf.Pid)
 	}
 }
