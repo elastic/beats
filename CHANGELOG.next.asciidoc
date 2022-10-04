@@ -82,6 +82,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
 
 *Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
 
 
 *Metricbeat*
