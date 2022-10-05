@@ -15,7 +15,6 @@ import (
 	"errors"
 	"fmt"
 	"hash"
-	"net/http"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -130,11 +129,10 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 }
 
 func tryDebugTemplateValue(target, val string, log *logp.Logger) {
-	banList := map[string]struct{}{
-		"Authorization":       {},
-		"Proxy-Authorization": {},
-	}
-	if _, found := banList[http.CanonicalHeaderKey(target)]; !found {
+	switch target {
+	case "Authorization", "Proxy-Authorization":
+		// ignore filtered headers
+	default:
 		log.Debugf("template execution: evaluated template %q", val)
 	}
 }
