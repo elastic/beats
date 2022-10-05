@@ -20,7 +20,7 @@ func TestInputMetricsClose(t *testing.T) {
 	metrics := newInputMetrics(reg, "aws-s3-aws.cloudfront_logs-8b312b5f-9f99-492c-b035-3dff354a1f01")
 	metrics.Close()
 
-	reg.Do(monitoring.Full, func(s string, i interface{}) {
+	reg.Do(monitoring.Full, func(s string, _ interface{}) {
 		t.Errorf("registry should be empty, but found %v", s)
 	})
 }
