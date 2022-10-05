@@ -48009,21 +48009,21 @@ type: keyword
 *`logstash.node.stats.os.cpu.load_average.15m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
 *`logstash.node.stats.os.cpu.load_average.1m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
 *`logstash.node.stats.os.cpu.load_average.5m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
