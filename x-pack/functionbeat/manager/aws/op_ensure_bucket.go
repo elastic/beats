@@ -44,15 +44,22 @@ func (o *opEnsureBucket) Execute(_ executor.Context) error {
 	}
 
 	var apiError smithy.APIError
+	var input *s3.CreateBucketInput
 	if errors.As(err, &apiError) {
 		if apiError.ErrorCode() == notFound {
-			// bucket do not exist let's create it.
-			input := &s3.CreateBucketInput{
-				Bucket: aws.String(o.bucketName),
-				CreateBucketConfiguration: &types.CreateBucketConfiguration{
-					LocationConstraint: types.BucketLocationConstraint(o.region),
-				},
+			if o.region == "us-east-1" {
+				input = &s3.CreateBucketInput{
+					Bucket: aws.String(o.bucketName),
+				}
+			} else {
+				input = &s3.CreateBucketInput{
+					Bucket: aws.String(o.bucketName),
+					CreateBucketConfiguration: &types.CreateBucketConfiguration{
+						LocationConstraint: types.BucketLocationConstraint(o.region),
+					},
+				}
 			}
+			// bucket do not exist let's create it.
 			resp, err := o.svc.CreateBucket(context.TODO(), input)
 			if err != nil {
 				o.log.Debugf("Could not create bucket, resp: %v", resp)
