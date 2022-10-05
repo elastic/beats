@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/rand"
 	"os"
 	"runtime"
 	"time"
@@ -89,7 +88,6 @@ func (lock *Locker) Lock() error {
 		if err != nil {
 			return fmt.Errorf("cannot obtain lockfile: %w", err)
 		}
-		// At this point, the filepath should be unique to a given pid, and not just a beatname
 		// If something fails here, it's probably unrecoverable
 		fh, err = os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0o600)
 		if err != nil {
@@ -220,27 +218,21 @@ func (lock *Locker) handleFailedCreate() error {
 
 // recoverLockfile attempts to remove the lockfile and continue running
 // This should only be called after we're sure it's safe to ignore a pre-existing lockfile
-// This will reset the internal lockfile path when it's successful.
+// This will reset the internal lockfile handler when it's successful.
 func (lock *Locker) recoverLockfile() error {
 	// File remove may or not work, depending on os-specific details with lockfiles
 	err := os.Remove(lock.fileLock.Path())
 	if err != nil {
-		lock.logger.Debugf("Could not remove old lockfile, got error %s. Attempting to fix.")
-		rname := rand.New(rand.NewSource(time.Now().UnixNano()))
-		lockfilePath := paths.Resolve(paths.Data, fmt.Sprintf("%s_%d.lock", lock.beatName, rname.Int()))
-		// Per @leehinman, on windows the lock release can be dependent on OS resources. Retry.
 		if runtime.GOOS == "windows" {
+			// retry on windows, the OS can take time to clean up
 			time.Sleep(time.Second)
 			err = os.Remove(lock.fileLock.Path())
 			if err != nil {
-				lock.logger.Infof("tried twice to remove lockfile %s on windows, continuing on with new lockfile name %s",
-					lockfilePath, err)
-				lock.filePath = lockfilePath
+				return fmt.Errorf("tried twice to remove lockfile %s on windows: %w",
+					lock.fileLock.Path(), err)
 			}
 		} else {
-			lock.logger.Infof("failed to reset lockfile, cannot remove %s, continuing on with new lockfile name %s",
-				lock.fileLock.Path(), lockfilePath)
-			lock.filePath = lockfilePath
+			return fmt.Errorf("lockfile %s cannot be removed: %w", lock.fileLock.Path(), err)
 		}
 
 	}
