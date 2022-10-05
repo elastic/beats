@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"hash"
+	"net/http"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -91,11 +92,11 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
 			log.Debugf("template execution: falling back to default value")
-			return defaultVal.Execute(emptyTransformContext(), transformable{}, nil, log)
+			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, log)
 		}
 		return "", err
 	}
@@ -107,7 +108,7 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 		if err != nil {
 			log.Debugf("template execution failed: %v", err)
 		}
-		log.Debugf("template execution: evaluated template %q", val)
+		tryDebugTemplateValue(targetName, val, log)
 	}()
 
 	buf := new(bytes.Buffer)
@@ -126,6 +127,16 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 		return fallback(errEmptyTemplateResult)
 	}
 	return val, nil
+}
+
+func tryDebugTemplateValue(target, val string, log *logp.Logger) {
+	banList := map[string]struct{}{
+		"Authorization":       {},
+		"Proxy-Authorization": {},
+	}
+	if _, found := banList[http.CanonicalHeaderKey(target)]; !found {
+		log.Debugf("template execution: evaluated template %q", val)
+	}
 }
 
 const defaultTimeLayout = "RFC3339"
@@ -444,7 +455,7 @@ func urlEncode(value string) string {
 // make pipelining more ergonomic. This allows s to be piped in because it is
 // the final argument. For example,
 //
-//   [[ "some value" | replaceAll "some" "my" ]]  // == "my value"
+//	[[ "some value" | replaceAll "some" "my" ]]  // == "my value"
 func replaceAll(old, new, s string) string {
 	return strings.ReplaceAll(s, old, new)
 }
