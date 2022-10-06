@@ -573,13 +573,6 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				}
 
 				identifierValue := labels[identifierValueIdx]
-
-				// remove dimension names from identifier value if applicable
-				if strings.Contains(identifierValue, dimensionSeparator) {
-					identifierSeparators := strings.Split(identifierValue, dimensionSeparator)
-					identifierValue = identifierSeparators[len(identifierSeparators)-1]
-				}
-
 				if _, ok := events[identifierValue]; !ok {
 					// when tagsFilter is not empty but no entry in
 					// resourceTagMap for this identifier, do not initialize
