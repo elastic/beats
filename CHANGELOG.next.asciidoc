@@ -71,12 +71,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
 - Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
 - Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
-
-*Auditbeat*
-
-
-*Filebeat*
-
 - Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
 - Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
@@ -117,9 +111,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
-- Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
-- Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
 
 *Auditbeat*
 
@@ -184,6 +175,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
