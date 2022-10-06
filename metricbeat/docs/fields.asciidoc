@@ -31878,13 +31878,6 @@ type: long
 
 
 
-*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
 +
 --
