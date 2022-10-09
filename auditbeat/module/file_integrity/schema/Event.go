@@ -120,21 +120,8 @@ func (rcv *Event) Hashes(obj *Hash) *Hash {
 	return nil
 }
 
-func (rcv *Event) File(obj *ParserResult) *ParserResult {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(16))
-	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
-		if obj == nil {
-			obj = new(ParserResult)
-		}
-		obj.Init(rcv._tab.Bytes, x)
-		return obj
-	}
-	return nil
-}
-
 func EventStart(builder *flatbuffers.Builder) {
-	builder.StartObject(7)
+	builder.StartObject(6)
 }
 func EventAddTimestampNs(builder *flatbuffers.Builder, timestampNs int64) {
 	builder.PrependInt64Slot(0, timestampNs, 0)
@@ -153,9 +140,6 @@ func EventAddInfo(builder *flatbuffers.Builder, info flatbuffers.UOffsetT) {
 }
 func EventAddHashes(builder *flatbuffers.Builder, hashes flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(5, flatbuffers.UOffsetT(hashes), 0)
-}
-func EventAddFile(builder *flatbuffers.Builder, file flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(6, flatbuffers.UOffsetT(file), 0)
 }
 func EventEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

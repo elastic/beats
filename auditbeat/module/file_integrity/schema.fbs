@@ -61,41 +61,6 @@ table Hash {
   xxh64: [byte];
 }
 
-table Section {
-  name:string;
-  physical_size:ulong;
-  virtual_size:ulong;
-  entropy:float64;
-  var_entropy:float64;
-}
-
-table ExecutableObject {
-  // Import hashes
-  import_hash:[byte];
-  imphash:[byte];
-  symhash:[byte];
-  go_import_hash:[byte];
-
-  // Name entropies
-  import_names_entropy:float64;
-  go_import_names_entropy:float64;
-
-  // Import list
-  imports:[string];
-  go_imports:[string];
-
-  // Section statistics
-  sections:[Section];
-
-  go_stripped:bool;
-}
-
-table ParserResult {
-  pe:ExecutableObject;
-  elf:ExecutableObject;
-  macho:ExecutableObject;
-}
-
 table Event {
   timestamp_ns:long;
   target_path:string;
@@ -103,7 +68,6 @@ table Event {
   source:Source;
   info:Metadata;
   hashes:Hash;
-  file:ParserResult;
 }
 
 root_type Event;
