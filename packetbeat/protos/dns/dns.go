@@ -61,10 +61,6 @@ type dnsPlugin struct {
 	watcher procs.ProcessesWatcher
 }
 
-var debugf = logp.MakeDebug("dns")
-
-const maxDNSTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
-
 // Transport protocol.
 type transport uint8
 
@@ -92,6 +88,15 @@ func (t transport) String() string {
 
 type hashableDNSTuple [maxDNSTupleRawSize]byte
 
+const (
+	maxDNSTupleRawSize = 2*(sizeofIP+sizeofPort) + sizeofID + sizeofTransport
+
+	sizeofIP        = 16
+	sizeofPort      = 2
+	sizeofID        = 2
+	sizeofTransport = 1
+)
+
 // DnsMessage contains a single DNS message.
 type dnsMessage struct {
 	ts           time.Time          // Time when the message was received.
@@ -109,8 +114,8 @@ type dnsTuple struct {
 	transport transport
 	id        uint16
 
-	raw    hashableDNSTuple // Src_ip:Src_port:Dst_ip:Dst_port:Transport:Id
-	revRaw hashableDNSTuple // Dst_ip:Dst_port:Src_ip:Src_port:Transport:Id
+	raw    hashableDNSTuple // Src_ip:Src_port:Dst_ip:Dst_port:ID:Transport
+	revRaw hashableDNSTuple // Dst_ip:Dst_port:Src_ip:Src_port:ID:Transport
 }
 
 func dnsTupleFromIPPort(t *common.IPPortTuple, trans transport, id uint16) dnsTuple {
@@ -152,21 +157,21 @@ func (t *dnsTuple) computeHashables() {
 	copy(t.raw[18:34], t.DstIP)
 	copy(t.raw[34:36], []byte{byte(t.DstPort >> 8), byte(t.DstPort)})
 	copy(t.raw[36:38], []byte{byte(t.id >> 8), byte(t.id)})
-	t.raw[39] = byte(t.transport)
+	t.raw[38] = byte(t.transport)
 
 	copy(t.revRaw[0:16], t.DstIP)
 	copy(t.revRaw[16:18], []byte{byte(t.DstPort >> 8), byte(t.DstPort)})
 	copy(t.revRaw[18:34], t.SrcIP)
 	copy(t.revRaw[34:36], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
 	copy(t.revRaw[36:38], []byte{byte(t.id >> 8), byte(t.id)})
-	t.revRaw[39] = byte(t.transport)
+	t.revRaw[38] = byte(t.transport)
 }
 
 func (t *dnsTuple) String() string {
 	return fmt.Sprintf("DnsTuple src[%s:%d] dst[%s:%d] transport[%s] id[%d]",
-		t.SrcIP.String(),
+		t.SrcIP,
 		t.SrcPort,
-		t.DstIP.String(),
+		t.DstIP,
 		t.DstPort,
 		t.transport,
 		t.id)
@@ -212,12 +217,7 @@ func init() {
 	protos.Register("dns", New)
 }
 
-func New(
-	testMode bool,
-	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *conf.C,
-) (protos.Plugin, error) {
+func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
 	p := &dnsPlugin{}
 	config := defaultConfig
 	if !testMode {
@@ -253,14 +253,13 @@ func (dns *dnsPlugin) init(results protos.Reporter, watcher procs.ProcessesWatch
 	return nil
 }
 
-func (dns *dnsPlugin) setFromConfig(config *dnsConfig) error {
+func (dns *dnsPlugin) setFromConfig(config *dnsConfig) {
 	dns.ports = config.Ports
 	dns.sendRequest = config.SendRequest
 	dns.sendResponse = config.SendResponse
 	dns.includeAuthorities = config.IncludeAuthorities
 	dns.includeAdditionals = config.IncludeAdditionals
 	dns.transactionTimeout = config.TransactionTimeout
-	return nil
 }
 
 func newTransaction(ts time.Time, tuple dnsTuple, cmd common.ProcessTuple) *dnsTransaction {
@@ -292,14 +291,14 @@ func (dns *dnsPlugin) ConnectionTimeout() time.Duration {
 }
 
 func (dns *dnsPlugin) receivedDNSRequest(tuple *dnsTuple, msg *dnsMessage) {
-	debugf("Processing query. %s", tuple.String())
+	logp.Debug("dns", "Processing query. %s", tuple)
 
 	trans := dns.deleteTransaction(tuple.hashable())
 	if trans != nil {
 		// This happens if a client puts multiple requests in flight
 		// with the same ID.
 		trans.notes = append(trans.notes, duplicateQueryMsg.Error())
-		debugf("%s %s", duplicateQueryMsg.Error(), tuple.String())
+		logp.Debug("dns", "%v %s", duplicateQueryMsg, tuple)
 		dns.publishTransaction(trans)
 		dns.deleteTransaction(trans.tuple.hashable())
 	}
@@ -308,7 +307,7 @@ func (dns *dnsPlugin) receivedDNSRequest(tuple *dnsTuple, msg *dnsMessage) {
 
 	if tuple.transport == transportUDP && (msg.data.IsEdns0() != nil) && msg.length > maxDNSPacketSize {
 		trans.notes = append(trans.notes, udpPacketTooLarge.Error())
-		debugf("%s", udpPacketTooLarge.Error())
+		logp.Debug("dns", "%v", udpPacketTooLarge)
 	}
 
 	dns.transactions.Put(tuple.hashable(), trans)
@@ -316,13 +315,13 @@ func (dns *dnsPlugin) receivedDNSRequest(tuple *dnsTuple, msg *dnsMessage) {
 }
 
 func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
-	debugf("Processing response. %s", tuple.String())
+	logp.Debug("dns", "Processing response. %s", tuple)
 
 	trans := dns.getTransaction(tuple.revHashable())
 	if trans == nil {
 		trans = newTransaction(msg.ts, tuple.reverse(), msg.cmdlineTuple.Reverse())
 		trans.notes = append(trans.notes, orphanedResponse.Error())
-		debugf("%s %s", orphanedResponse.Error(), tuple.String())
+		logp.Debug("dns", "%v %s", orphanedResponse, tuple)
 		unmatchedResponses.Add(1)
 	}
 
@@ -332,7 +331,7 @@ func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
 		respIsEdns := msg.data.IsEdns0() != nil
 		if !respIsEdns && msg.length > maxDNSPacketSize {
 			trans.notes = append(trans.notes, udpPacketTooLarge.responseError())
-			debugf("%s", udpPacketTooLarge.responseError())
+			logp.Debug("dns", "%s", udpPacketTooLarge.responseError())
 		}
 
 		request := trans.request
@@ -342,10 +341,10 @@ func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
 			switch {
 			case reqIsEdns && !respIsEdns:
 				trans.notes = append(trans.notes, respEdnsNoSupport.Error())
-				debugf("%s %s", respEdnsNoSupport.Error(), tuple.String())
+				logp.Debug("dns", "%v %s", respEdnsNoSupport, tuple)
 			case !reqIsEdns && respIsEdns:
 				trans.notes = append(trans.notes, respEdnsUnexpected.Error())
-				debugf("%s %s", respEdnsUnexpected.Error(), tuple.String())
+				logp.Debug("dns", "%v %s", respEdnsUnexpected, tuple)
 			}
 		}
 	}
@@ -359,7 +358,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 		return
 	}
 
-	debugf("Publishing transaction. %s", t.tuple.String())
+	logp.Debug("dns", "Publishing transaction. %s", &t.tuple)
 
 	evt, pbf := pb.NewBeatEvent(t.ts)
 
@@ -439,7 +438,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 
 func (dns *dnsPlugin) expireTransaction(t *dnsTransaction) {
 	t.notes = append(t.notes, noResponse.Error())
-	debugf("%s %s", noResponse.Error(), t.tuple.String())
+	logp.Debug("dns", "%v %s", noResponse, &t.tuple)
 	dns.publishTransaction(t)
 	unmatchedRequests.Add(1)
 }
@@ -671,17 +670,17 @@ func rrToMapStr(rr mkdns.RR, ipList bool) (mapstr.M, []string) {
 	switch x := rr.(type) {
 	default:
 		// We don't have special handling for this type
-		debugf("No special handling for RR type %s", dnsTypeToString(rrType))
+		logp.Debug("dns", "No special handling for RR type %s", dnsTypeToString(rrType))
 		unsupportedRR := new(mkdns.RFC3597)
 		err := unsupportedRR.ToRFC3597(x)
 		if err == nil {
 			rData, err := hexStringToString(unsupportedRR.Rdata)
 			mapStr["data"] = rData
 			if err != nil {
-				debugf("%s", err.Error())
+				logp.Debug("dns", "%v", err)
 			}
 		} else {
-			debugf("Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
+			logp.Debug("dns", "Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
 		}
 
 	// Don't attempt to render IPs for answers that are incomplete.
@@ -735,11 +734,11 @@ func rrToMapStr(rr mkdns.RR, ipList bool) (mapstr.M, []string) {
 		mapStr["data"] = trimRightDot(x.Ptr)
 	case *mkdns.RFC3597:
 		// Miekg/dns lib doesn't handle this type
-		debugf("Unknown RR type %s", dnsTypeToString(rrType))
+		logp.Debug("dns", "Unknown RR type %s", dnsTypeToString(rrType))
 		rData, err := hexStringToString(x.Rdata)
 		mapStr["data"] = rData
 		if err != nil {
-			debugf("%s", err.Error())
+			logp.Debug("dns", "%v", err)
 		}
 	case *mkdns.RRSIG:
 		mapStr["type_covered"] = dnsTypeToString(x.TypeCovered)

@@ -30,15 +30,14 @@ func (dns *dnsPlugin) ParseUDP(pkt *protos.Packet) {
 	defer logp.Recover("Dns ParseUdp")
 	packetSize := len(pkt.Payload)
 
-	debugf("Parsing packet addressed with %s of length %d.",
-		pkt.Tuple.String(), packetSize)
+	logp.Debug("dns", "Parsing packet addressed with %s of length %d.", &pkt.Tuple, packetSize)
 
 	dnsPkt, err := decodeDNSData(transportUDP, pkt.Payload)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the DNS port for non-DNS traffic. Both
 		// are issues that a monitoring system should report.
-		debugf("%s", err.Error())
+		logp.Debug("dns", "%v", err)
 		return
 	}
 
