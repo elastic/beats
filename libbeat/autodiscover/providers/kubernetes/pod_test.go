@@ -2120,7 +2120,7 @@ func getNestedAnnotations(in mapstr.M) mapstr.M {
 	out := mapstr.M{}
 
 	for k, v := range in {
-		out.Put(k, v)
+		_, _ = out.Put(k, v)
 	}
 	return out
 }
