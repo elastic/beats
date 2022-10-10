@@ -225,23 +225,48 @@ func TestFragment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to open test pcap: %v", err)
 	}
-	d, tcp, udp := newTestDecoder(t)
 
-	var n int
 	src := gopacket.NewPacketSource(h, h.LinkType())
+	var packets []gopacket.Packet
 	for p := range src.Packets() {
-		n++
-		d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
+		packets = append(packets, p)
 	}
-	if tcp.pkt != nil {
-		t.Errorf("unexpected non-nil TCP packet: %v", tcp.pkt)
-	}
-	// Details confirmed by inspection of the test pcap with Wireshark.
-	assert.Equal(t, 3, n, "unexpected number of packets in stream")
-	assert.NotNil(t, udp.pkt, "UDP packet not received")
-	assert.Equal(t, "8.8.8.8", udp.pkt.Tuple.SrcIP.String(), "unexpected source IP")
-	assert.Equal(t, uint16(53), udp.pkt.Tuple.SrcPort, "unexpected source port")
-	assert.Equal(t, "192.168.178.24", udp.pkt.Tuple.DstIP.String(), "unexpected destination IP")
-	assert.Equal(t, uint16(35873), udp.pkt.Tuple.DstPort, "unexpected destination port")
-	assert.Equal(t, len(udp.pkt.Payload), 3398, "unexpected payload length")
+	assert.Equal(t, 3, len(packets), "unexpected number of packets in stream")
+
+	var payload []byte
+	t.Run("in_order", func(t *testing.T) {
+		d, tcp, udp := newTestDecoder(t)
+		for _, p := range packets {
+			d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
+		}
+
+		// Details confirmed by inspection of the test pcap with Wireshark.
+		assert.Nil(t, tcp.pkt, "unexpected non-nil TCP packet")
+		assert.NotNil(t, udp.pkt, "UDP packet not received")
+		assert.Equal(t, "8.8.8.8", udp.pkt.Tuple.SrcIP.String(), "unexpected source IP")
+		assert.Equal(t, uint16(53), udp.pkt.Tuple.SrcPort, "unexpected source port")
+		assert.Equal(t, "192.168.178.24", udp.pkt.Tuple.DstIP.String(), "unexpected destination IP")
+		assert.Equal(t, uint16(35873), udp.pkt.Tuple.DstPort, "unexpected destination port")
+		assert.Equal(t, len(udp.pkt.Payload), 3398, "unexpected payload length")
+		payload = udp.pkt.Payload
+	})
+
+	t.Run("out_of_order", func(t *testing.T) {
+		d, tcp, udp := newTestDecoder(t)
+
+		// Reverse the order of the packets.
+		for i := len(packets) - 1; i >= 0; i-- {
+			p := packets[i]
+			d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
+		}
+
+		// Details confirmed by inspection of the test pcap with Wireshark.
+		assert.Nil(t, tcp.pkt, "unexpected non-nil TCP packet")
+		assert.NotNil(t, udp.pkt, "UDP packet not received")
+		assert.Equal(t, "8.8.8.8", udp.pkt.Tuple.SrcIP.String(), "unexpected source IP")
+		assert.Equal(t, uint16(53), udp.pkt.Tuple.SrcPort, "unexpected source port")
+		assert.Equal(t, "192.168.178.24", udp.pkt.Tuple.DstIP.String(), "unexpected destination IP")
+		assert.Equal(t, uint16(35873), udp.pkt.Tuple.DstPort, "unexpected destination port")
+		assert.Equal(t, udp.pkt.Payload, payload, "unexpected payload")
+	})
 }

@@ -20,6 +20,7 @@ package decoder
 import (
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -49,7 +50,7 @@ type Decoder struct {
 	udp       layers.UDP
 	truncated bool
 
-	fragments []fragment
+	fragments fragmentCache
 
 	stD1Q, stIP4, stIP6 multiLayer
 
@@ -69,16 +70,6 @@ type Decoder struct {
 	flowIDBufferBacking [flows.SizeFlowIDMax]byte
 }
 
-// maxReconstruct is the maximum size that a collection of fragmented
-// packets will be reconstructed to.
-const maxReconstruct = 1e5
-
-type fragment struct {
-	id     uint16
-	offset int
-	data   []byte
-}
-
 const (
 	netPacketsTotalCounter = "packets"
 	netBytesTotalCounter   = "bytes"
@@ -92,6 +83,7 @@ func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, i
 		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp,
+		fragments: fragmentCache{collected: make(map[uint16]fragments)},
 	}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])
@@ -199,43 +191,28 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 		if nextType == gopacket.LayerTypeFragment {
 			ipv4, ok := ipv4Layer(current)
 			if !ok {
-				// This should never happen.
+				// This should never happen. Log the issue and attempt to continue.
+				// The process logic below will handle this if it can.
 				logp.Warn("no IPv4 layer for fragment")
 			} else {
-				// FIXME: The current code assumes that the final packet in the
-				// set of fragments arrives last. This is not guaranteed to happen.
-				// An approach to dealing with this would be to keep a time-to-live
-				// store keyed on the packet ID.
-
+				now := time.Now()
 				const offsetMask = 1<<13 - 1 // https://datatracker.ietf.org/doc/html/rfc791#section-3.1
-				more := ipv4.Flags&layers.IPv4MoreFragments != 0
-				d.fragments = append(d.fragments, fragment{
+				f := fragment{
 					id:     ipv4.Id,
 					offset: int(ipv4.FragOffset&offsetMask) * 8,
 					data:   append(data[:0:0], data...), // Ensure that we are not aliasing data.
-				})
+					more:   ipv4.Flags&layers.IPv4MoreFragments != 0,
+					expire: now.Add(time.Duration(ipv4.TTL) * time.Second),
+				}
+				var more bool
+				data, more, err = d.fragments.add(now, f)
+				if err != nil {
+					logp.Warn("%v src=%s dst=%s", err, ipv4.SrcIP, ipv4.DstIP)
+					return
+				}
 				if more {
 					return
 				}
-				sort.Slice(d.fragments, func(i, j int) bool {
-					return d.fragments[i].offset < d.fragments[j].offset
-				})
-				id := d.fragments[0].id
-				data = d.fragments[0].data
-				for _, f := range d.fragments[1:] {
-					if f.id != id {
-						logp.Warn("unexpected fragment ID: %d != %d", f.id, id)
-					}
-					if f.offset != len(data) {
-						logp.Warn("unexpected fragment offset for packet ID=%d: %d != %d", id, f.offset, len(data))
-					}
-					if len(data)+len(f.data) > maxReconstruct {
-						logp.Warn("packet reconstruction would exceed limit ID=%d src=%s dst=%s", id, ipv4.SrcIP, ipv4.DstIP)
-						return
-					}
-					data = append(data, f.data...)
-				}
-				d.fragments = d.fragments[:0]
 				d.process(&packet, currentType)
 				currentType = ipv4.Protocol.LayerType()
 				current, ok = d.decoders[currentType]
@@ -275,6 +252,116 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 		d.statPackets.Add(flow, 1)
 		d.statBytes.Add(flow, uint64(ci.Length))
 	}
+}
+
+// fragmentCache is a TTL aware cache of IPv4 fragments to reassemble.
+type fragmentCache struct {
+	// oldest is the expiry time of the oldest fragment.
+	oldest time.Time
+
+	// collected is the collections of fragments keyed on their
+	// IPv4 packet ID field.
+	collected map[uint16]fragments
+}
+
+// maxReassemble is the maximum size that a collection of fragmented
+// packets will be reassembled to.
+const maxReassemble = 1e5
+
+// add adds a new fragment to the cache. The value of now is used to expire fragments
+// and collections of fragments. If the fragment completes a set of fragments for
+// reassembly, the payload of the reassembled packet is returned in data.
+// If more packets are required to complete the reassembly of the packets in the
+// fragments ID set, more is returned true. Expiries and oversize reassemblies are
+// signaled via the returned error.
+// The cache is purged of expired collections before add returns.
+func (c *fragmentCache) add(now time.Time, f fragment) (data []byte, more bool, err error) {
+	defer c.purge(now)
+
+	collected, ok := c.collected[f.id]
+	if ok && !collected.expire.IsZero() && now.After(collected.expire) {
+		delete(c.collected, f.id)
+		return nil, false, fmt.Errorf("fragments expired before reassembly ID=%d", f.id)
+	}
+	if c.oldest.After(f.expire) {
+		c.oldest = f.expire
+	}
+	if collected.expire.IsZero() || collected.expire.After(f.expire) {
+		collected.expire = f.expire
+	}
+	collected.fragments = append(collected.fragments, f)
+
+	// Check whether we have all the fragments we need to do a reassembly.
+	// Do the least amount of work possible
+	if !f.more {
+		collected.haveFinal = true
+	}
+	more = !collected.haveFinal
+	if collected.haveFinal {
+		sort.Slice(collected.fragments, func(i, j int) bool {
+			return collected.fragments[i].offset < collected.fragments[j].offset
+		})
+		more = collected.fragments[0].offset != 0
+		if !more {
+			n := len(collected.fragments[0].data)
+			for _, f := range collected.fragments[1:] {
+				if f.offset != n {
+					more = true
+					break
+				}
+				n += len(f.data)
+			}
+		}
+	}
+	if more {
+		c.collected[f.id] = collected
+		return nil, true, nil
+	}
+
+	// Drop the fragments and do the reassembly.
+	delete(c.collected, f.id)
+	data = collected.fragments[0].data
+	for _, f := range collected.fragments[1:] {
+		if len(data)+len(f.data) > maxReassemble {
+			return nil, false, fmt.Errorf("packet reconstruction would exceed limit ID=%d", f.id)
+		}
+		data = append(data, f.data...)
+	}
+	return data, false, nil
+}
+
+// purge performs a cache expiry purge, removing all collected fragments
+// that expired before now.
+func (c *fragmentCache) purge(now time.Time) {
+	if c.oldest.After(now) {
+		return
+	}
+	c.oldest = now
+	for id, coll := range c.collected {
+		if now.After(coll.expire) {
+			delete(c.collected, id)
+			continue
+		}
+		if c.oldest.After(coll.expire) {
+			c.oldest = coll.expire
+		}
+	}
+}
+
+// fragments holds a collection of fragmented packets sharing an IPv4 packet ID.
+type fragments struct {
+	expire    time.Time
+	fragments []fragment
+	haveFinal bool
+}
+
+// fragment is an IPv4 packet fragment.
+type fragment struct {
+	id     uint16
+	offset int
+	data   []byte
+	more   bool
+	expire time.Time
 }
 
 func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (done bool) {
