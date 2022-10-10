@@ -49,7 +49,8 @@ type Index struct {
 
 type primaries struct {
 	Docs struct {
-		Count int `json:"count"`
+		Count   int `json:"count"`
+		Deleted int `json:"deleted"`
 	} `json:"docs"`
 	Indexing struct {
 		IndexTotal           int `json:"index_total"`
@@ -60,22 +61,50 @@ type primaries struct {
 		TotalSizeInBytes int `json:"total_size_in_bytes"`
 	} `json:"merges"`
 	Segments struct {
-		Count int `json:"count"`
+		Count                     int `json:"count"`
+		MemoryInBytes             int `json:"memory_in_bytes"`
+		TermsMemoryInBytes        int `json:"terms_memory_in_bytes"`
+		StoredFieldsMemoryInBytes int `json:"stored_fields_memory_in_bytes"`
+		TermVectorsMemoryInBytes  int `json:"term_vectors_memory_in_bytes"`
+		NormsMemoryInBytes        int `json:"norms_memory_in_bytes"`
+		PointsMemoryInBytes       int `json:"points_memory_in_bytes"`
+		DocValuesMemoryInBytes    int `json:"doc_values_memory_in_bytes"`
+		IndexWriterMemoryInBytes  int `json:"index_writer_memory_in_bytes"`
+		VersionMapMemoryInBytes   int `json:"version_map_memory_in_bytes"`
+		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
 		SizeInBytes int `json:"size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		TotalTimeInMillis int `json:"total_time_in_millis"`
+		TotalTimeInMillis         int `json:"total_time_in_millis"`
+		ExternalTotalTimeInMillis int `json:"external_total_time_in_millis"`
 	} `json:"refresh"`
+	QueryCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+	} `json:"query_cache"`
+	RequestCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"request_cache"`
+	Search struct {
+		QueryTotal        int `json:"query_total"`
+		QueryTimeInMillis int `json:"query_time_in_millis"`
+	} `json:"search"`
 }
 
 type total struct {
 	Docs struct {
-		Count int `json:"count"`
+		Count   int `json:"count"`
+		Deleted int `json:"deleted"`
 	} `json:"docs"`
 	FieldData struct {
 		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		Evictions         int `json:"evictions"`
 	} `json:"fielddata"`
 	Indexing struct {
 		IndexTotal           int `json:"index_total"`
@@ -107,8 +136,21 @@ type total struct {
 		SizeInBytes int `json:"size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		TotalTimeInMillis int `json:"total_time_in_millis"`
+		TotalTimeInMillis         int `json:"total_time_in_millis"`
+		ExternalTotalTimeInMillis int `json:"external_total_time_in_millis"`
 	} `json:"refresh"`
+	QueryCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"query_cache"`
+	RequestCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"request_cache"`
 }
 
 type shardStats struct {

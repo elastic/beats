@@ -70,6 +70,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Import dashboards from CEF integration. {pull}32766[32766]
 - Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
 - Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+- Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
+- Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3, aws-cloudwatch, and lumberjack inputs. {pull}33259[33259]
 
 *Auditbeat*
 
@@ -90,6 +92,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 - Add GCP CloudSQL region filter {pull}32943[32943]
+- Fix logstash cgroup mappings {pull}33131[33131]
 
 *Packetbeat*
 
@@ -115,9 +118,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
-- Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
-- Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
 
 *Auditbeat*
 
@@ -182,6 +182,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
