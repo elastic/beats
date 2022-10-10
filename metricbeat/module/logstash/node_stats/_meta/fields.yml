@@ -89,11 +89,11 @@
                   type: group
                   fields:
                     - name: 15m
-                      type: long
+                      type: half_float
                     - name: 1m
-                      type: long
+                      type: half_float
                     - name: 5m
-                      type: long
+                      type: half_float
             - name: cgroup
               type: group
               fields:
