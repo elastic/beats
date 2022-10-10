@@ -83,6 +83,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
 
 *Heartbeat*
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
 
 
 *Metricbeat*
