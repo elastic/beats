@@ -20,7 +20,7 @@ import (
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
-// heartbeatCfg is a callback registered via SetTransform that returns a packetbeat Elastic Agent client.Unit
+// heartbeatCfg is a callback registered via SetTransform that returns a Elastic Agent client.Unit
 // configuration generated from a raw Elastic Agent config
 func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	//grab and properly format the input streams
