@@ -50,7 +50,14 @@ func TestMain(m *testing.M) {
 	}()
 	paths.Paths.Data = tmp
 
-	os.Exit(m.Run())
+	exit := m.Run()
+	// cleanup tmpdir after run, but let the tests set the exit code
+	err = os.RemoveAll(tmp)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error removing tempdir %s, %s:", tmp, err)
+	}
+
+	os.Exit(exit)
 }
 
 func TestLockWithDeadPid(t *testing.T) {
