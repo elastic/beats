@@ -410,6 +410,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -448,6 +449,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -538,6 +540,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -576,6 +579,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -621,6 +625,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -707,6 +712,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -743,6 +749,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -786,6 +793,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -919,6 +927,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -953,6 +962,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1022,6 +1032,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1058,6 +1069,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1144,6 +1156,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1180,6 +1193,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1223,6 +1237,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1323,6 +1338,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1361,6 +1377,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1404,6 +1421,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1480,6 +1498,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1518,6 +1537,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1596,6 +1616,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1634,6 +1655,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1743,6 +1765,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1782,6 +1805,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1828,6 +1852,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
@@ -1874,6 +1899,7 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 						"namespace":   "default",
 						"annotations": mapstr.M{},
+						"labels":      mapstr.M{},
 					},
 					"meta": mapstr.M{
 						"kubernetes": mapstr.M{
