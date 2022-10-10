@@ -39,6 +39,8 @@ func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Durat
 // GetListMetricsOutput function gets listMetrics results from cloudwatch ~~per namespace~~ for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
+// Note: We are not using Dimensions and MetricName in ListMetricsInput because with that we will have to make one ListMetrics
+// API call per metric name and set of dimensions. This will increase API cost.
 func GetListMetricsOutput(namespace string, regionName string, period time.Duration, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]types.Metric, error) {
 	var metricsTotal []types.Metric
 	var nextToken *string
