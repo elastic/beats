@@ -30,6 +30,7 @@ import (
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -71,6 +72,14 @@ func (l *TestUDPProcessor) Process(id *flows.FlowID, pkt *protos.Packet) {
 	l.pkt = pkt
 }
 
+type TestMultiUDPProcessor struct {
+	pkt []*protos.Packet
+}
+
+func (l *TestMultiUDPProcessor) Process(id *flows.FlowID, pkt *protos.Packet) {
+	l.pkt = append(l.pkt, pkt)
+}
+
 // 172.16.16.164:1108 172.16.16.139:53 DNS 87  Standard query 0x0007  AXFR contoso.local
 var ipv4TcpDNS = []byte{
 	0x00, 0x0c, 0x29, 0xce, 0xd1, 0x9e, 0x00, 0x0c, 0x29, 0x7e, 0xec, 0xa4, 0x08, 0x00, 0x45, 0x00,
@@ -83,7 +92,7 @@ var ipv4TcpDNS = []byte{
 
 // Test that DecodePacket decodes and IPv4/TCP packet and invokes the TCP processor.
 func TestDecodePacketData_ipv4Tcp(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("decoder"))
+	_ = logp.TestingSetup(logp.WithSelectors("decoder"))
 
 	p := gopacket.NewPacket(ipv4TcpDNS, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
@@ -209,4 +218,30 @@ func newTestDecoder(t *testing.T) (*Decoder, *TestTCPProcessor, *TestUDPProcesso
 		t.Fatalf("Error creating decoder %v", err)
 	}
 	return d, tcpLayer, udpLayer
+}
+
+func TestFragment(t *testing.T) {
+	h, err := pcap.OpenOffline("testdata/udp_edns0_resp.pcap")
+	if err != nil {
+		t.Fatalf("failed to open test pcap: %v", err)
+	}
+	d, tcp, udp := newTestDecoder(t)
+
+	var n int
+	src := gopacket.NewPacketSource(h, h.LinkType())
+	for p := range src.Packets() {
+		n++
+		d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
+	}
+	if tcp.pkt != nil {
+		t.Errorf("unexpected non-nil TCP packet: %v", tcp.pkt)
+	}
+	// Details confirmed by inspection of the test pcap with Wireshark.
+	assert.Equal(t, 3, n, "unexpected number of packets in stream")
+	assert.NotNil(t, udp.pkt, "UDP packet not received")
+	assert.Equal(t, "8.8.8.8", udp.pkt.Tuple.SrcIP.String(), "unexpected source IP")
+	assert.Equal(t, uint16(53), udp.pkt.Tuple.SrcPort, "unexpected source port")
+	assert.Equal(t, "192.168.178.24", udp.pkt.Tuple.DstIP.String(), "unexpected destination IP")
+	assert.Equal(t, uint16(35873), udp.pkt.Tuple.DstPort, "unexpected destination port")
+	assert.Equal(t, len(udp.pkt.Payload), 3398, "unexpected payload length")
 }
