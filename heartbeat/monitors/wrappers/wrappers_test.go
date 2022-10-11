@@ -719,6 +719,12 @@ func TestProjectBrowserJob(t *testing.T) {
 }
 
 func TestECSErrors(t *testing.T) {
+	// key is test name, value is whether to test a summary event or not
+	testCases := map[string]bool{
+		"on summary event":     true,
+		"on non-summary event": false,
+	}
+
 	ecse := ecserr.NewBadCmdStatusErr(123, "mycommand")
 	wrappedECSErr := fmt.Errorf("wrapped: %w", ecse)
 	expectedECSErr := ecserr.NewECSErr(
@@ -727,9 +733,13 @@ func TestECSErrors(t *testing.T) {
 		wrappedECSErr.Error(),
 	)
 
-	j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", true, wrappedECSErr, projectMonitorValues)}, testBrowserMonFields, nil)
-	event := &beat.Event{}
-	_, err := j[0](event)
-	require.NoError(t, err)
-	require.Equal(t, expectedECSErr, event.Fields["error"])
+	for name, makeSummaryEvent := range testCases {
+		t.Run(name, func(t *testing.T) {
+			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, wrappedECSErr, projectMonitorValues)}, testBrowserMonFields, nil)
+			event := &beat.Event{}
+			_, err := j[0](event)
+			require.NoError(t, err)
+			require.Equal(t, expectedECSErr, event.Fields["error"])
+		})
+	}
 }
