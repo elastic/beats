@@ -143,6 +143,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Heartbeat*
 - Add new states field for internal use by new synthetics app. {pull}30632[30632]
+- Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
 
 
 *Metricbeat*
