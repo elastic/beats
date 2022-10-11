@@ -33,7 +33,7 @@ func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
 	monitoring.NewString(reg, "id").Set(id)
 	out := &inputMetrics{
 		id:                    id,
-		parent:                reg,
+		parent:                parent,
 		bindAddress:           monitoring.NewString(reg, "bind_address"),
 		batchesReceivedTotal:  monitoring.NewUint(reg, "batches_received_total"),
 		batchesACKedTotal:     monitoring.NewUint(reg, "batches_acked_total"),

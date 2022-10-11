@@ -12,10 +12,12 @@ processors:
 - date:
     field: kibana.log.meta.@timestamp
     formats:
-    - ISO8601
+      - ISO8601
     target_field: '@timestamp'
 - remove:
     field: kibana.log.meta.@timestamp
+- remove:
+    field: message
 - rename:
     field: kibana.log.meta.message
     target_field: message
@@ -93,12 +95,11 @@ processors:
           ctx.event.type = "info";
         }
       }
-
 - set:
     field: event.outcome
     value: success
-    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400"
+    if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400'
 - set:
     field: event.outcome
     value: failure
-    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
+    if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
