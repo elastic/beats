@@ -108,10 +108,12 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 
 		// If this chain expires sooner than a previously seen chain we don't
 		// set any fields
-		if chainNotAfter.Before(latestChainExpiration) && chainNotBefore.After(now) {
-			continue
+		if chainNotAfter != nil {
+			if chainNotAfter.Before(latestChainExpiration) && chainNotBefore.After(now) {
+				continue
+			}
+			latestChainExpiration = *chainNotAfter
 		}
-		latestChainExpiration = *chainNotAfter
 
 		// Legacy non-ECS field
 		_, _ = tlsFields.Put("certificate_not_valid_before", chainNotBefore)
