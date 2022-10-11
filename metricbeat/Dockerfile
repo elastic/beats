@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:1.18.5
+=======
+FROM golang:1.18.7
+>>>>>>> 27807aa9db ([Automation] Update go release version to 1.18.7 (#33287))
 
 RUN \
     apt update \
