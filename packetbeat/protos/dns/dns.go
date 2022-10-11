@@ -59,6 +59,8 @@ type dnsPlugin struct {
 
 	results protos.Reporter // Channel where results are pushed.
 	watcher procs.ProcessesWatcher
+
+	logger *logp.Logger
 }
 
 // Transport protocol.
@@ -218,7 +220,7 @@ func init() {
 }
 
 func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
-	p := &dnsPlugin{}
+	p := &dnsPlugin{logger: logp.NewLogger("dns")}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -240,7 +242,7 @@ func (dns *dnsPlugin) init(results protos.Reporter, watcher procs.ProcessesWatch
 		func(k common.Key, v common.Value) {
 			trans, ok := v.(*dnsTransaction)
 			if !ok {
-				logp.Err("Expired value is not a *DnsTransaction.")
+				dns.logger.Error("Expired value is not a *DnsTransaction.")
 				return
 			}
 			dns.expireTransaction(trans)
@@ -291,14 +293,14 @@ func (dns *dnsPlugin) ConnectionTimeout() time.Duration {
 }
 
 func (dns *dnsPlugin) receivedDNSRequest(tuple *dnsTuple, msg *dnsMessage) {
-	logp.Debug("dns", "Processing query. %s", tuple)
+	dns.logger.Debugf("Processing query. %s", tuple)
 
 	trans := dns.deleteTransaction(tuple.hashable())
 	if trans != nil {
 		// This happens if a client puts multiple requests in flight
 		// with the same ID.
 		trans.notes = append(trans.notes, duplicateQueryMsg.Error())
-		logp.Debug("dns", "%v %s", duplicateQueryMsg, tuple)
+		dns.logger.Debugf("%v %s", duplicateQueryMsg, tuple)
 		dns.publishTransaction(trans)
 		dns.deleteTransaction(trans.tuple.hashable())
 	}
@@ -307,7 +309,7 @@ func (dns *dnsPlugin) receivedDNSRequest(tuple *dnsTuple, msg *dnsMessage) {
 
 	if tuple.transport == transportUDP && (msg.data.IsEdns0() != nil) && msg.length > maxDNSPacketSize {
 		trans.notes = append(trans.notes, udpPacketTooLarge.Error())
-		logp.Debug("dns", "%v", udpPacketTooLarge)
+		dns.logger.Debugf("%v", udpPacketTooLarge)
 	}
 
 	dns.transactions.Put(tuple.hashable(), trans)
@@ -315,13 +317,13 @@ func (dns *dnsPlugin) receivedDNSRequest(tuple *dnsTuple, msg *dnsMessage) {
 }
 
 func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
-	logp.Debug("dns", "Processing response. %s", tuple)
+	dns.logger.Debugf("Processing response. %s", tuple)
 
 	trans := dns.getTransaction(tuple.revHashable())
 	if trans == nil {
 		trans = newTransaction(msg.ts, tuple.reverse(), msg.cmdlineTuple.Reverse())
 		trans.notes = append(trans.notes, orphanedResponse.Error())
-		logp.Debug("dns", "%v %s", orphanedResponse, tuple)
+		dns.logger.Debugf("%v %s", orphanedResponse, tuple)
 		unmatchedResponses.Add(1)
 	}
 
@@ -331,7 +333,7 @@ func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
 		respIsEdns := msg.data.IsEdns0() != nil
 		if !respIsEdns && msg.length > maxDNSPacketSize {
 			trans.notes = append(trans.notes, udpPacketTooLarge.responseError())
-			logp.Debug("dns", "%s", udpPacketTooLarge.responseError())
+			dns.logger.Debugf("%s", udpPacketTooLarge.responseError())
 		}
 
 		request := trans.request
@@ -341,10 +343,10 @@ func (dns *dnsPlugin) receivedDNSResponse(tuple *dnsTuple, msg *dnsMessage) {
 			switch {
 			case reqIsEdns && !respIsEdns:
 				trans.notes = append(trans.notes, respEdnsNoSupport.Error())
-				logp.Debug("dns", "%v %s", respEdnsNoSupport, tuple)
+				dns.logger.Debugf("%v %s", respEdnsNoSupport, tuple)
 			case !reqIsEdns && respIsEdns:
 				trans.notes = append(trans.notes, respEdnsUnexpected.Error())
-				logp.Debug("dns", "%v %s", respEdnsUnexpected, tuple)
+				dns.logger.Debugf("%v %s", respEdnsUnexpected, tuple)
 			}
 		}
 	}
@@ -358,7 +360,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 		return
 	}
 
-	logp.Debug("dns", "Publishing transaction. %s", &t.tuple)
+	dns.logger.Debugf("Publishing transaction. %s", &t.tuple)
 
 	evt, pbf := pb.NewBeatEvent(t.ts)
 
@@ -387,18 +389,17 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
 			fields["resource"] = t.request.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, pbf, t.response.data, dns.includeAuthorities,
-			dns.includeAdditionals)
+		addDNSToMapStr(dnsEvent, pbf, t.response.data, dns.includeAuthorities, dns.includeAdditionals, dns.logger)
 
 		if t.response.data.Rcode == 0 {
 			fields["status"] = common.OK_STATUS
 		}
 
 		if dns.sendRequest {
-			fields["request"] = dnsToString(t.request.data)
+			fields["request"] = dnsToString(t.request.data, dns.logger)
 		}
 		if dns.sendResponse {
-			fields["response"] = dnsToString(t.response.data)
+			fields["response"] = dnsToString(t.response.data, dns.logger)
 		}
 	} else if t.request != nil {
 		pbf.Source.Bytes = int64(t.request.length)
@@ -410,11 +411,10 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
 			fields["resource"] = t.request.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, pbf, t.request.data, dns.includeAuthorities,
-			dns.includeAdditionals)
+		addDNSToMapStr(dnsEvent, pbf, t.request.data, dns.includeAuthorities, dns.includeAdditionals, dns.logger)
 
 		if dns.sendRequest {
-			fields["request"] = dnsToString(t.request.data)
+			fields["request"] = dnsToString(t.request.data, dns.logger)
 		}
 	} else if t.response != nil {
 		pbf.Destination.Bytes = int64(t.response.length)
@@ -426,10 +426,9 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.response.data.Question[0])
 			fields["resource"] = t.response.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, pbf, t.response.data, dns.includeAuthorities,
-			dns.includeAdditionals)
+		addDNSToMapStr(dnsEvent, pbf, t.response.data, dns.includeAuthorities, dns.includeAdditionals, dns.logger)
 		if dns.sendResponse {
-			fields["response"] = dnsToString(t.response.data)
+			fields["response"] = dnsToString(t.response.data, dns.logger)
 		}
 	}
 
@@ -438,13 +437,13 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 
 func (dns *dnsPlugin) expireTransaction(t *dnsTransaction) {
 	t.notes = append(t.notes, noResponse.Error())
-	logp.Debug("dns", "%v %s", noResponse, &t.tuple)
+	dns.logger.Debugf("%v %s", noResponse, &t.tuple)
 	dns.publishTransaction(t)
 	unmatchedRequests.Add(1)
 }
 
 // Adds the DNS message data to the supplied MapStr.
-func addDNSToMapStr(m mapstr.M, pbf *pb.Fields, dns *mkdns.Msg, authority bool, additional bool) {
+func addDNSToMapStr(m mapstr.M, pbf *pb.Fields, dns *mkdns.Msg, authority bool, additional bool, logger *logp.Logger) {
 	m["id"] = dns.Id
 	m["op_code"] = dnsOpCodeToString(dns.Opcode)
 
@@ -526,7 +525,7 @@ func addDNSToMapStr(m mapstr.M, pbf *pb.Fields, dns *mkdns.Msg, authority bool, 
 	m["answers_count"] = len(dns.Answer)
 	if len(dns.Answer) > 0 {
 		var resolvedIPs []string
-		m["answers"], resolvedIPs = rrsToMapStrs(dns.Answer, true)
+		m["answers"], resolvedIPs = rrsToMapStrs(dns.Answer, true, logger)
 		if len(resolvedIPs) > 0 {
 			m["resolved_ip"] = resolvedIPs
 			pbf.AddIP(resolvedIPs...)
@@ -535,7 +534,7 @@ func addDNSToMapStr(m mapstr.M, pbf *pb.Fields, dns *mkdns.Msg, authority bool, 
 
 	m["authorities_count"] = len(dns.Ns)
 	if authority && len(dns.Ns) > 0 {
-		m["authorities"], _ = rrsToMapStrs(dns.Ns, false)
+		m["authorities"], _ = rrsToMapStrs(dns.Ns, false, logger)
 	}
 
 	if rrOPT != nil {
@@ -544,7 +543,7 @@ func addDNSToMapStr(m mapstr.M, pbf *pb.Fields, dns *mkdns.Msg, authority bool, 
 		m["additionals_count"] = len(dns.Extra)
 	}
 	if additional && len(dns.Extra) > 0 {
-		rrsMapStrs, _ := rrsToMapStrs(dns.Extra, false)
+		rrsMapStrs, _ := rrsToMapStrs(dns.Extra, false, logger)
 		// We do not want OPT RR to appear in the 'additional' section,
 		// that's why rrsMapStrs could be empty even though len(dns.Extra) > 0
 		if len(rrsMapStrs) > 0 {
@@ -589,13 +588,13 @@ func optToMapStr(rrOPT *mkdns.OPT) mapstr.M {
 
 // rrsToMapStr converts an slice of RR's to an slice of MapStr's and optionally
 // returns a list of the IP addresses found in the resource records.
-func rrsToMapStrs(records []mkdns.RR, ipList bool) ([]mapstr.M, []string) {
+func rrsToMapStrs(records []mkdns.RR, ipList bool, logger *logp.Logger) ([]mapstr.M, []string) {
 	var allIPs []string
 	mapStrSlice := make([]mapstr.M, 0, len(records))
 	for _, rr := range records {
 		rrHeader := rr.Header()
 
-		mapStr, ips := rrToMapStr(rr, ipList)
+		mapStr, ips := rrToMapStr(rr, ipList, logger)
 		if len(mapStr) == 0 { // OPT pseudo-RR returns an empty MapStr
 			continue
 		}
@@ -618,11 +617,11 @@ func rrsToMapStrs(records []mkdns.RR, ipList bool) ([]mapstr.M, []string) {
 //
 // TODO An improvement would be to replace 'data' by the real field name
 // It would require some changes in unit tests
-func rrToString(rr mkdns.RR) string {
+func rrToString(rr mkdns.RR, logger *logp.Logger) string {
 	var st string
 	var keys []string
 
-	mapStr, _ := rrToMapStr(rr, false)
+	mapStr, _ := rrToMapStr(rr, false, logger)
 	data, ok := mapStr["data"]
 	delete(mapStr, "data")
 
@@ -655,7 +654,7 @@ func rrToString(rr mkdns.RR) string {
 	return b.String()
 }
 
-func rrToMapStr(rr mkdns.RR, ipList bool) (mapstr.M, []string) {
+func rrToMapStr(rr mkdns.RR, ipList bool, logger *logp.Logger) (mapstr.M, []string) {
 	mapStr := mapstr.M{}
 	rrType := rr.Header().Rrtype
 
@@ -670,17 +669,17 @@ func rrToMapStr(rr mkdns.RR, ipList bool) (mapstr.M, []string) {
 	switch x := rr.(type) {
 	default:
 		// We don't have special handling for this type
-		logp.Debug("dns", "No special handling for RR type %s", dnsTypeToString(rrType))
+		logger.Debugf("No special handling for RR type %s", dnsTypeToString(rrType))
 		unsupportedRR := new(mkdns.RFC3597)
 		err := unsupportedRR.ToRFC3597(x)
 		if err == nil {
 			rData, err := hexStringToString(unsupportedRR.Rdata)
 			mapStr["data"] = rData
 			if err != nil {
-				logp.Debug("dns", "%v", err)
+				logger.Debugf("%v", err)
 			}
 		} else {
-			logp.Debug("dns", "Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
+			logger.Debugf("Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
 		}
 
 	// Don't attempt to render IPs for answers that are incomplete.
@@ -734,11 +733,11 @@ func rrToMapStr(rr mkdns.RR, ipList bool) (mapstr.M, []string) {
 		mapStr["data"] = trimRightDot(x.Ptr)
 	case *mkdns.RFC3597:
 		// Miekg/dns lib doesn't handle this type
-		logp.Debug("dns", "Unknown RR type %s", dnsTypeToString(rrType))
+		logger.Debugf("Unknown RR type %s", dnsTypeToString(rrType))
 		rData, err := hexStringToString(x.Rdata)
 		mapStr["data"] = rData
 		if err != nil {
-			logp.Debug("dns", "%v", err)
+			logger.Debugf("%v", err)
 		}
 	case *mkdns.RRSIG:
 		mapStr["type_covered"] = dnsTypeToString(x.TypeCovered)
@@ -780,16 +779,16 @@ func dnsQuestionToString(q mkdns.Question) string {
 
 // rrsToString converts an array of RR's to a
 // string.
-func rrsToString(r []mkdns.RR) string {
+func rrsToString(r []mkdns.RR, logger *logp.Logger) string {
 	var rrStrs []string
 	for _, rr := range r {
-		rrStrs = append(rrStrs, rrToString(rr))
+		rrStrs = append(rrStrs, rrToString(rr, logger))
 	}
 	return strings.Join(rrStrs, "; ")
 }
 
 // dnsToString converts a DNS message to a string.
-func dnsToString(dns *mkdns.Msg) string {
+func dnsToString(dns *mkdns.Msg, logger *logp.Logger) string {
 	var msgType string
 	if dns.Response {
 		msgType = "response"
@@ -833,17 +832,17 @@ func dnsToString(dns *mkdns.Msg) string {
 
 	if len(dns.Answer) > 0 {
 		a = append(a, fmt.Sprintf("ANSWER %s",
-			rrsToString(dns.Answer)))
+			rrsToString(dns.Answer, logger)))
 	}
 
 	if len(dns.Ns) > 0 {
 		a = append(a, fmt.Sprintf("AUTHORITY %s",
-			rrsToString(dns.Ns)))
+			rrsToString(dns.Ns, logger)))
 	}
 
 	if len(dns.Extra) > 0 {
 		a = append(a, fmt.Sprintf("ADDITIONAL %s",
-			rrsToString(dns.Extra)))
+			rrsToString(dns.Extra, logger)))
 	}
 
 	return strings.Join(a, "; ")
