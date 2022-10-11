@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call {pull}33105[33105]
 
 *Packetbeat*
 
