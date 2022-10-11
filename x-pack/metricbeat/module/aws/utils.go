@@ -39,12 +39,21 @@ func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Durat
 // GetListMetricsOutput function gets listMetrics results from cloudwatch ~~per namespace~~ for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
-func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]types.Metric, error) {
+// Note: We are not using Dimensions and MetricName in ListMetricsInput because with that we will have to make one ListMetrics
+// API call per metric name and set of dimensions. This will increase API cost.
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]types.Metric, error) {
 	var metricsTotal []types.Metric
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
 		NextToken: nextToken,
+	}
+
+	// To filter the results to show only metrics that have had data points published
+	// in the past three hours, specify this parameter with a value of PT3H.
+	// Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html for more details.
+	if period <= time.Hour*3 {
+		listMetricsInput.RecentlyActive = types.RecentlyActivePt3h
 	}
 
 	if namespace != "*" {
@@ -67,14 +76,14 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwatch.GetMetricDataAPIClient, startTime time.Time, endTime time.Time) ([]types.MetricDataResult, error) {
-	maxQuerySize := 100
+	maxNumberOfMetricsRetrieved := 500
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 
-	// Split metricDataQueries into smaller slices that length no longer than 100.
-	// 100 is defined in maxQuerySize.
-	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
-	for i := 0; i < len(metricDataQueries); i += maxQuerySize {
-		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
+	// Split metricDataQueries into smaller slices that length no longer than 500.
+	// 500 is defined in maxNumberOfMetricsRetrieved.
+	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 500.
+	for i := 0; i < len(metricDataQueries); i += maxNumberOfMetricsRetrieved {
+		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxNumberOfMetricsRetrieved), float64(len(metricDataQueries))))]
 		if len(metricDataQueriesPartial) == 0 {
 			return getMetricDataOutput.MetricDataResults, nil
 		}
@@ -111,19 +120,22 @@ func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (boo
 
 // FindTimestamp function checks MetricDataResults and find the timestamp to collect metrics from.
 // For example, MetricDataResults might look like:
-// metricDataResults =  [{
-//	 Id: "sqs0",
-//   Label: "testName SentMessageSize",
-//   StatusCode: Complete,
-//   Timestamps: [2019-03-11 17:45:00 +0000 UTC],
-//   Values: [981]
-// } {
-//	 Id: "sqs1",
-//	 Label: "testName NumberOfMessagesSent",
-//	 StatusCode: Complete,
-//	 Timestamps: [2019-03-11 17:45:00 +0000 UTC,2019-03-11 17:40:00 +0000 UTC],
-//	 Values: [0.5,0]
-// }]
+//
+//	metricDataResults =  [{
+//		 Id: "sqs0",
+//	  Label: "testName SentMessageSize",
+//	  StatusCode: Complete,
+//	  Timestamps: [2019-03-11 17:45:00 +0000 UTC],
+//	  Values: [981]
+//	} {
+//
+//		 Id: "sqs1",
+//		 Label: "testName NumberOfMessagesSent",
+//		 StatusCode: Complete,
+//		 Timestamps: [2019-03-11 17:45:00 +0000 UTC,2019-03-11 17:40:00 +0000 UTC],
+//		 Values: [0.5,0]
+//	}]
+//
 // This case, we are collecting values for both metrics from timestamp 2019-03-11 17:45:00 +0000 UTC.
 func FindTimestamp(getMetricDataResults []types.MetricDataResult) time.Time {
 	timestamp := time.Time{}
