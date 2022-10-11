@@ -68,6 +68,8 @@ type Decoder struct {
 	// hold current flow ID
 	flowID              *flows.FlowID // buffer flowID among many calls
 	flowIDBufferBacking [flows.SizeFlowIDMax]byte
+
+	logger *logp.Logger
 }
 
 const (
@@ -84,6 +86,7 @@ func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, i
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp,
 		fragments: fragmentCache{collected: make(map[uint16]fragments)},
+		logger:    logp.NewLogger("decoder"),
 	}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])
@@ -121,7 +124,7 @@ func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, i
 		&d.tcp, &d.udp, // TCP/UDP
 	})
 
-	logp.Debug("decoder", "Layer type: %s", datalink)
+	d.logger.Debugf("Layer type: %s", datalink)
 
 	switch datalink {
 	case layers.LinkTypeLinuxSLL:
@@ -157,7 +160,7 @@ func (d *Decoder) AddLayers(layers []gopacket.DecodingLayer) {
 }
 
 func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
-	defer logp.Recover("packet decoding failed")
+	defer d.logger.Recover("packet decoding failed")
 
 	d.truncated = false
 
@@ -166,7 +169,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 
 	packet := protos.Packet{Ts: ci.Timestamp}
 
-	logp.Debug("decoder", "decode packet data")
+	d.logger.Debug("decode packet data")
 
 	if d.flowID != nil {
 		d.flowID.Reset(d.flowIDBufferBacking[:0])
@@ -182,7 +185,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	for len(data) != 0 {
 		err := current.DecodeFromBytes(data, d)
 		if err != nil {
-			logp.Info("packet decode failed with: %v", err)
+			d.logger.Infof("packet decode failed with: %v", err)
 			break
 		}
 
@@ -193,7 +196,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 			if !ok {
 				// This should never happen. Log the issue and attempt to continue.
 				// The process logic below will handle this if it can.
-				logp.Warn("no IPv4 layer for fragment")
+				d.logger.Warn("no IPv4 layer for fragment")
 			} else {
 				now := time.Now()
 				const offsetMask = 1<<13 - 1 // https://datatracker.ietf.org/doc/html/rfc791#section-3.1
@@ -207,7 +210,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 				var more bool
 				data, more, err = d.fragments.add(now, f)
 				if err != nil {
-					logp.Warn("%v src=%s dst=%s", err, ipv4.SrcIP, ipv4.DstIP)
+					d.logger.Warnf("%v src=%s dst=%s", err, ipv4.SrcIP, ipv4.DstIP)
 					return
 				}
 				if more {
@@ -217,7 +220,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 				currentType = ipv4.Protocol.LayerType()
 				current, ok = d.decoders[currentType]
 				if !ok {
-					logp.Debug("decoder", "no layer decoder for reconstructed fragments: %v (%[1]d)", currentType)
+					d.logger.Debugf("no layer decoder for reconstructed fragments: %v (%[1]d)", currentType)
 					break
 				}
 				continue
@@ -226,14 +229,14 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 
 		done := d.process(&packet, currentType)
 		if done {
-			logp.Debug("decoder", "processed")
+			d.logger.Debugf("processed")
 			break
 		}
 
 		// choose next decoding layer
 		next, ok := d.decoders[nextType]
 		if !ok {
-			logp.Debug("decoder", "no next type: %v (%[1]d)", nextType)
+			d.logger.Debugf("no next type: %v (%[1]d)", nextType)
 			break
 		}
 
@@ -244,7 +247,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 
 	// add flow s.tats
 	if d.flowID != nil {
-		logp.Debug("decoder", "flow id flags: %v", d.flowID.Flags())
+		d.logger.Debugf("flow id flags: %v", d.flowID.Flags())
 	}
 
 	if d.flowID != nil && d.flowID.Flags() != 0 {
@@ -381,7 +384,7 @@ func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (
 		}
 
 	case layers.LayerTypeIPv4:
-		logp.Debug("decoder", "IPv4 packet")
+		d.logger.Debugf("IPv4 packet")
 		ip4 := &d.ip4[d.stIP4.i]
 		d.stIP4.next()
 
@@ -394,7 +397,7 @@ func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (
 		packet.Tuple.IPLength = 4
 
 	case layers.LayerTypeIPv6:
-		logp.Debug("decoder", "IPv6 packet")
+		d.logger.Debugf("IPv6 packet")
 		ip6 := &d.ip6[d.stIP6.i]
 		d.stIP6.next()
 
@@ -407,22 +410,22 @@ func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (
 		packet.Tuple.IPLength = 16
 
 	case layers.LayerTypeICMPv4:
-		logp.Debug("decoder", "ICMPv4 packet")
+		d.logger.Debugf("ICMPv4 packet")
 		d.onICMPv4(packet)
 		return true
 
 	case layers.LayerTypeICMPv6:
-		logp.Debug("decoder", "ICMPv6 packet")
+		d.logger.Debugf("ICMPv6 packet")
 		d.onICMPv6(packet)
 		return true
 
 	case layers.LayerTypeUDP:
-		logp.Debug("decoder", "UDP packet")
+		d.logger.Debugf("UDP packet")
 		d.onUDP(packet)
 		return true
 
 	case layers.LayerTypeTCP:
-		logp.Debug("decoder", "TCP packet")
+		d.logger.Debugf("TCP packet")
 		d.onTCP(packet)
 		return true
 	}
@@ -493,7 +496,7 @@ func (d *Decoder) onTCP(packet *protos.Packet) {
 
 	if id == nil && len(packet.Payload) == 0 && !d.tcp.FIN {
 		// We have no use for this atm.
-		logp.Debug("decoder", "Ignore empty non-FIN packet")
+		d.logger.Debugf("Ignore empty non-FIN packet")
 		return
 	}
 	packet.Tuple.ComputeHashables()
