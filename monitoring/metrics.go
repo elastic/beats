@@ -20,6 +20,7 @@ package monitoring
 import (
 	"encoding/json"
 	"expvar"
+	"fmt"
 	"math"
 	"strconv"
 	"sync"
@@ -43,8 +44,14 @@ type Int struct{ i atomic.Int64 }
 // variable will be available via expvars package as well, but can not be removed
 // anymore.
 func NewInt(r *Registry, name string, opts ...Option) *Int {
-	if r == nil {
-		r = Default
+	existingVar, r := setupMetric(r, name, opts)
+	if existingVar != nil {
+		cast, ok := existingVar.(*Int)
+		if ok {
+			return cast
+		} else {
+			panicErr(fmt.Errorf("variable name %s was first registered as a %T, tried to register as Int", name, existingVar))
+		}
 	}
 
 	v := &Int{}
@@ -71,8 +78,14 @@ type Uint struct{ u atomic.Uint64 }
 // variable will be available via expvars package as well, but can not be removed
 // anymore.
 func NewUint(r *Registry, name string, opts ...Option) *Uint {
-	if r == nil {
-		r = Default
+	existingVar, r := setupMetric(r, name, opts)
+	if existingVar != nil {
+		cast, ok := existingVar.(*Uint)
+		if ok {
+			return cast
+		} else {
+			panicErr(fmt.Errorf("variable name %s was first registered as a %T, tried to register as Uint", name, existingVar))
+		}
 	}
 
 	v := &Uint{}
@@ -102,8 +115,14 @@ type Float struct{ f atomic.Uint64 }
 // variable will be available via expvars package as well, but can not be removed
 // anymore.
 func NewFloat(r *Registry, name string, opts ...Option) *Float {
-	if r == nil {
-		r = Default
+	existingVar, r := setupMetric(r, name, opts)
+	if existingVar != nil {
+		cast, ok := existingVar.(*Float)
+		if ok {
+			return cast
+		} else {
+			panicErr(fmt.Errorf("variable name %s was first registered as a %T, tried to register as Float", name, existingVar))
+		}
 	}
 
 	v := &Float{}
@@ -137,8 +156,14 @@ type Bool struct{ f atomic.Bool }
 // variable will be available via expvars package as well, but can not be removed
 // anymore.
 func NewBool(r *Registry, name string, opts ...Option) *Bool {
-	if r == nil {
-		r = Default
+	existingVar, r := setupMetric(r, name, opts)
+	if existingVar != nil {
+		cast, ok := existingVar.(*Bool)
+		if ok {
+			return cast
+		} else {
+			panicErr(fmt.Errorf("variable name %s was first registered as a %T, tried to register as Bool", name, existingVar))
+		}
 	}
 
 	v := &Bool{}
@@ -164,8 +189,14 @@ type String struct {
 // variable will be available via expvars package as well, but can not be removed
 // anymore.
 func NewString(r *Registry, name string, opts ...Option) *String {
-	if r == nil {
-		r = Default
+	existingVar, r := setupMetric(r, name, opts)
+	if existingVar != nil {
+		cast, ok := existingVar.(*String)
+		if ok {
+			return cast
+		} else {
+			panicErr(fmt.Errorf("variable name %s was first registered as a %T, tried to register as String", name, existingVar))
+		}
 	}
 
 	v := &String{}
@@ -209,8 +240,14 @@ type Func struct {
 }
 
 func NewFunc(r *Registry, name string, f func(Mode, Visitor), opts ...Option) *Func {
-	if r == nil {
-		r = Default
+	existingVar, r := setupMetric(r, name, opts)
+	if existingVar != nil {
+		cast, ok := existingVar.(*Func)
+		if ok {
+			return cast
+		} else {
+			panicErr(fmt.Errorf("variable name %s was first registered as a %T, tried to register as Func", name, existingVar))
+		}
 	}
 
 	v := &Func{f}
@@ -246,8 +283,14 @@ type Timestamp struct {
 
 // NewTimestamp creates and registers a new timestamp variable.
 func NewTimestamp(r *Registry, name string, opts ...Option) *Timestamp {
-	if r == nil {
-		r = Default
+	existingVar, r := setupMetric(r, name, opts)
+	if existingVar != nil {
+		cast, ok := existingVar.(*Timestamp)
+		if ok {
+			return cast
+		} else {
+			panicErr(fmt.Errorf("variable name %s was first registered as a %T, tried to register as Timestamp", name, existingVar))
+		}
 	}
 
 	v := &Timestamp{}
@@ -289,4 +332,24 @@ func (v *Timestamp) toString() string {
 		v.cached = v.ts.Format(TSLayout)
 	}
 	return v.cached
+}
+
+func setupMetric(reg *Registry, name string, opts []Option) (Var, *Registry) {
+	if reg == nil {
+		return nil, Default
+	}
+	vis := reg.Get(name)
+	if vis == nil {
+		return nil, reg
+	}
+
+	// Just being overly cautious.
+	// If someone tries to re-register a variable with options, should we try to "reset"
+	// the variable somehow? Even if we did, this wouldn't work 100% of the time, as we can't
+	// un-publish to expvar.
+	if len(opts) > 0 {
+		panicErr(fmt.Errorf("the variable %s cannot be re-registered with options", name))
+	}
+	return vis, reg
+
 }
