@@ -146,6 +146,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Metricbeat*
+- Updated README file on how to run Metricbeat using Kubernetes. {pull}33308[33308]
 
 
 *Packetbeat*
