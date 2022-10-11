@@ -101,15 +101,17 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 	// which only gives us the chain metadata in that scenario, unlike
 	// the go stdlib
 	// https://github.com/elastic/elastic-agent-libs/blob/main/transport/tlscommon/tls_config.go#L240
-	var maxNotAfterFloor time.Time
+	var latestChainExpiration time.Time
+	now := time.Now()
 	for _, chain := range verifiedChains {
 		chainNotBefore, chainNotAfter := calculateCertTimestamps(chain)
 
 		// If this chain expires sooner than a previously seen chain we don't
 		// set any fields
-		if chainNotAfter.Before(maxNotAfterFloor) {
+		if chainNotAfter.Before(latestChainExpiration) && chainNotBefore.After(now) {
 			continue
 		}
+		latestChainExpiration = *chainNotAfter
 
 		// Legacy non-ECS field
 		_, _ = tlsFields.Put("certificate_not_valid_before", chainNotBefore)
