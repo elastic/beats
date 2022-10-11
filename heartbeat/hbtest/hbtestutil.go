@@ -147,9 +147,14 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 }
 
 func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
+<<<<<<< HEAD
 	expected := common.MapStr{}
 	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
 	return lookslike.MustCompile(expected)
+=======
+	tlsFields := tlsmeta.CertFields(certificate, nil)
+	return lookslike.MustCompile(mapstr.M{"tls": tlsFields})
+>>>>>>> bd081b6690 ([Heartbeat] Fix expiration of cert chains calculation (#33231))
 }
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present

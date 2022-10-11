@@ -241,9 +241,22 @@ func execPing(
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways
 	if resp == nil || errReason != nil {
+<<<<<<< HEAD
 		if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
 			if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
 				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+=======
+		var ecsErr *ecserr.ECSErr
+		var urlError *url.Error
+		if errors.As(errReason.Unwrap(), &ecsErr) {
+			return time.Now(), ecsErr
+		} else if errors.As(errReason.Unwrap(), &urlError) {
+			var certErr x509.CertificateInvalidError
+			if errors.As(urlError, &certErr) {
+				tlsFields := tlsmeta.CertFields(certErr.Cert, nil)
+				event.Fields.DeepUpdate(mapstr.M{"tls": tlsFields})
+
+>>>>>>> bd081b6690 ([Heartbeat] Fix expiration of cert chains calculation (#33231))
 			}
 		}
 

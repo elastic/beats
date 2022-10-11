@@ -228,8 +228,15 @@ func (jf *jobFactory) execDialer(
 	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
 		debugf("dial failed with: %v", err)
+<<<<<<< HEAD
 		if certErr, ok := err.(x509.CertificateInvalidError); ok {
 			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+=======
+		var certErr x509.CertificateInvalidError
+		if errors.As(err, &certErr) {
+			tlsFields := tlsmeta.CertFields(certErr.Cert, nil)
+			event.Fields.DeepUpdate(mapstr.M{"tls": tlsFields})
+>>>>>>> bd081b6690 ([Heartbeat] Fix expiration of cert chains calculation (#33231))
 		}
 		return reason.IOFailed(err)
 	}
