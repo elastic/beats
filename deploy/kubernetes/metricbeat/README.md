@@ -13,12 +13,12 @@ We use official [Metricbeat Docker images](https://www.docker.elastic.co/r/beats
 This file uses a set of environment variables to configure Elasticsearch output. We have two different sets:
   * [Self-managed](https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html) Elasticsearch service:
 
-      | Variable               | Default       | Description                          |
-      |------------------------|---------------|--------------------------------------|
-      | ELASTICSEARCH_HOST     | elasticsearch | Elasticsearch host                   |
-      | ELASTICSEARCH_PORT     | 9200          | Elasticsearch port                   |
-      | ELASTICSEARCH_USERNAME | elastic       | Elasticsearch username for HTTP auth |
-      | ELASTICSEARCH_PASSWORD | changeme      | Elasticsearch password               |
+    | Variable               | Default       | Description                          |
+    |------------------------|---------------|--------------------------------------|
+    | ELASTICSEARCH_HOST     | elasticsearch | Elasticsearch host                   |
+     | ELASTICSEARCH_PORT     | 9200          | Elasticsearch port                   |
+     | ELASTICSEARCH_USERNAME | elastic       | Elasticsearch username for HTTP auth |
+     | ELASTICSEARCH_PASSWORD | changeme      | Elasticsearch password               |
 
   * Elasticsearch service on [Elastic Cloud](https://www.elastic.co/guide/en/beats/metricbeat/current/configure-cloud-id.html):
 
@@ -145,8 +145,7 @@ To visualize your data in Kibana, we will use Elastic Cloud. For that do the fol
 
 1. [Log in](https://cloud.elastic.co/home) to your Elastic Cloud account.
 
-2. Create a [deployment](https://www.elastic.co/guide/en/cloud/current/ec-create-deployment.html).
-   While waiting, you are prompted to save the admin credentials for your deployment which provides you with superuser access to Elasticsearch.
+2. Create a [deployment](https://www.elastic.co/guide/en/cloud/current/ec-create-deployment.html). Make sure to save the credentials.
 
 3. On the deployment overview page, copy down the Cloud ID.
 
