@@ -21,7 +21,6 @@
 package process
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -33,7 +32,6 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 
 	sysinfo "github.com/elastic/go-sysinfo"
-	psutil "github.com/shirou/gopsutil/process"
 )
 
 // ProcNotExist indicates that a process was not found.
@@ -201,47 +199,4 @@ func (procStats *Stats) Init() error {
 		procStats.cgroups = cgReader
 	}
 	return nil
-}
-
-// ListStates is a wrapper that returns a list of processess with only the basic PID info filled out.
-func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
-	init := Stats{
-		Hostfs:        hostfs,
-		Procs:         []string{".*"},
-		EnableCgroups: false,
-		skipExtended:  true,
-	}
-	err := init.Init()
-	if err != nil {
-		return nil, fmt.Errorf("error initializing process collectors: %w", err)
-	}
-
-	// actually fetch the PIDs from the OS-specific code
-	_, plist, err := init.FetchPids()
-	if err != nil {
-		return nil, fmt.Errorf("error gathering PIDs: %w", err)
-	}
-
-	return plist, nil
-}
-
-// GetPIDState returns the state of a given PID
-// It will return ProcNotExist if the process was not found.
-func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
-	// This library still doesn't have a good cross-platform way to distinguish between "does not eixst" and other process errors.
-	// This is a fairly difficult problem to solve in a cross-platform way
-	exists, err := psutil.PidExistsWithContext(context.Background(), int32(pid))
-	if err != nil {
-		return "", fmt.Errorf("Error truing to find process: %d: %w", pid, err)
-	}
-	if !exists {
-		return "", ProcNotExist
-	}
-	//GetInfoForPid will return the smallest possible dataset for a PID
-	procState, err := GetInfoForPid(hostfs, pid)
-	if err != nil {
-		return "", fmt.Errorf("error getting state info for pid %d: %w", pid, err)
-	}
-
-	return procState.State, nil
 }
