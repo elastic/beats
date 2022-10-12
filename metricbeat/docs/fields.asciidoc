@@ -30378,13 +30378,6 @@ type: long
 *`elasticsearch.cluster.stats.nodes.data`*::
 +
 --
-type: long
-
---
-
-*`elasticsearch.cluster.stats.nodes.stats.data`*::
-+
---
 Number of data nodes in cluster.
 
 type: long
@@ -31884,13 +31877,6 @@ type: long
 
 
 
-
-*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
-+
---
-type: long
-
---
 
 *`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
 +
@@ -47726,34 +47712,6 @@ type: nested
 
 
 
-*`logstash_stats.os.cpu.stat.number_of_elapsed_periods`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
-
---
-
-*`logstash_stats.os.cpu.stat.time_throttled_nanos`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
-
---
-
-*`logstash_stats.os.cpu.stat.number_of_times_throttled`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
-
---
-
-
 *`logstash_stats.os.cpu.load_average.15m`*::
 +
 --
@@ -47788,6 +47746,44 @@ alias to: logstash.node.stats.os.cpu.load_average.5m
 type: alias
 
 alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
+
+--
+
+
+*`logstash_stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.cfs_quota_micros
+
+--
+
+
+*`logstash_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+
+--
+
+*`logstash_stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+
+--
+
+*`logstash_stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
 
 --
 
@@ -48006,21 +48002,21 @@ type: keyword
 *`logstash.node.stats.os.cpu.load_average.15m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
 *`logstash.node.stats.os.cpu.load_average.1m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
 *`logstash.node.stats.os.cpu.load_average.5m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
@@ -48032,6 +48028,13 @@ type: long
 
 --
 
+
+*`logstash.node.stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: long
+
+--
 
 
 *`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::

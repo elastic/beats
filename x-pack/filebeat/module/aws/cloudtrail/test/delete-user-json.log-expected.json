@@ -5,6 +5,7 @@
         "aws.cloudtrail.event_version": "1.05",
         "aws.cloudtrail.flattened.request_parameters.userName": "Bob",
         "aws.cloudtrail.recipient_account_id": "123456789012",
+        "aws.cloudtrail.request_id": "0e794d53-cdb5-4f7d-b7db-5EXAMPLE",
         "aws.cloudtrail.request_parameters": "{userName=Bob}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY_ID",
         "aws.cloudtrail.user_identity.arn": "arn:aws:iam::123456789012:user/Alice",
