@@ -1,9 +1,18 @@
 # Delete and stop the service if it already exists.
 if (Get-Service {{.BeatName}} -ErrorAction SilentlyContinue) {
-  $service = Get-WmiObject -Class Win32_Service -Filter "name='{{.BeatName}}'"
-  $service.StopService()
-  Start-Sleep -s 1
-  $service.delete()
+  try {
+    $service = Get-WmiObject -Class Win32_Service -Filter "name='{{.BeatName}}'"
+    $service.StopService()
+    (Get-Service {{.BeatName}}).WaitForStatus('Stopped')
+    Start-Sleep -s 1
+    $service.delete()
+  }
+  catch {
+    Stop-Service {{.BeatName}}
+    (Get-Service {{.BeatName}}).WaitForStatus('Stopped')
+    Start-Sleep -s 1
+    sc.exe delete {{.BeatName}}
+  }
 }
 
 $workdir = Split-Path $MyInvocation.MyCommand.Path
