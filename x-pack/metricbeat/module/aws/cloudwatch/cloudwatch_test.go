@@ -1508,8 +1508,11 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 
 	expectedID := regionName + accountID
 	metricValue, err := events[expectedID+label3+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	assert.NoError(t, err)
 	metricValue1, err := events[expectedID+label3+"-1"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	assert.NoError(t, err)
 	metricValue2, err := events[expectedID+label4+"-0"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	assert.NoError(t, err)
 	metricValue3, err := events[expectedID+label4+"-1"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value1, metricValue)
