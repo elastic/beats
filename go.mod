@@ -116,7 +116,7 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/kardianos/service v1.2.1-0.20210728001519-a323c3813bc7
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
-	github.com/magefile/mage v1.13.0
+	github.com/magefile/mage v1.14.0
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-colorable v0.1.12
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
