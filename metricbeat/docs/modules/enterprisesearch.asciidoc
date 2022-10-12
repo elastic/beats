@@ -8,8 +8,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == Enterprise Search module
 
-beta[]
-
 This module periodically fetches metrics and health information from Elastic Enterprise Search instances using HTTP APIs.
 
 [float]
