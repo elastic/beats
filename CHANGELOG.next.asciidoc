@@ -79,6 +79,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Beats will now attempt to recover if a lockfile has not been removed {pull}[33169]
+
 
 *Auditbeat*
 
