@@ -16,9 +16,9 @@ This file uses a set of environment variables to configure Elasticsearch output.
     | Variable               | Default       | Description                          |
     |------------------------|---------------|--------------------------------------|
     | ELASTICSEARCH_HOST     | elasticsearch | Elasticsearch host                   |
-     | ELASTICSEARCH_PORT     | 9200          | Elasticsearch port                   |
-     | ELASTICSEARCH_USERNAME | elastic       | Elasticsearch username for HTTP auth |
-     | ELASTICSEARCH_PASSWORD | changeme      | Elasticsearch password               |
+    | ELASTICSEARCH_PORT     | 9200          | Elasticsearch port                   |
+    | ELASTICSEARCH_USERNAME | elastic       | Elasticsearch username for HTTP auth |
+    | ELASTICSEARCH_PASSWORD | changeme      | Elasticsearch password               |
 
   * Elasticsearch service on [Elastic Cloud](https://www.elastic.co/guide/en/beats/metricbeat/current/configure-cloud-id.html):
 
