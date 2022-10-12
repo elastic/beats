@@ -7,49 +7,29 @@
 
 We use official [Metricbeat Docker images](https://www.docker.elastic.co/r/beats/metricbeat), as they allow external files' configuration. Our YAML manifests are the following:
 
-<ul>
+* [metricbeat-daemonset-configmap.yaml](metricbeat-daemonset-configmap.yaml) to create the [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/) necessary to [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml).
 
-<li>
-
-[metricbeat-daemonset-configmap.yaml](metricbeat-daemonset-configmap.yaml) to create the [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/) necessary to [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml).
-
-</li>
-<li>
-
-[metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) to create a [DeamonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). This way we ensure we get a running metricbeat daemon on each node of the cluster.
+* [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) to create a [DeamonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). This way we ensure we get a running metricbeat daemon on each node of the cluster.
 This file uses a set of environment variables to configure Elasticsearch output. We have two different sets:
+  * [Self-managed](https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html) Elasticsearch service:
 
-<ul>
-<li>
+    | Variable               | Default       | Description                          |
+    |------------------------|---------------|--------------------------------------|
+    | ELASTICSEARCH_HOST     | elasticsearch | Elasticsearch host                   |
+     | ELASTICSEARCH_PORT     | 9200          | Elasticsearch port                   |
+     | ELASTICSEARCH_USERNAME | elastic       | Elasticsearch username for HTTP auth |
+     | ELASTICSEARCH_PASSWORD | changeme      | Elasticsearch password               |
 
-[Self-managed](https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html) Elasticsearch service:
+  * Elasticsearch service on [Elastic Cloud](https://www.elastic.co/guide/en/beats/metricbeat/current/configure-cloud-id.html):
 
-| Variable               | Default       | Description                          |
-|------------------------|---------------|--------------------------------------|
-| ELASTICSEARCH_HOST     | elasticsearch | Elasticsearch host                   |
-| ELASTICSEARCH_PORT     | 9200          | Elasticsearch port                   |
-| ELASTICSEARCH_USERNAME | elastic       | Elasticsearch username for HTTP auth |
-| ELASTICSEARCH_PASSWORD | changeme      | Elasticsearch password               |
-</li>
-<li>
+      | Variable           | Default | Description        |
+      |--------------------|---------|--------------------|
+      | ELASTIC_CLOUD_ID   |         | Elastic cloud ID   |
+      | ELASTIC_CLOUD_AUTH |         | Elastic cloud auth |
 
-Elasticsearch service on [Elastic Cloud](https://www.elastic.co/guide/en/beats/metricbeat/current/configure-cloud-id.html):
+* [metricbeat-role-binding.yaml](metricbeat-role-binding.yaml),[metricbeat-role.yaml](metricbeat-role.yaml) and [metricbeat-service-account.yaml](metricbeat-service-account.yaml) to define a user's permissions in our namespace (more information on this can be found [here](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)). Notice that the namespace we are using is `kube-system`, but this can be changed by updating the YAML manifests.
 
-| Variable           | Default | Description        |
-|--------------------|---------|--------------------|
-| ELASTIC_CLOUD_ID   |         | Elastic cloud ID   |
-| ELASTIC_CLOUD_AUTH |         | Elastic cloud auth |
 
-</li>
-</ul>
-
-</li>
-<li>
-
-[metricbeat-role-binding.yaml](metricbeat-role-binding.yaml),[metricbeat-role.yaml](metricbeat-role.yaml) and [metricbeat-service-account.yaml](metricbeat-service-account.yaml) to define a user's permissions in our namespace (more information on this can be found [here](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)). Notice that the namespace we are using is `kube-system`, but this can be changed by updating the YAML manifests.
-
-</li>
-</ul>
 
 ### Example
 
@@ -161,53 +141,41 @@ $ kubectl get pods -o wide --namespace=kube-system | grep ^metricbeat
 
 To visualize your data in Kibana, we will use Elastic Cloud. For that do the following:
 
-<ol>
-<li>
 
-[Log in](https://cloud.elastic.co/home) to your Elastic Cloud account.
-</li>
-<li>
 
-Create a [deployment](https://www.elastic.co/guide/en/cloud/current/ec-create-deployment.html). Make sure to save the credentials.
-</li>
-<li>
+1. [Log in](https://cloud.elastic.co/home) to your Elastic Cloud account.
 
-On the deployment overview page, copy down the Cloud ID.
-</li>
-<li>
+2. Create a [deployment](https://www.elastic.co/guide/en/cloud/current/ec-create-deployment.html). Make sure to save the credentials.
 
-Set the environment variables on the [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) file:
+3. On the deployment overview page, copy down the Cloud ID.
 
-```YAML
-- name: ELASTIC_CLOUD_ID
-  value: <cloud_id>
-- name: ELASTIC_CLOUD_AUTH
-  value: <username>:<password>
-```
+4. Set the environment variables on the [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) file:
 
-If you already applied all the YAML manifest files you can just update this one:
+    ```YAML
+    - name: ELASTIC_CLOUD_ID
+      value: <cloud_id>
+    - name: ELASTIC_CLOUD_AUTH
+      value: <username>:<password>
+    ```
 
-```
-$ kubectl apply -f beats/deploy/kubernetes/metricbeat/metricbeat-daemonset.yaml
-```
+    If you already applied all the YAML manifest files you can just update this one:
 
-Otherwise, make sure to apply all:
+    ```
+    $ kubectl apply -f beats/deploy/kubernetes/metricbeat/metricbeat-daemonset.yaml
+    ```
 
-```
-$ kubectl apply -f beats/deploy/kubernetes/metricbeat
-```
-</li>
-<li>
+    Otherwise, make sure to apply all:
 
-Navigate to the **Analytics** endpoint and select **Discover**. To see Metricbeat data, make sure the predefined `metricbeat-*` index pattern is selected.
-</li>
-<li>
+    ```
+    $ kubectl apply -f beats/deploy/kubernetes/metricbeat
+    ```
 
-To load a Kibana dashboard, you have to select **Dashboard** on the side menu.
+5. Navigate to the **Analytics** endpoint and select **Discover**. To see Metricbeat data, make sure the predefined `metricbeat-*` index pattern is selected.
+
+6. To load a Kibana dashboard, you have to select **Dashboard** on the side menu.
 For example, you can see data about your Metricbeat DaemonSet on the dashboard *[Metricbeat Kubernetes] DaemonSets*.
 If by any chance, you don't have dashboards downloaded in Kibana, you can go [here](https://www.elastic.co/guide/en/beats/metricbeat/current/load-kibana-dashboards.html) to find a solution for that.
-</li>
-</ol>
+
 
 You should now be able to visualize your data on Kibana.
 
