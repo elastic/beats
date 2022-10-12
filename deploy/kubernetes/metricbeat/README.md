@@ -4,10 +4,25 @@
 
 ### Settings
 
+
 We use official [Metricbeat Docker images](https://www.docker.elastic.co/r/beats/metricbeat), as they allow external files' configuration. Our YAML manifests are the following:
-- [metricbeat-daemonset-configmap.yaml](metricbeat-daemonset-configmap.yaml) to create the [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/) necessary to [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml).
-- [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) to create a [DeamonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). This way we ensure we get a running metricbeat daemon on each node of the cluster.
-  This files uses a set of environment variables to configure Elasticsearch output.
+
+<ul>
+
+<li>
+
+[metricbeat-daemonset-configmap.yaml](metricbeat-daemonset-configmap.yaml) to create the [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/) necessary to [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml).
+
+</li>
+<li>
+
+[metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) to create a [DeamonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). This way we ensure we get a running metricbeat daemon on each node of the cluster.
+This file uses a set of environment variables to configure Elasticsearch output. We have two different sets:
+
+<ul>
+<li>
+
+[Self-managed](https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html) Elasticsearch service:
 
 | Variable               | Default       | Description                          |
 |------------------------|---------------|--------------------------------------|
@@ -15,24 +30,45 @@ We use official [Metricbeat Docker images](https://www.docker.elastic.co/r/beats
 | ELASTICSEARCH_PORT     | 9200          | Elasticsearch port                   |
 | ELASTICSEARCH_USERNAME | elastic       | Elasticsearch username for HTTP auth |
 | ELASTICSEARCH_PASSWORD | changeme      | Elasticsearch password               |
-| ELASTIC_CLOUD_ID       |               | Elastic cloud ID                     |
-| ELASTIC_CLOUD_AUTH     |               | Elastic cloud auth                   |
+</li>
+<li>
 
-- [metricbeat-role-binding.yaml](metricbeat-role-binding.yaml),[metricbeat-role.yaml](metricbeat-role.yaml) and [metricbeat-service-account.yaml](metricbeat-service-account.yaml) to define a user's permissions in our namespace (more information on this can be found [here](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)). Notice that the namespace we are using is `kube-system`, but this can be changed by updating the YAML manifests.
+Elasticsearch service on [Elastic Cloud](https://www.elastic.co/guide/en/beats/metricbeat/current/configure-cloud-id.html):
+
+| Variable           | Default | Description        |
+|--------------------|---------|--------------------|
+| ELASTIC_CLOUD_ID   |         | Elastic cloud ID   |
+| ELASTIC_CLOUD_AUTH |         | Elastic cloud auth |
+
+</li>
+</ul>
+
+</li>
+<li>
+
+[metricbeat-role-binding.yaml](metricbeat-role-binding.yaml),[metricbeat-role.yaml](metricbeat-role.yaml) and [metricbeat-service-account.yaml](metricbeat-service-account.yaml) to define a user's permissions in our namespace (more information on this can be found [here](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)). Notice that the namespace we are using is `kube-system`, but this can be changed by updating the YAML manifests.
+
+</li>
+</ul>
 
 ### Example
 
-In this example, we will use `kind` to run a local Kubernetes cluster. Our cluster will have more than one node.
+In this example, we will explore two different options to run our Kubernetes cluster:
+
+- [For option 1](#Option-1.-Run-locally-on-Kind): Run locally using [Kind](https://kind.sigs.k8s.io/).
+- [For option 2](#Option-2.-Run-on-GKE): Run on cloud using [GKE](https://cloud.google.com/kubernetes-engine).
+
+In both options, our cluster will have more than one node.
 This way we can see the usage of our Metricbeat DaemonSet.
 
 
 #### Prerequisites
 
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/) to run commands against Kubernetes clusters.
-- [For option 1](#Option-1.-Run-locally-on-kind): [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) for running local Kubernetes clusters.
+- [For option 1](#Option-1.-Run-locally-on-Kind): [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) for running local Kubernetes clusters.
 - [For option 2](#Option-2.-Run-on-GKE): [gcloud Cli](https://cloud.google.com/sdk/docs/install).
 
-#### Option 1. Run locally on kind
+#### Option 1. Run locally on Kind
 
 The first thing we need to do is create a Kubernetes cluster. On kind, the default [configuration](https://kind.sigs.k8s.io/docs/user/configuration/) of a cluster generates only one node. As we are using a DaemonSet to run our Metricbeat, we will make a cluster run 4 nodes, so we can check our pods are running on all (or some) of them. To do this, we simply create the file `cluster-config.yaml`:
 ```YAML
@@ -45,13 +81,17 @@ nodes:
 - role: worker
 ```
 
-After that, we can create a cluster using the command below.
+Note that you can also specify your cluster's [nodes images](https://hub.docker.com/r/kindest/node/tags).
+
+We now can create a cluster using the command below.
 
 ```
 $ kind create cluster --config=cluster-config.yaml
 ```
 
-Notice that our cluster was created using the configuration we created above. The name of our cluster is the default one, `kind`. To interact with the cluster, you only need to specify the cluster name as a context in kubectl:
+
+
+Notice that our cluster was created using the configuration shown above. The name of our cluster is the default one, `kind`. To interact with the cluster, you only need to specify the cluster name as a context in kubectl:
 
 ```
 $ kubectl cluster-info --context kind-kind
@@ -76,13 +116,26 @@ You can check the nodes of the newly created cluster by running the following:
 $ kubectl get nodes
 ```
 
-Metricbeat gets some metrics from [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics). You can download the project. You can run, for example:
+Metricbeat gets some metrics from [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics).
+Clone the repository locally:
+
+```
+$ git clone git@github.com:kubernetes/kube-state-metrics.git
+```
+
+After that, you can deploy Kube State Metrics by running:
 
 ```
 $ kubectl apply -f kube-state-metrics/examples/standard
 ```
 
-To deploy Metricbeat to Kubernetes, clone this repository. Don't forget to set the docker image version inside the [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml).
+To deploy Metricbeat to Kubernetes, clone this repository:
+
+```
+$ git clone git@github.com:elastic/beats.git
+```
+
+Don't forget to set the docker image version inside the [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml).
 Remember that you can find [Metricbeat Docker images here](https://www.docker.elastic.co/r/beats/metricbeat).
 After that, run:
 
@@ -107,12 +160,23 @@ $ kubectl get pods -o wide --namespace=kube-system | grep ^metricbeat
 #### Visualizing data in Kibana
 
 To visualize your data in Kibana, we will use Elastic Cloud. For that do the following:
-1. [Log in](https://cloud.elastic.co/home) to your Elastic Cloud account.
-2. Select the target deployment.
-3. Navigate to the **Analytics** endpoint and select **Discover**. To see Metricbeat data, make sure the predefined `metricbeat-*` index pattern is selected.
-4. To load a Kibana dashboard, you have to select **Dashboard** on the side menu. For example, you can see data about your Metricbeat DaemonSet on the dashboard *[Metricbeat Kubernetes] DaemonSets*. If, by any chance, you don't have dashboards downloaded in Kibana, you can go [here](https://www.elastic.co/guide/en/beats/metricbeat/current/load-kibana-dashboards.html) to find a solution for that.
 
-If you can't see any data on the index, then you probably haven't set the YAML manifest file as you should. To do that, open the [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) and update the following:
+<ol>
+<li>
+
+[Log in](https://cloud.elastic.co/home) to your Elastic Cloud account.
+</li>
+<li>
+
+Create a [deployment](https://www.elastic.co/guide/en/cloud/current/ec-create-deployment.html). Make sure to save the credentials.
+</li>
+<li>
+
+On the deployment overview page, copy down the Cloud ID.
+</li>
+<li>
+
+Set the environment variables on the [metricbeat-daemonset.yaml](metricbeat-daemonset.yaml) file:
 
 ```YAML
 - name: ELASTIC_CLOUD_ID
@@ -121,26 +185,32 @@ If you can't see any data on the index, then you probably haven't set the YAML m
   value: <username>:<password>
 ```
 
-To update the configuration of your Metricbeat DaemonSet you should run:
+If you already applied all the YAML manifest files you can just update this one:
+
 ```
 $ kubectl apply -f beats/deploy/kubernetes/metricbeat/metricbeat-daemonset.yaml
 ```
 
+Otherwise, make sure to apply all:
+
+```
+$ kubectl apply -f beats/deploy/kubernetes/metricbeat
+```
+</li>
+<li>
+
+Navigate to the **Analytics** endpoint and select **Discover**. To see Metricbeat data, make sure the predefined `metricbeat-*` index pattern is selected.
+</li>
+<li>
+
+To load a Kibana dashboard, you have to select **Dashboard** on the side menu.
+For example, you can see data about your Metricbeat DaemonSet on the dashboard *[Metricbeat Kubernetes] DaemonSets*.
+If by any chance, you don't have dashboards downloaded in Kibana, you can go [here](https://www.elastic.co/guide/en/beats/metricbeat/current/load-kibana-dashboards.html) to find a solution for that.
+</li>
+</ol>
+
 You should now be able to visualize your data on Kibana.
 
-#### Kubernetes dashboard
+#### Visualizing your Kubernetes cluster
 
-If you are curious about your cluster, you can use the Kubernetes dashboard to manage and visualize resources.
-You can find more information about that [here](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/).
-Briefly, we will have to deploy the Kubernetes dashboard and enable its access using the `kubectl` command-line tool:
-
-```
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.1/aio/deploy/recommended.yaml
-$ kubectl proxy
-```
-
-You should find the dashboard available [here](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/).
-You can generate a token that will allow you to sign in, by using this command:
-```
-$ kubectl -n kubernetes-dashboard create token metricbeat --namespace=kube-system
-```
+If you are curious about your cluster, you can use [this](https://k8slens.dev/) to visualize resources.
