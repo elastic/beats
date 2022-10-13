@@ -130,6 +130,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Change OAuth2 Authorization Style to Auto Detection, Avoid Client.Secret Validation {pull}33342[33342]
 - httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
 - Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
 - Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
