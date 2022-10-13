@@ -145,7 +145,7 @@ func generateData(event bus.Event) (*dockerContainerData, error) {
 						"image":  container.Image,
 						"labels": processorLabelMap,
 					},
-					"to": "container",
+					"target": "container",
 				},
 			},
 		},
