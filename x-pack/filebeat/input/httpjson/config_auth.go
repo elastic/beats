@@ -22,8 +22,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// authStyleInParams sends the "client_id" and "client_secret" in the POST body as application/x-www-form-urlencoded parameters.
-const authStyleInParams = 1
+// authStyleAutoDetect sets the autodetection either the client credentials are send as BODY params or HEADER params
+const authStyleAutoDetect = 0
 
 type authConfig struct {
 	Basic  *basicAuthConfig `config:"basic"`
@@ -211,7 +211,7 @@ func (o *oAuth2Config) Validate() error {
 	case oAuth2ProviderGoogle:
 		return o.validateGoogleProvider()
 	case oAuth2ProviderDefault:
-		if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == "" {
+		if o.TokenURL == "" || o.ClientID == "" {
 			return errors.New("both token_url and client credentials must be provided")
 		}
 		if (o.User != "" && o.Password == "") || (o.User == "" && o.Password != "") {
