@@ -30378,13 +30378,6 @@ type: long
 *`elasticsearch.cluster.stats.nodes.data`*::
 +
 --
-type: long
-
---
-
-*`elasticsearch.cluster.stats.nodes.stats.data`*::
-+
---
 Number of data nodes in cluster.
 
 type: long
