@@ -227,16 +227,16 @@ func RenderEvent(
 		return err
 	}
 
-	var publisherHandle uintptr
+	var publisherHandle EvtHandle
 	if pubHandleProvider != nil {
 		messageFiles := pubHandleProvider(providerName)
 		if messageFiles.Err == nil {
 			// There is only ever a single handle when using the Windows Event
 			// Log API.
-			publisherHandle = messageFiles.Handles[0].Handle
+			publisherHandle = EvtHandle(messageFiles.Handles[0].Handle)
 		}
 	}
-
+	defer _EvtClose(publisherHandle) //nolint:errcheck // This is just a resource release.
 	// Only a single string is returned when rendering XML.
 	err = FormatEventString(EvtFormatMessageXml,
 		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf, out)
