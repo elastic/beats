@@ -94,36 +94,36 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 	return result, nil
 }
 
-func fetchValueFromContext(trCtx *transformContext, expression string) (string, error) {
+func fetchValueFromContext(trCtx *transformContext, expression string) (string, bool, error) {
 	var val interface{}
 
 	keys := strings.Split(expression, ".")
 	if keys[0] == lastResponse {
-		respMap, err := responseToMap(trCtx.lastResponse)
+		respMap, err := responseToMap(trCtx.lastResponse, true)
 		if err != nil {
-			return "", err
+			return "", false, err
 		}
 		val, err = iterateRecursive(respMap, keys[1:], 0)
 		if err != nil {
-			return "", err
+			return "", false, err
 		}
 	} else if keys[0] == firstResponse {
-		respMap, err := responseToMap(trCtx.firstResponse)
+		// since first response body is already a map, we do not need to transform it
+		respMap, err := responseToMap(trCtx.firstResponse, false)
 		if err != nil {
-			return "", err
+			return "", false, err
 		}
 		val, err = iterateRecursive(respMap, keys[1:], 0)
 		if err != nil {
-			return "", err
+			return "", false, err
 		}
 	}
-
 	returnVal := fmt.Sprintf("%v", val)
 
-	return returnVal, nil
+	return returnVal, true, nil
 }
 
-func responseToMap(r *response) (mapstr.M, error) {
+func responseToMap(r *response, mapBody bool) (mapstr.M, error) {
 	respMap := map[string]interface{}{
 		"header": make(mapstr.M),
 		"body":   make(mapstr.M),
@@ -134,13 +134,16 @@ func responseToMap(r *response) (mapstr.M, error) {
 			key: value,
 		}
 	}
-	// store first response in transform context
-	var bodyMap mapstr.M
-	err := json.Unmarshal(r.body.([]byte), &bodyMap)
-	if err != nil {
-		return nil, err
+	if mapBody {
+		var bodyMap mapstr.M
+		err := json.Unmarshal(r.body.([]byte), &bodyMap)
+		if err != nil {
+			return nil, err
+		}
+		respMap["body"] = bodyMap
+	} else {
+		respMap["body"] = r.body
 	}
-	respMap["body"] = bodyMap
 
 	return respMap, nil
 }
@@ -177,7 +180,6 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 	default:
 		return nil, errors.New("unable to parse the value of the given expression")
 	}
-
 }
 
 func tryAssignAuth(parentConfig *authConfig, childConfig *authConfig) *authConfig {

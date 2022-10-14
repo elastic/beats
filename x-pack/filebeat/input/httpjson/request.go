@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/PaesslerAG/jsonpath"
+	"gotest.tools/gotestsum/log"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -304,15 +305,20 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			// store first response in transform context
+			var bodyMap mapstr.M
 			body, err := io.ReadAll(httpResp.Body)
 			if err != nil {
 				return fmt.Errorf("failed ro read http response body: %w", err)
 			}
 			httpResp.Body = io.NopCloser(bytes.NewReader(body))
+			err = json.Unmarshal(body, &bodyMap)
+			if err != nil {
+				log.Errorf("unable to unmarshal first_response.body : %v", err)
+			}
 			firstResponse := response{
 				url:    *httpResp.Request.URL,
 				header: httpResp.Header.Clone(),
-				body:   body,
+				body:   bodyMap,
 			}
 			trCtx.updateFirstResponse(firstResponse)
 
@@ -340,7 +346,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return err
 			}
-			// we will only processAndPublishEvents here if chains do not exist, inorder to avoid unnecessary pagination
+			// we will only processAndPublishEvents here if chains & root level pagination do not exist, inorder to avoid unnecessary pagination
 			if !isChainExpected {
 				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
 				n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
@@ -359,23 +365,32 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				chainTrCtx = trCtx.clone()
 			}
 
+			var val string
+			var replaceWith bool
+			var replaceArr []string
+			if len(rf.replaceWith) != 0 {
+				replaceArr = strings.Split(rf.replaceWith, ",")
+				val, replaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+				if err != nil {
+					return err
+				}
+			}
+
 			// perform request over collected ids
 			for _, id := range ids {
-				if len(rf.replaceWith) != 0 {
-					replaceArr := strings.Split(rf.replaceWith, ",")
-					val, err := fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
-					if err != nil {
-						fmt.Printf("ERROR : %v\n", err)
-					} else {
-						fmt.Printf("VALUE : %v\n", val)
-					}
-				}
 				// reformat urls of requestFactory using ids
 				rf.url, err = generateNewUrl(rf.replace, urlString, id)
 				if err != nil {
 					return fmt.Errorf("failed to generate new URL: %w", err)
 				}
 
+				// reformat url accordingly if replaceWith clause exists
+				if replaceWith {
+					rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
+					if err != nil {
+						return fmt.Errorf("failed to generate new URL: %w", err)
+					}
+				}
 				// collect data from new urls
 				httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
 				if err != nil {
@@ -587,12 +602,31 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			chainTrCtx = trCtx.clone()
 		}
 
+		var val string
+		var replaceWith bool
+		var replaceArr []string
+		if len(rf.replaceWith) != 0 {
+			replaceArr = strings.Split(rf.replaceWith, ",")
+			val, replaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+			if err != nil {
+				return n, err
+			}
+		}
+
 		// perform request over collected ids
 		for _, id := range ids {
 			// reformat urls of requestFactory using ids
 			rf.url, err = generateNewUrl(rf.replace, urlString, id)
 			if err != nil {
 				return -1, fmt.Errorf("failed to generate new URL: %w", err)
+			}
+
+			// reformat url accordingly if replaceWith clause exists
+			if replaceWith {
+				rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
+				if err != nil {
+					return n, fmt.Errorf("failed to generate new URL: %w", err)
+				}
 			}
 
 			// collect data from new urls
