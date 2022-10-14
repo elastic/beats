@@ -25,16 +25,16 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
     - name: Run build
       uses: magefile/mage-action@v2
-        with:
-          version: latest
-          args: build
-          workdir: ./${{ env.BEAT_MODULE }}
+      with:
+        version: latest
+        args: build
+        workdir: ./${{ env.BEAT_MODULE }}
     - name: Run test
       uses: magefile/mage-action@v2
-        with:
-          version: latest
-          args: unitTest
-          workdir: ./${{ env.BEAT_MODULE }}
+      with:
+        version: latest
+        args: unitTest
+        workdir: ./${{ env.BEAT_MODULE }}
     - uses: v1v/otel-upload-test-artifact-action@v2
       if: always()
       continue-on-error: true
