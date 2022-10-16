@@ -63,7 +63,7 @@ func Test_cleanEmptyValues(t *testing.T) {
 
 func Test_appendProcessor_appendValues(t *testing.T) {
 	type fields struct {
-		config appendConfig
+		config appendProcessorConfig
 		logger *logp.Logger
 	}
 	type args struct {
@@ -93,7 +93,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 			},
 			fields: fields{
 				logger: log,
-				config: appendConfig{
+				config: appendProcessorConfig{
 					Fields:      []string{"field"},
 					TargetField: "target",
 				},
@@ -114,7 +114,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 			},
 			fields: fields{
 				logger: log,
-				config: appendConfig{
+				config: appendProcessorConfig{
 					Fields:      []string{"field"},
 					TargetField: "target",
 				},
@@ -135,7 +135,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 			},
 			fields: fields{
 				logger: log,
-				config: appendConfig{
+				config: appendProcessorConfig{
 					IgnoreEmptyValues: false,
 					IgnoreMissing:     false,
 					AllowDuplicate:    true,
@@ -158,7 +158,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 			},
 			fields: fields{
 				logger: log,
-				config: appendConfig{
+				config: appendProcessorConfig{
 					IgnoreEmptyValues: false,
 					IgnoreMissing:     true,
 					AllowDuplicate:    true,
@@ -183,7 +183,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 
 func Test_appendProcessor_Run(t *testing.T) {
 	type fields struct {
-		config appendConfig
+		config appendProcessorConfig
 		logger *logp.Logger
 	}
 	type args struct {
@@ -200,7 +200,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 			description: "positive flow",
 			fields: fields{
 				logger: log,
-				config: appendConfig{
+				config: appendProcessorConfig{
 					Fields:            []string{"array-one", "array-two", "concrete-field"},
 					TargetField:       "target",
 					Values:            []interface{}{"value1", "value2"},
@@ -235,7 +235,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 			description: "test for nested field",
 			fields: fields{
 				logger: log,
-				config: appendConfig{
+				config: appendProcessorConfig{
 					Fields:            []string{"array.one", "array.two", "concrete-field"},
 					TargetField:       "target",
 					Values:            []interface{}{"value1", "value2"},
@@ -274,7 +274,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 			description: "remove empty values form output - 'ignore_empty_values: true'",
 			fields: fields{
 				logger: log,
-				config: appendConfig{
+				config: appendProcessorConfig{
 					Fields:            []string{"array-one", "array-two", "concrete-field"},
 					TargetField:       "target",
 					Values:            []interface{}{"value1", nil, "value2", "", nil},
@@ -309,7 +309,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 			description: "append value of a missing field with 'ignore_missing: false'",
 			fields: fields{
 				logger: log,
-				config: appendConfig{
+				config: appendProcessorConfig{
 					Fields:            []string{"missing-field"},
 					TargetField:       "target",
 					IgnoreMissing:     false,

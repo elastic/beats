@@ -32,11 +32,11 @@ import (
 )
 
 type appendProcessor struct {
-	config appendConfig
+	config appendProcessorConfig
 	logger *logp.Logger
 }
 
-type appendConfig struct {
+type appendProcessorConfig struct {
 	Fields            []string      `config:"fields"`
 	TargetField       string        `config:"target_field"`
 	Values            []interface{} `config:"values"`
@@ -48,16 +48,16 @@ type appendConfig struct {
 
 func init() {
 	processors.RegisterPlugin("append_processor",
-		checks.ConfigChecked(NewAppend,
+		checks.ConfigChecked(NewAppendProcessor,
 			checks.RequireFields("target_field"),
 		),
 	)
-	jsprocessor.RegisterPlugin("Append", NewAppend)
+	jsprocessor.RegisterPlugin("AppendProcessor", NewAppendProcessor)
 }
 
-// NewAppend returns a new append_processor processor.
-func NewAppend(c *conf.C) (processors.Processor, error) {
-	config := appendConfig{
+// NewAppendProcessor returns a new append_processor processor.
+func NewAppendProcessor(c *conf.C) (processors.Processor, error) {
+	config := appendProcessorConfig{
 		IgnoreMissing:     false,
 		IgnoreEmptyValues: false,
 		FailOnError:       true,
@@ -65,7 +65,7 @@ func NewAppend(c *conf.C) (processors.Processor, error) {
 	}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unpack the configuration of append processor: %s", err)
+		return nil, fmt.Errorf("failed to unpack the configuration of append processor: %w", err)
 	}
 
 	f := &appendProcessor{
@@ -83,11 +83,13 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 	err := f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, event)
 	if err != nil {
-		errMsg := fmt.Errorf("failed to append fields in append_processor processor: %s", err)
+		errMsg := fmt.Errorf("failed to append fields in append_processor processor: %w", err)
 		f.logger.Debug(errMsg.Error())
 		if f.config.FailOnError {
 			event = backup
-			event.PutValue("error.message", errMsg.Error())
+			if _, err := event.PutValue("error.message", errMsg.Error()); err != nil {
+				return nil, fmt.Errorf("failed to append fields in append_processor processor: %w", err)
+			}
 			return event, err
 		}
 	}
@@ -112,11 +114,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 			if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 				continue
 			}
-			return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)
-		}
-
-		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
-			continue
+			return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
 		}
 
 		valArr, ok := val.([]interface{})
@@ -134,8 +132,14 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 		arr = cleanEmptyValues(arr)
 	}
 
-	event.Delete(target)
-	event.PutValue(target, arr)
+	if err := event.Delete(target); err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+		return fmt.Errorf("unable to delete the target field %s due to error: %w", target, err)
+	}
+
+	if _, err := event.PutValue(target, arr); err != nil {
+		return fmt.Errorf("unable to put values in the target field %s due to error: %w", target, err)
+	}
+
 	return nil
 }
 
