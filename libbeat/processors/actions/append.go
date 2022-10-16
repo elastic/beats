@@ -37,13 +37,13 @@ type appendProcessor struct {
 }
 
 type appendConfig struct {
-	Fields            []string `config:"fields"`
-	TargetField       string   `config:"target_field"`
-	Values            []string `config:"values"`
-	IgnoreMissing     bool     `config:"ignore_missing"`
-	IgnoreEmptyValues bool     `config:"ignore_empty_values"`
-	FailOnError       bool     `config:"fail_on_error"`
-	AllowDuplicate    bool     `config:"allow_duplicate"`
+	Fields            []string      `config:"fields"`
+	TargetField       string        `config:"target_field"`
+	Values            []interface{} `config:"values"`
+	IgnoreMissing     bool          `config:"ignore_missing"`
+	IgnoreEmptyValues bool          `config:"ignore_empty_values"`
+	FailOnError       bool          `config:"fail_on_error"`
+	AllowDuplicate    bool          `config:"allow_duplicate"` //TODO: Add functionality to remove duplicate
 }
 
 func init() {
@@ -95,27 +95,44 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *appendProcessor) appendValues(target string, fields []string, values []string, event *beat.Event) error {
+func (f *appendProcessor) appendValues(target string, fields []string, values []interface{}, event *beat.Event) error {
 	var arr []interface{}
 
 	val, err := event.GetValue(target)
-	if err == nil {
-		return fmt.Errorf("could not fetch value for key: %s, Error: %s", target, err)
-	}
-	arr = append(arr, val)
-
-	for _, field := range fields {
-		val, err := event.GetValue(field)
-		if err == nil {
-			if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
-				return nil
-			}
-			return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)
-		}
+	if err != nil {
+		f.logger.Debugf("could not fetch value for key: %s. all the values will be appended in a new key %s.", target, target)
+	} else {
 		arr = append(arr, val)
 	}
 
-	arr = append(arr, values)
+	for _, field := range fields {
+
+		val, err := event.GetValue(field)
+		if err != nil {
+			if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+				continue
+			}
+			return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)
+		}
+
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+			continue
+		}
+
+		valArr, ok := val.([]interface{})
+		if ok {
+			arr = append(arr, valArr...)
+		} else {
+			arr = append(arr, val)
+		}
+	}
+
+	arr = append(arr, values...)
+
+	// remove empty strings and nil from the array
+	if f.config.IgnoreEmptyValues {
+		arr = cleanEmptyValues(arr)
+	}
 
 	event.Delete(target)
 	event.PutValue(target, arr)
@@ -123,5 +140,15 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 }
 
 func (f *appendProcessor) String() string {
-	return "append_processor=" + fmt.Sprintf("%+v", f.config.Fields)
+	return "append_processor=" + fmt.Sprintf("%+v", f.config.TargetField)
+}
+
+func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
+	for _, val := range dirtyArr {
+		if val == "" || val == nil {
+			continue
+		}
+		cleanArr = append(cleanArr, val)
+	}
+	return cleanArr
 }
