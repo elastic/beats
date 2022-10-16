@@ -20,15 +20,12 @@ package actions
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type appendProcessor struct {
@@ -111,7 +108,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 
 		val, err := event.GetValue(field)
 		if err != nil {
-			if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+			if f.config.IgnoreMissing && err.Error() == "key not found" {
 				continue
 			}
 			return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
@@ -132,7 +129,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 		arr = cleanEmptyValues(arr)
 	}
 
-	if err := event.Delete(target); err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+	if err := event.Delete(target); err != nil && !(err.Error() == "key not found") {
 		return fmt.Errorf("unable to delete the target field %s due to error: %w", target, err)
 	}
 
