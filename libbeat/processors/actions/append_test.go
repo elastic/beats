@@ -232,6 +232,45 @@ func Test_appendProcessor_Run(t *testing.T) {
 			},
 		},
 		{
+			description: "test for nested field",
+			fields: fields{
+				logger: log,
+				config: appendConfig{
+					Fields:            []string{"array.one", "array.two", "concrete-field"},
+					TargetField:       "target",
+					Values:            []interface{}{"value1", "value2"},
+					IgnoreMissing:     false,
+					IgnoreEmptyValues: false,
+					FailOnError:       true,
+					AllowDuplicate:    true,
+				},
+			},
+			args: args{
+				event: &beat.Event{
+					Meta: mapstr.M{},
+					Fields: mapstr.M{
+						"concrete-field": "some-value",
+						"array": mapstr.M{
+							"one": []interface{}{"one", "", "two", "three"},
+							"two": []interface{}{"four", "five", ""},
+						},
+					},
+				},
+			},
+			wantErr: false,
+			want: &beat.Event{
+				Meta: mapstr.M{},
+				Fields: mapstr.M{
+					"concrete-field": "some-value",
+					"array": mapstr.M{
+						"one": []interface{}{"one", "", "two", "three"},
+						"two": []interface{}{"four", "five", ""},
+					},
+					"target": []interface{}{"one", "", "two", "three", "four", "five", "", "some-value", "value1", "value2"},
+				},
+			},
+		},
+		{
 			description: "remove empty values form output - 'ignore_empty_values: true'",
 			fields: fields{
 				logger: log,
