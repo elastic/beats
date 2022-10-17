@@ -531,7 +531,7 @@ List of transforms to apply to the request before each execution.
 
 Available transforms for request: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
+Can read state from: [`.first_response.*`,`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 
@@ -1133,6 +1133,88 @@ request_url using file_name as 'file_2': \https://example.com/services/data/v1.0
 +
 Collect and make events from response in any format supported by httpjson for all calls.
 
++
+[[chain-step-replace_with]]
+[float]
+==== `chain[].step.replace_with`
+
+The `replace_with: "pattern,value"` clause is used to replace a pattern defined in the `request.url` with a given value. The value can be hard coded or can be 
+extracted from context variables like [`.last_response.*`, `.first_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
+thus providing a lot of flexibility in the logic of chain requests.
+
+Example:
+
+- First call: \https://example.com/services/data/v1.0/exports
++
+<<response-json1-replace_with,response>>
+
+- Second call: \https://example.com/services/data/v1.0/$.exportId/files
++
+<<response-json2-replace_with,response>>
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - step:
+      request.url: https://example.com/services/data/v1.0/$.exportId/files
+      request.method: GET
+      replace_with: '$.exportId,first_response.body.exportId'
+----
+
+Example:
+
+- First call to fetch exportId
+
++
+request_url: \https://example.com/services/data/v1.0/exports
+
++
+response_json:
+
++
+[[response-json1-replace_with]]
+["source","json",subs="attributes"]
+----
+{
+    "exportId" : "2212"
+}
+----
+
+- Second call to fetch `file ids` using exportId from first call.
+
++
+request_url using exportId as '2212': \https://example.com/services/data/v1.0/2212/files
+
++
+response_json using exportId as '2212':
+
++
+[[response-json2-replace_with]]
+["source","json",subs="attributes"]
+----
+{
+    "files": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+This behaviour of targeted pattern replacement in the url helps solve various use cases.
+
 [float]
 ==== `chain[].while`
 
@@ -1177,7 +1259,7 @@ Example:
 
 - Third call: \http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
 +
-<<response-json3-while,response 1>> , <<response-json4-while,response 2>>
+<<response-json3-while,response 1>>, <<response-json4-while,response 2>>
 
 ["source","yaml",subs="attributes"]
 ----
@@ -1289,6 +1371,11 @@ response_json using id as '2':
 Collect and make events from response in any format supported by httpjson for all calls.
 
 NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
+
+[float]
+==== `chain[].while.replace_with`
+
+See  <<chain-step-replace_with, chain[].step.replace_with>> .
 
 [[cursor]]
 [float]
