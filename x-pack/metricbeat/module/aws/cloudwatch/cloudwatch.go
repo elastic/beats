@@ -183,7 +183,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		for namespace, namespaceDetails := range namespaceDetailTotal {
 			m.logger.Debugf("Collected metrics from namespace %s", namespace)
 
-			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
+			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, svcCloudwatch)
 			if err != nil {
 				m.logger.Info(err.Error())
 				continue

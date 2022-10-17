@@ -207,24 +207,38 @@ func TestPreProcessors(t *testing.T) {
 }
 
 func TestDisabledMonitor(t *testing.T) {
-	confMap := map[string]interface{}{
-		"type":    "test",
-		"enabled": "false",
+	testConfigs := []map[string]interface{}{
+		{
+			"type":     "test",
+			"enabled":  "false",
+			"schedule": "@every 10s",
+		},
+		{
+			"streams": []map[string]interface{}{
+				{
+					"type":     "test",
+					"enabled":  "false",
+					"schedule": "@every 10s",
+				},
+			},
+		},
 	}
 
-	conf, err := config.NewConfigFrom(confMap)
-	require.NoError(t, err)
+	for _, confMap := range testConfigs {
+		conf, err := config.NewConfigFrom(confMap)
+		require.NoError(t, err)
 
-	reg, built, closed := mockPluginsReg()
-	f, sched, fClose := makeMockFactory(reg)
-	defer fClose()
-	defer sched.Stop()
-	runner, err := f.Create(&MockPipeline{}, conf)
-	require.NoError(t, err)
-	require.IsType(t, runner, NoopRunner{})
+		reg, built, closed := mockPluginsReg()
+		f, sched, fClose := makeMockFactory(reg)
+		defer fClose()
+		defer sched.Stop()
+		runner, err := f.Create(&MockPipeline{}, conf)
+		require.NoError(t, err)
+		require.IsType(t, NoopRunner{}, runner)
 
-	require.Equal(t, 0, built.Load())
-	require.Equal(t, 0, closed.Load())
+		require.Equal(t, 0, built.Load())
+		require.Equal(t, 0, closed.Load())
+	}
 }
 
 func TestDuplicateMonitorIDs(t *testing.T) {
