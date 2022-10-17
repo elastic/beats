@@ -277,7 +277,6 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 	return *newUrl, nil
 }
 
-//nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
 	var (
 		n                 int
@@ -563,8 +562,6 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 }
 
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
-//
-//nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
 	var (
 		n                 int
