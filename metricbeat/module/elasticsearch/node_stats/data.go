@@ -230,6 +230,9 @@ var (
 						"times_throttled": s.Object{
 							"count": c.Int("number_of_times_throttled"),
 						},
+						"time_throttled": s.Object{
+							"ns": c.Int("time_throttled_nanos"),
+						},
 					}),
 				}),
 				"memory": c.Dict("memory", s.Schema{
