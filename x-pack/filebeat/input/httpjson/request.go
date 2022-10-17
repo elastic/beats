@@ -303,7 +303,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			// store first response in transform context
-			var bodyMap mapstr.M
+			bodyMap := make(mapstr.M)
 			body, err := io.ReadAll(httpResp.Body)
 			if err != nil {
 				return fmt.Errorf("failed ro read http response body: %w", err)
