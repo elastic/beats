@@ -15,7 +15,6 @@ import (
 	"strings"
 
 	"github.com/PaesslerAG/jsonpath"
-	"gotest.tools/gotestsum/log"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -313,7 +312,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			httpResp.Body = io.NopCloser(bytes.NewReader(body))
 			err = json.Unmarshal(body, &bodyMap)
 			if err != nil {
-				log.Errorf("unable to unmarshal first_response.body : %v", err)
+				r.log.Errorf("unable to unmarshal first_response.body : %v", err)
 			}
 			firstResponse := response{
 				url:    *httpResp.Request.URL,

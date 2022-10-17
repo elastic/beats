@@ -94,11 +94,13 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 	return result, nil
 }
 
+// fetchValueFromContext evaluates a given expression and returns the appropriate value from context variables if present
 func fetchValueFromContext(trCtx *transformContext, expression string) (string, bool, error) {
 	var val interface{}
 
 	keys := strings.Split(expression, ".")
-	if keys[0] == lastResponse {
+	switch {
+	case keys[0] == lastResponse:
 		respMap, err := responseToMap(trCtx.lastResponse, true)
 		if err != nil {
 			return "", false, err
@@ -107,7 +109,7 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 		if err != nil {
 			return "", false, err
 		}
-	} else if keys[0] == firstResponse {
+	case keys[0] == firstResponse:
 		// since first response body is already a map, we do not need to transform it
 		respMap, err := responseToMap(trCtx.firstResponse, false)
 		if err != nil {
@@ -117,6 +119,8 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 		if err != nil {
 			return "", false, err
 		}
+	default:
+		return "", false, fmt.Errorf("context value not supported")
 	}
 	returnVal := fmt.Sprintf("%v", val)
 
