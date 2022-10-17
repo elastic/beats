@@ -20,6 +20,7 @@ package monitorstate
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/stretchr/testify/require"
 )
 
@@ -64,4 +65,28 @@ func TestTrackerRecordFlappingDisabled(t *testing.T) {
 	ms = mst.RecordStatus(TestSf, StatusDown)
 	require.Equal(t, StatusDown, ms.Status)
 	requireMSStatusCount(t, ms, StatusDown, 1)
+}
+
+func TestAtomicStateLoader(t *testing.T) {
+	stateA := &State{ID: "A"}
+	stateB := &State{ID: "B"}
+	loaderA := func(stdfields.StdMonitorFields) (*State, error) {
+		return stateA, nil
+	}
+	loaderB := func(stdfields.StdMonitorFields) (*State, error) {
+		return stateB, nil
+	}
+
+	asl, replace := AtomicStateLoader(loaderA)
+	resState, _ := asl(stdfields.StdMonitorFields{})
+	require.Equal(t, stateA, resState)
+
+	replace(loaderB)
+	resState, _ = asl(stdfields.StdMonitorFields{})
+	require.Equal(t, stateB, resState)
+
+	replace(loaderA)
+	resState, _ = asl(stdfields.StdMonitorFields{})
+	require.Equal(t, stateA, resState)
+
 }

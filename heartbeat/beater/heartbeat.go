@@ -47,11 +47,12 @@ import (
 type Heartbeat struct {
 	done chan struct{}
 	// config is used for iterating over elements of the config.
-	config          config.Config
-	scheduler       *scheduler.Scheduler
-	monitorReloader *cfgfile.Reloader
-	monitorFactory  *monitors.RunnerFactory
-	autodiscover    *autodiscover.Autodiscover
+	config             config.Config
+	scheduler          *scheduler.Scheduler
+	monitorReloader    *cfgfile.Reloader
+	monitorFactory     *monitors.RunnerFactory
+	autodiscover       *autodiscover.Autodiscover
+	replaceStateLoader func(sl monitorstate.StateLoader)
 }
 
 type EsConfig struct {
@@ -67,16 +68,16 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
-	stateLoader := monitorstate.NilStateLoader
+	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader)
 
-	if b.Config.Output.Name() == "elasticsearch" {
+	if b.Config.Output.Name() == "elasticsearch" && (b.Manager.Enabled() || parsedConfig.States.Enabled()) {
 		// Connect to ES and setup the State loader
 		esc, err := getESClient(b.Config.Output.Config())
 		if err != nil {
 			return nil, err
 		}
 		if esc != nil {
-			stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.RunFrom)
+			replaceStateLoader(monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.RunFrom))
 		}
 	}
 
@@ -107,9 +108,10 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	}
 
 	bt := &Heartbeat{
-		done:      make(chan struct{}),
-		config:    parsedConfig,
-		scheduler: sched,
+		done:               make(chan struct{}),
+		config:             parsedConfig,
+		scheduler:          sched,
+		replaceStateLoader: replaceStateLoader,
 		// monitorFactory is the factory used for creating all monitor instances,
 		// wiring them up to everything needed to actually execute.
 		monitorFactory: monitors.NewFactory(monitors.FactoryParams{
@@ -211,6 +213,18 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
+	if b.Config.Output.Name() == "elasticsearch" && (b.Manager.Enabled()) {
+		// Connect to ES and setup the State loader
+		esc, err := getESClient(b.Config.Output.Config())
+		if err != nil {
+			logp.L().Warnf("could not connect to ES for state management during reload: %s", err)
+		}
+		if esc != nil {
+			logp.L().Info("replacing states loader")
+			bt.replaceStateLoader(monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", bt.config.RunFrom))
+		}
+	}
+
 	mons := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".monitors", mons)
 	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)

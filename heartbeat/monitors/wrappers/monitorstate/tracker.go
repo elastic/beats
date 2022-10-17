@@ -104,3 +104,16 @@ func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 func NilStateLoader(_ stdfields.StdMonitorFields) (*State, error) {
 	return nil, nil
 }
+
+func AtomicStateLoader(inner StateLoader) (sl StateLoader, replace func(StateLoader)) {
+	mtx := &sync.Mutex{}
+	return func(currentSL stdfields.StdMonitorFields) (*State, error) {
+			mtx.Lock()
+			defer mtx.Unlock()
+			return inner(currentSL)
+		}, func(sl StateLoader) {
+			mtx.Lock()
+			defer mtx.Unlock()
+			inner = sl
+		}
+}

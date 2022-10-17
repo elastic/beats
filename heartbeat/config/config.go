@@ -40,6 +40,7 @@ type Config struct {
 	Autodiscover   *autodiscover.Config `config:"autodiscover"`
 	Jobs           map[string]*JobLimit `config:"jobs"`
 	RunFrom        *LocationWithID      `config:"run_from"`
+	States         *conf.C              `config:"states"` // only enabled / disabled for now
 }
 
 type JobLimit struct {
