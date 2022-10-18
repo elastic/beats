@@ -5,10 +5,12 @@
 package http_endpoint
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
+	"sync"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
@@ -81,28 +83,102 @@ func (e *httpEndpoint) Test(_ v2.TestContext) error {
 }
 
 func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error {
-	log := ctx.Logger.With("address", e.addr)
-
-	mux := http.NewServeMux()
-	mux.Handle(e.config.URL, newHandler(e.config, publisher, log))
-	server := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
-	_, cancel := ctxtool.WithFunc(ctx.Cancelation, func() { server.Close() })
-	defer cancel()
-
-	var err error
-	if server.TLSConfig != nil {
-		log.Infof("Starting HTTPS server on %s", server.Addr)
-		// certificate is already loaded. That's why the parameters are empty
-		err = server.ListenAndServeTLS("", "")
-	} else {
-		log.Infof("Starting HTTP server on %s", server.Addr)
-		err = server.ListenAndServe()
-	}
-
+	err := servers.serve(ctx, e, publisher)
 	if err != nil && err != http.ErrServerClosed {
 		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
+}
+
+// servers is the package-level server pool.
+var servers = pool{servers: make(map[string]*server)}
+
+// pool is a concurrence-safe pool of http servers.
+type pool struct {
+	mu sync.Mutex
+	// servers is the server pool keyed on their address/port.
+	servers map[string]*server
+}
+
+// serve runs an http server configured with the provided end-point and
+// publishing to pub. The server will run until either the context is
+// cancelled or the context of another end-point sharing the same address
+// has had its context cancelled. If an end-point is re-registered with
+// the same address and mux pattern, serve will return an error.
+func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) error {
+	log := ctx.Logger.With("address", e.addr)
+	pattern := e.config.URL
+
+	var err error
+	p.mu.Lock()
+	s, ok := p.servers[e.addr]
+	if ok {
+		if s.pattern[pattern] {
+			err := fmt.Errorf("pattern already exists for %s: %s", e.addr, pattern)
+			s.setErr(err)
+			s.cancel()
+			p.mu.Unlock()
+			return err
+		}
+		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
+		s.mux.Handle(pattern, newHandler(e.config, pub, log))
+		s.pattern[pattern] = true
+		p.mu.Unlock()
+		<-s.ctx.Done()
+		return s.getErr()
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle(pattern, newHandler(e.config, pub, log))
+	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
+	s = &server{
+		pattern: map[string]bool{pattern: true},
+		mux:     mux,
+		srv:     srv,
+	}
+	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
+	p.servers[e.addr] = s
+	p.mu.Unlock()
+
+	if e.tlsConfig != nil {
+		log.Infof("Starting HTTPS server on %s with %s end point", srv.Addr, pattern)
+		// The certificate is already loaded so we do not need
+		// to pass the cert file and key file parameters.
+		err = s.srv.ListenAndServeTLS("", "")
+	} else {
+		log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
+		err = s.srv.ListenAndServe()
+	}
+	s.setErr(err)
+	s.cancel()
+	return err
+}
+
+// server is a collection of http end-points sharing the same underlying
+// http.Server.
+type server struct {
+	pattern map[string]bool
+
+	mux *http.ServeMux
+	srv *http.Server
+
+	ctx    context.Context
+	cancel func()
+
+	mu  sync.Mutex
+	err error
+}
+
+func (s *server) setErr(err error) {
+	s.mu.Lock()
+	s.err = err
+	s.mu.Unlock()
+}
+
+func (s *server) getErr() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.err
 }
 
 func newHandler(c config, pub stateless.Publisher, log *logp.Logger) http.Handler {
