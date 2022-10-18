@@ -110,6 +110,8 @@ func AtomicStateLoader(inner StateLoader) (sl StateLoader, replace func(StateLoa
 	return func(currentSL stdfields.StdMonitorFields) (*State, error) {
 			mtx.Lock()
 			defer mtx.Unlock()
+
+			logp.L().Info("Updated atomic state loader")
 			return inner(currentSL)
 		}, func(sl StateLoader) {
 			mtx.Lock()

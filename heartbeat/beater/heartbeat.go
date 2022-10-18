@@ -20,12 +20,14 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"syscall"
 	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
@@ -56,9 +58,12 @@ type Heartbeat struct {
 }
 
 type EsConfig struct {
-	Hosts    []string `config:"hosts"`
-	Username string   `config:"username"`
-	Password string   `config:"password"`
+	Protocol  string                           `config:"protocol",default:"http"`
+	APIKey    string                           `config:"api_key"`
+	Hosts     []string                         `config:"hosts"`
+	Username  string                           `config:"username"`
+	Password  string                           `config:"password"`
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 // New creates a new heartbeat.
@@ -268,18 +273,48 @@ func (bt *Heartbeat) Stop() {
 // getESClient returns an ES client if one is configured. Will return nil, nil, if none is configured.
 func getESClient(outputConfig *conf.C) (esc *elasticsearch.Client, err error) {
 	esConfig := EsConfig{}
+	loggable := map[string]interface{}{}
+	outputConfig.Unpack(loggable)
+	logp.L().Infof("RAW ES CONFIG: %#v", loggable)
 	err = outputConfig.Unpack(&esConfig)
 	if err != nil {
 		logp.L().Info("output is not elasticsearch, error / state tracking will not be enabled: %w", err)
 		return nil, nil
 	}
+
+	protocol := esConfig.Protocol
+	if esConfig.Transport.TLS.IsEnabled() {
+		protocol = "https"
+	}
+
+	convertedHosts := make([]string, len(esConfig.Hosts))
+	for idx, host := range esConfig.Hosts {
+		formattedHost := host
+		if !strings.HasPrefix(host, "http") {
+			formattedHost = fmt.Sprintf("%s://%s", protocol, host)
+		}
+		convertedHosts[idx] = formattedHost
+	}
+
+	roundTripper, err := esConfig.Transport.RoundTripper()
+	if err != nil {
+		return nil, fmt.Errorf("could not create round tripper for states ES client: %w", err)
+	}
 	esc, err = elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: esConfig.Hosts,
 		Username:  esConfig.Username,
 		Password:  esConfig.Password,
+		Transport: roundTripper,
 	})
+
+	logp.L().Info("CONNECT TO ES: %s (%s:%s) T: %s", esConfig.Hosts, esConfig.Username, esConfig.Password, roundTripper)
+
 	if err != nil {
-		return nil, fmt.Errorf("could not initialize elasticsearch client: %w", err)
+		password := "<no-password>"
+		if len(password) > 0 {
+			password = "<password-hidden>"
+		}
+		return nil, fmt.Errorf("could not initialize elasticsearch client to %s (%s:%s): %w", esConfig.Hosts, esConfig.Username, password, err)
 	}
 	logp.L().Infof("successfully connected to elasticsearch for error / state tracking: %v", esConfig.Hosts)
 
