@@ -26,6 +26,7 @@ type config struct {
 	APISleep                  time.Duration       `config:"api_sleep" validate:"min=0,nonzero"`
 	Latency                   time.Duration       `config:"latency"`
 	NumberOfWorkers           int                 `config:"number_of_workers"`
+	NumberOfEvents            int                 `config:"number_of_events" validate:"max=10000,nonzero"`
 	AWSConfig                 awscommon.ConfigAWS `config:",inline"`
 }
 
@@ -39,6 +40,7 @@ func defaultConfig() config {
 		APITimeout:      120 * time.Second,
 		APISleep:        200 * time.Millisecond, // FilterLogEvents has a limit of 5 transactions per second (TPS)/account/Region: 1s / 5 = 200 ms
 		NumberOfWorkers: 1,
+		NumberOfEvents:  5000, // set FilterLogEvents API limit to 5000 as default.
 	}
 }
 
