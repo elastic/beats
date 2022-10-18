@@ -609,8 +609,26 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name:        "Test replace_with clause and first_response object",
-			setupServer: newReplaceWithTestServer(httptest.NewServer),
+			name: "Test replace_with clause and first_response object",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"exportId":"2212"}`)
+					case "/2212":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/2212/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId"
+				config["chain.1.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
 			baseConfig: map[string]interface{}{
 				"interval":       1,
 				"request.method": http.MethodGet,
@@ -751,30 +769,6 @@ func newChainPaginationTestServer(
 		serverURL = server.URL
 		config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
 		t.Cleanup(func() { registeredTransforms = newRegistry() })
-	}
-}
-
-func newReplaceWithTestServer(
-	newServer func(http.Handler) *httptest.Server,
-) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch r.URL.Path {
-			case "/":
-				fmt.Fprintln(w, `{"exportId":"2212"}`)
-			case "/2212":
-				fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
-			case "/2212/1":
-				fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
-			case "/2212/2":
-				fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
-			}
-		})
-		server := httptest.NewServer(r)
-		config["request.url"] = server.URL
-		config["chain.0.step.request.url"] = server.URL + "/$.exportId"
-		config["chain.1.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
-		t.Cleanup(server.Close)
 	}
 }
 

@@ -98,9 +98,8 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 func fetchValueFromContext(trCtx *transformContext, expression string) (string, bool, error) {
 	var val interface{}
 
-	keys := strings.Split(expression, ".")
-	switch {
-	case keys[0] == lastResponse:
+	switch keys := strings.Split(expression, "."); keys[0] {
+	case lastResponse:
 		respMap, err := responseToMap(trCtx.lastResponse, true)
 		if err != nil {
 			return "", false, err
@@ -109,7 +108,7 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 		if err != nil {
 			return "", false, err
 		}
-	case keys[0] == firstResponse:
+	case firstResponse:
 		// since first response body is already a map, we do not need to transform it
 		respMap, err := responseToMap(trCtx.firstResponse, false)
 		if err != nil {
@@ -120,14 +119,16 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 			return "", false, err
 		}
 	default:
-		return "", false, fmt.Errorf("context value not supported")
+		return "", false, fmt.Errorf("context value not supported: %q", keys[0])
 	}
-	returnVal := fmt.Sprintf("%v", val)
 
-	return returnVal, true, nil
+	return fmt.Sprint(val), true, nil
 }
 
 func responseToMap(r *response, mapBody bool) (mapstr.M, error) {
+	if r.body == nil {
+		return nil, fmt.Errorf("response body is empty for request url: %s", &r.url)
+	}
 	respMap := map[string]interface{}{
 		"header": make(mapstr.M),
 		"body":   make(mapstr.M),
@@ -153,14 +154,13 @@ func responseToMap(r *response, mapBody bool) (mapstr.M, error) {
 }
 
 func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error) {
-	if m[keys[depth]] == nil {
-		return nil, errors.New("value of expression could not be determined")
-	}
-
 	val := m[keys[depth]]
 
-	v := reflect.ValueOf(val)
-	switch v.Kind() {
+	if val == nil {
+		return nil, fmt.Errorf("value of expression could not be determined for %s", strings.Join(keys[:depth+1], "."))
+	}
+
+	switch v := reflect.ValueOf(val); v.Kind() {
 	case reflect.Bool:
 		return v.Bool(), nil
 	case reflect.Int, reflect.Int8, reflect.Int32, reflect.Int64:
@@ -176,8 +176,8 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 		if !ok {
 			return nil, errors.New("unable to parse the value of the given expression")
 		}
-		depth = depth + 1
-		if len(keys) == depth {
+		depth++
+		if depth >= len(keys) {
 			return nil, errors.New("value of expression could not be determined")
 		}
 		return iterateRecursive(nextMap, keys, depth)

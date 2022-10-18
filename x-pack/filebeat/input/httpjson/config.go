@@ -41,10 +41,10 @@ func (c config) Validate() error {
 		if v.Step == nil && v.While == nil {
 			return errors.New("both step & while blocks in a chain cannot be empty")
 		}
-		if v.Step != nil && len(v.Step.ReplaceWith) != 0 && len(strings.Split(v.Step.ReplaceWith, ",")) > 2 {
+		if v.Step != nil && v.Step.ReplaceWith != "" && len(strings.SplitN(v.Step.ReplaceWith, ",", 3)) > 2 {
 			return errors.New("invalid number of parameters inside replaceWith")
 		}
-		if v.While != nil && len(v.While.ReplaceWith) != 0 && len(strings.Split(v.While.ReplaceWith, ",")) > 2 {
+		if v.While != nil && v.While.ReplaceWith != "" && len(strings.SplitN(v.While.ReplaceWith, ",", 3)) > 2 {
 			return errors.New("invalid number of parameters inside replaceWith")
 		}
 	}

@@ -303,15 +303,15 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			// store first response in transform context
-			bodyMap := make(mapstr.M)
+			var bodyMap mapstr.M
 			body, err := io.ReadAll(httpResp.Body)
 			if err != nil {
-				return fmt.Errorf("failed ro read http response body: %w", err)
+				return fmt.Errorf("failed to read http response body: %w", err)
 			}
 			httpResp.Body = io.NopCloser(bytes.NewReader(body))
 			err = json.Unmarshal(body, &bodyMap)
 			if err != nil {
-				r.log.Errorf("unable to unmarshal first_response.body : %v", err)
+				r.log.Errorf("unable to unmarshal first_response.body: %v", err)
 			}
 			firstResponse := response{
 				url:    *httpResp.Request.URL,
@@ -364,11 +364,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 
 			var val string
-			var replaceWith bool
+			var doReplaceWith bool
 			var replaceArr []string
-			if len(rf.replaceWith) != 0 {
+			if rf.replaceWith != "" {
 				replaceArr = strings.Split(rf.replaceWith, ",")
-				val, replaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+				val, doReplaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
 				if err != nil {
 					return err
 				}
@@ -383,7 +383,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 
 				// reformat url accordingly if replaceWith clause exists
-				if replaceWith {
+				if doReplaceWith {
 					rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 					if err != nil {
 						return fmt.Errorf("failed to generate new URL: %w", err)
@@ -552,7 +552,7 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 
 			err = response.Body.Close()
 			if err != nil {
-				r.log.Errorf("error closing http response body : %w", err)
+				r.log.Errorf("error closing http response body: %w", err)
 			}
 		}
 
@@ -599,11 +599,11 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 		}
 
 		var val string
-		var replaceWith bool
+		var doReplaceWith bool
 		var replaceArr []string
-		if len(rf.replaceWith) != 0 {
+		if rf.replaceWith != "" {
 			replaceArr = strings.Split(rf.replaceWith, ",")
-			val, replaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+			val, doReplaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
 			if err != nil {
 				return n, err
 			}
@@ -618,7 +618,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 
 			// reformat url accordingly if replaceWith clause exists
-			if replaceWith {
+			if doReplaceWith {
 				rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 				if err != nil {
 					return n, fmt.Errorf("failed to generate new URL: %w", err)

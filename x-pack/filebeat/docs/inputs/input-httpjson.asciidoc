@@ -1215,6 +1215,8 @@ response_json using exportId as '2212':
 ----
 This behaviour of targeted pattern replacement in the url helps solve various use cases.
 
+NOTE: Replace patterns should not contain commas `","` in their definition.
+
 [float]
 ==== `chain[].while`
 
