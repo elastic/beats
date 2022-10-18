@@ -12,37 +12,13 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 *Affecting all Beats*
 
 * Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
-
-
-- Fix namespacing on self-monitoring {pull}32336[32336]
-- Fix formatting of hardware addresses populated by the add-host-metadata processor. {issue}32264[32264] {pull}32265[32265]
-
-*Auditbeat*
-
-
-*Filebeat*
-- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
-
-*Heartbeat*
-- Deprecate zip_url and local monitor options. {pull}33123[33123]
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
+- Fix formatting of MAC hardware addresses populated by the add-host-metadata processor. {issue}32264[32264] {pull}32265[32265]
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
-- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix metric namespacing for self-monitoring to correct some process incorrectly reading as zero. {pull}32336[32336]
 
 *Auditbeat*
 
@@ -56,19 +32,12 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 - Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
 - Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
 - Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3, aws-cloudwatch, and lumberjack inputs. {pull}33259[33259]
-
-*Auditbeat*
-
-
-*Filebeat*
-
 - Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
 - Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
 
 *Heartbeat*
 - Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
 - Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
-
 
 *Metricbeat*
 
@@ -88,101 +57,23 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 
 - Reduce severity of message salvage failure logging. {pull}32697[32697]
 
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
 *Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
+- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
 
 *Heartbeat*
 - Add new states field for internal use by new synthetics app. {pull}30632[30632]
 
-
-*Metricbeat*
-
-
 *Packetbeat*
-
 - Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
 - Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
 - Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
 
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
 ==== Deprecated
 
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
 *Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Deprecate zip_url and local monitor options. {pull}33123[33123]
 
 [[release-notes-8.4.2]]
 === Beats version 8.4.2
@@ -213,7 +104,7 @@ https://github.com/elastic/beats/compare/v8.4.1\...v8.4.2[View commits]
 === Beats version 8.4.1
 https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 
-==== Known Issue 
+==== Known Issue
 
 // tag::credentials-error[]
 
@@ -225,7 +116,7 @@ Filebeat agents configured to read from AWS inputs may return an error similar t
 ----
 sqs ReceiveMessage failed: operation error SQS: ReceiveMessage, https response
 error StatusCode: 403, RequestID: cb57783a-505f-5099-9160-23b8eea8ddbb,
-api error SignatureDoesNotMatch: Credential should be scoped to a valid region. 
+api error SignatureDoesNotMatch: Credential should be scoped to a valid region.
 ----
 
 This error was introduced by a breaking change in the AWS library.
