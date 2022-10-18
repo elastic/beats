@@ -97,11 +97,16 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 func (f *appendProcessor) appendValues(target string, fields []string, values []interface{}, event *beat.Event) error {
 	var arr []interface{}
 
-	val, err := event.GetValue(target)
+	targetVal, err := event.GetValue(target)
 	if err != nil {
 		f.logger.Debugf("could not fetch value for key: %s. all the values will be appended in a new key %s.", target, target)
 	} else {
-		arr = append(arr, val)
+		targetArr, ok := targetVal.([]interface{})
+		if ok {
+			arr = append(arr, targetArr...)
+		} else {
+			arr = append(arr, targetVal)
+		}
 	}
 
 	for _, field := range fields {
@@ -136,7 +141,6 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 	if _, err := event.PutValue(target, arr); err != nil {
 		return fmt.Errorf("unable to put values in the target field %s due to error: %w", target, err)
 	}
-
 	return nil
 }
 

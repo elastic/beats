@@ -79,28 +79,6 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 		wantErr     bool
 	}{
 		{
-			description: "append value in the arrays from a field when target_field is present",
-			args: args{
-				target: "target",
-				fields: []string{"field"},
-				event: &beat.Event{
-					Meta: mapstr.M{},
-					Fields: mapstr.M{
-						"target": []interface{}{"value1", "value2"},
-						"field":  "value",
-					},
-				},
-			},
-			fields: fields{
-				logger: log,
-				config: appendProcessorConfig{
-					Fields:      []string{"field"},
-					TargetField: "target",
-				},
-			},
-			wantErr: false,
-		},
-		{
 			description: "append value in the arrays from a field when target_field is not present",
 			args: args{
 				target: "target",
@@ -228,6 +206,60 @@ func Test_appendProcessor_Run(t *testing.T) {
 					"array-one":      []interface{}{"one", "", "two", "three"},
 					"array-two":      []interface{}{"four", "five", ""},
 					"target":         []interface{}{"one", "", "two", "three", "four", "five", "", "some-value", "value1", "value2"},
+				},
+			},
+		},
+		{
+			description: "append value in the arrays from a field when target_field is present and it is a scaler",
+			args: args{
+				event: &beat.Event{
+					Meta: mapstr.M{},
+					Fields: mapstr.M{
+						"target": "scaler-value",
+						"field":  "I'm being appended",
+					},
+				},
+			},
+			fields: fields{
+				logger: log,
+				config: appendProcessorConfig{
+					Fields:      []string{"field"},
+					TargetField: "target",
+				},
+			},
+			wantErr: false,
+			want: &beat.Event{
+				Meta: mapstr.M{},
+				Fields: mapstr.M{
+					"field":  "I'm being appended",
+					"target": []interface{}{"scaler-value", "I'm being appended"},
+				},
+			},
+		},
+		{
+			description: "append value in the arrays from a field when target_field is present and it is an array",
+			args: args{
+				event: &beat.Event{
+					Meta: mapstr.M{},
+					Fields: mapstr.M{
+						"target": []interface{}{"value1", "value2"},
+						"field":  "I'm being appended",
+					},
+				},
+			},
+			fields: fields{
+				logger: log,
+				config: appendProcessorConfig{
+					Fields:      []string{"field"},
+					TargetField: "target",
+				},
+			},
+			wantErr: false,
+			want: &beat.Event{
+				Meta: mapstr.M{},
+				Fields: mapstr.M{
+					"field":  "I'm being appended",
+					"target": []interface{}{"value1", "value2", "I'm being appended"},
 				},
 			},
 		},

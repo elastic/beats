@@ -5,7 +5,7 @@
 <titleabbrev>append_processor</titleabbrev>
 ++++
 
-The `append_processor` processor appends static values and values from the listed fields to target field.
+The `append_processor` processor appends one or more values to an existing array if the target field already exists and it is an array. COnverts a scaler to an array and appends one or more values to it if the field exists and it is a scaler. Here the values can either be one or more static values or one or more values from the fields listed under 'fields' key.
 
 `target_field`:: The field in which you want to append the data.
 `fields`:: () List of fields from which you want to copy data from. If the value is of a concrete type it will be appended directly to the target. 
