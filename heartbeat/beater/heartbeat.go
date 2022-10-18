@@ -75,6 +75,10 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader)
 
+	loggable := map[string]interface{}{}
+	b.Config.Output.Config().Unpack(loggable)
+	logp.L().Infof("LRAW INIT OUTPUT CONFIG %v > %v | %v > %v", "menabled", b.Manager.Enabled(), "cfg", loggable)
+
 	if b.Config.Output.Name() == "elasticsearch" && (b.Manager.Enabled() || parsedConfig.States.Enabled()) {
 		// Connect to ES and setup the State loader
 		esc, err := getESClient(b.Config.Output.Config())
@@ -218,6 +222,10 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
+	loggable := map[string]interface{}{}
+	b.Config.Output.Config().Unpack(loggable)
+	logp.L().Infof("LRAW CM OUTPUT CONFIG: %v>%v", "cfg", loggable)
+
 	if b.Config.Output.Name() == "elasticsearch" && (b.Manager.Enabled()) {
 		// Connect to ES and setup the State loader
 		esc, err := getESClient(b.Config.Output.Config())
@@ -273,9 +281,6 @@ func (bt *Heartbeat) Stop() {
 // getESClient returns an ES client if one is configured. Will return nil, nil, if none is configured.
 func getESClient(outputConfig *conf.C) (esc *elasticsearch.Client, err error) {
 	esConfig := EsConfig{}
-	loggable := map[string]interface{}{}
-	outputConfig.Unpack(loggable)
-	logp.L().Infof("RAW ES CONFIG: %#v", loggable)
 	err = outputConfig.Unpack(&esConfig)
 	if err != nil {
 		logp.L().Info("output is not elasticsearch, error / state tracking will not be enabled: %w", err)
