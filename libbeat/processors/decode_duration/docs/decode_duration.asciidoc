@@ -2,12 +2,12 @@
 === Decode duration
 
 ++++
-<titleabbrev>decode-duration</titleabbrev>
+<titleabbrev>decode_duration</titleabbrev>
 ++++
 
-The `decode_duration` processor decode Go style duration string into specific `format`.
+The `decode_duration` processor decodes a Go-style duration string into a specific `format`.
 
-For more information about Go `time.Duration` string style please visit https://pkg.go.dev/time#Duration[Reference of Go time.Duration]
+For more information about the Go `time.Duration` string style, refer to the https://pkg.go.dev/time#Duration[Go documentation].
 
 .Decode-Duration options
 [options="header"]

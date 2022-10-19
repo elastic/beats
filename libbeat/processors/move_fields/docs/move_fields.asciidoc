@@ -2,14 +2,14 @@
 === Move fields
 
 ++++
-<titleabbrev>move-fields</titleabbrev>
+<titleabbrev>move_fields</titleabbrev>
 ++++
 
 The `move_fields` processor allows to rearrange event fields from a object into another.
 
-The processor first extract fields from `from`, then use `fields` and `exclude` as filter to choose which fields should be moved into the `to` field.
+The processor extracts fields from `from`, then uses `fields` and `exclude` as filters to choose which fields to move into the `to` field.
 
-For example, given the event below:
+For example, given the following event:
 
 [source,json]
 ----
@@ -23,7 +23,7 @@ For example, given the event below:
 }
 ----
 
-If, you want move `method` and `elapsed_time` into another object, use this configuration:
+To move `method` and `elapsed_time` into another object, use this configuration:
 
 [source,yaml]
 ----
@@ -34,7 +34,7 @@ processors:
       to: "rpc."
 ----
 
-then your final event will be:
+Your final event will be:
 
 [source,json]
 ----
@@ -61,7 +61,7 @@ To add a prefix to the whole event:
 }
 ----
 
-use this configuration:
+Use this configuration:
 
 [source,yaml]
 ----
@@ -70,7 +70,7 @@ processors:
       to: "my_prefix_"
 ----
 
-then your final event will be:
+Your final event will be:
 
 [source,json]
 ----
@@ -84,10 +84,10 @@ then your final event will be:
 [options="header"]
 |======
 | Name                    | Required | Default                  | Description                                                                                           |
-| `from`                  | no       |                          | Which field you want extract. these field will be moved into `to`. empty indicate event root.         |
-| `fields`                | no       |                          | filter out which fields from `from` moving to `to`. empty list indicate all fields.                   |
-| `ignore_missing`        | no       | false                    | indicate ignore not found error when extract field from `fields` list.                                |
-| `exclude`               | no       |                          | filter out which fields from `from` NOT moving to `to`.                                               |
+| `from`                  | no       |                          | Which field you want extract. This field and any nested fields will be moved into `to` unless they are filtered out. If empty, indicates event root.         |
+| `fields`                | no       |                          | Which fields to extract from `from` and move to `to`. An empty list indicates all fields.                   |
+| `ignore_missing`        | no       | false                    | Ignore "not found" errors when extracting fields.                                |
+| `exclude`               | no       |                          | A list of fields to exclude and not move.                                               |
 | `to`                    | yes      |                          | These fields extract from `from` destination field prefix the `to` will base on fields root.          |
 |======
 
