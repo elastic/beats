@@ -3,6 +3,45 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.7]]
+=== Beats version 7.17.7
+https://github.com/elastic/beats/compare/v7.17.6\...v7.17.7[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+* Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix logging bug where setting `ssl.verification_mode` to `full` or `certificate` caused the `test output` command to incorrectly log that TLS was disabled. {pull}30331[30331]
+- Fix Windows service timeouts when the "TCP/IP NetBIOS Helper" service is disabled. {issue}31810[31810] {pull}31835[31835]
+
+*Filebeat*
+
+- cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
+- Fix `file.path` field in cloudtrail fileset to use `json.digestS3Object`. {pull}32759[32759]
+- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+- Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3 and aws-cloudwatch inputs. {pull}33259[33259]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+
+*Metricbeat*
+
+- Fix GCP storage field naming. {pull}32806[32806]
+- In `module/windows/perfmon`, changed collection method of the second counter value required to create a displayable value. {pull}32305[32305]
+- Fix and improve AWS metric period calculation to avoid zero-length intervals. {pull}32724[32724]
+- Make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts`. {pull}31001[31001]
+
+*Winlogbeat*
+
+- Fix fatal invalid memory write on Windows 11. {issue}32469[32469] {pull}32519[32519]
+- Fix handling of event formatting when no metadata is available on Windows 11. {issue}32468[32468] {pull}32519[32519]
+- Reduce severity of message salvage failure logging. {pull}32697[32697]
+
 [[release-notes-7.17.6]]
 === Beats version 7.17.6
 https://github.com/elastic/beats/compare/v7.17.5\...v7.17.6[View commits]
