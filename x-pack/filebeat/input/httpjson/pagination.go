@@ -139,7 +139,7 @@ func (iter *pageIterator) next() (*response, bool, error) {
 		return nil, false, err
 	}
 
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq) //nolint:bodyclose // Bad linter! The body is closed in the call.
+	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq)
 	if err != nil {
 		return nil, false, err
 	}
