@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -142,7 +143,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Pub
 			} else {
 				v, err = common.MapStr(obj).GetValue(r.jsonObjects)
 				if err != nil {
-					if err == common.ErrKeyNotFound {
+					if errors.Is(err, common.ErrKeyNotFound) {
 						break
 					}
 					return err
