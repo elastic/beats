@@ -63,11 +63,13 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	}
 
 	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader)
-	if b.Config.Output.Name() == "elasticsearch" {
-		// Connect to ES and setup the State loader
+	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
+		// Connect to ES and setup the State loader if the output is not managed by agent
 		if err := makeStatesClient(b.Config.Output.Config(), replaceStateLoader, parsedConfig.RunFrom); err != nil {
 			logp.L().Warnf("could not connect to ES for state management during initial load: %s", err)
 		}
+	} else if b.Manager.Enabled() {
+		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
 	}
 
 	limit := parsedConfig.Scheduler.Limit

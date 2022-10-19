@@ -18,6 +18,8 @@
 package monitorstate
 
 import (
+	"context"
+	"errors"
 	"math/rand"
 	"sync"
 	"time"
@@ -113,11 +115,38 @@ func AtomicStateLoader(inner StateLoader) (sl StateLoader, replace func(StateLoa
 			mtx.Lock()
 			defer mtx.Unlock()
 
-			logp.L().Info("Updated atomic state loader")
 			return inner(currentSL)
 		}, func(sl StateLoader) {
 			mtx.Lock()
 			defer mtx.Unlock()
 			inner = sl
+			logp.L().Info("Updated atomic state loader")
+		}
+}
+
+func DeferredStateLoader(inner StateLoader, timeout time.Duration) (sl StateLoader, replace func(StateLoader)) {
+	stateLoader, replace := AtomicStateLoader(inner)
+
+	wg := sync.WaitGroup{}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	wg.Add(1)
+	go func() {
+		<-ctx.Done()
+
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			logp.L().Warn("Timeout trying to defer state loader")
+		}
+
+		defer cancel()
+		defer wg.Done()
+	}()
+
+	return func(currentSL stdfields.StdMonitorFields) (*State, error) {
+			wg.Wait()
+
+			return stateLoader(currentSL)
+		}, func(sl StateLoader) {
+			defer cancel()
+			replace(sl)
 		}
 }
