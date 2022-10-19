@@ -125,7 +125,7 @@ func AtomicStateLoader(inner StateLoader) (sl StateLoader, replace func(StateLoa
 }
 
 func DeferredStateLoader(inner StateLoader, timeout time.Duration) (sl StateLoader, replace func(StateLoader)) {
-	stateLoader, replace := AtomicStateLoader(inner)
+	stateLoader, replaceStateLoader := AtomicStateLoader(inner)
 
 	wg := sync.WaitGroup{}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -147,6 +147,6 @@ func DeferredStateLoader(inner StateLoader, timeout time.Duration) (sl StateLoad
 			return stateLoader(currentSL)
 		}, func(sl StateLoader) {
 			defer cancel()
-			replace(sl)
+			replaceStateLoader(sl)
 		}
 }
