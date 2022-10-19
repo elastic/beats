@@ -621,6 +621,52 @@ func TestInput(t *testing.T) {
 				`{"space":{"cake":"pumpkin"}}`,
 			},
 		},
+		{
+			name: "Test replace_with clause and first_response object",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"exportId":"2212"}`)
+					case "/2212":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/2212/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId"
+				config["chain.1.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.exportId",
+						},
+					},
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,first_response.body.exportId",
+						},
+					},
+				},
+			},
+			handler: defaultHandler(http.MethodGet, ""),
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
