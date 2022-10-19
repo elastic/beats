@@ -182,8 +182,60 @@ func TestStatelessHTTPJSONInput(t *testing.T) {
 			},
 		},
 		{
+<<<<<<< HEAD
 			name:        "Test pagination",
 			setupServer: newTestServer(httptest.NewServer),
+=======
+			name: "Test pagination",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerPaginationTransforms()
+				registerResponseTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       time.Millisecond,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target": "body.items",
+					"transforms": []interface{}{
+						map[string]interface{}{
+							"set": map[string]interface{}{
+								"target": "body.page",
+								"value":  "[[.last_response.page]]",
+							},
+						},
+					},
+				},
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.params.page",
+							"value":                  "[[.last_response.body.nextPageToken]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+			},
+			handler: paginationHandler(),
+			expected: []string{
+				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+			},
+		},
+		{
+			name: "Test first event",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerPaginationTransforms()
+				registerResponseTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+>>>>>>> 229690b16e ([filebeat] Fix httpjson page number initialization and docs (#33400))
 			baseConfig: map[string]interface{}{
 				"http_method":          "GET",
 				"interval":             0,
@@ -419,7 +471,36 @@ func paginationHandler() http.HandlerFunc {
 		w.Header().Set("content-type", "application/json")
 		switch count {
 		case 0:
+<<<<<<< HEAD
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"bar"}]}`))
+=======
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"a"}]}`))
+		case 1:
+			if r.URL.Query().Get("page") != "bar" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
+				return
+			}
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:01Z","items":[{"foo":"b"}]}`))
+		case 2:
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","items":[{"foo":"c"}]}`))
+		case 3:
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:03Z","items":[{"foo":"d"}]}`))
+			count = 0
+			return
+		}
+		count += 1
+	}
+}
+
+func paginationArrayHandler() http.HandlerFunc {
+	var count int
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		switch count {
+		case 0:
+			_, _ = w.Write([]byte(`[{"nextPageToken":"bar","foo":"bar"},{"foo":"bar"}]`))
+>>>>>>> 229690b16e ([filebeat] Fix httpjson page number initialization and docs (#33400))
 		case 1:
 			if r.URL.Query().Get("page") != "bar" {
 				w.WriteHeader(http.StatusBadRequest)
