@@ -52,6 +52,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		client:        billingClient,
+		log:           logp.NewLogger("azure billing"),
 	}, nil
 }
 
