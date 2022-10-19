@@ -97,9 +97,10 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 func (f *appendProcessor) appendValues(target string, fields []string, values []interface{}, event *beat.Event) error {
 	var arr []interface{}
 
+	// get the existing value of target field
 	targetVal, err := event.GetValue(target)
 	if err != nil {
-		f.logger.Debugf("could not fetch value for key: %s. all the values will be appended in a new key %s.", target, target)
+		f.logger.Debugf("could not fetch value for key: '%s'. Therefore, all the values will be appended in a new key %s.", target, target)
 	} else {
 		targetArr, ok := targetVal.([]interface{})
 		if ok {
@@ -109,8 +110,8 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 		}
 	}
 
+	// append the values of all the fields listed under 'fields' section
 	for _, field := range fields {
-
 		val, err := event.GetValue(field)
 		if err != nil {
 			if f.config.IgnoreMissing && err.Error() == "key not found" {
@@ -118,7 +119,6 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 			}
 			return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
 		}
-
 		valArr, ok := val.([]interface{})
 		if ok {
 			arr = append(arr, valArr...)
@@ -127,6 +127,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 		}
 	}
 
+	// append all the static values from 'values' section
 	arr = append(arr, values...)
 
 	// remove empty strings and nil from the array
@@ -134,13 +135,19 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 		arr = cleanEmptyValues(arr)
 	}
 
+	// remove duplicate values from the array
+	if !f.config.AllowDuplicate {
+		arr = removeDuplicates(arr)
+	}
+
+	// replace the existing target with new array
 	if err := event.Delete(target); err != nil && !(err.Error() == "key not found") {
 		return fmt.Errorf("unable to delete the target field %s due to error: %w", target, err)
 	}
-
 	if _, err := event.PutValue(target, arr); err != nil {
 		return fmt.Errorf("unable to put values in the target field %s due to error: %w", target, err)
 	}
+
 	return nil
 }
 
@@ -148,12 +155,25 @@ func (f *appendProcessor) String() string {
 	return "append_processor=" + fmt.Sprintf("%+v", f.config.TargetField)
 }
 
+// this function will remove all the empty strings and nil values from the array
 func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
 	for _, val := range dirtyArr {
 		if val == "" || val == nil {
 			continue
 		}
 		cleanArr = append(cleanArr, val)
+	}
+	return cleanArr
+}
+
+// this function will remove all the duplicate values from the array
+func removeDuplicates(dirtyArr []interface{}) (cleanArr []interface{}) {
+	set := make(map[interface{}]bool, 0)
+	for _, val := range dirtyArr {
+		if _, ok := set[val]; !ok {
+			set[val] = true
+			cleanArr = append(cleanArr, val)
+		}
 	}
 	return cleanArr
 }

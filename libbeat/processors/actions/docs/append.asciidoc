@@ -14,6 +14,7 @@ However, if the value is an array, all the elements of the array are pushed indi
 `ignore_empty_values`:: (Optional) If set to `true`, all the `""` and `nil` are omitted from being appended to the target field.  
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original is returned. If set to `false`,
 processing continues if an error occurs. Default is `true`.
+`allow_duplicate`:: (Optional) If set to `false`, the processor does not append values already present in the field. The default is `true`, which will append duplicate values in the array.
 `ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source
                    field. The default is `false`, which will fail processing of
                    an event if a field is missing.

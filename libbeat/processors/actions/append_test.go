@@ -384,3 +384,70 @@ func Test_appendProcessor_Run(t *testing.T) {
 		})
 	}
 }
+
+func Test_removeDuplicates(t *testing.T) {
+	type args struct {
+		dirtyArr []interface{}
+	}
+	tests := []struct {
+		description  string
+		args         args
+		wantCleanArr []interface{}
+	}{
+		{
+			description: "clean up integer array with duplicate values",
+			args: args{
+				dirtyArr: []interface{}{1, 1, 4, 2, 3, 3, 3, 2, 3, 3, 4, 5},
+			},
+			wantCleanArr: []interface{}{1, 4, 2, 3, 5},
+		},
+		{
+			description: "clean up string array with duplicate values",
+			args: args{
+				dirtyArr: []interface{}{"a", "b", "test", "a", "b"},
+			},
+			wantCleanArr: []interface{}{"a", "b", "test"},
+		},
+		{
+			description: "clean up string array without duplicate values",
+			args: args{
+				dirtyArr: []interface{}{"a", "b", "test", "c", "d"},
+			},
+			wantCleanArr: []interface{}{"a", "b", "test", "c", "d"},
+		},
+		{
+			description: "clean up integer array without duplicate values",
+			args: args{
+				dirtyArr: []interface{}{1, 2, 3, 4, 5},
+			},
+			wantCleanArr: []interface{}{1, 2, 3, 4, 5},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			gotCleanArr := removeDuplicates(tt.args.dirtyArr)
+			isError := false
+			temp := make(map[interface{}]bool, 0)
+			for _, val := range gotCleanArr {
+				temp[val] = true
+			}
+
+			if len(temp) != len(tt.wantCleanArr) {
+				isError = true
+			}
+
+			if !isError {
+				for _, val := range tt.wantCleanArr {
+					if _, ok := temp[val]; !ok {
+						isError = true
+						break
+					}
+				}
+			}
+
+			if isError {
+				t.Errorf("removeDuplicates() = %v, want %v", gotCleanArr, tt.wantCleanArr)
+			}
+		})
+	}
+}
