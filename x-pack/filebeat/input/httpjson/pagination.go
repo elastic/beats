@@ -103,6 +103,7 @@ func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformCon
 		trCtx:      trCtx,
 		resp:       resp,
 		isFirst:    true,
+		n:          -1, // the first page needs to be 0 for every interval
 	}
 }
 
