@@ -36,7 +36,7 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 - Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
 
 *Heartbeat*
-- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix bug affecting Let's Encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
 - Fix broken disable feature for Kibana-configured monitors. {pull}33293[33293]
 
 *Metricbeat*
