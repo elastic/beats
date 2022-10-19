@@ -46,7 +46,7 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 - Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call. {pull}33105[33105]
 - Add GCP CloudSQL region filter. {pull}32943[32943]
 - Fix Logstash cgroup mappings. {pull}33131[33131]
-- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
+- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping. {pull}33263[33263]
 
 *Packetbeat*
 
