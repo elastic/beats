@@ -5693,11 +5693,6 @@ azure module
 
 
 
-[float]
-=== azure
-
-
-
 
 *`azure.timegrain`*::
 +
@@ -5770,6 +5765,16 @@ type: keyword
 +
 --
 The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.subscription_name`*::
++
+--
+The subscription name
 
 
 type: keyword
@@ -6060,7 +6065,7 @@ billing and usage details
 *`azure.billing.currency`*::
 +
 --
-The currency
+Billing Currency.
 
 
 type: keyword
@@ -6070,7 +6075,27 @@ type: keyword
 *`azure.billing.pretax_cost`*::
 +
 --
-Cost
+The amount of cost before tax.
+
+
+type: float
+
+--
+
+*`azure.billing.unit_price`*::
++
+--
+Unit Price is the price applicable to you. (your EA or other contract price).
+
+
+type: float
+
+--
+
+*`azure.billing.quantity`*::
++
+--
+Measure the quantity purchased or consumed. The amount of the meter used during the billing period.
 
 
 type: float
@@ -6090,7 +6115,7 @@ type: keyword
 *`azure.billing.product`*::
 +
 --
-The product type
+Product name for the consumed service or purchase.
 
 
 type: keyword
@@ -6120,7 +6145,7 @@ type: date
 *`azure.billing.billing_period_id`*::
 +
 --
-The billing period id
+The billing period id.
 
 
 type: keyword
@@ -6130,7 +6155,17 @@ type: keyword
 *`azure.billing.account_name`*::
 +
 --
-The billing account name
+Name of the Billing Account.
+
+
+type: keyword
+
+--
+
+*`azure.billing.account_id`*::
++
+--
+Billing Account identifier.
 
 
 type: keyword
