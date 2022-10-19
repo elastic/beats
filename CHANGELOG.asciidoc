@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v7.17.6\...v7.17.7[View commits]
 
 *Affecting all Beats*
 
-- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled. {pull}30331[30331]
+- Fix logging bug where setting `ssl.verification_mode` to `full` or `certificate` caused the `test output` command to incorrectly log that TLS was disabled. {pull}30331[30331]
 - Fix Windows service timeouts when the "TCP/IP NetBIOS Helper" service is disabled. {issue}31810[31810] {pull}31835[31835]
 
 *Filebeat*
