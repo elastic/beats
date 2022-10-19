@@ -162,12 +162,15 @@ func (iter *pageIterator) getPage() (*response, error) {
 		return nil, err
 	}
 	iter.resp.Body.Close()
-	iter.n += 1
 
 	var r response
 	r.header = iter.resp.Header
 	r.url = *iter.resp.Request.URL
+
+	// we set the page number before increasing its value
+	// because the first page needs to be 0 for every interval
 	r.page = iter.n
+	iter.n++
 
 	if len(bodyBytes) > 0 {
 		if iter.pagination.decoder != nil {

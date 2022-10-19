@@ -81,36 +81,6 @@ func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Rege
 		if len(matchArray) == 1 {
 			return matchArray[0][1], nil
 		}
-<<<<<<< HEAD
-=======
-		return tr, true, nil
-	}
-
-	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
-	switch {
-	case err == nil:
-		// OK
-	case errors.Is(err, errNewURLValueNotSet),
-		errors.Is(err, errEmptyTemplateResult),
-		errors.Is(err, errExecutingTemplate):
-		// If this error happens here it means a transform
-		// did not find any new value and we can stop paginating without error.
-		iter.done = true
-		return nil, false, nil
-	default:
-		return nil, false, err
-	}
-
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq)
-	if err != nil {
-		return nil, false, err
-	}
-	iter.resp = resp
-
-	r, err := iter.getPage()
-	if err != nil {
-		return nil, false, err
->>>>>>> 229690b16e ([filebeat] Fix httpjson page number initialization and docs (#33400))
 	}
 	return "", nil
 }
@@ -126,7 +96,6 @@ func (p *pagination) setRequestInfoFromBody(response, last common.MapStr, ri *re
 	if err != nil {
 		return fmt.Errorf("failed to retrieve id_field for pagination: %w", err)
 	}
-<<<<<<< HEAD
 
 	if p.requestField != "" {
 		_, _ = ri.contentMap.Put(p.requestField, v)
@@ -140,24 +109,6 @@ func (p *pagination) setRequestInfoFromBody(response, last common.MapStr, ri *re
 			q.Set(p.urlField, fmt.Sprint(v))
 			url.RawQuery = q.Encode()
 			ri.url = url.String()
-=======
-	iter.resp.Body.Close()
-
-	var r response
-	r.header = iter.resp.Header
-	r.url = *iter.resp.Request.URL
-
-	// we set the page number before increasing its value
-	// because the first page needs to be 0 for every interval
-	r.page = iter.n
-	iter.n++
-
-	if len(bodyBytes) > 0 {
-		if iter.pagination.decoder != nil {
-			err = iter.pagination.decoder(bodyBytes, &r)
-		} else {
-			err = decode(iter.resp.Header.Get("Content-Type"), bodyBytes, &r)
->>>>>>> 229690b16e ([filebeat] Fix httpjson page number initialization and docs (#33400))
 		}
 	} else {
 		switch vt := v.(type) {
