@@ -92,6 +92,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Metricbeat*
 
 - Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
+- Allow filtering on AWS tags by more than 1 value per key. {pull}32775[32775]
+- Azure Billing: switch to Cost Management API for forecast data {pull}32589[32589]
 
 *Packetbeat*
 
