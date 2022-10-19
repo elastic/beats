@@ -73,7 +73,7 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 ==== Deprecated
 
 *Heartbeat*
-- Deprecate zip_url and local monitor options. {pull}33123[33123]
+- Deprecate `zip_url` and local monitor options. {pull}33123[33123]
 
 [[release-notes-8.4.2]]
 === Beats version 8.4.2
