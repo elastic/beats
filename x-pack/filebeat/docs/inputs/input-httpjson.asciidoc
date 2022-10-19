@@ -1216,7 +1216,7 @@ response_json using exportId as '2212':
 ----
 This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
 
-NOTE: Fixed patterns must not contain commas `"`,`"` in their definition. String replacement patterns are matched by the 
+NOTE: Fixed patterns must not contain `commas` in their definition. String replacement patterns are matched by the 
 `replace_with` processor with exact string matching
 
 [float]
