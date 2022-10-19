@@ -32,12 +32,11 @@ type cloudwatchPoller struct {
 	metrics              *inputMetrics
 	workersListingMap    *sync.Map
 	workersProcessingMap *sync.Map
-	numberOfEvents       int
 }
 
 func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	awsRegion string, apiSleep time.Duration,
-	numberOfWorkers int, logStreams []*string, logStreamPrefix string, numberOfEvents int) *cloudwatchPoller {
+	numberOfWorkers int, logStreams []*string, logStreamPrefix string) *cloudwatchPoller {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -55,7 +54,6 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 		metrics:              metrics,
 		workersListingMap:    new(sync.Map),
 		workersProcessingMap: new(sync.Map),
-		numberOfEvents:       numberOfEvents,
 	}
 }
 
@@ -101,7 +99,6 @@ func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTim
 		LogGroupName: awssdk.String(logGroup),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
-		Limit:        awssdk.Int32(int32(p.numberOfEvents)),
 	}
 
 	if len(p.logStreams) > 0 {

@@ -141,8 +141,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		in.config.APISleep,
 		in.config.NumberOfWorkers,
 		in.config.LogStreams,
-		in.config.LogStreamPrefix,
-		in.config.NumberOfEvents)
+		in.config.LogStreamPrefix)
 	logProcessor := newLogProcessor(log.Named("log_processor"), metrics, client, ctx)
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
 	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
