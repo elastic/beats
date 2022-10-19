@@ -81,11 +81,13 @@ func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 	var err error
 	for i := 0; i < tries; i++ {
 		loadedState, err = t.stateLoader(sf)
-		if err != nil {
-			sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
-			logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
-			time.Sleep(sleepFor)
+		if err == nil {
+			break
 		}
+
+		sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
+		logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
+		time.Sleep(sleepFor)
 	}
 	if err != nil {
 		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", tries, sf.ID)

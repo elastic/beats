@@ -73,7 +73,7 @@ type State struct {
 	// Ends is a pointer to the prior state if this is the start of a new state
 	Ends *State `json:"ends"`
 	// Cause of the transition to this state
-	Reason          string `json:reason`
+	Reason          string `json:"reason"`
 	flappingEnabled bool
 	ctr             int
 }
