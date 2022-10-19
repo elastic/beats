@@ -44,7 +44,7 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 - Fix GCP storage field naming {pull}32806[32806]
 - In `module/windows/perfmon`, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
 - Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call. {pull}33105[33105]
-- Add GCP CloudSQL region filter {pull}32943[32943]
+- Add GCP CloudSQL region filter. {pull}32943[32943]
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 
