@@ -37,7 +37,7 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 
 *Heartbeat*
 - Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
-- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix broken disable feature for Kibana-configured monitors. {pull}33293[33293]
 
 *Metricbeat*
 
