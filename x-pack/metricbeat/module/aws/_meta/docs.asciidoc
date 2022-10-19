@@ -39,12 +39,14 @@ latency amount.
 
 * *data_granularity*
 
-This module accepts an optional `data_granularity` parameter which sets the granularity of the returned data points.
-This parameter can be used to decouple how frequently metricbeat would collect data from AWS, from how granular this data should be.
-This would helpful to reduce the cost incurred in calling AWS Cloudwatch, in cases where highly-granular data is required,
-but a delay in collecting and ingesting the metrics can be tolerated.
+AWS CloudWatch allows to define the granularity of the returned datapoints, by setting "Period" while querying metrics.
+Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html[MetricDataQuery parameters] for more information.
 
-If no value is specified, the value is set to the `period`.
+By default, metricbeat will query CloudWatch setting "Period" to Metricbeat collection period. If you wish to set a custom value for "Period", please specify a `data_granularity` parameter.
+By setting `period` and `data_granularity` together, you can control, respectively, how frequently you want your metrics to be collected and how granular they have to be.
+
+If you are concerned about reducing the cost derived by CloudWatch API calls made by Metricbeat with an extra delay in retrieving metrics as trade off, you may consider setting `data_granularity` and increase Metricbeat collection period. For example,
+setting `data_granularity` to your current value for `period`, and doubling the value of `period`, may lead to a 50% savings in terms of GetMetricData API calls cost.
 
 * *endpoint*
 
