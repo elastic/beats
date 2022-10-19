@@ -23,7 +23,7 @@ https://github.com/elastic/beats/compare/v7.17.6\...v7.17.7[View commits]
 *Filebeat*
 
 - cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
-- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
+- Fix `file.path` field in cloudtrail fileset to use `json.digestS3Object`. {pull}32759[32759]
 - Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
 - Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
 - Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3 and aws-cloudwatch inputs. {pull}33259[33259]
