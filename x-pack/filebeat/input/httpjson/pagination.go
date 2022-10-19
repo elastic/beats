@@ -89,7 +89,7 @@ func getNextLinkFromHeader(header http.Header, fieldName string, re *regexp.Rege
 func (p *pagination) setRequestInfoFromBody(response, last common.MapStr, ri *requestInfo) error {
 	// we try to get it from last element, if not found, from the original response
 	v, err := last.GetValue(p.idField)
-	if err == common.ErrKeyNotFound {
+	if errors.Is(err, common.ErrKeyNotFound) {
 		v, err = response.GetValue(p.idField)
 	}
 
@@ -119,7 +119,7 @@ func (p *pagination) setRequestInfoFromBody(response, last common.MapStr, ri *re
 		}
 	}
 	if len(p.extraBodyContent) > 0 {
-		ri.contentMap.Update(common.MapStr(p.extraBodyContent))
+		ri.contentMap.Update(p.extraBodyContent)
 	}
 	return nil
 }

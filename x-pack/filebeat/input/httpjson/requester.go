@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -82,7 +83,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Pub
 	}
 
 	if r.method == "POST" && r.reqBody != nil {
-		ri.contentMap.Update(common.MapStr(r.reqBody))
+		ri.contentMap.Update(r.reqBody)
 	}
 
 	var (
@@ -142,7 +143,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Pub
 			} else {
 				v, err = common.MapStr(obj).GetValue(r.jsonObjects)
 				if err != nil {
-					if err == common.ErrKeyNotFound {
+					if errors.Is(err, common.ErrKeyNotFound) {
 						break
 					}
 					return err
@@ -168,7 +169,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Pub
 		}
 
 		if lastObj != nil && r.dateCursor.enabled {
-			r.updateCursorState(ri.url, r.dateCursor.getNextValue(common.MapStr(lastObj)))
+			r.updateCursorState(ri.url, r.dateCursor.getNextValue(lastObj))
 		}
 	}
 
