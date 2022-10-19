@@ -72,7 +72,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
 - Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
 - Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3, aws-cloudwatch, and lumberjack inputs. {pull}33259[33259]
-- Fix `httpjson` input page number initialization and documentation. {pull}[]
+- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
 
 *Auditbeat*
 
