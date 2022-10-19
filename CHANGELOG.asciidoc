@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 
 *Affecting all Beats*
 
-* Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
+- Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
 - Fix formatting of MAC hardware addresses populated by the add-host-metadata processor. {issue}32264[32264] {pull}32265[32265]
 
 ==== Bugfixes
