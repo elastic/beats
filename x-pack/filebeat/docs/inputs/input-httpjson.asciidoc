@@ -1138,10 +1138,10 @@ Collect and make events from response in any format supported by httpjson for al
 [float]
 ==== `chain[].step.replace_with`
 
-The `replace_with: "fixed_pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with a given value. It is 
-called a fixed pattern string because it always needs to start with a `$.` character, for example: `$.xyz`. The `value` can be hard coded or 
-can be extracted from context variables like [`.last_response.*`, `.first_response.*`] etc. The `replace_with` clause can be used in 
-combination with the `replace` clause thus providing a lot of flexibility in the logic of chain requests.
+The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value. 
+The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables 
+like [`.last_response.*`, `.first_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
+thus providing a lot of flexibility in the logic of chain requests.
 
 Example:
 
@@ -1216,8 +1216,8 @@ response_json using exportId as '2212':
 ----
 This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
 
-NOTE: Fixed patterns must not contain `commas` in their definition. String replacement patterns are matched by the 
-`replace_with` processor with exact string matching
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the 
+`replace_with` processor with exact string matching.
 
 [float]
 ==== `chain[].while`
