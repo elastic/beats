@@ -209,28 +209,41 @@ func TestInput(t *testing.T) {
 			name: "Test pagination",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				registerPaginationTransforms()
+				registerResponseTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				server := httptest.NewServer(h)
 				config["request.url"] = server.URL
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       time.Second,
+				"interval":       time.Millisecond,
 				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.items",
+					"transforms": []interface{}{
+						map[string]interface{}{
+							"set": map[string]interface{}{
+								"target": "body.page",
+								"value":  "[[.last_response.page]]",
+							},
+						},
+					},
 				},
 				"response.pagination": []interface{}{
 					map[string]interface{}{
 						"set": map[string]interface{}{
-							"target": "url.params.page",
-							"value":  "[[.last_response.body.nextPageToken]]",
+							"target":                 "url.params.page",
+							"value":                  "[[.last_response.body.nextPageToken]]",
+							"fail_on_template_error": true,
 						},
 					},
 				},
 			},
-			handler:  paginationHandler(),
-			expected: []string{`{"foo":"a"}`, `{"foo":"b"}`},
+			handler: paginationHandler(),
+			expected: []string{
+				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+			},
 		},
 		{
 			name: "Test first event",
@@ -881,6 +894,8 @@ func paginationHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","items":[{"foo":"c"}]}`))
 		case 3:
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:03Z","items":[{"foo":"d"}]}`))
+			count = 0
+			return
 		}
 		count += 1
 	}
