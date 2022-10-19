@@ -119,7 +119,7 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 			return "", false, err
 		}
 	default:
-		return "", false, fmt.Errorf("context value not supported: %q", keys[0])
+		return "", false, fmt.Errorf("context value not supported: %q in %q", keys[0], expression)
 	}
 
 	return fmt.Sprint(val), true, nil
@@ -182,7 +182,7 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 		}
 		return iterateRecursive(nextMap, keys, depth)
 	default:
-		return nil, errors.New("unable to parse the value of the given expression")
+		return nil, fmt.Errorf("unable to parse the value of the expression %s: type %T is not handled", strings.Join(keys[:depth+1], "."), val)
 	}
 }
 

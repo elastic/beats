@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -42,10 +43,10 @@ func (c config) Validate() error {
 			return errors.New("both step & while blocks in a chain cannot be empty")
 		}
 		if v.Step != nil && v.Step.ReplaceWith != "" && len(strings.SplitN(v.Step.ReplaceWith, ",", 3)) > 2 {
-			return errors.New("invalid number of parameters inside replaceWith")
+			return fmt.Errorf("invalid number of parameters inside step replace_with: %q", v.Step.ReplaceWith)
 		}
 		if v.While != nil && v.While.ReplaceWith != "" && len(strings.SplitN(v.While.ReplaceWith, ",", 3)) > 2 {
-			return errors.New("invalid number of parameters inside replaceWith")
+			return fmt.Errorf("invalid number of parameters inside step replace_with: %q", v.While.ReplaceWith)
 		}
 	}
 	return nil

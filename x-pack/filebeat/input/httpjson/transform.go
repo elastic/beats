@@ -123,8 +123,8 @@ func (ctx *transformContext) updateLastResponse(r response) {
 
 func (ctx *transformContext) updateFirstResponse(r response) {
 	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
 	*ctx.firstResponse = r
+	ctx.lock.Unlock()
 }
 
 func (ctx *transformContext) clearIntervalData() {

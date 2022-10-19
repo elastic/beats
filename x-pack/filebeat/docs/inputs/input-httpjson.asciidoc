@@ -1138,9 +1138,9 @@ Collect and make events from response in any format supported by httpjson for al
 [float]
 ==== `chain[].step.replace_with`
 
-The `replace_with: "pattern,value"` clause is used to replace a pattern defined in the `request.url` with a given value. The value can be hard coded or can be 
-extracted from context variables like [`.last_response.*`, `.first_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
-thus providing a lot of flexibility in the logic of chain requests.
+The `replace_with: "pattern,value"` clause is used to replace a pattern defined in `request.url` with a given value. The pattern string needs to start with the 
+`$.` character, for example: `$.xyz`. The `value` can be hard coded or can be extracted from context variables like [`.last_response.*`, `.first_response.*`] etc. 
+The `replace_with` clause can be used in combination with the `replace` clause thus providing a lot of flexibility in the logic of chain requests.
 
 Example:
 
@@ -1215,7 +1215,7 @@ response_json using exportId as '2212':
 ----
 This behaviour of targeted pattern replacement in the url helps solve various use cases.
 
-NOTE: Replace patterns should not contain commas `","` in their definition.
+NOTE: Replace patterns must not contain commas `","` or `regular expressions` in their definition.
 
 [float]
 ==== `chain[].while`
