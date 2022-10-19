@@ -119,7 +119,7 @@ func (p *pagination) setRequestInfoFromBody(response, last common.MapStr, ri *re
 		}
 	}
 	if len(p.extraBodyContent) > 0 {
-		ri.contentMap.Update(common.MapStr(p.extraBodyContent))
+		ri.contentMap.Update(p.extraBodyContent)
 	}
 	return nil
 }
