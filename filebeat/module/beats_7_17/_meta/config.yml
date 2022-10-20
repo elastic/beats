@@ -1,4 +1,4 @@
-- module: beats_7.17
+- module: beats_7_17
   # All logs
   {fileset}:
     enabled: true

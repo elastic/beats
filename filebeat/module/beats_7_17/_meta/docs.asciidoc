@@ -1,9 +1,9 @@
-:modulename: beats_7.17
+:modulename: beats_7_17
 :has-dashboards: true
 
-== beats_7.17 module
+== beats_7_17 module
 
-This is the beats_7.17 module.
+This is the beats_7_17 module.
 
 include::../include/what-happens.asciidoc[]
 
