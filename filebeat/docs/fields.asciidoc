@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-azure>>
 * <<exported-fields-barracuda>>
 * <<exported-fields-beat-common>>
+* <<exported-fields-beats_7_17>>
 * <<exported-fields-bluecoat>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
@@ -9078,6 +9079,18 @@ Time series instance id
 type: keyword
 
 --
+
+[[exported-fields-beats_7_17]]
+== beats_7_17 fields
+
+beats_7_17 Module
+
+
+
+[float]
+=== beats_7_17
+
+
 
 [[exported-fields-bluecoat]]
 == Blue Coat Director fields
