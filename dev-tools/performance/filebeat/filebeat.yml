@@ -1,0 +1,29 @@
+name: performance-test
+
+filebeat.inputs:
+- type: filestream
+  id: my-filestream-id
+  enabled: true
+  paths:
+    - /tmp/flog.log
+# ======================= Elasticsearch template setting =======================
+
+setup.template:
+  name: "filebeat-performance-test-%{[agent.version]}"
+  pattern: "filebeat-performance-test-%{[agent.version]}"
+  settings:
+    index.number_of_shards: 1
+  
+output.elasticsearch:
+  enabled: true
+  hosts: ["${ES_HOSTS:https://localhost:9200}"]
+  username: "${ES_USER:elastic}"
+  password: "${ES_PASS:changeme}"
+  workers: 6
+  index: "filebeat-performance-test-%{[agent.version]}"
+  allow_older_versions: true
+  ssl.verification_mode: ${VERIFICATION_MODE:full}
+
+monitoring.enabled: true
+monitoring.cluster_uuid: "${CLUSTER_UUID}"
+#monitoring.elasticsearch:
