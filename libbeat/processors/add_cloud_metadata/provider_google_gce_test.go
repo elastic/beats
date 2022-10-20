@@ -299,7 +299,7 @@ const gceK8sPartialMetadataV1 = `{
 func initGCETestServer(resp string) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == "/computeMetadata/v1/?recursive=true&alt=json" {
-			w.Write([]byte(resp))
+			_, _ = w.Write([]byte(resp))
 			return
 		}
 
@@ -308,7 +308,7 @@ func initGCETestServer(resp string) *httptest.Server {
 }
 
 func TestRetrieveGCEMetadata(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	server := initGCETestServer(gceMetadataV1)
 	defer server.Close()
@@ -356,7 +356,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 }
 
 func TestRetrieveGCEMetadataInK8s(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	server := initGCETestServer(gceK8sMetadataV1)
 	defer server.Close()
@@ -410,7 +410,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 }
 
 func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	server := initGCETestServer(gceK8sMetadataV1)
 	defer server.Close()
@@ -475,7 +475,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 }
 
 func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	server := initGCETestServer(gceK8sPartialMetadataV1)
 	defer server.Close()
