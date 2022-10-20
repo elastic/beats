@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
 - Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
 - Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
+- Allow iptables module to parse ulogd v2 TOS field in logs. {pull}32126[32126]
 
 *Auditbeat*
 
