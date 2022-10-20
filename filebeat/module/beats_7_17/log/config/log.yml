@@ -1,5 +1,6 @@
 type: filestream
 enabled: true
+id: beats_7_17_module
 paths:
 {{ range $i, $path := .paths }}
  - {{$path}}

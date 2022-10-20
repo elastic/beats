@@ -1,3 +1,6 @@
+# Module: beats_7_17
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-beats_7_17.html
+
 - module: beats_7_17
   # All logs
   log:
