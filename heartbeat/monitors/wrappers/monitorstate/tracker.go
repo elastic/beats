@@ -131,14 +131,14 @@ func DeferredStateLoader(inner StateLoader, timeout time.Duration) (sl StateLoad
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	wg.Add(1)
 	go func() {
+		defer cancel()
+		defer wg.Done()
+
 		<-ctx.Done()
 
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			logp.L().Warn("Timeout trying to defer state loader")
 		}
-
-		defer cancel()
-		defer wg.Done()
 	}()
 
 	return func(currentSL stdfields.StdMonitorFields) (*State, error) {
@@ -147,6 +147,7 @@ func DeferredStateLoader(inner StateLoader, timeout time.Duration) (sl StateLoad
 			return stateLoader(currentSL)
 		}, func(sl StateLoader) {
 			defer cancel()
+
 			replaceStateLoader(sl)
 		}
 }

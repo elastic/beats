@@ -56,8 +56,6 @@ func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int,
 	return ms
 }
 
-const REASON_COULD_NOT_CONNECT = "REASON_COULD_NOT_CONNECT"
-
 type State struct {
 	ID string `json:"id"`
 	// StartedAt is the start time of the state, should be the same for a given state ID
@@ -71,9 +69,7 @@ type State struct {
 	// computation if loading from ES or another source
 	FlapHistory []StateStatus `json:"flap_history"`
 	// Ends is a pointer to the prior state if this is the start of a new state
-	Ends *State `json:"ends"`
-	// Cause of the transition to this state
-	Reason          string `json:"reason"`
+	Ends            *State `json:"ends"`
 	flappingEnabled bool
 	ctr             int
 }

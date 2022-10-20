@@ -16395,13 +16395,6 @@ type: object
 
 --
 
-*`state.reason`*::
-+
---
-type: keyword
-
---
-
 [[exported-fields-summary]]
 == Monitor summary fields
 

@@ -158,8 +158,6 @@
             - name: down
               type: integer
               description: total down checks run
-        - name: reason
-          type: keyword
 
 - key: summary
   title: "Monitor summary"
