@@ -114,6 +114,10 @@ var gceMetadataFetcher = provider{
 				meta.Delete("orchestrator.cluster.kubeconfig")
 			}
 
+			if _, err := meta.GetValue("orchestrator.cluster.name"); err != nil {
+				meta.Delete("orchestrator")
+			}
+
 			if project, ok := m["project"].(map[string]interface{}); ok {
 				s.Schema{
 					"project": s.Object{
