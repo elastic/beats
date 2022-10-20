@@ -18,11 +18,17 @@
 package monitorstate
 
 import (
+	"encoding/json"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+
+	"github.com/elastic/beats/v7/heartbeat/esutil"
+	"github.com/elastic/go-elasticsearch/v8"
 )
 
 // Helpers for tests here and elsewhere
@@ -34,8 +40,8 @@ func IntegESLoader(t *testing.T, indexPattern string, location *config.LocationW
 func IntegES(t *testing.T) (esc *eslegclient.Connection) {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:      eslegtest.GetURL(),
-		Username: eslegtest.GetUser(),
-		Password: eslegtest.GetPass(),
+		Username: "admin",
+		Password: "testing",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -51,4 +57,25 @@ func IntegES(t *testing.T) (esc *eslegclient.Connection) {
 	}
 
 	return conn
+}
+
+func IntegApiClient(t *testing.T) (esc *elasticsearch.Client) {
+	esc, err := elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: []string{eslegtest.GetURL()},
+		Username:  "admin",
+		Password:  "testing",
+	})
+	require.NoError(t, err)
+	respBody, err := esc.Cluster.Health()
+	healthRaw, err := esutil.CheckRetResp(respBody, err)
+	require.NoError(t, err)
+
+	healthResp := struct {
+		Status string `json:"status"`
+	}{}
+	err = json.Unmarshal(healthRaw, &healthResp)
+	require.NoError(t, err)
+	require.Contains(t, []string{"green", "yellow"}, healthResp.Status)
+
+	return esc
 }
