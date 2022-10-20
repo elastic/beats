@@ -1,0 +1,9 @@
+- key: beats_7.17
+  title: "beats_7.17"
+  description: >
+    beats_7.17 Module
+  fields:
+    - name: beats_7.17
+      type: group
+      description: >
+      fields:

@@ -1,0 +1,67 @@
+{
+  "description": "Pipeline for parsing beats_7.17 log logs",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:timestamp}\\t%{LOGLEVEL:loglevel}\\t\\[.*?%{GREEDYDATA:logger}\\]\\t.*?/?.*?%{GREEDYDATA:filename}:%{INT:line}\\t.*"
+        ]
+      }
+    },
+    {
+      "date": {
+        "field": "timestamp",
+        "formats": [
+          "ISO8601"
+        ]
+      }
+    },
+    {
+      "split": {
+        "field": "message",
+        "separator": "\\t",
+        "target_field": "tmp_split",
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "source": "ctx['tmp'] = ctx['tmp_split'][4];\nif (ctx['tmp'] =~ /Publish event:/){\nctx['tmp_published_event'] = /Publish event:/.matcher(ctx['tmp']).replaceAll('');\n}"
+      }
+    },
+    {
+      "script": {
+        "source": "ctx['filename'] = ctx['filename'] + \":\" + ctx['line']"
+      }
+    },
+    {
+      "json": {
+        "field": "tmp_published_event",
+        "target_field": "my_published_event",
+        "ignore_failure": true
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "timestamp",
+          "tmp",
+          "tmp_split",
+          "line",
+          "tmp_published_event"
+        ],
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

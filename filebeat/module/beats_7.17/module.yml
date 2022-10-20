@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-beats_7.17-log-Dashboard
+  file: Filebeat-beats_7.17-log.json
