@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
+	duration "google.golang.org/protobuf/types/known/durationpb"
+	timestamp "google.golang.org/protobuf/types/known/timestamppb"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 

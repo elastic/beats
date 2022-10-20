@@ -12,11 +12,11 @@ import (
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
-	"github.com/golang/protobuf/ptypes/duration"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	duration "google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -50,7 +50,7 @@ type MetricSet struct {
 	MetricsConfig []metricsConfig `config:"metrics" validate:"nonzero,required"`
 }
 
-//metricsConfig holds a configuration specific for metrics metricset.
+// metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
 	ServiceName string `config:"service"  validate:"required"`
 	// ServiceMetricPrefix allows to specify the prefix string for MetricTypes
