@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -385,13 +386,13 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path.
-	bl := newLocker(b)
-	err := bl.lock()
+	bl := locks.New(b.Info)
+	err := bl.Lock()
 	if err != nil {
 		return err
 	}
 	defer func() {
-		_ = bl.unlock()
+		_ = bl.Unlock()
 	}()
 
 	svc.BeforeRun()

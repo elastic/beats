@@ -1,0 +1,26 @@
+name: Add issue to platform ingest project board
+
+on:
+  issues:
+    types:
+      - labeled
+
+jobs:
+  add-to-ingest-project:
+    runs-on: ubuntu-latest
+    if: |
+      github.event.label.name == 'area:control-plane' || github.event.label.name == 'area:data-plane' || github.event.label.name == 'area:fleet-ui' 
+    steps:
+      - uses: octokit/graphql-action@v2.x
+        id: add_to_project
+        with:
+          headers: '{"GraphQL-Features": "projects_next_graphql"}'
+          query: |
+            mutation add_to_project($projectid:ID!,$contentid:ID!) {
+               addProjectV2ItemById(input:{projectId:$projectid contentId:$contentid}) {
+                clientMutationId
+              }
+             }
+          projectid: "PVT_kwDOAGc3Zs4AEzn4"
+          contentid: ${{ github.event.issue.node_id }}
+          GITHUB_TOKEN: ${{ secrets.ELASTIC_AGENT_PROJECT_BOARD_TOKEN }}

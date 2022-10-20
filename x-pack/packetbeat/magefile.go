@@ -37,7 +37,7 @@ import (
 // the packetbeat executable. It is used to specify which npcap builder crossbuild
 // image to use and the installer to obtain from the cloud store for testing.
 const (
-	NpcapVersion = "1.60"
+	NpcapVersion = "1.71"
 	installer    = "npcap-" + NpcapVersion + "-oem.exe"
 )
 

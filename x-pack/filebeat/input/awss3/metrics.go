@@ -48,7 +48,7 @@ func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
 	monitoring.NewString(reg, "id").Set(id)
 	out := &inputMetrics{
 		id:                                  id,
-		parent:                              reg,
+		parent:                              parent,
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
