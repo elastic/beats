@@ -39,7 +39,7 @@
     {
       "json": {
         "field": "tmp_published_event",
-        "target_field": "my_published_event",
+        "target_field": "published_event",
         "ignore_failure": true
       }
     },
