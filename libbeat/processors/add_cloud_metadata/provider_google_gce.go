@@ -111,7 +111,7 @@ var gceMetadataFetcher = provider{
 					}
 				}
 			} else {
-				meta.Delete("orchestrator")
+				meta.Delete("orchestrator.cluster.kubeconfig")
 			}
 
 			if project, ok := m["project"].(map[string]interface{}); ok {

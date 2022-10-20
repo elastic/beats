@@ -518,6 +518,11 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 				"name": "GCE",
 			},
 		},
+		"orchestrator": mapstr.M{
+			"cluster": mapstr.M{
+				"name": "staging-marketing-k8s",
+			},
+		},
 	}
 	assert.Equal(t, expected, actual.Fields)
 }
