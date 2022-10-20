@@ -100,7 +100,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 
 	// Open the file and seek to the starting position.
 	handle, err := request.segment.getReader(rl.settings)
-	rl.decoder.useJSON = request.segment.shouldUseJSON()
+	rl.decoder.serializationFormat = handle.serializationFormat
 	if err != nil {
 		return readerLoopResponse{err: err}
 	}

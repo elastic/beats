@@ -21,16 +21,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -71,7 +72,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	monitorConfig := hb.getRawConfigs(hints)
 
 	// If explicty disabled, return nothing
-	if builder.IsDisabled(hints, hb.config.Key) {
+	if utils.IsDisabled(hints, hb.config.Key) {
 		hb.logger.Warnf("heartbeat config disabled by hint: %+v", event)
 		return []*conf.C{}
 	}
@@ -96,7 +97,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	}
 
 	tempCfg := mapstr.M{}
-	monitors := builder.GetHintsAsList(hints, hb.config.Key)
+	monitors := utils.GetHintsAsList(hints, hb.config.Key)
 
 	configs := make([]*conf.C, 0, len(monitors))
 	for _, monitor := range monitors {
@@ -126,16 +127,16 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 }
 
 func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {
-	return builder.GetHintAsConfigs(hints, hb.config.Key)
+	return utils.GetHintAsConfigs(hints, hb.config.Key)
 }
 
 func (hb *heartbeatHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return builder.GetConfigs(hints, "", "processors")
+	return utils.GetConfigs(hints, "", "processors")
 }
 
 func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int) []string {
 	var result []string
-	thosts := builder.GetHintAsList(hints, "", hosts)
+	thosts := utils.GetHintAsList(hints, "", hosts)
 	// Only pick hosts that have ${data.port} or the port on current event. This will make
 	// sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {

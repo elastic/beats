@@ -112,6 +112,35 @@ oc patch namespace kube-system -p \
 This command sets the node selector for the project to an empty string. If you
 don't run this command, the default node selector will skip master nodes.
 
+In order to support runtime environments with Openshift (eg. CRI-O, containerd) you need to configure following path:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: container
+  paths: <1>
+    - '/var/log/containers/*.log'
+----
+
+Same path needs to be configured in case autodiscovery needs to be enabled:
+
+["source","yaml",subs="attributes"]
+----
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      node: ${NODE_NAME}
+      hints.enabled: true
+      hints.default_config:
+        type: container
+        paths:
+          - /var/log/containers/*.log
+----
+
+NOTE: '/var/log/containers/*.log' is normally a symlink to '/var/log/pods/*/*/.log', 
+so above paths can be edited accordingly
+
+
 [float]
 ==== Load {kib} dashboards
 

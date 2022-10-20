@@ -35,7 +35,8 @@ type OptionalStream struct {
 }
 
 type BaseStream struct {
-	Type string `config:"type"`
+	Type   string `config:"type"`
+	Origin string `config:"origin"`
 }
 
 // UnnestStream detects configs that come from fleet and transforms the config into something compatible
@@ -55,12 +56,14 @@ func UnnestStream(config *conf.C) (res *conf.C, err error) {
 	// Find the 'base' stream, that is the one stream that has `type` set.
 	// The other streams are sort of ancillary and only for fleet internals, the
 	// base stream has the full monitor config contained within
+	var origin string
 	for _, stream := range optS.Streams {
 		bs := &BaseStream{}
 		err = stream.Unpack(bs)
 		if err != nil {
 			return nil, fmt.Errorf("could not unpack stream: %w", err)
 		}
+		origin = bs.Origin
 		if bs.Type != "" {
 			res = stream
 			break
@@ -72,6 +75,15 @@ func UnnestStream(config *conf.C) (res *conf.C, err error) {
 		return nil, fmt.Errorf("could not determine base stream for config: %s", id)
 	}
 
-	err = res.Merge(mapstr.M{"id": optS.Id, "data_stream": optS.DataStream})
+	err = res.Merge(mapstr.M{"data_stream": optS.DataStream})
+	if err != nil {
+		return nil, err
+	}
+
+	// We only override the ID for the original fleet integration, not monitors configured
+	// through monitor mgmt. See https://github.com/elastic/beats/issues/32224
+	if origin == "" {
+		err = res.Merge(mapstr.M{"id": optS.Id})
+	}
 	return res, err
 }

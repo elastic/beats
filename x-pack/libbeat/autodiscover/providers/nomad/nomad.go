@@ -11,8 +11,9 @@ import (
 
 	"github.com/gofrs/uuid"
 
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
@@ -27,7 +28,10 @@ import (
 const NomadEventKey = "nomad"
 
 func init() {
-	autodiscover.Registry.AddProvider("nomad", AutodiscoverBuilder)
+	err := autodiscover.Registry.AddProvider("nomad", AutodiscoverBuilder)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // Provider implements autodiscover provider for docker containers
@@ -66,7 +70,7 @@ func AutodiscoverBuilder(
 	}
 	client, err := nomad.NewClient(clientConfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to intialize nomad API client: %w", err)
+		return nil, fmt.Errorf("failed to initialize nomad API client: %w", err)
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
@@ -272,14 +276,14 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 		}
 	}
 
-	cname := builder.GetContainerName(container)
-	hints := builder.GenerateHints(tasks, cname, p.config.Prefix)
+	cname := utils.GetContainerName(container)
+	hints := utils.GenerateHints(tasks, cname, p.config.Prefix)
 	if len(hints) > 0 {
 		e["hints"] = hints
 	}
 
 	prefix := strings.Split(p.config.Prefix, ".")[0]
-	tasks.Delete(prefix)
+	_ = tasks.Delete(prefix)
 
 	return e
 }

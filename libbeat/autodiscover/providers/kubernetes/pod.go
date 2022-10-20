@@ -28,10 +28,11 @@ import (
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -89,7 +90,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
 
 	options := kubernetes.WatchOptions{
@@ -215,10 +216,10 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		e["container"] = container
 	}
 
-	cname := builder.GetContainerName(container)
+	cname := utils.GetContainerName(container)
 
 	// Generate hints based on the cumulative of both namespace and pod annotations.
-	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
+	hints := utils.GenerateHints(annotations, cname, p.config.Prefix)
 	p.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {
@@ -276,6 +277,7 @@ func (p *pod) Stop() {
 // and for pods with at least one running container.
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	annotations := kubernetes.PodAnnotations(pod)
+	labels := kubernetes.PodLabels(pod)
 	namespaceAnnotations := kubernetes.PodNamespaceAnnotations(pod, p.namespaceWatcher)
 
 	eventList := make([][]bus.Event, 0)
@@ -287,7 +289,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 			anyContainerRunning = true
 		}
 
-		events, ports := p.containerPodEvents(flag, pod, c, annotations, namespaceAnnotations)
+		events, ports := p.containerPodEvents(flag, pod, c, annotations, namespaceAnnotations, labels)
 		if len(events) != 0 {
 			eventList = append(eventList, events)
 		}
@@ -296,7 +298,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 		}
 	}
 	if len(eventList) != 0 {
-		event := p.podEvent(flag, pod, portsMap, anyContainerRunning, annotations, namespaceAnnotations)
+		event := p.podEvent(flag, pod, portsMap, anyContainerRunning, annotations, namespaceAnnotations, labels)
 		// Ensure that the pod level event is published first to avoid
 		// pod metadata overriding a valid container metadata.
 		eventList = append([][]bus.Event{{event}}, eventList...)
@@ -313,7 +315,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 // running.
 // If the container ID is unknown, only "stop" events are generated.
 // It also returns a map with the named ports.
-func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes.ContainerInPod, annotations, namespaceAnnotations mapstr.M) ([]bus.Event, mapstr.M) {
+func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes.ContainerInPod, annotations, namespaceAnnotations, labels mapstr.M) ([]bus.Event, mapstr.M) {
 	if c.ID == "" && flag != "stop" {
 		return nil, nil
 	}
@@ -337,6 +339,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 	kubemeta, _ := kubemetaMap.(mapstr.M)
 	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
+	kubemeta["labels"] = labels
 	kubemeta["container"] = mapstr.M{
 		"id":      c.ID,
 		"name":    c.Spec.Name,
@@ -358,7 +361,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 	var events []bus.Event
 	portsMap := mapstr.M{}
 
-	meta.Put("container", cmeta)
+	ShouldPut(meta, "container", cmeta, p.logger)
 
 	for _, port := range ports {
 		event := bus.Event{
@@ -387,7 +390,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 
 // podEvent creates an event for a pod.
 // It only includes network information if `includeNetwork` is true.
-func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports mapstr.M, includeNetwork bool, annotations, namespaceAnnotations mapstr.M) bus.Event {
+func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports mapstr.M, includeNetwork bool, annotations, namespaceAnnotations, labels mapstr.M) bus.Event {
 	meta := p.metagen.Generate(pod)
 
 	// Information that can be used in discovering a workload
@@ -395,6 +398,7 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports mapstr.M, include
 	kubemeta, _ := kubemetaMap.(mapstr.M)
 	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
+	kubemeta["labels"] = labels
 	if len(namespaceAnnotations) != 0 {
 		kubemeta["namespace_annotations"] = namespaceAnnotations
 	}

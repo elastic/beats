@@ -22,8 +22,14 @@ package config
 
 import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/processors/util"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
+
+type LocationWithID struct {
+	ID  string         `config:"id"`
+	Geo util.GeoConfig `config:"geo"`
+}
 
 // Config defines the structure of heartbeat.yml.
 type Config struct {
@@ -32,7 +38,8 @@ type Config struct {
 	ConfigMonitors *conf.C              `config:"config.monitors"`
 	Scheduler      Scheduler            `config:"scheduler"`
 	Autodiscover   *autodiscover.Config `config:"autodiscover"`
-	Jobs           map[string]JobLimit  `config:"jobs"`
+	Jobs           map[string]*JobLimit `config:"jobs"`
+	RunFrom        *LocationWithID      `config:"run_from"`
 }
 
 type JobLimit struct {
@@ -46,4 +53,10 @@ type Scheduler struct {
 }
 
 // DefaultConfig is the canonical instantiation of Config.
-var DefaultConfig = Config{}
+var DefaultConfig = Config{
+	Jobs: map[string]*JobLimit{
+		"browser": {
+			Limit: 2,
+		},
+	},
+}

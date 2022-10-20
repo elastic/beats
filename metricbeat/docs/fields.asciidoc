@@ -4799,6 +4799,24 @@ type: long
 
 --
 
+*`aws.transitgateway.metrics.BytesDropCountNoRoute.sum`*::
++
+--
+The number of bytes dropped because they did not match a route.
+
+type: long
+
+--
+
+*`aws.transitgateway.metrics.BytesDropCountBlackhole.sum`*::
++
+--
+The number of bytes dropped because they matched a blackhole route.
+
+type: long
+
+--
+
 [float]
 === usage
 
@@ -4942,6 +4960,26 @@ type: keyword
 +
 --
 Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
+
+
+type: keyword
+
+--
+
+*`awsfargate.task_stats.task_desired_status`*::
++
+--
+The desired status for the task from Amazon ECS.
+
+
+type: keyword
+
+--
+
+*`awsfargate.task_stats.task_known_status`*::
++
+--
+The known status for the task from Amazon ECS.
 
 
 type: keyword
@@ -5580,11 +5618,6 @@ azure module
 
 
 
-[float]
-=== azure
-
-
-
 
 *`azure.timegrain`*::
 +
@@ -5657,6 +5690,16 @@ type: keyword
 +
 --
 The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.subscription_name`*::
++
+--
+The subscription name
 
 
 type: keyword
@@ -5947,7 +5990,7 @@ billing and usage details
 *`azure.billing.currency`*::
 +
 --
-The currency
+Billing Currency.
 
 
 type: keyword
@@ -5957,7 +6000,27 @@ type: keyword
 *`azure.billing.pretax_cost`*::
 +
 --
-Cost
+The amount of cost before tax.
+
+
+type: float
+
+--
+
+*`azure.billing.unit_price`*::
++
+--
+Unit Price is the price applicable to you. (your EA or other contract price).
+
+
+type: float
+
+--
+
+*`azure.billing.quantity`*::
++
+--
+Measure the quantity purchased or consumed. The amount of the meter used during the billing period.
 
 
 type: float
@@ -5977,7 +6040,7 @@ type: keyword
 *`azure.billing.product`*::
 +
 --
-The product type
+Product name for the consumed service or purchase.
 
 
 type: keyword
@@ -6007,7 +6070,7 @@ type: date
 *`azure.billing.billing_period_id`*::
 +
 --
-The billing period id
+The billing period id.
 
 
 type: keyword
@@ -6017,7 +6080,17 @@ type: keyword
 *`azure.billing.account_name`*::
 +
 --
-The billing account name
+Name of the Billing Account.
+
+
+type: keyword
+
+--
+
+*`azure.billing.account_id`*::
++
+--
+Billing Account identifier.
 
 
 type: keyword
@@ -8892,28 +8965,28 @@ type: long
 *`beat.stats.libbeat.config.running`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.starts`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.stops`*::
 +
 --
-type: short
+type: long
 
 --
 
 *`beat.stats.libbeat.config.reloads`*::
 +
 --
-type: short
+type: long
 
 --
 
@@ -10264,7 +10337,7 @@ type: float
 [[exported-fields-cockroachdb]]
 == CockroachDB fields
 
-CockroachDB module
+CockroachDB module scrape metrics using Prometheus endpoint.
 
 
 
@@ -30305,13 +30378,6 @@ type: long
 *`elasticsearch.cluster.stats.nodes.data`*::
 +
 --
-type: long
-
---
-
-*`elasticsearch.cluster.stats.nodes.stats.data`*::
-+
---
 Number of data nodes in cluster.
 
 type: long
@@ -31812,13 +31878,6 @@ type: long
 
 
 
-*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
 +
 --
@@ -32397,18 +32456,14 @@ type: keyword
 *`elasticsearch.node.stats.os.cgroup.memory.limit.bytes`*::
 +
 --
-type: long
-
-format: bytes
+type: keyword
 
 --
 
 *`elasticsearch.node.stats.os.cgroup.memory.usage.bytes`*::
 +
 --
-type: long
-
-format: bytes
+type: keyword
 
 --
 
@@ -35340,15 +35395,6 @@ type: long
 Google Cloud Dataproc metrics
 
 
-*`gcp.dataproc.batch.spark.executors.count`*::
-+
---
-Indicates the number of Batch Spark executors.
-
-type: long
-
---
-
 *`gcp.dataproc.cluster.hdfs.datanodes.count`*::
 +
 --
@@ -35499,6 +35545,42 @@ type: double
 Indicates the number of virtual cores in YARN.
 
 type: long
+
+--
+
+*`gcp.dataproc.cluster.job.completion_time.value`*::
++
+--
+The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.job.duration.value`*::
++
+--
+The time jobs have spent in a given state.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.operation.completion_time.value`*::
++
+--
+The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+
+type: object
+
+--
+
+*`gcp.dataproc.cluster.operation.duration.value`*::
++
+--
+The time operations have spent in a given state.
+
+type: object
 
 --
 
@@ -36078,6 +36160,96 @@ type: long
 
 --
 
+*`gcp.loadbalancing.https.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.external.regional.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.external.regional.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.frontend_tcp_rtt.value`*::
++
+--
+A distribution of the RTT measured for each connection between client and proxy.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.internal.backend_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was sent by the internal HTTP/S load balancer proxy to the backend until the proxy received from the backend the last byte of response.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.internal.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the internal HTTP/S load balancer proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.https.total_latencies.value`*::
++
+--
+A distribution of the latency calculated from when the request was received by the external HTTP/S load balancer proxy until the proxy got ACK from client on last response byte.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.l3.external.rtt_latencies.value`*::
++
+--
+A distribution of the round trip time latency, measured over TCP connections for the external network load balancer.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.l3.internal.rtt_latencies.value`*::
++
+--
+A distribution of RTT measured over TCP connections for internal TCP/UDP load balancer flows.
+
+type: object
+
+--
+
+*`gcp.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.value`*::
++
+--
+A distribution of the smoothed RTT (in ms) measured by the proxy's TCP stack, each minute application layer bytes pass from proxy to client.
+
+type: object
+
+--
+
 [float]
 === pubsub
 
@@ -36318,15 +36490,6 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.push_request_latencies.value`*::
-+
---
-Distribution of push request latencies (in microseconds), grouped by result.
-
-type: long
-
---
-
 *`gcp.pubsub.subscription.retained_acked.bytes`*::
 +
 --
@@ -36449,7 +36612,7 @@ type: long
 --
 Distribution of publish message sizes (in bytes)
 
-type: long
+type: object
 
 --
 
@@ -36516,6 +36679,24 @@ type: long
 
 --
 
+*`gcp.pubsub.subscription.ack_latencies.value`*::
++
+--
+Distribution of ack latencies in milliseconds. The ack latency is the time between when Cloud Pub/Sub sends a message to a subscriber client and when Cloud Pub/Sub receives an Acknowledge request for that message.
+
+type: object
+
+--
+
+*`gcp.pubsub.subscription.push_request_latencies.value`*::
++
+--
+Distribution of push request latencies (in microseconds), grouped by result.
+
+type: object
+
+--
+
 [float]
 === storage
 
@@ -36531,7 +36712,7 @@ type: long
 
 --
 
-*`gcp.storage.authz.acl_based_object_access_.ount`*::
+*`gcp.storage.authz.acl_based_object_access.count`*::
 +
 --
 Delta count of requests that result in an object being granted access solely due to object ACLs.
@@ -43058,7 +43239,7 @@ format: percent
 *`kubernetes.container.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited)
+CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited). If the container CPU limits are missing and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
 
 
 type: scaled_float
@@ -43186,7 +43367,7 @@ format: percent
 *`kubernetes.container.memory.usage.limit.pct`*::
 +
 --
-Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited). If the container Memory limits are missing and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
 
 
 type: scaled_float
@@ -43451,7 +43632,7 @@ type: long
 
 --
 
-*`kubernetes.controllermanager.client.request.duration.sec.bucket.*`*::
+*`kubernetes.controllermanager.client.request.duration.us.bucket.*`*::
 +
 --
 Response latency distribution, histogram buckets
@@ -43460,16 +43641,16 @@ type: object
 
 --
 
-*`kubernetes.controllermanager.client.request.duration.sec.sum`*::
+*`kubernetes.controllermanager.client.request.duration.us.sum`*::
 +
 --
-Request duration, sum in seconds
+Request duration, sum in microseconds
 
 type: long
 
 --
 
-*`kubernetes.controllermanager.client.request.duration.sec.count`*::
+*`kubernetes.controllermanager.client.request.duration.us.count`*::
 +
 --
 Request duration, number of operations
@@ -43521,33 +43702,6 @@ type: long
 Workqueue number of retries
 
 type: long
-
---
-
-*`kubernetes.controllermanager.workqueue.work.duration.sec.sum`*::
-+
---
-Processing time of workqueue item, sum in seconds
-
-type: long
-
---
-
-*`kubernetes.controllermanager.workqueue.work.duration.sec.count`*::
-+
---
-Processing time of workqueue item, number of operations
-
-type: long
-
---
-
-*`kubernetes.controllermanager.workqueue.work.duration.sec.bucket.*`*::
-+
---
-Processing time of workqueue item, histogram buckets
-
-type: object
 
 --
 
@@ -44203,7 +44357,7 @@ format: percent
 *`kubernetes.pod.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited)
+CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited). If one or more containers of the pod is unlimited and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
 
 
 type: scaled_float
@@ -44241,7 +44395,7 @@ format: percent
 *`kubernetes.pod.memory.usage.limit.pct`*::
 +
 --
-Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited). If one or more containers of the pod is unlimited and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
 
 
 type: scaled_float
@@ -47558,34 +47712,6 @@ type: nested
 
 
 
-*`logstash_stats.os.cpu.stat.number_of_elapsed_periods`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
-
---
-
-*`logstash_stats.os.cpu.stat.time_throttled_nanos`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
-
---
-
-*`logstash_stats.os.cpu.stat.number_of_times_throttled`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
-
---
-
-
 *`logstash_stats.os.cpu.load_average.15m`*::
 +
 --
@@ -47620,6 +47746,44 @@ alias to: logstash.node.stats.os.cpu.load_average.5m
 type: alias
 
 alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
+
+--
+
+
+*`logstash_stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.cfs_quota_micros
+
+--
+
+
+*`logstash_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+
+--
+
+*`logstash_stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+
+--
+
+*`logstash_stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
 
 --
 
@@ -47838,21 +48002,21 @@ type: keyword
 *`logstash.node.stats.os.cpu.load_average.15m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
 *`logstash.node.stats.os.cpu.load_average.1m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
 *`logstash.node.stats.os.cpu.load_average.5m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
@@ -47864,6 +48028,13 @@ type: long
 
 --
 
+
+*`logstash.node.stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: long
+
+--
 
 
 *`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::

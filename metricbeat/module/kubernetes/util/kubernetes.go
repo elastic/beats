@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
@@ -81,7 +82,7 @@ const selector = "kubernetes"
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	res kubernetes.Resource,
-	perfMetrics *PerfMetricsCache,
+	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
@@ -120,18 +121,20 @@ func NewResourceMetadataEnricher(
 				m[id] = podMetaGen.Generate(r)
 
 			case *kubernetes.Node:
-				// Report node allocatable resources to PerfMetrics cache
-				name := r.GetObjectMeta().GetName()
+				nodeName := r.GetObjectMeta().GetName()
+				metrics := NewNodeMetrics()
 				if cpu, ok := r.Status.Capacity["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						perfMetrics.NodeCoresAllocatable.Set(name, float64(q.MilliValue())/1000)
+						metrics.CoresAllocatable = NewFloat64Metric(float64(q.MilliValue()) / 1000)
 					}
 				}
 				if memory, ok := r.Status.Capacity["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						perfMetrics.NodeMemAllocatable.Set(name, float64(q.Value()))
+						metrics.MemoryAllocatable = NewFloat64Metric(float64(q.Value()))
 					}
 				}
+				nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+				nodeStore.SetNodeMetrics(metrics)
 
 				m[id] = metaGen.Generate("node", r)
 
@@ -155,6 +158,8 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate("persistentvolume", r)
 			case *kubernetes.PersistentVolumeClaim:
 				m[id] = metaGen.Generate("persistentvolumeclaim", r)
+			case *kubernetes.StorageClass:
+				m[id] = metaGen.Generate("storageclass", r)
 			default:
 				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
@@ -162,6 +167,13 @@ func NewResourceMetadataEnricher(
 		// delete
 		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			accessor, _ := meta.Accessor(r)
+
+			switch r := r.(type) {
+			case *kubernetes.Node:
+				nodeName := r.GetObjectMeta().GetName()
+				metricsRepo.DeleteNodeStore(nodeName)
+			}
+
 			id := join(accessor.GetNamespace(), accessor.GetName())
 			delete(m, id)
 		},
@@ -183,7 +195,7 @@ func NewResourceMetadataEnricher(
 // NewContainerMetadataEnricher returns an Enricher configured for container events
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
-	perfMetrics *PerfMetricsCache,
+	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
 	config, err := GetValidatedConfig(base)
@@ -223,31 +235,39 @@ func NewContainerMetadataEnricher(
 			}
 			mapStatuses(pod.Status.ContainerStatuses)
 			mapStatuses(pod.Status.InitContainerStatuses)
-			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 
-				// Report container limits to PerfMetrics cache
+			nodeStore, _ := metricsRepo.AddNodeStore(pod.Spec.NodeName)
+			podId := NewPodId(pod.Namespace, pod.Name)
+			podStore, _ := nodeStore.AddPodStore(podId)
+
+			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
+				metrics := NewContainerMetrics()
+
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
 					if q, err := resource.ParseQuantity(cpu.String()); err == nil {
-						perfMetrics.ContainerCoresLimit.Set(cuid, float64(q.MilliValue())/1000)
+						metrics.CoresLimit = NewFloat64Metric(float64(q.MilliValue()) / 1000)
 					}
 				}
 				if memory, ok := container.Resources.Limits["memory"]; ok {
 					if q, err := resource.ParseQuantity(memory.String()); err == nil {
-						perfMetrics.ContainerMemLimit.Set(cuid, float64(q.Value()))
+						metrics.MemoryLimit = NewFloat64Metric(float64(q.Value()))
 					}
 				}
+
+				containerStore, _ := podStore.AddContainerStore(container.Name)
+				containerStore.SetContainerMetrics(metrics)
 
 				if s, ok := statuses[container.Name]; ok {
 					// Extracting id and runtime ECS fields from ContainerID
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+						kubernetes2.ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
 
-						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
+						kubernetes2.ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
+
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
 			}
@@ -258,6 +278,10 @@ func NewContainerMetadataEnricher(
 			if !ok {
 				base.Logger().Debugf("Error while casting event: %s", ok)
 			}
+			podId := NewPodId(pod.Namespace, pod.Name)
+			nodeStore := metricsRepo.GetNodeStore(pod.Spec.NodeName)
+			nodeStore.DeletePodStore(podId)
+
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
@@ -538,20 +562,6 @@ func CreateEvent(event mapstr.M, namespace string) (mb.Event, error) {
 	return e, err
 }
 
-func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
-	_, err := event.Put(field, value)
-	if err != nil {
-		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
-	}
-}
-
-func ShouldDelete(event mapstr.M, field string, logger *logp.Logger) {
-	err := event.Delete(field)
-	if err != nil {
-		logger.Debugf("Failed to delete field '%s': %s", field, err)
-	}
-}
-
 func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Logger) (mapstr.M, error) {
 	clusterInfo, err := metadata.GetKubernetesClusterIdentifier(cfg, client)
 	if err != nil {
@@ -559,10 +569,31 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 	}
 	ecsClusterMeta := mapstr.M{}
 	if clusterInfo.URL != "" {
-		ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.URL, logger)
+		kubernetes2.ShouldPut(ecsClusterMeta, "orchestrator.cluster.url", clusterInfo.URL, logger)
 	}
 	if clusterInfo.Name != "" {
-		ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
+		kubernetes2.ShouldPut(ecsClusterMeta, "orchestrator.cluster.name", clusterInfo.Name, logger)
 	}
 	return ecsClusterMeta, nil
+}
+
+// AddClusterECSMeta adds ECS orchestrator fields
+func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
+	config, err := GetValidatedConfig(base)
+	if err != nil {
+		logp.Info("could not retrieve validated config")
+		return nil
+	}
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+	if err != nil {
+		logp.Err("fail to get kubernetes client: %s", err)
+		return nil
+	}
+	cfg, _ := conf.NewConfigFrom(&config)
+	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
+	if err != nil {
+		logp.Info("could not retrieve cluster metadata: %s", err)
+		return nil
+	}
+	return ecsClusterMeta
 }

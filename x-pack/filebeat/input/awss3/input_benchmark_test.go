@@ -16,13 +16,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	s3Types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 
@@ -40,44 +42,53 @@ const (
 )
 
 type constantSQS struct {
-	msgs []sqs.Message
+	msgs []sqsTypes.Message
 }
 
 var _ sqsAPI = (*constantSQS)(nil)
 
 func newConstantSQS() *constantSQS {
 	return &constantSQS{
-		msgs: []sqs.Message{
+		msgs: []sqsTypes.Message{
 			newSQSMessage(newS3Event(filepath.Base(cloudtrailTestFile))),
 		},
 	}
 }
 
-func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.Message, error) {
+func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqsTypes.Message, error) {
 	return c.msgs, nil
 }
 
-func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
+func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqsTypes.Message) error {
 	return nil
 }
 
-func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
+func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqsTypes.Message, timeout time.Duration) error {
 	return nil
 }
 
 type s3PagerConstant struct {
-	objects      []s3.Object
+	mutex        *sync.Mutex
+	objects      []s3Types.Object
 	currentIndex int
 }
 
 var _ s3Pager = (*s3PagerConstant)(nil)
 
-func (c *s3PagerConstant) Next(ctx context.Context) bool {
+func (c *s3PagerConstant) HasMorePages() bool {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.currentIndex < len(c.objects)
 }
 
-func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsOutput {
-	ret := &s3.ListObjectsOutput{}
+func (c *s3PagerConstant) NextPage(ctx context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+	if !c.HasMorePages() {
+		return nil, errors.New("no more pages")
+	}
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	ret := &s3.ListObjectsV2Output{}
 	pageSize := 1000
 	if len(c.objects) < c.currentIndex+pageSize {
 		pageSize = len(c.objects) - c.currentIndex
@@ -86,24 +97,18 @@ func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsOutput {
 	ret.Contents = c.objects[c.currentIndex : c.currentIndex+pageSize]
 	c.currentIndex = c.currentIndex + pageSize
 
-	return ret
-}
-
-func (c *s3PagerConstant) Err() error {
-	if c.currentIndex >= len(c.objects) {
-		c.currentIndex = 0
-	}
-	return nil
+	return ret, nil
 }
 
 func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 	lastModified := time.Now()
 	ret := &s3PagerConstant{
+		mutex:        new(sync.Mutex),
 		currentIndex: 0,
 	}
 
 	for i := 0; i < totalListingObjectsForInputS3; i++ {
-		ret.objects = append(ret.objects, s3.Object{
+		ret.objects = append(ret.objects, s3Types.Object{
 			Key:          aws.String(fmt.Sprintf("%s-%d.json.gz", listPrefix, i)),
 			ETag:         aws.String(fmt.Sprintf("etag-%s-%d", listPrefix, i)),
 			LastModified: aws.Time(lastModified),
@@ -135,7 +140,7 @@ func newConstantS3(t testing.TB) *constantS3 {
 	}
 }
 
-func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error) {
+func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
 	return newS3GetObjectResponse(c.filename, c.data, c.contentType), nil
 }
 
@@ -259,6 +264,8 @@ func TestBenchmarkInputSQS(t *testing.T) {
 func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
+		log.Infof("benchmark with %d number of workers", numberOfWorkers)
+
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics(metricRegistry, "test_id")
 
@@ -266,14 +273,11 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
 
-		defer close(client.Channel)
-		conf := makeBenchmarkConfig(t)
+		defer func() {
+			_ = client.Close()
+		}()
 
-		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-		store, err := storeReg.Get("test")
-		if err != nil {
-			t.Fatalf("Failed to access store: %v", err)
-		}
+		config := makeBenchmarkConfig(t)
 
 		b.ResetTimer()
 		start := time.Now()
@@ -296,13 +300,20 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				listPrefix := fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
 				s3API.pagerConstant = newS3PagerConstant(listPrefix)
+				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+				store, err := storeReg.Get("test")
+				if err != nil {
+					errChan <- fmt.Errorf("failed to access store: %w", err)
+					return
+				}
+
 				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
 				if err != nil {
 					errChan <- err
 					return
 				}
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, config.FileSelectors)
 				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
 
 				if err := s3Poller.Poll(ctx); err != nil {

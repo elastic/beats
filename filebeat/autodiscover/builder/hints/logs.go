@@ -21,22 +21,27 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
+
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("hints", NewLogHints)
+	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 const (
@@ -49,7 +54,7 @@ const (
 )
 
 // validModuleNames to sanitize user input
-var validModuleNames = regexp.MustCompile("[^a-zA-Z0-9\\_\\-]+")
+var validModuleNames = regexp.MustCompile(`[^a-zA-Z0-9\\_\\-]+`)
 
 type logHints struct {
 	config   *config
@@ -64,7 +69,7 @@ func NewLogHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false)
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +85,8 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 	}
 
 	// Hint must be explicitly enabled when default_config sets enabled=false.
-	if !l.config.DefaultConfig.Enabled() && !builder.IsEnabled(hints, l.config.Key) ||
-		builder.IsDisabled(hints, l.config.Key) {
+	if !l.config.DefaultConfig.Enabled() && !utils.IsEnabled(hints, l.config.Key) ||
+		utils.IsDisabled(hints, l.config.Key) {
 		l.log.Debugw("Hints config is not enabled.", "autodiscover.event", event)
 		return nil
 	}
@@ -105,30 +110,33 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 	for _, h := range inputs {
 		// Clone original config, enable it if disabled
 		config, _ := conf.NewConfigFrom(l.config.DefaultConfig)
-		config.Remove("enabled", -1)
+		_, err := config.Remove("enabled", -1)
+		if err != nil {
+			continue
+		}
 
 		tempCfg := mapstr.M{}
 		mline := l.getMultiline(h)
 		if len(mline) != 0 {
-			tempCfg.Put(multiline, mline)
+			kubernetes.ShouldPut(tempCfg, multiline, mline, l.log)
 		}
 		if ilines := l.getIncludeLines(h); len(ilines) != 0 {
-			tempCfg.Put(includeLines, ilines)
+			kubernetes.ShouldPut(tempCfg, includeLines, ilines, l.log)
 		}
 		if elines := l.getExcludeLines(h); len(elines) != 0 {
-			tempCfg.Put(excludeLines, elines)
+			kubernetes.ShouldPut(tempCfg, excludeLines, elines, l.log)
 		}
 
 		if procs := l.getProcessors(h); len(procs) != 0 {
-			tempCfg.Put(processors, procs)
+			kubernetes.ShouldPut(tempCfg, processors, procs, l.log)
 		}
 
 		if pip := l.getPipeline(h); len(pip) != 0 {
-			tempCfg.Put(pipeline, pip)
+			kubernetes.ShouldPut(tempCfg, pipeline, pip, l.log)
 		}
 
 		if jsonOpts := l.getJSONOptions(h); len(jsonOpts) != 0 {
-			tempCfg.Put(json, jsonOpts)
+			kubernetes.ShouldPut(tempCfg, json, jsonOpts, l.log)
 		}
 		// Merge config template with the configs from the annotations
 		if err := config.Merge(tempCfg); err != nil {
@@ -147,9 +155,9 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				filesetConf, _ := conf.NewConfigFrom(config)
 
 				if inputType, _ := filesetConf.String("type", -1); inputType == harvester.ContainerType {
-					filesetConf.SetString("stream", -1, cfg.Stream)
+					_ = filesetConf.SetString("stream", -1, cfg.Stream)
 				} else {
-					filesetConf.SetString("containers.stream", -1, cfg.Stream)
+					_ = filesetConf.SetString("containers.stream", -1, cfg.Stream)
 				}
 
 				moduleConf[fileset+".enabled"] = cfg.Enabled
@@ -168,37 +176,37 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 }
 
 func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {
-	return builder.GetHintMapStr(hints, l.config.Key, multiline)
+	return utils.GetHintMapStr(hints, l.config.Key, multiline)
 }
 
 func (l *logHints) getIncludeLines(hints mapstr.M) []string {
-	return builder.GetHintAsList(hints, l.config.Key, includeLines)
+	return utils.GetHintAsList(hints, l.config.Key, includeLines)
 }
 
 func (l *logHints) getExcludeLines(hints mapstr.M) []string {
-	return builder.GetHintAsList(hints, l.config.Key, excludeLines)
+	return utils.GetHintAsList(hints, l.config.Key, excludeLines)
 }
 
 func (l *logHints) getModule(hints mapstr.M) string {
-	module := builder.GetHintString(hints, l.config.Key, "module")
+	module := utils.GetHintString(hints, l.config.Key, "module")
 	// for security, strip module name
 	return validModuleNames.ReplaceAllString(module, "")
 }
 
 func (l *logHints) getInputsConfigs(hints mapstr.M) []mapstr.M {
-	return builder.GetHintAsConfigs(hints, l.config.Key)
+	return utils.GetHintAsConfigs(hints, l.config.Key)
 }
 
 func (l *logHints) getProcessors(hints mapstr.M) []mapstr.M {
-	return builder.GetProcessors(hints, l.config.Key)
+	return utils.GetProcessors(hints, l.config.Key)
 }
 
 func (l *logHints) getPipeline(hints mapstr.M) string {
-	return builder.GetHintString(hints, l.config.Key, "pipeline")
+	return utils.GetHintString(hints, l.config.Key, "pipeline")
 }
 
 func (l *logHints) getJSONOptions(hints mapstr.M) mapstr.M {
-	return builder.GetHintMapStr(hints, l.config.Key, json)
+	return utils.GetHintMapStr(hints, l.config.Key, json)
 }
 
 type filesetConfig struct {
@@ -222,7 +230,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 	}
 
 	// If a single fileset is given, pass all streams to it
-	fileset := builder.GetHintString(hints, l.config.Key, "fileset")
+	fileset := utils.GetHintString(hints, l.config.Key, "fileset")
 	if fileset != "" {
 		if conf, ok := filesets[fileset]; ok {
 			conf.Enabled = true
@@ -232,7 +240,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 
 	// If fileset is defined per stream, return all of them
 	for _, stream := range []string{"all", "stdout", "stderr"} {
-		fileset := builder.GetHintString(hints, l.config.Key, "fileset."+stream)
+		fileset := utils.GetHintString(hints, l.config.Key, "fileset."+stream)
 		if fileset != "" {
 			if conf, ok := filesets[fileset]; ok {
 				conf.Enabled = true
@@ -253,7 +261,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 }
 
 func (l *logHints) getInputs(hints mapstr.M) []mapstr.M {
-	modules := builder.GetHintsAsList(hints, l.config.Key)
+	modules := utils.GetHintsAsList(hints, l.config.Key)
 	var output []mapstr.M
 
 	for _, mod := range modules {

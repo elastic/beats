@@ -784,6 +784,7 @@ function AuditProcessor(tenant_names, debug) {
             4: 'SharePoint', // SharePoint events.
             6: 'SharePointFileOperation', // SharePoint file operation events.
             8: 'AzureActiveDirectory', // Azure Active Directory events.
+            7: 'OneDrive', // OneDrive for Business events.
             9: 'AzureActiveDirectoryAccountLogon', // Azure Active Directory OrgId logon events (deprecating).
             10: 'DataCenterSecurityCmdlet', // Data Center security cmdlet events.
             11: 'ComplianceDLPSharePoint', // Data loss protection (DLP) events in SharePoint and OneDrive for Business.
@@ -791,7 +792,10 @@ function AuditProcessor(tenant_names, debug) {
             13: 'ComplianceDLPExchange', // Data loss protection (DLP) events in Exchange, when configured via Unified DLP Policy. DLP events based on Exchange Transport Rules are not supported.
             14: 'SharePointSharingOperation', // SharePoint sharing events.
             15: 'AzureActiveDirectoryStsLogon', // Secure Token Service (STS) logon events in Azure Active Directory.
+            16: 'SkypeForBusinessPSTNUsage', // Public Switched Telephone Network (PSTN) events from Skype for Business.
+            17: 'SkypeForBusinessUsersBlocked', // Blocked user events from Skype for Business.
             18: 'SecurityComplianceCenterEOPCmdlet', // Admin actions from the Security & Compliance Center.
+            19: 'ExchangeAggregatedOperation', // Aggregated Exchange mailbox auditing events.
             20: 'PowerBIAudit', // Power BI events.
             21: 'CRM', // Microsoft CRM events.
             22: 'Yammer', // Yammer events.
@@ -799,26 +803,84 @@ function AuditProcessor(tenant_names, debug) {
             24: 'Discovery', // Events for eDiscovery activities performed by running content searches and managing eDiscovery cases in the Security & Compliance Center.
             25: 'MicrosoftTeams', // Events from Microsoft Teams.
             28: 'ThreatIntelligence', // Phishing and malware events from Exchange Online Protection and Office 365 Advanced Threat Protection.
+            29: 'MailSubmission', // Submission events from Exchange Online Protection and Microsoft Defender for Office 365.
             30: 'MicrosoftFlow', // Microsoft Power Automate (formerly called Microsoft Flow) events.
             31: 'AeD', // Advanced eDiscovery events.
             32: 'MicrosoftStream', // Microsoft Stream events.
             33: 'ComplianceDLPSharePointClassification', // Events related to DLP classification in SharePoint.
+            34: 'ThreatFinder', // Campaign-related events from Microsoft Defender for Office 365.
             35: 'Project', // Microsoft Project events.
             36: 'SharePointListOperation', // SharePoint List events.
+            37: 'SharePointCommentOperation', // SharePoint comment events.
             38: 'DataGovernance', // Events related to retention policies and retention labels in the Security & Compliance Center
+            39: 'Kaizala', // Kaizala events.
             40: 'SecurityComplianceAlerts', // Security and compliance alert signals.
             41: 'ThreatIntelligenceUrl', // Safe links time-of-block and block override events from Office 365 Advanced Threat Protection.
             42: 'SecurityComplianceInsights', // Events related to insights and reports in the Office 365 security and compliance center.
+            43: 'MIPLabel', // Events related to the detection in the Transport pipeline of email messages that have been tagged (manually or automatically) with sensitivity labels.
             44: 'WorkplaceAnalytics', // Workplace Analytics events.
             45: 'PowerAppsApp', // Power Apps events.
+            46: 'PowerAppsPlan', // Subscription plan events for Power Apps.
             47: 'ThreatIntelligenceAtpContent', // Phishing and malware events for files in SharePoint, OneDrive for Business, and Microsoft Teams from Office 365 Advanced Threat Protection.
+            48: 'LabelContentExplorer', // Events related to data classification content explorer.
             49: 'TeamsHealthcare', // Events related to the Patients application in Microsoft Teams for Healthcare.
+            50: 'ExchangeItemAggregated', // Events related to the MailItemsAccessed mailbox auditing action.
+            51: 'HygieneEvent', // Events related to outbound spam protection.
             52: 'DataInsightsRestApiAudit', // Data Insights REST API events.
+            53: 'InformationBarrierPolicyApplication', // Events related to the application of information barrier policies.
             54: 'SharePointListItemOperation', // SharePoint list item events.
             55: 'SharePointContentTypeOperation', // SharePoint list content type events.
             56: 'SharePointFieldOperation', // SharePoint list field events.
+            57: 'MicrosoftTeamsAdmin', // Teams admin events.
+            58: 'HRSignal', // Events related to HR data signals that support the Insider risk management solution.
+            59: 'MicrosoftTeamsDevice', // Teams device events.
+            60: 'MicrosoftTeamsAnalytics', // Teams analytics events.
+            61: 'InformationWorkerProtection', // Events related to compromised user alerts.
+            62: 'Campaign', // Email campaign events from Microsoft Defender for Office 365.
+            63: 'DLPEndpoint', // Endpoint DLP events.
             64: 'AirInvestigation', // Automated incident response (AIR) events.
+            65: 'Quarantine', // Quarantine events.
             66: 'MicrosoftForms', // Microsoft Forms events.
+            67: 'ApplicationAudit', // Application audit events.
+            68: 'ComplianceSupervisionExchange', // Events tracked by the Communication compliance offensive language model.
+            69: 'CustomerKeyServiceEncryption', // Events related to the customer key encryption service.
+            70: 'OfficeNative', // Events related to sensitivity labels applied to Office documents.
+            71: 'MipAutoLabelSharePointItem', // Auto-labeling events in SharePoint.
+            72: 'MipAutoLabelSharePointPolicyLocation', // Auto-labeling policy events in SharePoint.
+            73: 'MicrosoftTeamsShifts', // Teams Shifts events.
+            75: 'MipAutoLabelExchangeItem', // Auto-labeling events in Exchange.
+            76: 'CortanaBriefing', // Briefing email events.
+            78: 'WDATPAlerts', // Events related to alerts generated by Windows Defender for Endpoint.
+            82: 'SensitivityLabelPolicyMatch', // Events generated when the file labeled with a sensitivity label is opened or renamed.
+            83: 'SensitivityLabelAction', // Event generated when sensitivity labels are applied, updated, or removed from a file.
+            84: 'SensitivityLabeledFileAction', // Events generated when a file labeled with a sensitivity label is opened or renamed.
+            85: 'AttackSim', // Attack simulator events.
+            86: 'AirManualInvestigation', // Events related to manual investigations in Automated investigation and response (AIR).
+            87: 'SecurityComplianceRBAC', // Security and compliance RBAC events.
+            88: 'UserTraining', // Attack simulator training events in Microsoft Defender for Office 365.
+            89: 'AirAdminActionInvestigation', // Events related to admin actions in Automated investigation and response (AIR).
+            90: 'MSTIC', // Threat intelligence events in Microsoft Defender for Office 365.
+            91: 'PhysicalBadgingSignal', // Events related to physical badging signals that support the Insider risk management solution.
+            93: 'AipDiscover', // Azure Information Protection (AIP) scanner events.
+            94: 'AipSensitivityLabelAction', // AIP sensitivity label events.
+            95: 'AipProtectionAction', // AIP protection events.
+            96: 'AipFileDeleted', // AIP file deletion events.
+            97: 'AipHeartBeat', // AIP heartbeat events.
+            98: 'MCASAlerts', // Events corresponding to alerts triggered by Microsoft Cloud App Security.
+            99: 'OnPremisesFileShareScannerDlp', // Events related to scanning for sensitive data on file shares.
+            100: 'OnPremisesSharePointScannerDlp', // Events related to scanning for sensitive data in SharePoint.
+            101: 'ExchangeSearch', // Events related to using Outlook on the web (OWA) to search for mailbox items.
+            102: 'SharePointSearch', // Events related to searching an organization's SharePoint home site.
+            103: 'PrivacyInsights', // Privacy insight events.
+            105: 'MyAnalyticsSettings', // MyAnalytics events.
+            106: 'SecurityComplianceUserChange', // Events related to modifying or deleting a user.
+            107: 'ComplianceDLPExchangeClassification', // Exchange DLP classification events.
+            109: 'MipExactDataMatch', // Exact Data Match (EDM) classification events.
+            113: 'MS365DCustomDetection', // Events related to custom detection actions in Microsoft 365 Defender.
+            147: 'CoreReportingSettings', // Reports settings events.
+            148: 'ComplianceConnector', // Events related to importing non-Microsoft data using data connectors in the Microsoft Purview compliance portal.
+            174: 'DataShareOperation', // Events related to sharing of data ingested via SystemSync.
+            181: 'EduDataLakeDownloadOperation', // Events related to the export of SystemSync ingested data from the lake.
         },
     }));
 

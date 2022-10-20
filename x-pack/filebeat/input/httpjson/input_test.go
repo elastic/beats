@@ -209,28 +209,41 @@ func TestInput(t *testing.T) {
 			name: "Test pagination",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				registerPaginationTransforms()
+				registerResponseTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				server := httptest.NewServer(h)
 				config["request.url"] = server.URL
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       time.Second,
+				"interval":       time.Millisecond,
 				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.items",
+					"transforms": []interface{}{
+						map[string]interface{}{
+							"set": map[string]interface{}{
+								"target": "body.page",
+								"value":  "[[.last_response.page]]",
+							},
+						},
+					},
 				},
 				"response.pagination": []interface{}{
 					map[string]interface{}{
 						"set": map[string]interface{}{
-							"target": "url.params.page",
-							"value":  "[[.last_response.body.nextPageToken]]",
+							"target":                 "url.params.page",
+							"value":                  "[[.last_response.body.nextPageToken]]",
+							"fail_on_template_error": true,
 						},
 					},
 				},
 			},
-			handler:  paginationHandler(),
-			expected: []string{`{"foo":"a"}`, `{"foo":"b"}`},
+			handler: paginationHandler(),
+			expected: []string{
+				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+			},
 		},
 		{
 			name: "Test first event",
@@ -578,6 +591,82 @@ func TestInput(t *testing.T) {
 				`{"space":{"cake":"pumpkin"}}`,
 			},
 		},
+		{
+			name:        "Test pagination when used with chaining",
+			setupServer: newChainPaginationTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.records[:].id",
+						},
+					},
+				},
+			},
+			handler: defaultHandler(http.MethodGet, ""),
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test replace_with clause and first_response object",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"exportId":"2212"}`)
+					case "/2212":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/2212/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId"
+				config["chain.1.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.exportId",
+						},
+					},
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,first_response.body.exportId",
+						},
+					},
+				},
+			},
+			handler: defaultHandler(http.MethodGet, ""),
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -665,6 +754,34 @@ func newChainTestServer(
 		config["request.url"] = server.URL
 		config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
 		t.Cleanup(server.Close)
+	}
+}
+
+func newChainPaginationTestServer(
+	newServer func(http.Handler) *httptest.Server,
+) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		registerPaginationTransforms()
+		var serverURL string
+		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.URL.Path {
+			case "/":
+				link := serverURL + "/link2"
+				value := fmt.Sprintf(`{"records":[{"id":1}], "nextLink":"%s"}`, link)
+				fmt.Fprintln(w, value)
+			case "/1":
+				fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+			case "/link2":
+				fmt.Fprintln(w, `{"records":[{"id":2}]}`)
+			case "/2":
+				fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+			}
+		})
+		server := httptest.NewServer(r)
+		config["request.url"] = server.URL
+		serverURL = server.URL
+		config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+		t.Cleanup(func() { registeredTransforms = newRegistry() })
 	}
 }
 
@@ -823,6 +940,8 @@ func paginationHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","items":[{"foo":"c"}]}`))
 		case 3:
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:03Z","items":[{"foo":"d"}]}`))
+			count = 0
+			return
 		}
 		count += 1
 	}

@@ -29,20 +29,22 @@ type SetupFactory struct {
 	beatInfo              beat.Info
 	pipelineLoaderFactory PipelineLoaderFactory
 	overwritePipelines    bool
+	enableAllFilesets     bool
 }
 
 // NewSetupFactory creates a SetupFactory
-func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFactory) *SetupFactory {
+func NewSetupFactory(beatInfo beat.Info, pipelineLoaderFactory PipelineLoaderFactory, enableAllFilesets bool) *SetupFactory {
 	return &SetupFactory{
 		beatInfo:              beatInfo,
 		pipelineLoaderFactory: pipelineLoaderFactory,
 		overwritePipelines:    true,
+		enableAllFilesets:     enableAllFilesets,
 	}
 }
 
 // Create creates a new SetupCfgRunner to setup module configuration.
 func (sf *SetupFactory) Create(_ beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-	m, err := NewModuleRegistry([]*conf.C{c}, sf.beatInfo, false)
+	m, err := NewModuleRegistry([]*conf.C{c}, sf.beatInfo, false, sf.enableAllFilesets)
 	if err != nil {
 		return nil, err
 	}

@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -385,13 +386,13 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path.
-	bl := newLocker(b)
-	err := bl.lock()
+	bl := locks.New(b.Info)
+	err := bl.Lock()
 	if err != nil {
 		return err
 	}
 	defer func() {
-		_ = bl.unlock()
+		_ = bl.Unlock()
 	}()
 
 	svc.BeforeRun()
@@ -549,7 +550,8 @@ type SetupSettings struct {
 	//Deprecated: use IndexManagementKey instead
 	Template bool
 	//Deprecated: use IndexManagementKey instead
-	ILMPolicy bool
+	ILMPolicy         bool
+	EnableAllFilesets bool
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
@@ -614,12 +616,16 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 		}
 
 		if setup.Pipeline && b.OverwritePipelinesCallback != nil {
+			if setup.EnableAllFilesets {
+				if err := b.Beat.BeatConfig.SetBool("config.modules.enable_all_filesets", -1, true); err != nil {
+					return fmt.Errorf("error setting enable_all_filesets config option %w", err)
+				}
+			}
 			esConfig := b.Config.Output.Config()
 			err = b.OverwritePipelinesCallback(esConfig)
 			if err != nil {
 				return err
 			}
-
 			fmt.Println("Loaded Ingest pipelines")
 		}
 

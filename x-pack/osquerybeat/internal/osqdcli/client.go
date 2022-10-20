@@ -8,11 +8,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net"
 	"strconv"
-	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"golang.org/x/sync/semaphore"
@@ -156,33 +153,6 @@ func (c *Client) close() {
 	}
 }
 
-func (c *Client) withReconnect(ctx context.Context, fn func() error) error {
-	err := fn()
-	if err == nil {
-		return nil
-	}
-
-	var netErr *net.OpError
-
-	// The current osquery go library github.com/osquery/osquery-go uses the older version of thrift library that
-	// doesn't not wrap the original error, so we have to use this ugly check for the error message suffix here.
-	// The latest version of thrift library is wrapping the error, so adding this check first here.
-	if (errors.As(err, &netErr) && (errors.Is(netErr.Err, syscall.EPIPE) || errors.Is(netErr.Err, syscall.ECONNRESET))) ||
-		strings.HasSuffix(err.Error(), " broken pipe") {
-
-		c.log.Debugf("osquery error: %v, reconnect", err)
-
-		// reconnect && retry
-		err = c.reconnect(ctx)
-		if err != nil {
-			c.log.Errorf("failed to reconnect: %v", err)
-			return err
-		}
-		return fn()
-	}
-	return nil
-}
-
 // Query executes a given query, resolves the types
 func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{}, error) {
 	c.mx.Lock()
@@ -198,10 +168,7 @@ func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{
 	defer c.cliLimiter.Release(limit)
 
 	var res *genosquery.ExtensionResponse
-	err = c.withReconnect(ctx, func() error {
-		res, err = c.cli.Client.Query(ctx, sql)
-		return err
-	})
+	res, err = c.cli.Client.Query(ctx, sql)
 	if err != nil {
 		return nil, fmt.Errorf("osquery failed: %w", err)
 	}
@@ -260,10 +227,7 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 			err   error
 		)
 
-		err = c.withReconnect(ctx, func() error {
-			exres, err = c.cli.Client.GetQueryColumns(ctx, sql)
-			return err
-		})
+		exres, err = c.cli.Client.GetQueryColumns(ctx, sql)
 
 		if err != nil {
 			return nil, fmt.Errorf("osquery get query columns failed: %w", err)

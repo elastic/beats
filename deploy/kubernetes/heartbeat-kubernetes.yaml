@@ -7,8 +7,7 @@ metadata:
     k8s-app: heartbeat
 data:
   heartbeat.yml: |-
-    #heartbeat.autodiscover:
-    #  # Autodiscover pods
+    #heartbeat.autodiscover: # Enable one or more of the providers below
     #  providers:
     #    - type: kubernetes
     #      resource: pod
@@ -16,16 +15,12 @@ data:
     #      node: ${NODE_NAME}
     #      hints.enabled: true
     #
-    #  # Autodiscover services
-    #  providers:
     #    - type: kubernetes
     #      resource: service
     #      scope: cluster
     #      node: ${NODE_NAME}
     #      hints.enabled: true
     #
-    #  # Autodiscover nodes
-    #  providers:
     #    - type: kubernetes
     #      resource: node
     #      node: ${NODE_NAME}
@@ -74,7 +69,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: heartbeat
-        image: docker.elastic.co/beats/heartbeat:8.4.0
+        image: docker.elastic.co/beats/heartbeat:8.6.0
         args: [
           "-c", "/etc/heartbeat.yml",
           "-e",
@@ -100,7 +95,7 @@ spec:
           runAsUser: 0
         resources:
           limits:
-            memory: 1536mi
+            memory: 1536Mi
           requests:
             # for synthetics, 2 full cores is a good starting point for relatively consistent perform of a single concurrent check
             # For lightweight checks as low as 100m is fine

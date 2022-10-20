@@ -95,12 +95,9 @@ func Test_runPublishJob(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			client := &MockBeatClient{}
-			queue := runPublishJob(tc.job, &WrappedClient{
-				Publish: client.Publish,
-				Close:   client.Close,
-				wait:    func() {},
-			})
+			pipel := &MockPipeline{}
+			client := pipel.ConnectSync()
+			queue := runPublishJob(tc.job, client)
 			for {
 				if len(queue) == 0 {
 					break
@@ -110,10 +107,12 @@ func Test_runPublishJob(t *testing.T) {
 				conts := tf(context.Background())
 				queue = append(queue, conts...)
 			}
-			client.Close()
+			client.Wait()
+			err := client.Close()
+			require.NoError(t, err)
 
-			require.Len(t, client.publishes, len(tc.validators))
-			for idx, event := range client.publishes {
+			require.Len(t, pipel.PublishedEvents(), len(tc.validators))
+			for idx, event := range pipel.PublishedEvents() {
 				testslike.Test(t, tc.validators[idx], event.Fields)
 			}
 		})

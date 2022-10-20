@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -118,7 +119,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-		enricher:      util.NewContainerMetadataEnricher(base, mod.GetPerfMetricsCache(), false),
+		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), false),
 		mod:           mod,
 	}, nil
 }
@@ -153,9 +154,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 			split := strings.Index(cID, "://")
 			if split != -1 {
-				util.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
+				kubernetes.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
 
-				util.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
+				kubernetes.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
 			}
 		}
 		if containerImage, ok := event["image"]; ok {
@@ -164,9 +165,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				m.Logger().Debugf("Error while casting containerImage: %s", ok)
 			}
 
-			util.ShouldPut(containerFields, "image.name", cImage, m.Logger())
+			kubernetes.ShouldPut(containerFields, "image.name", cImage, m.Logger())
 			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
-			util.ShouldDelete(event, "image", m.Logger())
+			kubernetes.ShouldDelete(event, "image", m.Logger())
 		}
 
 		e, err := util.CreateEvent(event, "kubernetes.container")

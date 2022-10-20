@@ -3,9 +3,6 @@
   release: beta
   type: group
   fields:
-    - name: batch.spark.executors.count
-      type: long
-      description: Indicates the number of Batch Spark executors.
     - name: cluster.hdfs.datanodes.count
       type: long
       description: Indicates the number of HDFS DataNodes that are running inside a cluster.
@@ -57,3 +54,19 @@
     - name: cluster.yarn.virtual_cores.count
       type: long
       description: Indicates the number of virtual cores in YARN.
+    - name: cluster.job.completion_time.value
+      type: object
+      object_type: histogram
+      description: The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
+    - name: cluster.job.duration.value
+      type: object
+      object_type: histogram
+      description: The time jobs have spent in a given state.
+    - name: cluster.operation.completion_time.value
+      type: object
+      object_type: histogram
+      description: The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+    - name: cluster.operation.duration.value
+      type: object
+      object_type: histogram
+      description: The time operations have spent in a given state.

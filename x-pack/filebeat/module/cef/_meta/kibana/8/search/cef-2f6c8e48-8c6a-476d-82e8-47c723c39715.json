@@ -1,0 +1,52 @@
+{
+    "attributes": {
+        "columns": [
+            "cef.extensions.categoryDeviceGroup",
+            "cef.extensions.categoryTechnique",
+            "cef.extensions.categoryOutcome",
+            "cef.extensions.categorySignificance",
+            "cef.extensions.categoryObject",
+            "cef.extensions.categoryBehavior",
+            "cef.extensions.categoryDeviceType"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Host\" OR cef.extensions.categoryDeviceGroup:\"/Application\""
+                    }
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Endpoint Event Explorer — ArcSight [Filebeat CEF]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-2f6c8e48-8c6a-476d-82e8-47c723c39715",
+    "migrationVersion": {
+        "search": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NzMsMV0="
+}

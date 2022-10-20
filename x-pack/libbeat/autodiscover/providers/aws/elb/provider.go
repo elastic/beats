@@ -5,9 +5,9 @@
 package elb
 
 import (
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -23,20 +23,17 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddProvider("aws_elb", AutodiscoverBuilder)
+	_ = autodiscover.Registry.AddProvider("aws_elb", AutodiscoverBuilder)
 }
 
 // Provider implements autodiscover provider for aws ELBs.
 type Provider struct {
-	config        *awsauto.Config
-	bus           bus.Bus
-	builders      autodiscover.Builders
-	appenders     autodiscover.Appenders
-	templates     *template.Mapper
-	startListener bus.Listener
-	stopListener  bus.Listener
-	watcher       *watcher
-	uuid          uuid.UUID
+	config    *awsauto.Config
+	bus       bus.Bus
+	appenders autodiscover.Appenders
+	templates *template.Mapper
+	watcher   *watcher
+	uuid      uuid.UUID
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
@@ -62,11 +59,18 @@ func AutodiscoverBuilder(
 		ProfileName:     config.AWSConfig.ProfileName,
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
-		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsCfg.Region)
-		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, ec2ServiceName, awsCfg.Region, awsCfg))
+		svcEC2 := ec2.NewFromConfig(awsCfg, func(o *ec2.Options) {
+			if config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+
+		})
 
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
 		if err != nil {
@@ -76,7 +80,7 @@ func AutodiscoverBuilder(
 		config.Regions = completeRegionsList
 	}
 
-	var clients []elasticloadbalancingv2iface.ClientAPI
+	var clients []autodiscoverElbClient
 	for _, region := range config.Regions {
 		awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,
@@ -88,9 +92,12 @@ func AutodiscoverBuilder(
 			logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 		}
 		awsCfg.Region = region
-		elbServiceName := awscommon.CreateServiceName("elasticloadbalancing", config.AWSConfig.FIPSEnabled, region)
-		clients = append(clients, elasticloadbalancingv2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, elbServiceName, region, awsCfg)))
+		clients = append(clients, elasticloadbalancingv2.NewFromConfig(awsCfg, func(o *elasticloadbalancingv2.Options) {
+			if config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+
+		}))
 	}
 
 	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)

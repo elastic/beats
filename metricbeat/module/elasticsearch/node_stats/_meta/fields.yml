@@ -27,8 +27,6 @@
             - name: avg_time
               type: group
               fields:
-                - name: bytes
-                  type: long
                 - name: ms
                   type: long
             - name: total_time
@@ -307,11 +305,9 @@
                 - name: control_group
                   type: keyword
                 - name: limit.bytes
-                  type: long
-                  format: bytes
+                  type: keyword
                 - name: usage.bytes
-                  type: long
-                  format: bytes
+                  type: keyword
     - name: process.cpu.pct
       type: double
       format: percent

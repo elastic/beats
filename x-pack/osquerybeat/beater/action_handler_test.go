@@ -33,15 +33,17 @@ type mockPublisher struct {
 	index      string
 	actionID   string
 	responseID string
+	meta       map[string]interface{}
 	hits       []map[string]interface{}
 	ecsm       ecs.Mapping
 	reqData    interface{}
 }
 
-func (p *mockPublisher) Publish(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.index = index
 	p.actionID = actionID
 	p.responseID = responseID
+	p.meta = meta
 	p.hits = hits
 	p.ecsm = ecsm
 	p.reqData = reqData

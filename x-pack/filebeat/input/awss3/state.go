@@ -29,6 +29,10 @@ type state struct {
 	Error bool `json:"error" struct:"error"`
 }
 
+func stateID(bucket, key, etag string, lastModified time.Time) string {
+	return bucket + key + etag + lastModified.String()
+}
+
 // newState creates a new s3 object state
 func newState(bucket, key, etag, listPrefix string, lastModified time.Time) state {
 	s := state{
@@ -41,7 +45,7 @@ func newState(bucket, key, etag, listPrefix string, lastModified time.Time) stat
 		Error:        false,
 	}
 
-	s.ID = s.Bucket + s.Key + s.Etag + s.LastModified.String()
+	s.ID = stateID(s.Bucket, s.Key, s.Etag, s.LastModified)
 
 	return s
 }

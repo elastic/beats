@@ -10,7 +10,9 @@
 # =============================== Network device ===============================
 
 # Select the network interface to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
+# keyword to sniff on all connected interfaces. On all platforms, you
+# can use "default_route", "default_route_ipv4" or "default_route_ipv6"
+# to sniff on the device carrying the default route.
 packetbeat.interfaces.device: any
 
 # The network CIDR blocks that are considered "internal" networks for
@@ -595,6 +597,10 @@ packetbeat.protocols:
 
   # Preserve original contents in event.original
   keep_original: true
+
+  # You can monitor tcp SIP traffic by setting the transport_protocol option
+  # to tcp, it defaults to udp.
+  #transport_protocol: tcp
 
   # Overrides where this protocol's events are indexed.
   #index: my-custom-sip-index
@@ -1241,9 +1247,6 @@ output.elasticsearch:
 
     # Strategy for fetching the topics metadata from the broker. Default is false.
     #full: false
-
-  # The number of concurrent load-balanced Kafka output workers.
-  #worker: 1
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, events are typically dropped.

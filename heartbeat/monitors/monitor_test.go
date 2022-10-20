@@ -24,7 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -32,6 +31,8 @@ import (
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
+
+	"github.com/elastic/beats/v7/heartbeat/scheduler"
 )
 
 // TestMonitorBasic tests a basic config
@@ -63,30 +64,30 @@ func TestMonitorCfgError(t *testing.T) {
 
 func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Validator) {
 	reg, built, closed := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
+	pipel := &MockPipeline{}
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	mon, err := newMonitor(conf, reg, pipelineConnector, sched.Add, nil, false)
+	mon, err := newMonitor(conf, reg, pipel.ConnectSync(), sched.Add, nil, nil)
 	require.NoError(t, err)
 
 	mon.Start()
 
-	require.Equal(t, 1, len(pipelineConnector.clients))
-	pcClient := pipelineConnector.clients[0]
+	require.Equal(t, 1, len(pipel.Clients))
+	pcClient := pipel.Clients[0]
 
 	timeout := time.Second
 	start := time.Now()
 	success := false
 	for time.Since(start) < timeout && !success {
-		count := len(pcClient.Publishes())
+		count := len(pcClient.PublishedEvents())
 		if count >= 1 {
 			success = true
 
 			pcClient.Close()
 
-			for _, event := range pcClient.Publishes() {
+			for _, event := range pcClient.PublishedEvents() {
 				testslike.Test(t, eventValidator, event.Fields)
 			}
 		} else {
@@ -110,12 +111,12 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 func TestCheckInvalidConfig(t *testing.T) {
 	serverMonConf := mockInvalidPluginConf(t)
 	reg, built, closed := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
+	pipel := &MockPipeline{}
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	m, err := newMonitor(serverMonConf, reg, pipelineConnector, sched.Add, nil, false)
+	m, err := newMonitor(serverMonConf, reg, pipel.ConnectSync(), sched.Add, nil, nil)
 	require.Error(t, err)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")

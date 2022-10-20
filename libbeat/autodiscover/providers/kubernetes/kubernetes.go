@@ -31,7 +31,6 @@ import (
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -45,7 +44,10 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
+	err := autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // Eventer allows defining ways in which kubernetes resource events are observed and processed
@@ -98,7 +100,7 @@ func AutodiscoverBuilder(
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
-		return errors.Wrap(err, "error setting up kubernetes autodiscover provider")
+		return fmt.Errorf("error setting up kubernetes autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()
@@ -173,7 +175,7 @@ func (p *Provider) publish(events []bus.Event) {
 	}
 
 	configs := make([]*config.C, 0)
-	id, _ := events[0]["id"]
+	id := events[0]["id"]
 	for _, event := range events {
 		// Ensure that all events have the same ID. If not panic
 		if event["id"] != id {
@@ -347,8 +349,22 @@ func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
 func (p *leaderElectionManager) startLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
-		p.logger.Errorf("error while creating Leader Elector: %v", err)
+		p.logger.Errorf("error while creating Leader Elector: %w", err)
 	}
 	p.logger.Debugf("Starting Leader Elector")
 	go le.Run(ctx)
+}
+
+func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event mapstr.M, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
+	}
 }

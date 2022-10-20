@@ -14,10 +14,10 @@ import (
 	time "time"
 
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
-	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
+	types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	gomock "github.com/golang/mock/gomock"
 
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	aws "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	logp "github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -45,7 +45,7 @@ func (m *MockSQSAPI) EXPECT() *MockSQSAPIMockRecorder {
 }
 
 // ChangeMessageVisibility mocks base method.
-func (m *MockSQSAPI) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
+func (m *MockSQSAPI) ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeMessageVisibility", ctx, msg, timeout)
 	ret0, _ := ret[0].(error)
@@ -59,7 +59,7 @@ func (mr *MockSQSAPIMockRecorder) ChangeMessageVisibility(ctx, msg, timeout inte
 }
 
 // DeleteMessage mocks base method.
-func (m *MockSQSAPI) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
+func (m *MockSQSAPI) DeleteMessage(ctx context.Context, msg *types.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMessage", ctx, msg)
 	ret0, _ := ret[0].(error)
@@ -73,10 +73,10 @@ func (mr *MockSQSAPIMockRecorder) DeleteMessage(ctx, msg interface{}) *gomock.Ca
 }
 
 // ReceiveMessage mocks base method.
-func (m *MockSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.Message, error) {
+func (m *MockSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReceiveMessage", ctx, maxMessages)
-	ret0, _ := ret[0].([]sqs.Message)
+	ret0, _ := ret[0].([]types.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -111,10 +111,10 @@ func (m *MocksqsReceiver) EXPECT() *MocksqsReceiverMockRecorder {
 }
 
 // ReceiveMessage mocks base method.
-func (m *MocksqsReceiver) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.Message, error) {
+func (m *MocksqsReceiver) ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReceiveMessage", ctx, maxMessages)
-	ret0, _ := ret[0].([]sqs.Message)
+	ret0, _ := ret[0].([]types.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -149,7 +149,7 @@ func (m *MocksqsDeleter) EXPECT() *MocksqsDeleterMockRecorder {
 }
 
 // DeleteMessage mocks base method.
-func (m *MocksqsDeleter) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
+func (m *MocksqsDeleter) DeleteMessage(ctx context.Context, msg *types.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMessage", ctx, msg)
 	ret0, _ := ret[0].(error)
@@ -186,7 +186,7 @@ func (m *MocksqsVisibilityChanger) EXPECT() *MocksqsVisibilityChangerMockRecorde
 }
 
 // ChangeMessageVisibility mocks base method.
-func (m *MocksqsVisibilityChanger) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
+func (m *MocksqsVisibilityChanger) ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ChangeMessageVisibility", ctx, msg, timeout)
 	ret0, _ := ret[0].(error)
@@ -223,7 +223,7 @@ func (m *MockSQSProcessor) EXPECT() *MockSQSProcessorMockRecorder {
 }
 
 // ProcessSQS mocks base method.
-func (m *MockSQSProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
+func (m *MockSQSProcessor) ProcessSQS(ctx context.Context, msg *types.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProcessSQS", ctx, msg)
 	ret0, _ := ret[0].(error)
@@ -260,10 +260,10 @@ func (m *MockS3API) EXPECT() *MockS3APIMockRecorder {
 }
 
 // GetObject mocks base method.
-func (m *MockS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error) {
+func (m *MockS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetObject", ctx, bucket, key)
-	ret0, _ := ret[0].(*s3.GetObjectResponse)
+	ret0, _ := ret[0].(*s3.GetObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -312,10 +312,10 @@ func (m *Mocks3Getter) EXPECT() *Mocks3GetterMockRecorder {
 }
 
 // GetObject mocks base method.
-func (m *Mocks3Getter) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error) {
+func (m *Mocks3Getter) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetObject", ctx, bucket, key)
-	ret0, _ := ret[0].(*s3.GetObjectResponse)
+	ret0, _ := ret[0].(*s3.GetObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -386,46 +386,38 @@ func (m *MockS3Pager) EXPECT() *MockS3PagerMockRecorder {
 	return m.recorder
 }
 
-// CurrentPage mocks base method.
-func (m *MockS3Pager) CurrentPage() *s3.ListObjectsOutput {
+// HasMorePages mocks base method.
+func (m *MockS3Pager) HasMorePages() bool {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CurrentPage")
-	ret0, _ := ret[0].(*s3.ListObjectsOutput)
-	return ret0
-}
-
-// CurrentPage indicates an expected call of CurrentPage.
-func (mr *MockS3PagerMockRecorder) CurrentPage() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CurrentPage", reflect.TypeOf((*MockS3Pager)(nil).CurrentPage))
-}
-
-// Err mocks base method.
-func (m *MockS3Pager) Err() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Err")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Err indicates an expected call of Err.
-func (mr *MockS3PagerMockRecorder) Err() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Err", reflect.TypeOf((*MockS3Pager)(nil).Err))
-}
-
-// Next mocks base method.
-func (m *MockS3Pager) Next(ctx context.Context) bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Next", ctx)
+	ret := m.ctrl.Call(m, "HasMorePages")
 	ret0, _ := ret[0].(bool)
 	return ret0
 }
 
-// Next indicates an expected call of Next.
-func (mr *MockS3PagerMockRecorder) Next(ctx interface{}) *gomock.Call {
+// HasMorePages indicates an expected call of HasMorePages.
+func (mr *MockS3PagerMockRecorder) HasMorePages() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Next", reflect.TypeOf((*MockS3Pager)(nil).Next), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasMorePages", reflect.TypeOf((*MockS3Pager)(nil).HasMorePages))
+}
+
+// NextPage mocks base method.
+func (m *MockS3Pager) NextPage(ctx context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "NextPage", varargs...)
+	ret0, _ := ret[0].(*s3.ListObjectsV2Output)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NextPage indicates an expected call of NextPage.
+func (mr *MockS3PagerMockRecorder) NextPage(ctx interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NextPage", reflect.TypeOf((*MockS3Pager)(nil).NextPage), varargs...)
 }
 
 // MockS3ObjectHandlerFactory is a mock of s3ObjectHandlerFactory interface.
@@ -452,7 +444,7 @@ func (m *MockS3ObjectHandlerFactory) EXPECT() *MockS3ObjectHandlerFactoryMockRec
 }
 
 // Create mocks base method.
-func (m *MockS3ObjectHandlerFactory) Create(ctx context.Context, log *logp.Logger, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (m *MockS3ObjectHandlerFactory) Create(ctx context.Context, log *logp.Logger, acker *aws.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, log, acker, obj)
 	ret0, _ := ret[0].(s3ObjectHandler)
