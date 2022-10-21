@@ -1,0 +1,15 @@
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+output.elasticsearch:
+  enabled: true
+  hosts: ["${ES_HOSTS:https://localhost:9200}"]
+  username: "${ES_USER:elastic}"
+  password: "${ES_PASS:changeme}"
+  workers: 6
+  allow_older_versions: true
+  ssl.verification_mode: ${VERIFICATION_MODE:full}
+
+monitoring.enabled: true
+monitoring.cluster_uuid: "${CLUSTER_UUID}"
