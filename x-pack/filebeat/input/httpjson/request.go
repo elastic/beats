@@ -101,6 +101,7 @@ type requestFactory struct {
 	log                    *logp.Logger
 	encoder                encoderFunc
 	replace                string
+	replaceWith            string
 	isChain                bool
 	until                  *valueTpl
 	chainHTTPClient        *httpClient
@@ -148,6 +149,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				log:                    log,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.Step.Replace,
+				replaceWith:            ch.Step.ReplaceWith,
 				isChain:                true,
 				chainHTTPClient:        httpClient,
 				chainResponseProcessor: responseProcessor,
@@ -173,6 +175,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				log:                    log,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.While.Replace,
+				replaceWith:            ch.While.ReplaceWith,
 				until:                  ch.While.Until,
 				isChain:                true,
 				chainHTTPClient:        httpClient,
@@ -274,7 +277,6 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 	return *newUrl, nil
 }
 
-//nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
 	var (
 		n                 int
@@ -300,6 +302,24 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
+			// store first response in transform context
+			var bodyMap mapstr.M
+			body, err := io.ReadAll(httpResp.Body)
+			if err != nil {
+				return fmt.Errorf("failed to read http response body: %w", err)
+			}
+			httpResp.Body = io.NopCloser(bytes.NewReader(body))
+			err = json.Unmarshal(body, &bodyMap)
+			if err != nil {
+				r.log.Errorf("unable to unmarshal first_response.body: %v", err)
+			}
+			firstResponse := response{
+				url:    *httpResp.Request.URL,
+				header: httpResp.Header.Clone(),
+				body:   bodyMap,
+			}
+			trCtx.updateFirstResponse(firstResponse)
+
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
 				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
@@ -324,7 +344,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return err
 			}
-			// we will only processAndPublishEvents here if chains do not exist, inorder to avoid unnecessary pagination
+			// we will only processAndPublishEvents here if chains & root level pagination do not exist, inorder to avoid unnecessary pagination
 			if !isChainExpected {
 				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
 				n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
@@ -340,8 +360,18 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			// new transform context for every chain step , derived from parent transform context
 			var chainTrCtx *transformContext
 			if rf.isChain {
-				chainTrCtx = emptyTransformContext()
-				chainTrCtx.cursor = trCtx.cursor
+				chainTrCtx = trCtx.clone()
+			}
+
+			var val string
+			var doReplaceWith bool
+			var replaceArr []string
+			if rf.replaceWith != "" {
+				replaceArr = strings.Split(rf.replaceWith, ",")
+				val, doReplaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+				if err != nil {
+					return err
+				}
 			}
 
 			// perform request over collected ids
@@ -352,6 +382,13 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					return fmt.Errorf("failed to generate new URL: %w", err)
 				}
 
+				// reformat url accordingly if replaceWith clause exists
+				if doReplaceWith {
+					rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
+					if err != nil {
+						return fmt.Errorf("failed to generate new URL: %w", err)
+					}
+				}
 				// collect data from new urls
 				httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
 				if err != nil {
@@ -515,7 +552,7 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 
 			err = response.Body.Close()
 			if err != nil {
-				r.log.Errorf("error closing http response body : %w", err)
+				r.log.Errorf("error closing http response body: %w", err)
 			}
 		}
 
@@ -525,7 +562,6 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 }
 
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
-//nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
 	var (
 		n                 int
@@ -559,8 +595,18 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 		// new transform context for every chain step , derived from parent transform context
 		var chainTrCtx *transformContext
 		if rf.isChain {
-			chainTrCtx = emptyTransformContext()
-			chainTrCtx.cursor = trCtx.cursor
+			chainTrCtx = trCtx.clone()
+		}
+
+		var val string
+		var doReplaceWith bool
+		var replaceArr []string
+		if rf.replaceWith != "" {
+			replaceArr = strings.Split(rf.replaceWith, ",")
+			val, doReplaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+			if err != nil {
+				return n, err
+			}
 		}
 
 		// perform request over collected ids
@@ -569,6 +615,14 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			rf.url, err = generateNewUrl(rf.replace, urlString, id)
 			if err != nil {
 				return -1, fmt.Errorf("failed to generate new URL: %w", err)
+			}
+
+			// reformat url accordingly if replaceWith clause exists
+			if doReplaceWith {
+				rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
+				if err != nil {
+					return n, fmt.Errorf("failed to generate new URL: %w", err)
+				}
 			}
 
 			// collect data from new urls
