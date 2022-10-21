@@ -67,6 +67,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Bugfixes
 
+- Added a workaround for the Win32_Service error and added logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
 - Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
 - Metricbeat module builders call host parser only once when instantiating light modules. {pull}20149[20149]
 - Fix export dashboard command when running against Elastic Cloud hosted Kibana. {pull}22746[22746]
