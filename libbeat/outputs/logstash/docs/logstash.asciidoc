@@ -48,6 +48,18 @@ endif::[]
 
 // end::shared-logstash-config[]
 
+==== Outputting to Winlogbeat created Data Stream via Logstash
+When you setup Winlogbeat for the first time it will create a Data Stream within Elasticsearch.  To setup Logstash to output to the Elasticearch hosted Data Stream you can start wtih the below example:
+
+------------------------------------------------------------------------------
+elasticsearch {
+hosts => "["http://localhost:9200"]"
+index => "winlogbeat-8.4.3"
+pipeline => "winlogbeat-8.4.3-routing"
+action => "create"
+}
+------------------------------------------------------------------------------
+
 ==== Accessing metadata fields
 
 Every event sent to {ls} contains the following metadata fields that you can
@@ -126,6 +138,8 @@ of the `beat` metadata field and `%{[@metadata][version]}` sets the second part 
 the Beat's version. For example:
 +{beat_default_index_prefix}-{version}+.
 endif::[]
+
+
 
 ifdef::apm-server[]
 For example, the following {ls} configuration file tells
