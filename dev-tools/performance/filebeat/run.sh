@@ -6,13 +6,21 @@ set -e
 BEATS_VERSION="${BEATS_VERSION:=8.4.3}"
 FB_TAR_NAME=filebeat-$BEATS_VERSION-linux-x86_64.tar.gz
 FB_FOLDER_NAME=filebeat-$BEATS_VERSION-linux-x86_64
-LOG_FILE="${LOG_FILE:=/tmp/flog.log}"
 
 MB_TAR_NAME=metricbeat-$BEATS_VERSION-linux-x86_64.tar.gz
 MB_FOLDER_NAME=metricbeat-$BEATS_VERSION-linux-x86_64
 
 ES_USER="${ES_USER:=elastic}"
 ES_PASS="${ES_PASS:=changeme}"
+
+JSON_LOGS="${JSON_LOGS:=false}"
+
+if [[ "$JSON_LOGS" = 'true' ]]
+then
+    LOG_FILE="${LOG_FILE:=/tmp/flog.ndjson}"
+else
+    LOG_FILE="${LOG_FILE:=/tmp/flog.log}"
+fi
 
 ## Configure ES Cluster to accept metrics
 if [[ $VERIFICATION_MODE = "none" ]]
@@ -26,7 +34,7 @@ then
              "xpack.monitoring.collection.enabled": true
            }
          }'
-        CLUSTER_UUID=$(curl --insecure --location --request GET 'https://localhost:9200/' \
+        export CLUSTER_UUID=$(curl --insecure --location --request GET 'https://localhost:9200/' \
                             -u $ES_USER:$ES_PASS | jq '.cluster_uuid')
 else
     curl --location --request PUT 'https://localhost:9200/_cluster/settings' \
@@ -37,12 +45,12 @@ else
              "xpack.monitoring.collection.enabled": true
            }
          }'
-        CLUSTER_UUID=$(curl --location --request GET 'https://localhost:9200/' \
+        export CLUSTER_UUID=$(curl --location --request GET 'https://localhost:9200/' \
                             -u $ES_USER:$ES_PASS | jq '.cluster_uuid')
 fi
 
 # Install flog
-if [[ ! -e $FB_TAR_NAME ]]
+if [[ ! -e flog ]]
 then
      git clone https://github.com/belimawr/flog.git
      cd flog
@@ -84,16 +92,26 @@ fi
 
 # Deploy Metricbeat to the host
 
-# Generate a 1Gb file
-if [[ ! -e $LOG_FILE ]]
-then
-    flog -r 42 -n 10000000 -t log -w -o $LOG_FILE
-else
-    echo "Log file found"
-fi
-
 # Copy filebeat config file
-cp ./filebeat.yml $FB_FOLDER_NAME
+if [[ "$JSON_LOGS" = 'true' ]]
+then
+    if [[ ! -e $LOG_FILE ]]
+    then
+        flog -f json -r 42 -n 10000000 -s 0.01 -t log -w -o $LOG_FILE
+    else
+        echo "Log file found"
+    fi
+    cp ./filebeat_json.yml $FB_FOLDER_NAME/filebeat.yml
+else
+    # Generate a 1Gb file
+    if [[ ! -e $LOG_FILE ]]
+    then
+        flog -f apache_common -r 42 -n 10000000 -s 0.01 -t log -w -o $LOG_FILE
+    else
+        echo "Log file found"
+    fi
+    cp ./filebeat.yml $FB_FOLDER_NAME/filebeat.yml
+fi
 
 # Copy Metricbeat configuration files
 cp -vr ./modules.d $MB_FOLDER_NAME/

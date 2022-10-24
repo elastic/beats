@@ -5,7 +5,18 @@ filebeat.inputs:
   id: my-filestream-id
   enabled: true
   paths:
-    - /tmp/flog.log
+    - /tmp/flog.ndjson
+  parsers:
+    - ndjson:
+        target: ""
+        add_error_key: true
+  processors:
+    - timestamp:
+        field: datetime
+        layouts:
+          - "2006-01-02T15:04:05.999999999Z07:00" # RFC3339Nano
+        test:
+          - "2022-10-24T17:19:04.764155065+02:00"
 # ======================= Elasticsearch template setting =======================
 
 setup.template:
@@ -25,4 +36,4 @@ output.elasticsearch:
 
 monitoring.enabled: true
 monitoring.cluster_uuid: "${CLUSTER_UUID}"
-#monitoring.elasticsearch:
+
