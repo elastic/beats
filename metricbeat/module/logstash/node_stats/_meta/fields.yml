@@ -89,11 +89,11 @@
                   type: group
                   fields:
                     - name: 15m
-                      type: long
+                      type: half_float
                     - name: 1m
-                      type: long
+                      type: half_float
                     - name: 5m
-                      type: long
+                      type: half_float
             - name: cgroup
               type: group
               fields:
@@ -102,6 +102,8 @@
                 - name: cpu
                   type: group
                   fields:
+                    - name: cfs_quota_micros
+                      type: long
                     - name: stat
                       type: group
                       fields:

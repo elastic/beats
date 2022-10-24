@@ -38,7 +38,7 @@ processors:
       IPTABLES_IP_PAYLOAD: '%{IPTABLES_PROTOCOL}( %{IPTABLES_PORT_PAIR})?( (%{IPTABLES_TCP_DETAILS}|%{IPTABLES_UDP_DETAILS}|%{IPTABLES_ICMP_DETAILS}|%{IPTABLES_INCOMPLETE_PACKET}))?'
       IPTABLES_IP_FRAGFLAG: ((?<= )(CE|DF|MF))*
       IPTABLES_IP_START: 'SRC=%{IPV4:source.ip} DST=%{IPV4:destination.ip} LEN=%{UNSIGNED_INT:iptables.length:int}
-        TOS=0x%{BASE16NUM:iptables.tos} PREC=0x%{BASE16NUM:iptables.precedence_bits}
+        TOS=(0x)?%{BASE16NUM:iptables.tos} PREC=0x%{BASE16NUM:iptables.precedence_bits}
         TTL=%{UNSIGNED_INT:iptables.ttl:int} ID=%{UNSIGNED_INT:iptables.id:int}(?:
         %{IPTABLES_IP_FRAGFLAG:iptables.fragment_flags})?(?: FRAG: %{UNSIGNED_INT:iptables.fragment_offset:int})?'
       IPTABLES_IP: '%{IPTABLES_IP_START} %{IPTABLES_IP_PAYLOAD}'

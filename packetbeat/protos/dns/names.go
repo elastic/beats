@@ -35,7 +35,7 @@ import (
 func dnsOpCodeToString(opCode int) string {
 	s, exists := mkdns.OpcodeToString[opCode]
 	if !exists {
-		return strconv.Itoa(int(opCode))
+		return strconv.Itoa(opCode)
 	}
 	return s
 }
@@ -46,7 +46,7 @@ func dnsOpCodeToString(opCode int) string {
 func dnsResponseCodeToString(rcode int) string {
 	s, exists := mkdns.RcodeToString[rcode]
 	if !exists {
-		return fmt.Sprintf("Unknown %d", int(rcode))
+		return fmt.Sprintf("Unknown %d", rcode)
 	}
 	return s
 }
@@ -55,7 +55,7 @@ func dnsResponseCodeToString(rcode int) string {
 // string representation is unknown then the numeric value will be returned
 // as a string.
 func dnsTypeToString(t uint16) string {
-	s, exists := mkdns.TypeToString[uint16(t)]
+	s, exists := mkdns.TypeToString[t]
 	if !exists {
 		return strconv.Itoa(int(t))
 	}
@@ -66,7 +66,7 @@ func dnsTypeToString(t uint16) string {
 // string representation is unknown then the numeric value will be returned
 // as a string.
 func dnsClassToString(c uint16) string {
-	s, exists := mkdns.ClassToString[uint16(c)]
+	s, exists := mkdns.ClassToString[c]
 	if !exists {
 		return strconv.Itoa(int(c))
 	}
@@ -77,7 +77,7 @@ func dnsClassToString(c uint16) string {
 // string representation is unknown then the numeric value will be returned
 // as a string.
 func dnsAlgorithmToString(a uint8) string {
-	s, exists := mkdns.AlgorithmToString[uint8(a)]
+	s, exists := mkdns.AlgorithmToString[a]
 	if !exists {
 		return strconv.Itoa(int(a))
 	}
@@ -88,7 +88,7 @@ func dnsAlgorithmToString(a uint8) string {
 // string representation is unknown then the numeric value will be returned
 // as a string.
 func dnsHashToString(h uint8) string {
-	s, exists := mkdns.HashToString[uint8(h)]
+	s, exists := mkdns.HashToString[h]
 	if !exists {
 		return strconv.Itoa(int(h))
 	}

@@ -172,7 +172,6 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	packet := protos.Packet{Ts: ci.Timestamp}
 
 	debugf("decode packet data")
-	processed := false
 
 	if d.flowID != nil {
 		d.flowID.Reset(d.flowIDBufferBacking[:0])
@@ -182,6 +181,9 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 		defer d.flows.Unlock()
 	}
 
+	d.stD1Q.i = 0
+	d.stIP4.i = 0
+	d.stIP6.i = 0
 	for len(data) > 0 {
 		err := current.DecodeFromBytes(data, d)
 		if err != nil {
@@ -192,7 +194,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 		nextType := current.NextLayerType()
 		data = current.LayerPayload()
 
-		processed, err = d.process(&packet, currentType)
+		processed, err := d.process(&packet, currentType)
 		if err != nil {
 			logp.Info("Error processing packet: %v", err)
 			break

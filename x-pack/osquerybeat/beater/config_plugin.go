@@ -217,7 +217,11 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		namespaces[name] = ns
 		queriesCount++
 
-		qi.Snapshot = true
+		// Force snapshot by default
+		if qi.Snapshot == nil {
+			snapshot := true
+			qi.Snapshot = &snapshot
+		}
 		return qi, nil
 	}
 
