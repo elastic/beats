@@ -1525,7 +1525,7 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 func TestCreateEventsWithTagsFilter(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
-	m.MetricSet = &aws.MetricSet{Period: 5}
+	m.MetricSet = &aws.MetricSet{Period: 5, AccountID: accountID}
 	m.logger = logp.NewLogger("test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
@@ -1538,6 +1538,17 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 					Value: awssdk.String("i-1"),
 				}},
 				MetricName: awssdk.String("CPUUtilization"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+		},
+		{
+			cloudwatchtypes.Metric{
+				Dimensions: []cloudwatchtypes.Dimension{{
+					Name:  awssdk.String("InstanceId"),
+					Value: awssdk.String("i-1"),
+				}},
+				MetricName: awssdk.String("DiskReadOps"),
 				Namespace:  awssdk.String("AWS/EC2"),
 			},
 			[]string{"Average"},
@@ -1556,7 +1567,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(events))
+	assert.Equal(t, 2, len(events))
 
 	// Specify a tag filter that does not match the tag for i-1
 	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
@@ -1702,6 +1713,13 @@ func TestCreateEventsTimestamp(t *testing.T) {
 			},
 			[]string{"Average"},
 		},
+		{
+			cloudwatchtypes.Metric{
+				MetricName: awssdk.String("DiskReadOps"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+		},
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
@@ -1711,7 +1729,8 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	resGroupTaggingClientMock := &MockResourceGroupsTaggingClient{}
 	events, err := m.createEvents(cloudwatchMock, resGroupTaggingClientMock, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
-	assert.Equal(t, timestamp, events[regionName+accountID+namespace].Timestamp)
+	assert.Equal(t, timestamp, events[regionName+accountID+label3+"-0"].Timestamp)
+	assert.Equal(t, timestamp, events[regionName+accountID+label4+"-0"].Timestamp)
 }
 
 func TestGetStartTimeEndTime(t *testing.T) {
