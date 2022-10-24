@@ -498,7 +498,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 			labels := strings.Split(*metricDataResult.Label, labelSeparator)
 			for valI, metricDataResultValue := range metricDataResult.Values {
 				if len(labels) != 5 {
-					// when there is no identifier value in label, use region+accountID+namespace instead
+					// when there is no identifier value in label, use region+accountID+label+index instead
 					identifier := regionName + m.AccountID + *metricDataResult.Label + fmt.Sprint("-", valI)
 					if _, ok := events[identifier]; !ok {
 						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, metricDataResult.Timestamps[valI])
