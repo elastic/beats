@@ -1,5 +1,8 @@
 #! /bin/bash -x
 
+# Exit on errors
+set -e
+
 BEATS_VERSION="${BEATS_VERSION:=8.4.3}"
 FB_TAR_NAME=filebeat-$BEATS_VERSION-linux-x86_64.tar.gz
 FB_FOLDER_NAME=filebeat-$BEATS_VERSION-linux-x86_64
@@ -7,6 +10,36 @@ LOG_FILE="${LOG_FILE:=/tmp/flog.log}"
 
 MB_TAR_NAME=metricbeat-$BEATS_VERSION-linux-x86_64.tar.gz
 MB_FOLDER_NAME=metricbeat-$BEATS_VERSION-linux-x86_64
+
+ES_USER="${ES_USER:=elastic}"
+ES_PASS="${ES_PASS:=changeme}"
+
+## Configure ES Cluster to accept metrics
+if [[ $VERIFICATION_MODE = "none" ]]
+then
+    curl --location --request PUT 'https://localhost:9200/_cluster/settings' \
+         --insecure \
+         -u $ES_USER:$ES_PASS \
+         --header 'Content-Type: application/json' \
+         --data-raw '{
+           "persistent": {
+             "xpack.monitoring.collection.enabled": true
+           }
+         }'
+        CLUSTER_UUID=$(curl --insecure --location --request GET 'https://localhost:9200/' \
+                            -u $ES_USER:$ES_PASS | jq '.cluster_uuid')
+else
+    curl --location --request PUT 'https://localhost:9200/_cluster/settings' \
+         -u $ES_USER:$ES_PASS \
+         --header 'Content-Type: application/json' \
+         --data-raw '{
+           "persistent": {
+             "xpack.monitoring.collection.enabled": true
+           }
+         }'
+        CLUSTER_UUID=$(curl --location --request GET 'https://localhost:9200/' \
+                            -u $ES_USER:$ES_PASS | jq '.cluster_uuid')
+fi
 
 # Install flog
 if [[ ! -e $FB_TAR_NAME ]]
@@ -77,3 +110,6 @@ rm -rvf data
 
 # Start filebeat
 ./filebeat -e -v |tee filebeat.log
+
+# Kill Metricbeat
+killall metricbeat
