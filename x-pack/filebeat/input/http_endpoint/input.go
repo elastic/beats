@@ -113,8 +113,9 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 	p.mu.Lock()
 	s, ok := p.servers[e.addr]
 	if ok {
-		if s.pattern[pattern] {
-			err := fmt.Errorf("pattern already exists for %s: %s", e.addr, pattern)
+		if old, ok := s.idOf[pattern]; ok {
+			err := fmt.Errorf("pattern already exists for %s: %s old=%s new=%s",
+				e.addr, pattern, old, ctx.ID)
 			s.setErr(err)
 			s.cancel()
 			p.mu.Unlock()
@@ -122,7 +123,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
 		s.mux.Handle(pattern, newHandler(e.config, pub, log))
-		s.pattern[pattern] = true
+		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
 		return s.getErr()
@@ -132,9 +133,9 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 	mux.Handle(pattern, newHandler(e.config, pub, log))
 	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
 	s = &server{
-		pattern: map[string]bool{pattern: true},
-		mux:     mux,
-		srv:     srv,
+		idOf: map[string]string{pattern: ctx.ID},
+		mux:  mux,
+		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
 	p.servers[e.addr] = s
@@ -157,7 +158,9 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 // server is a collection of http end-points sharing the same underlying
 // http.Server.
 type server struct {
-	pattern map[string]bool
+	// idOf is a map of mux pattern
+	// to input IDs for the server.
+	idOf map[string]string
 
 	mux *http.ServeMux
 	srv *http.Server
