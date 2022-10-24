@@ -58,19 +58,21 @@ var cmdLineArgs = flags{
 	loop:       flag.Int("l", 1, "Loop file. 0 - loop forever"),
 	oneAtAtime: flag.Bool("O", false, "Read packets one at a time (press Enter)"),
 	topSpeed:   flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
-	dumpfile:   flag.String("dump", "", "Write all captured packets to this libpcap file"),
+	dumpfile:   flag.String("dump", "", "Write all captured packets to libpcap files with this prefix - a timestamp and pcap extension are added"),
 }
 
 func initialConfig() config.Config {
-	return config.Config{
-		Interfaces: config.InterfacesConfig{
+	c := config.Config{
+		Interfaces: []config.InterfaceConfig{{
 			File:       *cmdLineArgs.file,
 			Loop:       *cmdLineArgs.loop,
 			TopSpeed:   *cmdLineArgs.topSpeed,
 			OneAtATime: *cmdLineArgs.oneAtAtime,
 			Dumpfile:   *cmdLineArgs.dumpfile,
-		},
+		}},
 	}
+	c.Interface = &c.Interfaces[0]
+	return c
 }
 
 // Beater object. Contains all objects needed to run the beat

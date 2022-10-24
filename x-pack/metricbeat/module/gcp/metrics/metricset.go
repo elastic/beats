@@ -99,12 +99,13 @@ type metricMeta struct {
 }
 
 type config struct {
-	Zone                string `config:"zone"`
-	Region              string `config:"region"`
-	ProjectID           string `config:"project_id" validate:"required"`
-	ExcludeLabels       bool   `config:"exclude_labels"`
-	CredentialsFilePath string `config:"credentials_file_path"`
-	CredentialsJSON     string `config:"credentials_json"`
+	Zone                string   `config:"zone"`
+	Region              string   `config:"region"`
+	Regions             []string `config:"regions"`
+	ProjectID           string   `config:"project_id" validate:"required"`
+	ExcludeLabels       bool     `config:"exclude_labels"`
+	CredentialsFilePath string   `config:"credentials_file_path"`
+	CredentialsJSON     string   `config:"credentials_json"`
 
 	opt    []option.ClientOption
 	period *duration.Duration

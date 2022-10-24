@@ -22,7 +22,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -119,7 +118,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
-	monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
 	// Get startDate and endDate
 	startDate, endDate := getStartDateEndDate(m.Period)
 
@@ -128,10 +126,19 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// get cost metrics from cost explorer
 	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
-	svcCostExplorer := costexplorer.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(m.Endpoint, monitoringServiceName, "", awsBeatsConfig))
+	svcCostExplorer := costexplorer.NewFromConfig(awsBeatsConfig, func(o *costexplorer.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+
+	})
 
 	awsBeatsConfig.Region = regionName
-	svcCloudwatch := cloudwatch.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(m.Endpoint, monitoringServiceName, regionName, awsBeatsConfig))
+	svcCloudwatch := cloudwatch.NewFromConfig(awsBeatsConfig, func(o *cloudwatch.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+	})
 
 	timePeriod := costexplorertypes.DateInterval{
 		Start: awssdk.String(startDate),
@@ -164,7 +171,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	endTime time.Time) []mb.Event {
 	var events []mb.Event
 	namespace := "AWS/Billing"
-	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
+	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, svcCloudwatch)
 	if err != nil {
 		m.Logger().Error(err.Error())
 		return nil
@@ -223,10 +230,12 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 	}
 	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
-		organizationsServiceName := awscommon.CreateServiceName("organizations", config.AWSConfig.FIPSEnabled, regionName)
 
-		svcOrg := organizations.NewFromConfig(awscommon.EnrichAWSConfigWithEndpoint(
-			m.Endpoint, organizationsServiceName, regionName, awsConfig))
+		svcOrg := organizations.NewFromConfig(awsConfig, func(o *organizations.Options) {
+			if config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		})
 		accounts = m.getAccountName(svcOrg)
 	}
 

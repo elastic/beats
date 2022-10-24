@@ -136,6 +136,7 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 				return nil
 			}
 			if s.isRoot {
+				ch <- maybeMsg{msg: root}
 				return errEmptyRootField
 			}
 			ch <- maybeMsg{msg: root}

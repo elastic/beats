@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package source
 
 import (
@@ -40,6 +43,7 @@ type ZipURLSource struct {
 var ErrNoEtag = fmt.Errorf("no ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
 
 func (z *ZipURLSource) Validate() (err error) {
+	logp.L().Warn("Zip URL browser monitors are now deprecated! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project")
 	if z.httpClient == nil {
 		z.httpClient, _ = z.Transport.Client()
 	}

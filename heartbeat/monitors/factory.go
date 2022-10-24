@@ -25,8 +25,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -35,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
+	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
@@ -44,11 +47,13 @@ import (
 type RunnerFactory struct {
 	info                  beat.Info
 	addTask               scheduler.AddTask
+	stateLoader           monitorstate.StateLoader
 	byId                  map[string]*Monitor
 	mtx                   *sync.Mutex
 	pluginsReg            *plugin.PluginsReg
 	logger                *logp.Logger
 	pipelineClientFactory PipelineClientFactory
+	beatLocation          *config.LocationWithID
 }
 
 type PipelineClientFactory func(pipeline beat.Pipeline) (pipeline.ISyncClient, error)
@@ -72,16 +77,27 @@ type publishSettings struct {
 	DataSet    string                      `config:"dataset"`
 }
 
+type FactoryParams struct {
+	BeatInfo              beat.Info
+	AddTask               scheduler.AddTask
+	StateLoader           monitorstate.StateLoader
+	PluginsReg            *plugin.PluginsReg
+	PipelineClientFactory PipelineClientFactory
+	BeatRunFrom           *config.LocationWithID
+}
+
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg, pcf PipelineClientFactory) *RunnerFactory {
+func NewFactory(fp FactoryParams) *RunnerFactory {
 	return &RunnerFactory{
-		info:                  info,
-		addTask:               addTask,
+		info:                  fp.BeatInfo,
+		addTask:               fp.AddTask,
 		byId:                  map[string]*Monitor{},
 		mtx:                   &sync.Mutex{},
-		pluginsReg:            pluginsReg,
+		pluginsReg:            fp.PluginsReg,
 		logger:                logp.L(),
-		pipelineClientFactory: pcf,
+		pipelineClientFactory: fp.PipelineClientFactory,
+		beatLocation:          fp.BeatRunFrom,
+		stateLoader:           fp.StateLoader,
 	}
 }
 
@@ -99,16 +115,16 @@ func (NoopRunner) Stop() {
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
-	if !c.Enabled() {
-		return NoopRunner{}, nil
-	}
-
 	c, err := stdfields.UnnestStream(c)
 	if err != nil {
 		return nil, err
 	}
 
-	configEditor, err := newCommonPublishConfigs(f.info, c)
+	if !c.Enabled() {
+		return NoopRunner{}, nil
+	}
+
+	configEditor, err := newCommonPublishConfigs(f.info, f.beatLocation, c)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +159,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	if err != nil {
 		return nil, fmt.Errorf("could not create pipeline client via factory: %w", err)
 	}
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, safeStop)
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
@@ -167,7 +183,7 @@ func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
 }
 
-func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor, error) {
+func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID, cfg *conf.C) (pipetool.ConfigEditor, error) {
 	var settings publishSettings
 	if err := cfg.Unpack(&settings); err != nil {
 		return nil, err
@@ -179,7 +195,17 @@ func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor
 	}
 
 	// Early stage processors for setting data_stream, event.dataset, and index to write to
-	preProcs, err := preProcessors(info, settings, sf.Type)
+
+	// Use the monitor-specific location if possible, otherwise use the beat's location
+	// Generally speaking direct HB users would use the beat location, and the synthetics service may as well (TBD)
+	// while Fleet configured monitors will always use a per location monitor
+	var loc *config.LocationWithID
+	if sf.RunFrom != nil {
+		loc = sf.RunFrom
+	} else {
+		loc = beatLocation
+	}
+	preProcs, err := preProcessors(info, loc, settings, sf.Type)
 	if err != nil {
 		return nil, err
 	}
@@ -218,8 +244,10 @@ func newCommonPublishConfigs(info beat.Info, cfg *conf.C) (pipetool.ConfigEditor
 	}, nil
 }
 
-// preProcessors sets up the required event.dataset, data_stream.*, and write index processors for future event publishes.
-func preProcessors(info beat.Info, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
+var geoErrOnce = &sync.Once{}
+
+// preProcessors sets up the required geo, event.dataset, data_stream.*, and write index processors for future event publishes.
+func preProcessors(info beat.Info, location *config.LocationWithID, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
 	procs = processors.NewList(nil)
 
 	var dataset string
@@ -231,6 +259,27 @@ func preProcessors(info beat.Info, settings publishSettings, monitorType string)
 
 	// Always set event.dataset
 	procs.AddProcessor(actions.NewAddFields(mapstr.M{"event": mapstr.M{"dataset": dataset}}, true, true))
+
+	// If we have a location to add, use the add_observer_metadata processor
+	if location != nil {
+		var geoM mapstr.M
+
+		geoM, err := util.GeoConfigToMap(location.Geo)
+		if err != nil {
+			geoErrOnce.Do(func() {
+				logp.L().Warnf("could not add heartbeat geo info: %w", err)
+			})
+		}
+
+		obsFields := mapstr.M{
+			"observer": mapstr.M{
+				"name": location.ID,
+				"geo":  geoM,
+			},
+		}
+
+		procs.AddProcessor(actions.NewAddFields(obsFields, true, true))
+	}
 
 	// always use synthetics data streams for browser monitors, there is no good reason not to
 	// the default `heartbeat` data stream won't split out network and screenshot data.

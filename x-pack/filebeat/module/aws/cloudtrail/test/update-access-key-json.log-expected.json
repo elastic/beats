@@ -7,6 +7,7 @@
         "aws.cloudtrail.flattened.request_parameters.status": "Inactive",
         "aws.cloudtrail.flattened.request_parameters.userName": "Bob",
         "aws.cloudtrail.recipient_account_id": "0123456789012",
+        "aws.cloudtrail.request_id": "EXAMPLE-7d0c-45f4-b25b-EXAMPLE",
         "aws.cloudtrail.request_parameters": "{accessKeyId=EXAMPLE_KEY_ID, userName=Bob, status=Inactive}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY_ID",
         "aws.cloudtrail.user_identity.arn": "arn:aws:iam::0123456789012:user/Alice",

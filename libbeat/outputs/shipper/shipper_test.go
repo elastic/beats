@@ -22,10 +22,12 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
@@ -247,12 +249,13 @@ func TestPublish(t *testing.T) {
 	}
 
 	cases := []struct {
-		name        string
-		events      []beat.Event
-		expSignals  []outest.BatchSignal
-		serverError error
-		expError    string
-		qSize       int
+		name          string
+		events        []beat.Event
+		expSignals    []outest.BatchSignal
+		serverError   error
+		expError      string
+		qSize         int
+		acceptedCount uint32
 	}{
 		{
 			name:   "sends a batch excluding dropped",
@@ -269,11 +272,11 @@ func TestPublish(t *testing.T) {
 			events: events,
 			expSignals: []outest.BatchSignal{
 				{
-					Tag:    outest.BatchRetryEvents,
-					Events: toPublisherEvents(events[2:]),
+					Tag: outest.BatchACK,
 				},
 			},
-			qSize: 1,
+			qSize:         2,
+			acceptedCount: 1, // we'll enforce 2 `PublishEvents` requests
 		},
 		{
 			name:   "cancels the batch if server error",
@@ -297,7 +300,7 @@ func TestPublish(t *testing.T) {
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
 
-			addr, stop := runServer(t, tc.qSize, tc.serverError, "localhost:0")
+			addr, producer, stop := runServer(t, tc.qSize, tc.serverError, "localhost:0")
 			defer stop()
 
 			cfg, err := config.NewConfigFrom(map[string]interface{}{
@@ -315,17 +318,23 @@ func TestPublish(t *testing.T) {
 				require.Contains(t, err.Error(), tc.expError)
 			} else {
 				require.NoError(t, err)
+				producer.Persist(uint64(tc.qSize)) // always persisted all published events
 			}
 
+			assert.Eventually(t, func() bool {
+				// there is a background routine that checks acknowledgments,
+				// it should eventually change the status of the batch
+				return reflect.DeepEqual(tc.expSignals, batch.Signals)
+			}, 100*time.Millisecond, 10*time.Millisecond)
 			require.Equal(t, tc.expSignals, batch.Signals)
 		})
 	}
 
-	t.Run("cancel the batch when the server is not available", func(t *testing.T) {
+	t.Run("cancels the batch when a different server responds", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 
-		addr, stop := runServer(t, 5, nil, "localhost:0")
+		addr, _, stop := runServer(t, 5, nil, "localhost:0")
 		defer stop()
 
 		cfg, err := config.NewConfigFrom(map[string]interface{}{
@@ -340,72 +349,7 @@ func TestPublish(t *testing.T) {
 
 		client := createShipperClient(t, cfg)
 
-		// Should successfully publish with the server running
-		batch := outest.NewBatch(events...)
-		err = client.Publish(ctx, batch)
-		require.NoError(t, err)
-		expSignals := []outest.BatchSignal{
-			{
-				Tag: outest.BatchACK,
-			},
-		}
-		require.Equal(t, expSignals, batch.Signals)
-
-		stop() // now stop the server and try sending again
-
-		batch = outest.NewBatch(events...) // resetting the batch signals
-		err = client.Publish(ctx, batch)
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "failed to publish the batch to the shipper, none of the 2 events were accepted")
-		expSignals = []outest.BatchSignal{
-			{
-				Tag: outest.BatchCancelled, // "cancelled" means there will be a retry without decreasing the TTL
-			},
-		}
-		require.Equal(t, expSignals, batch.Signals)
-		client.Close()
-
-		// Start the server again
-		_, stop = runServer(t, 5, nil, addr)
-		defer stop()
-
-		batch = outest.NewBatch(events...) // resetting the signals
-		expSignals = []outest.BatchSignal{
-			{
-				Tag: outest.BatchACK,
-			},
-		}
-
-		// The backoff wrapper should take care of the errors and
-		// retries while the server is still starting
-		err = client.Connect()
-		require.NoError(t, err)
-
-		err = client.Publish(ctx, batch)
-		require.NoError(t, err)
-		require.Equal(t, expSignals, batch.Signals)
-	})
-
-	t.Run("cancel the batch when a different server responds", func(t *testing.T) {
-		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-		defer cancel()
-
-		addr, stop := runServer(t, 5, nil, "localhost:0")
-		defer stop()
-
-		cfg, err := config.NewConfigFrom(map[string]interface{}{
-			"server":  addr,
-			"timeout": 5, // 5 sec
-			"backoff": map[string]interface{}{
-				"init": "10ms",
-				"max":  "5s",
-			},
-		})
-		require.NoError(t, err)
-
-		client := createShipperClient(t, cfg)
-
-		// Should successfully publish without an ID change
+		// Should accept the batch and put it to the pending list
 		batch := outest.NewBatch(events...)
 		err = client.Publish(ctx, batch)
 		require.NoError(t, err)
@@ -413,20 +357,75 @@ func TestPublish(t *testing.T) {
 		// Replace the server (would change the ID)
 		stop()
 
-		_, stop = runServer(t, 5, nil, addr)
+		_, _, stop = runServer(t, 5, nil, addr)
 		defer stop()
+		err = client.Connect()
+		require.NoError(t, err)
 
-		batch = outest.NewBatch(events...)
-		err = client.Publish(ctx, batch)
-		require.Error(t, err)
-
-		require.Eventually(t, func() bool {
-			// the mock server does not validate incoming IDs on `Publish`, so the error should come from
-			// the acknowledgement request
-			return strings.Contains(err.Error(), "acknowledgement failed due to a connection to a different server")
+		expSignals := []outest.BatchSignal{
+			{
+				Tag: outest.BatchCancelled,
+			},
+		}
+		assert.Eventually(t, func() bool {
+			// there is a background routine that checks acknowledgments,
+			// it should eventually cancel the batch because the IDs don't match
+			return reflect.DeepEqual(expSignals, batch.Signals)
 		}, 100*time.Millisecond, 10*time.Millisecond)
+		require.Equal(t, expSignals, batch.Signals)
 	})
 
+	t.Run("acks multiple batches", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		addr, producer, stop := runServer(t, 6, nil, "localhost:0")
+		defer stop()
+
+		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"server":  addr,
+			"timeout": 5, // 5 sec
+			"backoff": map[string]interface{}{
+				"init": "10ms",
+				"max":  "5s",
+			},
+		})
+		require.NoError(t, err)
+
+		client := createShipperClient(t, cfg)
+
+		// Should accept the batch and put it to the pending list
+		batch1 := outest.NewBatch(events...)
+		err = client.Publish(ctx, batch1)
+		require.NoError(t, err)
+
+		batch2 := outest.NewBatch(events...)
+		err = client.Publish(ctx, batch2)
+		require.NoError(t, err)
+
+		batch3 := outest.NewBatch(events...)
+		err = client.Publish(ctx, batch3)
+		require.NoError(t, err)
+
+		expSignals := []outest.BatchSignal{
+			{
+				Tag: outest.BatchACK,
+			},
+		}
+
+		producer.Persist(6) // 2 events per batch, 3 batches
+
+		assert.Eventually(t, func() bool {
+			// there is a background routine that checks acknowledgments,
+			// it should eventually send expected signals
+			return reflect.DeepEqual(expSignals, batch1.Signals) &&
+				reflect.DeepEqual(expSignals, batch2.Signals) &&
+				reflect.DeepEqual(expSignals, batch3.Signals)
+		}, 100*time.Millisecond, 10*time.Millisecond)
+		require.Equal(t, expSignals, batch1.Signals, "batch1")
+		require.Equal(t, expSignals, batch2.Signals, "batch2")
+		require.Equal(t, expSignals, batch3.Signals, "batch3")
+	})
 }
 
 // BenchmarkToShipperEvent is used to detect performance regression when the conversion function is changed.
@@ -484,7 +483,7 @@ func BenchmarkToShipperEvent(b *testing.B) {
 // `err` is a preset error that the server will serve to the client
 // `listenAddr` is the address for the server to listen
 // returns `actualAddr` where the listener actually is and the `stop` function to stop the server
-func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAddr string, stop func()) {
+func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAddr string, mock *api.ProducerMock, stop func()) {
 	producer := api.NewProducerMock(qSize)
 	producer.Error = err
 	grpcServer := grpc.NewServer()
@@ -502,7 +501,7 @@ func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAdd
 		listener.Close()
 	}
 
-	return actualAddr, stop
+	return actualAddr, producer, stop
 }
 
 func createShipperClient(t *testing.T, cfg *config.C) outputs.NetworkClient {
@@ -539,12 +538,4 @@ func requireEqualProto(t *testing.T, expected, actual proto.Message) {
 		proto.Equal(expected, actual),
 		fmt.Sprintf("These two protobuf messages are not equal:\nexpected: %v\nactual:  %v", expected, actual),
 	)
-}
-
-func toPublisherEvents(events []beat.Event) []publisher.Event {
-	converted := make([]publisher.Event, 0, len(events))
-	for _, e := range events {
-		converted = append(converted, publisher.Event{Content: e})
-	}
-	return converted
 }

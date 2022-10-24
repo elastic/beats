@@ -1,11 +1,13 @@
 [
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"created": "2021-08-12T14:24:52.000Z",
 			"name": "standard",
-			"provisioner": "rancher.io/local-path"
+			"provisioner": "rancher.io/local-path",
+			"reclaim_policy": "Delete",
+			"volume_binding_mode": "WaitForFirstConsumer"
 		},
 		"Index": "",
 		"ID": "",

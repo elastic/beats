@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package browser
 
@@ -13,6 +15,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
@@ -22,14 +25,12 @@ func init() {
 
 var showExperimentalOnce = sync.Once{}
 
-var ErrNotSyntheticsCapableError = fmt.Errorf("synthetic monitors cannot be created outside the official elastic docker image")
-
 func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
 	// We don't want users running synthetics in environments that don't have the required GUI libraries etc, so we check
 	// this flag. When we're ready to support the many possible configurations of systems outside the docker environment
 	// we can remove this check.
 	if os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") != "true" {
-		return plugin.Plugin{}, ErrNotSyntheticsCapableError
+		return plugin.Plugin{}, ecserr.NewNotSyntheticsCapableError()
 	}
 
 	showExperimentalOnce.Do(func() {

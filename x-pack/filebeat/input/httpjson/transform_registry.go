@@ -52,7 +52,7 @@ func (reg registry) String() string {
 
 	var str string
 	for namespace, m := range reg.namespaces {
-		var names []string
+		names := make([]string, 0, len(m))
 		for k := range m {
 			names = append(names, k)
 		}
