@@ -112,7 +112,6 @@ func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTim
 		LogGroupName: awssdk.String(logGroup),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
-		Limit:        awssdk.Int64(100),
 	}
 
 	if len(p.logStreams) > 0 {
