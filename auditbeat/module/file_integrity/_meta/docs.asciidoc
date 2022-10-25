@@ -68,7 +68,12 @@ described later.
 *`paths`*:: A list of paths (directories or files) to watch. Globs are
 not supported. The specified paths should exist when the metricset is started.
 Paths should be absolute, although the file integrity module will attempt to
-resolve relative path events to their absolute file path.
+resolve relative path events to their absolute file path. Symbolic links will
+be resolved on module start and the link target will be watched if link resolution
+is successful. Changes to the symbolic link after module start will not change
+the watch target. If the link does not resolve to a valid target, the symbolic
+link itself will be watched; if the symlink target becomes valid after module
+start up this will not be picked up by the file system watches.
 
 *`exclude_files`*:: A list of regular expressions used to filter out events
 for unwanted files. The expressions are matched against the full path of every
