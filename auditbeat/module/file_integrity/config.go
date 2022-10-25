@@ -89,11 +89,19 @@ type Config struct {
 // Validate validates the config data and return an error explaining all the
 // problems with the config. This method modifies the given config.
 func (c *Config) Validate() error {
-	// Resolve symlinks.
+	// Resolve symlinks and make filepaths absolute if possible
+	// anything that does not resolve will be logged during
+	// scanning and metric set collection.
 	for i, p := range c.Paths {
-		if evalPath, err := filepath.EvalSymlinks(p); err == nil {
-			c.Paths[i] = evalPath
+		p, err := filepath.EvalSymlinks(p)
+		if err != nil {
+			continue
 		}
+		p, err = filepath.Abs(p)
+		if err != nil {
+			continue
+		}
+		c.Paths[i] = p
 	}
 	// Sort and deduplicate.
 	sort.Strings(c.Paths)
