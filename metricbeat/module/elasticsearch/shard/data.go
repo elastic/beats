@@ -67,7 +67,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var errs multierror.Errors
 	for _, index := range stateData.RoutingTable.Indices {
 		for _, shards := range index.Shards {
-			for _, shard := range shards {
+			for i, shard := range shards {
 				event := mb.Event{
 					ModuleFields: mapstr.M{},
 				}
@@ -97,7 +97,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 					continue
 				}
 
-				event.ID, err = generateHashForEvent(stateData.StateID, fields)
+				event.ID, err = generateHashForEvent(stateData.StateID, fields, i)
 				if err != nil {
 					errs = append(errs, errors.Wrap(err, "failure getting event ID"))
 					continue
@@ -160,7 +160,10 @@ func getSourceNode(nodeID string, stateData *stateStruct) (mapstr.M, error) {
 	}, nil
 }
 
-func generateHashForEvent(stateID string, shard mapstr.M) (string, error) {
+// Note: This function may generate duplicate IDs, but those will be dropped since libbeat
+// ignores the 409 status code
+// https://github.com/elastic/beats/blob/main/libbeat/outputs/elasticsearch/client.go#L396
+func generateHashForEvent(stateID string, shard mapstr.M, index int) (string, error) {
 	var nodeID string
 	if shard["node"] == nil {
 		nodeID = "_na"
@@ -181,7 +184,7 @@ func generateHashForEvent(stateID string, shard mapstr.M) (string, error) {
 	if !ok {
 		return "", elastic.MakeErrorForMissingField("shard", elastic.Elasticsearch)
 	}
-	shardNumberStr := strconv.FormatInt(shardNumberInt, 10)
+	shardNumberStr := "s" + strconv.FormatInt(shardNumberInt, 10)
 
 	isPrimary, ok := shard["primary"].(bool)
 	if !ok {
@@ -191,7 +194,7 @@ func generateHashForEvent(stateID string, shard mapstr.M) (string, error) {
 	if isPrimary {
 		shardType = "p"
 	} else {
-		shardType = "r"
+		shardType = "r" + strconv.Itoa(index)
 	}
 
 	return stateID + ":" + nodeID + ":" + indexName + ":" + shardNumberStr + ":" + shardType, nil
