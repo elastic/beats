@@ -162,7 +162,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
 - Fix handling of invalid UserIP and LocalIP values. {pull}32896[32896]
-- Expose Cloud Foundry filtering options into user configuration. {pull}[]
+- Expose Cloud Foundry filtering options into user configuration. {pull}33456[33456]
 
 *Auditbeat*
 
