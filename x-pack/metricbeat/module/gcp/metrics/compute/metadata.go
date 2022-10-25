@@ -11,8 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/api/compute/v1"
+	compute "cloud.google.com/go/compute/apiv1"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	computepb "google.golang.org/genproto/googleapis/cloud/compute/v1"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -127,15 +129,15 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 		computeMetadata.User = instance.Labels
 	}
 
-	if instance.MachineType != "" {
-		computeMetadata.machineType = instance.MachineType
+	if instance.GetMachineType() != "" {
+		computeMetadata.machineType = instance.GetMachineType()
 	}
 
 	if instance.Metadata != nil && instance.Metadata.Items != nil {
 		computeMetadata.Metadata = make(map[string]string)
 
 		for _, i := range instance.Metadata.Items {
-			computeMetadata.Metadata[i.Key] = *i.Value
+			computeMetadata.Metadata[i.GetKey()] = i.GetValue()
 		}
 	}
 
@@ -143,11 +145,11 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 }
 
 // instance returns data from an instance ID using the cache or making a request
-func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*compute.Instance, error) {
+func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*computepb.Instance, error) {
 	s.refreshInstanceCache(ctx)
 	instanceCachedData := s.instanceCache.Get(instanceID)
 	if instanceCachedData != nil {
-		if computeInstance, ok := instanceCachedData.(*compute.Instance); ok {
+		if computeInstance, ok := instanceCachedData.(*computepb.Instance); ok {
 			return computeInstance, nil
 		}
 	}
@@ -176,22 +178,32 @@ func (s *metadataCollector) refreshInstanceCache(ctx context.Context) {
 	if s.instanceCache.Size() > 0 {
 		return
 	}
-	s.logger.Debugf("refresh cache with Instances.AggregatedList API")
-	computeService, err := compute.NewService(ctx, s.opt...)
+
+	s.logger.Debugf("refresh cache with AggregatedList API")
+
+	computeService, err := compute.NewInstancesRESTClient(context.Background(), s.opt...)
 	if err != nil {
-		s.logger.Errorf("error getting client from Compute service: %v", err)
+		s.logger.Errorf("error getting client from compute REST service: %v", err)
 		return
 	}
 
-	req := computeService.Instances.AggregatedList(s.projectID)
-	if err := req.Pages(ctx, func(page *compute.InstanceAggregatedList) error {
-		for _, instancesScopedList := range page.Items {
-			for _, instance := range instancesScopedList.Instances {
-				s.instanceCache.Put(strconv.Itoa(int(instance.Id)), instance)
-			}
+	aggredatedListReq := computeService.AggregatedList(context.Background(), &computepb.AggregatedListInstancesRequest{
+		Project: s.projectID,
+	})
+
+	for {
+		resp, err := aggredatedListReq.Next()
+		if err == iterator.Done {
+			break
 		}
-		return nil
-	}); err != nil {
-		s.logger.Errorf("google Instances.AggregatedList error: %v", err)
+
+		if err != nil {
+			s.logger.Errorf("google AggregatedListReq.Next err: %v", err)
+			return
+		}
+
+		for _, i := range resp.Value.Instances {
+			s.instanceCache.Put(strconv.Itoa(int(i.GetId())), i)
+		}
 	}
 }
