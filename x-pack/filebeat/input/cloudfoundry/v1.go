@@ -41,6 +41,7 @@ func (i *inputV1) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	defer log.Info("Stopped cloudfoundry input")
 
 	callbacks := cloudfoundry.DopplerCallbacks{
+		Filter: i.config.FirehoseFilter,
 		Log: func(evt cloudfoundry.Event) {
 			publisher.Publish(createEvent(evt))
 		},

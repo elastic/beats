@@ -67,6 +67,19 @@ The URL of the Cloud Foundry UAA API. Optional. Default: "(value from ${api_addr
 The URL of the Cloud Foundry RLP Gateway. Optional. Default: "(`log-stream` subdomain under the same domain as `api_server`)".
 
 [float]
+==== `firehose_filter`
+
+The kind of filtering to apply for events from Cloud Foundry's firehose.
+
+Possible values:
+* `all`: {beatname_uc} doesn't apply any filter, all events in the firehose are requested.
+* `all-logs`: {beatname_uc} requests all events in the firehose, and selects the
+  ones that can be handled as logs, that is the ones whose envelope type is log message,
+  error, or http start/stop.
+* `logs`: {beatname_uc} requests to the firehose log messages only.
+* `metrics`: {beatname_uc} requests to the firehose metrics messages only.
+
+[float]
 ==== `client_id`
 
 Client ID to authenticate with Cloud Foundry. Default: "".

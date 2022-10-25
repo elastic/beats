@@ -19,6 +19,7 @@ import (
 )
 
 type DopplerCallbacks struct {
+	Filter string
 	Log    func(evt Event)
 	Metric func(evt Event)
 	Error  func(evt EventError)
@@ -80,23 +81,49 @@ func (c *DopplerConsumer) Run() {
 }
 
 func (c *DopplerConsumer) logsFirehose() {
-	c.firehose(c.callbacks.Log, consumer.LogMessages)
+	filter := FirehoseFilterAllLogs
+	if c.callbacks.Filter != "" {
+		filter = c.callbacks.Filter
+	}
+	filterFn, envelopeFilter := selectFilter(filter)
+	c.firehose(c.callbacks.Log, filterFn, envelopeFilter)
 }
 
 func (c *DopplerConsumer) metricsFirehose() {
-	c.firehose(c.callbacks.Metric, consumer.Metrics)
+	filter := FirehoseFilterMetrics
+	if c.callbacks.Filter != "" {
+		filter = c.callbacks.Filter
+	}
+	filterFn, envelopeFilter := selectFilter(filter)
+	c.firehose(c.callbacks.Metric, filterFn, envelopeFilter)
 }
 
-func (c *DopplerConsumer) firehose(cb func(evt Event), filter consumer.EnvelopeFilter) {
+func selectFilter(firehoseFilter string) (func(*events.Envelope) bool, consumer.EnvelopeFilter) {
+	switch firehoseFilter {
+	case FirehoseFilterAll:
+		return filterNoFilter, -1
+	case FirehoseFilterAllLogs:
+		// Requests all events, and selects log-like events.
+		return filterLogs, -1
+	case FirehoseFilterLogs:
+		// Uses filter-type=logs in requests to the firehose.
+		return filterNoFilter, consumer.LogMessages
+	case FirehoseFilterMetrics:
+		// Uses filter-type=metrics in requests to the firehose.
+		return filterNoFilter, consumer.Metrics
+	default:
+		// TODO: Handle unknown filters.
+		return filterNoFilter, -1
+	}
+}
+
+func (c *DopplerConsumer) firehose(cb func(evt Event), filterFn func(*events.Envelope) bool, filter consumer.EnvelopeFilter) {
 	var msgChan <-chan *events.Envelope
 	var errChan <-chan error
-	filterFn := filterNoFilter
-	if filter == consumer.LogMessages {
-		// We are interested in more envelopes than the ones obtained when filtering
-		// by log messages, retrieve them all and filter later.
-		// If this causes performance or other problems, we will have to investigate
-		// if it is possible to pass different filters to the firehose url.
-		filterFn = filterLogs
+	if filterFn == nil {
+		filterFn = filterNoFilter
+	}
+	if filter == consumer.LogMessages || filter == consumer.Metrics {
 		msgChan, errChan = c.consumer.Firehose(c.subscriptionID, "")
 	} else {
 		msgChan, errChan = c.consumer.FilteredFirehose(c.subscriptionID, "", filter)
