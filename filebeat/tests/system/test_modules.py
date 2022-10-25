@@ -11,6 +11,67 @@ import logging
 from parameterized import parameterized
 from deepdiff import DeepDiff
 
+<<<<<<< HEAD
+=======
+# datasets for which @timestamp is removed due to date missing
+remove_timestamp = {
+    "activemq.audit",
+    "barracuda.spamfirewall",
+    "barracuda.waf",
+    "bluecoat.director",
+    "cef.log",
+    "cisco.asa",
+    "cisco.ios",
+    "cisco.nexus",
+    "citrix.netscaler",
+    "cylance.protect",
+    "f5.bigipafm",
+    "fortinet.clientendpoint",
+    "haproxy.log",
+    "icinga.startup",
+    "imperva.securesphere",
+    "infoblox.nios",
+    "iptables.log",
+    "juniper.junos",
+    "juniper.netscreen",
+    "netscout.sightline",
+    "proofpoint.emailsecurity",
+    "redis.log",
+    "snort.log",
+    "symantec.endpointprotection",
+    "system.auth",
+    "system.syslog",
+    "crowdstrike.falcon_endpoint",
+    "crowdstrike.falcon_audit",
+    "zoom.webhook",
+    "threatintel.otx",
+    "threatintel.abuseurl",
+    "threatintel.abusemalware",
+    "threatintel.anomali",
+    "threatintel.anomalithreatstream",
+    "threatintel.malwarebazaar",
+    "threatintel.recordedfuture",
+    "snyk.vulnerabilities",
+    "snyk.audit",
+    "awsfargate.log",
+}
+
+# dataset + log file pairs for which @timestamp is kept as an exception from above
+remove_timestamp_exception = {
+    ('system.syslog', 'tz-offset.log'),
+    ('system.auth', 'timestamp.log'),
+    ('cisco.asa', 'asa.log'),
+    ('cisco.asa', 'hostnames.log'),
+    ('cisco.asa', 'not-ip.log'),
+    ('cisco.asa', 'sample.log')
+}
+
+# array fields whose order is kept before comparison
+array_fields_dont_sort = {
+    "process.args"
+}
+
+>>>>>>> a4c713b4bc ([x-pack/filebeat/module/cisco] Fix pipline for nexus type (#33385))
 
 def load_fileset_test_cases():
     """
