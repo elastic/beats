@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"reflect"
 	"sync"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -17,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -113,8 +115,13 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 	p.mu.Lock()
 	s, ok := p.servers[e.addr]
 	if ok {
+		err = checkTLSConsistency(e.addr, s.tls, e.config.TLS)
+		if err != nil {
+			return err
+		}
+
 		if old, ok := s.idOf[pattern]; ok {
-			err := fmt.Errorf("pattern already exists for %s: %s old=%s new=%s",
+			err = fmt.Errorf("pattern already exists for %s: %s old=%s new=%s",
 				e.addr, pattern, old, ctx.ID)
 			s.setErr(err)
 			s.cancel()
@@ -134,6 +141,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
 	s = &server{
 		idOf: map[string]string{pattern: ctx.ID},
+		tls:  e.config.TLS,
 		mux:  mux,
 		srv:  srv,
 	}
@@ -155,12 +163,38 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 	return err
 }
 
+func checkTLSConsistency(addr string, old, new *tlscommon.ServerConfig) error {
+	if (old == nil) != (new == nil) {
+		return fmt.Errorf("inconsistent TLS usage on %s: mixed TLS and unencrypted", addr)
+	}
+	if !reflect.DeepEqual(old, new) {
+		return fmt.Errorf("inconsistent TLS configuration on %s: configuration options do not agree: old=%s new=%s",
+			addr, renderTLSConfig(old), renderTLSConfig(new))
+	}
+	return nil
+}
+
+func renderTLSConfig(tls *tlscommon.ServerConfig) string {
+	c, err := conf.NewConfigFrom(tls)
+	if err != nil {
+		return fmt.Sprintf("!%v", err)
+	}
+	var m mapstr.M
+	err = c.Unpack(&m)
+	if err != nil {
+		return fmt.Sprintf("!%v", err)
+	}
+	return m.String()
+}
+
 // server is a collection of http end-points sharing the same underlying
 // http.Server.
 type server struct {
 	// idOf is a map of mux pattern
 	// to input IDs for the server.
 	idOf map[string]string
+
+	tls *tlscommon.ServerConfig
 
 	mux *http.ServeMux
 	srv *http.Server

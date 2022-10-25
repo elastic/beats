@@ -7,6 +7,7 @@ package http_endpoint
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -19,13 +20,15 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 var serverPoolTests = []struct {
-	name   string
-	cfgs   []*httpEndpoint
-	events []target
-	want   []mapstr.M
+	name    string
+	cfgs    []*httpEndpoint
+	events  []target
+	want    []mapstr.M
+	wantErr error
 }{
 	{
 		name: "single",
@@ -130,6 +133,76 @@ var serverPoolTests = []struct {
 			{"json": mapstr.M{"c": int64(3)}},
 		},
 	},
+	{
+		name: "inconsistent_tls_mixed_traffic",
+		cfgs: []*httpEndpoint{
+			{
+				addr: "127.0.0.1:9001",
+				config: config{
+					ResponseCode:  200,
+					ResponseBody:  `{"message": "success"}`,
+					ListenAddress: "127.0.0.1",
+					ListenPort:    "9001",
+					URL:           "/a/",
+					Prefix:        "json",
+					ContentType:   "application/json",
+				},
+			},
+			{
+				addr: "127.0.0.1:9001",
+				config: config{
+					TLS:           &tlscommon.ServerConfig{},
+					ResponseCode:  200,
+					ResponseBody:  `{"message": "success"}`,
+					ListenAddress: "127.0.0.1",
+					ListenPort:    "9001",
+					URL:           "/b/",
+					Prefix:        "json",
+					ContentType:   "application/json",
+				},
+			},
+		},
+		wantErr: errors.New("inconsistent TLS usage on 127.0.0.1:9001: mixed TLS and unencrypted"),
+	},
+	{
+		name: "inconsistent_tls_config",
+		cfgs: []*httpEndpoint{
+			{
+				addr: "127.0.0.1:9001",
+				config: config{
+					TLS: &tlscommon.ServerConfig{
+						VerificationMode: tlscommon.VerifyStrict,
+					},
+					ResponseCode:  200,
+					ResponseBody:  `{"message": "success"}`,
+					ListenAddress: "127.0.0.1",
+					ListenPort:    "9001",
+					URL:           "/a/",
+					Prefix:        "json",
+					ContentType:   "application/json",
+				},
+			},
+			{
+				addr: "127.0.0.1:9001",
+				config: config{
+					TLS: &tlscommon.ServerConfig{
+						VerificationMode: tlscommon.VerifyNone,
+					},
+					ResponseCode:  200,
+					ResponseBody:  `{"message": "success"}`,
+					ListenAddress: "127.0.0.1",
+					ListenPort:    "9001",
+					URL:           "/b/",
+					Prefix:        "json",
+					ContentType:   "application/json",
+				},
+			},
+		},
+		wantErr: errors.New(`inconsistent TLS configuration on 127.0.0.1:9001: ` +
+			`configuration options do not agree: ` +
+			`old={"ca_sha256":[],"certificate":"","certificate_authorities":[],"cipher_suites":[],"client_authentication":0,"curve_types":[],"key":"","key_passphrase":"","supported_protocols":[],"verification_mode":1} ` +
+			`new={"ca_sha256":[],"certificate":"","certificate_authorities":[],"cipher_suites":[],"client_authentication":0,"curve_types":[],"key":"","key_passphrase":"","supported_protocols":[],"verification_mode":3}`),
+	},
 }
 
 type target struct {
@@ -142,7 +215,10 @@ func TestServerPool(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			servers := pool{servers: make(map[string]*server)}
 
-			var pub publisher
+			var (
+				pub   publisher
+				fails = make(chan error, 1)
+			)
 			ctx, cancel := newCtx("server_pool_test", test.name)
 			var wg sync.WaitGroup
 			for _, cfg := range test.cfgs {
@@ -150,11 +226,29 @@ func TestServerPool(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					_ = servers.serve(ctx, cfg, &pub) // Always returns a non-nil error.
+					err := servers.serve(ctx, cfg, &pub)
+					if err != http.ErrServerClosed {
+						select {
+						case fails <- err:
+						default:
+						}
+					}
 				}()
 			}
 			time.Sleep(time.Second)
 
+			select {
+			case err := <-fails:
+				if test.wantErr == nil {
+					t.Errorf("unexpected error calling serve: %#q", err)
+				} else if test.wantErr.Error() != err.Error() {
+					t.Errorf("unexpected error calling serve: got=%#q, want=%#q", err, test.wantErr)
+				}
+			default:
+				if test.wantErr != nil {
+					t.Errorf("expected error calling serve")
+				}
+			}
 			for i, e := range test.events {
 				resp, err := http.Post(e.url, "application/json", strings.NewReader(e.event))
 				if err != nil {
