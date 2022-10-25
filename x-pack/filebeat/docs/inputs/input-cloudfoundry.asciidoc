@@ -75,7 +75,7 @@ Possible values:
 * `all`: {beatname_uc} doesn't apply any filter, all events in the firehose are requested.
 * `all-logs`: {beatname_uc} requests all events in the firehose, and selects the
   ones that can be handled as logs, that is the ones whose envelope type is log message,
-  error, or http start/stop.
+  error, or http start/stop. This is the default.
 * `logs`: {beatname_uc} requests to the firehose log messages only.
 * `metrics`: {beatname_uc} requests to the firehose metrics messages only.
 
