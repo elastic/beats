@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2022-10-19T13:34:01.000Z",
         "event.code": "IF_HARDWARE",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -25,7 +24,6 @@
         "rsa.misc.event_source": "ETHPORT",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet1/9",
-        "rsa.time.event_time": "2022-10-19T13:34:01.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -34,7 +32,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-17T12:27:35.000Z",
         "event.code": "NOHMS_ENV_FEX_ONLINE",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -58,7 +55,6 @@
         "rsa.misc.device_name": "FEX-105",
         "rsa.misc.event_source": "NOHMS",
         "rsa.misc.severity": "2",
-        "rsa.time.event_time": "2022-10-17T12:27:35.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -67,7 +63,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-25T00:33:33.717527Z",
         "event.code": "FEX_PS_FOUND",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -93,7 +88,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-25T00:33:33.717781Z",
         "event.code": "FEX_PS_FOUND",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -119,7 +113,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-17T12:27:38.000Z",
         "event.code": "FEX_STATUS",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -143,7 +136,6 @@
         "rsa.misc.device_name": "Fex 105",
         "rsa.misc.event_source": "PFMA",
         "rsa.misc.severity": "2",
-        "rsa.time.event_time": "2022-10-17T12:27:38.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -152,7 +144,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-17T16:00:07.000Z",
         "event.code": "IF_DOWN_LINK_FAILURE",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -178,7 +169,6 @@
         "rsa.misc.result": "Link failure",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet100/1/17",
-        "rsa.time.event_time": "2022-10-17T16:00:07.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -187,7 +177,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-18T12:32:04.000Z",
         "event.code": "VSHD_SYSLOG_CONFIG_I",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -216,10 +205,19 @@
         "rsa.misc.event_source": "VSHD",
         "rsa.misc.severity": "5",
         "rsa.misc.terminal": "pts/0",
-        "rsa.time.event_time": "2022-10-18T12:32:04.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
-        "source.ip": "1.2.3.4",
+        "source.geo.city_name": "Moscow",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
+        "source.geo.location.lat": 55.7527,
+        "source.geo.location.lon": 37.6172,
+        "source.geo.region_iso_code": "RU-MOW",
+        "source.geo.region_name": "Moscow",
+        "source.ip": [
+            "1.2.3.4"
+        ],
         "tags": [
             "cisco.nexus",
             "forwarded"
@@ -227,7 +225,6 @@
         "user.name": "username"
     },
     {
-        "@timestamp": "2022-10-19T13:28:06.000Z",
         "event.code": "IF_DOWN_LINK_FAILURE",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -253,7 +250,6 @@
         "rsa.misc.result": "Link failure",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet100/1/29",
-        "rsa.time.event_time": "2022-10-19T13:28:06.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -262,7 +258,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-19T13:28:08.000Z",
         "event.code": "IF_DOWN_ADMIN_DOWN",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -287,7 +282,6 @@
         "rsa.misc.result": "Administratively down",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet100/1/29",
-        "rsa.time.event_time": "2022-10-19T13:28:08.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -296,7 +290,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-19T13:33:57.000Z",
         "event.code": "IF_ADMIN_UP",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -325,7 +318,6 @@
         "rsa.misc.event_source": "ETHPORT",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet100/1/29",
-        "rsa.time.event_time": "2022-10-19T13:33:57.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -334,7 +326,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-19T13:34:01.000Z",
         "event.code": "SPEED",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -360,7 +351,6 @@
         "rsa.misc.result": "100 Mbps",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet100/1/29",
-        "rsa.time.event_time": "2022-10-19T13:34:01.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -369,7 +359,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-19T13:34:01.000Z",
         "event.code": "IF_DUPLEX",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -395,7 +384,6 @@
         "rsa.misc.result": "Full",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet100/1/29",
-        "rsa.time.event_time": "2022-10-19T13:34:01.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -404,7 +392,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-19T13:34:01.000Z",
         "event.code": "IF_RX_FLOW_CONTROL",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -430,7 +417,6 @@
         "rsa.misc.result": "off",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet100/1/29",
-        "rsa.time.event_time": "2022-10-19T13:34:01.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -439,7 +425,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-19T13:34:01.000Z",
         "event.code": "IF_TX_FLOW_CONTROL",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -465,7 +450,6 @@
         "rsa.misc.result": "on",
         "rsa.misc.severity": "5",
         "rsa.network.interface": "Ethernet100/1/29",
-        "rsa.time.event_time": "2022-10-19T13:34:01.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
@@ -474,7 +458,6 @@
         ]
     },
     {
-        "@timestamp": "2022-10-19T13:34:01.000Z",
         "event.code": "IF_UP",
         "event.dataset": "cisco.nexus",
         "event.module": "cisco",
@@ -499,7 +482,6 @@
         "rsa.misc.event_source": "ETHPORT",
         "rsa.misc.severity": "3",
         "rsa.network.sinterface": "Ethernet100/1/29",
-        "rsa.time.event_time": "2022-10-19T13:34:01.000Z",
         "rsa.time.timezone": "Berlin",
         "service.type": "cisco",
         "tags": [
