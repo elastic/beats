@@ -97,7 +97,7 @@ if [[ "$JSON_LOGS" = 'true' ]]
 then
     if [[ ! -e $LOG_FILE ]]
     then
-        flog -f json -r 42 -n 10000000 -s 0.01 -t log -w -o $LOG_FILE
+        flog -f json -r 42 -n 2000000 -s 0.001 -t log -w -o $LOG_FILE
     else
         echo "Log file found"
     fi
@@ -106,7 +106,7 @@ else
     # Generate a 1Gb file
     if [[ ! -e $LOG_FILE ]]
     then
-        flog -f apache_common -r 42 -n 10000000 -s 0.01 -t log -w -o $LOG_FILE
+        flog -f apache_common -r 42 -n 2000000 -s 0.001 -t log -w -o $LOG_FILE
     else
         echo "Log file found"
     fi
@@ -119,6 +119,7 @@ cp -v ./metricbeat.yml $MB_FOLDER_NAME/
 
 # Start Metricbeat
 cd $MB_FOLDER_NAME
+./metricbeat setup
 ./metricbeat &
 cd ../
 

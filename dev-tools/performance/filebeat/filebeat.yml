@@ -6,14 +6,17 @@ filebeat.inputs:
   enabled: true
   paths:
     - /tmp/flog.log
-# ======================= Elasticsearch template setting =======================
 
 setup.template:
   name: "filebeat-performance-test-%{[agent.version]}"
   pattern: "filebeat-performance-test-%{[agent.version]}"
   settings:
-    index.number_of_shards: 1
-  
+    index.number_of_shards: 6
+
+queue.mem:
+  events: 51200 # 2 * workers * batch size
+  flush.min_events: 16000
+
 output.elasticsearch:
   enabled: true
   hosts: ["${ES_HOSTS:https://localhost:9200}"]
@@ -22,7 +25,10 @@ output.elasticsearch:
   index: "filebeat-performance-test-%{[agent.version]}"
   allow_older_versions: true
   ssl.verification_mode: ${VERIFICATION_MODE:full}
+  bulk_max_size: 1600
+  worker: 16
+  compression_level: 9  
 
 monitoring.enabled: true
 monitoring.cluster_uuid: "${CLUSTER_UUID}"
-#monitoring.elasticsearch:
+

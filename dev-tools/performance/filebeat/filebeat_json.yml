@@ -17,13 +17,16 @@ filebeat.inputs:
           - "2006-01-02T15:04:05.999999999Z07:00" # RFC3339Nano
         test:
           - "2022-10-24T17:19:04.764155065+02:00"
-# ======================= Elasticsearch template setting =======================
+
+queue.mem:
+  events: 51200 # 2 * workers * batch size
+  flush.min_events: 16000
 
 setup.template:
   name: "filebeat-performance-test-%{[agent.version]}"
   pattern: "filebeat-performance-test-%{[agent.version]}"
   settings:
-    index.number_of_shards: 1
+    index.number_of_shards: 6
   
 output.elasticsearch:
   enabled: true
@@ -33,6 +36,9 @@ output.elasticsearch:
   index: "filebeat-performance-test-%{[agent.version]}"
   allow_older_versions: true
   ssl.verification_mode: ${VERIFICATION_MODE:full}
+  bulk_max_size: 1600
+  worker: 16
+  compression_level: 9
 
 monitoring.enabled: true
 monitoring.cluster_uuid: "${CLUSTER_UUID}"
