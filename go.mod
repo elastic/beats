@@ -197,7 +197,7 @@ require (
 	github.com/elastic/elastic-agent-shipper-client v0.4.0
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
-	github.com/elastic/toutoumomoma v0.0.0-20220921114644-2d19714c7ab1
+	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/googleapis/gax-go/v2 v2.5.1
 	github.com/pierrec/lz4/v4 v4.1.15
 	github.com/shirou/gopsutil/v3 v3.21.12

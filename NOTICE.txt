@@ -12988,11 +12988,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/toutoumomoma
-Version: v0.0.0-20220921114644-2d19714c7ab1
+Version: v0.0.0-20221026030040-594ef30cb640
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/toutoumomoma@v0.0.0-20220921114644-2d19714c7ab1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/toutoumomoma@v0.0.0-20221026030040-594ef30cb640/LICENSE:
 
 Copyright ©2022 Elastic N.V. All rights reserved.
 Copyright ©2021 Dan Kortschak. All rights reserved.
