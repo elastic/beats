@@ -25,7 +25,7 @@ fi
 ## Configure ES Cluster to accept metrics
 if [[ $VERIFICATION_MODE = "none" ]]
 then
-    curl --location --request PUT 'https://localhost:9200/_cluster/settings' \
+    curl --location --request PUT "$ES_HOSTS/_cluster/settings" \
          --insecure \
          -u $ES_USER:$ES_PASS \
          --header 'Content-Type: application/json' \
@@ -34,10 +34,10 @@ then
              "xpack.monitoring.collection.enabled": true
            }
          }'
-        export CLUSTER_UUID=$(curl --insecure --location --request GET 'https://localhost:9200/' \
+        export CLUSTER_UUID=$(curl --insecure --location --request GET "$ES_HOSTS/" \
                             -u $ES_USER:$ES_PASS | jq '.cluster_uuid')
 else
-    curl --location --request PUT 'https://localhost:9200/_cluster/settings' \
+    curl --location --request PUT "$ES_HOSTS/_cluster/settings" \
          -u $ES_USER:$ES_PASS \
          --header 'Content-Type: application/json' \
          --data-raw '{
@@ -45,7 +45,7 @@ else
              "xpack.monitoring.collection.enabled": true
            }
          }'
-        export CLUSTER_UUID=$(curl --location --request GET 'https://localhost:9200/' \
+        export CLUSTER_UUID=$(curl --location --request GET "$ES_HOSTS/" \
                             -u $ES_USER:$ES_PASS | jq '.cluster_uuid')
 fi
 

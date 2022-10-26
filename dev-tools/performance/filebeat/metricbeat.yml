@@ -2,6 +2,9 @@ metricbeat.config.modules:
   path: ${path.config}/modules.d/*.yml
   reload.enabled: false
 
+setup.kibana:
+  host: "${KIBANA_HOST:http://localhost:5601}"
+
 output.elasticsearch:
   enabled: true
   hosts: ["${ES_HOSTS:https://localhost:9200}"]
