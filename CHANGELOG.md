@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- service: Improve shutdown logs #87
+
 ### Deprecated
 
 ### Removed

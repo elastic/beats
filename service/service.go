@@ -38,7 +38,7 @@ import (
 
 // HandleSignals manages OS signals that ask the service/daemon to stop.
 // The stopFunction should break the loop in the Beat so that
-// the service shut downs gracefully.
+// the service shuts down gracefully.
 func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	var callback sync.Once
 	logger := logp.NewLogger("service")
@@ -49,20 +49,14 @@ func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	go func() {
 		sig := <-sigc
 
-		switch sig {
-		case syscall.SIGINT, syscall.SIGTERM:
-			logger.Debug("Received sigterm/sigint, stopping")
-		case syscall.SIGHUP:
-			logger.Debug("Received sighup, stopping")
-		}
-
+		logger.Infof("Received signal %q, stopping", sig)
 		cancel()
 		callback.Do(stopFunction)
 	}()
 
 	// Handle the Windows service events
 	go ProcessWindowsControlEvents(func() {
-		logger.Debug("Received svc stop/shutdown request")
+		logger.Info("Received Windows SVC stop/shutdown request")
 		callback.Do(stopFunction)
 	})
 }
