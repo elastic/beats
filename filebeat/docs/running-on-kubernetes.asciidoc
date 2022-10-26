@@ -20,7 +20,7 @@ endif::[]
 You deploy {beatname_uc} as a https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/[DaemonSet]
 to ensure there's a running instance on each node of the cluster.
 
-The Docker logs host folder (`/var/lib/docker/containers`) is mounted on the
+The container logs host folder (`/var/log/containers`) is mounted on the
 {beatname_uc} container. {beatname_uc} starts an input for the files and
 begins harvesting them as soon as they appear in the folder.
 
