@@ -20,7 +20,7 @@ pipeline {
   stages {
     stage('Weekly beats builds for AWS') {
       steps {
-        runBuilds(quietPeriodFactor: 1000, branches: ['main', '8.<minor>', '8.<next-patch>', '7.<minor>'], parameters: [booleanParam(name: 'awsCloudTests', value: true)])
+        runBuilds(quietPeriodFactor: 1000, branches: ['main', '8.<next-minor>', '8.<minor>', '8.<next-patch>', '7.<minor>'], parameters: [booleanParam(name: 'awsCloudTests', value: true)])
       }
     }
     stage('Weekly beats builds for Orka M1') {

@@ -27,8 +27,6 @@
             - name: avg_time
               type: group
               fields:
-                - name: bytes
-                  type: long
                 - name: ms
                   type: long
             - name: total_time

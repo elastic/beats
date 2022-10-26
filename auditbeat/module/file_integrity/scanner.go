@@ -95,10 +95,15 @@ func (s *scanner) scan() {
 	startTime := time.Now()
 
 	for _, path := range s.config.Paths {
-		// Resolve symlinks to ensure we have an absolute path.
+		// Resolve symlinks and ensure we have an absolute path.
 		evalPath, err := filepath.EvalSymlinks(path)
 		if err != nil {
-			s.log.Warnw("Failed to scan", "file_path", path, "error", err)
+			s.log.Warnw("Failed to resolve symlink", "file_path", path, "error", err)
+			continue
+		}
+		evalPath, err = filepath.Abs(evalPath)
+		if err != nil {
+			s.log.Warnw("Failed to resolve to absolute path", "file_path", path, "error", err)
 			continue
 		}
 

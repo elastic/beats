@@ -171,7 +171,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	endTime time.Time) []mb.Event {
 	var events []mb.Event
 	namespace := "AWS/Billing"
-	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
+	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, svcCloudwatch)
 	if err != nil {
 		m.Logger().Error(err.Error())
 		return nil
@@ -181,7 +181,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 		return events
 	}
 
-	metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.Period)
+	metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.DataGranularity)
 	metricDataOutput, err := aws.GetMetricDataResults(metricDataQueriesTotal, svcCloudwatch, startTime, endTime)
 	if err != nil {
 		err = fmt.Errorf("aws GetMetricDataResults failed with %w, skipping region %s", err, regionName)
@@ -189,22 +189,15 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 		return nil
 	}
 
-	// Find a timestamp for all metrics in output
-	timestamp := aws.FindTimestamp(metricDataOutput)
-	if timestamp.IsZero() {
-		return nil
-	}
-
 	for _, output := range metricDataOutput {
 		if len(output.Values) == 0 {
 			continue
 		}
-		exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-		if exists {
+		for valI, metricDataResultValue := range output.Values {
 			labels := strings.Split(*output.Label, labelSeparator)
 
-			event := aws.InitEvent("", m.AccountName, m.AccountID, timestamp)
-			_, _ = event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+			event := aws.InitEvent("", m.AccountName, m.AccountID, output.Timestamps[valI])
+			_, _ = event.MetricSetFields.Put(labels[0], metricDataResultValue)
 
 			i := 1
 			for i < len(labels)-1 {
@@ -345,11 +338,11 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricVa
 	return event
 }
 
-func constructMetricQueries(listMetricsOutput []types.Metric, period time.Duration) []types.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []types.Metric, dataGranularity time.Duration) []types.MetricDataQuery {
 	var metricDataQueries []types.MetricDataQuery
 	metricDataQueryEmpty := types.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, i, period)
+		metricDataQuery := createMetricDataQuery(listMetric, i, dataGranularity)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}
@@ -358,9 +351,9 @@ func constructMetricQueries(listMetricsOutput []types.Metric, period time.Durati
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric types.Metric, index int, period time.Duration) types.MetricDataQuery {
+func createMetricDataQuery(metric types.Metric, index int, dataGranularity time.Duration) types.MetricDataQuery {
 	statistic := "Maximum"
-	periodInSeconds := int32(period.Seconds())
+	dataGranularityInSeconds := int32(dataGranularity.Seconds())
 	id := metricsetName + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 	metricName := *metric.MetricName
@@ -373,7 +366,7 @@ func createMetricDataQuery(metric types.Metric, index int, period time.Duration)
 	return types.MetricDataQuery{
 		Id: &id,
 		MetricStat: &types.MetricStat{
-			Period: &periodInSeconds,
+			Period: &dataGranularityInSeconds,
 			Stat:   &statistic,
 			Metric: &metric,
 		},

@@ -72,15 +72,11 @@ func TestPrepareAutoloadFile(t *testing.T) {
 	validLogger := logp.NewLogger("osqueryd_test")
 
 	// Prepare the directory with extension
-	dir, err := os.MkdirTemp("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	mandatoryExtensionPath := filepath.Join(dir, extensionName)
 
 	// Write fake extension file for testing
-	err = ioutil.WriteFile(mandatoryExtensionPath, nil, 0600)
+	err := ioutil.WriteFile(mandatoryExtensionPath, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,14 +119,7 @@ func TestPrepareAutoloadFile(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 
 			// Setup
-			dir, err := os.MkdirTemp("", "")
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			defer os.RemoveAll(dir)
-
-			extensionAutoloadPath := filepath.Join(dir, osqueryAutoload)
+			extensionAutoloadPath := filepath.Join(t.TempDir(), osqueryAutoload)
 
 			err = ioutil.WriteFile(extensionAutoloadPath, tc.FileContent, 0600)
 			if err != nil {
