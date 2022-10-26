@@ -6,6 +6,7 @@ package compute
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -193,7 +194,7 @@ func (s *metadataCollector) refreshInstanceCache(ctx context.Context) {
 
 	for {
 		resp, err := aggredatedListReq.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 
