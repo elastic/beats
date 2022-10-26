@@ -251,6 +251,7 @@ def clean_keys(obj):
         "cef.log",
         "cisco.asa",
         "cisco.ios",
+        "cisco.nexus",
         "citrix.netscaler",
         "cyberark.corepas",
         "cylance.protect",
