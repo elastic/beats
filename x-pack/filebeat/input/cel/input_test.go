@@ -1039,7 +1039,7 @@ func TestInput(t *testing.T) {
 
 			v2Ctx := v2.Context{
 				Logger:      logp.NewLogger("cel_test"),
-				ID:          "test_id",
+				ID:          "test_id:" + test.name,
 				Cancelation: ctx,
 			}
 			var client publisher

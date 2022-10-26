@@ -25,6 +25,7 @@ import (
 	"time"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/rcrowley/go-metrics"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
 
@@ -41,6 +42,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
@@ -97,6 +100,9 @@ func (input) run(env v2.Context, src inputcursor.Source, cursor map[string]inter
 	cfg := src.(*source).cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
+	metrics := newInputMetrics(monitoring.GetNamespace("dataset").GetRegistry(), env.ID)
+	defer metrics.Close()
+
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
 	client, err := newClient(ctx, cfg, log)
@@ -128,6 +134,7 @@ func (input) run(env v2.Context, src inputcursor.Source, cursor map[string]inter
 	goodCursor := cursor
 	goodURL := cfg.Resource.URL.String()
 	state["url"] = goodURL
+	metrics.resource.Set(goodURL)
 	// On entry, state is expected to be in the shape:
 	//
 	// {
@@ -181,6 +188,8 @@ func (input) run(env v2.Context, src inputcursor.Source, cursor map[string]inter
 
 			// Process a set of event requests.
 			log.Debugw("request state", "state", state)
+			metrics.executions.Add(1)
+			start := time.Now()
 			state, err = evalWith(ctx, prg, map[string]interface{}{
 				root: state,
 			})
@@ -188,6 +197,7 @@ func (input) run(env v2.Context, src inputcursor.Source, cursor map[string]inter
 			if err != nil {
 				log.Errorw("failed evaluation", "error", err)
 			}
+			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
 
 			// On exit, state is expected to be in the shape:
 			//
@@ -311,6 +321,10 @@ func (input) run(env v2.Context, src inputcursor.Source, cursor map[string]inter
 				return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 			}
 
+			// We have a non-empty batch of events to process.
+			metrics.batchesReceived.Add(1)
+			metrics.eventsReceived.Add(uint64(len(events)))
+
 			// Drop events from state. If we fail during the publication,
 			// we will re-request these events.
 			delete(state, "events")
@@ -339,6 +353,7 @@ func (input) run(env v2.Context, src inputcursor.Source, cursor map[string]inter
 			// the current cursor object below; it is an array now.
 			delete(state, "cursor")
 
+			start = time.Now()
 			var hadPublicationError bool
 			for i, e := range events {
 				event, ok := e.(map[string]interface{})
@@ -380,12 +395,18 @@ func (input) run(env v2.Context, src inputcursor.Source, cursor map[string]inter
 					// events we have now, with a fallback to the last guaranteed
 					// correctly published cursor.
 				}
+				if i == 0 {
+					metrics.batchesPublished.Add(1)
+				}
+				metrics.eventsPublished.Add(1)
 
 				err = ctx.Err()
 				if err != nil {
 					return err
 				}
 			}
+			metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
+
 			// Advance the cursor to the final state if there was no error during
 			// publications. This is needed to transition to the next set of events.
 			if !hadPublicationError {
@@ -817,4 +838,47 @@ func test(url *url.URL) error {
 	}
 
 	return nil
+}
+
+// inputMetrics handles the input's metric reporting.
+type inputMetrics struct {
+	id     string
+	parent *monitoring.Registry
+
+	resource            *monitoring.String // URL-ish of input resource
+	executions          *monitoring.Uint   // times the CEL program has been executed
+	batchesReceived     *monitoring.Uint   // number of event arrays received
+	eventsReceived      *monitoring.Uint   // number of events received
+	batchesPublished    *monitoring.Uint   // number of event arrays published
+	eventsPublished     *monitoring.Uint   // number of events published
+	celProcessingTime   metrics.Sample     // histogram of the elapsed successful cel program processing times in nanoseconds
+	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
+}
+
+func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
+	reg := parent.NewRegistry(id)
+	monitoring.NewString(reg, "input").Set(inputName)
+	monitoring.NewString(reg, "id").Set(id)
+	out := &inputMetrics{
+		id:                  id,
+		parent:              reg,
+		resource:            monitoring.NewString(reg, "resource"),
+		executions:          monitoring.NewUint(reg, "cel_executions"),
+		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
+		eventsReceived:      monitoring.NewUint(reg, "events_received_total"),
+		batchesPublished:    monitoring.NewUint(reg, "batches_published_total"),
+		eventsPublished:     monitoring.NewUint(reg, "events_published_total"),
+		celProcessingTime:   metrics.NewUniformSample(1024),
+		batchProcessingTime: metrics.NewUniformSample(1024),
+	}
+	_ = adapter.NewGoMetrics(reg, "cel_processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
+
+	return out
+}
+
+func (m *inputMetrics) Close() {
+	m.parent.Remove(m.id)
 }
