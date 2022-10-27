@@ -315,7 +315,7 @@ func (dq *diskQueue) Metrics() (queue.Metrics, error) {
 	return queue.Metrics{
 		ByteLimit:            opt.UintWith(maxSize),
 		ByteCount:            opt.UintWith(resp.sizeOnDisk),
-		UnackedConsumedBytes: opt.UintWith(uint64(resp.OccupiedRead)),
+		UnackedConsumedBytes: opt.UintWith(resp.OccupiedRead),
 		OldestEntryID:        queue.EntryID(resp.oldestEntryID),
 	}, nil
 }

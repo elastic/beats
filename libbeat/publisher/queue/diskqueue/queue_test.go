@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/stretchr/testify/require"
 )
 
