@@ -106,6 +106,46 @@ value specified for `timeout` is greater than `schedule`, intermediate checks
 will not be executed by the scheduler.
 
 [float]
+[[monitor-run-from]]
+=== `run_from`
+
+Determines which geographic location to label this monitor as running from. Note, this
+is usually better handled by using the top level `heartbeat.run_from` option which
+takes the same values, but applies them to every monitor.
+
+Takes two top-level fields: `id` and `geo`, where `id` is a string used to uniquely identify
+the geographic location, and indexed as the `observer.name` field, and `geo` which is a map
+conforming to https://www.elastic.co/guide/en/ecs/current/ecs-geo.html[ECS geo fields]
+and is indexed under `observer.geo`.
+
+Example:
+
+```yaml
+- type: http
+  # Set enabled to true (or delete the following line) to enable this example monitor
+  enabled: true
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: geo-test
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: Geo Test
+  # List or urls to query
+  urls: ["http://example.net"]
+  # Configure task schedule
+  schedule: '@every 10s'
+  run_from:
+    id: my-custom-geo
+    geo:
+      name: nyc-dc1-rack1
+      location: 40.7128, -74.0060
+      continent_name: North America
+      country_iso_code: US
+      region_name: New York
+      region_iso_code: NY
+      city_name: New York
+
+```
+
+[float]
 [[monitor-fields]]
 ==== `fields`
 
