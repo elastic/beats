@@ -26,7 +26,9 @@ import (
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	"github.com/rcrowley/go-metrics"
+	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"golang.org/x/time/rate"
 
 	"github.com/google/cel-go/cel"
@@ -40,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -640,6 +643,19 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	if err != nil {
 		return nil, err
 	}
+
+	if cfg.Resource.Tracer != nil {
+		w := zapcore.AddSync(cfg.Resource.Tracer)
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		traceLogger := zap.New(core)
+
+		c.Transport = httplog.NewLoggingRoundTripper(c.Transport, traceLogger)
+	}
+
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
 
 	client := &retryablehttp.Client{

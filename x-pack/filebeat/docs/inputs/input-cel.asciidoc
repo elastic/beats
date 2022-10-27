@@ -471,6 +471,43 @@ The value of the response that specifies the maximum overall resource request ra
 
 The maximum burst size. Burst is the maximum number of resource requests that can be made above the overall rate limit.
 
+[float]
+==== `resource.tracer.filename`
+
+It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations.
+This option is enabled by setting the `resource.tracer.filename` value. Additional options are available to
+tune log rotation behavior.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `resource.tracer.maxsize`
+
+This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
+logs are allowed to reach 1MB before rotation.
+
+[float]
+==== `resource.tracer.maxage`
+
+This specifies the number days to retain rotated log files. If it is not set, log files are retained
+indefinitely.
+
+[float]
+==== `resource.tracer.maxbackups`
+
+The number of old logs to retain. If it is not set all old logs are retained subject to the `resource.tracer.maxage`
+setting.
+
+[float]
+==== `resource.tracer.localtime`
+
+Whether to use the host's local time rather that UTC for timestamping rotated log file names.
+
+[float]
+==== `resource.tracer.compress`
+
+This determines whether rotated logs should be gzip compressed.
+
 [[cursor]]
 [float]
 ==== `cursor`

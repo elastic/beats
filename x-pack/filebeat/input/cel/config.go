@@ -12,6 +12,8 @@ import (
 	"regexp"
 	"time"
 
+	"gopkg.in/natefinch/lumberjack.v2"
+
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -149,6 +151,8 @@ type ResourceConfig struct {
 	RateLimit              *rateLimitConfig `config:"rate_limit"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+
+	Tracer *lumberjack.Logger `config:"tracer"`
 }
 
 type urlConfig struct {
@@ -174,5 +178,17 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 func (c *ResourceConfig) Validate() error {
+	if c.Tracer == nil {
+		return nil
+	}
+	if c.Tracer.Filename == "" {
+		return errors.New("request tracer must have a filename if used")
+	}
+	if c.Tracer.MaxSize == 0 {
+		// By default Lumberjack caps file sizes at 100MB which
+		// is excessive for a debugging logger, so default to 1MB
+		// which is the minimum.
+		c.Tracer.MaxSize = 1
+	}
 	return nil
 }
