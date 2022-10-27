@@ -3,14 +3,13 @@
 
 Use the `heartbeat.run_from` option to set the geographic location fields relevant to a given heartbeat instance.
 
-Determines which geographic location to label this monitor as running from. Note, this
-can also be handled by setting the `run_from` option on an individual monitor to apply
-a unique setting to just that monitor.
+The `run_from` option is used to label the geographic location where the monitor is running.
+Note, you can also set the `run_from` option on an individual monitor to apply a unique setting to just that monitor.
 
-Takes two top-level fields: `id` and `geo`, where `id` is a string used to uniquely identify
-the geographic location, and indexed as the `observer.name` field, and `geo` which is a map
-conforming to https://www.elastic.co/guide/en/ecs/current/ecs-geo.html[ECS geo fields] 
-and is indexed under `observer.geo`.
+The `run_from` option takes two top-level fields:
+
+* `id`: A string used to uniquely identify the geographic location. It is indexed as the `observer.name` field.
+* `geo`: A map conforming to https://www.elastic.co/guide/en/ecs/current/ecs-geo.html[ECS geo fields]. It is indexed under `observer.geo`.
 
 Example:
 
