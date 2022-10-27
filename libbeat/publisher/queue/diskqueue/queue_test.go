@@ -28,6 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/require"
 )
 
 var seed int64
@@ -73,6 +75,63 @@ func TestProduceConsumer(t *testing.T) {
 	}
 
 	t.Run("direct", testWith(makeTestQueue()))
+}
+
+func TestMetrics(t *testing.T) {
+	dir, err := ioutil.TempDir("", "diskqueue_test")
+	defer func() {
+		_ = os.RemoveAll(dir)
+	}()
+	require.NoError(t, err)
+	settings := DefaultSettings()
+	settings.Path = dir
+	// lower max segment size so we can get multiple segments
+	settings.MaxSegmentSize = 100
+
+	testQueue, err := NewQueue(logp.L(), settings)
+	require.NoError(t, err)
+	defer testQueue.Close()
+
+	eventsToTest := 100
+
+	// Send events to queue
+	producer := testQueue.Producer(queue.ProducerConfig{})
+	sendEventsToQueue(eventsToTest, producer)
+
+	// fetch metrics before we read any events
+	time.Sleep(time.Millisecond * 100)
+	testMetrics, err := testQueue.Metrics()
+	require.NoError(t, err)
+
+	require.Equal(t, testMetrics.ByteLimit.ValueOr(0), uint64((1 << 30)))
+	require.NotZero(t, testMetrics.ByteCount.ValueOr(0))
+	require.NotZero(t, testMetrics.UnackedConsumedBytes.ValueOr(0))
+
+	// now read & ACK the events
+	batch, err := testQueue.Get(eventsToTest)
+	require.NoError(t, err, "error in Get")
+	// ACK
+	batch.Done()
+
+	// Occupied read should now be zero
+	testMetricsACKed, err := testQueue.Metrics()
+	require.NoError(t, err)
+	require.Zero(t, testMetricsACKed.UnackedConsumedBytes.ValueOr(0))
+
+	// insert again
+	sendEventsToQueue(eventsToTest, producer)
+	// This time, the oldest segment ID should be  > 0
+	time.Sleep(time.Millisecond * 100)
+	testMetricsSecond, err := testQueue.Metrics()
+	require.NoError(t, err)
+	require.NotZero(t, testMetricsSecond.OldestEntryID)
+
+}
+
+func sendEventsToQueue(count int, prod queue.Producer) {
+	for i := 0; i < count; i++ {
+		prod.Publish(queuetest.MakeEvent(mapstr.M{"count": i}))
+	}
 }
 
 func makeTestQueue() queuetest.QueueFactory {

@@ -84,8 +84,21 @@ func (dq *diskQueue) run() {
 			// If there were blocked producers waiting for more queue space,
 			// we might be able to unblock them now.
 			dq.maybeUnblockProducers()
+
+		case metricsReq := <-dq.metricsRequestChan:
+			dq.handleMetricsRequest(metricsReq)
 		}
 	}
+}
+
+// handleMetricsRequest responds to an event on the metricsRequestChan chan
+func (dq *diskQueue) handleMetricsRequest(request metricsRequest) {
+	resp := metricsRequestResponse{
+		sizeOnDisk:    dq.segments.sizeOnDisk(),
+		OccupiedRead:  dq.segments.unACKedReadBytes(),
+		oldestEntryID: dq.segments.oldestIDOnDisk(),
+	}
+	request.response <- resp
 }
 
 func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
