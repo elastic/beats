@@ -19,7 +19,6 @@ package diskqueue
 
 import (
 	"io"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -57,9 +56,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 			plaintext: []byte("encryption and compression"),
 		},
 	}
-	dir, err := os.MkdirTemp("", t.Name())
-	assert.Nil(t, err)
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	for name, tc := range tests {
 		dst := make([]byte, len(tc.plaintext))
 		settings := DefaultSettings()
@@ -133,9 +130,7 @@ func TestSegmentReaderSeek(t *testing.T) {
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 		},
 	}
-	dir, err := os.MkdirTemp("", t.Name())
-	assert.Nil(t, err)
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
@@ -210,9 +205,7 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 			location:   2,
 		},
 	}
-	dir, err := os.MkdirTemp("", t.Name())
-	assert.Nil(t, err)
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir

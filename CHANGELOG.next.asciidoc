@@ -73,12 +73,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
 - Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3, aws-cloudwatch, and lumberjack inputs. {pull}33259[33259]
 - Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
-
-*Auditbeat*
-
-
-*Filebeat*
-
 - Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
 - Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
@@ -128,6 +122,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Improve documentation for symlink handling behaviour in file integrity module. {pull}33430[33430]
+- Ensure file integrity module watch paths are absolute. {pull}33430[33430]
 
 *Filebeat*
 
@@ -159,18 +155,16 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
 - Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
-
-*Auditbeat*
-
-
-*Filebeat*
-
+- Fix handling of invalid UserIP and LocalIP values. {pull}32896[32896]
+- Allow http_endpoint instances to share ports. {issue}32578[32578] {pull}33377[33377]
 
 *Heartbeat*
+
 - Add new states field for internal use by new synthetics app. {pull}30632[30632]
 
-
 *Metricbeat*
+
+- Add Data Granularity option to AWS module to allow for for fewer API calls of longer periods and keep small intervals. {issue}33133[33133] {pull}33166[33166]
 - Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
 
 *Packetbeat*
@@ -178,6 +172,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
 - Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
 - Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
+- Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
 
 *Functionbeat*
 
