@@ -79,7 +79,7 @@ func TestProduceConsumer(t *testing.T) {
 }
 
 func TestMetrics(t *testing.T) {
-	dir, err := ioutil.TempDir("", "diskqueue_test")
+	dir, err := ioutil.TempDir("", "diskqueue_metrics")
 	defer func() {
 		_ = os.RemoveAll(dir)
 	}()
@@ -106,6 +106,7 @@ func TestMetrics(t *testing.T) {
 
 	require.Equal(t, testMetrics.ByteLimit.ValueOr(0), uint64((1 << 30)))
 	require.NotZero(t, testMetrics.ByteCount.ValueOr(0))
+	t.Logf("got %d bytes written", testMetrics.ByteCount.ValueOr(0))
 	require.NotZero(t, testMetrics.UnackedConsumedBytes.ValueOr(0))
 
 	// now read & ACK the events
