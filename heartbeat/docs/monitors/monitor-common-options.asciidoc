@@ -109,14 +109,15 @@ will not be executed by the scheduler.
 [[monitor-run-from]]
 === `run_from`
 
-Determines which geographic location to label this monitor as running from. Note, this
-is usually better handled by using the top level `heartbeat.run_from` option which
-takes the same values, but applies them to every monitor.
+Use the `run_from` option to set the geographic location fields relevant to a given heartbeat monitor.
 
-Takes two top-level fields: `id` and `geo`, where `id` is a string used to uniquely identify
-the geographic location, and indexed as the `observer.name` field, and `geo` which is a map
-conforming to https://www.elastic.co/guide/en/ecs/current/ecs-geo.html[ECS geo fields]
-and is indexed under `observer.geo`.
+The `run_from` option is used to label the geographic location where the monitor is running.
+Note, you can also set the `run_from` option on all monitors via the `heartbeat.run_from` option.
+
+The `run_from` option takes two top-level fields:
+
+* `id`: A string used to uniquely identify the geographic location. It is indexed as the `observer.name` field.
+* `geo`: A map conforming to https://www.elastic.co/guide/en/ecs/current/ecs-geo.html[ECS geo fields]. It is indexed under `observer.geo`.
 
 Example:
 
