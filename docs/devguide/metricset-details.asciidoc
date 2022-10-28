@@ -103,11 +103,19 @@ Here an example for the `fields.yml` file from the MySQL module.
 ----
 include::../../metricbeat/module/mysql/_meta/fields.yml[]
 ----
+<<<<<<< HEAD
 
 There is another `fields.yml` file under `module/{module}/{metricset}/_meta/fields.yml` that contains all fields retrieved
 by the metricset. As field types, each field must have a core data type
 https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-types.html#_core_datatypes[supported by elasticsearch]. Here's a very basic example that shows one group from the MySQL `status` metricset:
 
+=======
++
+* `metricbeat/module/{module}/{metricset}/_meta/fields.yml`: Contains all fields definitions retrieved by the metricset.
+As field types, each field must have a core data type
+{ref}/mapping-types.html#_core_datatypes[supported by elasticsearch]. Here's a very basic example that shows one group from the MySQL `status` metricset:
++
+>>>>>>> 916fab0683 ([DOCS] Fix hard-coded mapping type doc link (#33319))
 [source,yaml]
 ----
 - name: status
