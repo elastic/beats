@@ -9,7 +9,7 @@ Note, you can also set the `run_from` option on an individual monitor to apply a
 The `run_from` option takes two top-level fields:
 
 * `id`: A string used to uniquely identify the geographic location. It is indexed as the `observer.name` field.
-* `geo`: A map conforming to https://www.elastic.co/guide/en/ecs/current/ecs-geo.html[ECS geo fields]. It is indexed under `observer.geo`.
+* `geo`: A map conforming to {ecs-ref}/ecs-geo.html[ECS geo fields]. It is indexed under `observer.geo`.
 
 Example:
 
