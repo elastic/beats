@@ -100,18 +100,19 @@ func TestMetrics(t *testing.T) {
 	sendEventsToQueue(eventsToTest, producer)
 
 	// fetch metrics before we read any events
-	time.Sleep(time.Millisecond * 100)
+	time.Sleep(time.Millisecond * 500)
 	testMetrics, err := testQueue.Metrics()
 	require.NoError(t, err)
 
 	require.Equal(t, testMetrics.ByteLimit.ValueOr(0), uint64((1 << 30)))
 	require.NotZero(t, testMetrics.ByteCount.ValueOr(0))
 	t.Logf("got %d bytes written", testMetrics.ByteCount.ValueOr(0))
-	require.NotZero(t, testMetrics.UnackedConsumedBytes.ValueOr(0))
 
 	// now read & ACK the events
 	batch, err := testQueue.Get(eventsToTest)
 	require.NoError(t, err, "error in Get")
+	time.Sleep(time.Millisecond * 100)
+	require.NotZero(t, testMetrics.UnackedConsumedBytes.ValueOr(0))
 	// ACK
 	batch.Done()
 
