@@ -565,6 +565,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 
 				identifierValue := labels[identifierValueIdx]
 				uniqueIdentifierValue := *output.Label + fmt.Sprint("-", valI)
+
 				// add tags to event based on identifierValue
 				// Check if identifier includes dimensionSeparator (comma in this case),
 				// split the identifier and check for each sub-identifier.
