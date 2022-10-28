@@ -21,6 +21,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: octokit/graphql-action@v2.x
+        id: add_to_project
+        if: ${{ github.event.label.name == env.DATA_PLANE_LABEL || github.event.label.name == env.CONTROL_PLANE_LABEL || github.event.label.name == env.ECOSYSTEM_LABEL || github.event.label.name == env.FLEET_LABEL }}
+        with:
+          query: |
+            # Variables have to be snake cased because of https://github.com/octokit/graphql-action/issues/164
+            mutation AddToIngestProject($project_id: ID!, $content_id: ID!) {
+              addProjectV2ItemById(input: { projectId: $project_id, contentId: $content_id }) {
+                  item {
+                    id
+                  }
+                }
+              }
+          project_id: ${{ env.INGEST_PROJECT_ID }}
+          content_id: ${{ github.event.issue.node_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PROJECT_ASSIGNER_TOKEN }}
+      - uses: octokit/graphql-action@v2.x
         id: set_elastic_agent_area
         if: github.event.label.name == env.DATA_PLANE_LABEL || github.event.label.name == env.CONTROL_PLANE_LABEL || github.event.label.name == env.ELASTIC_AGENT_LABEL
         with:
