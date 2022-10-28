@@ -45648,7 +45648,7 @@ type: keyword
 *`kubernetes.node.cpu.allocatable.cores`*::
 +
 --
-Node CPU allocatable cores
+Node CPU allocatable cores for pods
 
 
 type: float
@@ -45669,7 +45669,7 @@ type: long
 *`kubernetes.node.memory.allocatable.bytes`*::
 +
 --
-Node allocatable memory in bytes
+Node allocatable memory for pods in bytes
 
 
 type: long
