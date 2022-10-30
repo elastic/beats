@@ -30,6 +30,7 @@ import (
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -71,6 +72,14 @@ func (l *TestUDPProcessor) Process(id *flows.FlowID, pkt *protos.Packet) {
 	l.pkt = pkt
 }
 
+type TestMultiUDPProcessor struct {
+	pkt []*protos.Packet
+}
+
+func (l *TestMultiUDPProcessor) Process(id *flows.FlowID, pkt *protos.Packet) {
+	l.pkt = append(l.pkt, pkt)
+}
+
 // 172.16.16.164:1108 172.16.16.139:53 DNS 87  Standard query 0x0007  AXFR contoso.local
 var ipv4TcpDNS = []byte{
 	0x00, 0x0c, 0x29, 0xce, 0xd1, 0x9e, 0x00, 0x0c, 0x29, 0x7e, 0xec, 0xa4, 0x08, 0x00, 0x45, 0x00,
@@ -83,7 +92,7 @@ var ipv4TcpDNS = []byte{
 
 // Test that DecodePacket decodes and IPv4/TCP packet and invokes the TCP processor.
 func TestDecodePacketData_ipv4Tcp(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("decoder"))
+	_ = logp.TestingSetup(logp.WithSelectors("decoder"))
 
 	p := gopacket.NewPacket(ipv4TcpDNS, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
@@ -209,4 +218,55 @@ func newTestDecoder(t *testing.T) (*Decoder, *TestTCPProcessor, *TestUDPProcesso
 		t.Fatalf("Error creating decoder %v", err)
 	}
 	return d, tcpLayer, udpLayer
+}
+
+func TestFragment(t *testing.T) {
+	h, err := pcap.OpenOffline("testdata/udp_edns0_resp.pcap")
+	if err != nil {
+		t.Fatalf("failed to open test pcap: %v", err)
+	}
+
+	src := gopacket.NewPacketSource(h, h.LinkType())
+	var packets []gopacket.Packet
+	for p := range src.Packets() {
+		packets = append(packets, p)
+	}
+	assert.Equal(t, 3, len(packets), "unexpected number of packets in stream")
+
+	var payload []byte
+	t.Run("in_order", func(t *testing.T) {
+		d, tcp, udp := newTestDecoder(t)
+		for _, p := range packets {
+			d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
+		}
+
+		// Details confirmed by inspection of the test pcap with Wireshark.
+		assert.Nil(t, tcp.pkt, "unexpected non-nil TCP packet")
+		assert.NotNil(t, udp.pkt, "UDP packet not received")
+		assert.Equal(t, "8.8.8.8", udp.pkt.Tuple.SrcIP.String(), "unexpected source IP")
+		assert.Equal(t, uint16(53), udp.pkt.Tuple.SrcPort, "unexpected source port")
+		assert.Equal(t, "192.168.178.24", udp.pkt.Tuple.DstIP.String(), "unexpected destination IP")
+		assert.Equal(t, uint16(35873), udp.pkt.Tuple.DstPort, "unexpected destination port")
+		assert.Equal(t, len(udp.pkt.Payload), 3398, "unexpected payload length")
+		payload = udp.pkt.Payload
+	})
+
+	t.Run("out_of_order", func(t *testing.T) {
+		d, tcp, udp := newTestDecoder(t)
+
+		// Reverse the order of the packets.
+		for i := len(packets) - 1; i >= 0; i-- {
+			p := packets[i]
+			d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
+		}
+
+		// Details confirmed by inspection of the test pcap with Wireshark.
+		assert.Nil(t, tcp.pkt, "unexpected non-nil TCP packet")
+		assert.NotNil(t, udp.pkt, "UDP packet not received")
+		assert.Equal(t, "8.8.8.8", udp.pkt.Tuple.SrcIP.String(), "unexpected source IP")
+		assert.Equal(t, uint16(53), udp.pkt.Tuple.SrcPort, "unexpected source port")
+		assert.Equal(t, "192.168.178.24", udp.pkt.Tuple.DstIP.String(), "unexpected destination IP")
+		assert.Equal(t, uint16(35873), udp.pkt.Tuple.DstPort, "unexpected destination port")
+		assert.Equal(t, udp.pkt.Payload, payload, "unexpected payload")
+	})
 }
