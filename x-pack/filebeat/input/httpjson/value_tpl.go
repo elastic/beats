@@ -116,6 +116,9 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 	data.Put("first_event", trCtx.firstEventClone())
 	data.Put("last_event", trCtx.lastEventClone())
 	data.Put("last_response", trCtx.lastResponseClone().templateValues())
+	if trCtx.firstResponse != nil {
+		data.Put("first_response", trCtx.firstResponseClone().templateValues())
+	}
 
 	if err := t.Template.Execute(buf, data); err != nil {
 		return fallback(err)

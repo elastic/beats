@@ -109,7 +109,7 @@ The state has the following elements:
 - `last_response.url.params`: A https://pkg.go.dev/net/url#Values[`url.Values`] of the params from the URL in `last_response.url.value`.  Can be queried with the https://pkg.go.dev/net/url#Values.Get[`Get`] function.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
-- `last_response.page`: A number indicating the page number of the last response.
+- `last_response.page`: A number indicating the page number of the last response. It starts with the value `0` at every interval.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
 - `last_event`: A map representing the last event of the current request in the requests chain (result from applying transforms to `last_response.body`).
 - `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
@@ -531,7 +531,7 @@ List of transforms to apply to the request before each execution.
 
 Available transforms for request: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
+Can read state from: [`.first_response.*`,`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 
@@ -633,6 +633,7 @@ filebeat.inputs:
 ==== `response.split`
 
 Split operation to apply to the response once it is received. A split can convert a map, array, or string into multiple events.
+If the split target is empty the parent document will be kept. If documents with empty splits should be dropped, the `ignore_empty_value` option should be set to `true`.
 
 [float]
 ==== `response.split[].target`
@@ -1133,6 +1134,92 @@ request_url using file_name as 'file_2': \https://example.com/services/data/v1.0
 +
 Collect and make events from response in any format supported by httpjson for all calls.
 
++
+[[chain-step-replace_with]]
+[float]
+==== `chain[].step.replace_with`
+
+The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value. 
+The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables 
+like [`.last_response.*`, `.first_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
+thus providing a lot of flexibility in the logic of chain requests.
+
+Example:
+
+- First call: \https://example.com/services/data/v1.0/exports
++
+<<response-json1-replace_with,response>>
+
+- Second call: \https://example.com/services/data/v1.0/$.exportId/files
++
+<<response-json2-replace_with,response>>
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - step:
+      request.url: https://example.com/services/data/v1.0/$.exportId/files
+      request.method: GET
+      replace_with: '$.exportId,first_response.body.exportId'
+----
+
+Example:
+
+- First call to fetch exportId
+
++
+request_url: \https://example.com/services/data/v1.0/exports
+
++
+response_json:
+
++
+[[response-json1-replace_with]]
+["source","json",subs="attributes"]
+----
+{
+    "exportId" : "2212"
+}
+----
+
+- Second call to fetch `file ids` using exportId from first call.
+
++
+request_url using exportId as '2212': \https://example.com/services/data/v1.0/2212/files
+
++
+response_json using exportId as '2212':
+
++
+[[response-json2-replace_with]]
+["source","json",subs="attributes"]
+----
+{
+    "files": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
+
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the 
+`replace_with` processor with exact string matching.
+
 [float]
 ==== `chain[].while`
 
@@ -1177,7 +1264,7 @@ Example:
 
 - Third call: \http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
 +
-<<response-json3-while,response 1>> , <<response-json4-while,response 2>>
+<<response-json3-while,response 1>>, <<response-json4-while,response 2>>
 
 ["source","yaml",subs="attributes"]
 ----
@@ -1289,6 +1376,11 @@ response_json using id as '2':
 Collect and make events from response in any format supported by httpjson for all calls.
 
 NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
+
+[float]
+==== `chain[].while.replace_with`
+
+See  <<chain-step-replace_with, chain[].step.replace_with>> .
 
 [[cursor]]
 [float]

@@ -516,5 +516,90 @@
             "forwarded",
             "iptables"
         ]
+    },
+    {
+        "destination.ip": "10.251.1.1",
+        "destination.mac": "0a:ea:10:00:f0:06",
+        "destination.port": 9000,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "iptables.log",
+        "event.kind": "event",
+        "event.module": "iptables",
+        "event.original": "Jun 28 04:35:30 Abc-A1 [SOMETHING-1234-A] IN=abc.123 OUT=abc.123 MAC=0a:ea:10:00:f0:06:10:e1:21:31:61:20:01:00:41:00:00:01 SRC=10.251.1.1 DST=10.251.1.1 LEN=32 TOS=00 PREC=0x00 TTL=63 ID=12345 PROTO=UDP SPT=9000 DPT=9000 LEN=12 MARK=0",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "iptables.ether_type": 256,
+        "iptables.id": 12345,
+        "iptables.input_device": "abc.123",
+        "iptables.length": 32,
+        "iptables.output_device": "abc.123",
+        "iptables.precedence_bits": 0,
+        "iptables.tos": 0,
+        "iptables.ttl": 63,
+        "iptables.udp.length": 12,
+        "log.offset": 2603,
+        "network.community_id": "1:lfOjndLd+4T6slJDyt61NIoEYHM=",
+        "network.transport": "udp",
+        "related.ip": [
+            "10.251.1.1",
+            "10.251.1.1"
+        ],
+        "service.type": "iptables",
+        "source.ip": "10.251.1.1",
+        "source.mac": "10:e1:21:31:61:20",
+        "source.port": 9000,
+        "tags": [
+            "forwarded",
+            "iptables"
+        ]
+    },
+    {
+        "destination.ip": "10.251.1.1",
+        "destination.mac": "0a:ea:10:00:f0:06",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "iptables.log",
+        "event.kind": "event",
+        "event.module": "iptables",
+        "event.original": "Jun 28 04:30:32 Abc-A1 [SOMETHING-1234-A] IN=abc.123 OUT=abc.123 MAC=0a:ea:10:00:f0:06:10:e1:21:31:61:20:01:00:41:00:00:01 SRC=10.251.1.1 DST=10.251.1.1 LEN=84 TOS=00 PREC=0x00 TTL=63 ID=6789 PROTO=ICMP TYPE=8 CODE=0 ID=98765 SEQ=30123 MARK=0",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "iptables.ether_type": 256,
+        "iptables.icmp.code": 0,
+        "iptables.icmp.id": 98765,
+        "iptables.icmp.seq": 30123,
+        "iptables.icmp.type": 8,
+        "iptables.id": 6789,
+        "iptables.input_device": "abc.123",
+        "iptables.length": 84,
+        "iptables.output_device": "abc.123",
+        "iptables.precedence_bits": 0,
+        "iptables.tos": 0,
+        "iptables.ttl": 63,
+        "log.offset": 2838,
+        "network.community_id": "1:FRJfyWaZVkG3e+uSp7d4BFAySFw=",
+        "network.transport": "icmp",
+        "related.ip": [
+            "10.251.1.1",
+            "10.251.1.1"
+        ],
+        "service.type": "iptables",
+        "source.ip": "10.251.1.1",
+        "source.mac": "10:e1:21:31:61:20",
+        "tags": [
+            "forwarded",
+            "iptables"
+        ]
     }
 ]
