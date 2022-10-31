@@ -7,7 +7,7 @@ package httpjson
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -709,25 +709,25 @@ func TestInput(t *testing.T) {
 					case "/link1":
 						fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213"}`)
 					case "/2212/1":
-						body, _ := ioutil.ReadAll(r.Body)
+						body, _ := io.ReadAll(r.Body)
 						r.Body.Close()
 						if string(body) == `{"exportId":"2212"}` {
 							fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
 						}
 					case "/2212/2":
-						body, _ := ioutil.ReadAll(r.Body)
+						body, _ := io.ReadAll(r.Body)
 						r.Body.Close()
 						if string(body) == `{"exportId":"2212"}` {
 							fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
 						}
 					case "/2213/3":
-						body, _ := ioutil.ReadAll(r.Body)
+						body, _ := io.ReadAll(r.Body)
 						r.Body.Close()
 						if string(body) == `{"exportId":"2213"}` {
 							fmt.Fprintln(w, `{"hello":{"cake":"pumpkin"}}`)
 						}
 					case "/2213/4":
-						body, _ := ioutil.ReadAll(r.Body)
+						body, _ := io.ReadAll(r.Body)
 						r.Body.Close()
 						if string(body) == `{"exportId":"2213"}` {
 							fmt.Fprintln(w, `{"space":{"world":"moon"}}`)
@@ -922,7 +922,7 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			msg = fmt.Sprintf(`{"error":"expected method was %q"}`, expectedMethod)
 		case expectedBody != "":
-			body, _ := ioutil.ReadAll(r.Body)
+			body, _ := io.ReadAll(r.Body)
 			r.Body.Close()
 			if expectedBody != string(body) {
 				w.WriteHeader(http.StatusBadRequest)
