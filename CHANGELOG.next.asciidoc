@@ -158,6 +158,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
 - Fix handling of invalid UserIP and LocalIP values. {pull}32896[32896]
 - Allow http_endpoint instances to share ports. {issue}32578[32578] {pull}33377[33377]
+- Improve httpjson documentation for split processor. {pull}33473[33473]
 
 *Heartbeat*
 
