@@ -531,9 +531,12 @@ List of transforms to apply to the request before each execution.
 
 Available transforms for request: [`append`, `delete`, `set`].
 
-Can read state from: [`.first_response.*`,`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
+Can read state from: [`.first_response.*`,`.last_response.*`, `.parent_last_response.*` `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
+
+NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination 
+does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -1140,7 +1143,7 @@ Collect and make events from response in any format supported by httpjson for al
 
 The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value. 
 The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables 
-like [`.last_response.*`, `.first_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
+like [`last_response.*`, `first_response.*`, `parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
 thus providing a lot of flexibility in the logic of chain requests.
 
 Example:
@@ -1217,7 +1220,9 @@ response_json using exportId as '2212':
 This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
 
 NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the 
-`replace_with` processor with exact string matching.
+`replace_with` processor with exact string matching. The `value` should not start with a `.` (dot). For example, if we want to
+extract the value from the last_response context object, the `replace_with` clause should look like: `replace_with:'$.xyz_pattern,last_response.body.id'`
+and not `replace_with:'$.xyz_pattern,.last_response.body.id'`.  
 
 [float]
 ==== `chain[].while`

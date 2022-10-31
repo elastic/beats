@@ -21,8 +21,14 @@ import (
 )
 
 const (
-	lastResponse  = "last_response"
+	// This is generally updated with chain responses, if present, as they continue to occur
+	// Otherwise this is always the last response of the root request w.r.t pagination
+	lastResponse = "last_response"
+	// This is always the first root response
 	firstResponse = "first_response"
+	// This is always the last response of the parent (root) request w.r.t pagination
+	// This is only set if chaining is used
+	parentLastResponse = "parent_last_response"
 )
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {
@@ -100,7 +106,16 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 
 	switch keys := strings.Split(expression, "."); keys[0] {
 	case lastResponse:
-		respMap, err := responseToMap(trCtx.lastResponse, true)
+		respMap, err := responseToMap(trCtx.lastResponse)
+		if err != nil {
+			return "", false, err
+		}
+		val, err = iterateRecursive(respMap, keys[1:], 0)
+		if err != nil {
+			return "", false, err
+		}
+	case parentLastResponse:
+		respMap, err := responseToMap(trCtx.parentTrCtx.lastResponse)
 		if err != nil {
 			return "", false, err
 		}
@@ -110,7 +125,7 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 		}
 	case firstResponse:
 		// since first response body is already a map, we do not need to transform it
-		respMap, err := responseToMap(trCtx.firstResponse, false)
+		respMap, err := responseToMap(trCtx.firstResponse)
 		if err != nil {
 			return "", false, err
 		}
@@ -118,6 +133,9 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 		if err != nil {
 			return "", false, err
 		}
+	// In this scenario we treat the expression as a hardcoded value, with which we will replace the fixed-pattern
+	case expression:
+		return expression, true, nil
 	default:
 		return "", false, fmt.Errorf("context value not supported: %q in %q", keys[0], expression)
 	}
@@ -125,7 +143,7 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 	return fmt.Sprint(val), true, nil
 }
 
-func responseToMap(r *response, mapBody bool) (mapstr.M, error) {
+func responseToMap(r *response) (mapstr.M, error) {
 	if r.body == nil {
 		return nil, fmt.Errorf("response body is empty for request url: %s", &r.url)
 	}
@@ -139,16 +157,7 @@ func responseToMap(r *response, mapBody bool) (mapstr.M, error) {
 			key: value,
 		}
 	}
-	if mapBody {
-		var bodyMap mapstr.M
-		err := json.Unmarshal(r.body.([]byte), &bodyMap)
-		if err != nil {
-			return nil, err
-		}
-		respMap["body"] = bodyMap
-	} else {
-		respMap["body"] = r.body
-	}
+	respMap["body"] = r.body
 
 	return respMap, nil
 }
@@ -172,7 +181,7 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 	case reflect.String:
 		return v.String(), nil
 	case reflect.Map:
-		nextMap, ok := v.Interface().(mapstr.M)
+		nextMap, ok := v.Interface().(map[string]interface{})
 		if !ok {
 			return nil, errors.New("unable to parse the value of the given expression")
 		}

@@ -667,6 +667,91 @@ func TestInput(t *testing.T) {
 				`{"space":{"cake":"pumpkin"}}`,
 			},
 		},
+		{
+			name: "Test global transform context separation with parent_last_response object",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				var serverURL string
+				registerPaginationTransforms()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						link := serverURL + "/link1"
+						value := fmt.Sprintf(`{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212", "nextLink":"%s"}`, link)
+						fmt.Fprintln(w, value)
+					case "/link1":
+						fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213"}`)
+					case "/2212/1":
+						body, _ := ioutil.ReadAll(r.Body)
+						r.Body.Close()
+						if string(body) == `{"exportId":"2212"}` {
+							fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+						}
+					case "/2212/2":
+						body, _ := ioutil.ReadAll(r.Body)
+						r.Body.Close()
+						if string(body) == `{"exportId":"2212"}` {
+							fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+						}
+					case "/2213/3":
+						body, _ := ioutil.ReadAll(r.Body)
+						r.Body.Close()
+						if string(body) == `{"exportId":"2213"}` {
+							fmt.Fprintln(w, `{"hello":{"cake":"pumpkin"}}`)
+						}
+					case "/2213/4":
+						body, _ := ioutil.ReadAll(r.Body)
+						r.Body.Close()
+						if string(body) == `{"exportId":"2213"}` {
+							fmt.Fprintln(w, `{"space":{"world":"moon"}}`)
+						}
+					}
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				serverURL = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":                            1,
+				"request.method":                      http.MethodPost,
+				"response.request_body_on_pagination": true,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodPost,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,parent_last_response.body.exportId",
+							"request.transforms": []interface{}{
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.exportId",
+										"value":  "[[ .parent_last_response.body.exportId ]]",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+				`{"hello":{"cake":"pumpkin"}}`,
+				`{"space":{"world":"moon"}}`,
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
