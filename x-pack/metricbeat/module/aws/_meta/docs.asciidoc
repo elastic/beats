@@ -37,6 +37,17 @@ or none get collected by Metricbeat. In this case, please specify a `latency`
 parameter so collection start time and end time will be shifted by the given
 latency amount.
 
+* *data_granularity*
+
+AWS CloudWatch allows to define the granularity of the returned datapoints, by setting "Period" while querying metrics.
+Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html[MetricDataQuery parameters] for more information.
+
+By default, metricbeat will query CloudWatch setting "Period" to Metricbeat collection period. If you wish to set a custom value for "Period", please specify a `data_granularity` parameter.
+By setting `period` and `data_granularity` together, you can control, respectively, how frequently you want your metrics to be collected and how granular they have to be.
+
+If you are concerned about reducing the cost derived by CloudWatch API calls made by Metricbeat with an extra delay in retrieving metrics as trade off, you may consider setting `data_granularity` and increase Metricbeat collection period. For example,
+setting `data_granularity` to your current value for `period`, and doubling the value of `period`, may lead to a 50% savings in terms of GetMetricData API calls cost.
+
 * *endpoint*
 
 Most AWS services offer a regional endpoint that can be used to make requests.
@@ -57,7 +68,7 @@ For example, if tags parameter is given as `Organization=Engineering` under
 `Organization` and tag value equals to `Engineering`. In order to filter for different
 values for the same key, add the values to the value array (see example)
 
-Note: tag filtering only works for metricsets with `resource_type` specified in the 
+Note: tag filtering only works for metricsets with `resource_type` specified in the
 metricset-specific configuration.
 
 [source,yaml]

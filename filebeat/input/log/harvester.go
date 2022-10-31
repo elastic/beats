@@ -461,10 +461,7 @@ func (h *Harvester) onMessage(
 				"_id": id,
 			}
 		}
-	} else if &text != nil {
-		if fields == nil {
-			fields = mapstr.M{}
-		}
+	} else if len(text) != 0 {
 		fields["message"] = text
 	}
 

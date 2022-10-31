@@ -38,7 +38,7 @@ func TestInput(t *testing.T) {
 				"interval":       1,
 				"request.method": http.MethodGet,
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -49,7 +49,7 @@ func TestInput(t *testing.T) {
 				"request.method":                http.MethodGet,
 				"request.ssl.verification_mode": "none",
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -85,7 +85,7 @@ func TestInput(t *testing.T) {
 					"test": "abc",
 				},
 			},
-			handler:  defaultHandler(http.MethodPost, `{"test":"abc"}`),
+			handler:  defaultHandler(http.MethodPost, `{"test":"abc"}`, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -95,7 +95,7 @@ func TestInput(t *testing.T) {
 				"interval":       "100ms",
 				"request.method": http.MethodPost,
 			},
-			handler: defaultHandler(http.MethodPost, ""),
+			handler: defaultHandler(http.MethodPost, "", ""),
 			expected: []string{
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
@@ -111,7 +111,7 @@ func TestInput(t *testing.T) {
 					"target": "body.hello",
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
@@ -125,11 +125,38 @@ func TestInput(t *testing.T) {
 					"keep_parent": true,
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"hello":{"space":[{"cake":"pumpkin"}]}}`,
 			},
+		},
+		{
+			name:        "Test split on empty array without ignore_empty_value",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target": "body.response.empty",
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", `{"response":{"empty":[]}}`),
+			expected: []string{`{"response":{"empty":[]}}`},
+		},
+		{
+			name:        "Test split on empty array with ignore_empty_value",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target":             "body.response.empty",
+					"ignore_empty_value": true,
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", `{"response":{"empty":[]}}`),
+			expected: nil,
 		},
 		{
 			name:        "Test nested split",
@@ -145,7 +172,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"world":"moon"}`,
 				`{"space":{"cake":"pumpkin"}}`,
@@ -161,7 +188,7 @@ func TestInput(t *testing.T) {
 					"target": "body.unknown",
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{},
 		},
 		{
@@ -209,28 +236,41 @@ func TestInput(t *testing.T) {
 			name: "Test pagination",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				registerPaginationTransforms()
+				registerResponseTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				server := httptest.NewServer(h)
 				config["request.url"] = server.URL
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       time.Second,
+				"interval":       time.Millisecond,
 				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.items",
+					"transforms": []interface{}{
+						map[string]interface{}{
+							"set": map[string]interface{}{
+								"target": "body.page",
+								"value":  "[[.last_response.page]]",
+							},
+						},
+					},
 				},
 				"response.pagination": []interface{}{
 					map[string]interface{}{
 						"set": map[string]interface{}{
-							"target": "url.params.page",
-							"value":  "[[.last_response.body.nextPageToken]]",
+							"target":                 "url.params.page",
+							"value":                  "[[.last_response.body.nextPageToken]]",
+							"fail_on_template_error": true,
 						},
 					},
 				},
 			},
-			handler:  paginationHandler(),
-			expected: []string{`{"foo":"a"}`, `{"foo":"b"}`},
+			handler: paginationHandler(),
+			expected: []string{
+				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+			},
 		},
 		{
 			name: "Test first event",
@@ -353,7 +393,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodPost, `{"bar":"foo","url":{"path":"/test-path"}}`),
+			handler:  defaultHandler(http.MethodPost, `{"bar":"foo","url":{"path":"/test-path"}}`, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -386,7 +426,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -404,7 +444,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -444,7 +484,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -519,7 +559,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
@@ -541,7 +581,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"hello":{"space":[{"cake":"pumpkin"}]}}`,
@@ -572,7 +612,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"world":"moon"}`,
 				`{"space":{"cake":"pumpkin"}}`,
@@ -602,7 +642,53 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test replace_with clause and first_response object",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"exportId":"2212"}`)
+					case "/2212":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/2212/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId"
+				config["chain.1.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.exportId",
+						},
+					},
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,first_response.body.exportId",
+						},
+					},
+				},
+			},
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"space":{"cake":"pumpkin"}}`,
@@ -640,6 +726,11 @@ func TestInput(t *testing.T) {
 			t.Cleanup(func() { _ = timeout.Stop() })
 
 			if len(tc.expected) == 0 {
+				select {
+				case <-timeout.C:
+				case got := <-chanClient.Channel:
+					t.Errorf("unexpected event: %v", got)
+				}
 				cancel()
 				assert.NoError(t, g.Wait())
 				return
@@ -735,10 +826,12 @@ func newV2Context() (v2.Context, func()) {
 	}, cancel
 }
 
-func defaultHandler(expectedMethod, expectedBody string) http.HandlerFunc {
+func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
-		msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+		if msg == "" {
+			msg = `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+		}
 		switch {
 		case r.Method != expectedMethod:
 			w.WriteHeader(http.StatusBadRequest)
@@ -881,6 +974,8 @@ func paginationHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","items":[{"foo":"c"}]}`))
 		case 3:
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:03Z","items":[{"foo":"d"}]}`))
+			count = 0
+			return
 		}
 		count += 1
 	}
