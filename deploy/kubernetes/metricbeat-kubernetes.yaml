@@ -1,4 +1,3 @@
----
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -6,47 +5,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: metricbeat
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: metricbeat
-subjects:
-- kind: ServiceAccount
-  name: metricbeat
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: metricbeat
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: metricbeat
-  namespace: kube-system
-subjects:
-  - kind: ServiceAccount
-    name: metricbeat
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: metricbeat
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: metricbeat-kubeadm-config
-  namespace: kube-system
-subjects:
-  - kind: ServiceAccount
-    name: metricbeat
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: metricbeat-kubeadm-config
-  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -130,6 +88,47 @@ rules:
     resourceNames:
       - kubeadm-config
     verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: metricbeat
+subjects:
+- kind: ServiceAccount
+  name: metricbeat
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: metricbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metricbeat
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: metricbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: metricbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metricbeat-kubeadm-config
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: metricbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: metricbeat-kubeadm-config
+  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: v1
 kind: ConfigMap
