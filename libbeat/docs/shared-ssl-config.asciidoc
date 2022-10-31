@@ -386,6 +386,14 @@ present in the chain during the handshake, it will be added to the
 `certificate_authorities` list and the handshake will continue
 normaly.
 
+One way to get the fingerprint from a CA certificate is using the
+following command where `ca.crt` is the certificate.
+
+[source]
+------------------------
+openssl x509 -fingerprint -sha256 -noout -in ./ca.crt | awk --field-separator="=" '{print $2}' | sed 's/://g'
+------------------------
+
 
 [discrete]
 [[ssl-server-config]]
