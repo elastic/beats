@@ -7,6 +7,15 @@
 === Beats version 8.5.0
 https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 
+==== Known issues
+
+*Affecting most Beats*
+
+Due to a recent change in the Red Hat scan verification process,
+this version of {heartbeat}, {filebeat}, {metricbeat}, and {auditbeat} are not available in the Red Hat Ecosystem Catalog.
+This bug will be fixed in the next release.
+Please use the https://www.docker.elastic.co/search?q=beats[Elastic docker registry] to download 8.5.0 images.
+
 ==== Breaking changes
 
 *Affecting all Beats*
