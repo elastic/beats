@@ -573,7 +573,6 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				}
 
 				identifierValue := labels[identifierValueIdx]
-<<<<<<< HEAD
 				if _, ok := events[identifierValue]; !ok {
 					// when tagsFilter is not empty but no entry in
 					// resourceTagMap for this identifier, do not initialize
@@ -586,30 +585,23 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 
 				// add tags to event based on identifierValue
-				insertTags(events, identifierValue, resourceTagMap)
-=======
-				uniqueIdentifierValue := *output.Label + fmt.Sprint("-", valI)
-
-				// add tags to event based on identifierValue
 				// Check if identifier includes dimensionSeparator (comma in this case),
 				// split the identifier and check for each sub-identifier.
 				// For example, identifier might be [storageType, s3BucketName].
 				// And tags are only store under s3BucketName in resourceTagMap.
 				subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
 				for _, subIdentifier := range subIdentifiers {
-					if _, ok := events[uniqueIdentifierValue]; !ok {
+					if _, ok := events[identifierValue]; !ok {
 						// when tagsFilter is not empty but no entry in
 						// resourceTagMap for this identifier, do not initialize
 						// an event for this identifier.
 						if len(tagsFilter) != 0 && resourceTagMap[subIdentifier] == nil {
 							continue
 						}
-						events[uniqueIdentifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, output.Timestamps[valI])
+						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+						insertTags(events, identifierValue, subIdentifier, resourceTagMap)
 					}
-					events[uniqueIdentifierValue] = insertRootFields(events[uniqueIdentifierValue], metricDataResultValue, labels)
-					insertTags(events, uniqueIdentifierValue, subIdentifier, resourceTagMap)
 				}
->>>>>>> 50c6ae5f3a ([AWS] Add tags to events based on parsed identifier (#33472))
 			}
 		}
 	}
@@ -649,31 +641,7 @@ func compareAWSDimensions(dim1 []types.Dimension, dim2 []types.Dimension) bool {
 	return reflect.DeepEqual(dim1NameToValue, dim2NameToValue)
 }
 
-<<<<<<< HEAD
-func insertTags(events map[string]mb.Event, identifier string, resourceTagMap map[string][]resourcegroupstaggingapitypes.Tag) {
-	// Check if identifier includes dimensionSeparator (comma in this case),
-	// split the identifier and check for each sub-identifier.
-	// For example, identifier might be [storageType, s3BucketName].
-	// And tags are only store under s3BucketName in resourceTagMap.
-	subIdentifiers := strings.Split(identifier, dimensionSeparator)
-	for _, v := range subIdentifiers {
-		tags := resourceTagMap[v]
-		// some metric dimension values are arn format, eg: AWS/DDOS namespace metric
-		if len(tags) == 0 && strings.HasPrefix(v, "arn:") {
-			resourceID, err := aws.FindShortIdentifierFromARN(v)
-			if err == nil {
-				tags = resourceTagMap[resourceID]
-			}
-		}
-		if len(tags) != 0 {
-			// By default, replace dot "." using underscore "_" for tag keys.
-			// Note: tag values are not dedotted.
-			for _, tag := range tags {
-				_, _ = events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
-			}
-			continue
-=======
-func insertTags(events map[string]mb.Event, uniqueIdentifierValue string, subIdentifier string, resourceTagMap map[string][]resourcegroupstaggingapitypes.Tag) {
+func insertTags(events map[string]mb.Event, identifier string, subIdentifier string, resourceTagMap map[string][]resourcegroupstaggingapitypes.Tag) {
 	tags := resourceTagMap[subIdentifier]
 	// some metric dimension values are arn format, eg: AWS/DDOS namespace metric
 	if len(tags) == 0 && strings.HasPrefix(subIdentifier, "arn:") {
@@ -686,8 +654,7 @@ func insertTags(events map[string]mb.Event, uniqueIdentifierValue string, subIde
 		// By default, replace dot "." using underscore "_" for tag keys.
 		// Note: tag values are not dedotted.
 		for _, tag := range tags {
-			_, _ = events[uniqueIdentifierValue].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
->>>>>>> 50c6ae5f3a ([AWS] Add tags to events based on parsed identifier (#33472))
+			_, _ = events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
 		}
 	}
 }

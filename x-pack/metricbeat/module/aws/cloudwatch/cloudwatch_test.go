@@ -1561,14 +1561,10 @@ func TestInsertTags(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-<<<<<<< HEAD
-			insertTags(events, c.identifier, resourceTagMap)
-=======
 			subIdentifiers := strings.Split(c.identifier, dimensionSeparator)
 			for _, subIdentifier := range subIdentifiers {
 				insertTags(events, c.identifier, subIdentifier, resourceTagMap)
 			}
->>>>>>> 50c6ae5f3a ([AWS] Add tags to events based on parsed identifier (#33472))
 			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)
 			assert.NoError(t, err)
 			assert.Equal(t, c.expectedTagValue, value)
