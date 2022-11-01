@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"golang.org/x/sync/semaphore"
-	"gotest.tools/gotestsum/log"
 
 	"github.com/osquery/osquery-go"
 	genosquery "github.com/osquery/osquery-go/gen/osquery"
@@ -132,7 +131,7 @@ func (c *Client) reconnect(ctx context.Context) error {
 	return r.Run(ctx, func(ctx context.Context) error {
 		cli, err := osquery.NewClient(c.socketPath, c.timeout)
 		if err != nil {
-			log.Errorf("failed to connect: %v", err)
+			r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", err)
 			return err
 		}
 		c.cli = cli
