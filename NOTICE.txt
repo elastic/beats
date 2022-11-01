@@ -17199,11 +17199,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/magefile/mage
-Version: v1.14.0
+Version: v1.13.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/magefile/mage@v1.14.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/magefile/mage@v1.13.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
