@@ -109,7 +109,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *p.MetricFamily) []collector.Prom
 				events = append(events, collector.PromEvent{
 					Data: mapstr.M{
 						name + "_sum":   g.rateCounterFloat64(name, labels, summary.GetSampleSum()),
-						name + "_count": g.rateCounterUint64(name, labels, summary.GetSampleCount()),
+						name + "_count": g.rateCounterUint64(name, labels, uint64(summary.GetSampleCount())),
 					},
 					Labels: labels,
 				})

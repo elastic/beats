@@ -116,12 +116,12 @@ func (m *Quantile) GetValue() float64 {
 }
 
 type Summary struct {
-	SampleCount *uint64
+	SampleCount *float64
 	SampleSum   *float64
 	Quantile    []*Quantile
 }
 
-func (m *Summary) GetSampleCount() uint64 {
+func (m *Summary) GetSampleCount() float64 {
 	if m != nil && m.SampleCount != nil {
 		return *m.SampleCount
 	}
@@ -154,12 +154,12 @@ func (m *Unknown) GetValue() float64 {
 }
 
 type Bucket struct {
-	CumulativeCount *uint64
+	CumulativeCount *float64
 	UpperBound      *float64
 	Exemplar        *exemplar.Exemplar
 }
 
-func (m *Bucket) GetCumulativeCount() uint64 {
+func (m *Bucket) GetCumulativeCount() float64 {
 	if m != nil && m.CumulativeCount != nil {
 		return *m.CumulativeCount
 	}
@@ -174,13 +174,13 @@ func (m *Bucket) GetUpperBound() float64 {
 }
 
 type Histogram struct {
-	SampleCount      *uint64
+	SampleCount      *float64
 	SampleSum        *float64
 	Bucket           []*Bucket
 	IsGaugeHistogram bool
 }
 
-func (m *Histogram) GetSampleCount() uint64 {
+func (m *Histogram) GetSampleCount() float64 {
 	if m != nil && m.SampleCount != nil {
 		return *m.SampleCount
 	}
@@ -371,8 +371,7 @@ func summaryMetricName(name string, s float64, qv string, lbls string, summaries
 
 	switch {
 	case isCount(name):
-		u := uint64(s)
-		summary.SampleCount = &u
+		summary.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		summary.SampleSum = &s
@@ -423,15 +422,13 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 
 	switch {
 	case isCount(name):
-		u := uint64(s)
-		histogram.SampleCount = &u
+		histogram.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		histogram.SampleSum = &s
 		name = strings.TrimSuffix(name, suffixSum)
 	case isGaugeHistogram && isGCount(name):
-		u := uint64(s)
-		histogram.SampleCount = &u
+		histogram.SampleCount = &s
 		name = strings.TrimSuffix(name, suffixGCount)
 	case isGaugeHistogram && isGSum(name):
 		histogram.SampleSum = &s
@@ -441,9 +438,8 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 		if err != nil {
 			f = math.MaxUint64
 		}
-		cnt := uint64(s)
 		bkt.UpperBound = &f
-		bkt.CumulativeCount = &cnt
+		bkt.CumulativeCount = &s
 
 		if e != nil {
 			if !e.HasTs {
