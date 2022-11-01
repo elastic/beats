@@ -17,10 +17,9 @@ processors:
   - convert:
       field: crowdstrike.event.LocalIP
       target_field: source.ip
-      type: string
+      type: ip
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.crowdstrike?.event?.LocalIP != null && ctx?.crowdstrike?.event?.LocalIP != ""
   - convert:
       field: crowdstrike.event.ProcessId
       target_field: process.pid

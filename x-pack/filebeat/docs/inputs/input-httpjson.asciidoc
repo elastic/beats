@@ -633,6 +633,7 @@ filebeat.inputs:
 ==== `response.split`
 
 Split operation to apply to the response once it is received. A split can convert a map, array, or string into multiple events.
+If the split target is empty the parent document will be kept. If documents with empty splits should be dropped, the `ignore_empty_value` option should be set to `true`.
 
 [float]
 ==== `response.split[].target`
