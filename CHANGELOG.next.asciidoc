@@ -61,14 +61,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix GCP storage field naming {pull}32806[32806]
-- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
-- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
-- Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call {pull}33105[33105]
-- Add GCP CloudSQL region filter {pull}32943[32943]
-- Fix logstash cgroup mappings {pull}33131[33131]
-- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 - Add tags to events based on parsed identifier. {pull}33472[33472]
 
 *Packetbeat*
