@@ -1,0 +1,19 @@
+# HELP net_conntrack_listener_conn_accepted Total number of connections opened to the listener of a given name.
+# TYPE net_conntrack_listener_conn_accepted counter
+net_conntrack_listener_conn_accepted_total{listener_name="http"} 3
+# HELP net_conntrack_listener_conn_closed Total number of connections closed that were made to the listener of a given name.
+# TYPE net_conntrack_listener_conn_closed counter
+net_conntrack_listener_conn_closed_total{listener_name="http"} NaN
+# HELP http_request_duration_seconds request duration histogram
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le="0.1"} +Inf
+http_request_duration_seconds_bucket{le="0.2"} -Inf
+http_request_duration_seconds_bucket{le="0.5"} NaN
+http_request_duration_seconds_bucket{le="1"} 0
+http_request_duration_seconds_bucket{le="2"} 2
+http_request_duration_seconds_bucket{le="3"} 3
+http_request_duration_seconds_bucket{le="5"} 3
+http_request_duration_seconds_bucket{le="+Inf"} 3
+http_request_duration_seconds_count 3
+http_request_duration_seconds_sum 6
+http_request_duration_seconds_created 1520430000.123
