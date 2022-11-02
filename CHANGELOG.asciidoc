@@ -3,24 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
-[[release-notes-8.4.3]]
-=== Beats version 8.4.3
-https://github.com/elastic/beats/compare/v8.4.2\...v8.4.3[View commits]
-
-==== Bugfixes
-
-*Filebeat*
-
-- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
-- Fix handling of empty array in httpjson input. {pull}32001[32001]
-
-==== Added
-
-*Affecting all Beats*
-
-- Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
-=======
 [[release-notes-8.5.0]]
 === Beats version 8.5.0
 https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
@@ -92,7 +74,23 @@ https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 
 *Heartbeat*
 - Deprecate `zip_url` and local monitor options. {pull}33123[33123]
->>>>>>> a9edcd4b2d (docs: Prepare Changelog for 8.5.0 (#33386))
+
+[[release-notes-8.4.3]]
+=== Beats version 8.4.3
+https://github.com/elastic/beats/compare/v8.4.2\...v8.4.3[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+
+==== Added
+
+*Affecting all Beats*
+
+- Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
 
 [[release-notes-8.4.2]]
 === Beats version 8.4.2
