@@ -110,13 +110,14 @@ func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
 // Event describe the filesystem change and includes metadata about the file.
 type Event struct {
-	Timestamp  time.Time           `json:"timestamp"`             // Time of event.
-	Path       string              `json:"path"`                  // The path associated with the event.
-	TargetPath string              `json:"target_path,omitempty"` // Target path for symlinks.
-	Info       *Metadata           `json:"info"`                  // File metadata (if the file exists).
-	Source     Source              `json:"source"`                // Source of the event.
-	Action     Action              `json:"action"`                // Action (like created, updated).
-	Hashes     map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
+	Timestamp     time.Time           `json:"timestamp"`             // Time of event.
+	Path          string              `json:"path"`                  // The path associated with the event.
+	TargetPath    string              `json:"target_path,omitempty"` // Target path for symlinks.
+	Info          *Metadata           `json:"info"`                  // File metadata (if the file exists).
+	Source        Source              `json:"source"`                // Source of the event.
+	Action        Action              `json:"action"`                // Action (like created, updated).
+	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
+	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from runnimg file parsers.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.
@@ -153,6 +154,7 @@ func NewEventFromFileInfo(
 	source Source,
 	maxFileSize uint64,
 	hashTypes []HashType,
+	fileParsers []FileParser,
 ) Event {
 	event := Event{
 		Timestamp: time.Now().UTC(),
@@ -195,6 +197,16 @@ func NewEventFromFileInfo(
 				event.Hashes = hashes
 				event.Info.Size = nbytes
 			}
+
+			if len(fileParsers) != 0 && event.ParserResults == nil {
+				event.ParserResults = make(mapstr.M)
+			}
+			for _, p := range fileParsers {
+				err = p.Parse(event.ParserResults, path)
+				if err != nil {
+					event.errors = append(event.errors, err)
+				}
+			}
 		}
 	case SymlinkType:
 		event.TargetPath, _ = filepath.EvalSymlinks(event.Path)
@@ -211,6 +223,7 @@ func NewEvent(
 	source Source,
 	maxFileSize uint64,
 	hashTypes []HashType,
+	fileParsers []FileParser,
 ) Event {
 	info, err := os.Lstat(path)
 	if err != nil {
@@ -221,7 +234,7 @@ func NewEvent(
 			err = fmt.Errorf("failed to lstat: %w", err)
 		}
 	}
-	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
+	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes, fileParsers)
 }
 
 func isASCIILetter(letter byte) bool {
@@ -315,15 +328,18 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 		file["hash"] = hashes
 	}
+	for k, v := range e.ParserResults {
+		file[k] = v
+	}
 
-	out.MetricSetFields.Put("event.kind", "event")
-	out.MetricSetFields.Put("event.category", []string{"file"})
+	out.MetricSetFields.Put("event.kind", "event")              //nolint:errcheck // Will not error.
+	out.MetricSetFields.Put("event.category", []string{"file"}) //nolint:errcheck // Will not error.
 	if e.Action > 0 {
 		actions := e.Action.InOrder(existedBefore, e.Info != nil)
-		out.MetricSetFields.Put("event.type", actions.ECSTypes())
-		out.MetricSetFields.Put("event.action", actions.StringArray())
+		out.MetricSetFields.Put("event.type", actions.ECSTypes())      //nolint:errcheck // Will not error.
+		out.MetricSetFields.Put("event.action", actions.StringArray()) //nolint:errcheck // Will not error.
 	} else {
-		out.MetricSetFields.Put("event.type", None.ECSTypes())
+		out.MetricSetFields.Put("event.type", None.ECSTypes()) //nolint:errcheck // Will not error.
 	}
 
 	if n := len(e.errors); n > 0 {
@@ -332,9 +348,9 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 			errors[idx] = err.Error()
 		}
 		if n == 1 {
-			out.MetricSetFields.Put("error.message", errors[0])
+			out.MetricSetFields.Put("error.message", errors[0]) //nolint:errcheck // Will not error.
 		} else {
-			out.MetricSetFields.Put("error.message", errors)
+			out.MetricSetFields.Put("error.message", errors) //nolint:errcheck // Will not error.
 		}
 	}
 	return out
