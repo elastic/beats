@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+- Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
 
 *Auditbeat*
 
@@ -92,6 +93,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add GCP CloudSQL region filter {pull}32943[32943]
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
+- Add tags to events based on parsed identifier. {pull}33472[33472]
 
 *Packetbeat*
 
@@ -122,6 +124,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Add file parser processor to file_integrity module. {pull}28802[28802]
 - Improve documentation for symlink handling behaviour in file integrity module. {pull}33430[33430]
 - Ensure file integrity module watch paths are absolute. {pull}33430[33430]
 
@@ -157,10 +160,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
 - Fix handling of invalid UserIP and LocalIP values. {pull}32896[32896]
 - Allow http_endpoint instances to share ports. {issue}32578[32578] {pull}33377[33377]
+- Improve httpjson documentation for split processor. {pull}33473[33473]
 
 *Heartbeat*
 
 - Add new states field for internal use by new synthetics app. {pull}30632[30632]
+- Upgrade node to 18.12.0
 
 *Metricbeat*
 

@@ -66,7 +66,7 @@ var gceMetadataFetcher = provider{
 				if !ok {
 					return
 				}
-				cloud.Put(key, path.Base(p))
+				_, _ = cloud.Put(key, path.Base(p))
 			}
 
 			if instance, ok := m["instance"].(map[string]interface{}); ok {
@@ -97,21 +97,29 @@ var gceMetadataFetcher = provider{
 			if kubeconfig, err := meta.GetValue("orchestrator.cluster.kubeconfig"); err == nil {
 				kubeConfig, ok := kubeconfig.(string)
 				if !ok {
-					meta.Delete("orchestrator.cluster.kubeconfig")
+					_ = meta.Delete("orchestrator.cluster.kubeconfig")
 				}
 				cc := &KubeConfig{}
 				err := yaml.Unmarshal([]byte(kubeConfig), cc)
 				if err != nil {
-					meta.Delete("orchestrator.cluster.kubeconfig")
+					_ = meta.Delete("orchestrator.cluster.kubeconfig")
 				}
 				if len(cc.Clusters) > 0 {
 					if cc.Clusters[0].Cluster.Server != "" {
-						meta.Delete("orchestrator.cluster.kubeconfig")
-						meta.Put("orchestrator.cluster.url", cc.Clusters[0].Cluster.Server)
+						_ = meta.Delete("orchestrator.cluster.kubeconfig")
+						_, _ = meta.Put("orchestrator.cluster.url", cc.Clusters[0].Cluster.Server)
 					}
 				}
 			} else {
-				meta.Delete("orchestrator")
+				_ = meta.Delete("orchestrator.cluster.kubeconfig")
+			}
+
+			clusterName, err := meta.GetValue("orchestrator.cluster.name")
+			if err != nil {
+				_ = meta.Delete("orchestrator")
+			}
+			if clusterName, ok := clusterName.(string); !ok || clusterName == "" {
+				_ = meta.Delete("orchestrator")
 			}
 
 			if project, ok := m["project"].(map[string]interface{}); ok {

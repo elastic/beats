@@ -38,6 +38,8 @@ type fsreader struct {
 	eventC      chan Event
 	watchedDirs []os.FileInfo
 	log         *logp.Logger
+
+	parsers []FileParser
 }
 
 var flagToAction = map[fsevents.EventFlags]Action{
@@ -124,6 +126,7 @@ func NewEventReader(c Config) (EventProducer, error) {
 		eventC:      make(chan Event, 1),
 		watchedDirs: dirs,
 		log:         log,
+		parsers:     FileParsers(c),
 	}, nil
 }
 
@@ -169,7 +172,7 @@ func (r *fsreader) consumeEvents(done <-chan struct{}) {
 
 				start := time.Now()
 				e := NewEvent(event.Path, flagsToAction(event.Flags), SourceFSNotify,
-					r.config.MaxFileSizeBytes, r.config.HashTypes)
+					r.config.MaxFileSizeBytes, r.config.HashTypes, r.parsers)
 
 				e.rtt = time.Since(start)
 				r.eventC <- e
