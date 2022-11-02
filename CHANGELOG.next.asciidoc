@@ -92,7 +92,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add GCP CloudSQL region filter {pull}32943[32943]
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
-- Fix kafka dashboard field names {pull}[]
+- Fix kafka dashboard field names {pull}33555[33555]
 
 *Packetbeat*
 
