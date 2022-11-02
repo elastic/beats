@@ -631,5 +631,44 @@
         ],
         "user.email": "alice@company.com",
         "user.name": "alice@company.com"
+    },
+    {
+        "crowdstrike.event.OperationName": "selfAcceptEula",
+        "crowdstrike.event.ServiceName": "CrowdStrike Authentication",
+        "crowdstrike.event.Success": true,
+        "crowdstrike.event.UTCTimestamp": "2020-02-13T13:50:20.289Z",
+        "crowdstrike.event.UserId": "alice@company.com",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-13T13:50:20.289Z",
+        "crowdstrike.metadata.eventType": "AuthActivityAuditEvent",
+        "crowdstrike.metadata.offset": 9,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "self_accept_eula",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "success",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 8094,
+        "message": "CrowdStrike Authentication",
+        "related.user": [
+            "alice@company.com"
+        ],
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "alice@company.com",
+        "user.name": "alice@company.com"
     }
 ]
