@@ -96,11 +96,11 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 			return err
 		}
 	}
-	return input{}.run(env, src, cursor, pub)
+	return input{}.run(env, src.(*source), cursor, pub)
 }
 
-func (input) run(env v2.Context, src inputcursor.Source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
-	cfg := src.(*source).cfg
+func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
+	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
 	metrics := newInputMetrics(monitoring.GetNamespace("dataset").GetRegistry(), env.ID)
