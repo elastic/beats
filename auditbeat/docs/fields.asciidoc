@@ -18027,7 +18027,8 @@ format: number
 *`file.elf.go_import_hash`*::
 +
 --
-A hash of the Go language imports in an ELF file. An import hash can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+A hash of the Go language imports in an ELF file excluding standard library imports. An import hash can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+The algorithm used to calculate the Go symbol hash and a reference implementation are available [here](https://github.com/elastic/toutoumomoma).
 
 type: keyword
 
@@ -18070,6 +18071,7 @@ format: number
 +
 --
 A hash of the imports in an ELF file. An import hash can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+This is an ELF implementation of the Windows PE imphash.
 
 type: keyword
 
@@ -18128,7 +18130,8 @@ format: number
 *`file.macho.go_import_hash`*::
 +
 --
-A hash of the Go language imports in an ELF file. An import hash can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+A hash of the Go language imports in a Mach-O file excluding standard library imports. An import hash can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+The algorithm used to calculate the Go symbol hash and a reference implementation are available [here](https://github.com/elastic/toutoumomoma).
 
 type: keyword
 
@@ -18302,7 +18305,8 @@ format: number
 *`file.pe.go_import_hash`*::
 +
 --
-A hash of the Go language imports in a PE file. An import hash can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+A hash of the Go language imports in a PE file excluding standard library imports. An import hash can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+The algorithm used to calculate the Go symbol hash and a reference implementation are available [here](https://github.com/elastic/toutoumomoma).
 
 type: keyword
 

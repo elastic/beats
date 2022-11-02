@@ -36,15 +36,20 @@
         level: extended
         type: keyword
         ignore_above: 1024
-        description: 'A hash of the Go language imports in an ELF file. An import hash can be used to
-          fingerprint binaries even after recompilation or other code-level
-          transformations have occurred, which would change more traditional hash values.'
+        short: A hash of the Go language imports in an ELF file.
+        description: 'A hash of the Go language imports in an ELF file excluding standard library imports.
+          An import hash can be used to fingerprint binaries even after recompilation or other
+          code-level transformations have occurred, which would change more traditional hash values.
+
+          The algorithm used to calculate the Go symbol hash and a reference implementation
+          are available [here](https://github.com/elastic/toutoumomoma).'
         example: 10bddcb4cee42080f76c88d9ff964491
         default_field: false
       - name: go_stripped
         level: extended
         type: boolean
         ignore_above: 1024
+        short: Whether the file is a stripped or obfuscated Go executable.
         description: Set to true if the file is a Go executable that has had its symbols stripped or obfuscated and false if an unobfuscated Go executable.
         default_field: false
       - name: imports_names_entropy
@@ -65,9 +70,12 @@
         level: extended
         type: keyword
         ignore_above: 1024
+        short: A hash of the imports in an ELF file.
         description: 'A hash of the imports in an ELF file. An import hash can be used to
           fingerprint binaries even after recompilation or other code-level
-          transformations have occurred, which would change more traditional hash values.'
+          transformations have occurred, which would change more traditional hash values.
+
+          This is an ELF implementation of the Windows PE imphash.'
         example: d41d8cd98f00b204e9800998ecf8427e
         default_field: false
       - name: sections.var_entropy
@@ -107,15 +115,20 @@
         level: extended
         type: keyword
         ignore_above: 1024
-        description: 'A hash of the Go language imports in an ELF file. An import hash can be used to
-          fingerprint binaries even after recompilation or other code-level
-          transformations have occurred, which would change more traditional hash values.'
+        short: A hash of the Go language imports in a Mach-O file.
+        description: 'A hash of the Go language imports in a Mach-O file excluding standard library imports.
+          An import hash can be used to fingerprint binaries even after recompilation or other
+          code-level transformations have occurred, which would change more traditional hash values.
+
+          The algorithm used to calculate the Go symbol hash and a reference implementation
+          are available [here](https://github.com/elastic/toutoumomoma).'
         example: 10bddcb4cee42080f76c88d9ff964491
         default_field: false
       - name: go_stripped
         level: extended
         type: boolean
         ignore_above: 1024
+        short: Whether the file is a stripped or obfuscated Go executable.
         description: Set to true if the file is a Go executable that has had its symbols stripped or obfuscated and false if an unobfuscated Go executable.
         default_field: false
       - name: imports
@@ -142,6 +155,7 @@
         level: extended
         type: keyword
         ignore_above: 1024
+        short: A hash of the imports in a Mach-O file.
         description: 'A hash of the imports in a Mach-O file. An import hash can be used to
           fingerprint binaries even after recompilation or other code-level
           transformations have occurred, which would change more traditional hash values.
@@ -153,6 +167,7 @@
         level: extended
         type: nested
         ignore_above: 1024
+        short: Section information of the Mach-O file.
         description: 'An array containing an object for each section of the Mach-O file.
 
           The keys that should be present in these objects are defined by sub-fields
@@ -196,6 +211,7 @@
         level: extended
         type: keyword
         ignore_above: 1024
+        short: A hash of the imports in a Mach-O file.
         description: 'A hash of the imports in a Mach-O file. An import hash can be used to
           fingerprint binaries even after recompilation or other code-level
           transformations have occurred, which would change more traditional hash values.'
@@ -231,15 +247,20 @@
         level: extended
         type: keyword
         ignore_above: 1024
-        description: 'A hash of the Go language imports in a PE file. An import hash can be used to
-          fingerprint binaries even after recompilation or other code-level
-          transformations have occurred, which would change more traditional hash values.'
+        short: A hash of the Go language imports in a PE file.
+        description: 'A hash of the Go language imports in a PE file excluding standard library imports.
+          An import hash can be used to fingerprint binaries even after recompilation or other
+          code-level transformations have occurred, which would change more traditional hash values.
+
+          The algorithm used to calculate the Go symbol hash and a reference implementation
+          are available [here](https://github.com/elastic/toutoumomoma).'
         example: 10bddcb4cee42080f76c88d9ff964491
         default_field: false
       - name: go_stripped
         level: extended
         type: boolean
         ignore_above: 1024
+        short: Whether the file is a stripped or obfuscated Go executable.
         description: Set to true if the file is a Go executable that has had its symbols stripped or obfuscated and false if an unobfuscated Go executable.
         default_field: false
       - name: imports
@@ -266,6 +287,7 @@
         level: extended
         type: keyword
         ignore_above: 1024
+        short: A hash of the imports in a PE file.
         description: 'A hash of the imports in a PE file. An import hash can be used to
           fingerprint binaries even after recompilation or other code-level
           transformations have occurred, which would change more traditional hash values.
