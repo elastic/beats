@@ -377,6 +377,74 @@ func TestConfig(t *testing.T) {
 			"provider can only be overriden when polling non-AWS S3 services",
 			nil,
 		},
+		{
+			"backup_to_bucket with AWS",
+			queueURL,
+			"",
+			"",
+			mapstr.M{
+				"bucket_arn":              "arn:aws:s3:::aBucket",
+				"backup_to_bucket_arn":    "arn:aws:s3:::bBucket",
+				"backup_to_bucket_prefix": "backup",
+				"number_of_workers":       5,
+			},
+			"",
+			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+				c := makeConfig("", s3Bucket, "")
+				c.BucketARN = "arn:aws:s3:::aBucket"
+				c.BackupConfig.BackupToBucketArn = "arn:aws:s3:::bBucket"
+				c.BackupConfig.BackupToBucketPrefix = "backup"
+				c.NumberOfWorkers = 5
+				return c
+			},
+		},
+		{
+			"backup_to_bucket with non-AWS",
+			queueURL,
+			"",
+			"",
+			mapstr.M{
+				"non_aws_bucket_name":           "aBucket",
+				"non_aws_backup_to_bucket_name": "bBucket",
+				"backup_to_bucket_prefix":       "backup",
+				"number_of_workers":             5,
+			},
+			"",
+			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+				c := makeConfig("", s3Bucket, "")
+				c.NonAWSBucketName = "aBucket"
+				c.BackupConfig.NonAWSBackupToBucketName = "bBucket"
+				c.BackupConfig.BackupToBucketPrefix = "backup"
+				c.NumberOfWorkers = 5
+				return c
+			},
+		},
+		{
+			"error with AWS backup and non-AWS source",
+			queueURL,
+			"",
+			"",
+			mapstr.M{
+				"non_aws_backup_to_bucket_name": "bBucket",
+				"bucket_arn":                    "arn:aws:s3:::aBucket",
+				"number_of_workers":             5,
+			},
+			"backup to non-AWS bucket can only be used for non-AWS sources",
+			nil,
+		},
+		{
+			"error with non-AWS backup and AWS source",
+			queueURL,
+			"",
+			"",
+			mapstr.M{
+				"non_aws_bucket_name":  "aBucket",
+				"backup_to_bucket_arn": "arn:aws:s3:::bBucket",
+				"number_of_workers":    5,
+			},
+			"backup to AWS bucket can only be used for AWS sources",
+			nil,
+		},
 	}
 
 	for _, tc := range testCases {

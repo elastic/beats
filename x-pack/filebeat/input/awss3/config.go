@@ -37,6 +37,7 @@ type config struct {
 	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
 	PathStyle           bool                 `config:"path_style"`
 	ProviderOverride    string               `config:"provider"`
+	BackupConfig        backupConfig         `config:",inline"`
 }
 
 func defaultConfig() config {
@@ -106,8 +107,31 @@ func (c *config) Validate() error {
 	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
 		return errors.New("provider can only be overriden when polling non-AWS S3 services")
 	}
+	if c.BackupConfig.NonAWSBackupToBucketName != "" && c.NonAWSBucketName == "" {
+		return errors.New("backup to non-AWS bucket can only be used for non-AWS sources")
+	}
+	if c.BackupConfig.BackupToBucketArn != "" && c.BucketARN == "" {
+		return errors.New("backup to AWS bucket can only be used for AWS sources")
+	}
+	if c.BackupConfig.BackupToBucketArn != "" && c.BackupConfig.NonAWSBackupToBucketName != "" {
+		return errors.New("backup_to_bucket_arn and non_aws_backup_to_bucket_name cannot be used together")
+	}
 
 	return nil
+}
+
+type backupConfig struct {
+	BackupToBucketArn        string `config:"backup_to_bucket_arn"`
+	NonAWSBackupToBucketName string `config:"non_aws_backup_to_bucket_name"`
+	BackupToBucketPrefix     string `config:"backup_to_bucket_prefix"`
+	Delete                   bool   `config:"delete"`
+}
+
+func (c *backupConfig) GetBucketName() string {
+	if c.BackupToBucketArn != "" {
+		return getBucketNameFromARN(c.BackupToBucketArn)
+	}
+	return c.NonAWSBackupToBucketName
 }
 
 // fileSelectorConfig defines reader configuration that applies to a subset

@@ -144,7 +144,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil, backupConfig{})
 		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
@@ -166,7 +166,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(nil, nil)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil, backupConfig{})
 		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
@@ -193,7 +193,114 @@ func TestS3ObjectProcessor(t *testing.T) {
 				Times(2),
 		)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil, backupConfig{})
+		ack := awscommon.NewEventACKTracker(ctx)
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		require.NoError(t, err)
+	})
+
+	t.Run("backups objects after reading", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+		mockPublisher := NewMockBeatClient(ctrl)
+		s3Event, s3Resp := newS3Object(t, "testdata/log.txt", "")
+
+		backupCfg := backupConfig{
+			BackupToBucketArn: "arn:aws:s3:::backup",
+		}
+
+		var events []beat.Event
+		gomock.InOrder(
+			mockS3API.EXPECT().
+				GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(s3Resp, nil),
+			mockPublisher.EXPECT().
+				Publish(gomock.Any()).
+				Do(func(event beat.Event) { events = append(events, event) }).
+				Times(2),
+			mockS3API.EXPECT().
+				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(nil, nil),
+		)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil, backupCfg)
+		ack := awscommon.NewEventACKTracker(ctx)
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		require.NoError(t, err)
+	})
+
+	t.Run("deletes objects after backing up", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+		mockPublisher := NewMockBeatClient(ctrl)
+		s3Event, s3Resp := newS3Object(t, "testdata/log.txt", "")
+
+		backupCfg := backupConfig{
+			BackupToBucketArn: "arn:aws:s3:::backup",
+			Delete:            true,
+		}
+
+		var events []beat.Event
+		gomock.InOrder(
+			mockS3API.EXPECT().
+				GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(s3Resp, nil),
+			mockPublisher.EXPECT().
+				Publish(gomock.Any()).
+				Do(func(event beat.Event) { events = append(events, event) }).
+				Times(2),
+			mockS3API.EXPECT().
+				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(nil, nil),
+			mockS3API.EXPECT().
+				DeleteObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(nil, nil),
+		)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil, backupCfg)
+		ack := awscommon.NewEventACKTracker(ctx)
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		require.NoError(t, err)
+	})
+
+	t.Run("prefixes objects when backing up", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+		mockPublisher := NewMockBeatClient(ctrl)
+		s3Event, s3Resp := newS3Object(t, "testdata/log.txt", "")
+
+		backupCfg := backupConfig{
+			BackupToBucketArn:    s3Event.S3.Bucket.ARN,
+			BackupToBucketPrefix: "backup/",
+		}
+
+		var events []beat.Event
+		gomock.InOrder(
+			mockS3API.EXPECT().
+				GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(s3Resp, nil),
+			mockPublisher.EXPECT().
+				Publish(gomock.Any()).
+				Do(func(event beat.Event) { events = append(events, event) }).
+				Times(2),
+			mockS3API.EXPECT().
+				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq("backup/testdata/log.txt")).
+				Return(nil, nil),
+		)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil, backupCfg)
 		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.NoError(t, err)
@@ -231,7 +338,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 			Times(numEvents),
 	)
 
-	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, selectors)
+	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, selectors, backupConfig{})
 	ack := awscommon.NewEventACKTracker(ctx)
 	err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 

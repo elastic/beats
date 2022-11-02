@@ -41,12 +41,13 @@ const (
 type s3ObjectProcessorFactory struct {
 	log           *logp.Logger
 	metrics       *inputMetrics
-	s3            s3Getter
+	s3            s3API
 	publisher     beat.Client
 	fileSelectors []fileSelectorConfig
+	backupConfig  backupConfig
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3Getter, publisher beat.Client, sel []fileSelectorConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, publisher beat.Client, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -61,6 +62,7 @@ func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3G
 		s3:            s3,
 		publisher:     publisher,
 		fileSelectors: sel,
+		backupConfig:  backupConfig,
 	}
 }
 
@@ -158,9 +160,15 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	default:
 		err = p.readFile(reader)
 	}
+
 	if err != nil {
 		return fmt.Errorf("failed reading s3 object (elapsed_time_ns=%d): %w",
 			time.Since(start).Nanoseconds(), err)
+	}
+
+	err = p.finalizeObject()
+	if err != nil {
+		return fmt.Errorf("failed to finalize s3 object (elapsed_time_ns=%d): %w", time.Since(start).Nanoseconds(), err)
 	}
 
 	return nil
@@ -359,6 +367,27 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 	}
 
 	return event
+}
+
+func (p *s3ObjectProcessor) finalizeObject() error {
+	bucketName := p.backupConfig.GetBucketName()
+	if bucketName != "" {
+		backupKey := p.s3Obj.S3.Object.Key
+		if p.backupConfig.BackupToBucketPrefix != "" {
+			backupKey = fmt.Sprintf("%s%s", p.backupConfig.BackupToBucketPrefix, backupKey)
+		}
+		_, err := p.s3.CopyObject(p.ctx, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
+		if err != nil {
+			return fmt.Errorf("failed to copy object to backup bucket: %w", err)
+		}
+		if p.backupConfig.Delete {
+			_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+			if err != nil {
+				return fmt.Errorf("failed to delete object from bucket: %w", err)
+			}
+		}
+	}
+	return nil
 }
 
 func objectID(objectHash string, offset int64) string {
