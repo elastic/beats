@@ -198,6 +198,10 @@ func TestS3ObjectProcessor(t *testing.T) {
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.NoError(t, err)
 	})
+
+	t.Run("text file without end of line marker", func(t *testing.T) {
+		testProcessS3Object(t, "testdata/no-eol.txt", "text/plain", 1)
+	})
 }
 
 func testProcessS3Object(t testing.TB, file, contentType string, numEvents int, selectors ...fileSelectorConfig) []beat.Event {

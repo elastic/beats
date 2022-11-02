@@ -300,11 +300,8 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
-		if errors.Is(err, io.EOF) {
-			// No more lines
-			break
-		}
-		if err != nil {
+		isEOF := errors.Is(err, io.EOF)
+		if err != nil && !isEOF {
 			return fmt.Errorf("error reading message: %w", err)
 		}
 
@@ -312,6 +309,12 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 		event.Fields.DeepUpdate(message.Fields)
 		offset += int64(message.Bytes)
 		p.publish(p.acker, &event)
+
+		if isEOF {
+			// No more lines
+			break
+		}
+
 	}
 
 	return nil
