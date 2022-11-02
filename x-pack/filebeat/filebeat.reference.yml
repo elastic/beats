@@ -169,6 +169,16 @@ filebeat.modules:
     # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
     #var.ssl:
 
+    # Configures backing up processed files to another (or the same) bucket
+    #var.backup_to_bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.non_aws_backup_to_bucket_name: 'mybucket'
+
+    # Sets a prefix to prepend to object keys when backing up
+    #var.backup_to_bucket_prefix: 'backup/'
+
+    # Controls deletion of objects after backing them up
+    #var.delete: false
+
   cloudwatch:
     enabled: false
 
@@ -843,7 +853,7 @@ filebeat.modules:
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
-  log: 
+  log:
     enabled: false
 
     # Set custom paths for the log files. If left empty,
@@ -852,7 +862,7 @@ filebeat.modules:
 
 #----------------------------- Crowdstrike Module -----------------------------
 - module: crowdstrike
-  
+
   falcon:
     enabled: false
 
@@ -944,7 +954,7 @@ filebeat.modules:
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   # Fileset for native deployment
-  log: 
+  log:
     enabled: false
 
     # Set custom paths for the log files. If left empty,
@@ -1473,7 +1483,7 @@ filebeat.modules:
 
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
-    
+
     # Related scopes, default should be included
     #var.oauth2.scopes:
     #  - "https://api.security.microsoft.com/.default"
@@ -1879,7 +1889,7 @@ filebeat.modules:
 
     # URL, should include the instance_url
     #var.url: "https://instance_id.my.salesforce.com"
-      
+
   login-rest:
     enabled: false
 
@@ -2973,7 +2983,7 @@ filebeat.inputs:
        # Source of container events. Available options: all, stdin, stderr.
        #stream: all
 
-       # Format of the container events. Available options: auto, cri, docker, json-file 
+       # Format of the container events. Available options: auto, cri, docker, json-file
        #format: auto
 
   ### Log rotation
@@ -2983,7 +2993,7 @@ filebeat.inputs:
   #rotation.external.strategy.copytruncate:
   # Regex that matches the rotated files.
   #  suffix_regex: \.\d$
-  # If the rotated filename suffix is a datetime, set it here. 
+  # If the rotated filename suffix is a datetime, set it here.
   #  dateformat: -20060102
 
   ### State options
@@ -3180,7 +3190,7 @@ filebeat.inputs:
   #hosts:
     #- kafka-broker-1:9092
     #- kafka-broker-2:9092
-  
+
   # A list of topics to read from.
   #topics: ["my-topic", "important-logs"]
 
@@ -3215,7 +3225,7 @@ filebeat.inputs:
 
   # The minimum number of bytes to wait for.
   #fetch.min: 1
-  
+
   # The default number of bytes to read per request.
   #fetch.default: 1MB
 
@@ -4538,7 +4548,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-  
+
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
 
