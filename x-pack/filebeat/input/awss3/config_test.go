@@ -361,7 +361,7 @@ func TestConfig(t *testing.T) {
 				"number_of_workers": 5,
 				"provider":          "asdf",
 			},
-			"provider can only be overriden when polling non-AWS S3 services",
+			"provider can only be overridden when polling non-AWS S3 services",
 			nil,
 		},
 		{
@@ -374,7 +374,7 @@ func TestConfig(t *testing.T) {
 				"number_of_workers": 5,
 				"provider":          "asdf",
 			},
-			"provider can only be overriden when polling non-AWS S3 services",
+			"provider can only be overridden when polling non-AWS S3 services",
 			nil,
 		},
 		{

@@ -105,7 +105,7 @@ func (c *config) Validate() error {
 		return errors.New("path_style can only be used when polling non-AWS S3 services")
 	}
 	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
-		return errors.New("provider can only be overriden when polling non-AWS S3 services")
+		return errors.New("provider can only be overridden when polling non-AWS S3 services")
 	}
 	if c.BackupConfig.NonAWSBackupToBucketName != "" && c.NonAWSBucketName == "" {
 		return errors.New("backup to non-AWS bucket can only be used for non-AWS sources")
