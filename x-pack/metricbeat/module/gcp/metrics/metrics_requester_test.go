@@ -85,7 +85,7 @@ func TestGetFilterForMetric(t *testing.T) {
 			"storage",
 			"storage.googleapis.com/firewall/dropped_bytes_count",
 			metricsRequester{config: config{Region: "us-central1"}, logger: logger},
-			"metric.type=\"storage.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.location = \"us-central1\"",
+			"metric.type=\"storage.googleapis.com/firewall/dropped_bytes_count\" AND resource.label.location = starts_with(\"us-central1\")",
 		},
 		{
 			"storage service with 2 regions in regions config",
