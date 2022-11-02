@@ -1,0 +1,3 @@
+The files in this directory are sample executables built from the source
+also in this directory. Either built with the Go gc compiler or with the
+garble obfuscator v0.4.0 using the -literals -tiny flags.
