@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+- Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
 
 *Auditbeat*
 
