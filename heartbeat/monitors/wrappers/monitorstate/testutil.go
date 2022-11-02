@@ -24,6 +24,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+
 	"github.com/elastic/beats/v7/heartbeat/esutil"
 	"github.com/elastic/go-elasticsearch/v8"
 )
@@ -34,9 +37,31 @@ func IntegESLoader(t *testing.T, indexPattern string, location *config.LocationW
 	return MakeESLoader(IntegES(t), indexPattern, location)
 }
 
-func IntegES(t *testing.T) (esc *elasticsearch.Client) {
+func IntegES(t *testing.T) (esc *eslegclient.Connection) {
+	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+		URL:      eslegtest.GetURL(),
+		Username: "admin",
+		Password: "testing",
+	})
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
+
+	err = conn.Connect()
+	if err != nil {
+		t.Fatal(err)
+		panic(err) // panic in case TestLogger did not stop test
+	}
+
+	return conn
+}
+
+func IntegApiClient(t *testing.T) (esc *elasticsearch.Client) {
 	esc, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{"http://127.0.0.1:9200"},
+		Addresses: []string{eslegtest.GetURL()},
 		Username:  "admin",
 		Password:  "testing",
 	})
