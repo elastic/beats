@@ -18,6 +18,7 @@
 package file_integrity
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -89,6 +90,48 @@ func TestScanner(t *testing.T) {
 		assert.True(t, foundRecursivePath, "expected subdir/c to be included")
 	})
 
+	t.Run("executable", func(t *testing.T) {
+		c := config
+		c.FileParsers = []string{"file.elf.import_hash", "file.macho.import_hash", "file.pe.import_hash"}
+
+		target := filepath.Join(dir, "executable")
+		err := copyFile(filepath.Join("testdata", "go_pe_executable"), target)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(target)
+
+		reader, err := NewFileSystemScanner(c, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		done := make(chan struct{})
+		defer close(done)
+
+		eventC, err := reader.Start(done)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var (
+			foundExecutable bool
+			events          []Event
+		)
+		for event := range eventC {
+			events = append(events, event)
+			if filepath.Base(event.Path) == "executable" {
+				foundExecutable = true
+				h, err := event.ParserResults.GetValue("pe.import_hash")
+				assert.NoError(t, err, "no value for pe.import_hash")
+				assert.Len(t, h, 16, "wrong length for hash")
+			}
+		}
+
+		assert.Len(t, events, 8)
+		assert.True(t, foundExecutable, "expected executable to be included")
+	})
+
 	// This smoke tests the rate limit code path, but does not validate the rate.
 	t.Run("with rate limit", func(t *testing.T) {
 		c := config
@@ -151,4 +194,19 @@ func setupTestDir(t *testing.T) string {
 	}
 
 	return dir
+}
+
+func copyFile(old, new string) error {
+	o, err := os.Open(old)
+	if err != nil {
+		return err
+	}
+	defer o.Close()
+	n, err := os.Create(new)
+	if err != nil {
+		return err
+	}
+	defer n.Close()
+	_, err = io.Copy(n, o)
+	return err
 }

@@ -19,6 +19,7 @@ remove_timestamp = {
     "cef.log",
     "cisco.asa",
     "cisco.ios",
+    "cisco.nexus",
     "citrix.netscaler",
     "cylance.protect",
     "f5.bigipafm",
