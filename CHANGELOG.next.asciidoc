@@ -123,6 +123,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Add file parser processor to file_integrity module. {pull}28802[28802]
 - Improve documentation for symlink handling behaviour in file integrity module. {pull}33430[33430]
 - Ensure file integrity module watch paths are absolute. {pull}33430[33430]
 
