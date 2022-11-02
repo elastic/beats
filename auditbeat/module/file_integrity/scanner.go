@@ -45,6 +45,8 @@ type scanner struct {
 	log      *logp.Logger
 	config   Config
 	newPaths map[string]struct{}
+
+	parsers []FileParser
 }
 
 // NewFileSystemScanner creates a new EventProducer instance that scans the
@@ -56,6 +58,7 @@ func NewFileSystemScanner(c Config, newPathsInConfig map[string]struct{}) (Event
 		config:   c,
 		newPaths: newPathsInConfig,
 		eventC:   make(chan Event, 1),
+		parsers:  FileParsers(c),
 	}, nil
 }
 
@@ -179,7 +182,7 @@ func (s *scanner) walkDir(dir string, action Action) error {
 
 		return nil
 	})
-	if err == errDone {
+	if err == errDone { //nolint:errorlint // Bad linter! This is never wrapped.
 		err = nil
 	}
 	return err
@@ -213,7 +216,7 @@ func (s *scanner) throttle(fileSize uint64) {
 
 func (s *scanner) newScanEvent(path string, info os.FileInfo, err error, action Action) Event {
 	event := NewEventFromFileInfo(path, info, err, action, SourceScan,
-		s.config.MaxFileSizeBytes, s.config.HashTypes)
+		s.config.MaxFileSizeBytes, s.config.HashTypes, s.parsers)
 
 	// Update metrics.
 	atomic.AddUint64(&s.fileCount, 1)
