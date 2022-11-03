@@ -28,7 +28,10 @@ documents will be rejected upon index after a few minutes, producing the followi
 
 IMPORTANT: ** It is strongly recommended to update directly to v8.5.1 when it is available. ** If not possible to update, please continue to the suggested solution.
 
-Suggested resolution: Manually update Heartbeat index template mappings. Start by exporting the actual mappings:
+Suggested resolution: Manually update Heartbeat index template mappings. The instructions provided below assume access to `heartbeat` executable
+and familiarity with ES APIs. For a detailed GUI walkthrough, please check https://discuss.elastic.co/t/heartbeat-8-5-0-mapper-error-workaround/318133[this thread].
+
+Start by exporting the actual mappings:
 
 [source,shell]
 ----
