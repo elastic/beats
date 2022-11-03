@@ -75,7 +75,7 @@ Finally, execute the following request, also in Kibana `Dev Tools`, to perform a
 
 [source,json]
 ----
-POST heartbeat-8.5.1/_rollover
+POST heartbeat-8.5.0/_rollover
 ----
 
 This should create a new backing index with the correct mappings.
