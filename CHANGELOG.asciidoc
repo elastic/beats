@@ -26,7 +26,7 @@ documents will be rejected upon index after a few minutes, producing the followi
 {..., "reason":"failed to parse date field [4.0614878e+07] with format [strict_date_optional_time||epoch_millis]","caused_by":{"type":"date_time_parse_exception","reason":"date_time_parse_exception: Failed to parse with all enclosed parsers"}
 ----
 
-IMPORTANT: ** It is strongly recommended to update directly to v8.5.1. ** If not possible to update, please continue to the suggested solution.
+IMPORTANT: ** It is strongly recommended to update directly to v8.5.1 when it is available. ** If not possible to update, please continue to the suggested solution.
 
 Suggested resolution: Manually update Heartbeat index template mappings. Start by exporting the actual mappings:
 
