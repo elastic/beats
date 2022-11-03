@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
 - Fix states client support for output options. {pull}33405[33405]
 - Fix states client reloader under managed mode. {pull}33405[33405]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 
 *Auditbeat*
 
