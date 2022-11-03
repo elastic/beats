@@ -89,7 +89,7 @@ func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	}()
 	s.mux.Handle(route, h)
 	s.log.Debugf("Attached handler at %q to server.", route)
-	return
+	return nil
 }
 
 func parse(host string, port int) (string, string, error) {

@@ -20,7 +20,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	_ "net/http/pprof"
 	"net/url"
 
 	"github.com/elastic/elastic-agent-libs/config"
@@ -76,9 +75,9 @@ func makeAPIHandler(ns *monitoring.Namespace) handlerFunc {
 func prettyPrint(w http.ResponseWriter, data mapstr.M, u *url.URL) {
 	query := u.Query()
 	if _, ok := query["pretty"]; ok {
-		fmt.Fprintf(w, data.StringToPrint())
+		fmt.Fprint(w, data.StringToPrint())
 	} else {
-		fmt.Fprintf(w, data.String())
+		fmt.Fprint(w, data.String())
 	}
 }
 
