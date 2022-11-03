@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
 - Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
 - Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
+- Support for multiline zookeeper logs {issue}2496[2496]
 
 *Auditbeat*
 
@@ -60,6 +61,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
 - Fix states client support for output options. {pull}33405[33405]
 - Fix states client reloader under managed mode. {pull}33405[33405]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 
 *Auditbeat*
 
