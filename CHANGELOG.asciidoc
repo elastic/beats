@@ -16,6 +16,73 @@ this version of {heartbeat}, {filebeat}, {metricbeat}, and {auditbeat} are not a
 This bug will be fixed in the next release.
 Please use the https://www.docker.elastic.co/search?q=beats[Elastic docker registry] to download 8.5.0 images.
 
+*Heartbeat*
+
+Heartbeat mappings have introduced a new section to improve state tracking, `state`. Due to inconsistent serialization of the underlying data type,
+documents will be rejected upon index after a few minutes, producing the following error message:
+
+[source,json]
+----
+{..., "reason":"failed to parse date field [4.0614878e+07] with format [strict_date_optional_time||epoch_millis]","caused_by":{"type":"date_time_parse_exception","reason":"date_time_parse_exception: Failed to parse with all enclosed parsers"}
+----
+
+IMPORTANT: ** It is strongly recommended to update directly to v8.5.1 when it is available. ** If not possible to update, please continue to the suggested solution.
+
+Suggested resolution: Manually update Heartbeat index template mappings. The instructions provided below assume access to `heartbeat` executable
+and familiarity with ES APIs. For a detailed GUI walkthrough, please check https://discuss.elastic.co/t/heartbeat-8-5-0-mapper-error-workaround/318133[this thread].
+
+Start by exporting the actual mappings:
+
+[source,shell]
+----
+$ ./heartbeat export template > /tmp/idx-pattern.json
+----
+
+Inside the exported file, locate the field `duration_ms` and change the type to `long`:
+
+[source,json]
+----
+"state": {
+  "properties": {
+    ...,
+
+    "duration_ms": {
+      "type": "long"
+    },
+----
+
+Copy the contents of this file and log into Kibana. 
+Once in Kibana, go to `Dev Tools`, write the request URL to update the index template and paste file contents underneath:
+
+[source,json]
+----
+PUT /_index_template/heartbeat-8.5.0
+{
+  "data_stream": {},
+  "index_patterns": [
+    "heartbeat-8.5.0"
+  ],
+  ...
+----
+
+Execute the request and check that the operation has been acknowledged:
+
+[source,json]
+----
+{
+  "acknowledged": true
+}
+----
+
+Finally, execute the following request, also in Kibana `Dev Tools`, to perform an index rollover:
+
+[source,json]
+----
+POST heartbeat-8.5.0/_rollover
+----
+
+This should create a new backing index with the correct mappings.
+
 ==== Breaking changes
 
 *Affecting all Beats*
