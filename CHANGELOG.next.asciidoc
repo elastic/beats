@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
 
 *Auditbeat*
 
