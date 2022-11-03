@@ -415,6 +415,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 			_ = s.Stop()
 		}()
 		if b.Config.HTTPPprof.IsEnabled() {
+			pprof.SetRuntimeProfilingParameters(b.Config.HTTPPprof)
+
 			if err := pprof.HttpAttach(b.Config.HTTPPprof, s); err != nil {
 				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
 			}
