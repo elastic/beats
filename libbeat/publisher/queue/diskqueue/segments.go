@@ -470,35 +470,6 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 	return total
 }
 
-// Iterates through all segment types to find the oldest ID in the queue
-func (segments *diskQueueSegments) oldestIDOnDisk() segmentID {
-	// not all segment types are pre-sorted, hence us appending some, taking [0] from others
-	oldSegments := []*queueSegment{}
-
-	if len(segments.reading) > 0 {
-		oldSegments = append(oldSegments, segments.reading[0])
-	}
-	if len(segments.acking) > 0 {
-		oldSegments = append(oldSegments, segments.acking[0])
-	}
-
-	oldSegments = append(oldSegments, segments.writing...)
-	oldSegments = append(oldSegments, segments.acked...)
-
-	sort.Slice(oldSegments, func(i, j int) bool { return oldSegments[i].id < oldSegments[j].id })
-
-	return oldSegments[0].id
-}
-
-// unACKedReadBytes returns the total count of bytes that have been read, but not ack'ed by the consumer
-func (segments *diskQueueSegments) unACKedReadBytes() uint64 {
-	var acc uint64
-	for _, seg := range segments.acking {
-		acc += seg.byteCount
-	}
-	return acc
-}
-
 // segmentReader handles reading of segments.  getReader sets up the
 // reader and handles setting up the Reader to deal with the different
 // schema version.  With Schema version 2 there is the option for

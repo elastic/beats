@@ -94,9 +94,7 @@ func (dq *diskQueue) run() {
 // handleMetricsRequest responds to an event on the metricsRequestChan chan
 func (dq *diskQueue) handleMetricsRequest(request metricsRequest) {
 	resp := metricsRequestResponse{
-		sizeOnDisk:    dq.segments.sizeOnDisk(),
-		OccupiedRead:  dq.segments.unACKedReadBytes(),
-		oldestEntryID: dq.segments.oldestIDOnDisk(),
+		sizeOnDisk: dq.segments.sizeOnDisk(),
 	}
 	request.response <- resp
 }

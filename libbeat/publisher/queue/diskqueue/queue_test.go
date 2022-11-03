@@ -108,27 +108,6 @@ func TestMetrics(t *testing.T) {
 	require.NotZero(t, testMetrics.ByteCount.ValueOr(0))
 	t.Logf("got %d bytes written", testMetrics.ByteCount.ValueOr(0))
 
-	// now read & ACK the events
-	batch, err := testQueue.Get(eventsToTest)
-	require.NoError(t, err, "error in Get")
-	time.Sleep(time.Millisecond * 100)
-	require.NotZero(t, testMetrics.UnackedConsumedBytes.ValueOr(0))
-	// ACK
-	batch.Done()
-
-	// Occupied read should now be zero
-	testMetricsACKed, err := testQueue.Metrics()
-	require.NoError(t, err)
-	require.Zero(t, testMetricsACKed.UnackedConsumedBytes.ValueOr(0))
-
-	// insert again
-	sendEventsToQueue(eventsToTest, producer)
-	// This time, the oldest segment ID should be  > 0
-	time.Sleep(time.Millisecond * 100)
-	testMetricsSecond, err := testQueue.Metrics()
-	require.NoError(t, err)
-	require.NotZero(t, testMetricsSecond.OldestEntryID)
-
 }
 
 func sendEventsToQueue(count int, prod queue.Producer) {

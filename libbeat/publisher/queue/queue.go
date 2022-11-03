@@ -47,8 +47,6 @@ type Metrics struct {
 
 	//UnackedConsumedEvents is the count of events that an output consumer has read, but not yet ack'ed
 	UnackedConsumedEvents opt.Uint
-	//UnackedConsumedEvents is the count of bytes that an output consumer has read, but not yet ack'ed
-	UnackedConsumedBytes opt.Uint
 
 	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
 	OldestActiveTimestamp common.Time

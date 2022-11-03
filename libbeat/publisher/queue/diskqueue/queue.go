@@ -98,9 +98,7 @@ type metricsRequest struct {
 
 // metrics response from the disk queue
 type metricsRequestResponse struct {
-	sizeOnDisk    uint64
-	oldestEntryID segmentID
-	OccupiedRead  uint64
+	sizeOnDisk uint64
 }
 
 func init() {
@@ -308,14 +306,19 @@ func (dq *diskQueue) Metrics() (queue.Metrics, error) {
 	case <-dq.done:
 		return queue.Metrics{}, io.EOF
 	case dq.metricsRequestChan <- req:
+
 	}
-	resp := <-respChan
+
+	resp := metricsRequestResponse{}
+	select {
+	case <-dq.done:
+		return queue.Metrics{}, io.EOF
+	case resp = <-respChan:
+	}
 
 	maxSize := dq.settings.MaxBufferSize
 	return queue.Metrics{
-		ByteLimit:            opt.UintWith(maxSize),
-		ByteCount:            opt.UintWith(resp.sizeOnDisk),
-		UnackedConsumedBytes: opt.UintWith(resp.OccupiedRead),
-		OldestEntryID:        queue.EntryID(resp.oldestEntryID),
+		ByteLimit: opt.UintWith(maxSize),
+		ByteCount: opt.UintWith(resp.sizeOnDisk),
 	}, nil
 }
