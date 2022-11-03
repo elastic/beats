@@ -83,6 +83,10 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Supporting the double digit date parsing in ingest pipeline for oracle logs. {pull}31514[31514]
 - Fix handling of code_sign data in ThreatIntel Malwarebazaar. {issue}29972[29972] {pull}31552[31552]
 - Remove invalid term from event.outcome in the cisco asa and ftd modules. {pull}31628[31628]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+- Support for multiline zookeeper logs {issue}2496[2496]
 
 *Heartbeat*
 
