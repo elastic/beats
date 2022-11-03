@@ -198,6 +198,10 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			})
 			log.Debugw("response state", "state", state)
 			if err != nil {
+				switch {
+				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+					return err
+				}
 				log.Errorw("failed evaluation", "error", err)
 			}
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -803,6 +807,11 @@ func evalWith(ctx context.Context, prg cel.Program, input map[string]interface{}
 	if err != nil {
 		input["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed eval: %v", err)}
 		return input, fmt.Errorf("failed eval: %w", err)
+	}
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
 	}
 
 	v, err := out.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
