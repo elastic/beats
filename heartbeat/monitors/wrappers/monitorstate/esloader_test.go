@@ -105,7 +105,7 @@ func newESTestContext(t *testing.T) *esTestContext {
 		},
 	}
 	namespace, _ := uuid.NewV4()
-	esc := IntegES(t)
+	esc := IntegApiClient(t)
 	etc := &esTestContext{
 		namespace: namespace.String(),
 		esc:       esc,
