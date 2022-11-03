@@ -38,18 +38,17 @@ fraction of goroutine blocking events that are reported in the blocking profile
 available from `/debug/pprof/block`. The profiler aims to sample an average of
 one blocking event per rate nanoseconds spent blocked. To include every blocking
 event in the profile, pass rate = 1. To turn off profiling entirely, pass rate
-<= 0.
+<= 0. Defaults to 0.
 `http.pprof.mem_profile_rate`:: (Optional) `mem_profile_rate` controls the
 fraction of memory allocations that are recorded and reported in the memory
 profile available from `/debug/pprof/heap`. The profiler aims to sample an
 average of one allocation per `mem_profile_rate` bytes allocated. To include
 every allocated block in the profile, set `mem_profile_rate` to 1. To turn off
-profiling entirely, set `mem_profile_rate` to 0.
+profiling entirely, set `mem_profile_rate` to 0. Defaults to 524288.
 `http.pprof.mutex_profile_rate`:: (Optional) `mutex_profile_rate` controls the
 fraction of mutex contention events that are reported in the mutex profile
-available from `/debug/pprof/mutex`. On average 1/rate events are reported. The
-previous rate is returned. To turn off profiling entirely, pass rate 0. To just
-read the current rate, pass rate < 0.
+available from `/debug/pprof/mutex`. On average 1/rate events are reported.
+To turn off profiling entirely, pass rate 0. The default value is 0.
 
 This is the list of paths you can access. For pretty JSON output append `?pretty` to the URL.
 
