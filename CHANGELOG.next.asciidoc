@@ -44,6 +44,16 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Filebeat*
 
 - Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+
+*Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix states client support for output options. {pull}33405[33405]
+- Fix states client reloader under managed mode. {pull}33405[33405]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 
 *Auditbeat*
 
