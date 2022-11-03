@@ -29,8 +29,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Server takes cares of correctly starting the HTTP component of the API
-// and will answers all the routes defined in the received ServeMux.
+// Server takes care of correctly starting the HTTP component of the API
+// and will answer all the routes defined in the received ServeMux.
 type Server struct {
 	log    *logp.Logger
 	mux    *http.ServeMux
@@ -83,12 +83,12 @@ func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 			case string:
 				err = errors.New(r)
 			default:
-				err = fmt.Errorf("handle attempted to panic with %v", r)
+				err = fmt.Errorf("failed to register http handler at path %v: %v", route, h)
 			}
 		}
 	}()
-	s.log.Infof("Attempting to attach %q to server.", route)
 	s.mux.Handle(route, h)
+	s.log.Debugf("Attached handler at %q to server.", route)
 	return
 }
 
@@ -98,7 +98,7 @@ func parse(host string, port int) (string, string, error) {
 		return "", "", err
 	}
 
-	// When you don't explicitely define the Scheme we fallback on tcp + host.
+	// When you don't explicitly define the Scheme we fall back on tcp + host.
 	if len(url.Host) == 0 && len(url.Scheme) == 0 {
 		addr := host + ":" + strconv.Itoa(port)
 		return "tcp", addr, nil

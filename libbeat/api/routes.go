@@ -49,14 +49,6 @@ func NewWithDefaultRoutes(log *logp.Logger, config *config.C, ns lookupFunc) (*S
 	return New(log, mux, config)
 }
 
-func (s *Server) AttachPprof() {
-	s.log.Info("Attaching pprof endpoints")
-	s.mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
-		http.DefaultServeMux.ServeHTTP(w, r)
-	})
-
-}
-
 func makeRootAPIHandler(handler handlerFunc) handlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
