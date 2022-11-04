@@ -964,6 +964,7 @@ func newV2Context() (v2.Context, func()) {
 	}, cancel
 }
 
+//nolint:errcheck // We can safely ignore errors here
 func matchBody(w io.Writer, req *http.Request, match, response string) {
 	body, _ := io.ReadAll(req.Body)
 	req.Body.Close()
