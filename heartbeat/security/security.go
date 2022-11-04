@@ -90,7 +90,7 @@ func setCapabilities() error {
 	// Raise all permitted caps to effective
 	err := newcaps.Fill(cap.Effective, cap.Permitted)
 	if err != nil {
-		return fmt.Errorf("error clearing inheritable cap set: %w", err)
+		return fmt.Errorf("error raising effective cap set: %w", err)
 	}
 
 	// Drop all inheritable caps to stop propagation to child proc
