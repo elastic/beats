@@ -45648,7 +45648,7 @@ type: keyword
 *`kubernetes.node.cpu.allocatable.cores`*::
 +
 --
-The allocatable CPU cores of a node that is available for pods scheduling
+The allocatable CPU cores of a node that are available for pods scheduling
 
 
 type: float

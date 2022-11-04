@@ -37,7 +37,7 @@
         - name: allocatable.cores
           type: float
           description: >
-            The allocatable CPU cores of a node that is available for pods scheduling
+            The allocatable CPU cores of a node that are available for pods scheduling
         - name: capacity.cores
           type: long
           description: >
