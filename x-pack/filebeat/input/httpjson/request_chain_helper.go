@@ -104,7 +104,7 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 func fetchValueFromContext(trCtx *transformContext, expression string) (string, bool, error) {
 	var val interface{}
 
-	switch keys := strings.Split(expression, "."); keys[0] {
+	switch keys := processExpression(expression, "."); keys[0] {
 	case lastResponse:
 		respMap, err := responseToMap(trCtx.lastResponse)
 		if err != nil {
@@ -193,6 +193,36 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 	default:
 		return nil, fmt.Errorf("unable to parse the value of the expression %s: type %T is not handled", strings.Join(keys[:depth+1], "."), val)
 	}
+}
+
+// processExpression, splits the expression string based on the separator and looks for
+// supported keywords. If present, returns an expression array containing separated elements.
+// If no keywords are present, the expression is treated as a hardcoded value and returned
+// as a merged string which is the only array element.
+func processExpression(expression string, separator string) []string {
+	expArr := strings.Split(expression, separator)
+	startIndex := 0
+	isExpressionValue := false
+
+	for i, v := range expArr {
+		if v == "" {
+			continue
+		}
+		startIndex = i
+		if v != lastResponse && v != firstResponse && v != parentLastResponse {
+			isExpressionValue = true
+		}
+		break
+	}
+
+	var returnArr []string
+	if isExpressionValue {
+		returnArr = append(returnArr, strings.Join(expArr, separator))
+	} else {
+		returnArr = expArr[startIndex:]
+	}
+
+	return returnArr
 }
 
 func tryAssignAuth(parentConfig *authConfig, childConfig *authConfig) *authConfig {

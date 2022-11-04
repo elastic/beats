@@ -535,9 +535,6 @@ Can read state from: [`.first_response.*`,`.last_response.*`, `.parent_last_resp
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 
-NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination 
-does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains.
-
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
@@ -549,6 +546,47 @@ filebeat.inputs:
         target: body.from
         value: '[[now (parseDuration "-1h")]]'
 ----
+
+NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination 
+does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains. You can look at this 
+<<parent-last-response,example>> below for a better idea.
+
+
+["source","yaml",subs="attributes",id="parent-last-response"]
+  filebeat.inputs:
+  - type: httpjson
+    enabled: true
+    id: my-httpjson-id
+    request.url: http://xyz.com/services/data/v1.0/export_ids/page
+    request.method: POST
+    interval: 1h
+    request.retry.max_attempts: 2
+    request.retry.wait_min: 5s
+    request.transforms:
+    - set:
+        target: body.page
+        value: 0
+    response.request_body_on_pagination: true
+    response.pagination:
+      - set:
+          target: body.page
+          value: '[[ .last_response.body.page ]]'
+          fail_on_template_error: true 
+    chain: 
+    - step:
+          request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
+          request.method: POST
+          request.transforms:
+          - set:
+              target: body.exportId
+              value: '[[ .parent_last_response.body.exportId ]]'
+          replace: $.files[:].id
+          replace_with: '$.exportId,.parent_last_response.body.exportId'
+
+Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request.
+However if `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is 
+because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the
+`first_response` object always stores the very first response in the process chain.
 
 [float]
 ==== `request.tracer.filename`
@@ -1144,7 +1182,7 @@ Collect and make events from response in any format supported by httpjson for al
 
 The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value. 
 The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables 
-like [`last_response.*`, `first_response.*`, `parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
+like [`.last_response.*`, `.first_response.*`, `.parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
 thus providing a lot of flexibility in the logic of chain requests.
 
 Example:
@@ -1220,10 +1258,7 @@ response_json using exportId as '2212':
 ----
 This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
 
-NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the 
-`replace_with` processor with exact string matching. The `value` should not start with a `.` (dot). For example, if we want to
-extract the value from the last_response context object, the `replace_with` clause should look like: `replace_with:'$.xyz_pattern,last_response.body.id'`
-and not `replace_with:'$.xyz_pattern,.last_response.body.id'`.  
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching.
 
 [float]
 ==== `chain[].while`
