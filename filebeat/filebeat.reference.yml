@@ -746,7 +746,7 @@ filebeat.inputs:
 
   #parsers:
     #- include_message.patterns:
-      - ["WARN", "ERR"]
+      #- ["WARN", "ERR"]
 
   #### Multiline options
 

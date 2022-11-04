@@ -17,7 +17,10 @@ clean:
 $(ALL):
 	@echo "Generating $@-kubernetes.yaml"
 	@rm -f $@-kubernetes.yaml
-	@for f in $(shell ls $@/*.yaml); do \
-		sed "s/%VERSION%/${BEAT_VERSION}/g" $$f >> $@-kubernetes.yaml; \
-		echo --- >> $@-kubernetes.yaml; \
+	@for f in service-account role role-binding configmap deployment daemonset ; do \
+		if [ -f "$@/$@-$$f.yaml" ]; then \
+			echo "file: $@/$@-$$f.yaml"; \
+			sed "s/%VERSION%/${BEAT_VERSION}/g" $@/$@-$$f.yaml >> $@-kubernetes.yaml; \
+			echo --- >> $@-kubernetes.yaml; \
+		fi \
 	done

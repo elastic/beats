@@ -10,6 +10,7 @@ package cloudwatch
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -1646,7 +1647,10 @@ func TestInsertTags(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			insertTags(events, c.identifier, c.identifier, resourceTagMap)
+			subIdentifiers := strings.Split(c.identifier, dimensionSeparator)
+			for _, subIdentifier := range subIdentifiers {
+				insertTags(events, c.identifier, subIdentifier, resourceTagMap)
+			}
 			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)
 			assert.NoError(t, err)
 			assert.Equal(t, c.expectedTagValue, value)
