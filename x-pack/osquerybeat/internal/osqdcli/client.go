@@ -253,7 +253,7 @@ func resolveTypes(hits []map[string]string, colTypes map[string]string) []map[st
 }
 
 // Best effort to convert value types and replace values in the
-// If conversion fails the value is kept as string
+// If type conversion fails the value is preserved as string
 func resolveHitTypes(hit, colTypes map[string]string) map[string]interface{} {
 	m := make(map[string]interface{})
 	for k, v := range hit {
@@ -266,25 +266,26 @@ func resolveHitTypes(hit, colTypes map[string]string) map[string]interface{} {
 				n, err = strconv.ParseInt(v, 10, 64)
 				if err == nil {
 					m[k] = n
+					continue
 				}
 			case "UNSIGNED_BIGINT":
 				var n uint64
 				n, err = strconv.ParseUint(v, 10, 64)
 				if err == nil {
 					m[k] = n
+					continue
 				}
 			case "DOUBLE":
 				var n float64
 				n, err = strconv.ParseFloat(v, 64)
 				if err == nil {
 					m[k] = n
+					continue
 				}
-			default:
-				m[k] = v
 			}
-		} else {
-			m[k] = v
 		}
+		// Keep the original string value if the value can not be converted
+		m[k] = v
 	}
 	return m
 }
