@@ -11,134 +11,268 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 )
 
 // MonitorService service wrapper to the azure sdk for go
 type MonitorService struct {
-	metricsClient          *insights.MetricsClient
-	metricDefinitionClient *insights.MetricDefinitionsClient
-	metricNamespaceClient  *insights.MetricNamespacesClient
-	resourceClient         *resources.Client
+	metricsClient          *armmonitor.MetricsClient
+	metricDefinitionClient *armmonitor.MetricDefinitionsClient
+	metricNamespaceClient  *armmonitor.MetricNamespacesClient
+	resourceClient         *armresources.Client
 	context                context.Context
 	log                    *logp.Logger
 }
 
 const (
 	metricNameLimit = 20
-	ApiVersion      = "2019-12-01"
+	ApiVersion      = "2021-04-01"
 )
 
 // NewService instantiates the Azure monitoring service
 func NewService(config Config) (*MonitorService, error) {
-	clientConfig := auth.NewClientCredentialsConfig(config.ClientId, config.ClientSecret, config.TenantId)
-	clientConfig.AADEndpoint = config.ActiveDirectoryEndpoint
-	clientConfig.Resource = config.ResourceManagerEndpoint
-	authorizer, err := clientConfig.Authorizer()
+	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret,
+		&azidentity.ClientSecretCredentialOptions{
+			ClientOptions: policy.ClientOptions{
+				Cloud: cloud.Configuration{
+					Services:                     cloud.AzurePublic.Services,
+					ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+				},
+			},
+		})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
 	}
-	metricsClient := insights.NewMetricsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
-	metricsDefinitionClient := insights.NewMetricDefinitionsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
-	resourceClient := resources.NewClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
-	metricNamespaceClient := insights.NewMetricNamespacesClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
-	metricsClient.Authorizer = authorizer
-	metricsDefinitionClient.Authorizer = authorizer
-	resourceClient.Authorizer = authorizer
-	metricNamespaceClient.Authorizer = authorizer
+
+	metricsClient, err := armmonitor.NewMetricsClient(credential, &arm.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cloud.Configuration{
+				Services:                     cloud.AzurePublic.Services,
+				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create metrics client: %w", err)
+	}
+
+	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(credential, &arm.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cloud.Configuration{
+				Services:                     cloud.AzurePublic.Services,
+				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create metric definitions client: %w", err)
+	}
+
+	resourceClient, err := armresources.NewClient(config.SubscriptionId, credential, &arm.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cloud.Configuration{
+				Services:                     cloud.AzurePublic.Services,
+				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create resources client: %w", err)
+	}
+
+	metricNamespaceClient, err := armmonitor.NewMetricNamespacesClient(credential, &arm.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cloud.Configuration{
+				Services:                     cloud.AzurePublic.Services,
+				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create metric namespaces client: %w", err)
+	}
+
 	service := &MonitorService{
-		metricDefinitionClient: &metricsDefinitionClient,
-		metricsClient:          &metricsClient,
-		metricNamespaceClient:  &metricNamespaceClient,
-		resourceClient:         &resourceClient,
+		metricDefinitionClient: metricsDefinitionClient,
+		metricsClient:          metricsClient,
+		metricNamespaceClient:  metricNamespaceClient,
+		resourceClient:         resourceClient,
 		context:                context.Background(),
 		log:                    logp.NewLogger("azure monitor service"),
 	}
+
 	return service, nil
 }
 
 // GetResourceDefinitions will retrieve the azure resources based on the options entered
-func (service MonitorService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]resources.GenericResourceExpanded, error) {
+func (service MonitorService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]*armresources.GenericResourceExpanded, error) {
 	var resourceQuery string
-	var resourceList []resources.GenericResourceExpanded
+	var resourceList []*armresources.GenericResourceExpanded
+
 	if len(id) > 0 {
 		// listing multiple resourceId conditions does not seem to work with the API, extracting the name and resource type does not work as the position of the `resourceType` can move if a parent resource is involved, filtering by resource name and resource group (if extracted) is also not possible as
 		// different types of resources can contain the same name.
 		for _, id := range id {
-			resource, err := service.resourceClient.List(service.context, fmt.Sprintf("resourceId eq '%s'", id), "", nil)
-			if err != nil {
-				return nil, err
-			}
-			if len(resource.Values()) > 0 {
-				resourceList = append(resourceList, resource.Values()...)
+			filter := fmt.Sprintf("resourceId eq '%s'", id)
+			pager := service.resourceClient.NewListPager(&armresources.ClientListOptions{
+				Filter: &filter,
+			})
+
+			for pager.More() {
+				nextResult, err := pager.NextPage(service.context)
+				if err != nil {
+					return nil, err
+				}
+
+				if len(nextResult.Value) > 0 {
+					resourceList = append(resourceList, nextResult.Value...)
+				}
 			}
 		}
+
 		return resourceList, nil
 	}
-	if len(group) > 0 {
+
+	switch {
+	case len(group) > 0:
 		var filterList []string
+
 		for _, gr := range group {
 			filterList = append(filterList, fmt.Sprintf("resourceGroup eq '%s'", gr))
 		}
+
 		resourceQuery = strings.Join(filterList, " OR ")
 		if rType != "" {
 			resourceQuery = fmt.Sprintf("(%s) AND resourceType eq '%s'", resourceQuery, rType)
 		}
-	} else if query != "" {
+	case query != "":
 		resourceQuery = query
 	}
-	result, err := service.resourceClient.List(service.context, resourceQuery, "", nil)
-	if err == nil {
-		resourceList = result.Values()
+
+	var tempResourceList []*armresources.GenericResourceExpanded
+
+	pager := service.resourceClient.NewListPager(&armresources.ClientListOptions{
+		Filter: &resourceQuery,
+	})
+	for pager.More() {
+		nextResult, err := pager.NextPage(service.context)
+		if err != nil {
+			return nil, err
+		}
+
+		tempResourceList = append(tempResourceList, nextResult.Value...)
 	}
-	return resourceList, err
+
+	resourceList = tempResourceList
+
+	return resourceList, nil
 }
 
 // GetResourceDefinitionById will retrieve the azure resource based on the resource Id
-func (service MonitorService) GetResourceDefinitionById(id string) (resources.GenericResource, error) {
-	return service.resourceClient.GetByID(service.context, id, ApiVersion)
+func (service MonitorService) GetResourceDefinitionById(id string) (armresources.GenericResource, error) {
+	resp, err := service.resourceClient.GetByID(service.context, id, ApiVersion, nil)
+	if err != nil {
+		return armresources.GenericResource{}, err
+	}
+
+	return resp.GenericResource, nil
 }
 
 // GetMetricNamespaces will return all supported namespaces based on the resource id and namespace
-func (service *MonitorService) GetMetricNamespaces(resourceId string) (insights.MetricNamespaceCollection, error) {
-	return service.metricNamespaceClient.List(service.context, resourceId, "")
+func (service *MonitorService) GetMetricNamespaces(resourceId string) (armmonitor.MetricNamespaceCollection, error) {
+	pager := service.metricNamespaceClient.NewListPager(resourceId, nil)
+
+	metricNamespaceCollection := armmonitor.MetricNamespaceCollection{}
+
+	for pager.More() {
+		nextPage, err := pager.NextPage(service.context)
+		if err != nil {
+			return armmonitor.MetricNamespaceCollection{}, err
+		}
+
+		metricNamespaceCollection.Value = append(metricNamespaceCollection.Value, nextPage.Value...)
+	}
+
+	return metricNamespaceCollection, nil
 }
 
 // GetMetricDefinitions will return all supported metrics based on the resource id and namespace
-func (service *MonitorService) GetMetricDefinitions(resourceId string, namespace string) (insights.MetricDefinitionCollection, error) {
-	return service.metricDefinitionClient.List(service.context, resourceId, namespace)
+func (service *MonitorService) GetMetricDefinitions(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
+	pager := service.metricDefinitionClient.NewListPager(resourceId, &armmonitor.MetricDefinitionsClientListOptions{
+		Metricnamespace: &namespace,
+	})
+
+	metricDefinitionCollection := armmonitor.MetricDefinitionCollection{}
+
+	for pager.More() {
+		nextPage, err := pager.NextPage(service.context)
+		if err != nil {
+			return armmonitor.MetricDefinitionCollection{}, nil
+		}
+
+		metricDefinitionCollection.Value = append(metricDefinitionCollection.Value, nextPage.Value...)
+	}
+
+	return metricDefinitionCollection, nil
 }
 
 // GetMetricValues will return the metric values based on the resource and metric details
-func (service *MonitorService) GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, string, error) {
+func (service *MonitorService) GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]armmonitor.Metric, string, error) {
 	var tg *string
 	var interval string
+
 	if timegrain != "" {
 		tg = &timegrain
 	}
+
+	orderBy := ""
+	resultTypeData := armmonitor.ResultTypeData
+
 	// check for limit of requested metrics (20)
-	var metrics []insights.Metric
+	var metrics []armmonitor.Metric
+
 	for i := 0; i < len(metricNames); i += metricNameLimit {
 		end := i + metricNameLimit
+
 		if end > len(metricNames) {
 			end = len(metricNames)
 		}
-		resp, err := service.metricsClient.List(service.context, resourceId, timespan, tg, strings.Join(metricNames[i:end], ","),
-			aggregations, nil, "", filter, insights.Data, namespace)
+
+		metricNames := strings.Join(metricNames[i:end], ",")
+
+		resp, err := service.metricsClient.List(service.context, resourceId, &armmonitor.MetricsClientListOptions{
+			Aggregation:     &aggregations,
+			Filter:          &filter,
+			Interval:        tg,
+			Metricnames:     &metricNames,
+			Metricnamespace: &namespace,
+			Timespan:        &timespan,
+			Top:             nil,
+			Orderby:         &orderBy,
+			ResultType:      &resultTypeData,
+		})
 
 		// check for applied charges before returning any errors
 		if resp.Cost != nil && *resp.Cost != 0 {
 			service.log.Warnf("Charges amounted to %v are being applied while retrieving the metric values from the resource %s ", *resp.Cost, resourceId)
 		}
+
 		if err != nil {
 			return metrics, "", err
 		}
-		interval = *resp.Interval
-		metrics = append(metrics, *resp.Value...)
 
+		interval = *resp.Interval
+
+		for _, v := range resp.Value {
+			metrics = append(metrics, *v)
+		}
 	}
+
 	return metrics, interval, nil
 }
 

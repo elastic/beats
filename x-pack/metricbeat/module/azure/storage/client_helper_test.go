@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -20,25 +20,25 @@ var (
 	time1         = "PT1M"
 	time2         = "PT5M"
 	time3         = "PT1H"
-	availability1 = []insights.MetricAvailability{
+	availability1 = []*armmonitor.MetricAvailability{
 		{TimeGrain: &time1},
 		{TimeGrain: &time2},
 	}
-	availability2 = []insights.MetricAvailability{
+	availability2 = []*armmonitor.MetricAvailability{
 		{TimeGrain: &time3},
 	}
-	availability3 = []insights.MetricAvailability{
+	availability3 = []*armmonitor.MetricAvailability{
 		{TimeGrain: &time1},
 		{TimeGrain: &time3},
 	}
 )
 
-func MockResource() resources.GenericResourceExpanded {
+func MockResource() *armresources.GenericResourceExpanded {
 	id := "123"
 	name := "resourceName"
 	location := "resourceLocation"
 	rType := "resourceType"
-	return resources.GenericResourceExpanded{
+	return &armresources.GenericResourceExpanded{
 		ID:       &id,
 		Name:     &name,
 		Location: &location,
@@ -46,50 +46,74 @@ func MockResource() resources.GenericResourceExpanded {
 	}
 }
 
-func MockNamespace() insights.MetricNamespaceCollection {
+func MockNamespace() armmonitor.MetricNamespaceCollection {
 	name := "namespace"
-	property := insights.MetricNamespaceName{
+	property := armmonitor.MetricNamespaceName{
 		MetricNamespaceName: &name,
 	}
-	namespace := insights.MetricNamespace{
+	namespace := &armmonitor.MetricNamespace{
 		Name:       &name,
 		Properties: &property,
 	}
-	list := []insights.MetricNamespace{namespace}
-	return insights.MetricNamespaceCollection{
-		Value: &list,
+
+	list := []*armmonitor.MetricNamespace{namespace}
+
+	return armmonitor.MetricNamespaceCollection{
+		Value: list,
 	}
 }
 
-func MockMetricDefinitions() *[]insights.MetricDefinition {
-	metric1 := "TotalRequests"
-	metric2 := "Capacity"
-	defs := []insights.MetricDefinition{
+func MockMetricDefinitions() []*armmonitor.MetricDefinition {
+	var (
+		metric1 = "TotalRequests"
+		metric2 = "Capacity"
+
+		aggregationTypeAverage = armmonitor.AggregationTypeAverage
+		aggregationTypeCount   = armmonitor.AggregationTypeCount
+		aggregationTypeMinimum = armmonitor.AggregationTypeMinimum
+		aggregationTypeMaximum = armmonitor.AggregationTypeMaximum
+		aggregationTypeTotal   = armmonitor.AggregationTypeTotal
+	)
+
+	defs := []*armmonitor.MetricDefinition{
 		{
-			Name:                      &insights.LocalizableString{Value: &metric1},
-			PrimaryAggregationType:    insights.Average,
-			MetricAvailabilities:      &availability1,
-			SupportedAggregationTypes: &[]insights.AggregationType{insights.Maximum, insights.Count, insights.Total, insights.Average},
+			Name:                   &armmonitor.LocalizableString{Value: &metric1},
+			PrimaryAggregationType: &aggregationTypeAverage,
+			MetricAvailabilities:   availability1,
+			SupportedAggregationTypes: []*armmonitor.AggregationType{
+				&aggregationTypeMaximum,
+				&aggregationTypeCount,
+				&aggregationTypeTotal,
+				&aggregationTypeAverage,
+			},
 		},
 		{
-			Name:                      &insights.LocalizableString{Value: &metric2},
-			PrimaryAggregationType:    insights.Average,
-			MetricAvailabilities:      &availability2,
-			SupportedAggregationTypes: &[]insights.AggregationType{insights.Average, insights.Count, insights.Minimum},
+			Name:                   &armmonitor.LocalizableString{Value: &metric2},
+			PrimaryAggregationType: &aggregationTypeAverage,
+			MetricAvailabilities:   availability2,
+			SupportedAggregationTypes: []*armmonitor.AggregationType{
+				&aggregationTypeAverage,
+				&aggregationTypeCount,
+				&aggregationTypeMinimum,
+			},
 		},
 	}
-	return &defs
+
+	return defs
 }
 
 func TestMapMetric(t *testing.T) {
 	resource := MockResource()
-	metricDefinitions := insights.MetricDefinitionCollection{
+	metricDefinitions := armmonitor.MetricDefinitionCollection{
 		Value: MockMetricDefinitions(),
 	}
-	emptyList := []insights.MetricDefinition{}
-	emptyMetricDefinitions := insights.MetricDefinitionCollection{
-		Value: &emptyList,
+
+	emptyList := []*armmonitor.MetricDefinition{}
+
+	emptyMetricDefinitions := armmonitor.MetricDefinitionCollection{
+		Value: emptyList,
 	}
+
 	metricConfig := azure.MetricConfig{Name: []string{"*"}}
 	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}, ServiceType: []string{"blob"}}
 	client := azure.NewMockClient()
@@ -97,9 +121,9 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
 		client.AzureMonitorService = m
-		metric, err := mapMetrics(client, []resources.GenericResourceExpanded{resource}, resourceConfig)
+		metric, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.Error(t, err)
-		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace Microsoft.Storage/storageAccounts.")
+		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace Microsoft.Storage/storageAccounts %!w(<nil>)")
 		assert.Equal(t, metric, []azure.Metric(nil))
 		m.AssertExpectations(t)
 	})
@@ -107,7 +131,7 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
-		metrics, err := mapMetrics(client, []resources.GenericResourceExpanded{resource}, resourceConfig)
+		metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.NoError(t, err)
 		assert.Equal(t, metrics[0].ResourceId, "123")
 		assert.Equal(t, metrics[0].Namespace, "Microsoft.Storage/storageAccounts")
@@ -133,20 +157,20 @@ func TestMapMetric(t *testing.T) {
 }
 
 func TestFilterOnTimeGrain(t *testing.T) {
-	var list = []insights.MetricDefinition{
-		{MetricAvailabilities: &availability1},
-		{MetricAvailabilities: &availability2},
-		{MetricAvailabilities: &availability3},
+	var list = []armmonitor.MetricDefinition{
+		{MetricAvailabilities: availability1},
+		{MetricAvailabilities: availability2},
+		{MetricAvailabilities: availability3},
 	}
 	response := groupOnTimeGrain(list)
 	assert.Equal(t, len(response), 2)
-	result := [][]insights.MetricDefinition{
+	result := [][]armmonitor.MetricDefinition{
 		{
-			{MetricAvailabilities: &availability1},
+			{MetricAvailabilities: availability1},
 		},
 		{
-			{MetricAvailabilities: &availability2},
-			{MetricAvailabilities: &availability3},
+			{MetricAvailabilities: availability2},
+			{MetricAvailabilities: availability3},
 		},
 	}
 	for key, availabilities := range response {

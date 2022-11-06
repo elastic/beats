@@ -6,61 +6,88 @@ package billing
 
 import (
 	"context"
+	"fmt"
 	"time"
-
-	"github.com/Azure/go-autorest/autorest/date"
-
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-	//"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 )
 
 // Service offers access to Azure Usage Details and Forecast data.
 type Service interface {
-	GetForecast(scope string, startTime, endTime time.Time) (costmanagement.QueryResult, error)
+	GetForecast(
+		scope string,
+		startTime,
+		endTime time.Time,
+	) (armcostmanagement.QueryResult, error)
 	GetUsageDetails(
 		scope string,
 		expand string,
 		filter string,
 		skipToken string,
 		top *int32,
-		metricType consumption.Metrictype,
+		metricType armconsumption.Metrictype,
 		startDate string,
-		endDate string) (consumption.UsageDetailsListResultPage, error)
+		endDate string,
+	) (armconsumption.UsageDetailsListResult, error)
 }
 
 // UsageService is a thin wrapper to the Usage Details API and the Forecast API from the Azure SDK for Go.
 type UsageService struct {
-	usageDetailsClient *consumption.UsageDetailsClient
-	forecastClient     *costmanagement.ForecastClient
+	usageDetailsClient *armconsumption.UsageDetailsClient
+	forecastClient     *armcostmanagement.ForecastClient
 	context            context.Context
 	log                *logp.Logger
 }
 
 // NewService builds a new UsageService using the given config.
 func NewService(config azure.Config) (*UsageService, error) {
-	clientConfig := auth.NewClientCredentialsConfig(config.ClientId, config.ClientSecret, config.TenantId)
-	clientConfig.AADEndpoint = config.ActiveDirectoryEndpoint
-	clientConfig.Resource = config.ResourceManagerEndpoint
-	authorizer, err := clientConfig.Authorizer()
+	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret, &azidentity.ClientSecretCredentialOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cloud.Configuration{
+				Services:                     cloud.AzurePublic.Services,
+				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+			},
+		},
+	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
 	}
 
-	usageDetailsClient := consumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
-	forecastsClient := costmanagement.NewForecastClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	usageDetailsClient, err := armconsumption.NewUsageDetailsClient(credential, &arm.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cloud.Configuration{
+				Services:                     cloud.AzurePublic.Services,
+				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create usage details client: %w", err)
+	}
 
-	usageDetailsClient.Authorizer = authorizer
-	forecastsClient.Authorizer = authorizer
+	forecastsClient, err := armcostmanagement.NewForecastClient(credential, &arm.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cloud.Configuration{
+				Services:                     cloud.AzurePublic.Services,
+				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create forecast client: %w", err)
+	}
 
 	service := UsageService{
-		usageDetailsClient: &usageDetailsClient,
-		forecastClient:     &forecastsClient,
+		usageDetailsClient: usageDetailsClient,
+		forecastClient:     forecastsClient,
 		context:            context.Background(),
 		log:                logp.NewLogger("azure billing service"),
 	}
@@ -69,7 +96,11 @@ func NewService(config azure.Config) (*UsageService, error) {
 }
 
 // GetForecast fetches the forecast for the given scope and time interval.
-func (service *UsageService) GetForecast(scope string, startTime, endTime time.Time) (costmanagement.QueryResult, error) {
+func (service *UsageService) GetForecast(
+	scope string,
+	startTime,
+	endTime time.Time,
+) (armcostmanagement.QueryResult, error) {
 	// With this flag, the Forecast API will also return actual usage data
 	// for the given time interval (usually the current month).
 	//
@@ -85,30 +116,30 @@ func (service *UsageService) GetForecast(scope string, startTime, endTime time.T
 
 	// The aggregation is performed by the "sum" of "cost" for each day.
 	aggregationName := "Cost"
-	aggregationFunction := costmanagement.FunctionTypeSum
+	aggregationFunction := armcostmanagement.FunctionTypeSum
 
-	forecastDefinition := costmanagement.ForecastDefinition{
-		Dataset: &costmanagement.QueryDataset{
-			Aggregation: map[string]*costmanagement.QueryAggregation{
+	forecastDefinition := armcostmanagement.ForecastDefinition{
+		Dataset: &armcostmanagement.ForecastDataset{
+			Aggregation: map[string]*armcostmanagement.QueryAggregation{
 				"totalCost": {
-					Function: aggregationFunction,
+					Function: &aggregationFunction,
 					Name:     &aggregationName,
 				},
 			},
-			Granularity: costmanagement.GranularityTypeDaily,
+			Granularity: &armcostmanagement.PossibleGranularityTypeValues()[0],
 		},
 
 		// Time frame/period of the forecast. Required for MCA accounts.
 		//
 		// If omitted, EA users will get a forecast for the current month, and
 		// MCA users will get an error.
-		Timeframe: costmanagement.ForecastTimeframeTypeCustom,
-		TimePeriod: &costmanagement.QueryTimePeriod{
-			From: &date.Time{Time: startTime},
-			To:   &date.Time{Time: endTime},
+		Timeframe: &armcostmanagement.PossibleForecastTimeframeTypeValues()[1],
+		TimePeriod: &armcostmanagement.QueryTimePeriod{
+			From: &startTime,
+			To:   &endTime,
 		},
 
-		Type:                    costmanagement.ForecastTypeActualCost,
+		Type:                    &armcostmanagement.PossibleForecastTypeValues()[0],
 		IncludeActualCost:       &includeActualCost,
 		IncludeFreshPartialCost: &includeFreshPartialCost,
 	}
@@ -116,15 +147,45 @@ func (service *UsageService) GetForecast(scope string, startTime, endTime time.T
 	// required, but I don't have a use for it, yet.
 	filter := ""
 
-	queryResult, err := service.forecastClient.Usage(service.context, scope, forecastDefinition, filter)
+	queryResult, err := service.forecastClient.Usage(service.context, scope, forecastDefinition, &armcostmanagement.ForecastClientUsageOptions{
+		Filter: &filter,
+	})
 	if err != nil {
-		return costmanagement.QueryResult{}, err
+		return armcostmanagement.QueryResult{}, err
 	}
 
-	return queryResult, nil
+	return queryResult.QueryResult, nil
 }
 
 // GetUsageDetails fetches the usage details for the given filters.
-func (service *UsageService) GetUsageDetails(scope string, expand string, filter string, skipToken string, top *int32, metrictype consumption.Metrictype, startDate string, endDate string) (consumption.UsageDetailsListResultPage, error) {
-	return service.usageDetailsClient.List(service.context, scope, expand, filter, skipToken, top, metrictype, startDate, endDate)
+func (service *UsageService) GetUsageDetails(
+	scope string,
+	expand string,
+	filter string,
+	skipToken string,
+	top *int32,
+	metrictype armconsumption.Metrictype,
+	startDate string,
+	endDate string,
+) (armconsumption.UsageDetailsListResult, error) {
+	pager := service.usageDetailsClient.NewListPager(scope, &armconsumption.UsageDetailsClientListOptions{
+		Expand:    &expand,
+		Filter:    &filter,
+		Metric:    &metrictype,
+		Skiptoken: &skipToken,
+		Top:       top,
+	})
+
+	usageDetails := armconsumption.UsageDetailsListResult{}
+
+	for pager.More() {
+		nextPage, err := pager.NextPage(service.context)
+		if err != nil {
+			return armconsumption.UsageDetailsListResult{}, err
+		}
+
+		usageDetails.Value = append(usageDetails.Value, nextPage.Value...)
+	}
+
+	return usageDetails, nil
 }

@@ -10,7 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/costmanagement/mgmt/2019-11-01/costmanagement"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement"
 
 	"errors"
 
@@ -21,7 +22,12 @@ import (
 
 // EventsMapping maps the usage details and forecast data to a list of metricbeat events to
 // send to Elasticsearch.
-func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOptions, logger *logp.Logger) ([]mb.Event, error) {
+func EventsMapping(
+	subscriptionId string,
+	results Usage,
+	timeOpts TimeIntervalOptions,
+	logger *logp.Logger,
+) ([]mb.Event, error) {
 	events := make([]mb.Event, 0, len(results.UsageDetails))
 
 	//
@@ -37,81 +43,78 @@ func EventsMapping(subscriptionId string, results Usage, timeOpts TimeIntervalOp
 				"cloud.provider": "azure",
 			}
 
-			if legacy, isLegacy := ud.AsLegacyUsageDetail(); isLegacy {
-
+			switch usageDetails := ud.(type) {
+			case *armconsumption.LegacyUsageDetail:
 				//
 				// legacy data format
 				//
 
+				legacy := usageDetails
+
 				event.ModuleFields = mapstr.M{
-					"subscription_id":   legacy.SubscriptionID,
-					"subscription_name": legacy.SubscriptionName,
+					"subscription_id":   legacy.Properties.SubscriptionID,
+					"subscription_name": legacy.Properties.SubscriptionName,
 					"resource": mapstr.M{
-						"name":  legacy.ResourceName,
-						"type":  legacy.ConsumedService,
-						"group": legacy.ResourceGroup,
+						"name":  legacy.Properties.ResourceName,
+						"type":  legacy.Properties.ConsumedService,
+						"group": legacy.Properties.ResourceGroup,
 					},
 				}
 				event.MetricSetFields = mapstr.M{
 					// original fields
 					"billing_period_id": legacy.ID,
-					"product":           legacy.Product,
-					"pretax_cost":       legacy.Cost,
-					"currency":          legacy.BillingCurrency,
-					"department_name":   legacy.InvoiceSection,
-					"account_name":      legacy.BillingAccountName,
+					"product":           legacy.Properties.Product,
+					"pretax_cost":       legacy.Properties.Cost,
+					"currency":          legacy.Properties.BillingCurrency,
+					"department_name":   legacy.Properties.InvoiceSection,
+					"account_name":      legacy.Properties.BillingAccountName,
 					"usage_start":       timeOpts.usageStart,
 					"usage_end":         timeOpts.usageEnd,
 
 					// additional fields
-					"usage_date": legacy.Date, // Date for the usage record.
-					"account_id": legacy.BillingAccountID,
-					"unit_price": legacy.UnitPrice,
-					"quantity":   legacy.Quantity,
+					"usage_date": legacy.Properties.Date, // Date for the usage record.
+					"account_id": legacy.Properties.BillingAccountID,
+					"unit_price": legacy.Properties.UnitPrice,
+					"quantity":   legacy.Properties.Quantity,
 				}
-				_, _ = event.RootFields.Put("cloud.region", legacy.ResourceLocation)
-				_, _ = event.RootFields.Put("cloud.instance.name", legacy.ResourceName)
-				_, _ = event.RootFields.Put("cloud.instance.id", legacy.ResourceID)
-
-			} else if modern, isModern := ud.AsModernUsageDetail(); isModern {
-
+				_, _ = event.RootFields.Put("cloud.region", legacy.Properties.ResourceLocation)
+				_, _ = event.RootFields.Put("cloud.instance.name", legacy.Properties.ResourceName)
+				_, _ = event.RootFields.Put("cloud.instance.id", legacy.Properties.ResourceID)
+			case *armconsumption.ModernUsageDetail:
 				//
 				// modern data format
 				//
 
+				modern := usageDetails
+
 				event.ModuleFields = mapstr.M{
-					"subscription_id":   modern.SubscriptionGUID,
-					"subscription_name": modern.SubscriptionName,
+					"subscription_id":   modern.Properties.SubscriptionGUID,
+					"subscription_name": modern.Properties.SubscriptionName,
 					"resource": mapstr.M{
-						"name":  getResourceNameFromPath(*modern.InstanceName),
-						"type":  modern.ConsumedService,
-						"group": strings.ToLower(*modern.ResourceGroup),
+						"name":  getResourceNameFromPath(*modern.Properties.InstanceName),
+						"type":  modern.Properties.ConsumedService,
+						"group": strings.ToLower(*modern.Properties.ResourceGroup),
 					},
 				}
 				event.MetricSetFields = mapstr.M{
 					// original fields
 					"billing_period_id": modern.ID,
-					"product":           modern.Product,
-					"pretax_cost":       modern.CostInBillingCurrency,
-					"currency":          modern.BillingCurrencyCode,
-					"department_name":   modern.InvoiceSectionName,
-					"account_name":      modern.BillingAccountName,
+					"product":           modern.Properties.Product,
+					"pretax_cost":       modern.Properties.CostInBillingCurrency,
+					"currency":          modern.Properties.BillingCurrencyCode,
+					"department_name":   modern.Properties.InvoiceSectionName,
+					"account_name":      modern.Properties.BillingAccountName,
 					"usage_start":       timeOpts.usageStart,
 					"usage_end":         timeOpts.usageEnd,
 
 					// additional fields
-					"usage_date": modern.Date, // Date for the usage record.
-					"account_id": modern.BillingAccountID,
-					"unit_price": modern.UnitPrice,
-					"quantity":   modern.Quantity,
+					"usage_date": modern.Properties.Date, // Date for the usage record.
+					"account_id": modern.Properties.BillingAccountID,
+					"unit_price": modern.Properties.UnitPrice,
+					"quantity":   modern.Properties.Quantity,
 				}
-				_, _ = event.RootFields.Put("cloud.region", modern.ResourceLocation)
-
-			} else {
-
-				//
-				// Unsupported data format
-				//
+				_, _ = event.RootFields.Put("cloud.region", modern.Properties.ResourceLocation)
+			default:
 				return events, errors.New("unsupported usage details format: not legacy nor modern")
 			}
 
@@ -159,28 +162,27 @@ func getResourceNameFromPath(path string) string {
 // .Rows:
 // 0: []interface {}{0.11, 2.0200807e+07, "Actual", "USD"}
 // 1: []interface {}{0.11, 2.0200808e+07, "Forecast", "USD"}
-//
-func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID string, logger *logp.Logger) ([]mb.Event, error) {
+func getEventsFromQueryResult(result armcostmanagement.QueryResult, subscriptionID string, logger *logp.Logger) ([]mb.Event, error) {
 	// The number of columns expected in the QueryResult supported by this input.
 	// The structure of the QueryResult is determined by the value we set in
 	// the `costmanagement.ForecastDefinition` struct at query time.
 	const expectedNumberOfColumns = 4
 
-	if result.QueryProperties == nil || result.Columns == nil {
+	if result.Properties == nil || result.Properties.Columns == nil {
 		return []mb.Event{}, errors.New("unsupported forecasts QueryResult format: no columns")
 	}
 
-	if len(*result.Columns) != expectedNumberOfColumns {
-		return []mb.Event{}, fmt.Errorf("unsupported forecasts QueryResult format: got %d columns instead of %d", len(*result.Columns), expectedNumberOfColumns)
+	if len(result.Properties.Columns) != expectedNumberOfColumns {
+		return []mb.Event{}, fmt.Errorf("unsupported forecasts QueryResult format: got %d columns instead of %d", len(result.Properties.Columns), expectedNumberOfColumns)
 	}
 
-	if result.Rows == nil {
+	if result.Properties.Rows == nil {
 		logger.Warn("no rows in forecasts QueryResult")
 		return []mb.Event{}, nil
 	}
 
-	events := make([]mb.Event, 0, len(*result.Rows))
-	for _, row := range *result.Rows {
+	events := make([]mb.Event, 0, len(result.Properties.Rows))
+	for _, row := range result.Properties.Rows {
 		var cost float64
 		var currency string
 		var costStatus string
