@@ -101,6 +101,20 @@ func TestMoveFields(t *testing.T) {
 				excludeMap: nil,
 			},
 		},
+		{
+			`move field "other" into app.b object`,
+			mapstr.M{"app": mapstr.M{"version": 1, "method": "2"}, "other": 3},
+			mapstr.M{"app": mapstr.M{"version": 1, "method": "2", "b": mapstr.M{"my_prefix_other": 3}}},
+			&moveFields{
+				config: moveFieldsConfig{
+					From:    "",
+					Fields:  []string{"other"},
+					To:      "app.b.my_prefix_",
+					Exclude: nil,
+				},
+				excludeMap: nil,
+			},
+		},
 	}
 
 	for idx, c := range cases {
