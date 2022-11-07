@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/http_endpoint"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson"
@@ -29,6 +30,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		azureblobstorage.Plugin(log, store),
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
+		entityanalytics.Plugin(log),
 		gcs.Plugin(log, store),
 		http_endpoint.Plugin(),
 		httpjson.Plugin(log, store),

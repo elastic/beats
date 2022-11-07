@@ -50,7 +50,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
-- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for 
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
    automatic splitting at root level, if root level element is an array. {pull}34155[34155]
 - [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
 - [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
@@ -167,6 +167,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
 - Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 - Add support for recognizing the log level in Elasticsearch JVM logs {pull}34159[34159]
+- Add new Entity Analytics input with Azure Active Directory support. {pull}34305[34305]
 
 *Auditbeat*
 

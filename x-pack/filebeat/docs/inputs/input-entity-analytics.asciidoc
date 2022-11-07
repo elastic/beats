@@ -1,0 +1,116 @@
+[role="xpack"]
+
+:type: entity-analytics
+
+[id="{beatname_lc}-input-{type}"]
+=== Entity Analytics Input
+
+++++
+<titleabbrev>Entity Analytics</titleabbrev>
+++++
+
+Experimental[Input]
+
+The Entity Analytics input collects identity assets, such as users, from external
+identity providers.
+
+The following identity providers are supported:
+
+- <<provider-azure>>
+
+==== Configuration options
+
+The `entity-analytics` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `provider`
+
+The identity provider. Must be one of: `azure`.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+==== Providers
+
+[id="provider-azure"]
+==== Azure Active Directory (`azure`)
+
+The azure provider allows entitystream to retrieve users, with group
+memberships, from Azure Active Directory (AD).
+
+==== Setup
+
+The necessary API permissions need to be granted in Azure in order for the provider to function properly:
+
+|===
+|Permission |Type
+
+|GroupMember.Read.All
+|Application
+
+|User.Read.All
+|Application
+|===
+
+For a full guide on how to set up the necessary App Registration, permission
+granting, and secret configuration, follow this https://learn.microsoft.com/en-us/graph/auth-v2-service[guide].
+
+==== Configuration
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: entity-analytics
+  enabled: true
+  id: azure-1
+  provider: azure
+  sync_interval: "12h"
+  update_interval: "30m"
+  client_id: "CLIENT_ID"
+  tenant_id: "TENANT_ID"
+  secret: "SECRET"
+----
+
+The `azure` provider supports the following configuration:
+
+==== `tenant_id`
+
+The Tenant ID. Field is required.
+
+==== `client_id`
+
+The client/application ID. Used for authentication. Field is required.
+
+==== `secret`
+
+The secret value, used for authentication. Field is required.
+
+==== `sync_interval`
+
+The interval in which full synchronizations should occur. The interval must be
+longer than the update interval (`update_interval`) Expressed as a duration
+string (e.g., 1m, 3h, 24h). Defaults to `24h` (24 hours).
+
+==== `update_interval`
+
+The interval in which incremental updates should occur. The interval must be
+shorter than the full synchronization interval (`sync_interval`). Expressed as a
+duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
+
+==== `login_endpoint`
+
+Override the default authentication login endpoint. Only change if directed to do
+so. Altering this value will also require a change to `login_scopes`.
+
+==== `login_scopes`
+
+Override the default authentication scopes. Only change if directed to do so.
+
+NOTE: This input is experimental and is under active developement. Configuration
+options and behaviors may change without warning. Use with caution and do not use
+in production environments.
+
+:type!:
