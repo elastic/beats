@@ -569,19 +569,26 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 				}
 
 				identifierValue := labels[identifierValueIdx]
-				if _, ok := events[identifierValue]; !ok {
-					// when tagsFilter is not empty but no entry in
-					// resourceTagMap for this identifier, do not initialize
-					// an event for this identifier.
-					if len(tagsFilter) != 0 && resourceTagMap[identifierValue] == nil {
-						continue
-					}
-					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
-				}
-				events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
 
 				// add tags to event based on identifierValue
-				insertTags(events, identifierValue, resourceTagMap)
+				// Check if identifier includes dimensionSeparator (comma in this case),
+				// split the identifier and check for each sub-identifier.
+				// For example, identifier might be [storageType, s3BucketName].
+				// And tags are only store under s3BucketName in resourceTagMap.
+				subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
+				for _, subIdentifier := range subIdentifiers {
+					if _, ok := events[identifierValue]; !ok {
+						// when tagsFilter is not empty but no entry in
+						// resourceTagMap for this identifier, do not initialize
+						// an event for this identifier.
+						if len(tagsFilter) != 0 && resourceTagMap[subIdentifier] == nil {
+							continue
+						}
+						events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+					}
+					events[identifierValue] = insertRootFields(events[identifierValue], output.Values[timestampIdx], labels)
+					insertTags(events, identifierValue, subIdentifier, resourceTagMap)
+				}
 			}
 		}
 	}
@@ -630,28 +637,20 @@ func compareAWSDimensions(dim1 []cloudwatch.Dimension, dim2 []cloudwatch.Dimensi
 	return reflect.DeepEqual(dim1NameToValue, dim2NameToValue)
 }
 
-func insertTags(events map[string]mb.Event, identifier string, resourceTagMap map[string][]resourcegroupstaggingapi.Tag) {
-	// Check if identifier includes dimensionSeparator (comma in this case),
-	// split the identifier and check for each sub-identifier.
-	// For example, identifier might be [storageType, s3BucketName].
-	// And tags are only store under s3BucketName in resourceTagMap.
-	subIdentifiers := strings.Split(identifier, dimensionSeparator)
-	for _, v := range subIdentifiers {
-		tags := resourceTagMap[v]
-		// some metric dimension values are arn format, eg: AWS/DDOS namespace metric
-		if len(tags) == 0 && strings.HasPrefix(v, "arn:") {
-			resourceID, err := aws.FindShortIdentifierFromARN(v)
-			if err == nil {
-				tags = resourceTagMap[resourceID]
-			}
+func insertTags(events map[string]mb.Event, identifier string, subIdentifier string, resourceTagMap map[string][]resourcegroupstaggingapi.Tag) {
+	tags := resourceTagMap[subIdentifier]
+	// some metric dimension values are arn format, eg: AWS/DDOS namespace metric
+	if len(tags) == 0 && strings.HasPrefix(subIdentifier, "arn:") {
+		resourceID, err := aws.FindShortIdentifierFromARN(subIdentifier)
+		if err == nil {
+			tags = resourceTagMap[resourceID]
 		}
-		if len(tags) != 0 {
-			// By default, replace dot "." using underscore "_" for tag keys.
-			// Note: tag values are not dedotted.
-			for _, tag := range tags {
-				_, _ = events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
-			}
-			continue
+	}
+	if len(tags) != 0 {
+		// By default, replace dot "." using underscore "_" for tag keys.
+		// Note: tag values are not dedotted.
+		for _, tag := range tags {
+			_, _ = events[identifier].RootFields.Put("aws.tags."+common.DeDot(*tag.Key), *tag.Value)
 		}
 	}
 }
