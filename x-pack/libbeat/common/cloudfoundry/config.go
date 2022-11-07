@@ -21,9 +21,6 @@ const (
 	// FirehoseFilterAll doesn't apply any filter.
 	FirehoseFilterAll = "all"
 
-	// FirehoseFilterAllLogs filters on client side, for log-like events (logs, errors and http events).
-	FirehoseFilterAllLogs = "all-logs"
-
 	// FirehoseFilterLogs filters on server side for log events, adding the parameter "file-type=logs"
 	// and then filters on client side, for log-like events (logs, errors and http events).
 	FirehoseFilterLogs = "logs"

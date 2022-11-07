@@ -81,7 +81,7 @@ func (c *DopplerConsumer) Run() {
 }
 
 func (c *DopplerConsumer) logsFirehose() {
-	filter := FirehoseFilterAllLogs
+	filter := FirehoseFilterLogs
 	if c.callbacks.Filter != "" {
 		filter = c.callbacks.Filter
 	}
@@ -102,17 +102,14 @@ func selectFilter(firehoseFilter string) (func(*events.Envelope) bool, consumer.
 	switch firehoseFilter {
 	case FirehoseFilterAll:
 		return filterNoFilter, -1
-	case FirehoseFilterAllLogs:
-		// Requests all events, and selects log-like events.
-		return filterLogs, -1
 	case FirehoseFilterLogs:
-		// Uses filter-type=logs in requests to the firehose.
+		// Uses filter-type=logs in requests to the firehose and selects log-like events.
 		return filterLogs, consumer.LogMessages
 	case FirehoseFilterMetrics:
 		// Uses filter-type=metrics in requests to the firehose.
 		return filterNoFilter, consumer.Metrics
 	default:
-		// TODO: Handle unknown filters.
+		// No filter.
 		return filterNoFilter, -1
 	}
 }
