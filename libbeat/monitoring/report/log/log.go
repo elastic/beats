@@ -42,6 +42,7 @@ var gauges = map[string]bool{
 	"libbeat.pipeline.clients":           true,
 	"libbeat.config.module.running":      true,
 	"registrar.states.current":           true,
+	"filebeat.events.active":             true,
 	"filebeat.harvester.running":         true,
 	"filebeat.harvester.open_files":      true,
 	"beat.memstats.memory_total":         true,
