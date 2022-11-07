@@ -224,6 +224,11 @@ func (l *Logger) Sync() error {
 	return l.logger.Sync()
 }
 
+// Core returns the backend zapcore.Core for the logger.
+func (l *Logger) Core() zapcore.Core {
+	return l.logger.Core()
+}
+
 // L returns an unnamed global logger.
 func L() *Logger {
 	return loadLogger().logger
