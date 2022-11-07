@@ -107,7 +107,7 @@ func selectFilter(firehoseFilter string) (func(*events.Envelope) bool, consumer.
 		return filterLogs, -1
 	case FirehoseFilterLogs:
 		// Uses filter-type=logs in requests to the firehose.
-		return filterNoFilter, consumer.LogMessages
+		return filterLogs, consumer.LogMessages
 	case FirehoseFilterMetrics:
 		// Uses filter-type=metrics in requests to the firehose.
 		return filterNoFilter, consumer.Metrics
