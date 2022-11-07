@@ -249,16 +249,16 @@ func toKeyValuePairs(snaps map[string]monitoring.FlatSnapshot) []interface{} {
 	for name, snap := range snaps {
 		data := make(mapstr.M, snapshotLen(snap))
 		for k, v := range snap.Bools {
-			data.Put(k, v)
+			data.Put(k, v) //nolint:errcheck // All keys within the flat snapshot are unique and are for scalar values.
 		}
 		for k, v := range snap.Floats {
-			data.Put(k, v)
+			data.Put(k, v) //nolint:errcheck // All keys within the flat snapshot are unique and are for scalar values.
 		}
 		for k, v := range snap.Ints {
-			data.Put(k, v)
+			data.Put(k, v) //nolint:errcheck // All keys within the flat snapshot are unique and are for scalar values.
 		}
 		for k, v := range snap.Strings {
-			data.Put(k, v)
+			data.Put(k, v) //nolint:errcheck // All keys within the flat snapshot are unique and are for scalar values.
 		}
 		if len(data) > 0 {
 			args = append(args, logp.Reflect(name, data))
