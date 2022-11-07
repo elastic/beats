@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@v1.1.351') _
+@Library('apm@v1.1.352') _
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
