@@ -17,18 +17,6 @@ const (
 	ConsumerVersionV2 = "v2"
 )
 
-const (
-	// FirehoseFilterAll doesn't apply any filter.
-	FirehoseFilterAll = "all"
-
-	// FirehoseFilterLogs filters on server side for log events, adding the parameter "file-type=logs"
-	// and then filters on client side, for log-like events (logs, errors and http events).
-	FirehoseFilterLogs = "logs"
-
-	// FirehoseFilterMetrics filters on server side for metric events, adding the parameter "file-type=metrics".
-	FirehoseFilterMetrics = "metrics"
-)
-
 type Config struct {
 	// Version of the consumer to use, it can be v1 or v2, defaults to v1
 	Version string `config:"version"`
@@ -42,9 +30,6 @@ type Config struct {
 	DopplerAddress string `config:"doppler_address"`
 	UaaAddress     string `config:"uaa_address"`
 	RlpAddress     string `config:"rlp_address"`
-
-	// Override default firehose filtering
-	FirehoseFilter string `config:"firehose_filter"`
 
 	// ShardID when retrieving events from loggregator, sharing this ID across
 	// multiple filebeats will shard the load of receiving and sending events.

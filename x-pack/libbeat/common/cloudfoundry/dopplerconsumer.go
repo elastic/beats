@@ -19,7 +19,6 @@ import (
 )
 
 type DopplerCallbacks struct {
-	Filter string
 	Log    func(evt Event)
 	Metric func(evt Event)
 	Error  func(evt EventError)
@@ -81,50 +80,15 @@ func (c *DopplerConsumer) Run() {
 }
 
 func (c *DopplerConsumer) logsFirehose() {
-	filter := FirehoseFilterLogs
-	if c.callbacks.Filter != "" {
-		filter = c.callbacks.Filter
-	}
-	filterFn, envelopeFilter := selectFilter(filter)
-	c.firehose(c.callbacks.Log, filterFn, envelopeFilter)
+	c.firehose(c.callbacks.Log, filterLogs, consumer.LogMessages)
 }
 
 func (c *DopplerConsumer) metricsFirehose() {
-	filter := FirehoseFilterMetrics
-	if c.callbacks.Filter != "" {
-		filter = c.callbacks.Filter
-	}
-	filterFn, envelopeFilter := selectFilter(filter)
-	c.firehose(c.callbacks.Metric, filterFn, envelopeFilter)
-}
-
-func selectFilter(firehoseFilter string) (func(*events.Envelope) bool, consumer.EnvelopeFilter) {
-	switch firehoseFilter {
-	case FirehoseFilterAll:
-		return filterNoFilter, -1
-	case FirehoseFilterLogs:
-		// Uses filter-type=logs in requests to the firehose and selects log-like events.
-		return filterLogs, consumer.LogMessages
-	case FirehoseFilterMetrics:
-		// Uses filter-type=metrics in requests to the firehose.
-		return filterNoFilter, consumer.Metrics
-	default:
-		// No filter.
-		return filterNoFilter, -1
-	}
+	c.firehose(c.callbacks.Metric, filterNoFilter, consumer.Metrics)
 }
 
 func (c *DopplerConsumer) firehose(cb func(evt Event), filterFn func(*events.Envelope) bool, filter consumer.EnvelopeFilter) {
-	var msgChan <-chan *events.Envelope
-	var errChan <-chan error
-	if filterFn == nil {
-		filterFn = filterNoFilter
-	}
-	if filter == consumer.LogMessages || filter == consumer.Metrics {
-		msgChan, errChan = c.consumer.Firehose(c.subscriptionID, "")
-	} else {
-		msgChan, errChan = c.consumer.FilteredFirehose(c.subscriptionID, "", filter)
-	}
+	msgChan, errChan := c.consumer.FilteredFirehose(c.subscriptionID, "", filter)
 	for {
 		select {
 		case env := <-msgChan:

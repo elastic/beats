@@ -149,7 +149,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix handling of invalid UserIP and LocalIP values. {pull}32896[32896]
 - Allow http_endpoint instances to share ports. {issue}32578[32578] {pull}33377[33377]
 - Improve httpjson documentation for split processor. {pull}33473[33473]
-- Expose Cloud Foundry filtering options into user configuration. {pull}33456[33456]
+- Cloud Foundry input uses server-side filtering when retrieving logs. {pull}33456[33456]
 
 *Auditbeat*
 
