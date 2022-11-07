@@ -694,7 +694,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test replace_with clause with hardcoded value",
+			name: "Test replace_with clause with hardcoded value_1",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					switch r.URL.Path {
@@ -720,6 +720,78 @@ func TestInput(t *testing.T) {
 							"request.method": http.MethodGet,
 							"replace":        "$.files[:].id",
 							"replace_with":   "$.exportId,2212",
+						},
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test replace_with clause with hardcoded value (no dot prefix)",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/first_response.body.id/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/first_response.body.id/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,first_response.body.id",
+						},
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test replace_with clause with hardcoded value (more than one dot prefix)",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/..first_response.body.id/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/..first_response.body.id/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,..first_response.body.id",
 						},
 					},
 				},

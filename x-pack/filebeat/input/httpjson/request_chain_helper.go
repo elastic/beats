@@ -104,7 +104,7 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 func fetchValueFromContext(trCtx *transformContext, expression string) (string, bool, error) {
 	var val interface{}
 
-	switch keys := processExpression(expression, "."); keys[0] {
+	switch keys := processExpression(expression); keys[0] {
 	case lastResponse:
 		respMap, err := responseToMap(trCtx.lastResponse)
 		if err != nil {
@@ -137,7 +137,7 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 	case expression:
 		return expression, true, nil
 	default:
-		return "", false, fmt.Errorf("context value not supported: %q in %q", keys[0], expression)
+		return "", false, fmt.Errorf("context value not supported for key: %q in expression %q", keys[0], expression)
 	}
 
 	return fmt.Sprint(val), true, nil
@@ -166,7 +166,7 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 	val := m[keys[depth]]
 
 	if val == nil {
-		return nil, fmt.Errorf("value of expression could not be determined for %s", strings.Join(keys[:depth+1], "."))
+		return nil, fmt.Errorf("value of expression could not be determined for key %s", strings.Join(keys[:depth+1], "."))
 	}
 
 	switch v := reflect.ValueOf(val); v.Kind() {
@@ -199,30 +199,18 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 // supported keywords. If present, returns an expression array containing separated elements.
 // If no keywords are present, the expression is treated as a hardcoded value and returned
 // as a merged string which is the only array element.
-func processExpression(expression string, separator string) []string {
-	expArr := strings.Split(expression, separator)
-	startIndex := 0
-	isExpressionValue := false
-
-	for i, v := range expArr {
-		if v == "" {
-			continue
-		}
-		startIndex = i
-		if v != lastResponse && v != firstResponse && v != parentLastResponse {
-			isExpressionValue = true
-		}
-		break
+func processExpression(expression string) []string {
+	if !strings.HasPrefix(expression, ".") {
+		return []string{expression}
 	}
-
-	var returnArr []string
-	if isExpressionValue {
-		returnArr = append(returnArr, strings.Join(expArr, separator))
-	} else {
-		returnArr = expArr[startIndex:]
+	switch {
+	case strings.HasPrefix(expression, "."+firstResponse+"."),
+		strings.HasPrefix(expression, "."+lastResponse+"."),
+		strings.HasPrefix(expression, "."+parentLastResponse+"."):
+		return strings.Split(expression, ".")[1:]
+	default:
+		return []string{expression}
 	}
-
-	return returnArr
 }
 
 func tryAssignAuth(parentConfig *authConfig, childConfig *authConfig) *authConfig {

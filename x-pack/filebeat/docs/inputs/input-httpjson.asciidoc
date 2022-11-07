@@ -1208,7 +1208,7 @@ filebeat.inputs:
     - step:
       request.url: https://example.com/services/data/v1.0/$.exportId/files
       request.method: GET
-      replace_with: '$.exportId,first_response.body.exportId'
+      replace_with: '$.exportId,.first_response.body.exportId'
 ----
 
 Example:
@@ -1257,6 +1257,18 @@ response_json using exportId as '2212':
 }
 ----
 This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
+
+**Some useful points to remember:- **
+  
+    1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a 
+    **single '.' (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal 
+    processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one '.' (dot) as prefix) or  
+    `replace_with:'$.exportId,first_response.body.exportId'` (no '.' dot as prefix)
+   
+   2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with: 
+    '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from
+    the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be 
+    extrated becomes `"" (an empty string)`, which has no definition within any context variable.
 
 NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching.
 
