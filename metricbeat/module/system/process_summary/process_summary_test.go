@@ -82,6 +82,9 @@ func TestStateNames(t *testing.T) {
 		if key == "total" {
 			continue
 		}
+		if _, ok := val.(int); !ok {
+			continue
+		}
 		// Check to make sure the values we got actually exist
 		exists := false
 		for _, proc := range process.PidStates {
