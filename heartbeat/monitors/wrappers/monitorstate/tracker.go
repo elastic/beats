@@ -18,6 +18,8 @@
 package monitorstate
 
 import (
+	"context"
+	"errors"
 	"math/rand"
 	"sync"
 	"time"
@@ -81,11 +83,13 @@ func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 	var err error
 	for i := 0; i < tries; i++ {
 		loadedState, err = t.stateLoader(sf)
-		if err != nil {
-			sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
-			logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
-			time.Sleep(sleepFor)
+		if err == nil {
+			break
 		}
+
+		sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
+		logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
+		time.Sleep(sleepFor)
 	}
 	if err != nil {
 		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", tries, sf.ID)
@@ -103,4 +107,47 @@ func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 // or during testing
 func NilStateLoader(_ stdfields.StdMonitorFields) (*State, error) {
 	return nil, nil
+}
+
+func AtomicStateLoader(inner StateLoader) (sl StateLoader, replace func(StateLoader)) {
+	mtx := &sync.Mutex{}
+	return func(currentSL stdfields.StdMonitorFields) (*State, error) {
+			mtx.Lock()
+			defer mtx.Unlock()
+
+			return inner(currentSL)
+		}, func(sl StateLoader) {
+			mtx.Lock()
+			defer mtx.Unlock()
+			inner = sl
+			logp.L().Info("Updated atomic state loader")
+		}
+}
+
+func DeferredStateLoader(inner StateLoader, timeout time.Duration) (sl StateLoader, replace func(StateLoader)) {
+	stateLoader, replaceStateLoader := AtomicStateLoader(inner)
+
+	wg := sync.WaitGroup{}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	wg.Add(1)
+	go func() {
+		defer cancel()
+		defer wg.Done()
+
+		<-ctx.Done()
+
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			logp.L().Warn("Timeout trying to defer state loader")
+		}
+	}()
+
+	return func(currentSL stdfields.StdMonitorFields) (*State, error) {
+			wg.Wait()
+
+			return stateLoader(currentSL)
+		}, func(sl StateLoader) {
+			defer cancel()
+
+			replaceStateLoader(sl)
+		}
 }

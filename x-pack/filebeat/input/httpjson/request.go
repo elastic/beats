@@ -303,7 +303,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			// store first response in transform context
-			var bodyMap mapstr.M
+			var bodyMap map[string]interface{}
 			body, err := io.ReadAll(httpResp.Body)
 			if err != nil {
 				return fmt.Errorf("failed to read http response body: %w", err)
@@ -319,6 +319,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				body:   bodyMap,
 			}
 			trCtx.updateFirstResponse(firstResponse)
+			// since, initially the first response and last response are the same
+			trCtx.updateLastResponse(firstResponse)
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
@@ -357,7 +359,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			urlCopy = rf.url
 			urlString = rf.url.String()
 
-			// new transform context for every chain step , derived from parent transform context
+			// new transform context for every chain step, derived from parent transform context
 			var chainTrCtx *transformContext
 			if rf.isChain {
 				chainTrCtx = trCtx.clone()
@@ -368,7 +370,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			var replaceArr []string
 			if rf.replaceWith != "" {
 				replaceArr = strings.Split(rf.replaceWith, ",")
-				val, doReplaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+				val, doReplaceWith, err = fetchValueFromContext(chainTrCtx, strings.TrimSpace(replaceArr[1]))
 				if err != nil {
 					return err
 				}
@@ -418,11 +420,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 			var events <-chan maybeMsg
 			if rf.isChain {
-				events = rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps)
+				events = rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps)
 			} else {
 				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps)
 			}
-			n += processAndPublishEvents(trCtx, events, publisher, i < len(r.requestFactories), r.log)
+			n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
 		}
 	}
 
@@ -517,7 +519,7 @@ func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, pu
 	return n
 }
 
-// processRemainingChainEvents , processes the remaining pagination events for chain blocks
+// processRemainingChainEvents, processes the remaining pagination events for chain blocks
 func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
 	events := r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp)
@@ -542,7 +544,7 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 			}
 			response.Body = io.NopCloser(body)
 
-			// for each pagination response , we repeat all the chain steps / blocks
+			// for each pagination response, we repeat all the chain steps / blocks
 			count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)
 			if err != nil {
 				r.log.Errorf("error processing chain event: %w", err)
@@ -592,18 +594,15 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 		urlCopy = rf.url
 		urlString = rf.url.String()
 
-		// new transform context for every chain step , derived from parent transform context
-		var chainTrCtx *transformContext
-		if rf.isChain {
-			chainTrCtx = trCtx.clone()
-		}
+		// new transform context for every chain step, derived from parent transform context
+		chainTrCtx := trCtx.clone()
 
 		var val string
 		var doReplaceWith bool
 		var replaceArr []string
 		if rf.replaceWith != "" {
 			replaceArr = strings.Split(rf.replaceWith, ",")
-			val, doReplaceWith, err = fetchValueFromContext(trCtx, strings.TrimSpace(replaceArr[1]))
+			val, doReplaceWith, err = fetchValueFromContext(chainTrCtx, strings.TrimSpace(replaceArr[1]))
 			if err != nil {
 				return n, err
 			}
@@ -651,8 +650,8 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 			resps = intermediateResps
 		}
-		events := rf.chainResponseProcessor.startProcessing(stdCtx, trCtx, resps)
-		n += processAndPublishEvents(trCtx, events, publisher, i < len(r.requestFactories), r.log)
+		events := rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps)
+		n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
 	}
 
 	defer httpResp.Body.Close()
