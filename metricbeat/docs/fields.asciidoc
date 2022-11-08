@@ -62928,6 +62928,30 @@ type: long
 --
 
 [float]
+=== threads
+
+Counts of individual threads on a system.
+
+
+*`system.process.summary.threads.running`*::
++
+--
+Count of currently running threads.
+
+type: long
+
+--
+
+*`system.process.summary.threads.blocked`*::
++
+--
+Count of threads blocked by I/O.
+
+type: long
+
+--
+
+[float]
 === raid
 
 raid

@@ -99,9 +99,11 @@ func TestStateNames(t *testing.T) {
 }
 
 func TestThreads(t *testing.T) {
-	root := resolve.NewTestResolver("/")
+	root := resolve.NewTestResolver("_meta/testdata")
 	stats, err := threadStats(root)
 	require.NoError(t, err)
+	require.Equal(t, int64(1), stats["blocked"])
+	require.Equal(t, int64(3), stats["running"])
 	t.Logf("metrics: %#v", stats)
 }
 

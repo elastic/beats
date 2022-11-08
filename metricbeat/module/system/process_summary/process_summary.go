@@ -23,6 +23,7 @@ package process_summary
 import (
 	"fmt"
 	"io/ioutil"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -86,6 +87,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	outMap := mapstr.M{}
 	typeconv.Convert(&outMap, procStates)
+	if runtime.GOOS == "linux" {
+		threads, err := threadStats(m.sys)
+		if err != nil {
+			return fmt.Errorf("error fetching thread stats: %w", err)
+		}
+		outMap["threads"] = threads
+	}
 	outMap["total"] = len(procList)
 	r.Event(mb.Event{
 		// change the name space to use . instead of _
@@ -96,25 +104,32 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
+// threadStats returns a map of state counts for running threads on a system
 func threadStats(sys resolve.Resolver) (mapstr.M, error) {
 	statPath := sys.ResolveHostFS("/proc/stat")
 	procData, err := ioutil.ReadFile(statPath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading procfs file %s: %w", statPath, err)
 	}
-
 	threadData := mapstr.M{}
 	for _, line := range strings.Split(string(procData), "\n") {
+		// look for format procs_[STATE] [COUNT]
 		fields := strings.Fields(line)
 		if len(fields) < 2 {
 			continue
 		}
 		if strings.Contains(fields[0], "procs_") {
+			keyFields := strings.Split(fields[0], "_")
+			// the field isn't what we're expecting, continue
+			if len(keyFields) < 2 {
+				continue
+			}
 			procsInt, err := strconv.ParseInt(fields[1], 10, 64)
 			if err != nil {
 				return nil, fmt.Errorf("Error parsing value %s from %s: %w", fields[0], statPath, err)
 			}
-			threadData[fields[0]] = procsInt
+
+			threadData[keyFields[1]] = procsInt
 		}
 	}
 	return threadData, nil
