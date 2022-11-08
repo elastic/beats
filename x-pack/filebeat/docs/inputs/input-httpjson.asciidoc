@@ -549,10 +549,10 @@ filebeat.inputs:
 
 NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination 
 does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains. You can look at this 
-<<parent-last-response,example>> below for a better idea.
+**example** below for a better idea.
 
-
-["source","yaml",subs="attributes",id="parent-last-response"]
+**Example Config:**
+["source","yaml",subs="attributes"]
   filebeat.inputs:
   - type: httpjson
     enabled: true
