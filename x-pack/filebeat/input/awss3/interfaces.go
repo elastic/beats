@@ -8,13 +8,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
+
+	smithyhttp "github.com/aws/smithy-go/transport/http"
+
+	"github.com/aws/smithy-go/middleware"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -28,6 +34,8 @@ import (
 // SQS interfaces
 // ------
 
+const s3RequestURLMetadataKey = `x-beat-s3-request-url`
+
 type sqsAPI interface {
 	sqsReceiver
 	sqsDeleter
@@ -35,15 +43,15 @@ type sqsAPI interface {
 }
 
 type sqsReceiver interface {
-	ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.Message, error)
+	ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error)
 }
 
 type sqsDeleter interface {
-	DeleteMessage(ctx context.Context, msg *sqs.Message) error
+	DeleteMessage(ctx context.Context, msg *types.Message) error
 }
 
 type sqsVisibilityChanger interface {
-	ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error
+	ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error
 }
 
 type sqsProcessor interface {
@@ -51,7 +59,7 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *sqs.Message) error
+	ProcessSQS(ctx context.Context, msg *types.Message) error
 }
 
 // ------
@@ -64,7 +72,7 @@ type s3API interface {
 }
 
 type s3Getter interface {
-	GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error)
+	GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error)
 }
 
 type s3Lister interface {
@@ -72,9 +80,8 @@ type s3Lister interface {
 }
 
 type s3Pager interface {
-	Next(ctx context.Context) bool
-	CurrentPage() *s3.ListObjectsOutput
-	Err() error
+	HasMorePages() bool // NextPage retrieves the next ListObjectsV2 page.
+	NextPage(ctx context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error)
 }
 
 type s3ObjectHandlerFactory interface {
@@ -110,22 +117,18 @@ type awsSQSAPI struct {
 	longPollWaitTime  time.Duration
 }
 
-func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.Message, error) {
+func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error) {
 	const sqsMaxNumberOfMessagesLimit = 10
-
-	req := a.client.ReceiveMessageRequest(
-		&sqs.ReceiveMessageInput{
-			QueueUrl:            awssdk.String(a.queueURL),
-			MaxNumberOfMessages: awssdk.Int64(int64(min(maxMessages, sqsMaxNumberOfMessagesLimit))),
-			VisibilityTimeout:   awssdk.Int64(int64(a.visibilityTimeout.Seconds())),
-			WaitTimeSeconds:     awssdk.Int64(int64(a.longPollWaitTime.Seconds())),
-			AttributeNames:      []sqs.QueueAttributeName{sqsApproximateReceiveCountAttribute},
-		})
-
 	ctx, cancel := context.WithTimeout(ctx, a.apiTimeout)
 	defer cancel()
 
-	resp, err := req.Send(ctx)
+	receiveMessageOutput, err := a.client.ReceiveMessage(ctx, &sqs.ReceiveMessageInput{
+		QueueUrl:            awssdk.String(a.queueURL),
+		MaxNumberOfMessages: int32(min(maxMessages, sqsMaxNumberOfMessagesLimit)),
+		VisibilityTimeout:   int32(a.visibilityTimeout.Seconds()),
+		WaitTimeSeconds:     int32(a.longPollWaitTime.Seconds()),
+		AttributeNames:      []types.QueueAttributeName{sqsApproximateReceiveCountAttribute},
+	})
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			err = fmt.Errorf("api_timeout exceeded: %w", err)
@@ -133,7 +136,7 @@ func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.
 		return nil, fmt.Errorf("sqs ReceiveMessage failed: %w", err)
 	}
 
-	return resp.Messages, nil
+	return receiveMessageOutput.Messages, nil
 }
 
 func min(a, b int) int {
@@ -143,17 +146,16 @@ func min(a, b int) int {
 	return b
 }
 
-func (a *awsSQSAPI) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
-	req := a.client.DeleteMessageRequest(
+func (a *awsSQSAPI) DeleteMessage(ctx context.Context, msg *types.Message) error {
+	ctx, cancel := context.WithTimeout(ctx, a.apiTimeout)
+	defer cancel()
+	_, err := a.client.DeleteMessage(ctx,
 		&sqs.DeleteMessageInput{
 			QueueUrl:      awssdk.String(a.queueURL),
 			ReceiptHandle: msg.ReceiptHandle,
 		})
 
-	ctx, cancel := context.WithTimeout(ctx, a.apiTimeout)
-	defer cancel()
-
-	if _, err := req.Send(ctx); err != nil {
+	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			err = fmt.Errorf("api_timeout exceeded: %w", err)
 		}
@@ -163,18 +165,18 @@ func (a *awsSQSAPI) DeleteMessage(ctx context.Context, msg *sqs.Message) error {
 	return nil
 }
 
-func (a *awsSQSAPI) ChangeMessageVisibility(ctx context.Context, msg *sqs.Message, timeout time.Duration) error {
-	req := a.client.ChangeMessageVisibilityRequest(
-		&sqs.ChangeMessageVisibilityInput{
-			QueueUrl:          awssdk.String(a.queueURL),
-			ReceiptHandle:     msg.ReceiptHandle,
-			VisibilityTimeout: awssdk.Int64(int64(timeout.Seconds())),
-		})
-
+func (a *awsSQSAPI) ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error {
 	ctx, cancel := context.WithTimeout(ctx, a.apiTimeout)
 	defer cancel()
 
-	if _, err := req.Send(ctx); err != nil {
+	_, err := a.client.ChangeMessageVisibility(ctx,
+		&sqs.ChangeMessageVisibilityInput{
+			QueueUrl:          awssdk.String(a.queueURL),
+			ReceiptHandle:     msg.ReceiptHandle,
+			VisibilityTimeout: int32(timeout.Seconds()),
+		})
+
+	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			err = fmt.Errorf("api_timeout exceeded: %w", err)
 		}
@@ -192,26 +194,44 @@ type awsS3API struct {
 	client *s3.Client
 }
 
-func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error) {
-	req := a.client.GetObjectRequest(&s3.GetObjectInput{
+func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
+	getObjectOutput, err := a.client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: awssdk.String(bucket),
 		Key:    awssdk.String(key),
-	})
+	}, s3.WithAPIOptions(
+		func(stack *middleware.Stack) error {
+			// adds AFTER operation finalize middleware
+			return stack.Finalize.Add(middleware.FinalizeMiddlewareFunc("add s3 request url to metadata",
+				func(ctx context.Context, in middleware.FinalizeInput, next middleware.FinalizeHandler) (
+					out middleware.FinalizeOutput, metadata middleware.Metadata, err error,
+				) {
+					out, metadata, err = next.HandleFinalize(ctx, in)
+					requestURL, parseErr := url.Parse(in.Request.(*smithyhttp.Request).URL.String())
+					if parseErr != nil {
+						return out, metadata, err
+					}
 
-	resp, err := req.Send(ctx)
+					requestURL.RawQuery = ""
+
+					metadata.Set(s3RequestURLMetadataKey, requestURL.String())
+
+					return out, metadata, err
+				},
+			), middleware.After)
+		}))
+
 	if err != nil {
 		return nil, fmt.Errorf("s3 GetObject failed: %w", err)
 	}
 
-	return resp, nil
+	return getObjectOutput, nil
 }
 
 func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
-	req := a.client.ListObjectsRequest(&s3.ListObjectsInput{
+	pager := s3.NewListObjectsV2Paginator(a.client, &s3.ListObjectsV2Input{
 		Bucket: awssdk.String(bucket),
 		Prefix: awssdk.String(prefix),
 	})
 
-	pager := s3.NewListObjectsPaginator(req)
-	return &pager
+	return pager
 }

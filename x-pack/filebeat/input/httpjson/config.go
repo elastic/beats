@@ -6,6 +6,8 @@ package httpjson
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -35,6 +37,17 @@ func (ce cursorEntry) mustIgnoreEmptyValue() bool {
 func (c config) Validate() error {
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
+	}
+	for _, v := range c.Chain {
+		if v.Step == nil && v.While == nil {
+			return errors.New("both step & while blocks in a chain cannot be empty")
+		}
+		if v.Step != nil && v.Step.ReplaceWith != "" && len(strings.SplitN(v.Step.ReplaceWith, ",", 3)) > 2 {
+			return fmt.Errorf("invalid number of parameters inside step replace_with: %q", v.Step.ReplaceWith)
+		}
+		if v.While != nil && v.While.ReplaceWith != "" && len(strings.SplitN(v.While.ReplaceWith, ",", 3)) > 2 {
+			return fmt.Errorf("invalid number of parameters inside step replace_with: %q", v.While.ReplaceWith)
+		}
 	}
 	return nil
 }

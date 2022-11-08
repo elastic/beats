@@ -20,7 +20,8 @@ pipeline {
   stages {
     stage('Nighly beats builds') {
       steps {
-        runBuilds(quietPeriodFactor: 2000, branches: ['main', '8.<minor>', '8.<next-patch>', '7.<minor>'])
+        runMacosBuilds(quietPeriodFactor: 2000, branches: ['main', '8.<next-minor>', '8.<minor>', '8.<next-patch>', '7.<minor>'])
+        runIronbankBuilds(quietPeriodFactor: 100, branches: ['main', '8.<next-minor>', '8.<minor>', '8.<next-patch>', '7.<minor>'])
       }
     }
   }
@@ -31,13 +32,24 @@ pipeline {
   }
 }
 
-def runBuilds(Map args = [:]) {
+def runMacosBuilds(Map args = [:]) {
   def branches = getBranchesFromAliases(aliases: args.branches)
 
   def quietPeriod = 0
   branches.each { branch ->
     // IMPORTANT: ephemeral Orka VMs are not provisioned so, we cannot run builds on daily basis at all.
     // build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
+    // Increate the quiet period for the next iteration
+    quietPeriod += args.quietPeriodFactor
+  }
+}
+
+def runIronbankBuilds(Map args = [:]) {
+  def branches = getBranchesFromAliases(aliases: args.branches)
+
+  def quietPeriod = 0
+  branches.each { branch ->
+    build(quietPeriod: quietPeriod, job: "Beats/ironbank-validation-mbp/${branch}", wait: false, propagate: false)
     // Increate the quiet period for the next iteration
     quietPeriod += args.quietPeriodFactor
   }

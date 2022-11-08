@@ -15,10 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint:errcheck // All complaints are about mapstr.M puts.
 package dhcpv4
 
 import (
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -126,6 +128,7 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 	fields["type"] = pbf.Event.Dataset
 	fields["status"] = "OK"
 
+	mac16 := v4.ClientHwAddr()
 	dhcpData := mapstr.M{
 		"op_code":        strings.ToLower(v4.OpcodeToString()),
 		"hardware_type":  v4.HwTypeToString(),
@@ -133,7 +136,7 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 		"transaction_id": fmt.Sprintf("0x%08x", v4.TransactionID()),
 		"seconds":        v4.NumSeconds(),
 		"flags":          strings.ToLower(v4.FlagsToString()),
-		"client_mac":     v4.ClientHwAddrToString(),
+		"client_mac":     formatHardwareAddr(net.HardwareAddr(mac16[:v4.HwAddrLen()])),
 	}
 	fields["dhcpv4"] = dhcpData
 
@@ -160,8 +163,21 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 		p.log.Warnw("Failed converting DHCP options to map",
 			"dhcpv4", v4, "error", err)
 	} else if len(opts) > 0 {
-		dhcpData.Put("option", opts)
+		_, _ = dhcpData.Put("option", opts)
 	}
 
 	return &evt
+}
+
+// formatHardwareAddr formats hardware addresses according to the ECS spec.
+func formatHardwareAddr(addr net.HardwareAddr) string {
+	buf := make([]byte, 0, len(addr)*3-1)
+	for _, b := range addr {
+		if len(buf) != 0 {
+			buf = append(buf, '-')
+		}
+		const hexDigit = "0123456789ABCDEF"
+		buf = append(buf, hexDigit[b>>4], hexDigit[b&0xf])
+	}
+	return string(buf)
 }

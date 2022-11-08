@@ -78,25 +78,7 @@ include::../include/var-paths.asciidoc[]
 
 *`var.log_level`*::
 
-An integer between 1 and 7 that allows to filter messages based on the
-severity level. The different severity levels supported by the Cisco ASA are:
-
-[width="30%",cols="^1,2",options="header"]
-|===========================
-| log_level | severity
-|     1     | Alert
-|     2     | Critical
-|     3     | Error
-|     4     | Warning
-|     5     | Notification
-|     6     | Informational
-|     7     | Debugging
-|===========================
-
-A value of 7 (default) will not filter any messages. A lower value will drop
-any messages with a severity level higher than the specified value. For
-example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
-and 3 (Error). All other messages will be dropped.
+include::../include/cisco-log-level.asciidoc[]
 
 *`var.syslog_host`*::
 
@@ -226,25 +208,7 @@ include::../include/var-paths.asciidoc[]
 
 *`var.log_level`*::
 
-An integer between 1 and 7 that allows to filter messages based on the
-severity level. The different severity levels supported by the Cisco ASA are:
-
-[width="30%",cols="^1,2",options="header"]
-|===========================
-| log_level | severity
-|     1     | Alert
-|     2     | Critical
-|     3     | Error
-|     4     | Warning
-|     5     | Notification
-|     6     | Informational
-|     7     | Debugging
-|===========================
-
-A value of 7 (default) will not filter any messages. A lower value will drop
-any messages with a severity level higher than the specified value. For
-example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
-and 3 (Error). All other messages will be dropped.
+include::../include/cisco-log-level.asciidoc[]
 
 *`var.syslog_host`*::
 
@@ -552,4 +516,4 @@ image::./images/kibana-cisco-asa.png[]
 For a description of each field in the module, see the
 <<exported-fields-cisco,exported fields>> section.
 
-edit_url!:
+:edit_url!:

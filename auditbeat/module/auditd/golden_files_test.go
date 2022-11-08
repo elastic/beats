@@ -44,13 +44,12 @@ import (
 )
 
 const (
-	testDir       = "testdata"
-	testExt       = ".log"
-	testPattern   = "*" + testExt
-	goldenSuffix  = "-expected.json"
-	goldenPattern = testPattern + goldenSuffix
-	fileTimeout   = 3 * time.Minute
-	terminator    = "type=TEST msg=audit(0.0:585): msg=\"terminate\""
+	testDir      = "testdata"
+	testExt      = ".log"
+	testPattern  = "*" + testExt
+	goldenSuffix = "-expected.json"
+	fileTimeout  = 3 * time.Minute
+	terminator   = "type=TEST msg=audit(0.0:585): msg=\"terminate\""
 )
 
 var (
@@ -96,7 +95,7 @@ func readGoldenFile(t testing.TB, path string) (events []mapstr.M) {
 	if err = json.Unmarshal(data, &events); err != nil {
 		t.Fatalf("error decoding JSON from golden file '%s': %v", path, err)
 	}
-	return
+	return events
 }
 
 func normalize(t testing.TB, events []mb.Event) (norm []mapstr.M) {
@@ -106,7 +105,7 @@ func normalize(t testing.TB, events []mb.Event) (norm []mapstr.M) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		json.Unmarshal(data, &output)
+		_ = json.Unmarshal(data, &output)
 		norm = append(norm, output)
 	}
 	return norm
@@ -197,7 +196,8 @@ func TestGoldenFiles(t *testing.T) {
 				// Get Status response for initClient
 				returnACK().returnStatus().
 				// Send expected ACKs for initialization
-				returnACK().returnACK().returnACK().returnACK().returnACK().
+				returnACK().returnStatus().returnACK().returnACK().
+				returnACK().returnACK().returnACK().
 				// Send audit messages
 				returnMessage(lines...).
 				// Send stream terminator

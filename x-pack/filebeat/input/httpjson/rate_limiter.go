@@ -42,10 +42,6 @@ func (r *rateLimiter) execute(ctx context.Context, f func() (*http.Response, err
 	for {
 		resp, err := f()
 		if err != nil {
-			return nil, err
-		}
-
-		if err != nil {
 			return nil, fmt.Errorf("failed to read http.response.body: %w", err)
 		}
 

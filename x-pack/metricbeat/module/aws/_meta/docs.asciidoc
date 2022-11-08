@@ -37,6 +37,17 @@ or none get collected by Metricbeat. In this case, please specify a `latency`
 parameter so collection start time and end time will be shifted by the given
 latency amount.
 
+* *data_granularity*
+
+AWS CloudWatch allows to define the granularity of the returned datapoints, by setting "Period" while querying metrics.
+Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html[MetricDataQuery parameters] for more information.
+
+By default, metricbeat will query CloudWatch setting "Period" to Metricbeat collection period. If you wish to set a custom value for "Period", please specify a `data_granularity` parameter.
+By setting `period` and `data_granularity` together, you can control, respectively, how frequently you want your metrics to be collected and how granular they have to be.
+
+If you are concerned about reducing the cost derived by CloudWatch API calls made by Metricbeat with an extra delay in retrieving metrics as trade off, you may consider setting `data_granularity` and increase Metricbeat collection period. For example,
+setting `data_granularity` to your current value for `period`, and doubling the value of `period`, may lead to a 50% savings in terms of GetMetricData API calls cost.
+
 * *endpoint*
 
 Most AWS services offer a regional endpoint that can be used to make requests.
@@ -48,6 +59,18 @@ the `endpoint-code` part, such as `amazonaws.com`, `amazonaws.com.cn`, `c2s.ic.g
 
 If endpoint is specified, `regions` config becomes required. For example:
 
+* *tags_filter*
+
+The tags to filter against. If tags are given in config, then only
+collect metrics from resources that have tag key and tag value matches the filter.
+For example, if tags parameter is given as `Organization=Engineering` under
+`AWS/ELB` namespace, then only collect metrics from ELBs with tag name equals to
+`Organization` and tag value equals to `Engineering`. In order to filter for different
+values for the same key, add the values to the value array (see example)
+
+Note: tag filtering only works for metricsets with `resource_type` specified in the
+metricset-specific configuration.
+
 [source,yaml]
 ----
 - module: aws
@@ -56,6 +79,9 @@ If endpoint is specified, `regions` config becomes required. For example:
   regions: cn-north-1
   metricsets:
     - ec2
+  tags_filter:
+    - key: "Organization"
+      value: ["Engineering", "Product"]
 ----
 
 * *fips_enabled*
@@ -83,14 +109,9 @@ image::./images/metricbeat-aws-overview.png[]
 [float]
 == Metricsets
 
-Currently, we have `billing`, `cloudwatch`, `dynamodb`, `ebs`, `ec2`, `elb`,
-`lambda`, `natgateway`, `rds`, `s3_daily_storage`, `s3_request`, `sns`, `sqs`,
+Currently, we have `billing`, `cloudwatch`, `dynamodb`, `ebs`, `ec2`, `elb`, `kinesis`
+`lambda`, `mtest`, `natgateway`, `rds`, `s3_daily_storage`, `s3_request`, `sns`, `sqs`,
 `transitgateway`, `usage` and `vpn` metricset in `aws` module.
-
-Collecting `tags` for `ec2`, `rds`, `cloudwatch`, and metricset created based on
-`cloudwatch` using light module is supported.
-
-* *tags.*: Tag key value pairs from aws resources. A tag is a label that user assigns to an AWS resource.
 
 [float]
 === `billing`

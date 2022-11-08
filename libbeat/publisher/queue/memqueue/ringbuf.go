@@ -52,11 +52,6 @@ type region struct {
 	size int
 }
 
-type clientState struct {
-	seq   uint32        // event sequence number
-	state *produceState // the producer it's state used to compute and signal the ACK count
-}
-
 func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	*b = ringBuffer{
 		logger:  logger,
@@ -64,17 +59,9 @@ func (b *ringBuffer) init(logger *logp.Logger, size int) {
 	}
 }
 
-// Old spec:
-// Returns the number of free entries left in the queue buffer after
-// insertion.
-// Also returns 0 if there is no space left in the queue to insert
-// the given event. However, this is an error state: the first time
-// it returns 0, insertion should be disabled by setting the
-// pushRequest channel in directEventLoop to nil.
-// New spec:
 // Returns true if the ringBuffer is full after handling
 // the given insertion, false otherwise.
-func (b *ringBuffer) insert(event interface{}, client clientState) {
+func (b *ringBuffer) insert(entry queueEntry) {
 	// always insert into region B, if region B exists.
 	// That is, we have 2 regions and region A is currently processed by consumers
 	if b.regB.size > 0 {
@@ -83,7 +70,7 @@ func (b *ringBuffer) insert(event interface{}, client clientState) {
 		idx := b.regB.index + b.regB.size
 		avail := b.regA.index - idx
 		if avail > 0 {
-			b.entries[idx] = queueEntry{event, client}
+			b.entries[idx] = entry
 			b.regB.size++
 		}
 		return
@@ -97,24 +84,24 @@ func (b *ringBuffer) insert(event interface{}, client clientState) {
 			// If there is space before region A, create
 			// region B there.
 			b.regB = region{index: 0, size: 1}
-			b.entries[0] = queueEntry{event, client}
+			b.entries[0] = entry
 		}
 		return
 	}
 
 	// space available in region A -> let's append the event
 	// log.Debug("  - push into region A")
-	b.entries[idx] = queueEntry{event, client}
+	b.entries[idx] = entry
 	b.regA.size++
 }
 
 // cancel removes all buffered events matching `st`, not yet reserved by
 // any consumer
-func (b *ringBuffer) cancel(st *produceState) int {
-	cancelledB := b.cancelRegion(st, b.regB)
+func (b *ringBuffer) cancel(producer *ackProducer) int {
+	cancelledB := b.cancelRegion(producer, b.regB)
 	b.regB.size -= cancelledB
 
-	cancelledA := b.cancelRegion(st, region{
+	cancelledA := b.cancelRegion(producer, region{
 		index: b.regA.index + b.reserved,
 		size:  b.regA.size - b.reserved,
 	})
@@ -126,7 +113,7 @@ func (b *ringBuffer) cancel(st *produceState) int {
 // cancelRegion removes the events in the specified range having
 // the specified produceState. It returns the number of events
 // removed.
-func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
+func (b *ringBuffer) cancelRegion(producer *ackProducer, reg region) int {
 	start := reg.index
 	end := start + reg.size
 	entries := b.entries[start:end]
@@ -135,7 +122,7 @@ func (b *ringBuffer) cancelRegion(st *produceState, reg region) int {
 
 	// filter loop
 	for i := 0; i < reg.size; i++ {
-		if entries[i].client.state == st {
+		if entries[i].producer == producer {
 			continue // remove
 		}
 		toEntries = append(toEntries, entries[i])
@@ -213,4 +200,11 @@ func (b *ringBuffer) Size() int {
 // Items returns the count of events currently in the buffer
 func (b *ringBuffer) Items() int {
 	return b.regA.size + b.regB.size
+}
+
+func (b *ringBuffer) OldestEntry() *queueEntry {
+	if b.regA.size == 0 {
+		return nil
+	}
+	return &b.entries[b.regA.index]
 }

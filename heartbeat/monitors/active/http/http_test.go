@@ -41,6 +41,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -49,12 +57,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/testslike"
-	"github.com/elastic/go-lookslike/validator"
 )
 
 func sendSimpleTLSRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
@@ -85,7 +87,7 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -299,7 +301,7 @@ func TestDownStatuses(t *testing.T) {
 					hbtest.RespondingTCPChecks(),
 					hbtest.SummaryChecks(0, 1),
 					respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
-					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
+					hbtest.ECSErrChecks(ecserr.NewBadHTTPStatusErr(status)),
 					respondingHTTPBodyChecks("hello, world!"),
 				)),
 				event.Fields,
@@ -325,7 +327,7 @@ func TestLargeResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -441,7 +443,7 @@ func TestJsonBody(t *testing.T) {
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
-			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 			event := &beat.Event{}
 			_, err = job(event)
@@ -592,7 +594,6 @@ func TestHTTPSx509Auth(t *testing.T) {
 		ClientCAs:  clientCerts,
 		MinVersion: tls.VersionTLS12,
 	}
-	tlsConf.BuildNameToCertificate()
 
 	server := httptest.NewUnstartedServer(hbtest.HelloWorldHandler(http.StatusOK))
 	server.TLS = tlsConf
@@ -615,7 +616,6 @@ func TestConnRefusedJob(t *testing.T) {
 	require.NoError(t, err)
 
 	url := fmt.Sprintf("http://%s:%d", ip, port)
-
 	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
@@ -623,7 +623,7 @@ func TestConnRefusedJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
-			hbtest.ErrorChecks(url, "io"),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, fmt.Sprintf("%s:%d", ip, port)),
 			urlChecks(url),
 		)),
 		event.Fields,
@@ -645,7 +645,7 @@ func TestUnreachableJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
-			hbtest.ErrorChecks(url, "io"),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, fmt.Sprintf("%s:%d", ip, port)),
 			urlChecks(url),
 		)),
 		event.Fields,
@@ -676,7 +676,7 @@ func TestRedirect(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	// Run this test multiple times since in the past we had an issue where the redirects
 	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
@@ -723,7 +723,7 @@ func TestNoHeaders(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -907,7 +907,7 @@ func TestUserAgentInject(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

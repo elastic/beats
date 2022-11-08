@@ -37,7 +37,7 @@ import (
 // the packetbeat executable. It is used to specify which npcap builder crossbuild
 // image to use and the installer to obtain from the cloud store for testing.
 const (
-	NpcapVersion = "1.60"
+	NpcapVersion = "1.71"
 	installer    = "npcap-" + NpcapVersion + "-oem.exe"
 )
 
@@ -148,6 +148,15 @@ func Package() {
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	start := time.Now()
+	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
+	return devtools.Ironbank()
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).

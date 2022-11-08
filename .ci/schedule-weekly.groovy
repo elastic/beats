@@ -18,9 +18,17 @@ pipeline {
     cron('H H(1-2) * * 0')
   }
   stages {
-    stage('Weekly beats builds') {
+    stage('Weekly beats builds for AWS') {
       steps {
-        runBuilds(quietPeriodFactor: 1000, branches: ['main', '8.<minor>', '8.<next-patch>', '7.<minor>'])
+        runBuilds(quietPeriodFactor: 1000, branches: ['main', '8.<next-minor>', '8.<minor>', '8.<next-patch>', '7.<minor>'], parameters: [booleanParam(name: 'awsCloudTests', value: true)])
+      }
+    }
+    stage('Weekly beats builds for Orka M1') {
+      steps {
+        // There are some limitations with the number of concurrent macos m1 that can run in parallel
+        // let's only run for the `main` branch for the timebeing and wait to start a bit longer,
+        // so the previous stage for AWS validation can run further
+        runBuilds(quietPeriodFactor: 10000, branches: ['main'], parameters: [booleanParam(name: 'macosM1Test', value: true)])
       }
     }
   }
@@ -36,7 +44,7 @@ def runBuilds(Map args = [:]) {
 
   def quietPeriod = 0
   branches.each { branch ->
-    build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+    build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: args.parameters, wait: false, propagate: false)
     // Increate the quiet period for the next iteration
     quietPeriod += args.quietPeriodFactor
   }

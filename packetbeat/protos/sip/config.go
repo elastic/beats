@@ -24,9 +24,10 @@ import (
 
 type config struct {
 	cfg.ProtocolCommon `config:",inline"`
-	ParseAuthorization bool `config:"parse_authorization"`
-	ParseBody          bool `config:"parse_body"`
-	KeepOriginal       bool `config:"keep_original"`
+	ParseAuthorization bool   `config:"parse_authorization"`
+	ParseBody          bool   `config:"parse_body"`
+	KeepOriginal       bool   `config:"keep_original"`
+	TransportProto     string `config:"transport_protocol"`
 }
 
 var defaultConfig = config{
@@ -36,4 +37,5 @@ var defaultConfig = config{
 	ParseAuthorization: true,
 	ParseBody:          true,
 	KeepOriginal:       true,
+	TransportProto:     "udp",
 }

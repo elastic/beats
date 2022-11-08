@@ -1,0 +1,433 @@
+{
+    "attributes": {
+        "description": "Operating system activity from endpoints via ArcSight",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset:cef.log"
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "Count": "#64B0C8",
+                            "Destination User Names": "#E24D42",
+                            "Event Types": "#EF843C"
+                        },
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "4",
+                    "w": 40,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 55k": "rgb(255,255,204)",
+                            "110k - 165k": "rgb(254,225,135)",
+                            "165k - 220k": "rgb(254,201,101)",
+                            "220k - 275k": "rgb(254,171,73)",
+                            "275k - 330k": "rgb(253,141,60)",
+                            "330k - 385k": "rgb(252,91,46)",
+                            "385k - 440k": "rgb(237,47,34)",
+                            "440k - 495k": "rgb(212,16,32)",
+                            "495k - 550k": "rgb(176,0,38)",
+                            "55k - 110k": "rgb(255,241,170)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 28
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "7",
+                    "w": 48,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "/Attempt": "#447EBC",
+                            "/Failure": "#E24D42",
+                            "/Success": "#7EB26D"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "8",
+                    "w": 24,
+                    "x": 24,
+                    "y": 52
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "9",
+                    "w": 24,
+                    "x": 0,
+                    "y": 40
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "10",
+                    "w": 24,
+                    "x": 24,
+                    "y": 40
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "11",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "12",
+                    "w": 8,
+                    "x": 40,
+                    "y": 4
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "Destination Users": "#E24D42",
+                            "Event Count": "#64B0C8"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "13",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "14",
+                    "w": 16,
+                    "x": 32,
+                    "y": 64
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "15",
+                    "w": 16,
+                    "x": 32,
+                    "y": 84
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "16",
+                    "w": 32,
+                    "x": 0,
+                    "y": 80
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "17",
+                    "w": 32,
+                    "x": 0,
+                    "y": 100
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "18",
+                    "w": 32,
+                    "x": 0,
+                    "y": 64
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "19",
+                    "w": 32,
+                    "x": 0,
+                    "y": 92
+                },
+                "panelIndex": "19",
+                "panelRefName": "panel_19",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "refreshInterval": {
+            "display": "Off",
+            "pause": false,
+            "value": 0
+        },
+        "timeFrom": "now-24h",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat CEF] ArcSight — Endpoint OS Activity Dashboard",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-110da36b-6544-4507-9ae5-591d44bd2333",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-81cc567b-7ef9-44f8-9fc6-9fd98f8d8a3d",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-f5fde1d9-50ff-4a55-aa6a-724a8d6c05b2",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-09047d0c-900c-4949-9cf6-122154cc203f",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-c77b16c9-031b-45ec-af29-b8f116c610ba",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-dc5d284d-a136-4207-9557-657f0972d534",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-18a1d5b4-8f9e-43b6-a6e7-d9f24db85136",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-6d82b7f1-5400-43b4-91c0-9f27952d571f",
+            "name": "10:panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-7ce3dc59-a4ec-4748-a5f4-7a35a4a055e0",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-3ab5a5fa-3775-49d3-892b-4362531971cd",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-97a3e327-9b8b-4a1b-91ad-6c93c90d0193",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-e386b2cc-4e81-4e16-bbfa-65cf583dd247",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-08dd95b3-aa74-4271-9c53-30e106fd5ea6",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-0b7d6680-54e6-4afd-9748-a686ad4d72f0",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-02b3c5cc-240f-4ca5-b49f-56e2f1cc83fc",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-a29c8241-2598-4964-b800-0e298e9d2ad8",
+            "name": "18:panel_18",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-a09db928-f867-46cf-85f9-1d0a29afa903",
+            "name": "19:panel_19",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzIzNDMsMV0="
+}

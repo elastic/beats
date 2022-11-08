@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package synthexec
 
@@ -8,22 +10,25 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const debugSelector = "synthexec"
@@ -32,6 +37,14 @@ type FilterJourneyConfig struct {
 	Tags  []string `config:"tags"`
 	Match string   `config:"match"`
 }
+
+// platformCmdMutate is the hook for OS specific mutation of cmds
+// This is practically just used by synthexec_unix.go to add Sysprocattrs
+// It's still nice for devs to be able to test browser monitors on OSX
+// where these are unsupported
+var platformCmdMutate func(*exec.Cmd) = func(*exec.Cmd) {}
+
+var SynthexecTimeout struct{}
 
 // ProjectJob will run a single journey by name from the given project.
 func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
@@ -79,12 +92,18 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
 func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
+		senr := newStreamEnricher(sFields)
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
+			err := senr.enrich(event, &SynthEvent{
+				Type:  "cmd/could_not_start",
+				Error: ECSErrToSynthError(ecserr.NewSyntheticsCmdCouldNotStartErr(err)),
+			})
 			return nil, err
 		}
-		senr := newStreamEnricher(sFields)
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
+		// We don't just return the readResultsJob, otherwise we'd just send an empty event, execute it right away
+		// then it'll keep executing itself until we're truly done
+		return readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)(event)
 	}
 }
 
@@ -111,6 +130,9 @@ func runCmd(
 	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
+	// Attach sysproc attrs to ensure subprocesses are properly killed
+	platformCmdMutate(cmd)
+
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
@@ -165,6 +187,7 @@ func runCmd(
 		if err != nil {
 			logp.Warn("could not scan stdout events from synthetics: %s", err)
 		}
+
 		wg.Done()
 	}()
 
@@ -184,21 +207,62 @@ func runCmd(
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		err := scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
-		if err != nil {
-			logp.Warn("could not scan JSON events from synthetics: %s", err)
+		defer jsonReader.Close()
+
+		// We don't use scanToSynthEvents here because all lines here will be JSON
+		// It's more efficient to let the json decoder handle the ndjson than
+		// using the scanner
+		decoder := json.NewDecoder(jsonReader)
+		for {
+			var se SynthEvent
+			err := decoder.Decode(&se)
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if err != nil {
+				logp.L().Warn("error decoding json for test json results: %w", err)
+			}
+
+			mpx.writeSynthEvent(&se)
 		}
+
 		wg.Done()
 	}()
-	err = cmd.Start()
+
+	// This use of channels for results is awkward, but required for the thread locking below
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err = cmd.Start()
+
+		cmdStarted <- err
+
+		err := cmd.Wait()
+		cmdDone <- err
+	}()
+
+	err = <-cmdStarted
 	if err != nil {
 		logp.Warn("Could not start command %s: %s", cmd, err)
 		return nil, err
 	}
 
-	// Kill the process if the context ends
+	// Get timeout from parent ctx
+	timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	go func() {
 		<-ctx.Done()
+
+		// ProcessState can be null if it hasn't reported back yet
+		if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
+			return
+		}
+
 		err := cmd.Process.Kill()
 		if err != nil {
 			logp.Warn("could not kill synthetics process: %s", err)
@@ -207,15 +271,22 @@ func runCmd(
 
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
-		err := cmd.Wait()
-		jsonWriter.Close()
-		jsonReader.Close()
+		err := <-cmdDone
+		_ = jsonWriter.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 
 		var cmdError *SynthError = nil
 		if err != nil {
-			cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
+			// err could be generic or it could have been killed by context timeout, log and check context
+			// to decide which error to stream
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
+
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, loggableCmd.String()))
+			} else {
+				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
+			}
 		}
 
 		mpx.writeSynthEvent(&SynthEvent{
@@ -226,6 +297,7 @@ func runCmd(
 
 		wg.Wait()
 		mpx.Close()
+		cancel()
 	}()
 
 	return mpx, nil
@@ -234,9 +306,12 @@ func runCmd(
 // scanToSynthEvents takes a reader, a transform function, and a callback, and processes
 // each scanned line via the reader before invoking it with the callback.
 func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) (*SynthEvent, error), cb func(*SynthEvent)) error {
+	defer func() {
+		_ = rdr.Close()
+	}()
 	scanner := bufio.NewScanner(rdr)
-	buf := make([]byte, 1024*1024*2)  // 2MiB initial buffer (images can be big!)
-	scanner.Buffer(buf, 1024*1024*40) // Max 50MiB Buffer
+	buf := make([]byte, 1024*10)      // 10KiB initial buffer
+	scanner.Buffer(buf, 1024*1024*10) // Max 10MiB Buffer
 
 	for scanner.Scan() {
 		se, err := transform(scanner.Bytes(), scanner.Text())

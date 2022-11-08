@@ -11,6 +11,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
@@ -49,33 +50,35 @@ func (t *valueTpl) Unpack(in string) error {
 	tpl, err := template.New("").
 		Option("missingkey=error").
 		Funcs(template.FuncMap{
+			"add":                 add,
+			"base64Decode":        base64Decode,
+			"base64DecodeNoPad":   base64DecodeNoPad,
+			"base64Encode":        base64Encode,
+			"base64EncodeNoPad":   base64EncodeNoPad,
+			"beatInfo":            beatInfo,
+			"div":                 div,
+			"formatDate":          formatDate,
+			"getRFC5988Link":      getRFC5988Link,
+			"hash":                hashStringHex,
+			"hashBase64":          hashStringBase64,
+			"hexDecode":           hexDecode,
+			"hmac":                hmacStringHex,
+			"hmacBase64":          hmacStringBase64,
+			"join":                join,
+			"toJSON":              toJSON,
+			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
-			"formatDate":          formatDate,
 			"parseDuration":       parseDuration,
 			"parseTimestamp":      parseTimestamp,
 			"parseTimestampMilli": parseTimestampMilli,
 			"parseTimestampNano":  parseTimestampNano,
-			"getRFC5988Link":      getRFC5988Link,
-			"toInt":               toInt,
-			"add":                 add,
-			"mul":                 mul,
-			"div":                 div,
-			"hmac":                hmacStringHex,
-			"hash":                hashStringHex,
-			"hexDecode":           hexDecode,
-			"base64Encode":        base64Encode,
-			"base64EncodeNoPad":   base64EncodeNoPad,
-			"base64Decode":        base64Decode,
-			"base64DecodeNoPad":   base64DecodeNoPad,
-			"join":                join,
+			"replaceAll":          replaceAll,
 			"sprintf":             fmt.Sprintf,
-			"hmacBase64":          hmacStringBase64,
-			"hashBase64":          hashStringBase64,
-			"uuid":                uuidString,
-			"userAgent":           userAgentString,
-			"beatInfo":            beatInfo,
+			"toInt":               toInt,
 			"urlEncode":           urlEncode,
+			"userAgent":           userAgentString,
+			"uuid":                uuidString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -113,6 +116,13 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 	data.Put("first_event", trCtx.firstEventClone())
 	data.Put("last_event", trCtx.lastEventClone())
 	data.Put("last_response", trCtx.lastResponseClone().templateValues())
+	if trCtx.firstResponse != nil {
+		data.Put("first_response", trCtx.firstResponseClone().templateValues())
+	}
+	// This is only set when chaining is used
+	if trCtx.parentTrCtx != nil {
+		data.Put("parent_last_response", trCtx.parentTrCtx.lastResponseClone().templateValues())
+	}
 
 	if err := t.Template.Execute(buf, data); err != nil {
 		return fallback(err)
@@ -211,8 +221,8 @@ func parseTimestampNano(ns int64) time.Time {
 
 var regexpLinkRel = regexp.MustCompile(`<(.*)>;.*\srel\="?([^;"]*)`)
 
-func getRFC5988Link(rel string, links []string) string {
-	for _, link := range links {
+func getMatchLink(rel string, linksSplit []string) string {
+	for _, link := range linksSplit {
 		if !regexpLinkRel.MatchString(link) {
 			continue
 		}
@@ -228,8 +238,15 @@ func getRFC5988Link(rel string, links []string) string {
 
 		return matches[1]
 	}
-
 	return ""
+}
+
+func getRFC5988Link(rel string, links []string) string {
+	if len(links) == 1 && strings.Count(links[0], "rel=") > 1 {
+		linksSplit := strings.Split(links[0], ",")
+		return getMatchLink(rel, linksSplit)
+	}
+	return getMatchLink(rel, links)
 }
 
 func toInt(v interface{}) int64 {
@@ -425,4 +442,25 @@ func urlEncode(value string) string {
 		return ""
 	}
 	return url.QueryEscape(value)
+}
+
+// replaceAll returns a copy of the string s with all non-overlapping instances
+// of old replaced by new.
+//
+// Note that the order of the arguments differs from Go's [strings.ReplaceAll] to
+// make pipelining more ergonomic. This allows s to be piped in because it is
+// the final argument. For example,
+//
+//	[[ "some value" | replaceAll "some" "my" ]]  // == "my value"
+func replaceAll(old, new, s string) string {
+	return strings.ReplaceAll(s, old, new)
+}
+
+// toJSON converts the given structure into a JSON string.
+func toJSON(i interface{}) (string, error) {
+	result, err := json.Marshal(i)
+	if err != nil {
+		return "", fmt.Errorf("toJSON failed: %w", err)
+	}
+	return string(bytes.TrimSpace(result)), nil
 }

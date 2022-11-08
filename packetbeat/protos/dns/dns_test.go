@@ -85,7 +85,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
-	publish.MarshalPacketbeatFields(&event, nil, nil)
+	_, _ = publish.MarshalPacketbeatFields(&event, nil, nil)
 	e.events = append(e.events, event)
 }
 
@@ -98,7 +98,7 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 	if verbose {
 		level = logp.DebugLevel
 	}
-	logp.DevelopmentSetup(
+	_ = logp.DevelopmentSetup(
 		logp.WithLevel(level),
 		logp.WithSelectors("dns"),
 	)
@@ -327,7 +327,7 @@ func TestRRsToMapStrsWithOPTRecord(t *testing.T) {
 
 	// The OPT record is a pseudo-record so it doesn't become a real record
 	// in our conversion, and there will be 1 entry instead of 2.
-	mapStrs, _ := rrsToMapStrs([]mkdns.RR{o, r}, false)
+	mapStrs, _ := rrsToMapStrs([]mkdns.RR{o, r}, false, logp.NewLogger("dns_test"))
 	assert.Len(t, mapStrs, 1)
 
 	mapStr := mapStrs[0]

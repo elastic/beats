@@ -23,8 +23,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -47,8 +45,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
-
-	_ "github.com/elastic/beats/v7/filebeat/include"
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
@@ -91,7 +87,7 @@ func New(plugins PluginFactory) beat.Creator {
 func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("Error reading config file: %w", err)
 	}
 
 	if err := cfgwarn.CheckRemoved6xSettings(
@@ -105,7 +101,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, err
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +126,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	if !config.ConfigInput.Enabled() && !config.ConfigModules.Enabled() && !haveEnabledInputs && config.Autodiscover == nil && !b.Manager.Enabled() {
 		if !b.InSetupCmd {
-			return nil, errors.New("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
+			return nil, fmt.Errorf("no modules or inputs enabled and configuration reloading disabled. What files do you want me to watch?")
 		}
 
 		// in the `setup` command, log this only as a warning
@@ -138,7 +134,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
-		return nil, errors.New("input configs and -once cannot be used together")
+		return nil, fmt.Errorf("input configs and -once cannot be used together")
 	}
 
 	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {
@@ -177,8 +173,17 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
 		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
-		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory)
+		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, enableAllFilesets)
 		if fb.config.ConfigModules.Enabled() {
+			if enableAllFilesets {
+				//All module configs need to be loaded to enable all the filesets
+				//contained in the modules.  The default glob just loads the enabled
+				//ones.  Switching the glob pattern from *.yml to * achieves this.
+				origPath, _ := fb.config.ConfigModules.String("path", -1)
+				newPath := strings.TrimSuffix(origPath, ".yml")
+				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
+			}
 			modulesLoader := cfgfile.NewReloader(fb.pipeline, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
 		}
@@ -228,7 +233,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// count active events for waiting on shutdown
 	wgEvents := &eventCounter{
-		count: monitoring.NewInt(nil, "filebeat.events.active"),
+		count: monitoring.NewInt(nil, "filebeat.events.active"), // Gauge
 		added: monitoring.NewUint(nil, "filebeat.events.added"),
 		done:  monitoring.NewUint(nil, "filebeat.events.done"),
 	}
@@ -291,7 +296,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	var inputTaskGroup unison.TaskGroup
-	defer inputTaskGroup.Stop()
+	defer func() {
+		_ = inputTaskGroup.Stop()
+	}()
 	if err := v2InputLoader.Init(&inputTaskGroup, v2.ModeRun); err != nil {
 		logp.Err("Failed to initialize the input managers: %v", err)
 		return err
@@ -316,7 +323,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the registrar
 	err = registrar.Start()
 	if err != nil {
-		return fmt.Errorf("Could not start registrar: %v", err)
+		return fmt.Errorf("Could not start registrar: %w", err)
 	}
 
 	// Stopping registrar will write last state
@@ -340,7 +347,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	err = crawler.Start(fb.pipeline, config.ConfigInput, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()
-		return fmt.Errorf("Failed to start crawler: %+v", err)
+		return fmt.Errorf("Failed to start crawler: %w", err)
 	}
 
 	// If run once, add crawler completion check as alternative to done signal
@@ -433,7 +440,7 @@ func newPipelineLoaderFactory(esConfig *conf.C) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
 		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
-			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
+			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err)
 		}
 		return esClient, nil
 	}

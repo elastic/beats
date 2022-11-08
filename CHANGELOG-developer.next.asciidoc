@@ -76,6 +76,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
 - Allow to use metricbeat for named mssql instances. {issue}24076[24076] {pull}30859[30859]
 - Setting DEV=true when running `mage build` now correctly generates binaries without optimisations and with debug symbols {pull}31955[31955]
+- The beat.cgroup.memory.mem.usage.bytes metric is now a gauge {issue}31582[31582] {pull}32652[32652]
 
 ==== Added
 
@@ -143,6 +144,9 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add Github action for linting
 - Add regex support for drop_fields processor.
 - Improve compatibility and reduce flakyness of Python tests {pull}31588[31588]
+- Added `.python-version` file {pull}32323[32323]
+- Add support for multiple regions in GCP {pull}32964[32964]
+- Use `T.TempDir` to create temporary test directory {pull}33082[33082]
 
 ==== Deprecated
 

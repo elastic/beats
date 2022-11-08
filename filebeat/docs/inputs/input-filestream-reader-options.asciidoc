@@ -140,7 +140,7 @@ The default is 16384.
 ===== `message_max_bytes`
 
 The maximum number of bytes that a single log message can have. All bytes after
-`mesage_max_bytes` are discarded and not sent. The default is 10MB (10485760).
+`message_max_bytes` are discarded and not sent. The default is 10MB (10485760).
 
 [float]
 ===== `parsers`

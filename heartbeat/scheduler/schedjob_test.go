@@ -99,7 +99,7 @@ func TestSchedJobRun(t *testing.T) {
 
 // testRecursiveForkingJob tests that a schedJob that splits into multiple parallel pieces executes without error
 func TestRecursiveForkingJob(t *testing.T) {
-	s := Create(1000, monitoring.NewRegistry(), tarawaTime(), map[string]config.JobLimit{
+	s := Create(1000, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
 		"atype": {Limit: 1},
 	}, false)
 	ran := batomic.NewInt(0)

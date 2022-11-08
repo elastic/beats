@@ -24,8 +24,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
@@ -69,7 +71,7 @@ func (p *processor) Start() {
 
 		err := p.sniffer.Run()
 		if err != nil {
-			p.err <- fmt.Errorf("sniffer loop failed: %v", err)
+			p.err <- fmt.Errorf("sniffer loop failed: %w", err)
 			return
 		}
 		p.err <- nil
@@ -90,6 +92,7 @@ func (p *processor) Stop() {
 	p.publisher.Stop()
 }
 
+// processorFactory controls construction of modules runners.
 type processorFactory struct {
 	name         string
 	err          chan error
@@ -106,6 +109,7 @@ func newProcessorFactory(name string, err chan error, beat *beat.Beat, configura
 	}
 }
 
+// Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
 func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
 	config, err := p.configurator(cfg)
 	if err != nil {
@@ -117,8 +121,8 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		p.beat.Info.Name,
 		p.beat.Publisher,
 		config.IgnoreOutgoing,
-		config.Interfaces.File == "",
-		config.Interfaces.InternalNetworks,
+		config.Interfaces[0].File == "",
+		config.Interfaces[0].InternalNetworks,
 	)
 	if err != nil {
 		return nil, err
@@ -126,7 +130,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 
 	watcher := procs.ProcessesWatcher{}
 	// Enable the process watcher only if capturing live traffic
-	if config.Interfaces.File == "" {
+	if config.Interfaces[0].File == "" {
 		err = watcher.Init(config.Procs)
 		if err != nil {
 			logp.Critical(err.Error())
@@ -140,18 +144,65 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	protocols := protos.NewProtocols()
 	err = protocols.Init(false, publisher, watcher, config.Protocols, config.ProtocolsList)
 	if err != nil {
-		return nil, fmt.Errorf("Initializing protocol analyzers failed: %v", err)
+		return nil, fmt.Errorf("failed to initialize protocol analyzers: %w", err)
 	}
 	flows, err := setupFlows(pipeline, watcher, config)
 	if err != nil {
 		return nil, err
 	}
-	sniffer, err := setupSniffer(config, protocols, workerFactory(publisher, protocols, watcher, flows, config))
+	sniffer, err := setupSniffer(config, protocols, sniffer.DecodersFor(publisher, protocols, watcher, flows, config))
 	if err != nil {
 		return nil, err
 	}
 
 	return newProcessor(config.ShutdownTimeout, publisher, flows, sniffer, p.err), nil
+}
+
+// setupFlows returns a *flows.Flows that will publish to the provided pipeline,
+// configured with cfg and process enrichment via the provided watcher.
+func setupFlows(pipeline beat.Pipeline, watcher procs.ProcessesWatcher, cfg config.Config) (*flows.Flows, error) {
+	if !cfg.Flows.IsEnabled() {
+		return nil, nil
+	}
+
+	processors, err := processors.New(cfg.Flows.Processors)
+	if err != nil {
+		return nil, err
+	}
+
+	var meta mapstr.M
+	if cfg.Flows.Index != "" {
+		meta = mapstr.M{"raw_index": cfg.Flows.Index}
+	}
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			EventMetadata: cfg.Flows.EventMetadata,
+			Processor:     processors,
+			KeepNull:      cfg.Flows.KeepNull,
+			Meta:          meta,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return flows.NewFlows(client.PublishAll, watcher, cfg.Flows)
+}
+
+func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, decoders sniffer.Decoders) (*sniffer.Sniffer, error) {
+	icmp, err := cfg.ICMP()
+	if err != nil {
+		return nil, err
+	}
+
+	for i, iface := range cfg.Interfaces {
+		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
+			continue
+		}
+		cfg.Interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
+	}
+
+	return sniffer.New(false, "", decoders, cfg.Interfaces)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
