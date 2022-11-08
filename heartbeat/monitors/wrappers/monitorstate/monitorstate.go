@@ -167,5 +167,5 @@ func LoaderDBKey(sf stdfields.StdMonitorFields, at time.Time, ctr int) string {
 	if sf.RunFrom != nil {
 		rfid = sf.RunFrom.ID
 	}
-	return fmt.Sprintf("%s-%s-%x-%x", sf.ID, rfid, at.UnixMilli(), ctr)
+	return fmt.Sprintf("%s-%x-%x", rfid, at.UnixMilli(), ctr)
 }

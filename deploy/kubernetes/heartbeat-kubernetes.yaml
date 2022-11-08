@@ -1,4 +1,106 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: heartbeat
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: heartbeat
+  labels:
+    k8s-app: heartbeat
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - pods
+  - services
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+    - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+    - jobs
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: heartbeat
+  # should be the namespace where heartbeat is running
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: heartbeat-kubeadm-config
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+rules:
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    resourceNames:
+      - kubeadm-config
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: heartbeat
+subjects:
+- kind: ServiceAccount
+  name: heartbeat
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: heartbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: heartbeat
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: heartbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: heartbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: heartbeat-kubeadm-config
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: heartbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: heartbeat-kubeadm-config
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: heartbeat-deployment-config
@@ -7,8 +109,7 @@ metadata:
     k8s-app: heartbeat
 data:
   heartbeat.yml: |-
-    #heartbeat.autodiscover:
-    #  # Autodiscover pods
+    #heartbeat.autodiscover: # Enable one or more of the providers below
     #  providers:
     #    - type: kubernetes
     #      resource: pod
@@ -16,16 +117,12 @@ data:
     #      node: ${NODE_NAME}
     #      hints.enabled: true
     #
-    #  # Autodiscover services
-    #  providers:
     #    - type: kubernetes
     #      resource: service
     #      scope: cluster
     #      node: ${NODE_NAME}
     #      hints.enabled: true
     #
-    #  # Autodiscover nodes
-    #  providers:
     #    - type: kubernetes
     #      resource: node
     #      node: ${NODE_NAME}
@@ -125,106 +222,4 @@ spec:
           path: /var/lib/heartbeat-data
           type: DirectoryOrCreate
 
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: heartbeat
-subjects:
-- kind: ServiceAccount
-  name: heartbeat
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: heartbeat
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: heartbeat
-  namespace: kube-system
-subjects:
-  - kind: ServiceAccount
-    name: heartbeat
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: heartbeat
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: heartbeat-kubeadm-config
-  namespace: kube-system
-subjects:
-  - kind: ServiceAccount
-    name: heartbeat
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: heartbeat-kubeadm-config
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: heartbeat
-  labels:
-    k8s-app: heartbeat
-rules:
-- apiGroups: [""]
-  resources:
-  - nodes
-  - namespaces
-  - pods
-  - services
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["apps"]
-  resources:
-    - replicasets
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["batch"]
-  resources:
-    - jobs
-  verbs: ["get", "list", "watch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: heartbeat
-  # should be the namespace where heartbeat is running
-  namespace: kube-system
-  labels:
-    k8s-app: heartbeat
-rules:
-  - apiGroups:
-      - coordination.k8s.io
-    resources:
-      - leases
-    verbs: ["get", "create", "update"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: heartbeat-kubeadm-config
-  namespace: kube-system
-  labels:
-    k8s-app: heartbeat
-rules:
-  - apiGroups: [""]
-    resources:
-      - configmaps
-    resourceNames:
-      - kubeadm-config
-    verbs: ["get"]
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: heartbeat
-  namespace: kube-system
-  labels:
-    k8s-app: heartbeat
 ---

@@ -29,7 +29,7 @@ func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
 	monitoring.NewString(reg, "id").Set(id)
 	out := &inputMetrics{
 		id:                           id,
-		parent:                       reg,
+		parent:                       parent,
 		logEventsReceivedTotal:       monitoring.NewUint(reg, "log_events_received_total"),
 		logGroupsTotal:               monitoring.NewUint(reg, "log_groups_total"),
 		cloudwatchEventsCreatedTotal: monitoring.NewUint(reg, "cloudwatch_events_created_total"),

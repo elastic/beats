@@ -3,6 +3,95 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.5.0]]
+=== Beats version 8.5.0
+https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
+- Fix formatting of MAC hardware addresses populated by the add_host_metadata processor. {issue}32264[32264] {pull}32265[32265]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix metric namespacing for self-monitoring to correct some process incorrectly reading as zero. {pull}32336[32336]
+
+*Auditbeat*
+
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+
+*Filebeat*
+
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+- Import dashboards from CEF integration. {pull}32766[32766]
+- Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
+- Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
+- Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3, aws-cloudwatch, and lumberjack inputs. {pull}33259[33259]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+
+*Heartbeat*
+- Fix bug affecting Let's Encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for Kibana-configured monitors. {pull}33293[33293]
+
+*Metricbeat*
+
+- Fix GCP storage field naming {pull}32806[32806]
+- In `module/windows/perfmon`, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
+- Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call. {pull}33105[33105]
+- Add GCP CloudSQL region filter. {pull}32943[32943]
+- Fix Logstash cgroup mappings. {pull}33131[33131]
+- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping. {pull}33263[33263]
+
+*Packetbeat*
+
+- Fix formatting of debug logs. {pull}32698[32698]
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+
+*Winlogbeat*
+
+- Reduce severity of message salvage failure logging. {pull}32697[32697]
+
+==== Added
+
+*Filebeat*
+- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
+
+*Heartbeat*
+- Add new states field for internal use by new synthetics app. {pull}30632[30632]
+
+*Packetbeat*
+- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
+- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
+- Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
+
+==== Deprecated
+
+*Heartbeat*
+- Deprecate `zip_url` and local monitor options. {pull}33123[33123]
+
+[[release-notes-8.4.3]]
+=== Beats version 8.4.3
+https://github.com/elastic/beats/compare/v8.4.2\...v8.4.3[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+
+==== Added
+
+*Affecting all Beats*
+
+- Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
+
 [[release-notes-8.4.2]]
 === Beats version 8.4.2
 https://github.com/elastic/beats/compare/v8.4.1\...v8.4.2[View commits]
@@ -32,7 +121,7 @@ https://github.com/elastic/beats/compare/v8.4.1\...v8.4.2[View commits]
 === Beats version 8.4.1
 https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
 
-==== Known Issue 
+==== Known Issue
 
 // tag::credentials-error[]
 
@@ -44,7 +133,7 @@ Filebeat agents configured to read from AWS inputs may return an error similar t
 ----
 sqs ReceiveMessage failed: operation error SQS: ReceiveMessage, https response
 error StatusCode: 403, RequestID: cb57783a-505f-5099-9160-23b8eea8ddbb,
-api error SignatureDoesNotMatch: Credential should be scoped to a valid region. 
+api error SignatureDoesNotMatch: Credential should be scoped to a valid region.
 ----
 
 This error was introduced by a breaking change in the AWS library.
@@ -104,6 +193,20 @@ s3access:
 [[release-notes-8.4.0]]
 === Beats version 8.4.0
 https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
+
+==== Known Issues
+
+*Auditbeat*
+
+Auditbeat/auditd integration will send malformed data and may crash in version 8.4.0. {issue}32818[32818]
+
+Suggested resolution:
+Do not start Auditbeat or auditd integration on Elastic Agent at version 8.4.0. Skip 8.4.0 and upgrade directly to 8.4.1.
+
+This issue is resolved in 8.4.1 and later.
+
+//include credentials error from 8.4.1 section
+include::CHANGELOG.asciidoc[tag=credentials-error]
 
 ==== Breaking changes
 

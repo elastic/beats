@@ -115,13 +115,13 @@ func (NoopRunner) Stop() {
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
-	if !c.Enabled() {
-		return NoopRunner{}, nil
-	}
-
 	c, err := stdfields.UnnestStream(c)
 	if err != nil {
 		return nil, err
+	}
+
+	if !c.Enabled() {
+		return NoopRunner{}, nil
 	}
 
 	configEditor, err := newCommonPublishConfigs(f.info, f.beatLocation, c)

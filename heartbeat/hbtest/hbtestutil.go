@@ -159,9 +159,8 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 }
 
 func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
-	expected := mapstr.M{}
-	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
-	return lookslike.MustCompile(expected)
+	tlsFields := tlsmeta.CertFields(certificate, nil)
+	return lookslike.MustCompile(mapstr.M{"tls": tlsFields})
 }
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
