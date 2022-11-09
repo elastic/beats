@@ -232,10 +232,9 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			// the event). The error event will also be logged.
 			// If it is not empty, it must only have objects as elements.
 			// Additional fields may be present at the root of the object.
-			// The evaluation is repeated with the new state after removing
-			// events if the events array is not empty unless the "want_more"
-			// field is present; if "want_more" is false, a non-empty events
-			// array will not result in a repeat.
+			// The evaluation is repeated with the new state, after removing
+			// the events field, if the "want_more" field is present and true
+			// and a non-zero events array is returned.
 			//
 			// If cursor is present it must be either a single object or an
 			// array with the same length as events; each element i of the
@@ -423,8 +422,9 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			// Replace the last known good cursor.
 			state["cursor"] = goodCursor
 
-			m, ok := state["want_more"]
-			if ok && m == false { // Avoid explicit type assertion. This is safe as long as the value is Go-comparable.
+			// Avoid explicit type assertion. This is safe as long as the value is
+			// Go-comparable.
+			if state["want_more"] == false {
 				return nil
 			}
 		}

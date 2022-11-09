@@ -131,7 +131,7 @@ The https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317c
 
 The `status_code`, `header` and `rate_limit` values may be omitted if the program is not interacting with an HTTP API end-point and so will not contribute to program control.
 
-<7> The evaluation is repeated with the new state after removing events if the events array is not empty unless the `want_more` field is present; if `want_more` is false, a non-empty events array will not result in a repeat.
+<7> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned.
 
 ==== CEL extension libraries
 
