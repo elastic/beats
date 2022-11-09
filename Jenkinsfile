@@ -88,6 +88,10 @@ pipeline {
       steps {
         withGithubNotify(context: "Checks") {
           stageStatusCache(id: 'Checks'){
+            // test the ./dev-tools/run_with_go_ver used by the Unified Release process
+            dir("${BASE_DIR}") {
+              sh "HOME=${WORKSPACE} GO_VERSION=${GO_VERSION} ./dev-tools/run_with_go_ver make test-mage"
+            }
             withBeatsEnv(archive: false, id: "checks") {
               dumpVariables()
               whenTrue(env.ONLY_DOCS == 'false') {
