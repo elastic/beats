@@ -283,7 +283,9 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	}
 
 	var reader reader.Reader
-	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
+	buf := &bytes.Buffer{}
+	tee := io.TeeReader(r, buf)
+	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(tee), readfile.Config{
 		Codec:      enc,
 		BufferSize: int(p.readerConfig.BufferSize),
 		Terminator: p.readerConfig.LineTerminator,
@@ -300,8 +302,11 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
-		isEOF := errors.Is(err, io.EOF)
-		if err != nil && !isEOF {
+		if errors.Is(err, io.EOF) {
+			// No more lines
+			break
+		}
+		if err != nil {
 			return fmt.Errorf("error reading message: %w", err)
 		}
 
@@ -309,12 +314,28 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 		event.Fields.DeepUpdate(message.Fields)
 		offset += int64(message.Bytes)
 		p.publish(p.acker, &event)
+	}
 
-		if isEOF {
-			// No more lines
-			break
+	if offset == 0 {
+		reader = readfile.NewEncodeReaderEof(ioutil.NopCloser(buf), readfile.Config{
+			Codec:      enc,
+			BufferSize: int(p.readerConfig.BufferSize),
+			MaxBytes:   int(p.readerConfig.MaxBytes) * 4,
+		})
+
+		reader = readfile.NewStripNewline(reader, p.readerConfig.LineTerminator)
+		reader = p.readerConfig.Parsers.Create(reader)
+		reader = readfile.NewLimitReader(reader, int(p.readerConfig.MaxBytes))
+
+		message, err := reader.Next()
+		if !errors.Is(err, io.EOF) {
+			return fmt.Errorf("error reading message: %w", err)
 		}
 
+		event := p.createEvent(string(message.Content), offset)
+		event.Fields.DeepUpdate(message.Fields)
+		offset += int64(message.Bytes)
+		p.publish(p.acker, &event)
 	}
 
 	return nil
