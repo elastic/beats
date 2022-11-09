@@ -131,7 +131,7 @@ func (r *EncoderReaderEof) decode(end int) (int, error) {
 		if err != nil {
 			// Check if error is different from destination buffer too short
 			if errors.Is(err, transform.ErrShortDst) {
-				r.outBuffer.Write(inBytes[0:end])
+				_, _ = r.outBuffer.Write(inBytes[0:end])
 				start = end
 				break
 			}
