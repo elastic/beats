@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Re-enable build optimizations to reduce binary size and improve performance. {pull}33620[33620]
 - Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
