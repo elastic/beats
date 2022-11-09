@@ -233,7 +233,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// count active events for waiting on shutdown
 	wgEvents := &eventCounter{
-		count: monitoring.NewInt(nil, "filebeat.events.active"),
+		count: monitoring.NewInt(nil, "filebeat.events.active"), // Gauge
 		added: monitoring.NewUint(nil, "filebeat.events.added"),
 		done:  monitoring.NewUint(nil, "filebeat.events.done"),
 	}
