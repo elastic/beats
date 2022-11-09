@@ -410,12 +410,8 @@ def release(type){
     ]) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
-<<<<<<< HEAD
-        sh(label: "mage package ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
-        sh(label: "mage ironbank ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage ironbank')
-=======
         sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
->>>>>>> 2fdefcfbc7 (DRA: support for staging (#31092))
+        sh(label: "mage ironbank ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage ironbank')
         def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
