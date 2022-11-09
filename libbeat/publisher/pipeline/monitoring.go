@@ -84,7 +84,7 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 	return &metricsObserver{
 		metrics: metrics,
 		vars: metricsObserverVars{
-			clients: monitoring.NewUint(reg, "clients"),
+			clients: monitoring.NewUint(reg, "clients"), // Gauge
 
 			events:    monitoring.NewUint(reg, "events.total"),
 			filtered:  monitoring.NewUint(reg, "events.filtered"),
@@ -96,7 +96,7 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 			queueACKed:     monitoring.NewUint(reg, "queue.acked"),
 			queueMaxEvents: monitoring.NewUint(reg, "queue.max_events"),
 
-			activeEvents: monitoring.NewUint(reg, "events.active"),
+			activeEvents: monitoring.NewUint(reg, "events.active"), // Gauge
 		},
 	}
 }
