@@ -97,6 +97,9 @@ type Stats struct {
 	CgroupOpts    cgroup.ReaderOptions
 	EnableCgroups bool
 	EnableNetwork bool
+	// NetworkMetrics is an allowlist of network metrics,
+	// the names of which can be found in /proc/PID/net/snmp and /proc/PID/net/netstat
+	NetworkMetrics []string
 
 	skipExtended bool
 	procRegexps  []match.Matcher // List of regular expressions used to whitelist processes.
@@ -166,8 +169,12 @@ func (procStats *Stats) Init() error {
 	}
 
 	if procStats.EnableNetwork && procStats.Hostfs.IsSet() {
-		procStats.logger.Warnf("hostfs has been set to %s, and EnableNetwork has been set, but per-process network counters are currently not supported with an alternate filesystem", procStats.Hostfs.ResolveHostFS(""))
+		procStats.logger.Warnf("hostfs has been set to %s, and EnableNetwork has been set, but per-process network counters are currently not supported with an alternate filesystem.", procStats.Hostfs.ResolveHostFS(""))
 		procStats.EnableNetwork = false
+	}
+
+	if procStats.EnableNetwork && len(procStats.NetworkMetrics) == 0 {
+		procStats.logger.Warnf("Collecting all network metrics per-process; this will produce a large volume of data.")
 	}
 
 	procStats.ProcsMap = NewProcsTrack()

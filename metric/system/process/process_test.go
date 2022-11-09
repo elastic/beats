@@ -97,7 +97,6 @@ func TestNetworkFetch(t *testing.T) {
 	networkData, ok := data["network"]
 	require.True(t, ok, "network data not found")
 	require.NotEmpty(t, networkData)
-	t.Logf("%s", data.StringToPrint())
 }
 
 func TestNetworkSkipWithHostfs(t *testing.T) {
@@ -109,6 +108,28 @@ func TestNetworkSkipWithHostfs(t *testing.T) {
 	err := testConfig.Init()
 	require.NoError(t, err)
 	require.False(t, testConfig.EnableNetwork)
+}
+
+func TestNetworkFilter(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("Network data only available on linux")
+	}
+	testConfig := Stats{
+		Hostfs:         resolve.NewTestResolver("/"),
+		EnableNetwork:  true,
+		NetworkMetrics: []string{"Forwarding"},
+	}
+
+	err := testConfig.Init()
+	require.NoError(t, err)
+
+	data, err := testConfig.GetOne(os.Getpid())
+	require.NoError(t, err)
+
+	_, exists := data.GetValue("network.ip.Forwarding")
+	require.NoError(t, exists, "filter did not preserve key")
+	ipMetrics, exists := data.GetValue("network.ip")
+	require.Equal(t, 1, len(ipMetrics.(map[string]interface{})))
 }
 
 func TestFilter(t *testing.T) {

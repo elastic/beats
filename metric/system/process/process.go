@@ -284,7 +284,7 @@ func (procStats *Stats) getProcessEvent(process *ProcState) (mapstr.M, error) {
 	err := typeconv.Convert(&proc, process)
 
 	if procStats.EnableNetwork && process.Network != nil {
-		proc["network"] = network.MapProcNetCounters(process.Network)
+		proc["network"] = network.MapProcNetCountersWithFilter(process.Network, procStats.NetworkMetrics)
 	}
 
 	return proc, err
