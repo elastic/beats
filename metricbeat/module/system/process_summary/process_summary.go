@@ -27,8 +27,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -73,7 +71,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	procList, err := process.ListStates(m.sys)
 	if err != nil {
-		return errors.Wrap(err, "error fetching process list")
+		return fmt.Errorf("error fetching process list: %w", err)
 	}
 
 	procStates := map[string]int{}
@@ -86,7 +84,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	outMap := mapstr.M{}
-	typeconv.Convert(&outMap, procStates)
+	err = typeconv.Convert(&outMap, procStates)
+	if err != nil {
+		return fmt.Errorf("error formatting process stats: %w", err)
+	}
 	if runtime.GOOS == "linux" {
 		threads, err := threadStats(m.sys)
 		if err != nil {
