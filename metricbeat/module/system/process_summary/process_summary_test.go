@@ -43,7 +43,8 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	require.NoError(t, err)
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -53,13 +54,14 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		event.StringToPrint())
 
-	_, err := event.GetValue("system.process.summary")
+	_, err = event.GetValue("system.process.summary")
 	require.NoError(t, err)
 
 }
 
 func TestStateNames(t *testing.T) {
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	require.NoError(t, err)
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
