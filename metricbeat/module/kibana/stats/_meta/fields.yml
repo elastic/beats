@@ -145,3 +145,40 @@
         - name: max.ms
           type: long
           description: Maximum response time in milliseconds
+    - name: elasticsearch_client
+      type: group
+      description: Elasticsearch Client's stats
+      fields:
+        - name: protocol
+          type: string
+          description: Protocol used to connect to ES nodes (http, https or mixed)
+        - name: connected_nodes
+          type: short
+          description: Number of connected ES nodes
+        - name: nodes_with_active_sockets
+          type: integer
+          description: Number of nodes with active sockets
+        - name: nodes_with_idle_sockets
+          type: integer
+          description: Number of nodes with idle sockets
+        - name: total_active_sockets
+          type: integer
+          description: Total number of active sockets
+        - name: total_idle_sockets
+          type: integer
+          description: Total number of idle sockets
+        - name: total_queued_requests
+          type: integer
+          description: Total number of queued requests
+        - name: most_active_node_sockets
+          type: integer
+          description: Number of active sockets of the node with the most active sockets
+        - name: average_active_sockets_per_node
+          type: float
+          description: Average number of active sockets per node
+        - name: most_idle_node_sockets
+          type: integer
+          description: Number of idle sockets of the node with the most idle sockets
+        - name: average_idle_sockets_per_node
+          type: float
+          description: Average number of idle sockets per node
