@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"time"
 
@@ -38,7 +39,6 @@ type EncoderReaderEof struct {
 	maxBytes   int // max bytes per line limit to avoid OOM with malformatted files
 	inBuffer   *streambuf.Buffer
 	outBuffer  *streambuf.Buffer
-	inOffset   int // input buffer read offset
 	byteCount  int // number of bytes decoded from input buffer into output buffer
 	decoder    transform.Transformer
 	tempBuffer []byte
@@ -70,7 +70,7 @@ func (r *EncoderReaderEof) Next() (reader.Message, error) {
 		n, err = r.reader.Read(r.tempBuffer)
 		idx += n
 
-		if err == io.EOF && n > 0 {
+		if errors.Is(err, io.EOF) && n > 0 {
 			// Continue processing the returned bytes. The next call will yield EOF with 0 bytes.
 			err = nil
 		}
@@ -130,7 +130,7 @@ func (r *EncoderReaderEof) decode(end int) (int, error) {
 		nDst, nSrc, err = r.decoder.Transform(r.tempBuffer, inBytes[start:end], false)
 		if err != nil {
 			// Check if error is different from destination buffer too short
-			if err != transform.ErrShortDst {
+			if errors.Is(err, transform.ErrShortDst) {
 				r.outBuffer.Write(inBytes[0:end])
 				start = end
 				break
@@ -141,7 +141,7 @@ func (r *EncoderReaderEof) decode(end int) (int, error) {
 		}
 
 		start += nSrc
-		r.outBuffer.Write(r.tempBuffer[:nDst])
+		_, _ = r.outBuffer.Write(r.tempBuffer[:nDst])
 	}
 
 	r.byteCount += start

@@ -334,7 +334,6 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 
 		event := p.createEvent(string(message.Content), offset)
 		event.Fields.DeepUpdate(message.Fields)
-		offset += int64(message.Bytes)
 		p.publish(p.acker, &event)
 	}
 
