@@ -77,6 +77,40 @@ func TestGetOne(t *testing.T) {
 	t.Logf("Proc: %s", procData[0].StringToPrint())
 }
 
+func TestNetworkFetch(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("Network data only available on linux")
+	}
+	testConfig := Stats{
+		Procs:         []string{".*"},
+		Hostfs:        resolve.NewTestResolver("/"),
+		CPUTicks:      false,
+		EnableCgroups: false,
+		EnableNetwork: true,
+	}
+
+	err := testConfig.Init()
+	require.NoError(t, err)
+
+	data, err := testConfig.GetOne(os.Getpid())
+	require.NoError(t, err)
+	networkData, ok := data["network"]
+	require.True(t, ok, "network data not found")
+	require.NotEmpty(t, networkData)
+	t.Logf("%s", data.StringToPrint())
+}
+
+func TestNetworkSkipWithHostfs(t *testing.T) {
+	testConfig := Stats{
+		Hostfs:        resolve.NewTestResolver("testpath"),
+		EnableNetwork: true,
+	}
+
+	err := testConfig.Init()
+	require.NoError(t, err)
+	require.False(t, testConfig.EnableNetwork)
+}
+
 func TestFilter(t *testing.T) {
 	//The logic itself is os-independent, so we'll only test this on the platform least likly to have CI issues
 	if runtime.GOOS != "linux" {

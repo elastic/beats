@@ -34,7 +34,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	"github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/network"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/go-sysinfo"
+	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
 // ListStates is a wrapper that returns a list of processess with only the basic PID info filled out.
@@ -227,6 +230,23 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		}
 	} // end cgroups processor
 
+	// network data
+	if procStats.EnableNetwork {
+		procHandle, err := sysinfo.Process(pid)
+		// treat this as a soft error
+		if err != nil {
+			procStats.logger.Debugf("error initializing process handler for pid %d while trying to fetch network data: %w", pid, err)
+		} else {
+			procNet, ok := procHandle.(sysinfotypes.NetworkCounters)
+			if ok {
+				status.Network, err = procNet.NetworkCounters()
+				if err != nil {
+					procStats.logger.Debugf("error fetching network counters for process %d: %w", pid, err)
+				}
+			}
+		}
+	}
+
 	if status.CPU.Total.Ticks.Exists() {
 		status.CPU.Total.Value = opt.FloatWith(metric.Round(float64(status.CPU.Total.Ticks.ValueOr(0))))
 	}
@@ -262,6 +282,10 @@ func (procStats *Stats) getProcessEvent(process *ProcState) (mapstr.M, error) {
 
 	proc := mapstr.M{}
 	err := typeconv.Convert(&proc, process)
+
+	if procStats.EnableNetwork && process.Network != nil {
+		proc["network"] = network.MapProcNetCounters(process.Network)
+	}
 
 	return proc, err
 }

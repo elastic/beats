@@ -96,6 +96,7 @@ type Stats struct {
 	IncludeTop    IncludeTopConfig
 	CgroupOpts    cgroup.ReaderOptions
 	EnableCgroups bool
+	EnableNetwork bool
 
 	skipExtended bool
 	procRegexps  []match.Matcher // List of regular expressions used to whitelist processes.
@@ -162,6 +163,11 @@ func (procStats *Stats) Init() error {
 	//footcannon prevention
 	if procStats.Hostfs == nil {
 		procStats.Hostfs = resolve.NewTestResolver("/")
+	}
+
+	if procStats.EnableNetwork && procStats.Hostfs.IsSet() {
+		procStats.logger.Warnf("hostfs has been set to %s, and EnableNetwork has been set, but per-process network counters are currently not supported with an alternate filesystem", procStats.Hostfs.ResolveHostFS(""))
+		procStats.EnableNetwork = false
 	}
 
 	procStats.ProcsMap = NewProcsTrack()
