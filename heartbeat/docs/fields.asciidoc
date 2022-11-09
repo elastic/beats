@@ -16338,7 +16338,7 @@ type: date
 Length of time this state has existed in millis
 
 
-type: date
+type: long
 
 --
 
