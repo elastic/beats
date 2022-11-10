@@ -92,7 +92,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 - Add tags to events based on parsed identifier. {pull}33472[33472]
-- Fix loop in filesystemn reporting and debug statement in fsstat {pull}33646[33646]
+- Skip over unsupported filesystems in the system.filesystem metricset instead of failing immediately. Fix debug statement in system.fsstat metricset. {pull}33646[33646]
 
 
 *Packetbeat*
