@@ -21,7 +21,7 @@
 package process_summary
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -68,7 +68,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// This will not run on cgo
 	procList, err := process.ListStates(m.sys)
 	if err != nil {
-		return errors.Wrap(err, "error fetching process list")
+		return fmt.Errorf("error fetching process list: %w", err)
 	}
 
 	procStates := map[string]int{}
