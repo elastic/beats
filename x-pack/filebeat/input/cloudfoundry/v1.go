@@ -5,7 +5,7 @@
 package cloudfoundry
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
@@ -48,7 +48,7 @@ func (i *inputV1) Run(ctx v2.Context, publisher stateless.Publisher) error {
 
 	consumer, err := hub.DopplerConsumer(callbacks)
 	if err != nil {
-		return errors.Wrapf(err, "initializing doppler consumer")
+		return fmt.Errorf("initializing doppler consumer: %w", err)
 	}
 
 	stopCtx, cancel := ctxtool.WithFunc(ctx.Cancelation, func() {
