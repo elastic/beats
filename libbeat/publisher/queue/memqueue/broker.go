@@ -57,11 +57,6 @@ type broker struct {
 	///////////////////////////
 	// internal channels
 
-	// When ackLoop receives events ACKs from a consumer, it sends the number
-	// of ACKed events to ackChan to notify the event loop that those
-	// events can be removed from the queue.
-	ackChan chan int
-
 	// When events are sent to consumers, the ACK channels for their batches
 	// are collected into chanLists and sent to scheduledACKs.
 	// These are then read by ackLoop and concatenated to its internal
@@ -93,6 +88,14 @@ type Settings struct {
 	FlushMinEvents int
 	FlushTimeout   time.Duration
 	InputQueueSize int
+}
+
+type queueEntry struct {
+	event interface{}
+	id    queue.EntryID
+
+	producer   *ackProducer
+	producerID producerID // The order of this entry within its producer
 }
 
 type batch struct {
@@ -153,7 +156,7 @@ func create(
 func NewQueue(
 	logger *logp.Logger,
 	settings Settings,
-) queue.Queue {
+) *broker {
 	var (
 		sz           = settings.Events
 		minEvents    = settings.FlushMinEvents
@@ -187,7 +190,6 @@ func NewQueue(
 		cancelChan: make(chan producerCancelRequest, 5),
 
 		// internal broker and ACK handler channels
-		ackChan:       make(chan int),
 		scheduledACKs: make(chan chanList),
 
 		ackListener: settings.ACKListener,
@@ -271,6 +273,7 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
 		EventLimit:            opt.UintWith(uint64(b.bufSize)),
 		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
+		OldestEntryID:         resp.oldestEntryID,
 	}, nil
 }
 
@@ -380,8 +383,12 @@ func (b *batch) Count() int {
 	return len(b.entries)
 }
 
-func (b *batch) Event(i int) interface{} {
+func (b *batch) Entry(i int) interface{} {
 	return b.entries[i].event
+}
+
+func (b *batch) ID(i int) queue.EntryID {
+	return b.entries[i].id
 }
 
 func (b *batch) Done() {

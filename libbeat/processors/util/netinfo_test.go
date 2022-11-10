@@ -18,13 +18,16 @@
 package util
 
 import (
+	"net"
 	"reflect"
+	"regexp"
 	"sort"
+	"strings"
 	"testing"
 )
 
 func TestUnique(t *testing.T) {
-	var tests = [][]string{
+	tests := [][]string{
 		{},
 		{"a"},
 		{"a", "a"},
@@ -51,6 +54,34 @@ func TestUnique(t *testing.T) {
 
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("unexpected result for test %d: got:%q want:%q", i, got, want)
+		}
+	}
+}
+
+func TestFormatHardwareAddr(t *testing.T) {
+	tests := []string{
+		"00:00:5e:00:53:01",
+		"02:00:5e:10:00:00:00:01",
+		"00:00:00:00:fe:80:00:00:00:00:00:00:02:00:5e:10:00:00:00:01",
+		"00-00-5e-00-53-01",
+		"02-00-5e-10-00-00-00-01",
+		"00-00-00-00-fe-80-00-00-00-00-00-00-02-00-5e-10-00-00-00-01",
+		"0000.5e00.5301",
+		"0200.5e10.0000.0001",
+		"0000.0000.fe80.0000.0000.0000.0200.5e10.0000.0001",
+	}
+
+	spec := regexp.MustCompile(`[0-9A-F]{2}(?:[0-9A-F]{2})*`)
+	for _, test := range tests {
+		addr, err := net.ParseMAC(test)
+		if err != nil {
+			t.Errorf("failed to parse test case %q", test)
+			continue
+		}
+		got := formatHardwareAddr(addr)
+		want := strings.ToUpper(strings.ReplaceAll(addr.String(), ":", "-"))
+		if got != want || !spec.MatchString(got) {
+			t.Errorf("unexpected format for %q: got:%q want:%q", test, got, want)
 		}
 	}
 }

@@ -130,22 +130,32 @@ var reMapping = map[string]string{
 	"pod.volume.utilization.value":                    "pod.volume.utilization.pct",
 
 	// gcp.loadbalancing metricset
-	"https.backend_request_bytes_count.value":  "https.backend_request.bytes",
-	"https.backend_request_count.value":        "https.backend_request.count",
-	"https.backend_response_bytes_count.value": "https.backend_response.bytes",
-	"https.request_bytes_count.value":          "https.request.bytes",
-	"https.request_count.value":                "https.request.count",
-	"https.response_bytes_count.value":         "https.response.bytes",
-	"l3.external.egress_bytes_count.value":     "l3.external.egress.bytes",
-	"l3.external.egress_packets_count.value":   "l3.external.egress_packets.count",
-	"l3.external.ingress_bytes_count.value":    "l3.external.ingress.bytes",
-	"l3.external.ingress_packets_count.value":  "l3.external.ingress_packets.count",
-	"l3.internal.egress_bytes_count.value":     "l3.internal.egress.bytes",
-	"l3.internal.egress_packets_count.value":   "l3.internal.egress_packets.count",
-	"l3.internal.ingress_bytes_count.value":    "l3.internal.ingress.bytes",
-	"l3.internal.ingress_packets_count.value":  "l3.internal.ingress_packets.count",
-	"tcp_ssl_proxy.egress_bytes_count.value":   "tcp_ssl_proxy.egress.bytes",
-	"tcp_ssl_proxy.ingress_bytes_count.value":  "tcp_ssl_proxy.ingress.bytes",
+	"https.backend_request_bytes_count.value":         "https.backend_request.bytes",
+	"https.backend_request_count.value":               "https.backend_request.count",
+	"https.backend_response_bytes_count.value":        "https.backend_response.bytes",
+	"https.request_bytes_count.value":                 "https.request.bytes",
+	"https.request_count.value":                       "https.request.count",
+	"https.response_bytes_count.value":                "https.response.bytes",
+	"l3.external.egress_bytes_count.value":            "l3.external.egress.bytes",
+	"l3.external.egress_packets_count.value":          "l3.external.egress_packets.count",
+	"l3.external.ingress_bytes_count.value":           "l3.external.ingress.bytes",
+	"l3.external.ingress_packets_count.value":         "l3.external.ingress_packets.count",
+	"l3.internal.egress_bytes_count.value":            "l3.internal.egress.bytes",
+	"l3.internal.egress_packets_count.value":          "l3.internal.egress_packets.count",
+	"l3.internal.ingress_bytes_count.value":           "l3.internal.ingress.bytes",
+	"l3.internal.ingress_packets_count.value":         "l3.internal.ingress_packets.count",
+	"tcp_ssl_proxy.egress_bytes_count.value":          "tcp_ssl_proxy.egress.bytes",
+	"tcp_ssl_proxy.ingress_bytes_count.value":         "tcp_ssl_proxy.ingress.bytes",
+	"https.backend_latencies.value":                   "https.backend_latencies.value",
+	"https.external.regional.backend_latencies.value": "https.external.regional.backend_latencies.value",
+	"https.external.regional.total_latencies.value":   "https.external.regional.total_latencies.value",
+	"https.frontend_tcp_rtt.value":                    "https.frontend_tcp_rtt.value",
+	"https.internal.backend_latencies.value":          "https.internal.backend_latencies.value",
+	"https.internal.total_latencies.value":            "https.internal.total_latencies.value",
+	"https.total_latencies.value":                     "https.total_latencies.value",
+	"l3.external.rtt_latencies.value":                 "l3.external.rtt_latencies.value",
+	"l3.internal.rtt_latencies.value":                 "l3.internal.rtt_latencies.value",
+	"tcp_ssl_proxy.frontend_tcp_rtt.value":            "tcp_ssl_proxy.frontend_tcp_rtt.value",
 
 	// gcp.metrics metricset
 	// NOTE: nothing here; if the user directly uses this metricset the mapping to ECS is
@@ -198,6 +208,8 @@ var reMapping = map[string]string{
 	"topic.send_request_count.value":                                             "topic.send_request.count",
 	"topic.streaming_pull_response_count.value":                                  "topic.streaming_pull_response.count",
 	"topic.unacked_bytes_by_region.value":                                        "topic.unacked_bytes_by_region.bytes",
+	"subscription.ack_latencies.value":                                           "subscription.ack_latencies.value",
+	"subscription.push_request_latencies.value":                                  "subscription.push_request_latencies.value",
 
 	// gcp.storage metricset
 	"api.request_count.value":                        "api.request.count",
@@ -233,6 +245,10 @@ var reMapping = map[string]string{
 	"cluster.yarn.nodemanagers.value":                "cluster.yarn.nodemanagers.count",
 	"cluster.yarn.pending_memory_size.value":         "cluster.yarn.pending_memory_size.value",
 	"cluster.yarn.virtual_cores.value":               "cluster.yarn.virtual_cores.count",
+	"cluster.job.completion_time.value":              "cluster.job.completion_time.value",
+	"cluster.job.duration.value":                     "cluster.job.duration.value",
+	"cluster.operation.completion_time.value":        "cluster.operation.completion_time.value",
+	"cluster.operation.duration.value":               "cluster.operation.duration.value",
 }
 
 func remap(l *logp.Logger, s string) string {
@@ -259,7 +275,11 @@ func getValueFromPoint(p *monitoring.Point) (out interface{}) {
 		out = v.StringValue
 	case *monitoring.TypedValue_DistributionValue:
 		// Distribution values aren't simple values. Take a look at this
-		out = v.DistributionValue
+		histogram := gcp.DistributionHistogramToES(v.DistributionValue)
+
+		out = mapstr.M{
+			"histogram": histogram,
+		}
 	}
 
 	return out

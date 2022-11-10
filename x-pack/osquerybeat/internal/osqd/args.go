@@ -80,6 +80,10 @@ var protectedFlags = Flags{
 	// The delimiter for a full query name that is concatenated as "pack_" + {{pack name}} + "_" + {{query name}} by default
 	"pack_delimiter": "_",
 
+	// This enforces the batch format for differential results
+	// https://osquery.readthedocs.io/en/stable/deployment/logging
+	"logger_event_type": false,
+
 	// Refresh config every 60 seconds
 	// The previous setting was 10 seconds which is unnecessary frequent.
 	// Osquery does not expect that frequent policy/configuration changes

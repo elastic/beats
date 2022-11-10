@@ -18,9 +18,8 @@
 package beater
 
 import (
+	"fmt"
 	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -131,7 +130,7 @@ func DefaultTestModulesCreator() beat.Creator {
 func newMetricbeat(b *beat.Beat, c *conf.C, options ...Option) (*Metricbeat, error) {
 	config := defaultConfig
 	if err := c.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "error reading configuration file")
+		return nil, fmt.Errorf("error reading configuration file: %w", err)
 	}
 
 	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.Manager.Enabled()
@@ -219,7 +218,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	// Centrally managed modules
 	factory := module.NewFactory(b.Info, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".modules", modules)
+	reload.RegisterV2.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()

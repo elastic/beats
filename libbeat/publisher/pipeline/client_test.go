@@ -187,7 +187,6 @@ func TestClientWaitClose(t *testing.T) {
 		defer client.Close()
 
 		// Send an event which gets acknowledged immediately.
-		client.Publish(beat.Event{})
 		output := newMockClient(func(batch publisher.Batch) error {
 			batch.ACK()
 			return nil
@@ -195,6 +194,8 @@ func TestClientWaitClose(t *testing.T) {
 		defer output.Close()
 		pipeline.output.Set(outputs.Group{Clients: []outputs.Client{output}})
 		defer pipeline.output.Set(outputs.Group{})
+
+		client.Publish(beat.Event{})
 
 		closed := make(chan struct{})
 		go func() {

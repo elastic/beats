@@ -99,65 +99,133 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 	return results, nil
 }
 
+func (r *metricsRequester) buildRegionsFilter(regions []string, label string) string {
+	if len(regions) == 0 {
+		return ""
+	}
+
+	var filter strings.Builder
+
+	// No. of regions added to the filter string.
+	var regionsCount uint
+
+	for _, region := range regions {
+		// If 1 region has been added and the iteration continues, add the OR operator.
+		if regionsCount > 0 {
+			filter.WriteString("OR")
+			filter.WriteString(" ")
+		}
+
+		filter.WriteString(fmt.Sprintf("%s = starts_with(\"%s\")", label, strings.TrimSuffix(region, "*")))
+		filter.WriteString(" ")
+
+		regionsCount++
+	}
+
+	switch {
+	// If the filter string has more than 1 region, parentheses are added for better filter readability.
+	case regionsCount > 1:
+		return fmt.Sprintf("(%s)", strings.TrimSpace(filter.String()))
+	default:
+		return strings.TrimSpace(filter.String())
+	}
+}
+
 // getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
 // if they have a region specified.
 func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	f := fmt.Sprintf(`metric.type="%s"`, m)
-	if r.config.Zone == "" && r.config.Region == "" {
+	if r.config.Zone == "" && r.config.Region == "" && len(r.config.Regions) == 0 {
 		return f
 	}
 
 	switch serviceName {
+	case gcp.ServiceCompute:
+		if r.config.Region != "" && r.config.Zone != "" {
+			r.logger.Warnf("when region %s and zone %s config parameter "+
+				"both are provided, only use region", r.config.Regions, r.config.Zone)
+		}
+
+		if r.config.Region != "" && len(r.config.Regions) != 0 {
+			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
+		}
+
+		switch {
+		case r.config.Region != "":
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabelZone, strings.TrimSuffix(r.config.Region, "*"))
+		case r.config.Zone != "":
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabelZone, strings.TrimSuffix(r.config.Zone, "*"))
+		case len(r.config.Regions) != 0:
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.ComputeResourceLabelZone)
+			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
+		}
 	case gcp.ServiceGKE:
 		if r.config.Region != "" && r.config.Zone != "" {
 			r.logger.Warnf("when region %s and zone %s config parameter "+
 				"both are provided, only use region", r.config.Region, r.config.Zone)
 		}
 
-		region := r.config.Region
-		if region != "" {
-			// if strings.HasSuffix(region, "*") {
-			// region = strings.TrimSuffix(region, "*")
-			// }
-			region = strings.TrimSuffix(region, "*")
-
+		switch {
+		case r.config.Region != "":
+			region := strings.TrimSuffix(r.config.Region, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, region)
-			break
-		}
-		zone := r.config.Zone
-		if zone != "" {
-			// if strings.HasSuffix(zone, "*") {
-			// zone = strings.TrimSuffix(zone, "*")
-			// }
-			zone = strings.TrimSuffix(zone, "*")
+		case r.config.Zone != "":
+			zone := strings.TrimSuffix(r.config.Zone, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
+		case len(r.config.Regions) != 0:
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.GKEResourceLabelLocation)
+			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
-	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore, gcp.ServiceDataproc:
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
 		return f
-	case gcp.ServiceStorage:
-		if r.config.Region == "" {
-			return f
+	case gcp.ServiceDataproc:
+		if r.config.Region != "" && len(r.config.Regions) != 0 {
+			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
 		}
 
-		f = fmt.Sprintf(`%s AND resource.labels.location = "%s"`, f, r.config.Region)
+		switch {
+		case r.config.Region != "":
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.DataprocResourceLabelLocation, strings.TrimSuffix(r.config.Region, "*"))
+		case len(r.config.Regions) != 0:
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.DataprocResourceLabelLocation)
+			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
+		}
+	case gcp.ServiceStorage:
+		if r.config.Region != "" && len(r.config.Regions) != 0 {
+			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
+		}
+
+		switch {
+		case r.config.Region != "":
+			f = fmt.Sprintf(`%s AND resource.labels.location = "%s"`, f, r.config.Region)
+		case len(r.config.Regions) != 0:
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.StorageResourceLabelLocation)
+			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
+		}
+	case gcp.ServiceCloudSQL:
+		if r.config.Region != "" && len(r.config.Regions) != 0 {
+			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
+		}
+
+		switch {
+		case r.config.Region != "":
+			region := strings.TrimSuffix(r.config.Region, "*")
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.CloudSQLResourceLabelRegion, region)
+		case len(r.config.Regions) != 0:
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.CloudSQLResourceLabelRegion)
+			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
+		}
 	default:
 		if r.config.Region != "" && r.config.Zone != "" {
 			r.logger.Warnf("when region %s and zone %s config parameter "+
 				"both are provided, only use region", r.config.Region, r.config.Zone)
 		}
-		if r.config.Region != "" {
-			// region := r.config.Region
-			// if strings.HasSuffix(r.config.Region, "*") {
-			// region = strings.TrimSuffix(r.config.Region, "*")
-			// }
 
+		switch {
+		case r.config.Region != "":
 			region := strings.TrimSuffix(r.config.Region, "*")
 			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, region)
-		} else if r.config.Zone != "" {
-			// zone := r.config.Zone
-			// if strings.HasSuffix(r.config.Zone, "*") {
-			// zone = strings.TrimSuffix(r.config.Zone, "*")
-			// }
+		case r.config.Zone != "":
 			zone := strings.TrimSuffix(r.config.Zone, "*")
 			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, zone)
 		}

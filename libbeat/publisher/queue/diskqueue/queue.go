@@ -20,6 +20,7 @@ package diskqueue
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"sync"
 
@@ -27,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // diskQueue is the internal type representing a disk-based implementation
@@ -71,6 +73,9 @@ type diskQueue struct {
 	// The API channel used by diskQueueProducer to write events.
 	producerWriteRequestChan chan producerWriteRequest
 
+	// API channel used by the public Metrics() API to request queue metrics
+	metricsRequestChan chan metricsRequest
+
 	// pendingFrames is a list of all incoming data frames that have been
 	// accepted by the queue and are waiting to be sent to the writer loop.
 	// Segment ids in this list always appear in sorted order, even between
@@ -84,6 +89,16 @@ type diskQueue struct {
 
 	// The channel to signal our goroutines to shut down.
 	done chan struct{}
+}
+
+// channel request for metrics from an external client
+type metricsRequest struct {
+	response chan metricsRequestResponse
+}
+
+// metrics response from the disk queue
+type metricsRequestResponse struct {
+	sizeOnDisk uint64
 }
 
 func init() {
@@ -220,6 +235,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		deleterLoop: newDeleterLoop(settings),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
+		metricsRequestChan:       make(chan metricsRequest),
 
 		done: make(chan struct{}),
 	}
@@ -267,14 +283,42 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
+	var serializationFormat SerializationFormat
+	if dq.settings.UseProtobuf {
+		serializationFormat = SerializationProtobuf
+	} else {
+		serializationFormat = SerializationCBOR
+	}
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newEventEncoder(),
+		encoder: newEventEncoder(serializationFormat),
 		done:    make(chan struct{}),
 	}
 }
 
+// Metrics returns current disk metrics
 func (dq *diskQueue) Metrics() (queue.Metrics, error) {
-	return queue.Metrics{}, queue.ErrMetricsNotImplemented
+	respChan := make(chan metricsRequestResponse, 1)
+	req := metricsRequest{response: respChan}
+
+	select {
+	case <-dq.done:
+		return queue.Metrics{}, io.EOF
+	case dq.metricsRequestChan <- req:
+
+	}
+
+	resp := metricsRequestResponse{}
+	select {
+	case <-dq.done:
+		return queue.Metrics{}, io.EOF
+	case resp = <-respChan:
+	}
+
+	maxSize := dq.settings.MaxBufferSize
+	return queue.Metrics{
+		ByteLimit: opt.UintWith(maxSize),
+		ByteCount: opt.UintWith(resp.sizeOnDisk),
+	}, nil
 }

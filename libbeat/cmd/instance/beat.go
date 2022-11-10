@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -58,6 +59,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/plugin"
+	"github.com/elastic/beats/v7/libbeat/pprof"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -108,7 +110,7 @@ type beatConfig struct {
 
 	// beat internal components configurations
 	HTTP            *config.C              `config:"http"`
-	HTTPPprof       *config.C              `config:"http.pprof"`
+	HTTPPprof       *pprof.Config          `config:"http.pprof"`
 	BufferConfig    *config.C              `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
 	Logging         *config.C              `config:"logging"`
@@ -350,7 +352,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	reload.Register.MustRegister("output", b.makeOutputReloader(publisher.OutputReloader()))
+	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
@@ -385,13 +387,13 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path.
-	bl := newLocker(b)
-	err := bl.lock()
+	bl := locks.New(b.Info)
+	err := bl.Lock()
 	if err != nil {
 		return err
 	}
 	defer func() {
-		_ = bl.unlock()
+		_ = bl.Unlock()
 	}()
 
 	svc.BeforeRun()
@@ -412,8 +414,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		defer func() {
 			_ = s.Stop()
 		}()
-		if b.Config.HTTPPprof.Enabled() {
-			s.AttachPprof()
+		if b.Config.HTTPPprof.IsEnabled() {
+			pprof.SetRuntimeProfilingParameters(b.Config.HTTPPprof)
+
+			if err := pprof.HttpAttach(b.Config.HTTPPprof, s); err != nil {
+				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
+			}
 		}
 	}
 
@@ -549,7 +555,8 @@ type SetupSettings struct {
 	//Deprecated: use IndexManagementKey instead
 	Template bool
 	//Deprecated: use IndexManagementKey instead
-	ILMPolicy bool
+	ILMPolicy         bool
+	EnableAllFilesets bool
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
@@ -614,12 +621,16 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 		}
 
 		if setup.Pipeline && b.OverwritePipelinesCallback != nil {
+			if setup.EnableAllFilesets {
+				if err := b.Beat.BeatConfig.SetBool("config.modules.enable_all_filesets", -1, true); err != nil {
+					return fmt.Errorf("error setting enable_all_filesets config option %w", err)
+				}
+			}
 			esConfig := b.Config.Output.Config()
 			err = b.OverwritePipelinesCallback(esConfig)
 			if err != nil {
 				return err
 			}
-
 			fmt.Println("Loaded Ingest pipelines")
 		}
 
@@ -710,7 +721,7 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.Register, b.Beat.Info.ID)
+	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
 	if err != nil {
 		return err
 	}

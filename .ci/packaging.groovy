@@ -132,7 +132,7 @@ pipeline {
             }
           }
         }
-        stage('DRA Staging') {
+        stage('DRA Release Staging') {
           options { skipDefaultCheckout() }
           when {
             allOf {
@@ -394,12 +394,15 @@ def prepareE2ETestForPackage(String beat){
 
 def release(type){
   withBeatsEnv(type){
+    // As agreed DEV=false for staging otherwise DEV=true
+    // this should avoid releasing binaries with the debug symbols and disabled most build optimizations.
     withEnv([
-      "DEV=true"
+      "DEV=${!type.equals('staging')}"
     ]) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+        sh(label: "mage ironbank ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage ironbank')
         def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,

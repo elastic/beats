@@ -518,3 +518,71 @@ The following two types of host configurations are supported:
 
 
 Note: If the password contains the backslash (`\`) character, it must be escaped with a backslash. For example, if the password is `my\_password`, it should be written as `my\\_password`.
+=======
+[float]
+=== Example: Merge multiple queries to single event.
+
+Multiple queries will create multiple events, one for each query.  It may be preferrable to create a single event by combining the metrics together in a single event.
+
+This feature can be enabled using the `merge_results` config.
+
+However, such a merge is possible only if the table queries being merged, each produce a single row.
+
+For example:
+
+[source,yaml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  hosts: ["postgres://postgres:postgres@localhost?sslmode=disable"]
+
+  driver: "postgres"
+  raw_data.enabled: true
+  merge_results: true
+  sql_queries:
+    - query: "SELECT blks_hit,blks_read FROM pg_stat_database limit 1;"
+      response_format: table
+    - query: "select checkpoints_timed,checkpoints_req from pg_stat_bgwriter;"
+      response_format: table
+----
+
+This creates a combined event as below, where `blks_hit`, `blks_read`, `checkpoints_timed` and `checkpoints_req` are part of same event.
+
+[source,json]
+----
+{
+  "@timestamp": "2022-07-21T07:07:06.747Z",
+  "agent": {
+    "name": "Lalits-MBP-2",
+    "type": "metricbeat",
+    "version": "8.4.0",
+    "ephemeral_id": "b0867287-e56a-492f-b421-0ac870c426f9",
+    "id": "3fe7b378-6f9e-4ca3-9aa1-067c4a6866e5"
+  },
+  "metricset": {
+    "period": 10000,
+    "name": "query"
+  },
+  "service": {
+    "type": "sql",
+    "address": "localhost"
+  },
+  "sql": {
+    "metrics": {
+      "blks_read": 21,
+      "checkpoints_req": 1,
+      "checkpoints_timed": 66,
+      "blks_hit": 7592
+    },
+    "driver": "postgres"
+  },
+  "event": {
+    "module": "sql",
+    "duration": 18883084,
+    "dataset": "sql.query"
+  }
+}
+----
+

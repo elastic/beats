@@ -83,6 +83,16 @@ version of the operating system.
 * MacOS 10.13
 * MacOS 10.14
 
+[discrete]
+==== {filebeat} filesets are disabled by default
+Prior to version 8.0.0, modules had some filesets that were enabled by default.
+This meant that in some cases you could enable a module from the command line
+and run it without modifying the configuration in the `modules.d` directory.
+However this caused problems for some users.
+
+Starting in version 8.0.0, filesets are disabled by default. You must explicitly
+enable the filesets you want {filebeat} to use.
+
 // end::notable-breaking-changes[]
 
 
