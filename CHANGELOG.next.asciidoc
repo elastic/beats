@@ -31,15 +31,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Re-enable build optimizations to reduce binary size and improve performance. {pull}33620[33620]
-- Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
-- Fix namespacing on self-monitoring {pull}32336[32336]
-- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
-- Fix race condition when stopping runners {pull}32433[32433]
-- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
-- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
-- Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
-- Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
-- Support for multiline zookeeper logs {issue}2496[2496]
 
 *Auditbeat*
 

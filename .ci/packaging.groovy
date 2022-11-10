@@ -345,15 +345,10 @@ def prepareE2ETestForPackage(String beat){
   }
 }
 
-<<<<<<< HEAD
-def release(){
-  withBeatsEnv(){
-=======
 def release(type){
   withBeatsEnv(type){
     // As agreed DEV=false for staging otherwise DEV=true
     // this should avoid releasing binaries with the debug symbols and disabled most build optimizations.
->>>>>>> 8b858d3278 (packaging: staging artifacts with DEV=false (#33620))
     withEnv([
       "DEV=${!type.equals('staging')}"
     ]) {
