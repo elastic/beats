@@ -28,6 +28,8 @@ output:
 # Find the whole list here https://golangci-lint.run/usage/linters/
 linters:
   disable-all: true
+  disable:
+    - typecheck
   enable:
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
@@ -41,8 +43,7 @@ linters:
     - unused # checks Go code for unused constants, variables, functions and types
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
-    #- structcheck # finds unused struct fields
-    #- typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
+    - structcheck # finds unused struct fields
     - varcheck # Finds unused global variables and constants
     - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
     - bodyclose # checks whether HTTP response body is closed successfully
