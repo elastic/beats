@@ -21,6 +21,9 @@ issues:
     - text: "undefined"
       linters:
         - typecheck
+    - text: "imported but not used"
+      linters:
+        - typecheck
     # From mage we are priting to the console to ourselves
     - path: (.*magefile.go|.*dev-tools/mage/.*)
       linters: forbidigo
