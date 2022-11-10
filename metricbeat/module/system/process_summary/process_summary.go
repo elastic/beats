@@ -65,6 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
+	// This will not run on cgo
 	procList, err := process.ListStates(m.sys)
 	if err != nil {
 		return errors.Wrap(err, "error fetching process list")
