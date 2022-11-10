@@ -42573,6 +42573,111 @@ type: long
 --
 
 [float]
+=== elasticsearch_client
+
+Elasticsearch Client's stats
+
+
+*`kibana.stats.elasticsearch_client.protocol`*::
++
+--
+Protocol used to connect to ES nodes (http, https or mixed)
+
+type: keyword
+
+--
+
+*`kibana.stats.elasticsearch_client.connected_nodes`*::
++
+--
+Number of connected ES nodes
+
+type: short
+
+--
+
+*`kibana.stats.elasticsearch_client.nodes_with_active_sockets`*::
++
+--
+Number of nodes with active sockets
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.nodes_with_idle_sockets`*::
++
+--
+Number of nodes with idle sockets
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.total_active_sockets`*::
++
+--
+Total number of active sockets
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.total_idle_sockets`*::
++
+--
+Total number of idle sockets
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.total_queued_requests`*::
++
+--
+Total number of queued requests
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.most_active_node_sockets`*::
++
+--
+Number of active sockets of the node with the most active sockets
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.average_active_sockets_per_node`*::
++
+--
+Average number of active sockets per node
+
+type: float
+
+--
+
+*`kibana.stats.elasticsearch_client.most_idle_node_sockets`*::
++
+--
+Number of idle sockets of the node with the most idle sockets
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.average_idle_sockets_per_node`*::
++
+--
+Average number of idle sockets per node
+
+type: float
+
+--
+
+[float]
 === status
 
 Status fields

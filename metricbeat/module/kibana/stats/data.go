@@ -19,8 +19,7 @@ package stats
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -119,12 +118,12 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana Stats API response")
+		return fmt.Errorf("failure parsing Kibana Stats API response: %w", err)
 	}
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		return errors.Wrap(err, "failure to apply stats schema")
+		return fmt.Errorf("failure to apply stats schema: %w", err)
 	}
 
 	event := mb.Event{ModuleFields: mapstr.M{}, RootFields: mapstr.M{}}
