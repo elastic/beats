@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
 // ProcState is the main struct for process information and metrics.
@@ -43,9 +44,10 @@ type ProcState struct {
 	Env     mapstr.M `struct:"env,omitempty"`
 
 	// Resource Metrics
-	Memory ProcMemInfo `struct:"memory,omitempty"`
-	CPU    ProcCPUInfo `struct:"cpu,omitempty"`
-	FD     ProcFDInfo  `struct:"fd,omitempty"`
+	Memory  ProcMemInfo                       `struct:"memory,omitempty"`
+	CPU     ProcCPUInfo                       `struct:"cpu,omitempty"`
+	FD      ProcFDInfo                        `struct:"fd,omitempty"`
+	Network *sysinfotypes.NetworkCountersInfo `struct:"-,omitempty"`
 
 	// cgroups
 	Cgroup cgroup.CGStats `struct:"cgroup,omitempty"`

@@ -22,30 +22,52 @@ import (
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
+// MapProcNetCountersWithFilter converts the NetworkCountersInfo to a formatted mapstring,
+// and applies a filter to the resulting map. The filter should be an array key values, taken from /proc/PID/net/snmp or /proc/PID/net/netstat
+func MapProcNetCountersWithFilter(raw *sysinfotypes.NetworkCountersInfo, filter []string) mapstr.M {
+	return createMap(raw, filter)
+}
+
 // MapProcNetCounters converts the NetworkCountersInfo struct into a MapStr acceptable for sending upstream
 func MapProcNetCounters(raw *sysinfotypes.NetworkCountersInfo) mapstr.M {
+	return createMap(raw, []string{"all"})
+}
 
+func createMap(raw *sysinfotypes.NetworkCountersInfo, filter []string) mapstr.M {
 	eventByProto := mapstr.M{
-		"ip":       combineMap(raw.Netstat.IPExt, raw.SNMP.IP),
-		"tcp":      combineMap(raw.Netstat.TCPExt, raw.SNMP.TCP),
+		"ip":       combineMap(raw.Netstat.IPExt, raw.SNMP.IP, filter),
+		"tcp":      combineMap(raw.Netstat.TCPExt, raw.SNMP.TCP, filter),
 		"udp":      raw.SNMP.UDP,
 		"udp_lite": raw.SNMP.UDPLite,
-		"icmp":     combineMap(raw.SNMP.ICMPMsg, raw.SNMP.ICMP),
+		"icmp":     combineMap(raw.SNMP.ICMPMsg, raw.SNMP.ICMP, filter),
 	}
 
 	return eventByProto
 }
 
 // combineMap concatinates two given maps
-func combineMap(map1, map2 map[string]uint64) map[string]interface{} {
+func combineMap(map1, map2 map[string]uint64, filter []string) map[string]interface{} {
 	var compMap = make(map[string]interface{})
 
-	for k, v := range map1 {
-		compMap[k] = checkMaxConn(k, v)
+	if len(filter) == 0 || filter[0] == "all" {
+		for k, v := range map1 {
+			compMap[k] = checkMaxConn(k, v)
+		}
+		for k, v := range map2 {
+			compMap[k] = checkMaxConn(k, v)
+		}
+	} else {
+		for _, key := range filter {
+			if value, ok := map1[key]; ok {
+				compMap[key] = checkMaxConn(key, value)
+			}
+			if value, ok := map2[key]; ok {
+				compMap[key] = checkMaxConn(key, value)
+			}
+
+		}
 	}
-	for k, v := range map2 {
-		compMap[k] = checkMaxConn(k, v)
-	}
+
 	return compMap
 }
 

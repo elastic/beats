@@ -77,6 +77,61 @@ func TestGetOne(t *testing.T) {
 	t.Logf("Proc: %s", procData[0].StringToPrint())
 }
 
+func TestNetworkFetch(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("Network data only available on linux")
+	}
+	testConfig := Stats{
+		Procs:         []string{".*"},
+		Hostfs:        resolve.NewTestResolver("/"),
+		CPUTicks:      false,
+		EnableCgroups: false,
+		EnableNetwork: true,
+	}
+
+	err := testConfig.Init()
+	require.NoError(t, err)
+
+	data, err := testConfig.GetOne(os.Getpid())
+	require.NoError(t, err)
+	networkData, ok := data["network"]
+	require.True(t, ok, "network data not found")
+	require.NotEmpty(t, networkData)
+}
+
+func TestNetworkSkipWithHostfs(t *testing.T) {
+	testConfig := Stats{
+		Hostfs:        resolve.NewTestResolver("testpath"),
+		EnableNetwork: true,
+	}
+
+	err := testConfig.Init()
+	require.NoError(t, err)
+	require.False(t, testConfig.EnableNetwork)
+}
+
+func TestNetworkFilter(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("Network data only available on linux")
+	}
+	testConfig := Stats{
+		Hostfs:         resolve.NewTestResolver("/"),
+		EnableNetwork:  true,
+		NetworkMetrics: []string{"Forwarding"},
+	}
+
+	err := testConfig.Init()
+	require.NoError(t, err)
+
+	data, err := testConfig.GetOne(os.Getpid())
+	require.NoError(t, err)
+
+	_, exists := data.GetValue("network.ip.Forwarding")
+	require.NoError(t, exists, "filter did not preserve key")
+	ipMetrics, exists := data.GetValue("network.ip")
+	require.Equal(t, 1, len(ipMetrics.(map[string]interface{})))
+}
+
 func TestFilter(t *testing.T) {
 	//The logic itself is os-independent, so we'll only test this on the platform least likly to have CI issues
 	if runtime.GOOS != "linux" {
