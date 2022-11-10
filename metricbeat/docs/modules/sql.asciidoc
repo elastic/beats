@@ -561,10 +561,10 @@ This creates a combined event as below, where `blks_hit`, `blks_read`, `checkpoi
 To get connected with the Oracle Database ORACLE_SID, ORACLE_BASE, ORACLE_HOME environment variables should be set.
 
 For example: Let’s consider Oracle Database 21c installation using RPM manually by following https://docs.oracle.com/en/database/oracle/oracle-database/21/ladbi/running-rpm-packages-to-install-oracle-database.html[this] link, environment variables should be set as follows:
-    `ORACLE_SID=ORCLCDB`
+
     `ORACLE_BASE=/opt/oracle/oradata`
     `ORACLE_HOME=/opt/oracle/product/21c/dbhome_1`
-Also, add `ORACLE_HOME/bin` to the `PATH` environment variable. ORACLE_SID identifies the name of a specific database instance
+Also, add `ORACLE_HOME/bin` to the `PATH` environment variable. 
 
 ===== Oracle Instant Client Installation
 
