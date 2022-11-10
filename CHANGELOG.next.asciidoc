@@ -86,6 +86,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Add tags to events based on parsed identifier. {pull}33472[33472]
+- Skip over unsupported filesystems in the system.filesystem metricset instead of failing immediately. Fix debug statement in system.fsstat metricset. {pull}33646[33646]
+
 
 *Packetbeat*
 
