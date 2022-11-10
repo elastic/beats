@@ -42601,7 +42601,7 @@ type: short
 --
 Number of nodes with active sockets
 
-type: integer
+type: short
 
 --
 
@@ -42610,7 +42610,7 @@ type: integer
 --
 Number of nodes with idle sockets
 
-type: integer
+type: short
 
 --
 
