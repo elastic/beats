@@ -571,7 +571,7 @@ If the listener is not running, use the command to start:
 
 Then, Metricbeat can be launched.
 
-==== Host Configuration (Oracle)
+==== Host Configuration for Oracle
 
 The following two types of host configurations are supported:
 
