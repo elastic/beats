@@ -87,7 +87,6 @@ func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 func (r *LineReader) Next() (b []byte, n int, err error) {
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
-	iterN := 0
 	for {
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
@@ -126,7 +125,6 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 			r.byteCount = 0
 			return nil, sz, err
 		}
-		iterN++
 		// Check last decoded byte really being newline also unencoded
 		// if not, continue reading
 		buf := r.outBuffer.Bytes()
