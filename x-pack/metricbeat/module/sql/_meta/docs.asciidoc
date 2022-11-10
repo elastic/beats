@@ -504,7 +504,7 @@ If the listener is not running, use the command to start:
 
 Then, Metricbeat can be launched.
 
-==== Host Configuration
+==== Host Configuration (Oracle)
 
 The following two types of host configurations are supported:
 
@@ -515,6 +515,5 @@ The following two types of host configurations are supported:
 2. DSN host configuration:
     a. `hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']`
     b. `hosts: ['user="user" password="password" connectString="host:port/service_name" sysdba=true']`
-
 
 Note: If the password contains the backslash (`\`) character, it must be escaped with a backslash. For example, if the password is `my\_password`, it should be written as `my\\_password`.
