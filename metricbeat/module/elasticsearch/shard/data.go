@@ -24,8 +24,9 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"fmt"
+
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -61,7 +62,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Cluster State API response")
+		return fmt.Errorf("failure parsing Elasticsearch Cluster State API response: %w", err)
 	}
 
 	var errs multierror.Errors
@@ -79,27 +80,27 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 
 				fields, err := schema.Apply(shard)
 				if err != nil {
-					errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
+					errs = append(errs, fmt.Errorf("failure applying shard schema: %w", err))
 					continue
 				}
 
 				// Handle node field: could be string or null
 				err = elasticsearch.PassThruField("node", shard, fields)
 				if err != nil {
-					errs = append(errs, errors.Wrap(err, "failure passing through node field"))
+					errs = append(errs, fmt.Errorf("failure passing through node field: %w", err))
 					continue
 				}
 
 				// Handle relocating_node field: could be string or null
 				err = elasticsearch.PassThruField("relocating_node", shard, fields)
 				if err != nil {
-					errs = append(errs, errors.Wrap(err, "failure passing through relocating_node field"))
+					errs = append(errs, fmt.Errorf("failure passing through relocating_node field: %w", err))
 					continue
 				}
 
 				event.ID, err = generateHashForEvent(stateData.StateID, fields, i)
 				if err != nil {
-					errs = append(errs, errors.Wrap(err, "failure getting event ID"))
+					errs = append(errs, fmt.Errorf("failure getting event ID: %w", err))
 					continue
 				}
 
@@ -115,7 +116,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 
 					sourceNode, err := getSourceNode(nodeID.(string), stateData)
 					if err != nil {
-						errs = append(errs, errors.Wrap(err, "failure getting source node information"))
+						errs = append(errs, fmt.Errorf("failure getting source node information: %w", err))
 						continue
 					}
 					_, _ = event.ModuleFields.Put("node.name", sourceNode["name"])
