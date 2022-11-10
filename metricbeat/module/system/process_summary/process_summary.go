@@ -81,7 +81,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	outMap := mapstr.M{}
-	typeconv.Convert(&outMap, procStates)
+	err = typeconv.Convert(&outMap, procStates)
+	if err != nil {
+		return err
+	}
 	outMap["total"] = len(procList)
 	r.Event(mb.Event{
 		// change the name space to use . instead of _
