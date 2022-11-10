@@ -134,7 +134,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
 		return event.Error
 	}
-	event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+	_, _ = event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")
@@ -142,8 +142,8 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("service.id", uuid)
-	dataFields.Delete("uuid")
+	_, _ = event.RootFields.Put("service.id", uuid)
+	_ = dataFields.Delete("uuid")
 
 	// Set service version
 	version, err := dataFields.GetValue("version")
@@ -151,8 +151,8 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("kibana.version", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("service.version", version)
-	dataFields.Delete("version")
+	_, _ = event.RootFields.Put("service.version", version)
+	_ = dataFields.Delete("version")
 
 	// Set service address
 	serviceAddress, err := dataFields.GetValue("kibana.transport_address")
@@ -160,7 +160,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("service.address", serviceAddress)
+	_, _ = event.RootFields.Put("service.address", serviceAddress)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})
@@ -173,9 +173,9 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("process.pid", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("process.pid", int(pid))
+	_, _ = event.RootFields.Put("process.pid", int(pid))
 
-	dataFields.Delete("kibana")
+	_ = dataFields.Delete("kibana")
 
 	event.MetricSetFields = dataFields
 
