@@ -95,6 +95,7 @@ Includes information about data files and temp files, grouped by Tablespace with
 
 Includes the system metric values captured for the most current time interval from Oracle system metrics.
 
+
 :edit_url:
 
 [float]
