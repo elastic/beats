@@ -386,8 +386,8 @@ present in the chain during the handshake, it will be added to the
 `certificate_authorities` list and the handshake will continue
 normaly.
 
-One way to get the fingerprint from a CA certificate is, on a Unix like
-system, using the following command where `ca.crt` is the
+To get the fingerprint from a CA certificate on a Unix-like
+system, you can use the following command, where `ca.crt` is the
 certificate.
 
 [source]
