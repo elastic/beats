@@ -119,6 +119,10 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 	if trCtx.firstResponse != nil {
 		data.Put("first_response", trCtx.firstResponseClone().templateValues())
 	}
+	// This is only set when chaining is used
+	if trCtx.parentTrCtx != nil {
+		data.Put("parent_last_response", trCtx.parentTrCtx.lastResponseClone().templateValues())
+	}
 
 	if err := t.Template.Execute(buf, data); err != nil {
 		return fallback(err)
