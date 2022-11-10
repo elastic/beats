@@ -22,6 +22,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// lint this
+
 // BeatV2Manager is the main type for tracing V2-related config updates
 type BeatV2Manager struct {
 	config   *Config
@@ -53,7 +55,7 @@ type BeatV2Manager struct {
 
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is meant to be used by the management plugin system, which will register this as a callback.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
+func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (lbmanagement.Manager, error) {
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -141,11 +143,12 @@ func (cm *BeatV2Manager) Stop() {
 }
 
 // CheckRawConfig is currently not implemented for V1.
-func (cm *BeatV2Manager) CheckRawConfig(cfg *conf.C) error {
+func (cm *BeatV2Manager) CheckRawConfig(_ *conf.C) error {
 	// This does not do anything on V1 or V2, but here we are
 	return nil
 }
 
+// RegisterAction registers an action
 func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
@@ -158,6 +161,7 @@ func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 	}
 }
 
+// UnregisterAction unregisters an action
 func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
@@ -170,6 +174,7 @@ func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
 	}
 }
 
+// SetPayload sets the unit payload
 func (cm *BeatV2Manager) SetPayload(payload map[string]interface{}) {
 	cm.payload = payload
 }
