@@ -82,6 +82,8 @@ import (
 	ucfg "github.com/elastic/go-ucfg"
 )
 
+// Lint this?
+
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
 	beat.Beat
