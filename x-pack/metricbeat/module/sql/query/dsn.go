@@ -30,17 +30,14 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 	if err := mod.UnpackConfig(&config); err != nil {
 		return mb.HostData{}, fmt.Errorf("error parsing config file: %w", err)
 	}
-
 	if config.Driver == "oracle" {
 		params, err := godror.ParseDSN(host)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 		}
-
 		if params.Username == "" {
 			params.Username = config.Username
 		}
-
 		if params.Password.Secret() == "" {
 			params.StandaloneConnection = true
 			params.Password = dsn.NewPassword(config.Password)
@@ -54,7 +51,6 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 		}, nil
 	}
 	sanitized := sanitize(host)
-
 	return mb.HostData{
 		URI:          host,
 		SanitizedURI: sanitized,

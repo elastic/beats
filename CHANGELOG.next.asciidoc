@@ -10,8 +10,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix namespacing on self-monitoring {pull}32336[32336]
-
 
 *Auditbeat*
 
@@ -20,8 +18,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
-- Browser monitors (beta) no write to the `synthetics-*` index prefix. {pull}32064[32064]
-- Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
 
 
 *Metricbeat*
@@ -40,40 +36,62 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
+- Fix namespacing on self-monitoring {pull}32336[32336]
 - Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
-- Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
-- Fix race condition when reloading runners {pull}32309[32309]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+- Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
-- Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
-- cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
-- Fix race conditions when reloading input V2 and filestream input {pull}32309[32309]
-- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
+- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+
+*Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix states client support for output options. {pull}33405[33405]
+- Fix states client reloader under managed mode. {pull}33405[33405]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
 
 *Heartbeat*
 
-- Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
-- Reduced memory usage slightly for browser monitors. {pull}32317[32317]
 
 *Metricbeat*
 
-- update kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard {pull}31973[31973]
-- Check for nil metadata in GCP. {pull}32281[32281]
-- update kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard {pull}32037[32037]
-- update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long {pull}32197[32197]
+- Fix GCP storage field naming {pull}32806[32806]
+- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
+- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
+- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
+- Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call {pull}33105[33105]
+- Add GCP CloudSQL region filter {pull}32943[32943]
+- Fix logstash cgroup mappings {pull}33131[33131]
+- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
+- Add tags to events based on parsed identifier. {pull}33472[33472]
 
 *Packetbeat*
 
 
 *Winlogbeat*
 
-- Powershell: Fix processing of parameter details. {pull}31833[31833]
-- Security: Fix processing of sidlist, access list and access mask. {pull}31833[31833]
 
 *Functionbeat*
 
@@ -86,12 +104,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
+- Beats will now attempt to recover if a lockfile has not been removed {pull}[33169]
+
 
 *Auditbeat*
 
-- Add `immutable` option to the auditd module. {issue}8352[8352] {pull}32381[32381]
-
+- Add file parser processor to file_integrity module. {pull}28802[28802]
+- Improve documentation for symlink handling behaviour in file integrity module. {pull}33430[33430]
+- Ensure file integrity module watch paths are absolute. {pull}33430[33430]
 
 *Filebeat*
 
@@ -102,13 +122,30 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for parsers on journald input {pull}29070[29070]
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 - threatintel module: Add new Recorded Future integration. {pull}30030[30030]
+- Support SASL/SCRAM authentication in the Kafka input. {pull}31167[31167]
+- checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
+- Add URL Encode template function for httpjson input. {pull}30962[30962]
+- Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
+- Default value of `filebeat.registry.flush` increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk for each ingested log line. {issue}30279[30279]
+- Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
+- Change threatintel module from beta to GA. {pull}31693[31693]
+- Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
+- Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
 - Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
 - Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
 - Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
 - Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
-- Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
-- Add references for CRI-O configuration in input-container and in our kubernetes manifests {issue}32149[32149] {pull}32151[32151]
-- httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
+- Allow iptables module to parse ulogd v2 TOS field in logs. {pull}32126[32126]
+- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
+- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
+- Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
+- add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
+- httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
+- Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
+- Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
+- Fix handling of invalid UserIP and LocalIP values. {pull}32896[32896]
+- Allow http_endpoint instances to share ports. {issue}32578[32578] {pull}33377[33377]
+- Improve httpjson documentation for split processor. {pull}33473[33473]
 
 *Auditbeat*
 
@@ -118,23 +155,21 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Heartbeat*
 
+- Add new states field for internal use by new synthetics app. {pull}30632[30632]
+- Upgrade node to 18.12.0
 
 *Metricbeat*
 
-- Enhance Oracle Module: Change tablespace metricset collection period {issue}30948[30948] {pull}31259[#31259]
-- Add orchestrator cluster ECS fields in kubernetes events {pull}31341[31341]
-- Enhance Oracle Module: Refactor module to properly use host parsers instead of doing its own parsing of hosts {issue}31611[31611] {pull}31692[#31692]
-- Enhance Oracle Module: Connection string for Oracle does not handle special characters properly {issue}24609[24609] {pull}31368[#31368]
-- Enhance Oracle Module: New sysmetric metricset {issue}30946[30946] {pull}31462[#31462]
-- Upgrade Mongodb library in Beats to v5 {pull}31185[31185]
-- Upgrade Generic SQL to support new connection string and special character support {issue}32089[32089]
-- Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
-* Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
-- AWS Fargate: Added support for DesiredStatus and KnownStatus {issue}32077[32077] {pull}32342[#32342]
+- Add Data Granularity option to AWS module to allow for for fewer API calls of longer periods and keep small intervals. {issue}33133[33133] {pull}33166[33166]
+- Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
+- Upgrade Generic SQL to support new connection string and special character support for Oracle Database. {issue}32089[32089]
 
 *Packetbeat*
 
-- Add support for specifying default route interface sniffing. {issue}31905[31905] {pull}31950[31950]
+- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
+- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
+- Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
+- Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
 
 *Functionbeat*
 
@@ -167,6 +202,21 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

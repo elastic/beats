@@ -43,7 +43,6 @@ func TestMySQL(t *testing.T) {
 			Driver:         "mysql",
 			Query:          "select table_schema, table_name, engine, table_rows from information_schema.tables where table_rows > 0;",
 			ResponseFormat: tableResponseFormat,
-
 			RawData: rawData{
 				Enabled: true,
 			},
@@ -196,12 +195,11 @@ func TestOracle(t *testing.T) {
 			Driver:         "oracle",
 			Query:          `SELECT name, physical_reads, db_block_gets, consistent_gets, 1 - (physical_reads / (db_block_gets + consistent_gets)) "Hit_Ratio" FROM V$BUFFER_POOL_STATISTICS`,
 			ResponseFormat: tableResponseFormat,
-
 			RawData: rawData{
 				Enabled: true,
 			},
 		},
-		Host:      GetOracleConnectionDetails(host, port),
+		Host:      GetOracleConnectionDetails(t, host, port),
 		Assertion: assertFieldContainsFloat64("Hit_Ratio", 0.0),
 	}
 	t.Run("fetch", func(t *testing.T) {
@@ -237,11 +235,9 @@ func getConfig(cfg testFetchConfig) map[string]interface{} {
 		"sql_query":        cfg.config.Query,
 		"raw_data.enabled": cfg.config.RawData.Enabled,
 	}
-
 	if cfg.config.ResponseFormat != "" {
 		values["sql_response_format"] = cfg.config.ResponseFormat
 	}
-
 	return values
 }
 
@@ -262,16 +258,15 @@ func assertFieldContainsFloat64(field string, limit float64) func(t *testing.T, 
 	}
 }
 
-func GetOracleConnectionDetails(host string, port string) string {
-
-	params, _ := godror.ParseDSN(GetOracleConnectString(host, port))
+func GetOracleConnectionDetails(t *testing.T, host string, port string) string {
+	params, err := godror.ParseDSN(GetOracleConnectString(host, port))
+	require.Empty(t, err)
 	return params.StringWithPassword()
 }
 
 // GetOracleEnvServiceName returns the service name to use with Oracle testing server or the value of the environment variable ORACLE_SERVICE_NAME if not empty
 func GetOracleEnvServiceName() string {
 	serviceName := os.Getenv("ORACLE_SERVICE_NAME")
-
 	if len(serviceName) == 0 {
 		serviceName = "ORCLCDB.localdomain"
 	}
@@ -281,7 +276,6 @@ func GetOracleEnvServiceName() string {
 // GetOracleEnvUsername returns the username to use with Oracle testing server or the value of the environment variable ORACLE_USERNAME if not empty
 func GetOracleEnvUsername() string {
 	username := os.Getenv("ORACLE_USERNAME")
-
 	if len(username) == 0 {
 		username = "sys"
 	}
@@ -291,7 +285,6 @@ func GetOracleEnvUsername() string {
 // GetOracleEnvUsername returns the port of the Oracle server or the value of the environment variable ORACLE_PASSWORD if not empty
 func GetOracleEnvPassword() string {
 	password := os.Getenv("ORACLE_PASSWORD")
-
 	if len(password) == 0 {
 		password = "Oradoc_db1" // #nosec
 	}
