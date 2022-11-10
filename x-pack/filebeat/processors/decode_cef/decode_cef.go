@@ -6,10 +6,10 @@ package decode_cef
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -38,7 +38,7 @@ type processor struct {
 func New(cfg *conf.C) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the "+procName+" processor configuration")
+		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %w", err)
 	}
 
 	return newDecodeCEF(c)
@@ -64,7 +64,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreMissing {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "decode_cef field [%v] not found", p.Field)
+		return event, fmt.Errorf("decode_cef field [%v] not found: %w", p.Field, err)
 	}
 
 	cefData, ok := v.(string)
@@ -72,7 +72,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreFailure {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "decode_cef field [%v] is not a string", p.Field)
+		return event, fmt.Errorf("decode_cef field [%v] is not a string: %T", p.Field, v)
 	}
 
 	// Ignore any leading data before the CEF header.
@@ -81,7 +81,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreFailure {
 			return event, nil
 		}
-		return event, errors.Errorf("decode_cef field [%v] does not contain a CEF header", p.Field)
+		return event, fmt.Errorf("decode_cef field [%v] does not contain a CEF header", p.Field)
 	}
 	cefData = cefData[idx:]
 
@@ -91,12 +91,15 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreFailure {
 			return event, nil
 		}
-		return event, errors.Wrap(err, "decode_cef failed to parse message")
+		if err != nil {
+			err = fmt.Errorf("decode_cef failed to parse message: %w", err)
+		}
+		return event, err
 	}
 
 	cefErrors := multierr.Errors(err)
 	cefObject := toCEFObject(&ce)
-	event.PutValue(p.TargetField, cefObject)
+	_, _ = event.PutValue(p.TargetField, cefObject)
 
 	// Map CEF extension fields to ECS fields.
 	if p.ECS {
@@ -112,16 +115,16 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 			if mapping.Translate != nil {
 				translatedValue, err := mapping.Translate(field)
 				if err != nil {
-					cefErrors = append(cefErrors, errors.Wrap(err, key))
+					cefErrors = append(cefErrors, fmt.Errorf("%s: %w", key, err))
 					continue
 				}
 				if translatedValue != nil {
-					event.PutValue(mapping.Target, translatedValue)
+					_, _ = event.PutValue(mapping.Target, translatedValue)
 				}
 			} else if field.Interface != nil {
-				event.PutValue(mapping.Target, field.Interface)
+				_, _ = event.PutValue(mapping.Target, field.Interface)
 			} else {
-				event.PutValue(mapping.Target, field.String)
+				_, _ = event.PutValue(mapping.Target, field.String)
 			}
 		}
 	}
@@ -137,6 +140,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
+//nolint:errcheck // All errors are from mapstr puts.
 func toCEFObject(cefEvent *cef.Event) mapstr.M {
 	// Add CEF header fields.
 	cefObject := mapstr.M{"version": strconv.Itoa(cefEvent.Version)}
@@ -175,6 +179,7 @@ func toCEFObject(cefEvent *cef.Event) mapstr.M {
 	return cefObject
 }
 
+//nolint:errcheck // All errors are from mapstr puts.
 func writeCEFHeaderToECS(cefEvent *cef.Event, event *beat.Event) {
 	if cefEvent.DeviceVendor != "" {
 		event.PutValue("observer.vendor", cefEvent.DeviceVendor)
@@ -199,6 +204,7 @@ func writeCEFHeaderToECS(cefEvent *cef.Event, event *beat.Event) {
 	}
 }
 
+//nolint:errcheck // All errors are from mapstr puts.
 func appendErrorMessage(m mapstr.M, msg string) error {
 	const field = "error.message"
 	list, _ := m.GetValue(field)
@@ -227,7 +233,7 @@ func appendErrorMessage(m mapstr.M, msg string) error {
 		}
 		m.Put(field, append(v, msg))
 	default:
-		return errors.Errorf("unexpected type %T found for %v field", list, field)
+		return fmt.Errorf("unexpected type %T found for %v field", list, field)
 	}
 	return nil
 }

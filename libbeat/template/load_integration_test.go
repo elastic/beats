@@ -370,7 +370,7 @@ func TestESLoader_Load(t *testing.T) {
 					require.NoError(t, err)
 					p, ok := val.(map[string]interface{})
 					require.True(t, ok)
-					var properties []string
+					properties := make([]string, 0, len(p))
 					for k := range p {
 						properties = append(properties, k)
 					}

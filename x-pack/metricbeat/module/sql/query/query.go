@@ -49,7 +49,8 @@ type config struct {
 	ResponseFormat string `config:"sql_response_format"`
 	Query          string `config:"sql_query" `
 
-	Queries []query `config:"sql_queries" `
+	Queries      []query `config:"sql_queries" `
+	MergeResults bool    `config:"merge_results"`
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -124,6 +125,8 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		queries = append(queries, one_query)
 	}
 
+	merged := mapstr.M{}
+
 	for _, q := range queries {
 		if q.ResponseFormat == tableResponseFormat {
 			// Table format
@@ -133,7 +136,22 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 
 			for _, ms := range mss {
-				m.reportEvent(ms, reporter, q.Query)
+				if m.Config.MergeResults {
+					if len(mss) > 1 {
+						return fmt.Errorf("can not merge query resulting with more than one rows: %s", q)
+					} else {
+						for k, v := range ms {
+							_, ok := merged[k]
+							if ok {
+								m.Logger().Warn("overwriting duplicate metrics: ", k)
+							}
+							merged[k] = v
+						}
+					}
+				} else {
+					// Report immediately for non-merged cases.
+					m.reportEvent(ms, reporter, q.Query)
+				}
 			}
 		} else {
 			// Variable format
@@ -142,8 +160,23 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				return fmt.Errorf("fetch variable mode failed: %w", err)
 			}
 
-			m.reportEvent(ms, reporter, q.Query)
+			if m.Config.MergeResults {
+				for k, v := range ms {
+					_, ok := merged[k]
+					if ok {
+						m.Logger().Warn("overwriting duplicate metrics: ", k)
+					}
+					merged[k] = v
+				}
+			} else {
+				// Report immediately for non-merged cases.
+				m.reportEvent(ms, reporter, q.Query)
+			}
 		}
+	}
+	if m.Config.MergeResults {
+		// Report here for merged case.
+		m.reportEvent(merged, reporter, "")
 	}
 
 	return nil
@@ -154,20 +187,32 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string) {
 	if m.Config.RawData.Enabled {
 
-		reporter.Event(mb.Event{
-			// New usage.
-			// Only driver & query field mapped.
-			// metrics to be mapped by end user.
-			ModuleFields: mapstr.M{
-				"metrics": ms, // Individual metric
-				"driver":  m.Config.Driver,
-				"query":   qry,
-			},
-		})
+		// New usage.
+		// Only driver & query field mapped.
+		// metrics to be mapped by end user.
+		if len(qry) > 0 {
+			// set query.
+			reporter.Event(mb.Event{
+				ModuleFields: mapstr.M{
+					"metrics": ms, // Individual metric
+					"driver":  m.Config.Driver,
+					"query":   qry,
+				},
+			})
+		} else {
+			reporter.Event(mb.Event{
+				// Do not set query.
+				ModuleFields: mapstr.M{
+					"metrics": ms, // Individual metric
+					"driver":  m.Config.Driver,
+				},
+			})
+
+		}
 	} else {
+		// Previous usage. Backword compartibility.
+		// Supports field mapping.
 		reporter.Event(mb.Event{
-			// Previous usage. Backword compartibility.
-			// Supports field mapping.
 			ModuleFields: mapstr.M{
 				"driver":  m.Config.Driver,
 				"query":   qry,

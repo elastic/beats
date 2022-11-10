@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "query_string": {
+                        "query": "*"
+                    }
+                }
+            }
+        },
+        "title": " Dashboard Navigation [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "markdown": "[Network Overview](#/dashboard/cef-8d7c3098-7b2c-4d90-865b-75da6bfb29b6) | [Network Suspicious Activity](#/dashboard/cef-2745d8ff-e261-428b-a406-15ee77c8a3dd) | [Endpoint Overview](#dashboard/cef-c5ea76fb-5d0b-462d-922b-978ccd1f0f5c) | [Endpoint Activity](#/dashboard/cef-87e7074a-0764-4cdd-a39d-ec1be32c292f) | [Microsoft DNS Overview](#/dashboard/cef-244684fd-7be2-49fb-a817-e51cec267bf1)"
+            },
+            "title": " Dashboard Navigation [Filebeat CEF]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-5e4a73ac-198d-45b3-b1d8-41cb8a242927",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0MDMsMV0="
+}

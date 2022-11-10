@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -66,7 +66,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 				r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
 
 				// Throttle retries.
-				timed.Wait(ctx, sqsRetryDelay)
+				_ = timed.Wait(ctx, sqsRetryDelay)
 			}
 			continue
 		}
@@ -80,7 +80,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		r.metrics.sqsMessagesInflight.Add(uint64(len(msgs)))
 		workerWg.Add(len(msgs))
 		for _, msg := range msgs {
-			go func(msg sqs.Message, start time.Time) {
+			go func(msg types.Message, start time.Time) {
 				defer func() {
 					r.metrics.sqsMessagesInflight.Dec()
 					r.metrics.sqsMessageProcessingTime.Update(time.Since(start).Nanoseconds())

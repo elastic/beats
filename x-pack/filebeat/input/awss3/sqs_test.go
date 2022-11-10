@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +26,9 @@ const testTimeout = 10 * time.Second
 var errFakeConnectivityFailure = errors.New("fake connectivity failure")
 
 func TestSQSReceiver(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
+
 	const maxMessages = 5
 
 	t.Run("ReceiveMessage success", func(t *testing.T) {
@@ -44,9 +46,9 @@ func TestSQSReceiver(t *testing.T) {
 			mockAPI.EXPECT().
 				ReceiveMessage(gomock.Any(), gomock.Eq(maxMessages)).
 				Times(1).
-				DoAndReturn(func(_ context.Context, _ int) ([]sqs.Message, error) {
+				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
 					// Return single message.
-					return []sqs.Message{msg}, nil
+					return []types.Message{msg}, nil
 				}),
 
 			// Follow up ReceiveMessages for either maxMessages-1 or maxMessages
@@ -54,7 +56,7 @@ func TestSQSReceiver(t *testing.T) {
 			mockAPI.EXPECT().
 				ReceiveMessage(gomock.Any(), gomock.Any()).
 				Times(1).
-				DoAndReturn(func(_ context.Context, _ int) ([]sqs.Message, error) {
+				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
 					// Stop the test.
 					cancel()
 					return nil, nil
@@ -87,14 +89,14 @@ func TestSQSReceiver(t *testing.T) {
 			mockAPI.EXPECT().
 				ReceiveMessage(gomock.Any(), gomock.Eq(maxMessages)).
 				Times(1).
-				DoAndReturn(func(_ context.Context, _ int) ([]sqs.Message, error) {
+				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
 					return nil, errFakeConnectivityFailure
 				}),
 			// After waiting for sqsRetryDelay, it retries.
 			mockAPI.EXPECT().
 				ReceiveMessage(gomock.Any(), gomock.Eq(maxMessages)).
 				Times(1).
-				DoAndReturn(func(_ context.Context, _ int) ([]sqs.Message, error) {
+				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
 					cancel()
 					return nil, nil
 				}),
@@ -107,7 +109,7 @@ func TestSQSReceiver(t *testing.T) {
 	})
 }
 
-func newSQSMessage(events ...s3EventV2) sqs.Message {
+func newSQSMessage(events ...s3EventV2) types.Message {
 	body, err := json.Marshal(s3EventsV2{Records: events})
 	if err != nil {
 		panic(err)
@@ -119,14 +121,14 @@ func newSQSMessage(events ...s3EventV2) sqs.Message {
 	receipt := "receipt-" + messageID
 	bodyStr := string(body)
 
-	return sqs.Message{
+	return types.Message{
 		Body:          &bodyStr,
 		MessageId:     &messageID,
 		ReceiptHandle: &receipt,
 	}
 }
 
-func newSNSSQSMessage() sqs.Message {
+func newSNSSQSMessage() types.Message {
 	body, err := json.Marshal(s3EventsV2{
 		TopicArn: "arn:aws:sns:us-east-1:1234:sns-topic",
 		Message:  "{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"us-east-1\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"sns-notification-vpc-flow-logs\",\"bucket\":{\"name\":\"vpc-flow-logs-ks\",\"arn\":\"arn:aws:s3:::vpc-flow-logs-ks\"},\"object\":{\"key\":\"test-object-key\"}}}]}",
@@ -141,7 +143,7 @@ func newSNSSQSMessage() sqs.Message {
 	receipt := "receipt-" + messageID
 	bodyStr := string(body)
 
-	return sqs.Message{
+	return types.Message{
 		Body:          &bodyStr,
 		MessageId:     &messageID,
 		ReceiptHandle: &receipt,

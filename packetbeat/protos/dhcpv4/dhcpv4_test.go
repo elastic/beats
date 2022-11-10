@@ -82,7 +82,7 @@ var (
 )
 
 func TestParseDHCPRequest(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	p, err := newPlugin(true, nil, procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -137,7 +137,7 @@ func TestParseDHCPRequest(t *testing.T) {
 				"ip": []string{"0.0.0.0", "255.255.255.255"},
 			},
 			"dhcpv4": mapstr.M{
-				"client_mac":     "00:0b:82:01:fc:42",
+				"client_mac":     "00-0B-82-01-FC-42",
 				"flags":          "unicast",
 				"hardware_type":  "Ethernet",
 				"hops":           0,
@@ -161,7 +161,8 @@ func TestParseDHCPRequest(t *testing.T) {
 
 	actual := p.parseDHCPv4(pkt)
 	if assert.NotNil(t, actual) {
-		publish.MarshalPacketbeatFields(actual, nil, nil)
+		_, err := publish.MarshalPacketbeatFields(actual, nil, nil)
+		assert.NoError(t, err, "marshalling packet beat fields")
 		t.Logf("DHCP event: %+v", actual)
 		assertEqual(t, expected, *actual)
 	}
@@ -223,7 +224,7 @@ func TestParseDHCPACK(t *testing.T) {
 			},
 			"dhcpv4": mapstr.M{
 				"assigned_ip":    "192.168.0.10",
-				"client_mac":     "00:0b:82:01:fc:42",
+				"client_mac":     "00-0B-82-01-FC-42",
 				"flags":          "unicast",
 				"hardware_type":  "Ethernet",
 				"hops":           0,
@@ -244,7 +245,8 @@ func TestParseDHCPACK(t *testing.T) {
 
 	actual := p.parseDHCPv4(pkt)
 	if assert.NotNil(t, actual) {
-		publish.MarshalPacketbeatFields(actual, nil, nil)
+		_, err := publish.MarshalPacketbeatFields(actual, nil, nil)
+		assert.NoError(t, err, "marshalling packet beat fields")
 		t.Logf("DHCP event: %+v", actual)
 		assertEqual(t, expected, *actual)
 	}

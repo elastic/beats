@@ -21,7 +21,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -36,8 +38,6 @@ import (
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	//mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
-	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
@@ -46,7 +46,6 @@ import (
 func init() {
 	common.RegisterCheckDeps(Update)
 	unittest.RegisterPythonTestDeps(Fields)
-	integtest.RegisterPythonTestDeps(Fields)
 }
 
 // Package packages the Beat for distribution.
@@ -66,6 +65,14 @@ func Package() {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
+}
+
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages(devtools.WithMonitorsD())
@@ -78,6 +85,21 @@ func Fields() error {
 // Update updates the generated files (aka make update).
 func Update() {
 	mg.SerialDeps(Fields, FieldDocs, Config)
+}
+
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest)
+}
+
+func GoIntegTest(ctx context.Context) error {
+	if runtime.GOOS != "windows" {
+		return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
+	}
+	return nil
+}
+
+func PythonIntegTest() {
+	// intentionally blank, CI runs this for every beat
 }
 
 func FieldDocs() error {

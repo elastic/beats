@@ -17,11 +17,6 @@
 
 package memqueue
 
-type queueEntry struct {
-	event  interface{}
-	client clientState
-}
-
 type batchBuffer struct {
 	next    *batchBuffer
 	flushed bool
@@ -34,20 +29,20 @@ func newBatchBuffer(sz int) *batchBuffer {
 	return b
 }
 
-func (b *batchBuffer) add(event interface{}, st clientState) {
-	b.entries = append(b.entries, queueEntry{event, st})
+func (b *batchBuffer) add(entry queueEntry) {
+	b.entries = append(b.entries, entry)
 }
 
 func (b *batchBuffer) length() int {
 	return len(b.entries)
 }
 
-func (b *batchBuffer) cancel(st *produceState) int {
+func (b *batchBuffer) cancel(producer *ackProducer) int {
 	entries := b.entries[:0]
 
 	removedCount := 0
 	for _, entry := range b.entries {
-		if entry.client.state == st {
+		if entry.producer == producer {
 			removedCount++
 			continue
 		}

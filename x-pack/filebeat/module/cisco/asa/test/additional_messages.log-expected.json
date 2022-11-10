@@ -128,7 +128,7 @@
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -141,7 +141,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -265,7 +265,7 @@
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -278,7 +278,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -741,7 +741,7 @@
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -754,7 +754,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -791,7 +791,7 @@
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
-        "event.action": "flow-expiration",
+        "event.action": "flow-creation",
         "event.category": [
             "network"
         ],
@@ -804,7 +804,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "end"
+            "start"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -4581,6 +4581,244 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 13679,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113004",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113004,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-113004: AAA user authentication Successful: server = 81.2.69.144 , User = alice",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 13920,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113004",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113004,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-113004: AAA user authorization Successful: server = 81.2.69.144 , User = alice",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 14030,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113005",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113005,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-113005: AAA user authentication Rejected: reason = AAA failure: server = 81.2.69.144 : user = *****: user IP = 172.31.98.44",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 14139,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113012",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113012,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-113012: AAA user authentication Successful: local database: user = alice",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 14293,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113021",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113021,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-3-113021: Attempted console login failed. User eve did NOT have appropriate Admin Rights.",
+        "event.severity": 3,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 14396,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "716039",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 716039,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-716039: Authentication: rejected, group = malcorp user = eve , Session Type: admin",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 14514,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "716039",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 716039,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-716039: Authentication: rejected, group = malcorp user = malory , Session Type: WebVPN",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 14627,
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",

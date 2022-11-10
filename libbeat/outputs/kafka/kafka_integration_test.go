@@ -69,7 +69,7 @@ func TestKafkaPublish(t *testing.T) {
 		events []eventInfo
 	}{
 		{
-			"publish single event to test topic",
+			"publish single event to test topic with nil config",
 			nil,
 			testTopic,
 			single(mapstr.M{
@@ -186,7 +186,7 @@ func TestKafkaPublish(t *testing.T) {
 			}),
 		},
 		{
-			"publish single event to test topic",
+			"publish single event to test topic with empty config",
 			map[string]interface{}{},
 			testTopic,
 			single(mapstr.M{
@@ -199,7 +199,7 @@ func TestKafkaPublish(t *testing.T) {
 			// that added a full 30sec to the test. Instead most tests run
 			// in plaintext, and individual tests can switch to SCRAM
 			// by inserting the config in this example:
-			"publish single event to test topic over SASL/SCRAM",
+			"SASL/SCRAM publish single event to test topic",
 			map[string]interface{}{
 				"hosts":          []string{getTestSASLKafkaHost()},
 				"protocol":       "https",

@@ -277,10 +277,11 @@ func TestSplit(t *testing.T) {
 			},
 		},
 		{
-			name: "First level split skips publish if no events",
+			name: "First level split publishes with key if no events",
 			config: &splitConfig{
-				Target: "body.response",
-				Type:   "array",
+				Target:     "body.response",
+				Type:       "array",
+				KeepParent: true,
 				Split: &splitConfig{
 					Target:     "body.Event.Attributes",
 					KeepParent: true,
@@ -292,8 +293,12 @@ func TestSplit(t *testing.T) {
 					"response": []interface{}{},
 				},
 			},
-			expectedMessages: []mapstr.M{},
-			expectedErr:      errEmptyRootField,
+			expectedMessages: []mapstr.M{
+				{
+					"response": []interface{}{},
+				},
+			},
+			expectedErr: errEmptyRootField,
 		},
 		{
 			name: "Changes must be local to parent when nested splits",
@@ -618,6 +623,83 @@ func TestSplit(t *testing.T) {
 				{"@timestamp": "1234567890", "other_items": "Line 2"},
 				{"@timestamp": "1234567890", "other_items": "Line 3"},
 			},
+		},
+		{
+			name: "Array of Strings with keep_parent",
+			config: &splitConfig{
+				Target:     "body.alerts",
+				Type:       "array",
+				KeepParent: true,
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": mapstr.M{
+					"this": "is kept",
+					"alerts": []interface{}{
+						"test1",
+						"test2",
+						"test3",
+					},
+				},
+			},
+			expectedMessages: []mapstr.M{
+				{
+					"this":   "is kept",
+					"alerts": "test1",
+				},
+				{
+					"this":   "is kept",
+					"alerts": "test2",
+				},
+				{
+					"this":   "is kept",
+					"alerts": "test3",
+				},
+			},
+			expectedErr: nil,
+		},
+		{
+			name: "Array of Arrays with keep_parent",
+			config: &splitConfig{
+				Target:     "body.alerts",
+				Type:       "array",
+				KeepParent: true,
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": mapstr.M{
+					"this": "is kept",
+					"alerts": []interface{}{
+						[]interface{}{"test1-1", "test1-2"},
+						[]string{"test2-1", "test2-2"},
+						[]int{1, 2},
+					},
+				},
+			},
+			expectedMessages: []mapstr.M{
+				{
+					"this": "is kept",
+					"alerts": []interface{}{
+						"test1-1",
+						"test1-2",
+					},
+				},
+				{
+					"this": "is kept",
+					"alerts": []string{
+						"test2-1",
+						"test2-2",
+					},
+				},
+				{
+					"this": "is kept",
+					"alerts": []int{
+						1,
+						2,
+					},
+				},
+			},
+			expectedErr: nil,
 		},
 	}
 

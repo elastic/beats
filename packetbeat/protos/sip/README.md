@@ -17,7 +17,6 @@ SIP is a text-based protocol like HTTP. But SIP has various unique features like
 - If you need all SIP messages in throughout of SIP dialog, you need to retrieve from Elasticsearch using the SIP Call ID field etc.
 
 ### Notes
-* ``transport=tcp`` is not supported yet.
 * ``content-encoding`` is not supported yet.
 * Default timestamp field(@timestamp) precision is not sufficient(the sip response is often send immediately when request received eg. 100 Trying). You can sort to keep the message correct order using the ``sip.timestamp``(`date_nanos`) field.
 * Body parsing is partially supported for ``application/sdp`` content type only.
@@ -37,6 +36,10 @@ SIP is a text-based protocol like HTTP. But SIP has various unique features like
 
   # Preserve original contents in event.original
   keep_original: true
+
+  # You can monitor tcp SIP traffic by setting the transport_protocol option
+  # to tcp, it defaults to udp.
+  #transport_protocol: tcp
 ```
 
 ### Sample Full JSON Output

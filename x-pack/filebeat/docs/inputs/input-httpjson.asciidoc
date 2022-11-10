@@ -109,7 +109,7 @@ The state has the following elements:
 - `last_response.url.params`: A https://pkg.go.dev/net/url#Values[`url.Values`] of the params from the URL in `last_response.url.value`.  Can be queried with the https://pkg.go.dev/net/url#Values.Get[`Get`] function.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
-- `last_response.page`: A number indicating the page number of the last response.
+- `last_response.page`: A number indicating the page number of the last response. It starts with the value `0` at every interval.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
 - `last_event`: A map representing the last event of the current request in the requests chain (result from applying transforms to `last_response.body`).
 - `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
@@ -224,6 +224,7 @@ Some built-in helper functions are provided to work with the input state inside 
 - `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some" "my" "some value" ]]` returns `my value`.
 - `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
 - `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
+- `toJSON`: converts a value to a JSON string. This can be used with `value_type: json` to create an object from a template. Example: `[[ toJSON .last_response.body.pagingIdentifiers ]]`.
 - `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
 - `userAgent`: generates the User Agent with optional additional values. If no arguments are provided, it will generate the default User Agent that is added to all requests by default. It is recommended to delete the existing User-Agent header before setting a new one. Example: `[[ userAgent "integration/1.2.3" ]]` would generate `Elastic-Filebeat/8.1.0 (darwin; amd64; 9b893e88cfe109e64638d65c58fd75c2ff695402; 2021-12-15 13:20:00 +0000 UTC; integration_name/1.2.3)`
 - `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019`. Example: `[[ uuid ]]`
@@ -530,7 +531,7 @@ List of transforms to apply to the request before each execution.
 
 Available transforms for request: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
+Can read state from: [`.first_response.*`,`.last_response.*`, `.parent_last_response.*` `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 
@@ -545,6 +546,84 @@ filebeat.inputs:
         target: body.from
         value: '[[now (parseDuration "-1h")]]'
 ----
+
+NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination 
+does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains. You can look at this 
+**example** below for a better idea.
+
+**Example Config:**
+["source","yaml",subs="attributes"]
+  filebeat.inputs:
+  - type: httpjson
+    enabled: true
+    id: my-httpjson-id
+    request.url: http://xyz.com/services/data/v1.0/export_ids/page
+    request.method: POST
+    interval: 1h
+    request.retry.max_attempts: 2
+    request.retry.wait_min: 5s
+    request.transforms:
+    - set:
+        target: body.page
+        value: 0
+    response.request_body_on_pagination: true
+    response.pagination:
+      - set:
+          target: body.page
+          value: '[[ .last_response.body.page ]]'
+          fail_on_template_error: true 
+    chain: 
+    - step:
+          request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
+          request.method: POST
+          request.transforms:
+          - set:
+              target: body.exportId
+              value: '[[ .parent_last_response.body.exportId ]]'
+          replace: $.files[:].id
+          replace_with: '$.exportId,.parent_last_response.body.exportId'
+
+Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request.
+However if `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is 
+because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the
+`first_response` object always stores the very first response in the process chain.
+
+[float]
+==== `request.tracer.filename`
+
+It is possible to log httpjson requests and responses to a local file-system for debugging configurations.
+This option is enabled by setting the `request.tracer.filename` value. Additional options are available to
+tune log rotation behavior.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `request.tracer.maxsize`
+
+This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
+logs are allowed to reach 1MB before rotation.
+
+[float]
+==== `request.tracer.maxage`
+
+This specifies the number days to retain rotated log files. If it is not set, log files are retained
+indefinitely.
+
+[float]
+==== `request.tracer.maxbackups`
+
+The number of old logs to retain. If it is not set all old logs are retained subject to the `request.tracer.maxage`
+setting.
+
+[float]
+==== `request.tracer.localtime`
+
+Whether to use the host's local time rather that UTC for timestamping rotated log file names.
+
+[float]
+==== `request.tracer.compress`
+
+This determines whether rotated logs should be gzip compressed.
 
 [float]
 ==== `response.decode_as`
@@ -595,6 +674,7 @@ filebeat.inputs:
 ==== `response.split`
 
 Split operation to apply to the response once it is received. A split can convert a map, array, or string into multiple events.
+If the split target is empty the parent document will be kept. If documents with empty splits should be dropped, the `ignore_empty_value` option should be set to `true`.
 
 [float]
 ==== `response.split[].target`
@@ -973,11 +1053,11 @@ See <<request-parameters,request parameters>>. Required.
 
 Example:
 
-First call: https://example.com/services/data/v1.0/
+First call: \https://example.com/services/data/v1.0/
 
-Second call: https://example.com/services/data/v1.0/1/export_ids
+Second call: \https://example.com/services/data/v1.0/1/export_ids
 
-Third call: https://example.com/services/data/v1.0/export_ids/file_1/info
+Third call: \https://example.com/services/data/v1.0/export_ids/file_1/info
 
 [float]
 ==== `chain[].step.response.split`
@@ -993,15 +1073,15 @@ A link:https://goessner.net/articles/JsonPath/index.html#e2[JSONPath] string to 
 
 Example:
 
-- First call: https://example.com/services/data/v1.0/
+- First call: \https://example.com/services/data/v1.0/
 +
 <<response-json1,response>>
 
-- Second call: https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
+- Second call: \https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
 +
 <<response-json2,response>>
 
-- Third call: https://example.com/services/data/v1.0/export_ids`/`$.file_name`/info
+- Third call: \https://example.com/services/data/v1.0/export_ids/`$.file_name`/info
 
 ["source","yaml",subs="attributes"]
 ----
@@ -1029,7 +1109,7 @@ Example:
 - First call to collect record ids
 
 +
-request_url: https://example.com/services/data/v1.0/records
+request_url: \https://example.com/services/data/v1.0/records
 
 +
 response_json:
@@ -1056,7 +1136,7 @@ response_json:
 - Second call to collect `file_name` using collected ids from first call.
 
 +
-request_url using id as '1': https://example.com/services/data/v1.0/1/export_ids
+request_url using id as '1': \https://example.com/services/data/v1.0/1/export_ids
 
 +
 response_json using id as '1':
@@ -1071,7 +1151,7 @@ response_json using id as '1':
 ----
 
 +
-request_url using id as '2': https://example.com/services/data/v1.0/2/export_ids
+request_url using id as '2': \https://example.com/services/data/v1.0/2/export_ids
 
 +
 response_json using id as '2':
@@ -1087,13 +1167,110 @@ response_json using id as '2':
 - Third call to collect `files` using collected `file_name` from second call.
 
 +
-request_url using file_name as 'file_1': https://example.com/services/data/v1.0/export_ids/file_1/info
+request_url using file_name as 'file_1': \https://example.com/services/data/v1.0/export_ids/file_1/info
 
 +
-request_url using file_name as 'file_2': https://example.com/services/data/v1.0/export_ids/file_2/info
+request_url using file_name as 'file_2': \https://example.com/services/data/v1.0/export_ids/file_2/info
 
 +
 Collect and make events from response in any format supported by httpjson for all calls.
+
++
+[[chain-step-replace_with]]
+[float]
+==== `chain[].step.replace_with`
+
+The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value. 
+The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables 
+like [`.last_response.*`, `.first_response.*`, `.parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
+thus providing a lot of flexibility in the logic of chain requests.
+
+Example:
+
+- First call: \https://example.com/services/data/v1.0/exports
++
+<<response-json1-replace_with,response>>
+
+- Second call: \https://example.com/services/data/v1.0/$.exportId/files
++
+<<response-json2-replace_with,response>>
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - step:
+      request.url: https://example.com/services/data/v1.0/$.exportId/files
+      request.method: GET
+      replace_with: '$.exportId,.first_response.body.exportId'
+----
+
+Example:
+
+- First call to fetch exportId
+
++
+request_url: \https://example.com/services/data/v1.0/exports
+
++
+response_json:
+
++
+[[response-json1-replace_with]]
+["source","json",subs="attributes"]
+----
+{
+    "exportId" : "2212"
+}
+----
+
+- Second call to fetch `file ids` using exportId from first call.
+
++
+request_url using exportId as '2212': \https://example.com/services/data/v1.0/2212/files
+
++
+response_json using exportId as '2212':
+
++
+[[response-json2-replace_with]]
+["source","json",subs="attributes"]
+----
+{
+    "files": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
+
+**Some useful points to remember:- **
+  
+    1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a 
+    **single '.' (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal 
+    processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one '.' (dot) as prefix) or  
+    `replace_with:'$.exportId,first_response.body.exportId'` (no '.' dot as prefix)
+   
+   2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with: 
+    '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from
+    the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be 
+    extrated becomes `"" (an empty string)`, which has no definition within any context variable.
+
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching.
 
 [float]
 ==== `chain[].while`
@@ -1111,11 +1288,11 @@ See  <<request-parameters,request parameters>> .
 
 Example:
 
-First call: http://example.com/services/data/v1.0/exports
+First call: \http://example.com/services/data/v1.0/exports
 
-Second call: http://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+Second call: \http://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
 
-Third call: http://example.com/services/data/v1.0/export_ids/1/info
+Third call: \http://example.com/services/data/v1.0/export_ids/1/info
 
 [float]
 ==== `chain[].while.response.split`
@@ -1129,17 +1306,17 @@ See  <<chain-step-replace, chain[].step.replace>> .
 
 Example:
 
-- First call: http://example.com/services/data/v1.0/exports
+- First call: \http://example.com/services/data/v1.0/exports
 +
 <<response-json1-while,response>>
 
-- Second call: http://example.com/services/data/v1.0/`$.exportId`/export_ids/status
+- Second call: \http://example.com/services/data/v1.0/`$.exportId`/export_ids/status
 +
 <<response-json2-while,response>>
 
-- Third call: http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
+- Third call: \http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
 +
-<<response-json3-while,response 1>> , <<response-json4-while,response 2>>
+<<response-json3-while,response 1>>, <<response-json4-while,response 2>>
 
 ["source","yaml",subs="attributes"]
 ----
@@ -1171,7 +1348,7 @@ Example:
 - First call to collect export ids
 
 +
-request_url: https://example.com/services/data/v1.0/exports
+request_url: \https://example.com/services/data/v1.0/exports
 
 +
 response_json:
@@ -1188,7 +1365,7 @@ response_json:
 - Second call to collect `file_ids` using collected id from first call when `response.body.sataus == "completed"`. This call continues until the condition is satisfied or the maximum number of attempts gets exhausted.
 
 +
-request_url using id as '9ef0e6a5': https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+request_url using id as '9ef0e6a5': \https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
 
 +
 response_json using id as '9ef0e6a5':
@@ -1216,10 +1393,10 @@ response_json using id as '9ef0e6a5':
 - Third call to collect `files` using collected `file_id` from second call.
 
 +
-request_url using file_id as '1': https://example.com/services/data/v1.0/export_ids/1/info
+request_url using file_id as '1': \https://example.com/services/data/v1.0/export_ids/1/info
 
 +
-request_url using file_id as '2': https://example.com/services/data/v1.0/export_ids/2/info
+request_url using file_id as '2': \https://example.com/services/data/v1.0/export_ids/2/info
 
 +
 response_json using id as '1':
@@ -1251,6 +1428,11 @@ response_json using id as '2':
 Collect and make events from response in any format supported by httpjson for all calls.
 
 NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
+
+[float]
+==== `chain[].while.replace_with`
+
+See  <<chain-step-replace_with, chain[].step.replace_with>> .
 
 [[cursor]]
 [float]

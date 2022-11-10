@@ -18,7 +18,6 @@
 package memqueue
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -29,11 +28,11 @@ type forgetfulProducer struct {
 }
 
 type ackProducer struct {
-	broker       *broker
-	dropOnCancel bool
-	seq          uint32
-	state        produceState
-	openState    openState
+	broker        *broker
+	dropOnCancel  bool
+	producedCount uint64
+	state         produceState
+	openState     openState
 }
 
 type openState struct {
@@ -42,16 +41,22 @@ type openState struct {
 	events chan pushRequest
 }
 
+// producerID stores the order of events within a single producer, so multiple
+// event acknowledgement callbacks can be coalesced into a single call.
+// It is defined as an explicit type to reduce cross-confusion with the id
+// of an event in the queue itself, which is a queue.EntryID.
+type producerID uint64
+
 type produceState struct {
 	cb        ackHandler
-	dropCB    func(beat.Event)
+	dropCB    func(interface{})
 	cancelled bool
-	lastACK   uint32
+	lastACK   producerID
 }
 
 type ackHandler func(count int)
 
-func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		log:    b.logger,
 		done:   make(chan struct{}),
@@ -59,7 +64,7 @@ func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 	}
 
 	if cb != nil {
-		p := &ackProducer{broker: b, seq: 1, dropOnCancel: dropOnCancel, openState: openState}
+		p := &ackProducer{broker: b, dropOnCancel: dropOnCancel, openState: openState}
 		p.state.cb = cb
 		p.state.dropCB = dropCB
 		return p
@@ -67,12 +72,19 @@ func newProducer(b *broker, cb ackHandler, dropCB func(beat.Event), dropOnCancel
 	return &forgetfulProducer{broker: b, openState: openState}
 }
 
-func (p *forgetfulProducer) Publish(event interface{}) bool {
-	return p.openState.publish(pushRequest{event: event})
+func (p *forgetfulProducer) makePushRequest(event interface{}) pushRequest {
+	resp := make(chan queue.EntryID, 1)
+	return pushRequest{
+		event: event,
+		resp:  resp}
 }
 
-func (p *forgetfulProducer) TryPublish(event interface{}) bool {
-	return p.openState.tryPublish(pushRequest{event: event})
+func (p *forgetfulProducer) Publish(event interface{}) (queue.EntryID, bool) {
+	return p.openState.publish(p.makePushRequest(event))
+}
+
+func (p *forgetfulProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
 func (p *forgetfulProducer) Cancel() int {
@@ -80,28 +92,31 @@ func (p *forgetfulProducer) Cancel() int {
 	return 0
 }
 
-func (p *ackProducer) Publish(event interface{}) bool {
-	return p.updSeq(p.openState.publish(p.makeRequest(event)))
+func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
+	resp := make(chan queue.EntryID, 1)
+	return pushRequest{
+		event:    event,
+		producer: p,
+		// We add 1 to the id so the default lastACK of 0 is a
+		// valid initial state and 1 is the first real id.
+		producerID: producerID(p.producedCount + 1),
+		resp:       resp}
 }
 
-func (p *ackProducer) TryPublish(event interface{}) bool {
-	return p.updSeq(p.openState.tryPublish(p.makeRequest(event)))
-}
-
-func (p *ackProducer) updSeq(ok bool) bool {
-	if ok {
-		p.seq++
+func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
+	id, published := p.openState.publish(p.makePushRequest(event))
+	if published {
+		p.producedCount++
 	}
-	return ok
+	return id, published
 }
 
-func (p *ackProducer) makeRequest(event interface{}) pushRequest {
-	req := pushRequest{
-		event: event,
-		seq:   p.seq,
-		state: &p.state,
+func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+	id, published := p.openState.tryPublish(p.makePushRequest(event))
+	if published {
+		p.producedCount++
 	}
-	return req
+	return id, published
 }
 
 func (p *ackProducer) Cancel() int {
@@ -110,8 +125,8 @@ func (p *ackProducer) Cancel() int {
 	if p.dropOnCancel {
 		ch := make(chan producerCancelResponse)
 		p.broker.cancelChan <- producerCancelRequest{
-			state: &p.state,
-			resp:  ch,
+			producer: p,
+			resp:     ch,
 		}
 
 		// wait for cancel to being processed
@@ -125,25 +140,25 @@ func (st *openState) Close() {
 	close(st.done)
 }
 
-func (st *openState) publish(req pushRequest) bool {
+func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return true
+		return <-req.resp, true
 	case <-st.done:
 		st.events = nil
-		return false
+		return 0, false
 	}
 }
 
-func (st *openState) tryPublish(req pushRequest) bool {
+func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return true
+		return <-req.resp, true
 	case <-st.done:
 		st.events = nil
-		return false
+		return 0, false
 	default:
-		st.log.Debugf("Dropping event, queue is blocked (seq=%v) ", req.seq)
-		return false
+		st.log.Debugf("Dropping event, queue is blocked")
+		return 0, false
 	}
 }

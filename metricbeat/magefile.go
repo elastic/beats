@@ -91,6 +91,14 @@ func Package() {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
+}
+
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages(
@@ -222,7 +230,12 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("PYTEST_")...)
+
+	passThroughEnvVars := append(
+		[]string{"ELASTICSEARCH_VERSION", "KIBANA_VERSION", "BEAT_VERSION"},
+		devtools.ListMatchingEnvVars("PYTEST_")...,
+	)
+	runner, err := devtools.NewDockerIntegrationRunner(passThroughEnvVars...)
 	if err != nil {
 		return err
 	}

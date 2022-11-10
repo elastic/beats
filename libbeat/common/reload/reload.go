@@ -18,16 +18,21 @@
 package reload
 
 import (
+	"fmt"
 	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// Register holds a registry of reloadable objects
-var Register = NewRegistry()
+// RegisterV2 is the special registry used for the V2 controller
+var RegisterV2 = NewRegistry()
+
+// InputRegName is the registation name for V2 inputs
+const InputRegName = "input"
+
+// OutputRegName is the registation name for V2 Outputs
+const OutputRegName = "output"
 
 // ConfigWithMeta holds a pair of config.C and optional metadata for it
 type ConfigWithMeta struct {
@@ -72,11 +77,11 @@ func (r *Registry) Register(name string, obj Reloadable) error {
 	defer r.Unlock()
 
 	if obj == nil {
-		return errors.New("got a nil object")
+		return fmt.Errorf("got a nil object")
 	}
 
 	if r.nameTaken(name) {
-		return errors.Errorf("%s configuration list is already registered", name)
+		return fmt.Errorf("%s configuration list is already registered", name)
 	}
 
 	r.confs[name] = obj
@@ -89,11 +94,11 @@ func (r *Registry) RegisterList(name string, list ReloadableList) error {
 	defer r.Unlock()
 
 	if list == nil {
-		return errors.New("got a nil object")
+		return fmt.Errorf("got a nil object")
 	}
 
 	if r.nameTaken(name) {
-		return errors.Errorf("%s configuration is already registered", name)
+		return fmt.Errorf("%s configuration is already registered", name)
 	}
 
 	r.confsLists[name] = list
@@ -107,11 +112,36 @@ func (r *Registry) MustRegister(name string, obj Reloadable) {
 	}
 }
 
-// MustRegisterList declares a reloadable object list
-func (r *Registry) MustRegisterList(name string, list ReloadableList) {
-	if err := r.RegisterList(name, list); err != nil {
+// MustRegisterOutput is a V2-specific registration function
+// That declares a reloadable output
+func (r *Registry) MustRegisterOutput(obj Reloadable) {
+	if err := r.Register(OutputRegName, obj); err != nil {
 		panic(err)
 	}
+}
+
+// MustRegisterInput is a V2-specific registration function
+// that declares a reloadable object list for a beat input
+func (r *Registry) MustRegisterInput(list ReloadableList) {
+	if err := r.RegisterList(InputRegName, list); err != nil {
+		panic(err)
+	}
+}
+
+// GetInputList is a V2-specific function
+// That returns the reloadable list created for an input
+func (r *Registry) GetInputList() ReloadableList {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confsLists[InputRegName]
+}
+
+// GetReloadableOutput is a V2-specific function
+// That returns the reloader for the registered output
+func (r *Registry) GetReloadableOutput() Reloadable {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confs[OutputRegName]
 }
 
 // GetRegisteredNames returns the list of names registered
