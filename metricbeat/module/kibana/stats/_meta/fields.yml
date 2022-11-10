@@ -156,10 +156,10 @@
           type: short
           description: Number of connected ES nodes
         - name: nodes_with_active_sockets
-          type: integer
+          type: short
           description: Number of nodes with active sockets
         - name: nodes_with_idle_sockets
-          type: integer
+          type: short
           description: Number of nodes with idle sockets
         - name: total_active_sockets
           type: integer
