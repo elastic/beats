@@ -72,10 +72,10 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 					ModuleFields: mapstr.M{},
 				}
 
-				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
-				event.ModuleFields.Put("cluster.stats.state.state_uuid", stateData.StateID)
-				event.ModuleFields.Put("cluster.id", stateData.ClusterID)
-				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
+				_, _ = event.ModuleFields.Put("cluster.state.id", stateData.StateID)
+				_, _ = event.ModuleFields.Put("cluster.stats.state.state_uuid", stateData.StateID)
+				_, _ = event.ModuleFields.Put("cluster.id", stateData.ClusterID)
+				_, _ = event.ModuleFields.Put("cluster.name", stateData.ClusterName)
 
 				fields, err := schema.Apply(shard)
 				if err != nil {
@@ -110,7 +110,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 					continue
 				}
 				if nodeID != nil { // shard has not been allocated yet
-					event.ModuleFields.Put("node.id", nodeID)
+					_, _ = event.ModuleFields.Put("node.id", nodeID)
 					delete(fields, "node")
 
 					sourceNode, err := getSourceNode(nodeID.(string), stateData)
@@ -118,20 +118,20 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 						errs = append(errs, errors.Wrap(err, "failure getting source node information"))
 						continue
 					}
-					event.ModuleFields.Put("node.name", sourceNode["name"])
-					event.MetricSetFields.Put("source_node", sourceNode)
+					_, _ = event.ModuleFields.Put("node.name", sourceNode["name"])
+					_, _ = event.MetricSetFields.Put("source_node", sourceNode)
 				}
 
-				event.ModuleFields.Put("index.name", fields["index"])
+				_, _ = event.ModuleFields.Put("index.name", fields["index"])
 				delete(fields, "index")
 
-				event.MetricSetFields.Put("number", fields["shard"])
+				_, _ = event.MetricSetFields.Put("number", fields["shard"])
 				delete(event.MetricSetFields, "shard")
 
 				delete(event.MetricSetFields, "relocating_node")
 				relocatingNode := fields["relocating_node"]
-				event.MetricSetFields.Put("relocating_node.name", relocatingNode)
-				event.MetricSetFields.Put("relocating_node.id", relocatingNode)
+				_, _ = event.MetricSetFields.Put("relocating_node.name", relocatingNode)
+				_, _ = event.MetricSetFields.Put("relocating_node.id", relocatingNode)
 
 				// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 				// When using Agent, the index name is overwritten anyways.
