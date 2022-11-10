@@ -18,7 +18,7 @@ issues:
     - text: "ST1003:"
       linters:
         - stylecheck
-    - text: ".*undefined.*"
+    - text: "undefined"
       linters:
         - typecheck
     # From mage we are priting to the console to ourselves
