@@ -144,14 +144,15 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 		}
 
 		for _, e := range varr {
-			if err := s.sendMessage(ctx, root, "", e, ch); err != nil {
+			err := s.sendMessage(ctx, root, s.targetInfo.Name, e, ch)
+			if err != nil {
 				s.log.Debug(err)
 			}
 		}
 
 		return nil
 	case splitTypeMap:
-		vmap, ok := toMapStr(v)
+		vmap, ok := toMapStr(v, s.targetInfo.Name)
 		if !ok {
 			return errExpectedSplitObj
 		}
@@ -211,19 +212,17 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 // sendMessage sends an array or map split result value, v, on ch after performing
 // any necessary transformations. If key is "", the value is an element of an array.
 func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, ch chan<- maybeMsg) error {
-	obj, ok := toMapStr(v)
+	obj, ok := toMapStr(v, s.targetInfo.Name)
 	if !ok {
 		return errExpectedSplitObj
 	}
-
-	clone := root.Clone()
-
 	if s.keyField != "" && key != "" {
 		_, _ = obj.Put(s.keyField, key)
 	}
 
+	clone := root.Clone()
 	if s.keepParent {
-		_, _ = clone.Put(s.targetInfo.Name, obj)
+		_, _ = clone.Put(s.targetInfo.Name, v)
 	} else {
 		clone = obj
 	}
@@ -248,7 +247,7 @@ func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v 
 	return nil
 }
 
-func toMapStr(v interface{}) (mapstr.M, bool) {
+func toMapStr(v interface{}, key string) (mapstr.M, bool) {
 	if v == nil {
 		return mapstr.M{}, false
 	}
@@ -257,6 +256,8 @@ func toMapStr(v interface{}) (mapstr.M, bool) {
 		return t, true
 	case map[string]interface{}:
 		return mapstr.M(t), true
+	case string, []bool, []int, []string, []interface{}:
+		return mapstr.M{key: t}, true
 	}
 	return mapstr.M{}, false
 }
