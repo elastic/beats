@@ -283,13 +283,12 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	}
 
 	var reader reader.Reader
-	buf := &bytes.Buffer{}
-	tee := io.TeeReader(r, buf)
-	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(tee), readfile.Config{
-		Codec:      enc,
-		BufferSize: int(p.readerConfig.BufferSize),
-		Terminator: p.readerConfig.LineTerminator,
-		MaxBytes:   int(p.readerConfig.MaxBytes) * 4,
+	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
+		Codec:        enc,
+		BufferSize:   int(p.readerConfig.BufferSize),
+		Terminator:   p.readerConfig.LineTerminator,
+		CollectOnEOF: true,
+		MaxBytes:     int(p.readerConfig.MaxBytes) * 4,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create encode reader: %w", err)
@@ -302,6 +301,13 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
+		if len(message.Content) > 0 {
+			event := p.createEvent(string(message.Content), offset)
+			event.Fields.DeepUpdate(message.Fields)
+			offset += int64(message.Bytes)
+			p.publish(p.acker, &event)
+		}
+
 		if errors.Is(err, io.EOF) {
 			// No more lines
 			break
@@ -309,32 +315,6 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 		if err != nil {
 			return fmt.Errorf("error reading message: %w", err)
 		}
-
-		event := p.createEvent(string(message.Content), offset)
-		event.Fields.DeepUpdate(message.Fields)
-		offset += int64(message.Bytes)
-		p.publish(p.acker, &event)
-	}
-
-	if offset == 0 {
-		reader = readfile.NewEncodeReaderEof(ioutil.NopCloser(buf), readfile.Config{
-			Codec:      enc,
-			BufferSize: int(p.readerConfig.BufferSize),
-			MaxBytes:   int(p.readerConfig.MaxBytes) * 4,
-		})
-
-		reader = readfile.NewStripNewline(reader, p.readerConfig.LineTerminator)
-		reader = p.readerConfig.Parsers.Create(reader)
-		reader = readfile.NewLimitReader(reader, int(p.readerConfig.MaxBytes))
-
-		message, err := reader.Next()
-		if !errors.Is(err, io.EOF) {
-			return fmt.Errorf("error reading message: %w", err)
-		}
-
-		event := p.createEvent(string(message.Content), offset)
-		event.Fields.DeepUpdate(message.Fields)
-		p.publish(p.acker, &event)
 	}
 
 	return nil

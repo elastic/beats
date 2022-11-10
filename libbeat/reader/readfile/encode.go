@@ -36,10 +36,11 @@ type EncoderReader struct {
 // Config stores the configuration for the readers required to read
 // a file line by line
 type Config struct {
-	Codec      encoding.Encoding
-	BufferSize int
-	Terminator LineTerminator
-	MaxBytes   int
+	Codec        encoding.Encoding
+	BufferSize   int
+	Terminator   LineTerminator
+	MaxBytes     int
+	CollectOnEOF bool
 }
 
 // New creates a new Encode reader from input reader by applying

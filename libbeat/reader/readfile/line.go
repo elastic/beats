@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 
@@ -34,17 +35,18 @@ const unlimited = 0
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type LineReader struct {
-	reader     io.ReadCloser
-	maxBytes   int // max bytes per line limit to avoid OOM with malformatted files
-	nl         []byte
-	decodedNl  []byte
-	inBuffer   *streambuf.Buffer
-	outBuffer  *streambuf.Buffer
-	inOffset   int // input buffer read offset
-	byteCount  int // number of bytes decoded from input buffer into output buffer
-	decoder    transform.Transformer
-	tempBuffer []byte
-	logger     *logp.Logger
+	reader       io.ReadCloser
+	maxBytes     int // max bytes per line limit to avoid OOM with malformatted files
+	nl           []byte
+	decodedNl    []byte
+	collectOnEOF bool
+	inBuffer     *streambuf.Buffer
+	outBuffer    *streambuf.Buffer
+	inOffset     int // input buffer read offset
+	byteCount    int // number of bytes decoded from input buffer into output buffer
+	decoder      transform.Transformer
+	tempBuffer   []byte
+	logger       *logp.Logger
 }
 
 // NewLineReader creates a new reader object
@@ -63,15 +65,16 @@ func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 	}
 
 	return &LineReader{
-		reader:     input,
-		maxBytes:   config.MaxBytes,
-		decoder:    config.Codec.NewDecoder(),
-		nl:         nl,
-		decodedNl:  terminator,
-		inBuffer:   streambuf.New(nil),
-		outBuffer:  streambuf.New(nil),
-		tempBuffer: make([]byte, config.BufferSize),
-		logger:     logp.NewLogger("reader_line"),
+		reader:       input,
+		maxBytes:     config.MaxBytes,
+		decoder:      config.Codec.NewDecoder(),
+		nl:           nl,
+		decodedNl:    terminator,
+		collectOnEOF: config.CollectOnEOF,
+		inBuffer:     streambuf.New(nil),
+		outBuffer:    streambuf.New(nil),
+		tempBuffer:   make([]byte, config.BufferSize),
+		logger:       logp.NewLogger("reader_line"),
 	}, nil
 }
 
@@ -84,16 +87,46 @@ func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 func (r *LineReader) Next() (b []byte, n int, err error) {
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
+	iterN := 0
 	for {
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
 		if err != nil {
+			if errors.Is(err, io.EOF) && r.collectOnEOF {
+				// Found encoded byte sequence for newline in buffer
+				// -> decode input sequence into outBuffer
+				sz, err := r.decode(r.inOffset)
+				if err != nil {
+					r.logger.Errorf("Error decoding line: %s", err)
+					// In case of error increase size by unencoded length
+					sz = r.inBuffer.Len()
+				}
+
+				// Consume transformed bytes from input buffer
+				err = r.inBuffer.Advance(sz)
+				r.inBuffer.Reset()
+
+				// output buffer contains complete line ending with newline. Extract
+				// byte slice from buffer and reset output buffer.
+				bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
+				r.outBuffer.Reset()
+				if err != nil {
+					// This should never happen as otherwise we have a broken state
+					panic(err)
+				}
+
+				// return and reset consumed bytes count
+				sz = r.byteCount
+				r.byteCount = 0
+				return bytes, sz, io.EOF
+			}
+
 			// return and reset consumed bytes count
 			sz := r.byteCount
 			r.byteCount = 0
 			return nil, sz, err
 		}
-
+		iterN++
 		// Check last decoded byte really being newline also unencoded
 		// if not, continue reading
 		buf := r.outBuffer.Bytes()
@@ -144,7 +177,7 @@ func (r *LineReader) advance() error {
 		// Try to read more bytes into buffer
 		n, err := r.reader.Read(r.tempBuffer)
 
-		if err == io.EOF && n > 0 {
+		if errors.Is(err, io.EOF) && n > 0 {
 			// Continue processing the returned bytes. The next call will yield EOF with 0 bytes.
 			err = nil
 		}
