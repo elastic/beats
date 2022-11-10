@@ -100,7 +100,7 @@ func TestReaderEncodings(t *testing.T) {
 		}
 
 		// create line reader
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, LineFeed, unlimited})
+		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, LineFeed, unlimited, false})
 		if err != nil {
 			t.Fatal("failed to initialize reader:", err)
 		}
@@ -160,7 +160,7 @@ func TestLineTerminators(t *testing.T) {
 		buffer.Write([]byte("this is my second line"))
 		buffer.Write(nl)
 
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, terminator, unlimited})
+		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, terminator, unlimited, false})
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -238,7 +238,7 @@ func testReadLines(t *testing.T, inputLines [][]byte, eofOnLastRead bool) {
 	}
 
 	codec, _ := encoding.Plain(r)
-	reader, err := NewLineReader(ioutil.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited})
+	reader, err := NewLineReader(ioutil.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited, false})
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
@@ -358,7 +358,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	}
 
 	// Create line reader
-	reader, err := NewLineReader(ioutil.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit})
+	reader, err := NewLineReader(ioutil.NopCloser(strings.NewReader(input)), Config{codec, bufferSize, LineFeed, lineMaxLimit, false})
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}
@@ -418,7 +418,7 @@ func TestBufferSize(t *testing.T) {
 	bufferSize := 10
 
 	in := ioutil.NopCloser(strings.NewReader(strings.Join(lines, "")))
-	reader, err := NewLineReader(in, Config{codec, bufferSize, AutoLineTerminator, 1024})
+	reader, err := NewLineReader(in, Config{codec, bufferSize, AutoLineTerminator, 1024, false})
 	if err != nil {
 		t.Fatal("failed to initialize reader:", err)
 	}
