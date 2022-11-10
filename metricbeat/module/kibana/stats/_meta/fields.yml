@@ -150,7 +150,7 @@
       description: Elasticsearch Client's stats
       fields:
         - name: protocol
-          type: string
+          type: keyword
           description: Protocol used to connect to ES nodes (http, https or mixed)
         - name: connected_nodes
           type: short
