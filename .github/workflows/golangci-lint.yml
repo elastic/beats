@@ -40,7 +40,7 @@ jobs:
       - name: golangci-lint
         env:
           GOOS: ${{ matrix.GOOS }}
-          CGO_ENABLED: 1
+          #CGO_ENABLED: 1
         uses: golangci/golangci-lint-action@v3
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
