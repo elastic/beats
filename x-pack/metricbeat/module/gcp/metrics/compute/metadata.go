@@ -9,32 +9,33 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+/*
 const (
 	cacheTTL         = 30 * time.Second
 	initialCacheSize = 13
 )
+*/
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
 func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
-		projectID:     projectID,
-		zone:          zone,
-		region:        region,
-		regions:       regions,
-		opt:           opt,
-		instanceCache: common.NewCache(cacheTTL, initialCacheSize),
-		logger:        logp.NewLogger("metrics-compute"),
+		projectID: projectID,
+		zone:      zone,
+		region:    region,
+		regions:   regions,
+		opt:       opt,
+		// instanceCache: common.NewCache(cacheTTL, initialCacheSize),
+		computeInstances: make(map[string]*compute.Instance),
+		logger:           logp.NewLogger("metrics-compute"),
 	}, nil
 }
 
@@ -55,13 +56,14 @@ type computeMetadata struct {
 }
 
 type metadataCollector struct {
-	projectID     string
-	zone          string
-	region        string
-	regions       []string
-	opt           []option.ClientOption
-	instanceCache *common.Cache
-	logger        *logp.Logger
+	projectID string
+	zone      string
+	region    string
+	regions   []string
+	opt       []option.ClientOption
+	// instanceCache *common.Cache
+	computeInstances map[string]*compute.Instance
+	logger           *logp.Logger
 }
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Compute TimeSeries single point of data.
@@ -144,13 +146,25 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 
 // instance returns data from an instance ID using the cache or making a request
 func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*compute.Instance, error) {
-	s.refreshInstanceCache(ctx)
-	instanceCachedData := s.instanceCache.Get(instanceID)
-	if instanceCachedData != nil {
-		if computeInstance, ok := instanceCachedData.(*compute.Instance); ok {
-			return computeInstance, nil
+	/*
+		s.refreshInstanceCache(ctx)
+		instanceCachedData := s.instanceCache.Get(instanceID)
+		if instanceCachedData != nil {
+			if computeInstance, ok := instanceCachedData.(*compute.Instance); ok {
+				return computeInstance, nil
+			}
 		}
+	*/
+
+	s.getComputeInstances(ctx)
+
+	computeInstance, ok := s.computeInstances[instanceID]
+	if ok {
+		return computeInstance, nil
 	}
+
+	// Remake the compute instances map to avoid having stale data.
+	s.computeInstances = make(map[string]*compute.Instance)
 
 	return nil, nil
 }
@@ -171,12 +185,19 @@ func (s *metadataCollector) instanceZone(ts *monitoringpb.TimeSeries) string {
 	return ""
 }
 
-func (s *metadataCollector) refreshInstanceCache(ctx context.Context) {
-	// only refresh cache if it is empty
-	if s.instanceCache.Size() > 0 {
+func (s *metadataCollector) getComputeInstances(ctx context.Context) {
+	/*
+		// only refresh cache if it is empty
+		if s.instanceCache.Size() > 0 {
+			return
+		}
+		s.logger.Debugf("refresh cache with Instances.AggregatedList API")
+	*/
+
+	if len(s.computeInstances) > 0 {
 		return
 	}
-	s.logger.Debugf("refresh cache with Instances.AggregatedList API")
+
 	computeService, err := compute.NewService(ctx, s.opt...)
 	if err != nil {
 		s.logger.Errorf("error getting client from Compute service: %v", err)
@@ -187,7 +208,8 @@ func (s *metadataCollector) refreshInstanceCache(ctx context.Context) {
 	if err := req.Pages(ctx, func(page *compute.InstanceAggregatedList) error {
 		for _, instancesScopedList := range page.Items {
 			for _, instance := range instancesScopedList.Instances {
-				s.instanceCache.Put(strconv.Itoa(int(instance.Id)), instance)
+				// s.instanceCache.Put(strconv.Itoa(int(instance.Id)), instance)
+				s.computeInstances[strconv.Itoa(int(instance.Id))] = instance
 			}
 		}
 		return nil
