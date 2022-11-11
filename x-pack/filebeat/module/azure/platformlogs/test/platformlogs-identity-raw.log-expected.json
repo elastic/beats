@@ -1,0 +1,49 @@
+{
+    "expected": [
+        {
+            "@timestamp": "2020-11-09T10:57:31.000Z",
+            "azure": {
+                "platformlogs": {
+                    "Cloud": "AzureCloud",
+                    "Environment": "prod",
+                    "category": "kube-audit",
+                    "ccpNamespace": "5e4bf4baee195b00017cdbfa",
+                    "event_category": "Administrative",
+                    "identity_name": "Michael Dell",
+                    "operation_name": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
+                    "properties": {
+                        "log": {
+                            "apiVersion": "audit.k8s.io/v1",
+                            "auditID": "22af12c3-a1fe-4f2c-99a9-3cdde671dbfe",
+                            "kind": "Event",
+                            "level": "Metadata"
+                        },
+                        "pod": "kube-apiserver-666bd4b459-hjgdc",
+                        "stream": "stdout"
+                    }
+                },
+                "resource": {
+                    "group": "OBS-INFRASTRUCTURE",
+                    "id": "/SUBSCRIPTIONS/70BD6E77-4B1E-4835-8896-DB77B8EEF364/RESOURCEGROUPS/OBS-INFRASTRUCTURE/PROVIDERS/MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/OBSKUBE",
+                    "name": "OBSKUBE",
+                    "provider": "MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS"
+                },
+                "subscription_id": "70BD6E77-4B1E-4835-8896-DB77B8EEF364"
+            },
+            "cloud": {
+                "provider": "azure"
+            },
+            "ecs": {
+                "version": "8.0.0"
+            },
+            "event": {
+                "action": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
+                "kind": "event",
+                "original": "{\"Cloud\":\"AzureCloud\",\"Environment\":\"prod\",\"category\":\"kube-audit\",\"ccpNamespace\":\"5e4bf4baee195b00017cdbfa\",\"operationName\":\"Microsoft.ContainerService/managedClusters/diagnosticLogs/Read\",\"identity\":\"Michael Dell\",\"properties\":{\"log\":\"{\\\"kind\\\":\\\"Event\\\",\\\"apiVersion\\\":\\\"audit.k8s.io/v1\\\",\\\"level\\\":\\\"Metadata\\\",\\\"auditID\\\":\\\"22af12c3-a1fe-4f2c-99a9-3cdde671dbfe\\\"}\",\"pod\":\"kube-apiserver-666bd4b459-hjgdc\",\"stream\":\"stdout\"},\"resourceId\":\"/SUBSCRIPTIONS/70BD6E77-4B1E-4835-8896-DB77B8EEF364/RESOURCEGROUPS/OBS-INFRASTRUCTURE/PROVIDERS/MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/OBSKUBE\",\"time\":\"2020-11-09T10:57:31.0000000Z\"}"
+            },
+            "tags": [
+                "preserve_original_event"
+            ]
+        }
+    ]
+}
