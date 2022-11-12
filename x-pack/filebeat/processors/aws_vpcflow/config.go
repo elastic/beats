@@ -8,8 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	"gopkg.in/yaml.v3"
 )
 
 // mode represents the processing mode (original, ecs, ecs_and_original).
@@ -37,8 +35,12 @@ func (m *mode) Unpack(s string) error {
 	return fmt.Errorf("invalid mode type <%v> for "+procName, s)
 }
 
-func (m *mode) UnmarshalYAML(value *yaml.Node) error {
-	return m.Unpack(value.Value)
+func (m *mode) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var str string
+	if err := unmarshal(&str); err != nil {
+		return err
+	}
+	return m.Unpack(str)
 }
 
 func (m *mode) String() string {

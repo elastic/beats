@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v2"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -202,7 +202,6 @@ func readGoldenTestCase(t testing.TB) []GoldenTestCase {
 	}
 
 	dec := yaml.NewDecoder(f)
-	dec.KnownFields(true)
 
 	var testCases map[string]GoldenTestCase
 	if err = dec.Decode(&testCases); err != nil {
@@ -226,7 +225,6 @@ func writeGolden(t testing.TB, path string, events []mapstr.M) {
 	defer f.Close()
 
 	enc := yaml.NewEncoder(f)
-	enc.SetIndent(2)
 	if err = enc.Encode(events); err != nil {
 		t.Fatal()
 	}
