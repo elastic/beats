@@ -280,6 +280,43 @@ func TestProcessorsConfigs(t *testing.T) {
 	}
 }
 
+// TestEventNormalizationOverride verifies that the EventNormalization option
+// in beat.ProcessingConfig overrides the "skipNormalize" setting that is
+// specified in the builder (this is the default value set by the Beat).
+func TestEventNormalizationOverride(t *testing.T) {
+	boolPtr := func(b bool) *bool { return &b }
+
+	testCases := []struct {
+		skipNormalize          bool
+		normalizeOverride      *bool
+		hasGeneralizeProcessor bool
+	}{
+		{false, nil, true},
+		{false, boolPtr(false), false},
+		{false, boolPtr(true), true},
+		{true, nil, false},
+		{true, boolPtr(false), false},
+		{true, boolPtr(true), true},
+	}
+
+	for _, tc := range testCases {
+		builder, err := newBuilder(beat.Info{}, logp.NewLogger(""), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
+		require.NoError(t, err)
+
+		processor, err := builder.Create(beat.ProcessingConfig{EventNormalization: tc.normalizeOverride}, false)
+		require.NoError(t, err)
+		group := processor.(*group)
+
+		if tc.hasGeneralizeProcessor {
+			if assert.NotEmpty(t, group.list) {
+				assert.Equal(t, "generalizeEvent", group.list[0].String())
+			}
+		} else {
+			assert.Empty(t, group.list)
+		}
+	}
+}
+
 func TestNormalization(t *testing.T) {
 	cases := map[string]struct {
 		normalize bool

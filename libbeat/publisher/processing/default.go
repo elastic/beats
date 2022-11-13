@@ -288,8 +288,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 		builtin = tmp
 	}
 
-	if !b.skipNormalize {
-		// setup 1: generalize/normalize output (P)
+	// setup 1: generalize/normalize output (P)
+	if cfg.EventNormalization != nil {
+		if *cfg.EventNormalization {
+			processors.add(newGeneralizeProcessor(cfg.KeepNull))
+		}
+	} else if !b.skipNormalize {
 		processors.add(newGeneralizeProcessor(cfg.KeepNull))
 	}
 

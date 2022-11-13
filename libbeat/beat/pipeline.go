@@ -121,6 +121,10 @@ type ProcessingConfig struct {
 	// Disables the addition of host.name if it was enabled for the publisher.
 	DisableHost bool
 
+	// EventNormalization controls whether the event normalization processor
+	// is applied to events. If nil the Beat's default behavior prevails.
+	EventNormalization *bool
+
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}
