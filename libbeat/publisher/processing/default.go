@@ -57,7 +57,6 @@ type builder struct {
 	// global pipeline processors
 	processors *group
 
-	drop       bool // disabled is set if outputs have been disabled via CLI
 	alwaysCopy bool
 }
 
