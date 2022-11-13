@@ -168,7 +168,7 @@ func WithObserverMeta() modifier {
 			"version":      info.Version,
 		}
 		if info.Name != info.Hostname {
-			metadata.Put("name", info.Name)
+			metadata["name"] = info.Name
 		}
 		return mapstr.M{"observer": metadata}
 	})
@@ -211,9 +211,11 @@ func newBuilder(
 		b.builtinMeta = builtin
 	}
 
-	if fields := eventMeta.Fields; len(fields) > 0 {
+	if len(eventMeta.Fields) > 0 {
 		b.fields = mapstr.M{}
-		mapstr.MergeFields(b.fields, fields.Clone(), eventMeta.FieldsUnderRoot)
+		if err := mapstr.MergeFields(b.fields, eventMeta.Fields.Clone(), eventMeta.FieldsUnderRoot); err != nil {
+			return nil, fmt.Errorf("failed merging event metadata into fields: %w", err)
+		}
 	}
 
 	if timeSeries {
@@ -267,7 +269,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	builtin := b.builtinMeta
 	if cfg.DisableHost {
 		tmp := builtin.Clone()
-		tmp.Delete("host")
+		delete(tmp, "host")
 		builtin = tmp
 	}
 
@@ -313,7 +315,9 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	fields := cfg.Fields.Clone()
 	fields.DeepUpdate(b.fields.Clone())
 	if em := cfg.EventMetadata; len(em.Fields) > 0 {
-		mapstr.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot)
+		if err := mapstr.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot); err != nil {
+			return nil, fmt.Errorf("failed merging client event metadata into fields: %w", err)
+		}
 	}
 
 	if len(fields) > 0 {
