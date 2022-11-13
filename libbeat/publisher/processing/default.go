@@ -108,7 +108,7 @@ func MakeDefaultSupport(
 
 		processors, err := processors.New(cfg.Processors)
 		if err != nil {
-			return nil, fmt.Errorf("error initializing processors: %v", err)
+			return nil, fmt.Errorf("error initializing processors: %w", err)
 		}
 
 		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries)
