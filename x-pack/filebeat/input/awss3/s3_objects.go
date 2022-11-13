@@ -42,11 +42,10 @@ type s3ObjectProcessorFactory struct {
 	log           *logp.Logger
 	metrics       *inputMetrics
 	s3            s3Getter
-	publisher     beat.Client
 	fileSelectors []fileSelectorConfig
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3Getter, publisher beat.Client, sel []fileSelectorConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3Getter, sel []fileSelectorConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -59,7 +58,6 @@ func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3G
 		log:           log,
 		metrics:       metrics,
 		s3:            s3,
-		publisher:     publisher,
 		fileSelectors: sel,
 	}
 }
@@ -75,7 +73,7 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 
 // Create returns a new s3ObjectProcessor. It returns nil when no file selectors
 // match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, client beat.Client, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	log = log.With(
 		"bucket_arn", obj.S3.Bucket.Name,
 		"object_key", obj.S3.Object.Key)
@@ -90,6 +88,7 @@ func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger,
 		s3ObjectProcessorFactory: f,
 		log:                      log,
 		ctx:                      ctx,
+		publisher:                client,
 		acker:                    ack,
 		readerConfig:             readerConfig,
 		s3Obj:                    obj,
@@ -102,6 +101,7 @@ type s3ObjectProcessor struct {
 
 	log          *logp.Logger
 	ctx          context.Context
+	publisher    beat.Client
 	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
 	readerConfig *readerConfig              // Config about how to process the object.
 	s3Obj        s3EventV2                  // S3 object information.

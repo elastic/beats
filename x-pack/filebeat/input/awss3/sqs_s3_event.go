@@ -17,6 +17,7 @@ import (
 
 	"github.com/aws/smithy-go"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
@@ -89,13 +90,23 @@ type sqsS3EventProcessor struct {
 	sqsVisibilityTimeout time.Duration
 	maxReceiveCount      int
 	sqs                  sqsAPI
+	pipeline             beat.Pipeline // Pipeline creates clients for publishing events.
 	log                  *logp.Logger
 	warnOnce             sync.Once
 	metrics              *inputMetrics
 	script               *script
 }
 
-func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, script *script, sqsVisibilityTimeout time.Duration, maxReceiveCount int, s3 s3ObjectHandlerFactory) *sqsS3EventProcessor {
+func newSQSS3EventProcessor(
+	log *logp.Logger,
+	metrics *inputMetrics,
+	sqs sqsAPI,
+	script *script,
+	sqsVisibilityTimeout time.Duration,
+	maxReceiveCount int,
+	pipeline beat.Pipeline,
+	s3 s3ObjectHandlerFactory,
+) *sqsS3EventProcessor {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -104,6 +115,7 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 		sqsVisibilityTimeout: sqsVisibilityTimeout,
 		maxReceiveCount:      maxReceiveCount,
 		sqs:                  sqs,
+		pipeline:             pipeline,
 		log:                  log,
 		metrics:              metrics,
 		script:               script,
@@ -277,13 +289,26 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 	log.Debugf("SQS message contained %d S3 event notifications.", len(s3Events))
 	defer log.Debug("End processing SQS S3 event notifications.")
 
+	if len(s3Events) == 0 {
+		return nil
+	}
+
+	// Create a pipeline client scoped to this goroutine.
+	client, err := p.pipeline.ConnectWith(beat.ClientConfig{
+		ACKHandler: awscommon.NewEventACKHandler(),
+	})
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
 	// Wait for all events to be ACKed before proceeding.
 	acker := awscommon.NewEventACKTracker(ctx)
 	defer acker.Wait()
 
 	var errs []error
 	for i, event := range s3Events {
-		s3Processor := p.s3ObjectHandler.Create(ctx, log, acker, event)
+		s3Processor := p.s3ObjectHandler.Create(ctx, log, client, acker, event)
 		if s3Processor == nil {
 			continue
 		}

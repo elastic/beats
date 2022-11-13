@@ -108,16 +108,6 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	}()
 	defer cancelInputCtx()
 
-	// Create client for publishing events and receive notification of their ACKs.
-	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:   inputContext.Cancelation,
-		ACKHandler: awscommon.NewEventACKHandler(),
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create pipeline client: %w", err)
-	}
-	defer client.Close()
-
 	if in.config.QueueURL != "" {
 		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
 		if err != nil {
@@ -127,7 +117,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		in.awsConfig.Region = regionName
 
 		// Create SQS receiver and S3 notification processor.
-		receiver, err := in.createSQSReceiver(inputContext, client)
+		receiver, err := in.createSQSReceiver(inputContext, pipeline)
 		if err != nil {
 			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
 		}
@@ -139,6 +129,16 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	}
 
 	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
+		// Create client for publishing events and receive notification of their ACKs.
+		client, err := pipeline.ConnectWith(beat.ClientConfig{
+			CloseRef:   inputContext.Cancelation,
+			ACKHandler: awscommon.NewEventACKHandler(),
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create pipeline client: %w", err)
+		}
+		defer client.Close()
+
 		// Create S3 receiver and S3 notification processor.
 		poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
 		if err != nil {
@@ -154,7 +154,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	return nil
 }
 
-func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsReader, error) {
+func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
 	sqsAPI := &awsSQSAPI{
 		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
 			if in.config.AWSConfig.FIPSEnabled {
@@ -192,8 +192,8 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	if err != nil {
 		return nil, err
 	}
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, fileSelectors)
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, s3EventHandlerFactory)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
 	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
@@ -267,10 +267,11 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, fileSelectors)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors)
 	s3Poller := newS3Poller(log.Named("s3_poller"),
 		metrics,
 		s3API,
+		client,
 		s3EventHandlerFactory,
 		states,
 		persistentStore,
