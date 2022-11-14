@@ -142,7 +142,6 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 					errChan <- err
 				}
 				defer wg.Done()
-				return
 			}(wg)
 		}
 

@@ -207,7 +207,6 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight, sqsConsumers int) test
 				if err != nil && !errors.Is(err, context.DeadlineExceeded) {
 					errChan <- err
 				}
-				return
 			}(ctx, wg)
 		}
 

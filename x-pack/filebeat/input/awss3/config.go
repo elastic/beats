@@ -99,6 +99,12 @@ func (c *config) Validate() error {
 			c.NumberOfSQSConsumers)
 	}
 
+	if c.QueueURL != "" && c.MaxNumberOfMessages/c.NumberOfSQSConsumers < 1 {
+		return fmt.Errorf("the ratio between max_number_of_messages <%v> "+
+			"and number_of_sqs_consumers <%v> must be greater than 0",
+			c.MaxNumberOfMessages, c.NumberOfSQSConsumers)
+	}
+
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
 		return fmt.Errorf("api_timeout <%v> must be greater than the sqs.wait_time <%v",
 			c.APITimeout, c.SQSWaitTime)
@@ -111,7 +117,7 @@ func (c *config) Validate() error {
 		return errors.New("path_style can only be used when polling non-AWS S3 services")
 	}
 	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
-		return errors.New("provider can only be overriden when polling non-AWS S3 services")
+		return errors.New("provider can only be overridden when polling non-AWS S3 services")
 	}
 
 	return nil
