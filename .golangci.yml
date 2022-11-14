@@ -21,7 +21,7 @@ issues:
     - text: "undefined"
       linters:
         - typecheck
-    - text: "undeclared name"
+    - text: "undeclared name:"
       linters:
         - typecheck
     - text: "imported but not used"
