@@ -32,7 +32,7 @@ func (m *mode) Unpack(s string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("invalid mode type <%v> for "+procName, s)
+	return fmt.Errorf("invalid mode type %q for "+procName, s)
 }
 
 func (m *mode) UnmarshalYAML(unmarshal func(interface{}) error) error {
@@ -44,6 +44,9 @@ func (m *mode) UnmarshalYAML(unmarshal func(interface{}) error) error {
 }
 
 func (m *mode) String() string {
+	if m == nil {
+		return "<nil>"
+	}
 	if s, found := modeStrings[*m]; found {
 		return s
 	}
