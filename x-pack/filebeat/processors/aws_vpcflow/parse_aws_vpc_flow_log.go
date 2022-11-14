@@ -72,6 +72,7 @@ func newParseAWSVPCFlowLog(c config) (*processor, error) {
 }
 
 func (p *processor) String() string {
+	// JSON encoding of the config struct should never cause an error.
 	json, _ := json.Marshal(p.config)
 	return procName + "=" + string(json)
 }
