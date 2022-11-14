@@ -133,6 +133,13 @@ The `status_code`, `header` and `rate_limit` values may be omitted if the progra
 
 <7> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned.
 
+
+==== Debug state logging
+
+The CEL input will log the complete state after evaluation when logging at the DEBUG level.
+This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object.
+
+
 ==== CEL extension libraries
 
 As noted above the `cel` input provides function, macro and global variables to extend the language.

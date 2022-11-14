@@ -301,7 +301,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			_, ok = state["url"]
 			if !ok && goodURL != "" {
 				state["url"] = goodURL
-				log.Infow("adding missing url", "state", mapstr.M(state), "url", goodURL)
+				log.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", goodURL)
 			}
 
 			e, ok := state["events"]
