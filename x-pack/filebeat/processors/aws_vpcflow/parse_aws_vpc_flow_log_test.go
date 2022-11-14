@@ -186,14 +186,14 @@ func TestGoldenFile(t *testing.T) {
 	}
 }
 
-type GoldenTestCase struct {
+type goldenTestCase struct {
 	Name    string   `yaml:"-"` // Name of test.
 	Mode    *mode    // Processing mode (what fields to generate).
 	Format  string   // Flow log format.
 	Samples []string // List of sample logs to parse.
 }
 
-func readGoldenTestCase(t testing.TB) []GoldenTestCase {
+func readGoldenTestCase(t testing.TB) []goldenTestCase {
 	t.Helper()
 
 	f, err := os.Open("testdata/aws-vpc-flow-logs.yml")
@@ -203,12 +203,12 @@ func readGoldenTestCase(t testing.TB) []GoldenTestCase {
 
 	dec := yaml.NewDecoder(f)
 
-	var testCases map[string]GoldenTestCase
+	var testCases map[string]goldenTestCase
 	if err = dec.Decode(&testCases); err != nil {
 		t.Fatal(err)
 	}
 
-	testCasesList := make([]GoldenTestCase, 0, len(testCases))
+	testCasesList := make([]goldenTestCase, 0, len(testCases))
 	for k, v := range testCases {
 		v.Name = k
 		testCasesList = append(testCasesList, v)
