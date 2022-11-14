@@ -5,7 +5,7 @@
 <titleabbrev>move_fields</titleabbrev>
 ++++
 
-The `move_fields` processor allows to rearrange event fields from a object into another.
+The `move_fields` processor moves event fields from one object into another. It can also rearrange fields or add a prefix to fields.
 
 The processor extracts fields from `from`, then uses `fields` and `exclude` as filters to choose which fields to move into the `to` field.
 
