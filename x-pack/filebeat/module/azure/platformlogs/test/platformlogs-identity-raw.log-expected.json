@@ -6,6 +6,7 @@
         "azure.platformlogs.category": "kube-audit",
         "azure.platformlogs.ccpNamespace": "5e4bf4baee195b00017cdbfa",
         "azure.platformlogs.event_category": "Administrative",
+        "azure.platformlogs.identity_name": "Michael Dell",
         "azure.platformlogs.operation_name": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
         "azure.platformlogs.properties.log.kind": "Event",
         "azure.platformlogs.properties.pod": "kube-apiserver-666bd4b459-hjgdc",
