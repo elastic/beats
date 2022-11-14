@@ -190,13 +190,13 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			}
 
 			// Process a set of event requests.
-			log.Debugw("request state", "state", state)
+			log.Debugw("request state", logp.Namespace("cel"), "state", state)
 			metrics.executions.Add(1)
 			start := time.Now()
 			state, err = evalWith(ctx, prg, map[string]interface{}{
 				root: state,
 			})
-			log.Debugw("response state", "state", state)
+			log.Debugw("response state", logp.Namespace("cel"), "state", state)
 			if err != nil {
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
