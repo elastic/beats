@@ -93,6 +93,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 - Add tags to events based on parsed identifier. {pull}33472[33472]
 - Upgrade Generic SQL module to support new connection string and special character support for Oracle Database. {issue}32089[32089]
+- Skip over unsupported filesystems in the system.filesystem metricset instead of failing immediately. Fix debug statement in system.fsstat metricset. {pull}33646[33646]
+
 
 *Packetbeat*
 
@@ -171,6 +173,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Add Data Granularity option to AWS module to allow for for fewer API calls of longer periods and keep small intervals. {issue}33133[33133] {pull}33166[33166]
 - Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
+- Add per-thread metrics to system_summary {pull}33614[33614]
 
 *Packetbeat*
 
