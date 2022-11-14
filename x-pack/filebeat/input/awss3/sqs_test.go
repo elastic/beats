@@ -30,6 +30,7 @@ func TestSQSReceiver(t *testing.T) {
 	assert.Nil(t, err)
 
 	const maxMessages = 5
+	const sqsConsumers = 1
 
 	t.Run("ReceiveMessage success", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
@@ -70,7 +71,7 @@ func TestSQSReceiver(t *testing.T) {
 			Return(nil)
 
 		// Execute sqsReader and verify calls/state.
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, sqsConsumers, mockMsgHandler)
 		require.NoError(t, receiver.Receive(ctx))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
@@ -103,7 +104,7 @@ func TestSQSReceiver(t *testing.T) {
 		)
 
 		// Execute SQSReceiver and verify calls/state.
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, sqsConsumers, mockMsgHandler)
 		require.NoError(t, receiver.Receive(ctx))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})

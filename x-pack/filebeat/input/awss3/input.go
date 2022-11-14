@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"sync"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -132,9 +133,27 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
 		}
 		defer receiver.metrics.Close()
+		errChan := make(chan error)
+		wg := new(sync.WaitGroup)
+		for i := 0; i < in.config.NumberOfSQSConsumers; i++ {
+			wg.Add(1)
+			go func(wg *sync.WaitGroup) {
+				if err := receiver.Receive(ctx); err != nil {
+					errChan <- err
+				}
+				defer wg.Done()
+				return
+			}(wg)
+		}
 
-		if err := receiver.Receive(ctx); err != nil {
-			return err
+		wg.Wait()
+		select {
+		case err := <-errChan:
+			if err != nil {
+				return err
+			}
+		default:
+
 		}
 	}
 
@@ -180,6 +199,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
 	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
 	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
+	log.Infof("AWS SQS number_of_sqs_consumers is set to %v.", in.config.NumberOfSQSConsumers)
 
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	metrics := newInputMetrics(metricRegistry, ctx.ID)
@@ -194,7 +214,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	}
 	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, fileSelectors)
 	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, s3EventHandlerFactory)
-	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
+	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, in.config.NumberOfSQSConsumers, sqsMessageHandler)
 
 	return sqsReader, nil
 }
@@ -337,7 +357,6 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		"c2s.ic.gov":             "aws",
 		"amazonaws.com.cn":       "aws",
 		"backblazeb2.com":        "backblaze",
-		"cloudflarestorage.com":  "cloudflare",
 		"wasabisys.com":          "wasabi",
 		"digitaloceanspaces.com": "digitalocean",
 		"dream.io":               "dreamhost",

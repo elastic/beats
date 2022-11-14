@@ -164,7 +164,7 @@ file_selectors:
 	return inputConfig
 }
 
-func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
+func benchmarkInputSQS(t *testing.T, maxMessagesInflight, sqsConsumers int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
 		metricRegistry := monitoring.NewRegistry()
@@ -172,12 +172,11 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		sqsAPI := newConstantSQS()
 		s3API := newConstantS3(t)
 		client := pubtest.NewChanClient(100)
-		defer close(client.Channel)
 		conf := makeBenchmarkConfig(t)
 
 		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
 		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, s3EventHandlerFactory)
-		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
+		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsConsumers, sqsMessageHandler)
 
 		go func() {
 			for event := range client.Channel {
@@ -190,7 +189,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
+			for metrics.sqsMessagesReceivedTotal.Get() < uint64(maxMessagesInflight*b.N) {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
@@ -198,15 +197,35 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 
 		b.ResetTimer()
 		start := time.Now()
-		if err := sqsReader.Receive(ctx); err != nil {
-			if !errors.Is(err, context.DeadlineExceeded) {
+		errChan := make(chan error)
+		wg := new(sync.WaitGroup)
+		for i := 0; i < sqsConsumers; i++ {
+			wg.Add(1)
+			go func(ctx context.Context, wg *sync.WaitGroup) {
+				defer wg.Done()
+				err := sqsReader.Receive(ctx)
+				if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+					errChan <- err
+				}
+				return
+			}(ctx, wg)
+		}
+
+		wg.Wait()
+		select {
+		case err := <-errChan:
+			if err != nil {
 				t.Fatal(err)
 			}
+		default:
+
 		}
+
 		b.StopTimer()
 		elapsed := time.Since(start)
 
 		b.ReportMetric(float64(maxMessagesInflight), "max_messages_inflight")
+		b.ReportMetric(float64(sqsConsumers), "tot_sqs_consumers")
 		b.ReportMetric(elapsed.Seconds(), "sec")
 
 		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get()), "events")
@@ -224,21 +243,41 @@ func TestBenchmarkInputSQS(t *testing.T) {
 	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
-		benchmarkInputSQS(t, 1),
-		benchmarkInputSQS(t, 2),
-		benchmarkInputSQS(t, 4),
-		benchmarkInputSQS(t, 8),
-		benchmarkInputSQS(t, 16),
-		benchmarkInputSQS(t, 32),
-		benchmarkInputSQS(t, 64),
-		benchmarkInputSQS(t, 128),
-		benchmarkInputSQS(t, 256),
-		benchmarkInputSQS(t, 512),
-		benchmarkInputSQS(t, 1024),
+		benchmarkInputSQS(t, 1, 1),
+		benchmarkInputSQS(t, 2, 1),
+		benchmarkInputSQS(t, 4, 1),
+		benchmarkInputSQS(t, 8, 1),
+		benchmarkInputSQS(t, 16, 1),
+		benchmarkInputSQS(t, 32, 1),
+		benchmarkInputSQS(t, 64, 1),
+		benchmarkInputSQS(t, 128, 1),
+		benchmarkInputSQS(t, 256, 1),
+		benchmarkInputSQS(t, 512, 1),
+		benchmarkInputSQS(t, 1024, 1),
+		benchmarkInputSQS(t, 2, 2),
+		benchmarkInputSQS(t, 4, 2),
+		benchmarkInputSQS(t, 8, 2),
+		benchmarkInputSQS(t, 16, 2),
+		benchmarkInputSQS(t, 32, 2),
+		benchmarkInputSQS(t, 64, 2),
+		benchmarkInputSQS(t, 128, 2),
+		benchmarkInputSQS(t, 256, 2),
+		benchmarkInputSQS(t, 512, 2),
+		benchmarkInputSQS(t, 1024, 2),
+		benchmarkInputSQS(t, 8, 8),
+		benchmarkInputSQS(t, 16, 8),
+		benchmarkInputSQS(t, 32, 8),
+		benchmarkInputSQS(t, 64, 8),
+		benchmarkInputSQS(t, 128, 8),
+		benchmarkInputSQS(t, 256, 8),
+		benchmarkInputSQS(t, 512, 8),
+		benchmarkInputSQS(t, 1024, 8),
 	}
 
 	headers := []string{
-		"Max Msgs Inflight",
+		"Max Number of Msgs",
+		"Total SQS Consumers",
+		"Msgs for Consumers",
 		"Events per sec",
 		"S3 Bytes per sec",
 		"Time (sec)",
@@ -248,6 +287,8 @@ func TestBenchmarkInputSQS(t *testing.T) {
 	for _, r := range results {
 		data = append(data, []string{
 			fmt.Sprintf("%v", r.Extra["max_messages_inflight"]),
+			fmt.Sprintf("%v", r.Extra["tot_sqs_consumers"]),
+			fmt.Sprintf("%v", r.Extra["max_messages_inflight"]/r.Extra["tot_sqs_consumers"]),
 			fmt.Sprintf("%v", r.Extra["events_per_sec"]),
 			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes_per_sec"]))),
 			fmt.Sprintf("%v", r.Extra["sec"]),

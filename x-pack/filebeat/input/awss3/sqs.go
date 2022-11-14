@@ -31,12 +31,12 @@ type sqsReader struct {
 	metrics             *inputMetrics
 }
 
-func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
+func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, numberOfSQSConsumers int, msgHandler sqsProcessor) *sqsReader {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
 	return &sqsReader{
-		maxMessagesInflight: maxMessagesInflight,
+		maxMessagesInflight: maxMessagesInflight / numberOfSQSConsumers,
 		workerSem:           awscommon.NewSem(maxMessagesInflight),
 		sqs:                 sqs,
 		msgHandler:          msgHandler,

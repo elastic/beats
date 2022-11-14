@@ -20,35 +20,37 @@ import (
 )
 
 type config struct {
-	APITimeout          time.Duration        `config:"api_timeout"`
-	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
-	SQSWaitTime         time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
-	SQSMaxReceiveCount  int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
-	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
-	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
-	QueueURL            string               `config:"queue_url"`
-	BucketARN           string               `config:"bucket_arn"`
-	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
-	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
-	BucketListPrefix    string               `config:"bucket_list_prefix"`
-	NumberOfWorkers     int                  `config:"number_of_workers"`
-	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
-	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
-	PathStyle           bool                 `config:"path_style"`
-	ProviderOverride    string               `config:"provider"`
+	APITimeout           time.Duration        `config:"api_timeout"`
+	VisibilityTimeout    time.Duration        `config:"visibility_timeout"`
+	SQSWaitTime          time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSMaxReceiveCount   int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
+	SQSScript            *scriptConfig        `config:"sqs.notification_parsing_script"`
+	MaxNumberOfMessages  int                  `config:"max_number_of_messages"`
+	NumberOfSQSConsumers int                  `config:"number_of_sqs_consumers"`
+	QueueURL             string               `config:"queue_url"`
+	BucketARN            string               `config:"bucket_arn"`
+	NonAWSBucketName     string               `config:"non_aws_bucket_name"`
+	BucketListInterval   time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix     string               `config:"bucket_list_prefix"`
+	NumberOfWorkers      int                  `config:"number_of_workers"`
+	AWSConfig            awscommon.ConfigAWS  `config:",inline"`
+	FileSelectors        []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig         readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	PathStyle            bool                 `config:"path_style"`
+	ProviderOverride     string               `config:"provider"`
 }
 
 func defaultConfig() config {
 	c := config{
-		APITimeout:          120 * time.Second,
-		VisibilityTimeout:   300 * time.Second,
-		BucketListInterval:  120 * time.Second,
-		BucketListPrefix:    "",
-		SQSWaitTime:         20 * time.Second,
-		SQSMaxReceiveCount:  5,
-		MaxNumberOfMessages: 5,
-		PathStyle:           false,
+		APITimeout:           120 * time.Second,
+		VisibilityTimeout:    300 * time.Second,
+		BucketListInterval:   120 * time.Second,
+		BucketListPrefix:     "",
+		SQSWaitTime:          20 * time.Second,
+		SQSMaxReceiveCount:   5,
+		MaxNumberOfMessages:  5,
+		NumberOfSQSConsumers: 1,
+		PathStyle:            false,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
@@ -90,6 +92,11 @@ func (c *config) Validate() error {
 	if c.QueueURL != "" && c.MaxNumberOfMessages <= 0 {
 		return fmt.Errorf("max_number_of_messages <%v> must be greater than 0",
 			c.MaxNumberOfMessages)
+	}
+
+	if c.QueueURL != "" && c.NumberOfSQSConsumers <= 0 {
+		return fmt.Errorf("number_of_sqs_consumers <%v> must be greater than 0",
+			c.NumberOfSQSConsumers)
 	}
 
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
