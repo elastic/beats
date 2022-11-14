@@ -19,13 +19,21 @@ var googleWorkspace = (function () {
     });
 
     var addID = function(evt) {
+        var keys = [
+            "json.id.time",
+            "json.id.uniqueQualifier",
+            "json.id.applicationName",
+            "json.id.customerId",
+        ];
+        Object.keys(evt.Get("json.events")).forEach(function(evtsKey) {
+            var key = "json.events."+evtsKey;
+            var value = evt.Get(key);
+            if (!Array.isArray(value) && !(typeof value === "object")) {
+                keys.push(key);
+            }
+        });
         new processor.Fingerprint({
-            fields: [
-                "json.id.time",
-                "json.id.uniqueQualifier",
-                "json.id.applicationName",
-                "json.id.customerId",
-            ].concat(Object.keys(evt.Get("json.events"))),
+            fields: keys,
             target_field: "@metadata._id",
             ignore_missing: true,
             fail_on_error: false,
