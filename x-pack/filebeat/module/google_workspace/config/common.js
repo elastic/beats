@@ -18,17 +18,35 @@ var googleWorkspace = (function () {
         ignore_missing: true,
     });
 
-    var addID = new processor.Fingerprint({
-        fields: [
+    var addID = function(evt) {
+        var keys = [
             "json.id.time",
             "json.id.uniqueQualifier",
             "json.id.applicationName",
             "json.id.customerId",
+<<<<<<< HEAD
         ],
         target_field: "@metadata.id",
         ignore_missing: true,
         fail_on_error: false,
     });
+=======
+        ];
+        Object.keys(evt.Get("json.events")).forEach(function(evtsKey) {
+            var key = "json.events."+evtsKey;
+            var value = evt.Get(key);
+            if (!Array.isArray(value) && !(typeof value === "object")) {
+                keys.push(key);
+            }
+        });
+        new processor.Fingerprint({
+            fields: keys,
+            target_field: "@metadata._id",
+            ignore_missing: true,
+            fail_on_error: false,
+        }).Run(evt);
+    };
+>>>>>>> 311b1371e1 ([Filebeat][Google workspace] Backport integration fixes (#33666))
 
     var convertFields = new processor.Convert({
         fields: [
