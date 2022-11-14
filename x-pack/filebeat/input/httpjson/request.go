@@ -346,7 +346,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return err
 			}
-			// we will only processAndPublishEvents here if chains & root level pagination do not exist, inorder to avoid unnecessary pagination
+			// we do not clear the trCtx interval data for the 1st root request, if a chain is expected in the request config.
 			events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, !isChainExpected)
 			n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
 		} else {
