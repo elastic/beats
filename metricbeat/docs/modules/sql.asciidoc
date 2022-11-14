@@ -52,6 +52,10 @@ each row.
 
 `sql_query`:: The single query you want to run. (`Backward Compatibility`). Also provide corresponding  `sql_response_format`: either `variables` or `table`
 
+[float]
+== Example
+
+Examples of configurations in `sql.yml` to connect with supported databases are mentioned below. 
 
 [float]
 === Example: capture Innodb-related metrics
@@ -229,7 +233,7 @@ for each row. For example, this event is created for the first row:
 ----
 
 [float]
-==== Example: get the buffer catch hit ratio in Oracle
+=== Example: get the buffer catch hit ratio in Oracle
 
 This `sql.yml` configuration shows how to get the buffer cache hit ratio:
 
@@ -239,7 +243,7 @@ This `sql.yml` configuration shows how to get the buffer cache hit ratio:
   metricsets:
     - query
   period: 10s
-  hosts: ["oracle://sys:Oradoc_db1@172.17.0.3:1521/ORCLPDB1.localdomain?sysdba=1"]
+  hosts: ["oracle://sys:password@172.17.0.3:1521/ORCLPDB1.localdomain?sysdba=1"]
 
   driver: "oracle"
   sql_query: 'SELECT name, physical_reads, db_block_gets, consistent_gets, 1 - (physical_reads / (db_block_gets + consistent_gets)) "Hit Ratio" FROM V$BUFFER_POOL_STATISTICS'
@@ -554,16 +558,21 @@ This creates a combined event as below, where `blks_hit`, `blks_read`, `checkpoi
 }
 ----
 
-== Host Setup (Oracle)
+=== Host Setup
+
+Some drivers require additional configuration to work. Find here instructions for these drivers.
 
 ==== Oracle Database Connection Pre-requisites
 
 To get connected with the Oracle Database ORACLE_SID, ORACLE_BASE, ORACLE_HOME environment variables should be set.
 
-For example: Let’s consider Oracle Database 21c installation using RPM manually by following https://docs.oracle.com/en/database/oracle/oracle-database/21/ladbi/running-rpm-packages-to-install-oracle-database.html[this] link, environment variables should be set as follows:
+For example: Let us consider Oracle Database 21c installation using RPM manually by following https://docs.oracle.com/en/database/oracle/oracle-database/21/ladbi/running-rpm-packages-to-install-oracle-database.html[this] link, environment variables should be set as follows:
 
-    `ORACLE_BASE=/opt/oracle/oradata`
-    `ORACLE_HOME=/opt/oracle/product/21c/dbhome_1`
+[source,bash]
+----
+	export ORACLE_BASE=/opt/oracle/oradata
+	export ORACLE_HOME=/opt/oracle/product/21c/dbhome_1
+----
 Also, add `ORACLE_HOME/bin` to the `PATH` environment variable. 
 
 ===== Oracle Instant Client Installation
@@ -577,19 +586,25 @@ The OCI library install few Client Shared Libraries that must be referenced on t
 The Oracle listener is a service that runs on the database host and receives requests from Oracle clients. Make sure that https://docs.oracle.com/cd/B19306_01/network.102/b14213/lsnrctl.htm[listener] should be running. 
 To check if the listener is running or not, run: 
 
-`lsnrctl STATUS`
+[source,bash]
+----
+	lsnrctl STATUS
+----
 
 If the listener is not running, use the command to start:
 
-`lsnrctl START`
+[source,bash]
+----
+	lsnrctl START
+----
 
 Then, Metricbeat can be launched.
 
-==== Host Configuration for Oracle
+===== Host Configuration for Oracle
 
 The following two types of host configurations are supported:
 
-1. Old style host configuration for backwards compatibility:
+1. DSN host configuration as URL:
     a. `hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]`
     b. `hosts: ["user/password@0.0.0.0:1521/ORCLPDB1.localdomain as sysdba"]`
 
@@ -599,6 +614,23 @@ The following two types of host configurations are supported:
 
 Note: If the password contains the backslash (`\`) character, it must be escaped with a backslash. For example, if the password is `my\_password`, it should be written as `my\\_password`.
 
+Username and password to connect to the database can be provided as values to `username` and `password` keys of `sql.yml`. 
+
+[source,yml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 10s
+  driver: "oracle"
+  enabled: true
+  hosts: ['user="" password="" connectString="0.0.0.0:1521/ORCLCDB.localdomain" sysdba=true']
+  username: sys
+  password: password
+  sql_queries: 
+  - query: SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 and METRIC_NAME LIKE '%'
+    response_format: variables 
+----
 
 :edit_url:
 
