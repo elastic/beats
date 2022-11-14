@@ -257,6 +257,7 @@ func BenchmarkProcessorRun(b *testing.B) {
 			},
 		}
 
+		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			if _, err = p.Run(&evt); err != nil {
 				b.Fatal(err)
