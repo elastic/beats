@@ -394,8 +394,10 @@ def prepareE2ETestForPackage(String beat){
 
 def release(type){
   withBeatsEnv(type){
+    // As agreed DEV=false for staging otherwise DEV=true
+    // this should avoid releasing binaries with the debug symbols and disabled most build optimizations.
     withEnv([
-      "DEV=true"
+      "DEV=${!type.equals('staging')}"
     ]) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
