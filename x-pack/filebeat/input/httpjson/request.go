@@ -324,7 +324,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
-				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
+				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true)
 				n = processAndPublishEvents(trCtx, events, publisher, true, r.log)
 				continue
 			}
@@ -347,10 +347,13 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return err
 			}
 			// we will only processAndPublishEvents here if chains & root level pagination do not exist, inorder to avoid unnecessary pagination
+			var events <-chan maybeMsg
 			if !isChainExpected {
-				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
-				n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
+				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true)
+			} else {
+				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false)
 			}
+			n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
 		} else {
 			if len(ids) == 0 {
 				n = 0
@@ -420,9 +423,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 			var events <-chan maybeMsg
 			if rf.isChain {
-				events = rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps)
+				events = rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true)
 			} else {
-				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps)
+				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps, true)
 			}
 			n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
 		}
@@ -522,7 +525,7 @@ func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, pu
 // processRemainingChainEvents, processes the remaining pagination events for chain blocks
 func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
-	events := r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp)
+	events := r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true)
 
 	var n int
 	var eventCount int
@@ -650,7 +653,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 			resps = intermediateResps
 		}
-		events := rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps)
+		events := rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true)
 		n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
 	}
 

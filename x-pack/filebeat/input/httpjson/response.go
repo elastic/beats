@@ -129,8 +129,8 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, log *
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response) <-chan maybeMsg {
-	trCtx.clearIntervalData()
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, clearInterval bool) <-chan maybeMsg {
+	trCtx.clearIntervalData(clearInterval)
 
 	ch := make(chan maybeMsg)
 	go func() {

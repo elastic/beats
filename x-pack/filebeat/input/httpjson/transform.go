@@ -129,12 +129,14 @@ func (ctx *transformContext) updateFirstResponse(r response) {
 	ctx.lock.Unlock()
 }
 
-func (ctx *transformContext) clearIntervalData() {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
-	ctx.lastEvent = &mapstr.M{}
-	ctx.firstEvent = &mapstr.M{}
-	ctx.lastResponse = &response{}
+func (ctx *transformContext) clearIntervalData(clear bool) {
+	if clear {
+		ctx.lock.Lock()
+		defer ctx.lock.Unlock()
+		ctx.lastEvent = &mapstr.M{}
+		ctx.firstEvent = &mapstr.M{}
+		ctx.lastResponse = &response{}
+	}
 }
 
 type transformable mapstr.M
