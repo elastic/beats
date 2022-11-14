@@ -99,17 +99,6 @@ func TestNetworkFetch(t *testing.T) {
 	require.NotEmpty(t, networkData)
 }
 
-func TestNetworkSkipWithHostfs(t *testing.T) {
-	testConfig := Stats{
-		Hostfs:        resolve.NewTestResolver("testpath"),
-		EnableNetwork: true,
-	}
-
-	err := testConfig.Init()
-	require.NoError(t, err)
-	require.False(t, testConfig.EnableNetwork)
-}
-
 func TestNetworkFilter(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("Network data only available on linux")

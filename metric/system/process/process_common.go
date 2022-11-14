@@ -168,11 +168,6 @@ func (procStats *Stats) Init() error {
 		procStats.Hostfs = resolve.NewTestResolver("/")
 	}
 
-	if procStats.EnableNetwork && procStats.Hostfs.IsSet() {
-		procStats.logger.Warnf("hostfs has been set to %s, and EnableNetwork has been set, but per-process network counters are currently not supported with an alternate filesystem.", procStats.Hostfs.ResolveHostFS(""))
-		procStats.EnableNetwork = false
-	}
-
 	if procStats.EnableNetwork && len(procStats.NetworkMetrics) == 0 {
 		procStats.logger.Warnf("Collecting all network metrics per-process; this will produce a large volume of data.")
 	}
