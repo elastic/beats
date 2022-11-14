@@ -220,11 +220,11 @@ resources:
     validation:
       type: sha256
       value: 92da0b550e6843c13ee2cb56e7ffe263fcc222b365ce9b36c8a7b37a6dc16f0a
-  - filename: llvm-libs-13.0.1-1.module+el8.6.0+14118+d530a951.x86_64.rpm
-    url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/x86_64/appstream/os/Packages/l/llvm-libs-13.0.1-1.module+el8.6.0+14118+d530a951.x86_64.rpm
+  - filename: llvm-libs-13.0.1-1.module+el8.6.0+825+7e27476a.x86_64.rpm
+    url: https://rockylinux-distro.1gservers.com/8.6/AppStream/x86_64/os/Packages/l/llvm-libs-13.0.1-1.module+el8.6.0+825+7e27476a.x86_64.rpm
     validation:
       type: sha256
-      value: 0e2b45e2805db105e3e7439231b5f46953b959800fe3dd9ca3a76f88f3b0c08a
+      value: 8af31d39c221dd948d7548f84a84f5bdf3da22527a4dced1cff089f199f45a1a
   - filename: shared-mime-info-1.9-3.el8.x86_64.rpm
     url: https://ftp.plusline.net/rockylinux/8.6/BaseOS/x86_64/os/Packages/s/shared-mime-info-1.9-3.el8.x86_64.rpm
     validation:
