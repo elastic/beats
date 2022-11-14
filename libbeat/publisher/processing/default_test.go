@@ -291,12 +291,12 @@ func TestEventNormalizationOverride(t *testing.T) {
 		normalizeOverride      *bool
 		hasGeneralizeProcessor bool
 	}{
-		{false, nil, true},
-		{false, boolPtr(false), false},
-		{false, boolPtr(true), true},
-		{true, nil, false},
-		{true, boolPtr(false), false},
-		{true, boolPtr(true), true},
+		{skipNormalize: false, normalizeOverride: nil, hasGeneralizeProcessor: true},
+		{skipNormalize: false, normalizeOverride: boolPtr(false), hasGeneralizeProcessor: false},
+		{skipNormalize: false, normalizeOverride: boolPtr(true), hasGeneralizeProcessor: true},
+		{skipNormalize: true, normalizeOverride: nil, hasGeneralizeProcessor: false},
+		{skipNormalize: true, normalizeOverride: boolPtr(false), hasGeneralizeProcessor: false},
+		{skipNormalize: true, normalizeOverride: boolPtr(true), hasGeneralizeProcessor: true},
 	}
 
 	for _, tc := range testCases {
