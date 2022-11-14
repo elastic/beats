@@ -33,7 +33,7 @@ var dataTypeNames = map[dataType]string{
 }
 
 func (dt dataType) String() string {
-	if dt < integerType || timeStampType < dt {
+	if dt < integerType || timestampType < dt {
 		return fmt.Sprintf("invaild(%d)", dt)
 	}
 	return dataTypeNames[dt]
