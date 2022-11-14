@@ -18,17 +18,19 @@ var googleWorkspace = (function () {
         ignore_missing: true,
     });
 
-    var addID = new processor.Fingerprint({
-        fields: [
-            "json.id.time",
-            "json.id.uniqueQualifier",
-            "json.id.applicationName",
-            "json.id.customerId",
-        ],
-        target_field: "@metadata._id",
-        ignore_missing: true,
-        fail_on_error: false,
-    });
+    var addID = function(evt) {
+        new processor.Fingerprint({
+            fields: [
+                "json.id.time",
+                "json.id.uniqueQualifier",
+                "json.id.applicationName",
+                "json.id.customerId",
+            ].concat(Object.keys(evt.Get("json.events"))),
+            target_field: "@metadata._id",
+            ignore_missing: true,
+            fail_on_error: false,
+        }).Run(evt);
+    };
 
     var convertFields = new processor.Convert({
         fields: [
