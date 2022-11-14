@@ -70,7 +70,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
+	github.com/elastic/elastic-agent-client/v7 v7.0.0-20221028150015-05e494d37ccd
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.2
 	github.com/elastic/go-licenser v0.4.0
@@ -124,7 +124,7 @@ require (
 	github.com/miekg/dns v1.1.42
 	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
-	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/osquery/osquery-go v0.0.0-20210622151333-99b4efa62ec5
 	github.com/otiai10/copy v1.2.0
@@ -193,7 +193,7 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.4.0
-	github.com/elastic/elastic-agent-libs v0.2.11
+	github.com/elastic/elastic-agent-libs v0.2.13
 	github.com/elastic/elastic-agent-shipper-client v0.4.0
 	github.com/elastic/elastic-agent-system-metrics v0.4.5-0.20220927192933-25a985b07d51
 	github.com/elastic/go-elasticsearch/v8 v8.2.0

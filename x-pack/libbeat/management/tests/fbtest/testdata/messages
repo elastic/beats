@@ -1,0 +1,62 @@
+Aug  7 00:00:00 test-server systemd[1]: Starting unbound-anchor.service - update of the root trust anchor for DNSSEC validation in unbound...
+Aug  7 00:00:00 test-server audit: BPF prog-id=1328 op=LOAD
+Aug  7 00:00:00 test-server systemd[1]: Starting logrotate.service - Rotate log files...
+Aug  7 00:00:00 test-server systemd[1]: unbound-anchor.service: Deactivated successfully.
+Aug  7 00:00:00 test-server systemd[1]: Finished unbound-anchor.service - update of the root trust anchor for DNSSEC validation in unbound.
+Aug  7 00:00:00 test-server audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=unbound-anchor comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:00:00 test-server audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=unbound-anchor comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:00:00 test-server systemd[1]: rsyslog.service: Sent signal SIGHUP to main process 978 (rsyslogd) on client request.
+Aug  7 00:00:00 test-server rsyslogd[978]: [origin software="rsyslogd" swVersion="8.2204.0-2.fc36" x-pid="978" x-info="https://www.rsyslog.com"] rsyslogd was HUPed
+Aug  7 00:00:00 test-server systemd[1]: logrotate.service: Deactivated successfully.
+Aug  7 00:00:00 test-server systemd[1]: Finished logrotate.service - Rotate log files.
+Aug  7 00:00:00 test-server audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=logrotate comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:00:00 test-server audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=logrotate comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:00:00 test-server audit: BPF prog-id=0 op=UNLOAD
+Aug  7 00:08:00 test-server systemd[1]: Starting pmie_daily.service - Process PMIE logs...
+Aug  7 00:08:00 test-server systemd[1]: Started pmie_daily.service - Process PMIE logs.
+Aug  7 00:08:00 test-server audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=pmie_daily comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:08:01 test-server systemd[1]: pmie_daily.service: Deactivated successfully.
+Aug  7 00:08:01 test-server audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=pmie_daily comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:09:19 test-server systemd-logind[984]: Session 389 logged out. Waiting for processes to exit.
+Aug  7 00:09:19 test-server systemd[1]: session-389.scope: Deactivated successfully.
+Aug  7 00:09:19 test-server systemd-logind[984]: Removed session 389.
+Aug  7 00:09:21 test-server systemd-logind[984]: New session 390 of user alexk.
+Aug  7 00:09:21 test-server systemd[1]: Started session-390.scope - Session 390 of User alexk.
+Aug  7 00:09:21 test-server audit: BPF prog-id=1329 op=LOAD
+Aug  7 00:09:21 test-server audit: BPF prog-id=1330 op=LOAD
+Aug  7 00:09:21 test-server systemd[1]: Starting systemd-hostnamed.service - Hostname Service...
+Aug  7 00:09:21 test-server systemd[1]: Started systemd-hostnamed.service - Hostname Service.
+Aug  7 00:09:21 test-server audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-hostnamed comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:09:51 test-server systemd[1]: systemd-hostnamed.service: Deactivated successfully.
+Aug  7 00:09:51 test-server audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-hostnamed comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:09:51 test-server audit: BPF prog-id=0 op=UNLOAD
+Aug  7 00:09:51 test-server audit: BPF prog-id=0 op=UNLOAD
+Aug  7 00:10:00 test-server systemd[1]: Starting pmlogger_daily.service - Process archive logs...
+Aug  7 00:10:00 test-server systemd[1]: Started pmlogger_daily.service - Process archive logs.
+Aug  7 00:10:00 test-server audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=pmlogger_daily comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:10:03 test-server systemd[1]: pmlogger_daily.service: Deactivated successfully.
+Aug  7 00:10:03 test-server audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=pmlogger_daily comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:10:03 test-server systemd[1]: pmlogger_daily.service: Consumed 1.905s CPU time.
+Aug  7 00:11:11 test-server systemd[1]: run-docker-runtime\x2drunc-moby-c2afbe542c67dd805b6017d6e225bf18d830393752e82d9e97351f6b396c0be2-runc.QxRbu3.mount: Deactivated successfully.
+Aug  7 00:11:34 test-server systemd[1]: run-docker-runtime\x2drunc-moby-6435295863b92ffce5f9312196b9fe3153cfdeb385b4cea8a06f9532db8ef457-runc.xOrRCg.mount: Deactivated successfully.
+Aug  7 00:17:26 test-server systemd[1]: run-docker-runtime\x2drunc-moby-c2afbe542c67dd805b6017d6e225bf18d830393752e82d9e97351f6b396c0be2-runc.QQ0qVl.mount: Deactivated successfully.
+Aug  7 00:19:48 test-server systemd[1]: run-docker-runtime\x2drunc-moby-6435295863b92ffce5f9312196b9fe3153cfdeb385b4cea8a06f9532db8ef457-runc.4vtJU0.mount: Deactivated successfully.
+Aug  7 00:21:12 test-server audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=dnf-makecache comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:21:12 test-server audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=dnf-makecache comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:21:12 test-server systemd[1]: dnf-makecache.service: Consumed 16.261s CPU time.
+Aug  7 00:22:22 test-server NetworkManager[1141]: <info>  [1659856942.7446] dhcp4 (eno1): state changed new lease, address=192.168.1.96
+Aug  7 00:22:52 test-server systemd[1]: run-docker-runtime\x2drunc-moby-6435295863b92ffce5f9312196b9fe3153cfdeb385b4cea8a06f9532db8ef457-runc.8ba3LQ.mount: Deactivated successfully.
+Aug  7 00:22:59 test-server systemd[1]: run-docker-runtime\x2drunc-moby-6435295863b92ffce5f9312196b9fe3153cfdeb385b4cea8a06f9532db8ef457-runc.N1risu.mount: Deactivated successfully.
+Aug  7 00:23:29 test-server systemd[1]: run-docker-runtime\x2drunc-moby-56c445f9a6c907b6e46555e448111001f8b8ee4d5e44d94380db44702837789d-runc.VXLgpv.mount: Deactivated successfully.
+Aug  7 00:24:21 test-server systemd[1]: run-docker-runtime\x2drunc-moby-c2afbe542c67dd805b6017d6e225bf18d830393752e82d9e97351f6b396c0be2-runc.ia9DaI.mount: Deactivated successfully.
+Aug  7 00:25:00 test-server systemd[1]: Starting pmlogger_check.service - Check pmlogger instances are running...
+Aug  7 00:25:00 test-server systemd[1]: Started pmlogger_check.service - Check pmlogger instances are running.
+Aug  7 00:25:00 test-server audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=pmlogger_check comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:25:01 test-server systemd[1]: pmlogger_check.service: Deactivated successfully.
+Aug  7 00:25:01 test-server audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=pmlogger_check comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:25:10 test-server systemd[1]: Starting pmlogger_farm_check.service - Check and migrate non-primary pmlogger farm instances...
+Aug  7 00:25:10 test-server systemd[1]: Started pmlogger_farm_check.service - Check and migrate non-primary pmlogger farm instances.
+Aug  7 00:25:10 test-server audit[1]: SERVICE_START pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=pmlogger_farm_check comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:25:10 test-server systemd[1]: pmlogger_farm_check.service: Deactivated successfully.
+Aug  7 00:25:10 test-server audit[1]: SERVICE_STOP pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=pmlogger_farm_check comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Aug  7 00:26:30 test-server systemd[1]: run-docker-runtime\x2drunc-moby-c2afbe542c67dd805b6017d6e225bf18d830393752e82d9e97351f6b396c0be2-runc.OqtwmI.mount: Deactivated successfully.
