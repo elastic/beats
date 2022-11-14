@@ -347,12 +347,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return err
 			}
 			// we will only processAndPublishEvents here if chains & root level pagination do not exist, inorder to avoid unnecessary pagination
-			var events <-chan maybeMsg
-			if !isChainExpected {
-				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true)
-			} else {
-				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false)
-			}
+			events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, !isChainExpected)
 			n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
 		} else {
 			if len(ids) == 0 {
