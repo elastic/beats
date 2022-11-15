@@ -564,7 +564,7 @@ Some drivers require additional configuration to work. Find here instructions fo
 
 ==== Oracle Database Connection Pre-requisites
 
-To get connected with the Oracle Database ORACLE_SID, ORACLE_BASE, ORACLE_HOME environment variables should be set.
+To get connected with the Oracle Database `ORACLE_SID`, `ORACLE_BASE`, `ORACLE_HOME` environment variables should be set.
 
 For example: Let us consider Oracle Database 21c installation using RPM manually by following https://docs.oracle.com/en/database/oracle/oracle-database/21/ladbi/running-rpm-packages-to-install-oracle-database.html[this] link, environment variables should be set as follows:
 
