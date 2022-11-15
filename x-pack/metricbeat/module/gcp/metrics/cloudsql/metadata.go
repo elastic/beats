@@ -35,14 +35,10 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 // cloudsqlMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
 // reading and writing in the same method)
 type cloudsqlMetadata struct {
-	// projectID   string
-	region       string
-	instanceID   string
-	instanceName string
-	// machineType     string
+	region          string
+	instanceID      string
+	instanceName    string
 	databaseVersion string
-
-	// ts *monitoringpb.TimeSeries
 
 	User     map[string]string
 	Metadata map[string]string
@@ -101,14 +97,6 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
 		return gcp.MetadataCollectorData{}, err
-	}
-
-	if resp.Resource != nil && resp.Resource.Labels != nil {
-		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, cloudsqlMetadata.instanceID)
-	}
-
-	if resp.Metric.Labels != nil {
-		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, cloudsqlMetadata.instanceName)
 	}
 
 	cloudsqlMetadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
