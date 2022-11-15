@@ -133,3 +133,31 @@ func Test_evaluateResponse(t *testing.T) {
 		})
 	}
 }
+
+func TestProcessExpression(t *testing.T) {
+	tests := []struct {
+		in   string
+		want []string
+	}{
+		// Cursor values.
+		{in: ".first_response.foo", want: []string{"first_response", "foo"}},
+		{in: ".first_response.", want: []string{"first_response", ""}},
+		{in: ".last_response.foo", want: []string{"last_response", "foo"}},
+		{in: ".last_response.", want: []string{"last_response", ""}},
+		{in: ".parent_last_response.foo", want: []string{"parent_last_response", "foo"}},
+		{in: ".parent_last_response.", want: []string{"parent_last_response", ""}},
+
+		// Literal values.
+		{in: ".literal_foo", want: []string{".literal_foo"}},
+		{in: ".literal_foo.bar", want: []string{".literal_foo.bar"}},
+		{in: "literal.foo.bar", want: []string{"literal.foo.bar"}},
+		{in: "first_response.foo", want: []string{"first_response.foo"}},
+		{in: ".first_response", want: []string{".first_response"}},
+		{in: ".last_response", want: []string{".last_response"}},
+		{in: ".parent_last_response", want: []string{".parent_last_response"}},
+	}
+	for _, test := range tests {
+		got := processExpression(test.in)
+		assert.Equal(t, test.want, got)
+	}
+}
