@@ -56,6 +56,8 @@ type metadataCollector struct {
 	region    string
 	regions   []string
 	opt       []option.ClientOption
+	// NOTE: instances holds data used for all metrics collected in a given period
+	// this avoids calling the remote endpoint for each metric, which would take a long time overall
 	instances map[string]*sqladmin.DatabaseInstance
 	logger    *logp.Logger
 }
