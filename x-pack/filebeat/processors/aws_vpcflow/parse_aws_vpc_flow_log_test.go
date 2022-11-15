@@ -193,7 +193,7 @@ type goldenTestCase struct {
 	Samples []string // List of sample logs to parse.
 }
 
-func readGoldenTestCase(t testing.TB) []goldenTestCase {
+func readGoldenTestCase(t *testing.T) []goldenTestCase {
 	t.Helper()
 
 	f, err := os.Open("testdata/aws-vpc-flow-logs.yml")
@@ -217,7 +217,7 @@ func readGoldenTestCase(t testing.TB) []goldenTestCase {
 	return testCasesList
 }
 
-func writeGolden(t testing.TB, path string, events []mapstr.M) {
+func writeGolden(t *testing.T, path string, events []mapstr.M) {
 	t.Helper()
 
 	f, err := os.Create(path)
@@ -230,7 +230,7 @@ func writeGolden(t testing.TB, path string, events []mapstr.M) {
 	}
 }
 
-func readGolden(t testing.TB, path string) string {
+func readGolden(t *testing.T, path string) string {
 	t.Helper()
 
 	yamlData, err := os.ReadFile(path)
