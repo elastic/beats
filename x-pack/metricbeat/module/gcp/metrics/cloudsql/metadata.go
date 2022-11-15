@@ -36,8 +36,9 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 // reading and writing in the same method)
 type cloudsqlMetadata struct {
 	// projectID   string
-	region     string
-	instanceID string
+	region       string
+	instanceID   string
+	instanceName string
 	// machineType     string
 	databaseVersion string
 
@@ -101,11 +102,11 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	}
 
 	if resp.Resource != nil && resp.Resource.Labels != nil {
-		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, cloudsqlMetadata.instanceID)
 	}
 
 	if resp.Metric.Labels != nil {
-		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, cloudsqlMetadata.instanceName)
 	}
 
 	cloudsqlMetadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
@@ -158,6 +159,10 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 
 	if instance.DatabaseVersion != "" {
 		cloudsqlMetadata.databaseVersion = instance.DatabaseVersion
+	}
+
+	if instance.Name != "" {
+		cloudsqlMetadata.instanceName = instance.Name
 	}
 
 	return cloudsqlMetadata, nil
