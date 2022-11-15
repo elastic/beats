@@ -38,6 +38,7 @@ type processor struct {
 	config
 	fields             []vpcFlowField
 	log                *logp.Logger
+	originalFieldCount int
 	expectedIPCount    int
 }
 
@@ -69,9 +70,21 @@ func newParseAWSVPCFlowLog(c config) (*processor, error) {
 		}
 	}
 
+	originalFieldCount := len(fields)
+	if c.Mode == ecsMode {
+		for _, f := range fields {
+			// If an ECS mapping exists then ECS mode will not include the
+			// original field.
+			if len(f.ECSMappings) > 0 {
+				originalFieldCount--
+			}
+		}
+	}
+
 	return &processor{
 		config:             c,
 		fields:             fields,
+		originalFieldCount: originalFieldCount,
 		expectedIPCount:    ipCount,
 		log:                log,
 	}, nil
@@ -117,7 +130,7 @@ func (p *processor) run(event *beat.Event) error {
 		relatedIPs = make([]string, 0, p.expectedIPCount)
 	}
 
-	originalFields := make(mapstr.M, len(p.fields))
+	originalFields := make(mapstr.M, p.originalFieldCount)
 
 	// Iterate over the substrings in the source string and apply type
 	// conversion and then ECS mappings.
