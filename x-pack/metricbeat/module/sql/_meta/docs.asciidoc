@@ -600,7 +600,7 @@ The following two types of host configurations are supported:
 
 Note: If the password contains the backslash (`\`) character, it must be escaped with a backslash. For example, if the password is `my\_password`, it should be written as `my\\_password`.
 
-Username and password to connect to the database can be provided as values to `username` and `password` keys of `sql.yml`. 
+Username and Password to connect to the database can be provided as values to `username` and `password` keys of `sql.yml`. 
 
 [source,yml]
 ----
