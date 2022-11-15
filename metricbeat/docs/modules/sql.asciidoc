@@ -570,8 +570,8 @@ For example: Let us consider Oracle Database 21c installation using RPM manually
 
 [source,bash]
 ----
-	export ORACLE_BASE=/opt/oracle/oradata
-	export ORACLE_HOME=/opt/oracle/product/21c/dbhome_1
+export ORACLE_BASE=/opt/oracle/oradata
+export ORACLE_HOME=/opt/oracle/product/21c/dbhome_1
 ----
 Also, add `ORACLE_HOME/bin` to the `PATH` environment variable. 
 
