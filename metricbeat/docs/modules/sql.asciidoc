@@ -588,7 +588,7 @@ To check if the listener is running or not, run:
 
 [source,bash]
 ----
-	lsnrctl STATUS
+lsnrctl STATUS
 ----
 
 If the listener is not running, use the command to start:
