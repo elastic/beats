@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"google.golang.org/api/option"
-	"google.golang.org/api/sqladmin/v1"
+	sqladmin "google.golang.org/api/sqladmin/v1"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
