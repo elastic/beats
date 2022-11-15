@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package strings
 
 import (
@@ -43,10 +47,36 @@ var fieldstests = []FieldsTest{
 }
 
 func TestFields(t *testing.T) {
+	var dst [4]string
 	for _, tt := range fieldstests {
-		a := Fields(tt.s)
-		if !eq(a, tt.a) {
-			t.Errorf("Fields(%q) = %v; want %v", tt.s, a, tt.a)
+		n, err := Fields(dst[:], tt.s)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !eq(dst[:n], tt.a) {
+			t.Errorf("Fields(%q) = %v; want %v", tt.s, dst[:n], tt.a)
+			continue
+		}
+		if len(tt.a) != n {
+			t.Errorf("Return count n = %d; want %d", n, len(tt.a))
+		}
+	}
+
+	// Smaller
+	var smallDst [2]string
+	for _, tt := range fieldstests {
+		n, err := Fields(smallDst[:], tt.s)
+		if err == errTooManySubstrings {
+			if len(tt.a) > len(smallDst) {
+				continue
+			}
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !eq(smallDst[:n], tt.a[:n]) {
+			t.Errorf("Fields(%q) = %v; want %v", tt.s, smallDst[:n], tt.a)
 			continue
 		}
 	}
@@ -60,18 +90,66 @@ var FieldsFuncTests = []FieldsTest{
 }
 
 func TestFieldsFunc(t *testing.T) {
+	var dst [4]string
 	for _, tt := range fieldstests {
-		a := FieldsFunc(tt.s, unicode.IsSpace)
-		if !eq(a, tt.a) {
-			t.Errorf("FieldsFunc(%q, unicode.IsSpace) = %v; want %v", tt.s, a, tt.a)
+		n, err := fieldsFunc(dst[:], tt.s, unicode.IsSpace)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !eq(dst[:n], tt.a) {
+			t.Errorf("FieldsFunc(%q, unicode.IsSpace) = %v; want %v", tt.s, dst, tt.a)
 			continue
+		}
+		if len(tt.a) != n {
+			t.Errorf("Return count n = %d; want %d", n, len(tt.a))
 		}
 	}
 	pred := func(c rune) bool { return c == 'X' }
 	for _, tt := range FieldsFuncTests {
-		a := FieldsFunc(tt.s, pred)
-		if !eq(a, tt.a) {
-			t.Errorf("FieldsFunc(%q) = %v, want %v", tt.s, a, tt.a)
+		n, err := fieldsFunc(dst[:], tt.s, pred)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !eq(dst[:n], tt.a) {
+			t.Errorf("FieldsFunc(%q) = %v, want %v", tt.s, dst[:n], tt.a)
+		}
+		if len(tt.a) != n {
+			t.Errorf("Return count n = %d; want %d", n, len(tt.a))
+		}
+	}
+
+	// Smaller
+	var smallDst [2]string
+	for _, tt := range fieldstests {
+		n, err := Fields(smallDst[:], tt.s)
+		if err == errTooManySubstrings {
+			if len(tt.a) > len(smallDst) {
+				continue
+			}
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !eq(smallDst[:n], tt.a[:n]) {
+			t.Errorf("Fields(%q) = %v; want %v", tt.s, smallDst[:n], tt.a)
+			continue
+		}
+	}
+	for _, tt := range FieldsFuncTests {
+		n, err := fieldsFunc(smallDst[:], tt.s, pred)
+		if err == errTooManySubstrings {
+			if len(tt.a) > len(smallDst) {
+				continue
+			}
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !eq(smallDst[:n], tt.a[:n]) {
+			t.Errorf("Fields(%q) = %v; want %v", tt.s, smallDst[:n], tt.a)
+			continue
 		}
 	}
 }
