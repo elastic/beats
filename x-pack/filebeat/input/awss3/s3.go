@@ -15,6 +15,7 @@ import (
 	"github.com/gofrs/uuid"
 	"go.uber.org/multierr"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -53,6 +54,7 @@ type s3Poller struct {
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
+	client               beat.Client
 	s3ObjectHandler      s3ObjectHandlerFactory
 	states               *states
 	store                *statestore.Store
@@ -63,6 +65,7 @@ type s3Poller struct {
 func newS3Poller(log *logp.Logger,
 	metrics *inputMetrics,
 	s3 s3API,
+	client beat.Client,
 	s3ObjectHandler s3ObjectHandlerFactory,
 	states *states,
 	store *statestore.Store,
@@ -71,7 +74,8 @@ func newS3Poller(log *logp.Logger,
 	awsRegion string,
 	provider string,
 	numberOfWorkers int,
-	bucketPollInterval time.Duration) *s3Poller {
+	bucketPollInterval time.Duration,
+) *s3Poller {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -86,6 +90,7 @@ func newS3Poller(log *logp.Logger,
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,
+		client:               client,
 		s3ObjectHandler:      s3ObjectHandler,
 		states:               states,
 		store:                store,
@@ -125,7 +130,7 @@ func (p *s3Poller) createS3ObjectProcessor(ctx context.Context, state state) (s3
 
 	acker := awscommon.NewEventACKTracker(ctx)
 
-	return p.s3ObjectHandler.Create(ctx, p.log, acker, event), event
+	return p.s3ObjectHandler.Create(ctx, p.log, p.client, acker, event), event
 }
 
 func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {

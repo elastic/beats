@@ -156,6 +156,37 @@ func (c constantS3) ListObjectsPaginator(bucket, prefix string) s3Pager {
 	return c.pagerConstant
 }
 
+var _ beat.Pipeline = (*fakePipeline)(nil)
+
+// fakePipeline returns new ackClients.
+type fakePipeline struct{}
+
+func (c *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
+	return &ackClient{}, nil
+}
+
+func (c *fakePipeline) Connect() (beat.Client, error) {
+	panic("Connect() is not implemented.")
+}
+
+var _ beat.Client = (*ackClient)(nil)
+
+// ackClient is a fake beat.Client that ACKs the published messages.
+type ackClient struct{}
+
+func (c *ackClient) Close() error { return nil }
+
+func (c *ackClient) Publish(event beat.Event) {
+	// Fake the ACK handling.
+	event.Private.(*awscommon.EventACKTracker).ACK()
+}
+
+func (c *ackClient) PublishAll(event []beat.Event) {
+	for _, e := range event {
+		c.Publish(e)
+	}
+}
+
 func makeBenchmarkConfig(t testing.TB) config {
 	cfg := conf.MustNewConfigFrom(`---
 queue_url: foo
@@ -179,20 +210,12 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		metrics := newInputMetrics(metricRegistry, "test_id")
 		sqsAPI := newConstantSQS()
 		s3API := newConstantS3(t)
-		client := pubtest.NewChanClient(100)
-		defer close(client.Channel)
+		pipeline := &fakePipeline{}
 		conf := makeBenchmarkConfig(t)
 
-		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors, backupConfig{})
-		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, s3EventHandlerFactory)
+		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{})
+		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
 		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
-
-		go func() {
-			for event := range client.Channel {
-				// Fake the ACK handling that's not implemented in pubtest.
-				event.Private.(*awscommon.EventACKTracker).ACK()
-			}
-		}()
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
@@ -321,8 +344,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					return
 				}
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, config.FileSelectors, backupConfig{})
-				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
+				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, client, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
 
 				if err := s3Poller.Poll(ctx); err != nil {
 					if !errors.Is(err, context.DeadlineExceeded) {
