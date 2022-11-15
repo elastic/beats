@@ -16,11 +16,11 @@ type ExecMultiplexer struct {
 	done         chan struct{}
 }
 
-func (e ExecMultiplexer) Close() {
+func (e *ExecMultiplexer) Close() {
 	close(e.synthEvents)
 }
 
-func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
+func (e *ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 	if se == nil { // we skip writing nil events, since a nil means we're done
 		return
 	}
@@ -34,17 +34,17 @@ func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 }
 
 // SynthEvents returns a read only channel for synth events
-func (e ExecMultiplexer) SynthEvents() <-chan *SynthEvent {
+func (e *ExecMultiplexer) SynthEvents() <-chan *SynthEvent {
 	return e.synthEvents
 }
 
 // Done returns a channel that is closed when all output has been received
-func (e ExecMultiplexer) Done() <-chan struct{} {
+func (e *ExecMultiplexer) Done() <-chan struct{} {
 	return e.done
 }
 
 // Wait blocks until the multiplexer is done and has returned all data
-func (e ExecMultiplexer) Wait() {
+func (e *ExecMultiplexer) Wait() {
 	<-e.done
 }
 

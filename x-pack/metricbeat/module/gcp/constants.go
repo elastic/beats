@@ -78,10 +78,12 @@ const (
 )
 
 const (
-	DefaultResourceLabelZone     = "resource.label.zone"
-	ComputeResourceLabelZone     = "resource.labels.zone"
-	GKEResourceLabelLocation     = "resource.label.location"
-	StorageResourceLabelLocation = "resource.label.location"
+	DefaultResourceLabelZone      = "resource.label.zone"
+	ComputeResourceLabelZone      = "resource.labels.zone"
+	GKEResourceLabelLocation      = "resource.label.location"
+	StorageResourceLabelLocation  = "resource.label.location"
+	CloudSQLResourceLabelRegion   = "resource.labels.region"
+	DataprocResourceLabelLocation = "resource.label.region"
 )
 
 // AlignersMapToGCP map contains available perSeriesAligner

@@ -35,18 +35,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/common/x509util"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/common/x509util"
 )
 
 // HelloWorldBody is the body of the HelloWorldHandler.
@@ -61,9 +64,7 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 				w.Header().Set("Location", "/somewhere")
 			}
 			w.WriteHeader(status)
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			io.WriteString(w, HelloWorldBody)
+			_, _ = io.WriteString(w, HelloWorldBody)
 		},
 	)
 }
@@ -80,9 +81,7 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			io.WriteString(w, body.String())
+			_, _ = io.WriteString(w, body.String())
 		},
 	)
 }
@@ -94,9 +93,7 @@ func CustomResponseHandler(body []byte, status int, extraHeaders map[string]stri
 				w.Header().Add(key, val)
 			}
 			w.WriteHeader(status)
-			//nolint:errcheck // There are no new changes to this line but
-			// linter has been activated in the meantime. We'll cleanup separately.
-			w.Write(body)
+			_, _ = w.Write(body)
 		},
 	)
 }
@@ -162,9 +159,8 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 }
 
 func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
-	expected := mapstr.M{}
-	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
-	return lookslike.MustCompile(expected)
+	tlsFields := tlsmeta.CertFields(certificate, nil)
+	return lookslike.MustCompile(mapstr.M{"tls": tlsFields})
 }
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
@@ -194,13 +190,14 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	)
 }
 
-// SummaryChecks validates the "summary" field and its subfields.
+// SummaryChecks validates the "summary" + "state" fields
 func SummaryChecks(up int, down int) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"summary": map[string]interface{}{
 			"up":   uint16(up),
 			"down": uint16(down),
 		},
+		"state": hbtestllext.IsMonitorState,
 	})
 }
 
@@ -232,6 +229,18 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) vali
 func URLChecks(t *testing.T, u *url.URL) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"url": wrappers.URLFields(u),
+	})
+}
+
+func ECSErrCodeChecks(ecode ecserr.ECode, messageContains string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"error": hbtestllext.IsECSErrMatchingCode(ecode, messageContains),
+	})
+}
+
+func ECSErrChecks(eErr *ecserr.ECSErr) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"error": hbtestllext.IsECSErr(eErr),
 	})
 }
 
@@ -271,9 +280,7 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	// disk, not memory, so this little bit of extra work is worthwhile
 	certFile, err := ioutil.TempFile("", "sslcert")
 	require.NoError(t, err)
-	//nolint:errcheck // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
-	certFile.WriteString(x509util.CertToPEMString(cert))
+	_, _ = certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
 }
 
@@ -289,11 +296,10 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 	})
 	require.NoError(t, err)
 
-	srv := &http.Server{Handler: HelloWorldHandler(200)}
+	// We set ReadHeaderTimeout to make the gosec lint happy
+	srv := &http.Server{Handler: HelloWorldHandler(200), ReadHeaderTimeout: time.Second}
 	go func() {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		srv.Serve(l)
+		_ = srv.Serve(l)
 	}()
 
 	host, port, err = net.SplitHostPort(l.Addr().String())

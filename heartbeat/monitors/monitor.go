@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
@@ -78,7 +79,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, nil)
+	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
 
 	return err
 }
@@ -90,9 +91,10 @@ func newMonitor(
 	registrar *plugin.PluginsReg,
 	pubClient pipeline.ISyncClient,
 	taskAdder scheduler.AddTask,
+	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, onStop)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -106,6 +108,7 @@ func newMonitorUnsafe(
 	registrar *plugin.PluginsReg,
 	pubClient pipeline.ISyncClient,
 	addTask scheduler.AddTask,
+	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
@@ -151,15 +154,19 @@ func newMonitorUnsafe(
 		return p.Close()
 	}
 
-	// If we've hit an error at this point, still run on schedule, but always return an error.
-	// This way the error is clearly communicated through to kibana.
-	// Since the error is not recoverable in these instances, the user will need to reconfigure
-	// the monitor, which will destroy and recreate it in heartbeat, thus clearing this error.
-	//
-	// Note: we do this at this point, and no earlier, because at a minimum we need the
-	// standard monitor fields (id, name and schedule) to deliver an error to kibana in a way
-	// that it can render.
-	if err != nil {
+	var wrappedJobs []jobs.Job
+	if err == nil {
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
+	} else {
+		// If we've hit an error at this point, still run on schedule, but always return an error.
+		// This way the error is clearly communicated through to kibana.
+		// Since the error is not recoverable in these instances, the user will need to reconfigure
+		// the monitor, which will destroy and recreate it in heartbeat, thus clearing this error.
+		//
+		// Note: we do this at this point, and no earlier, because at a minimum we need the
+		// standard monitor fields (id, name and schedule) to deliver an error to kibana in a way
+		// that it can render.
+
 		// Note, needed to hoist err to this scope, not just to add a prefix
 		fullErr := fmt.Errorf("job could not be initialized: %w", err)
 		// A placeholder job that always returns an error
@@ -168,9 +175,13 @@ func newMonitorUnsafe(
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
 			return nil, fullErr
 		}}
+
+		// We need to use the lightweight wrapping for error jobs
+		// since browser wrapping won't write summaries, but the fake job here is
+		// effectively a lightweight job
+		wrappedJobs = wrappers.WrapLightweight(p.Jobs, m.stdFields, monitorstate.NewTracker(stateLoader, false))
 	}
 
-	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
 	m.endpoints = p.Endpoints
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)

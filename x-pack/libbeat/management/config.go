@@ -29,7 +29,7 @@ type ConfigBlocksWithType struct {
 // ConfigBlocks holds a list of type + configs objects
 type ConfigBlocks []ConfigBlocksWithType
 
-func defaultConfig() *Config {
+func DefaultConfig() *Config {
 	return &Config{
 		Blacklist: ConfigBlacklistSettings{
 			Patterns: map[string]string{

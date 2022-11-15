@@ -1,4 +1,4 @@
-description: Pipeline for parsing Kibana ecs logs
+description: Pipeline for parsing Kibana ECS logs
 processors:
 - set:
     field: event.ingested
@@ -6,11 +6,31 @@ processors:
 - set:
     copy_from: '@timestamp'
     field: event.created
-- script:
-    lang: painless
-    inline: 'ctx.json.keySet().each (key -> ctx[key] = ctx.json.get(key))'
-- remove:
-    field: json
+- rename:
+    field: message
+    target_field: _ecs_json_message
+    if: |-
+      def message = ctx.message;
+      return message != null
+          && message.startsWith('{')
+          && message.endsWith('}')
+          && message.contains('"@timestamp"')
+    ignore_missing: true
+- json:
+    field: _ecs_json_message
+    add_to_root: true
+    add_to_root_conflict_strategy: merge
+    allow_duplicate_keys: true
+    if: ctx.containsKey('_ecs_json_message')
+    on_failure:
+    - rename:
+        field: _ecs_json_message
+        target_field: message
+        ignore_missing: true
+    - set:
+        field: error.message
+        value: Error while parsing JSON
+        override: false
 - rename:
     field: http.request.headers
     target_field: kibana.log.meta.req.headers
@@ -27,3 +47,9 @@ processors:
     field: event.outcome
     value: failure
     if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
+- remove:
+    field: json
+    ignore_missing: true
+- remove:
+    field: _ecs_json_message
+    ignore_missing: true

@@ -10337,7 +10337,7 @@ type: float
 [[exported-fields-cockroachdb]]
 == CockroachDB fields
 
-CockroachDB module
+CockroachDB module scrape metrics using Prometheus endpoint.
 
 
 
@@ -30378,13 +30378,6 @@ type: long
 *`elasticsearch.cluster.stats.nodes.data`*::
 +
 --
-type: long
-
---
-
-*`elasticsearch.cluster.stats.nodes.stats.data`*::
-+
---
 Number of data nodes in cluster.
 
 type: long
@@ -31884,13 +31877,6 @@ type: long
 
 
 
-
-*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
-+
---
-type: long
-
---
 
 *`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
 +
@@ -35408,15 +35394,6 @@ type: long
 
 Google Cloud Dataproc metrics
 
-
-*`gcp.dataproc.batch.spark.executors.count`*::
-+
---
-Indicates the number of Batch Spark executors.
-
-type: long
-
---
 
 *`gcp.dataproc.cluster.hdfs.datanodes.count`*::
 +
@@ -45671,7 +45648,7 @@ type: keyword
 *`kubernetes.node.cpu.allocatable.cores`*::
 +
 --
-Node CPU allocatable cores
+The allocatable CPU cores of a node that are available for pods scheduling
 
 
 type: float
@@ -45692,7 +45669,7 @@ type: long
 *`kubernetes.node.memory.allocatable.bytes`*::
 +
 --
-Node allocatable memory in bytes
+The allocatable memory of a node in bytes that is available for pods scheduling
 
 
 type: long
@@ -47735,34 +47712,6 @@ type: nested
 
 
 
-*`logstash_stats.os.cpu.stat.number_of_elapsed_periods`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
-
---
-
-*`logstash_stats.os.cpu.stat.time_throttled_nanos`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
-
---
-
-*`logstash_stats.os.cpu.stat.number_of_times_throttled`*::
-+
---
-type: alias
-
-alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
-
---
-
-
 *`logstash_stats.os.cpu.load_average.15m`*::
 +
 --
@@ -47797,6 +47746,44 @@ alias to: logstash.node.stats.os.cpu.load_average.5m
 type: alias
 
 alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
+
+--
+
+
+*`logstash_stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.cfs_quota_micros
+
+--
+
+
+*`logstash_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+
+--
+
+*`logstash_stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+
+--
+
+*`logstash_stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
 
 --
 
@@ -48015,21 +48002,21 @@ type: keyword
 *`logstash.node.stats.os.cpu.load_average.15m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
 *`logstash.node.stats.os.cpu.load_average.1m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
 *`logstash.node.stats.os.cpu.load_average.5m`*::
 +
 --
-type: long
+type: half_float
 
 --
 
@@ -48041,6 +48028,13 @@ type: long
 
 --
 
+
+*`logstash.node.stats.os.cgroup.cpu.cfs_quota_micros`*::
++
+--
+type: long
+
+--
 
 
 *`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
@@ -63068,6 +63062,30 @@ type: long
 --
 Number of processes for which the state couldn't be retrieved or is unknown.
 
+
+type: long
+
+--
+
+[float]
+=== threads
+
+Counts of individual threads on a system.
+
+
+*`system.process.summary.threads.running`*::
++
+--
+Count of currently running threads.
+
+type: long
+
+--
+
+*`system.process.summary.threads.blocked`*::
++
+--
+Count of threads blocked by I/O.
 
 type: long
 

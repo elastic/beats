@@ -70,12 +70,12 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }
 
-func (p *Publisher) Publish(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *Publisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
 	for _, hit := range hits {
-		event := hitToEvent(index, p.b.Info.Name, actionID, responseID, hit, ecsm, reqData)
+		event := hitToEvent(index, p.b.Info.Name, actionID, responseID, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
 	p.log.Infof("%d events sent to index %s", len(hits), index)
@@ -129,7 +129,7 @@ func (p *Publisher) processorsForInputsConfig(inputs []config.InputConfig) (proc
 	return procs, nil
 }
 
-func hitToEvent(index, eventType, actionID, responseID string, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
+func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
 	var fields mapstr.M
 
 	if len(ecsm) > 0 {
@@ -155,6 +155,9 @@ func hitToEvent(index, eventType, actionID, responseID string, hit map[string]in
 	fields["type"] = eventType
 	fields["action_id"] = actionID
 	fields["osquery"] = hit
+	if meta != nil {
+		fields["osquery_meta"] = meta
+	}
 
 	event := beat.Event{
 		Timestamp: time.Now(),

@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -146,11 +147,14 @@ func Test_httpReadJSON(t *testing.T) {
 }
 
 type publisher struct {
+	mu     sync.Mutex
 	events []beat.Event
 }
 
-func (p *publisher) Publish(event beat.Event) {
-	p.events = append(p.events, event)
+func (p *publisher) Publish(e beat.Event) {
+	p.mu.Lock()
+	p.events = append(p.events, e)
+	p.mu.Unlock()
 }
 
 func Test_apiResponse(t *testing.T) {

@@ -28,8 +28,9 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/schema"
 )
 
-// Requires the Google flatbuffer compiler.
+// Requires the Google flatbuffer compiler and Elastic go-licenser.
 //go:generate flatc --go schema.fbs
+//go:generate go-licenser schema
 
 var actionMap = map[Action]schema.Action{
 	AttributesModified: schema.ActionAttributesModified,

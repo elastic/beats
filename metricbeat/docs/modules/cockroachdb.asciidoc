@@ -10,8 +10,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == CockroachDB module
 
-beta[]
-
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 :modulename!:

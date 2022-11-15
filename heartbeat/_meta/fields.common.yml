@@ -65,7 +65,6 @@
           type: keyword
           description: >
             Indicator if monitor could validate the service to be available.
-
         - name: check_group
           type: keyword
           description: >
@@ -89,10 +88,76 @@
             - name: id
               type: keyword
               description: Project ID
-          fields:
             - name: name
               type: keyword
               description: Project name
+
+- key: state
+  title: "Monitor state"
+  description: state related fields
+  fields:
+    - name: state
+      type: group
+      description: "Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`."
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            ID of this state
+        - name: started_at
+          type: date
+          description: >
+            First time state with this ID was seen
+        - name: duration_ms
+          type: long
+          description: >
+            Length of time this state has existed in millis
+        - name: status
+          type: keyword
+          description: >
+            The current status, "up", "down", or "flapping"
+            any state can change into flapping.
+        - name: checks
+          type: integer
+          description: total checks run
+        - name: up
+          type: integer
+          description: total up checks run
+        - name: down
+          type: integer
+          description: total down checks run
+        - name: flap_history
+          enabled: false
+        - name: ends
+          type: object
+          description: the state that was ended by this state
+          fields:
+            - name: id
+              type: integer
+              description: >
+                  ID of this state
+            - name: started_at
+              type: date
+              description: >
+                  First time state with this ID was seen
+            - name: duration_ms
+              type: long
+              description: >
+                Length of time this state has existed in millis
+            - name: status
+              type: keyword
+              description: >
+                The current status, "up", "down", or "flapping"
+                any state can change into flapping.
+            - name: checks
+              type: integer
+              description: total checks run
+            - name: up
+              type: integer
+              description: total up checks run
+            - name: down
+              type: integer
+              description: total down checks run
 
 - key: summary
   title: "Monitor summary"

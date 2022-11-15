@@ -101,7 +101,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, err
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -173,8 +173,17 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
 		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
-		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory)
+		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, enableAllFilesets)
 		if fb.config.ConfigModules.Enabled() {
+			if enableAllFilesets {
+				//All module configs need to be loaded to enable all the filesets
+				//contained in the modules.  The default glob just loads the enabled
+				//ones.  Switching the glob pattern from *.yml to * achieves this.
+				origPath, _ := fb.config.ConfigModules.String("path", -1)
+				newPath := strings.TrimSuffix(origPath, ".yml")
+				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
+			}
 			modulesLoader := cfgfile.NewReloader(fb.pipeline, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
 		}
@@ -224,7 +233,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// count active events for waiting on shutdown
 	wgEvents := &eventCounter{
-		count: monitoring.NewInt(nil, "filebeat.events.active"),
+		count: monitoring.NewInt(nil, "filebeat.events.active"), // Gauge
 		added: monitoring.NewUint(nil, "filebeat.events.added"),
 		done:  monitoring.NewUint(nil, "filebeat.events.done"),
 	}
@@ -353,10 +362,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Register reloadable list of inputs and modules
 	inputs := cfgfile.NewRunnerList(management.DebugK, inputLoader, fb.pipeline)
-	reload.Register.MustRegisterList("filebeat.inputs", inputs)
+	reload.RegisterV2.MustRegisterInput(inputs)
 
 	modules := cfgfile.NewRunnerList(management.DebugK, moduleLoader, fb.pipeline)
-	reload.Register.MustRegisterList("filebeat.modules", modules)
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
