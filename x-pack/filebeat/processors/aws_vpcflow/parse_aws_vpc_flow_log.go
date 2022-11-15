@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/x-pack/filebeat/processors/aws_vpcflow/internal/strings"
 )
 
 const (
@@ -35,9 +36,9 @@ var (
 
 type processor struct {
 	config
-	fields          []vpcFlowField
-	log             *logp.Logger
-	expectedIPCount int
+	fields             []vpcFlowField
+	log                *logp.Logger
+	expectedIPCount    int
 }
 
 // New constructs a new processor built from ucfg config.
@@ -68,7 +69,12 @@ func newParseAWSVPCFlowLog(c config) (*processor, error) {
 		}
 	}
 
-	return &processor{config: c, fields: fields, expectedIPCount: ipCount, log: log}, nil
+	return &processor{
+		config:             c,
+		fields:             fields,
+		expectedIPCount:    ipCount,
+		log:                log,
+	}, nil
 }
 
 func (p *processor) String() string {
@@ -97,30 +103,34 @@ func (p *processor) run(event *beat.Event) error {
 		return errValueNotString
 	}
 
-	itr := newWordIterator(strValue)
-	if itr.Count() != len(p.fields) {
+	// Split the string at whitespace without allocating.
+	var dst [len(vpcFlowFields)]string
+	n, err := strings.Fields(dst[:], strValue)
+	if err != nil {
 		return errInvalidFormat
 	}
+	substrings := dst[:n]
 
 	var relatedIPs []string
 	if p.Mode > originalMode {
+		// Allocate space for the expected number of IPs assuming all are unique.
 		relatedIPs = make([]string, 0, p.expectedIPCount)
 	}
 
 	originalFields := make(mapstr.M, len(p.fields))
 
-	for itr.Next() {
-		// Read one word.
-		value := itr.Word()
-		if value == "-" {
+	// Iterate over the substrings in the source string and apply type
+	// conversion and then ECS mappings.
+	for i, word := range substrings {
+		if word == "-" {
 			continue
 		}
-		field := p.fields[itr.WordIndex()]
+		field := p.fields[i]
 
-		// Convert the string the expected type.
-		v, err := toType(value, field.Type)
+		// Convert the string to the expected type.
+		v, err := toType(word, field.Type)
 		if err != nil {
-			return fmt.Errorf("failed to parse <%v>: %w", field.Name, err)
+			return fmt.Errorf("failed to parse %q: %w", field.Name, err)
 		}
 
 		// Add to the 'original' fields when we are in original mode

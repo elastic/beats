@@ -29,13 +29,13 @@ type ecsFieldMapping struct {
 var nameToFieldMap map[string]vpcFlowField
 
 func init() {
-	nameToFieldMap = make(map[string]vpcFlowField, len(fields))
-	for _, field := range fields {
+	nameToFieldMap = make(map[string]vpcFlowField, len(vpcFlowFields))
+	for _, field := range vpcFlowFields {
 		nameToFieldMap[field.Name] = field
 	}
 }
 
-var fields = []vpcFlowField{
+var vpcFlowFields = [...]vpcFlowField{
 	{
 		Name: "version",
 		Type: integerType,
