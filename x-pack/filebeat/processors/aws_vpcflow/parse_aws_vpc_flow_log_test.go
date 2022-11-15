@@ -5,6 +5,7 @@
 package aws_vpcflow
 
 import (
+	"encoding/json"
 	"flag"
 	"os"
 	"path/filepath"
@@ -140,7 +141,7 @@ func TestGoldenFile(t *testing.T) {
 
 	if *updateGolden {
 		// Delete existing golden files.
-		goldens, _ := filepath.Glob("testdata/*.golden.yml")
+		goldens, _ := filepath.Glob("testdata/*.golden.*")
 		for _, golden := range goldens {
 			os.Remove(golden)
 		}
@@ -171,16 +172,16 @@ func TestGoldenFile(t *testing.T) {
 				observed = append(observed, out.Fields)
 			}
 
-			goldenFile := filepath.Join("testdata", tc.Name+".golden.yml")
+			goldenFile := filepath.Join("testdata", tc.Name+".golden.json")
 			if *updateGolden {
 				writeGolden(t, goldenFile, observed)
 			} else {
-				expectedYAML := readGolden(t, goldenFile)
+				expectedJSON := readGolden(t, goldenFile)
 
-				observedYAML, err := yaml.Marshal(observed)
+				observedJSON, err := json.Marshal(observed)
 				require.NoError(t, err)
 
-				assert.YAMLEq(t, expectedYAML, string(observedYAML))
+				assert.JSONEq(t, expectedJSON, string(observedJSON))
 			}
 		})
 	}
@@ -224,7 +225,9 @@ func writeGolden(t *testing.T, path string, events []mapstr.M) {
 	require.NoError(t, err)
 	defer f.Close()
 
-	enc := yaml.NewEncoder(f)
+	enc := json.NewEncoder(f)
+	enc.SetIndent("", "    ")
+	enc.SetEscapeHTML(false)
 	if err = enc.Encode(events); err != nil {
 		t.Fatal()
 	}
@@ -233,12 +236,12 @@ func writeGolden(t *testing.T, path string, events []mapstr.M) {
 func readGolden(t *testing.T, path string) string {
 	t.Helper()
 
-	yamlData, err := os.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	return string(yamlData)
+	return string(data)
 }
 
 func BenchmarkProcessorRun(b *testing.B) {
