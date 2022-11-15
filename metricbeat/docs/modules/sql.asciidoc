@@ -595,7 +595,7 @@ If the listener is not running, use the command to start:
 
 [source,bash]
 ----
-	lsnrctl START
+lsnrctl START
 ----
 
 Then, Metricbeat can be launched.
