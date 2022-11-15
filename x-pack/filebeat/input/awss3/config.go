@@ -116,6 +116,16 @@ func (c *config) Validate() error {
 	if c.BackupConfig.BackupToBucketArn != "" && c.BackupConfig.NonAWSBackupToBucketName != "" {
 		return errors.New("backup_to_bucket_arn and non_aws_backup_to_bucket_name cannot be used together")
 	}
+	if c.BucketARN != "" || c.NonAWSBucketName != "" {
+		if c.BackupConfig.BackupToBucketArn == c.BucketARN || c.BackupConfig.NonAWSBackupToBucketName == c.NonAWSBucketName {
+			if c.BackupConfig.BackupToBucketPrefix == "" {
+				return errors.New("backup_to_bucket_prefix is a required property when source and backup bucket are the same")
+			}
+			if c.BackupConfig.BackupToBucketPrefix == c.BucketListPrefix {
+				return errors.New("backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop")
+			}
+		}
+	}
 
 	return nil
 }

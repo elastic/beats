@@ -181,6 +181,11 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
 	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
 
+	if in.config.BackupConfig.GetBucketName() != "" {
+		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets" +
+			"or prefixes to avoid an infinite loop.")
+	}
+
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	metrics := newInputMetrics(metricRegistry, ctx.ID)
 

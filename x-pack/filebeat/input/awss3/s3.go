@@ -115,6 +115,19 @@ func (p *s3Poller) handlePurgingLock(info s3ObjectInfo, isStored bool) {
 	}
 }
 
+func (p *s3Poller) createS3ObjectProcessor(ctx context.Context, state state) (s3ObjectHandler, s3EventV2) {
+	event := s3EventV2{}
+	event.AWSRegion = p.region
+	event.Provider = p.provider
+	event.S3.Bucket.Name = state.Bucket
+	event.S3.Bucket.ARN = p.bucket
+	event.S3.Object.Key = state.Key
+
+	acker := awscommon.NewEventACKTracker(ctx)
+
+	return p.s3ObjectHandler.Create(ctx, p.log, acker, event), event
+}
+
 func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {
 	var errs []error
 
@@ -205,16 +218,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 
 			p.states.Update(state, "")
 
-			event := s3EventV2{}
-			event.AWSRegion = p.region
-			event.Provider = p.provider
-			event.S3.Bucket.Name = bucketName
-			event.S3.Bucket.ARN = p.bucket
-			event.S3.Object.Key = filename
-
-			acker := awscommon.NewEventACKTracker(ctx)
-
-			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
+			s3Processor, event := p.createS3ObjectProcessor(ctx, state)
 			if s3Processor == nil {
 				p.log.Debugw("empty s3 processor.", "state", state)
 				continue
@@ -272,7 +276,7 @@ func (p *s3Poller) Purge() {
 
 		lock.(*sync.Mutex).Lock()
 
-		keys := map[string]struct{}{}
+		states := map[string]*state{}
 		latestStoredTimeByBucketAndListPrefix := make(map[string]time.Time, 0)
 
 		for _, state := range p.states.GetStatesByListingID(listingID) {
@@ -283,7 +287,7 @@ func (p *s3Poller) Purge() {
 			}
 
 			var latestStoredTime time.Time
-			keys[state.ID] = struct{}{}
+			states[state.ID] = &state
 			latestStoredTime, ok := latestStoredTimeByBucketAndListPrefix[state.Bucket+state.ListPrefix]
 			if !ok {
 				var commitWriteState commitWriteState
@@ -307,7 +311,7 @@ func (p *s3Poller) Purge() {
 			}
 		}
 
-		for key := range keys {
+		for key := range states {
 			p.states.Delete(key)
 		}
 
@@ -325,6 +329,14 @@ func (p *s3Poller) Purge() {
 		lock.(*sync.Mutex).Unlock()
 		p.workersListingMap.Delete(listingID)
 		p.states.DeleteListing(listingID)
+
+		// Listing is removed from all states, we can finalize now
+		for _, state := range states {
+			processor, _ := p.createS3ObjectProcessor(context.TODO(), *state)
+			if err := processor.FinalizeS3Object(); err != nil {
+				p.log.Errorw("Failed to finalize S3 object", "key", state.Key, "error", err)
+			}
+		}
 	}
 }
 

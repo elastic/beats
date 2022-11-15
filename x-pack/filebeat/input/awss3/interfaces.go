@@ -105,6 +105,10 @@ type s3ObjectHandler interface {
 	// determine this).
 	ProcessS3Object() error
 
+	// FinalizeS3Object finalizes processing of an S3 object after the current
+	// batch is finished.
+	FinalizeS3Object() error
+
 	// Wait waits for every event published by ProcessS3Object() to be ACKed
 	// by the publisher before returning. Internally it uses the
 	// s3ObjectHandler eventACKTracker's Wait() method

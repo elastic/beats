@@ -166,11 +166,6 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 			time.Since(start).Nanoseconds(), err)
 	}
 
-	err = p.finalizeObject()
-	if err != nil {
-		return fmt.Errorf("failed to finalize s3 object (elapsed_time_ns=%d): %w", time.Since(start).Nanoseconds(), err)
-	}
-
 	return nil
 }
 
@@ -369,7 +364,7 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 	return event
 }
 
-func (p *s3ObjectProcessor) finalizeObject() error {
+func (p *s3ObjectProcessor) FinalizeS3Object() error {
 	bucketName := p.backupConfig.GetBucketName()
 	if bucketName != "" {
 		backupKey := p.s3Obj.S3.Object.Key
