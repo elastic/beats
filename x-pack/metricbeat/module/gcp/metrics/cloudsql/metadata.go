@@ -9,33 +9,26 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"google.golang.org/api/option"
 	"google.golang.org/api/sqladmin/v1"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const (
-	cacheTTL         = 30 * time.Second
-	initialCacheSize = 13
-)
-
 // NewMetadataService returns the specific Metadata service for a GCP CloudSQL resource.
 func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
-		projectID:     projectID,
-		zone:          zone,
-		region:        region,
-		regions:       regions,
-		opt:           opt,
-		instanceCache: common.NewCache(cacheTTL, initialCacheSize),
-		logger:        logp.NewLogger("metrics-cloudsql"),
+		projectID: projectID,
+		zone:      zone,
+		region:    region,
+		regions:   regions,
+		opt:       opt,
+		instances: make(map[string]*sqladmin.DatabaseInstance),
+		logger:    logp.NewLogger("metrics-cloudsql"),
 	}, nil
 }
 
@@ -43,9 +36,9 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 // reading and writing in the same method)
 type cloudsqlMetadata struct {
 	// projectID   string
-	region          string
-	instanceID      string
-	machineType     string
+	region     string
+	instanceID string
+	// machineType     string
 	databaseVersion string
 
 	// ts *monitoringpb.TimeSeries
@@ -57,13 +50,13 @@ type cloudsqlMetadata struct {
 }
 
 type metadataCollector struct {
-	projectID     string
-	zone          string
-	region        string
-	regions       []string
-	opt           []option.ClientOption
-	instanceCache *common.Cache
-	logger        *logp.Logger
+	projectID string
+	zone      string
+	region    string
+	regions   []string
+	opt       []option.ClientOption
+	instances map[string]*sqladmin.DatabaseInstance
+	logger    *logp.Logger
 }
 
 func getDatabaseNameAndVersion(db string) mapstr.M {
@@ -107,9 +100,12 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 		return gcp.MetadataCollectorData{}, err
 	}
 
-	if cloudsqlMetadata.machineType != "" {
-		lastIndex := strings.LastIndex(cloudsqlMetadata.machineType, "/")
-		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, cloudsqlMetadata.machineType[lastIndex+1:])
+	if resp.Resource != nil && resp.Resource.Labels != nil {
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
+	}
+
+	if resp.Metric.Labels != nil {
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
 	}
 
 	cloudsqlMetadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
@@ -120,7 +116,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 			"cloudsql": getDatabaseNameAndVersion(cloudsqlMetadata.databaseVersion),
 		}, true)
 		if err != nil {
-			s.logger.Warnf("failed merging cloudsql to label fields: %w", err)
+			s.logger.Warnf("failed merging cloudsql to label fields: %v", err)
 		}
 	}
 
@@ -156,6 +152,7 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 	}
 
 	if instance == nil {
+		s.logger.Debugf("couldn't find instance %s, call sqladmin Instances.List", instanceID)
 		return cloudsqlMetadata, nil
 	}
 
@@ -164,39 +161,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 	}
 
 	return cloudsqlMetadata, nil
-}
-
-func (s *metadataCollector) refreshInstanceCache(ctx context.Context) {
-	// only refresh cache if it is empty
-	if s.instanceCache.Size() > 0 {
-		return
-	}
-
-	s.logger.Debugf("refresh cache with Instances.List API")
-
-	service, _ := sqladmin.NewService(ctx, s.opt...)
-
-	req := service.Instances.List(s.projectID)
-	if err := req.Pages(ctx, func(page *sqladmin.InstancesListResponse) error {
-		for _, instancesScopedList := range page.Items {
-			s.instanceCache.Put(fmt.Sprintf("%s:%s", instancesScopedList.Project, instancesScopedList.Name), instancesScopedList)
-		}
-		return nil
-	}); err != nil {
-		s.logger.Errorf("cloudsql Instances.List error: %v", err)
-	}
-}
-
-func (s *metadataCollector) instance(ctx context.Context, instanceName string) (*sqladmin.DatabaseInstance, error) {
-	s.refreshInstanceCache(ctx)
-	instanceCachedData := s.instanceCache.Get(instanceName)
-	if instanceCachedData != nil {
-		if cloudsqlInstance, ok := instanceCachedData.(*sqladmin.DatabaseInstance); ok {
-			return cloudsqlInstance, nil
-		}
-	}
-
-	return nil, nil
 }
 
 func (s *metadataCollector) ID(ctx context.Context, in *gcp.MetadataCollectorInputData) (string, error) {
@@ -215,4 +179,42 @@ func (s *metadataCollector) ID(ctx context.Context, in *gcp.MetadataCollectorInp
 	}
 
 	return metadata.ECS.String(), nil
+}
+
+func (s *metadataCollector) instance(ctx context.Context, instanceName string) (*sqladmin.DatabaseInstance, error) {
+	s.getInstances(ctx)
+
+	instance, ok := s.instances[instanceName]
+	if ok {
+		return instance, nil
+	}
+
+	// Remake the compute instances map to avoid having stale data.
+	s.instances = make(map[string]*sqladmin.DatabaseInstance)
+
+	return nil, nil
+}
+
+func (s *metadataCollector) getInstances(ctx context.Context) {
+	if len(s.instances) > 0 {
+		return
+	}
+
+	s.logger.Debug("sqladmin Instances.List API")
+
+	service, err := sqladmin.NewService(ctx, s.opt...)
+	if err != nil {
+		s.logger.Errorf("error getting client from sqladmin service: %v", err)
+		return
+	}
+
+	req := service.Instances.List(s.projectID)
+	if err := req.Pages(ctx, func(page *sqladmin.InstancesListResponse) error {
+		for _, instancesScopedList := range page.Items {
+			s.instances[fmt.Sprintf("%s:%s", instancesScopedList.Project, instancesScopedList.Name)] = instancesScopedList
+		}
+		return nil
+	}); err != nil {
+		s.logger.Errorf("sqladmin Instances.List error: %v", err)
+	}
 }

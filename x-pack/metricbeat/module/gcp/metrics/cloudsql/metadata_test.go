@@ -6,7 +6,6 @@ package cloudsql
 
 import (
 	"testing"
-	"time"
 
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/genproto/googleapis/api/metric"
@@ -14,7 +13,6 @@ import (
 	"google.golang.org/genproto/googleapis/monitoring/v3"
 	"gotest.tools/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -68,8 +66,7 @@ var fake = &monitoring.TimeSeries{
 }
 
 var m = &metadataCollector{
-	projectID:     "projectID",
-	instanceCache: common.NewCache(30*time.Second, 13),
+	projectID: "projectID",
 }
 
 func TestInstanceID(t *testing.T) {
