@@ -245,49 +245,40 @@ func readGolden(t *testing.T, path string) string {
 }
 
 func BenchmarkProcessorRun(b *testing.B) {
-	b.Run("v5-mode-original", func(b *testing.B) {
-		c := defaultConfig()
-		c.Format = formatV5
-		c.Mode = originalMode
+	benchmarks := []struct {
+		name    string
+		mode    mode
+		format  string
+		message string
+	}{
+		{"original-mode-v5-message", originalMode, formatV5, formatV5Sample},
+		{"ecs-mode-v5-message", ecsMode, formatV5, formatV5Sample},
+		{"ecs_and_original-mode-v5-message", ecsAndOriginalMode, formatV5, formatV5Sample},
+	}
 
-		p, err := newParseAWSVPCFlowLog(c)
-		require.NoError(b, err)
+	for _, benchmark := range benchmarks {
+		benchmark := benchmark
+		b.Run(benchmark.name, func(b *testing.B) {
+			c := defaultConfig()
+			c.Format = benchmark.format
+			c.Mode = benchmark.mode
 
-		evt := beat.Event{
-			Timestamp: time.Now().UTC(),
-			Fields: map[string]interface{}{
-				"message": formatV5Sample,
-			},
-		}
+			p, err := newParseAWSVPCFlowLog(c)
+			require.NoError(b, err)
 
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			if _, err = p.Run(&evt); err != nil {
-				b.Fatal(err)
+			evt := beat.Event{
+				Timestamp: time.Now().UTC(),
+				Fields: map[string]interface{}{
+					"message": benchmark.message,
+				},
 			}
-		}
-	})
 
-	b.Run("v5-mode-ecs_and_original", func(b *testing.B) {
-		c := defaultConfig()
-		c.Format = formatV5
-		c.Mode = ecsAndOriginalMode
-
-		p, err := newParseAWSVPCFlowLog(c)
-		require.NoError(b, err)
-
-		evt := beat.Event{
-			Timestamp: time.Now().UTC(),
-			Fields: map[string]interface{}{
-				"message": formatV5Sample,
-			},
-		}
-
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			if _, err = p.Run(&evt); err != nil {
-				b.Fatal(err)
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				if _, err = p.Run(&evt); err != nil {
+					b.Fatal(err)
+				}
 			}
-		}
-	})
+		})
+	}
 }
