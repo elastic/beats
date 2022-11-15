@@ -34,7 +34,7 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 		regions:   regions,
 		opt:       opt,
 		// instanceCache: common.NewCache(cacheTTL, initialCacheSize),
-		computeInstances: make(map[string]*compute.Instance),
+		computeInstances: make(map[uint64]*compute.Instance),
 		logger:           logp.NewLogger("metrics-compute"),
 	}, nil
 }
@@ -62,7 +62,7 @@ type metadataCollector struct {
 	regions   []string
 	opt       []option.ClientOption
 	// instanceCache *common.Cache
-	computeInstances map[string]*compute.Instance
+	computeInstances map[uint64]*compute.Instance
 	logger           *logp.Logger
 }
 
@@ -122,6 +122,7 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 	}
 
 	if instance == nil {
+		s.logger.Debugf("couldn't find instance %s, call Instances.AggregatedList", instanceID)
 		return computeMetadata, nil
 	}
 
@@ -158,13 +159,14 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*c
 
 	s.getComputeInstances(ctx)
 
-	computeInstance, ok := s.computeInstances[instanceID]
+	instanceIdInt, _ := strconv.Atoi(instanceID)
+	computeInstance, ok := s.computeInstances[uint64(instanceIdInt)]
 	if ok {
 		return computeInstance, nil
 	}
 
 	// Remake the compute instances map to avoid having stale data.
-	s.computeInstances = make(map[string]*compute.Instance)
+	s.computeInstances = make(map[uint64]*compute.Instance)
 
 	return nil, nil
 }
@@ -198,6 +200,8 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 		return
 	}
 
+	s.logger.Debug("Compute API Instances.AggregatedList")
+
 	computeService, err := compute.NewService(ctx, s.opt...)
 	if err != nil {
 		s.logger.Errorf("error getting client from Compute service: %v", err)
@@ -209,7 +213,7 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 		for _, instancesScopedList := range page.Items {
 			for _, instance := range instancesScopedList.Instances {
 				// s.instanceCache.Put(strconv.Itoa(int(instance.Id)), instance)
-				s.computeInstances[strconv.Itoa(int(instance.Id))] = instance
+				s.computeInstances[instance.Id] = instance
 			}
 		}
 		return nil
