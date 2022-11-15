@@ -3,10 +3,138 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.5.1]]
+=== Beats version 8.5.1
+https://github.com/elastic/beats/compare/v8.5.0\...v8.5.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Re-enable build optimizations to reduce binary size and improve performance. {pull}33620[33620]
+- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
+- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+- Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
+
+*Filebeat*
+
+- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled. {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+- Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
+- Fix splitting array of strings/arrays in httpjson input. {issue}30345[30345] {pull}33609[33609]
+- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+
+*Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix states client support for output options. {pull}33405[33405]
+- Fix states client reloader under managed mode. {pull}33405[33405]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+
+==== Bugfixes
+
+*Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix states client support for output options. {pull}33405[33405]
+- Fix states client reloader under managed mode. {pull}33405[33405]
+
+*Metricbeat*
+
+- Add tags to events based on parsed identifier. {pull}33472[33472]
+- Skip over unsupported filesystems in the system.filesystem metricset instead of failing immediately. Fix debug statement in system.fsstat metricset. {pull}33646[33646]
+
+==== Added
+
+*Affecting all Beats*
+
+- Beats will now attempt to recover if a lockfile has not been removed. {pull}[33169]
+
 [[release-notes-8.5.0]]
 === Beats version 8.5.0
 https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
 
+<<<<<<< HEAD
+=======
+==== Known issues
+
+*Affecting most Beats*
+
+Due to a recent change in the Red Hat scan verification process,
+this version of {heartbeat}, {filebeat}, {metricbeat}, and {auditbeat} are not available in the Red Hat Ecosystem Catalog.
+This bug will be fixed in the next release.
+Please use the https://www.docker.elastic.co/search?q=beats[Elastic docker registry] to download 8.5.0 images.
+
+*Heartbeat*
+
+Heartbeat mappings have introduced a new section to improve state tracking, `state`. Due to inconsistent serialization of the underlying data type,
+documents will be rejected upon index after a few minutes, producing the following error message:
+
+[source,json]
+----
+{..., "reason":"failed to parse date field [4.0614878e+07] with format [strict_date_optional_time||epoch_millis]","caused_by":{"type":"date_time_parse_exception","reason":"date_time_parse_exception: Failed to parse with all enclosed parsers"}
+----
+
+IMPORTANT: ** It is strongly recommended to update directly to v8.5.1 when it is available. ** If not possible to update, please continue to the suggested solution.
+
+Suggested resolution: Manually update Heartbeat index template mappings. The instructions provided below assume access to `heartbeat` executable
+and familiarity with ES APIs. For a detailed GUI walkthrough, please check https://discuss.elastic.co/t/heartbeat-8-5-0-mapper-error-workaround/318133[this thread].
+
+Start by exporting the actual mappings:
+
+[source,shell]
+----
+$ ./heartbeat export template > /tmp/idx-pattern.json
+----
+
+Inside the exported file, locate the field `duration_ms` and change the type to `long`:
+
+[source,json]
+----
+"state": {
+  "properties": {
+    ...,
+
+    "duration_ms": {
+      "type": "long"
+    },
+----
+
+Copy the contents of this file and log into Kibana.
+Once in Kibana, go to `Dev Tools`, write the request URL to update the index template and paste file contents underneath:
+
+[source,json]
+----
+PUT /_index_template/heartbeat-8.5.0
+{
+  "data_stream": {},
+  "index_patterns": [
+    "heartbeat-8.5.0"
+  ],
+  ...
+----
+
+Execute the request and check that the operation has been acknowledged:
+
+[source,json]
+----
+{
+  "acknowledged": true
+}
+----
+
+Finally, execute the following request, also in Kibana `Dev Tools`, to perform an index rollover:
+
+[source,json]
+----
+POST heartbeat-8.5.0/_rollover
+----
+
+This should create a new backing index with the correct mappings.
+
+>>>>>>> 1ebd0940bd (docs: Prepare Changelog for 8.5.1 (#33681))
 ==== Breaking changes
 
 *Affecting all Beats*
