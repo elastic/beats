@@ -23,25 +23,25 @@ const (
 )
 
 type sqsReader struct {
-	maxMessagesInflight int
-	workerSem           *awscommon.Sem
-	sqs                 sqsAPI
-	msgHandler          sqsProcessor
-	log                 *logp.Logger
-	metrics             *inputMetrics
+	maxNumberOfMessagesPerConsumer int
+	workerSem                      *awscommon.Sem
+	sqs                            sqsAPI
+	msgHandler                     sqsProcessor
+	log                            *logp.Logger
+	metrics                        *inputMetrics
 }
 
-func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, numberOfSQSConsumers int, msgHandler sqsProcessor) *sqsReader {
+func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxNumberOfMessages int, numberOfSQSConsumers int, msgHandler sqsProcessor) *sqsReader {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
 	return &sqsReader{
-		maxMessagesInflight: maxMessagesInflight / numberOfSQSConsumers,
-		workerSem:           awscommon.NewSem(maxMessagesInflight),
-		sqs:                 sqs,
-		msgHandler:          msgHandler,
-		log:                 log,
-		metrics:             metrics,
+		maxNumberOfMessagesPerConsumer: maxNumberOfMessages,
+		workerSem:                      awscommon.NewSem(maxNumberOfMessages * numberOfSQSConsumers),
+		sqs:                            sqs,
+		msgHandler:                     msgHandler,
+		log:                            log,
+		metrics:                        metrics,
 	}
 }
 
@@ -52,7 +52,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 	var workerWg sync.WaitGroup
 	for ctx.Err() == nil {
 		// Determine how many SQS workers are available.
-		workers, err := r.workerSem.AcquireContext(r.maxMessagesInflight, ctx)
+		workers, err := r.workerSem.AcquireContext(r.maxNumberOfMessagesPerConsumer, ctx)
 		if err != nil {
 			break
 		}

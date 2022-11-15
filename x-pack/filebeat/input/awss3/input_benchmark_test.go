@@ -56,7 +56,11 @@ func newConstantSQS() *constantSQS {
 }
 
 func (c *constantSQS) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqsTypes.Message, error) {
-	return c.msgs, nil
+	var msgs []sqsTypes.Message
+	for i := 0; i < maxMessages; i++ {
+		msgs = append(msgs, newSQSMessage(newS3Event(filepath.Base(cloudtrailTestFile))))
+	}
+	return msgs, nil
 }
 
 func (*constantSQS) DeleteMessage(ctx context.Context, msg *sqsTypes.Message) error {
@@ -164,7 +168,7 @@ file_selectors:
 	return inputConfig
 }
 
-func benchmarkInputSQS(t *testing.T, maxMessagesInflight, sqsConsumers int) testing.BenchmarkResult {
+func benchmarkInputSQS(t *testing.T, maxNumberOfMessages, sqsConsumers int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
 		metricRegistry := monitoring.NewRegistry()
@@ -176,7 +180,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight, sqsConsumers int) test
 
 		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
 		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, s3EventHandlerFactory)
-		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsConsumers, sqsMessageHandler)
+		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxNumberOfMessages, sqsConsumers, sqsMessageHandler)
 
 		go func() {
 			for event := range client.Channel {
@@ -189,7 +193,8 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight, sqsConsumers int) test
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.sqsMessagesReceivedTotal.Get() < uint64(maxMessagesInflight*b.N) {
+			start := time.Now()
+			for time.Since(start).Seconds() < 2 {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
@@ -223,7 +228,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight, sqsConsumers int) test
 		b.StopTimer()
 		elapsed := time.Since(start)
 
-		b.ReportMetric(float64(maxMessagesInflight), "max_messages_inflight")
+		b.ReportMetric(float64(maxNumberOfMessages), "max_number_of_messages")
 		b.ReportMetric(float64(sqsConsumers), "tot_sqs_consumers")
 		b.ReportMetric(elapsed.Seconds(), "sec")
 
@@ -253,6 +258,7 @@ func TestBenchmarkInputSQS(t *testing.T) {
 		benchmarkInputSQS(t, 256, 1),
 		benchmarkInputSQS(t, 512, 1),
 		benchmarkInputSQS(t, 1024, 1),
+		benchmarkInputSQS(t, 1, 2),
 		benchmarkInputSQS(t, 2, 2),
 		benchmarkInputSQS(t, 4, 2),
 		benchmarkInputSQS(t, 8, 2),
@@ -263,6 +269,9 @@ func TestBenchmarkInputSQS(t *testing.T) {
 		benchmarkInputSQS(t, 256, 2),
 		benchmarkInputSQS(t, 512, 2),
 		benchmarkInputSQS(t, 1024, 2),
+		benchmarkInputSQS(t, 1, 8),
+		benchmarkInputSQS(t, 2, 8),
+		benchmarkInputSQS(t, 4, 8),
 		benchmarkInputSQS(t, 8, 8),
 		benchmarkInputSQS(t, 16, 8),
 		benchmarkInputSQS(t, 32, 8),
@@ -276,20 +285,28 @@ func TestBenchmarkInputSQS(t *testing.T) {
 	headers := []string{
 		"Max Number of Msgs",
 		"Total SQS Consumers",
-		"Msgs for Consumers",
+		"Max Msgs in Flight",
+		"Total Events",
 		"Events per sec",
+		"Total S3 Bytes",
 		"S3 Bytes per sec",
+		"Total SQS Msgs",
+		"SQS Msgs per sec",
 		"Time (sec)",
 		"CPUs",
 	}
 	data := make([][]string, 0)
 	for _, r := range results {
 		data = append(data, []string{
-			fmt.Sprintf("%v", r.Extra["max_messages_inflight"]),
+			fmt.Sprintf("%v", r.Extra["max_number_of_messages"]),
 			fmt.Sprintf("%v", r.Extra["tot_sqs_consumers"]),
-			fmt.Sprintf("%v", r.Extra["max_messages_inflight"]/r.Extra["tot_sqs_consumers"]),
+			fmt.Sprintf("%v", r.Extra["max_number_of_messages"]*r.Extra["tot_sqs_consumers"]),
+			fmt.Sprintf("%v", r.Extra["events"]),
 			fmt.Sprintf("%v", r.Extra["events_per_sec"]),
+			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes"]))),
 			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes_per_sec"]))),
+			fmt.Sprintf("%v", r.Extra["sqs_messages"]),
+			fmt.Sprintf("%v", r.Extra["sqs_messages_per_sec"]),
 			fmt.Sprintf("%v", r.Extra["sec"]),
 			fmt.Sprintf("%v", runtime.GOMAXPROCS(0)),
 		})
