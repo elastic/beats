@@ -112,6 +112,11 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   inputContext.Cancelation,
 		ACKHandler: awscommon.NewEventACKHandler(),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
@@ -368,3 +373,6 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 	}
 	return "unknown"
 }
+
+// boolPtr returns a pointer to b.
+func boolPtr(b bool) *bool { return &b }
