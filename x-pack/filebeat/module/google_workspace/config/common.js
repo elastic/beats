@@ -24,13 +24,6 @@ var googleWorkspace = (function () {
             "json.id.uniqueQualifier",
             "json.id.applicationName",
             "json.id.customerId",
-<<<<<<< HEAD
-        ],
-        target_field: "@metadata.id",
-        ignore_missing: true,
-        fail_on_error: false,
-    });
-=======
         ];
         Object.keys(evt.Get("json.events")).forEach(function(evtsKey) {
             var key = "json.events."+evtsKey;
@@ -46,7 +39,6 @@ var googleWorkspace = (function () {
             fail_on_error: false,
         }).Run(evt);
     };
->>>>>>> 311b1371e1 ([Filebeat][Google workspace] Backport integration fixes (#33666))
 
     var convertFields = new processor.Convert({
         fields: [
