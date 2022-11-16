@@ -379,11 +379,11 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"backup_to_bucket with AWS",
-			queueURL,
 			"",
+			s3Bucket,
 			"",
 			mapstr.M{
-				"bucket_arn":              "arn:aws:s3:::aBucket",
+				"bucket_arn":              s3Bucket,
 				"backup_to_bucket_arn":    "arn:aws:s3:::bBucket",
 				"backup_to_bucket_prefix": "backup",
 				"number_of_workers":       5,
@@ -391,7 +391,6 @@ func TestConfig(t *testing.T) {
 			"",
 			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
 				c := makeConfig("", s3Bucket, "")
-				c.BucketARN = "arn:aws:s3:::aBucket"
 				c.BackupConfig.BackupToBucketArn = "arn:aws:s3:::bBucket"
 				c.BackupConfig.BackupToBucketPrefix = "backup"
 				c.NumberOfWorkers = 5
@@ -400,19 +399,19 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"backup_to_bucket with non-AWS",
-			queueURL,
 			"",
 			"",
+			nonAWSS3Bucket,
 			mapstr.M{
-				"non_aws_bucket_name":           "aBucket",
+				"non_aws_bucket_name":           nonAWSS3Bucket,
 				"non_aws_backup_to_bucket_name": "bBucket",
 				"backup_to_bucket_prefix":       "backup",
 				"number_of_workers":             5,
 			},
 			"",
 			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
-				c := makeConfig("", s3Bucket, "")
-				c.NonAWSBucketName = "aBucket"
+				c := makeConfig("", "", nonAWSS3Bucket)
+				c.NonAWSBucketName = nonAWSS3Bucket
 				c.BackupConfig.NonAWSBackupToBucketName = "bBucket"
 				c.BackupConfig.BackupToBucketPrefix = "backup"
 				c.NumberOfWorkers = 5
@@ -420,29 +419,57 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		{
-			"error with AWS backup and non-AWS source",
-			queueURL,
+			"error with non-AWS backup and AWS source",
 			"",
+			s3Bucket,
 			"",
 			mapstr.M{
+				"bucket_arn":                    s3Bucket,
 				"non_aws_backup_to_bucket_name": "bBucket",
-				"bucket_arn":                    "arn:aws:s3:::aBucket",
 				"number_of_workers":             5,
 			},
 			"backup to non-AWS bucket can only be used for non-AWS sources",
 			nil,
 		},
 		{
-			"error with non-AWS backup and AWS source",
-			queueURL,
+			"error with AWS backup and non-AWS source",
 			"",
 			"",
+			nonAWSS3Bucket,
 			mapstr.M{
-				"non_aws_bucket_name":  "aBucket",
+				"non_aws_bucket_name":  nonAWSS3Bucket,
 				"backup_to_bucket_arn": "arn:aws:s3:::bBucket",
 				"number_of_workers":    5,
 			},
 			"backup to AWS bucket can only be used for AWS sources",
+			nil,
+		},
+		{
+			"error with same bucket backup and empty backup prefix",
+			"",
+			"",
+			nonAWSS3Bucket,
+			mapstr.M{
+				"non_aws_bucket_name":           nonAWSS3Bucket,
+				"non_aws_backup_to_bucket_name": nonAWSS3Bucket,
+				"number_of_workers":             5,
+			},
+			"backup_to_bucket_prefix is a required property when source and backup bucket are the same",
+			nil,
+		},
+		{
+			"error with same bucket backup and backup prefix equal to list prefix",
+			"",
+			"",
+			nonAWSS3Bucket,
+			mapstr.M{
+				"non_aws_bucket_name":           nonAWSS3Bucket,
+				"non_aws_backup_to_bucket_name": nonAWSS3Bucket,
+				"number_of_workers":             5,
+				"backup_to_bucket_prefix":       "processed_",
+				"bucket_list_prefix":            "processed_",
+			},
+			"backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop",
 			nil,
 		},
 	}

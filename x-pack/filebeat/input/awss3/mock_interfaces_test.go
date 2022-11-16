@@ -521,6 +521,20 @@ func (mr *MockS3ObjectHandlerMockRecorder) ProcessS3Object() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessS3Object", reflect.TypeOf((*MockS3ObjectHandler)(nil).ProcessS3Object))
 }
 
+// ProcessS3Object mocks base method.
+func (m *MockS3ObjectHandler) FinalizeS3Object() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FinalizeS3Object")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ProcessS3Object indicates an expected call of ProcessS3Object.
+func (mr *MockS3ObjectHandlerMockRecorder) FinalizeS3Object() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FinalizeS3Object", reflect.TypeOf((*MockS3ObjectHandler)(nil).FinalizeS3Object))
+}
+
 // Wait mocks base method.
 func (m *MockS3ObjectHandler) Wait() {
 	m.ctrl.T.Helper()

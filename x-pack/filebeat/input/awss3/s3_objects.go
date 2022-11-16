@@ -46,7 +46,7 @@ type s3ObjectProcessorFactory struct {
 	backupConfig  backupConfig
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3Getter, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -366,21 +366,23 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 
 func (p *s3ObjectProcessor) FinalizeS3Object() error {
 	bucketName := p.backupConfig.GetBucketName()
-	if bucketName != "" {
-		backupKey := p.s3Obj.S3.Object.Key
-		if p.backupConfig.BackupToBucketPrefix != "" {
-			backupKey = fmt.Sprintf("%s%s", p.backupConfig.BackupToBucketPrefix, backupKey)
-		}
-		_, err := p.s3.CopyObject(p.ctx, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
-		if err != nil {
-			return fmt.Errorf("failed to copy object to backup bucket: %w", err)
-		}
-		if p.backupConfig.Delete {
-			_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
-			if err != nil {
-				return fmt.Errorf("failed to delete object from bucket: %w", err)
-			}
-		}
+	if bucketName == "" {
+		return nil
+	}
+	backupKey := p.s3Obj.S3.Object.Key
+	if p.backupConfig.BackupToBucketPrefix != "" {
+		backupKey = fmt.Sprintf("%s%s", p.backupConfig.BackupToBucketPrefix, backupKey)
+	}
+	_, err := p.s3.CopyObject(p.ctx, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
+	if err != nil {
+		return fmt.Errorf("failed to copy object to backup bucket: %w", err)
+	}
+	if !p.backupConfig.Delete {
+		return nil
+	}
+	_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+	if err != nil {
+		return fmt.Errorf("failed to delete object from bucket: %w", err)
 	}
 	return nil
 }

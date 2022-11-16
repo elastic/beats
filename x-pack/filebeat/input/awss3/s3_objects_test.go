@@ -195,11 +195,11 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{})
 		ack := awscommon.NewEventACKTracker(ctx)
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 		require.NoError(t, err)
 	})
 
-	t.Run("backups objects after reading", func(t *testing.T) {
+	t.Run("backups objects on finalize call", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
 
@@ -207,29 +207,21 @@ func TestS3ObjectProcessor(t *testing.T) {
 		defer ctrl.Finish()
 		mockS3API := NewMockS3API(ctrl)
 		mockPublisher := NewMockBeatClient(ctrl)
-		s3Event, s3Resp := newS3Object(t, "testdata/log.txt", "")
+		s3Event, _ := newS3Object(t, "testdata/log.txt", "")
 
 		backupCfg := backupConfig{
 			BackupToBucketArn: "arn:aws:s3:::backup",
 		}
 
-		var events []beat.Event
 		gomock.InOrder(
-			mockS3API.EXPECT().
-				GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
-				Return(s3Resp, nil),
-			mockPublisher.EXPECT().
-				Publish(gomock.Any()).
-				Do(func(event beat.Event) { events = append(events, event) }).
-				Times(2),
 			mockS3API.EXPECT().
 				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
 				Return(nil, nil),
 		)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil, backupCfg)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg)
 		ack := awscommon.NewEventACKTracker(ctx)
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
 		require.NoError(t, err)
 	})
 
@@ -241,22 +233,14 @@ func TestS3ObjectProcessor(t *testing.T) {
 		defer ctrl.Finish()
 		mockS3API := NewMockS3API(ctrl)
 		mockPublisher := NewMockBeatClient(ctrl)
-		s3Event, s3Resp := newS3Object(t, "testdata/log.txt", "")
+		s3Event, _ := newS3Object(t, "testdata/log.txt", "")
 
 		backupCfg := backupConfig{
 			BackupToBucketArn: "arn:aws:s3:::backup",
 			Delete:            true,
 		}
 
-		var events []beat.Event
 		gomock.InOrder(
-			mockS3API.EXPECT().
-				GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
-				Return(s3Resp, nil),
-			mockPublisher.EXPECT().
-				Publish(gomock.Any()).
-				Do(func(event beat.Event) { events = append(events, event) }).
-				Times(2),
 			mockS3API.EXPECT().
 				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
 				Return(nil, nil),
@@ -265,9 +249,9 @@ func TestS3ObjectProcessor(t *testing.T) {
 				Return(nil, nil),
 		)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil, backupCfg)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg)
 		ack := awscommon.NewEventACKTracker(ctx)
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
 		require.NoError(t, err)
 	})
 
@@ -279,22 +263,14 @@ func TestS3ObjectProcessor(t *testing.T) {
 		defer ctrl.Finish()
 		mockS3API := NewMockS3API(ctrl)
 		mockPublisher := NewMockBeatClient(ctrl)
-		s3Event, s3Resp := newS3Object(t, "testdata/log.txt", "")
+		s3Event, _ := newS3Object(t, "testdata/log.txt", "")
 
 		backupCfg := backupConfig{
 			BackupToBucketArn:    s3Event.S3.Bucket.ARN,
 			BackupToBucketPrefix: "backup/",
 		}
 
-		var events []beat.Event
 		gomock.InOrder(
-			mockS3API.EXPECT().
-				GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
-				Return(s3Resp, nil),
-			mockPublisher.EXPECT().
-				Publish(gomock.Any()).
-				Do(func(event beat.Event) { events = append(events, event) }).
-				Times(2),
 			mockS3API.EXPECT().
 				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq("backup/testdata/log.txt")).
 				Return(nil, nil),
@@ -302,7 +278,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg)
 		ack := awscommon.NewEventACKTracker(ctx)
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
 		require.NoError(t, err)
 	})
 }
