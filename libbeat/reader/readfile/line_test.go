@@ -23,6 +23,7 @@ package readfile
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -117,7 +118,7 @@ func TestReaderEncodings(t *testing.T) {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
 				offset := len(bytes)
-				if !test.collectOnEOF || err != io.EOF {
+				if !test.collectOnEOF || !errors.Is(err, io.EOF) {
 					offset -= len(nl)
 				}
 				readLines = append(readLines, string(bytes[:offset]))
@@ -147,7 +148,7 @@ func TestReaderEncodings(t *testing.T) {
 	for _, test := range tests {
 		for _, collectOnEOF := range []bool{false, true} {
 			test.collectOnEOF = collectOnEOF
-			t.Run(fmt.Sprintf("enconding: %s, collect on EOF: %t", test.encoding, test.collectOnEOF), func(t *testing.T) {
+			t.Run(fmt.Sprintf("encoding: %s, collect on EOF: %t", test.encoding, test.collectOnEOF), func(t *testing.T) {
 				runTest(t, test)
 			})
 
@@ -273,10 +274,6 @@ func testReadLines(t *testing.T, inputLines [][]byte, eofOnLastRead bool) {
 	}
 }
 
-func testReadLine(t *testing.T, line []byte) {
-	testReadLines(t, [][]byte{line}, false)
-}
-
 func randomInt(r *rand.Rand, min, max int) int {
 	return r.Intn(max+1-min) + min
 }
@@ -384,7 +381,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	for i := 0; ; i++ {
 		b, n, err := reader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				readLen += n
 				break
 			} else {
@@ -438,7 +435,7 @@ func TestBufferSize(t *testing.T) {
 	for i := 0; i < len(lines); i++ {
 		b, n, err := reader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			} else {
 				t.Fatal("unexpected error:", err)
