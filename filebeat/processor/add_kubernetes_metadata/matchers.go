@@ -92,7 +92,7 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 	f.logger.Debugf("Incoming log.file.path value: %s", source)
 
 	if !strings.Contains(source, f.LogsPath) {
-		f.logger.Errorf("Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
+		f.logger.Debugf("log.file.path value does not contain matcher's logs_path '%s', skipping...", f.LogsPath)
 		return ""
 	}
 
