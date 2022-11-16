@@ -55,20 +55,32 @@ func (m *mode) String() string {
 
 // config contains the configuration options for the processor.
 type config struct {
-	Format        string `config:"format" validate:"required"` // VPC flow log format.
-	Mode          mode   `config:"mode"`                       // Mode controls what fields are generated.
-	Field         string `config:"field"`                      // Source field containing the VPC flow log message.
-	TargetField   string `config:"target_field"`               // Target field for the VPC flow log object. This applies only to the original VPC flow log fields. ECS fields are written to the standard location.
-	IgnoreMissing bool   `config:"ignore_missing"`             // Ignore missing source field.
-	IgnoreFailure bool   `config:"ignore_failure"`             // Ignore failures while parsing and transforming the flow log message.
-	ID            string `config:"id"`                         // Instance ID for debugging purposes.
+	Format        formats `config:"format" validate:"required"` // VPC flow log format. In config, it can accept a string or list of strings. Each format must have a unique number of fields to enable matching it to a flow log message.
+	Mode          mode    `config:"mode"`                       // Mode controls what fields are generated.
+	Field         string  `config:"field"`                      // Source field containing the VPC flow log message.
+	TargetField   string  `config:"target_field"`               // Target field for the VPC flow log object. This applies only to the original VPC flow log fields. ECS fields are written to the standard location.
+	IgnoreMissing bool    `config:"ignore_missing"`             // Ignore missing source field.
+	IgnoreFailure bool    `config:"ignore_failure"`             // Ignore failures while parsing and transforming the flow log message.
+	ID            string  `config:"id"`                         // Instance ID for debugging purposes.
 }
 
-// Validate validates the config settings. It returns an error if the format
-// string is invalid.
+// Validate validates the format strings. Each format must have a unique number
+// of fields.
 func (c *config) Validate() error {
-	_, err := parseFormat(c.Format)
-	return err
+	counts := map[int]struct{}{}
+	for _, format := range c.Format {
+		fields, err := parseFormat(format)
+		if err != nil {
+			return err
+		}
+
+		_, found := counts[len(fields)]
+		if found {
+			return fmt.Errorf("each format must have a unique number of fields")
+		}
+		counts[len(fields)] = struct{}{}
+	}
+	return nil
 }
 
 func defaultConfig() config {
@@ -101,4 +113,28 @@ func parseFormat(format string) ([]vpcFlowField, error) {
 	}
 
 	return fields, nil
+}
+
+type formats []string
+
+func (f *formats) Unpack(value interface{}) error {
+	switch v := value.(type) {
+	case string:
+		*f = []string{v}
+	case []string:
+		*f = v
+	case []interface{}:
+		list := make([]string, 0, len(v))
+		for _, ifc := range v {
+			s, ok := ifc.(string)
+			if !ok {
+				return fmt.Errorf("format values must be strings, got %T", ifc)
+			}
+			list = append(list, s)
+		}
+		*f = list
+	default:
+		return fmt.Errorf("format must be a string or list of strings, got %T", v)
+	}
+	return nil
 }

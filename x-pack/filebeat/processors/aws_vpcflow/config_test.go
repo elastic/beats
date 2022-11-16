@@ -55,6 +55,27 @@ mode: invalid
 format: version
 `,
 		},
+		{
+			error: false,
+			yamlConfig: `
+---
+mode: ecs
+format:
+  - version srcaddr dstaddr
+  - version srcaddr dstaddr srcport dstport protocol
+`,
+		},
+		{
+			// Each format must have a unique token count.
+			error: true,
+			yamlConfig: `
+---
+mode: ecs
+format:
+  - version srcaddr dstaddr
+  - srcport dstport protocol
+`,
+		},
 	}
 
 	for i, tc := range testCases {
@@ -65,11 +86,16 @@ format: version
 			c := defaultConfig()
 			err := rawConfig.Unpack(&c)
 			if tc.error {
+				require.Error(t, err, "config: %v", tc.yamlConfig)
 				t.Log("Error:", err)
-				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
+
+			// Make sure valid configs produce processors.
+			p, err := New(rawConfig)
+			require.NoError(t, err)
+			require.NotNil(t, p)
 		})
 	}
 }

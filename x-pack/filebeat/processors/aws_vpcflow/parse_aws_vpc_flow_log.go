@@ -36,10 +36,7 @@ var (
 
 type processor struct {
 	config
-	fields             []vpcFlowField
-	log                *logp.Logger
-	originalFieldCount int
-	expectedIPCount    int
+	formats []*formatProcessor
 }
 
 // New constructs a new processor built from ucfg config.
@@ -58,35 +55,23 @@ func newParseAWSVPCFlowLog(c config) (*processor, error) {
 		log = log.With("instance_id", c.ID)
 	}
 
-	fields, err := parseFormat(c.Format)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse vpc flow log format: %w", err)
+	// Validate configs that did not pass through go-ucfg.
+	if err := c.Validate(); err != nil {
+		return nil, err
 	}
 
-	var ipCount int
-	for _, f := range fields {
-		if f.Type == ipType {
-			ipCount++
+	var formatProcessors []*formatProcessor
+	for _, f := range c.Format {
+		p, err := newFormatProcessor(c, log, f)
+		if err != nil {
+			return nil, err
 		}
-	}
-
-	originalFieldCount := len(fields)
-	if c.Mode == ecsMode {
-		for _, f := range fields {
-			// If an ECS mapping exists then ECS mode will not include the
-			// original field.
-			if len(f.ECSMappings) > 0 {
-				originalFieldCount--
-			}
-		}
+		formatProcessors = append(formatProcessors, p)
 	}
 
 	return &processor{
-		config:             c,
-		fields:             fields,
-		originalFieldCount: originalFieldCount,
-		expectedIPCount:    ipCount,
-		log:                log,
+		config:  c,
+		formats: formatProcessors,
 	}, nil
 }
 
@@ -124,13 +109,65 @@ func (p *processor) run(event *beat.Event) error {
 	}
 	substrings := dst[:n]
 
+	// Find the matching format based on substring count.
+	for _, format := range p.formats {
+		if len(format.fields) == n {
+			return format.process(substrings, event)
+		}
+	}
+	return errInvalidFormat
+}
+
+// formatProcessor processes an event using a single VPC flow log format.
+type formatProcessor struct {
+	config
+	log                *logp.Logger
+	fields             []vpcFlowField
+	originalFieldCount int
+	expectedIPCount    int
+}
+
+func newFormatProcessor(c config, log *logp.Logger, format string) (*formatProcessor, error) {
+	fields, err := parseFormat(format)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse vpc flow log format: %w", err)
+	}
+
+	originalFieldCount := len(fields)
+	if c.Mode == ecsMode {
+		for _, f := range fields {
+			// If an ECS mapping exists then ECS mode will not include the
+			// original field.
+			if len(f.ECSMappings) > 0 {
+				originalFieldCount--
+			}
+		}
+	}
+
+	var ipCount int
+	for _, f := range fields {
+		if f.Type == ipType {
+			ipCount++
+		}
+	}
+
+	return &formatProcessor{
+		config:             c,
+		log:                log,
+		fields:             fields,
+		originalFieldCount: originalFieldCount,
+		expectedIPCount:    ipCount,
+	}, nil
+}
+
+func (p *formatProcessor) process(substrings []string, event *beat.Event) error {
+	originalFields := make(mapstr.M, p.originalFieldCount)
+
 	var relatedIPs []string
 	if p.Mode > originalMode {
 		// Allocate space for the expected number of IPs assuming all are unique.
 		relatedIPs = make([]string, 0, p.expectedIPCount)
 	}
-
-	originalFields := make(mapstr.M, p.originalFieldCount)
 
 	// Iterate over the substrings in the source string and apply type
 	// conversion and then ECS mappings.
@@ -175,12 +212,12 @@ func (p *processor) run(event *beat.Event) error {
 		}
 	}
 
-	if _, err = event.PutValue(p.TargetField, originalFields); err != nil {
+	if _, err := event.PutValue(p.TargetField, originalFields); err != nil {
 		return err
 	}
 
 	if len(relatedIPs) > 0 {
-		if _, err = event.PutValue("related.ip", relatedIPs); err != nil {
+		if _, err := event.PutValue("related.ip", relatedIPs); err != nil {
 			return err
 		}
 	}

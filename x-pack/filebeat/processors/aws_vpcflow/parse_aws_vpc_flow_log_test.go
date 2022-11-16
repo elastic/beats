@@ -12,11 +12,10 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/yaml.v2"
-
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -31,13 +30,19 @@ const (
 )
 
 func TestProcessorRun(t *testing.T) {
-	t.Run("v5-mode-ecs_and_original", func(t *testing.T) {
+	t.Run("ecs_and_original-mode-v5-message", func(t *testing.T) {
 		c := defaultConfig()
-		c.Format = formatV5
+		c.Format = []string{
+			"version account-id", // Not a match.
+			formatV5,
+		}
 		c.Mode = ecsAndOriginalMode
 
 		p, err := newParseAWSVPCFlowLog(c)
 		require.NoError(t, err)
+
+		assert.Contains(t, p.String(), procName+"=")
+		assert.Contains(t, p.String(), formatV5)
 
 		evt := beat.Event{
 			Timestamp: time.Now().UTC(),
@@ -152,7 +157,7 @@ func TestGoldenFile(t *testing.T) {
 
 		t.Run(tc.Name, func(t *testing.T) {
 			c := defaultConfig()
-			c.Format = tc.Format
+			c.Format = []string{tc.Format}
 			if tc.Mode != nil {
 				c.Mode = *tc.Mode
 			}
@@ -260,7 +265,7 @@ func BenchmarkProcessorRun(b *testing.B) {
 		benchmark := benchmark
 		b.Run(benchmark.name, func(b *testing.B) {
 			c := defaultConfig()
-			c.Format = benchmark.format
+			c.Format = []string{benchmark.format}
 			c.Mode = benchmark.mode
 
 			p, err := newParseAWSVPCFlowLog(c)
