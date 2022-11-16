@@ -196,6 +196,30 @@ var vpcFlowFields = [...]vpcFlowField{
 					event.PutValue(targetField, strings.ToLower(value.(string))) //nolint:errcheck // This can only fail if 'event' is not an object.
 				},
 			},
+			{
+				Target: "event.type",
+				Transform: func(targetField string, value interface{}, event *beat.Event) {
+					var eventType string
+
+					switch s := value.(string); s {
+					case "ACCEPT":
+						eventType = "allowed"
+					case "REJECT":
+						eventType = "denied"
+					}
+
+					if len(eventType) > 0 {
+						// The processor always adds event.type: [connection] in ECS mode.
+						v, _ := event.GetValue(targetField)
+						if eventTypes, ok := v.([]string); ok {
+							event.PutValue(targetField, append(eventTypes, eventType)) //nolint:errcheck // This can only fail if 'event' is not an object.
+							return
+						}
+
+						event.PutValue(targetField, []string{eventType}) //nolint:errcheck // This can only fail if 'event' is not an object.
+					}
+				},
+			},
 		},
 	},
 	{Name: "log_status", Type: stringType},

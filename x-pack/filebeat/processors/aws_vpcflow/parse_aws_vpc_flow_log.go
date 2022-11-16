@@ -167,6 +167,13 @@ func (p *formatProcessor) process(substrings []string, event *beat.Event) error 
 	if p.Mode > originalMode {
 		// Allocate space for the expected number of IPs assuming all are unique.
 		relatedIPs = make([]string, 0, p.expectedIPCount)
+
+		// Preallocate event.type with extra capacity for "allowed" or "denied".
+		eventTypes := make([]string, 1, 2)
+		eventTypes[0] = "connection"
+		if _, err := event.PutValue("event.type", eventTypes); err != nil {
+			return err
+		}
 	}
 
 	// Iterate over the substrings in the source string and apply type

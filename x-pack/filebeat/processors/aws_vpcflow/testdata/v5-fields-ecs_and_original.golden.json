@@ -56,7 +56,11 @@
             "action": "reject",
             "end": "2021-03-26T03:29:09Z",
             "outcome": "failure",
-            "start": "2021-03-26T03:28:12Z"
+            "start": "2021-03-26T03:28:12Z",
+            "type": [
+                "connection",
+                "denied"
+            ]
         },
         "message": "5 64111117617 eni-069xxxxxb7a490 89.160.20.156 10.200.0.0 50041 33004 17 52 1 1616729292 1616729349 REJECT OK vpc-09676f97xxxxxb8a7 subnet-02d645xxxxxxxdbc0 i-0axxxxxx1ad77 1 IPv4 89.160.20.156 10.200.0.80 us-east-1 use1-az5 wavelength fake-id AMAZON CLOUDFRONT ingress 1",
         "network": {

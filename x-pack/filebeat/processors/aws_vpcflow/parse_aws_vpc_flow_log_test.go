@@ -113,6 +113,7 @@ func TestProcessorRun(t *testing.T) {
 				"end":     end,
 				"outcome": "failure",
 				"start":   start,
+				"type":    []string{"connection", "denied"},
 			},
 			"message": formatV5Sample,
 			"network": mapstr.M{
