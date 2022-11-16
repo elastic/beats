@@ -118,6 +118,11 @@ func (service *UsageService) GetForecast(
 	aggregationName := "Cost"
 	aggregationFunction := armcostmanagement.FunctionTypeSum
 
+	granularityDaily := armcostmanagement.GranularityTypeDaily
+
+	forecastTimeframeCustom := armcostmanagement.ForecastTimeframeTypeCustom
+	forecastTypeActualCost := armcostmanagement.ForecastTypeActualCost
+
 	forecastDefinition := armcostmanagement.ForecastDefinition{
 		Dataset: &armcostmanagement.ForecastDataset{
 			Aggregation: map[string]*armcostmanagement.QueryAggregation{
@@ -126,20 +131,20 @@ func (service *UsageService) GetForecast(
 					Name:     &aggregationName,
 				},
 			},
-			Granularity: &armcostmanagement.PossibleGranularityTypeValues()[0],
+			Granularity: &granularityDaily,
 		},
 
 		// Time frame/period of the forecast. Required for MCA accounts.
 		//
 		// If omitted, EA users will get a forecast for the current month, and
 		// MCA users will get an error.
-		Timeframe: &armcostmanagement.PossibleForecastTimeframeTypeValues()[1],
+		Timeframe: &forecastTimeframeCustom,
 		TimePeriod: &armcostmanagement.QueryTimePeriod{
 			From: &startTime,
 			To:   &endTime,
 		},
 
-		Type:                    &armcostmanagement.PossibleForecastTypeValues()[0],
+		Type:                    &forecastTypeActualCost,
 		IncludeActualCost:       &includeActualCost,
 		IncludeFreshPartialCost: &includeFreshPartialCost,
 	}
