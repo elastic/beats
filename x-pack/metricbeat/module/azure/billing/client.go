@@ -74,7 +74,7 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 		timeOpts.usageEnd.Format(time.RFC3339Nano),
 	)
 
-	paginator, err := client.BillingService.GetUsageDetails(
+	result, err := client.BillingService.GetUsageDetails(
 		scope,
 		"properties/meterDetails",
 		filter,
@@ -88,7 +88,7 @@ func (client *Client) GetMetrics(timeOpts TimeIntervalOptions) (Usage, error) {
 		return usage, fmt.Errorf("retrieving usage details failed in client: %w", err)
 	}
 
-	usage.UsageDetails = append(usage.UsageDetails, paginator.Value...)
+	usage.UsageDetails = append(usage.UsageDetails, result.Value...)
 
 	//
 	// Fetch the Forecast
