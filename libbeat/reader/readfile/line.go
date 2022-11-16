@@ -97,8 +97,13 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 			if errors.Is(err, io.EOF) && r.collectOnEOF {
 				// Found EOF and collectOnEOF is true
 				// -> decode input sequence into outBuffer
-				// let's add back len(r.nl) since we removed it, but we reached EOF and want to read till end of buffer
-				sz, err := r.decode(r.inOffset + len(r.nl))
+				// let's take whole buffer len without len(nl) if it ends with it
+				end := r.inBuffer.Len()
+				if bytes.HasSuffix(r.inBuffer.Bytes(), r.decodedNl) {
+					end -= len(r.nl)
+				}
+
+				sz, err := r.decode(end)
 				if err != nil {
 					r.logger.Errorf("Error decoding line: %s", err)
 					// In case of error increase size by unencoded length

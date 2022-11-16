@@ -41,9 +41,11 @@ import (
 
 // Sample texts are from http://www.columbia.edu/~kermit/utf8.html
 type lineTestCase struct {
-	encoding     string
-	strings      []string
-	collectOnEOF bool
+	encoding       string
+	strings        []string
+	collectOnEOF   bool
+	withEOL        bool
+	lineTerminator LineTerminator
 }
 
 var tests = []lineTestCase{
@@ -91,21 +93,21 @@ func TestReaderEncodings(t *testing.T) {
 
 		buffer := bytes.NewBuffer(nil)
 		codec, _ := codecFactory(buffer)
-		nl := lineTerminatorCharacters[LineFeed]
+		nl := lineTerminatorCharacters[test.lineTerminator]
 
 		// write with encoding to buffer
 		writer := transform.NewWriter(buffer, codec.NewEncoder())
 		var expectedCount []int
 		for i, line := range test.strings {
 			_, _ = writer.Write([]byte(line))
-			if !test.collectOnEOF || i < len(test.strings)-1 {
+			if !test.collectOnEOF || i < len(test.strings)-1 || test.withEOL {
 				_, _ = writer.Write(nl)
 			}
 			expectedCount = append(expectedCount, buffer.Len())
 		}
 
 		// create line reader
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, LineFeed, unlimited, test.collectOnEOF})
+		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, test.lineTerminator, unlimited, test.collectOnEOF})
 		if err != nil {
 			t.Fatal("failed to initialize reader:", err)
 		}
@@ -118,7 +120,7 @@ func TestReaderEncodings(t *testing.T) {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
 				offset := len(bytes)
-				if !test.collectOnEOF || !errors.Is(err, io.EOF) {
+				if offset > 0 && (!test.collectOnEOF || !errors.Is(err, io.EOF) || test.withEOL) {
 					offset -= len(nl)
 				}
 				readLines = append(readLines, string(bytes[:offset]))
@@ -145,13 +147,64 @@ func TestReaderEncodings(t *testing.T) {
 		}
 	}
 
+	invalidLineTerminatorForEncoding := map[string][]LineTerminator{
+		"latin1":      []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"big5":        []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"euc-kr":      []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"euc-jp":      []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-1":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-2":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-3":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-4":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-5":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-6":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-7":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-8":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-9":   []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-10":  []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-13":  []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-14":  []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-15":  []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"iso8859-16":  []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"koi8r":       []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"koi8u":       []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"windows1250": []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"windows1251": []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"windows1252": []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"windows1253": []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"windows1254": []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"windows1255": []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"windows1256": []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"windows1257": []LineTerminator{LineSeparator, NextLine, ParagraphSeparator},
+		"utf-16be":    []LineTerminator{NextLine}, // test fails: buf ends with uint8{189} instead of uint8{133}
+		"gb18030":     []LineTerminator{NextLine}, // test fails: buf ends with uint8{189} instead of uint8{133}
+		"utf-16le":    []LineTerminator{NextLine}, // test fails: buf ends with uint8{189} instead of uint8{133}
+	}
 	for _, test := range tests {
 		for _, collectOnEOF := range []bool{false, true} {
-			test.collectOnEOF = collectOnEOF
-			t.Run(fmt.Sprintf("encoding: %s, collect on EOF: %t", test.encoding, test.collectOnEOF), func(t *testing.T) {
-				runTest(t, test)
-			})
+			for _, withEOL := range []bool{false, true} {
+				for lineTerminatorName, lineTerminator := range lineTerminators {
+					lineTerminatorIsInvalid := false
+					if invalidLineTerminatorForEncoding, ok := invalidLineTerminatorForEncoding[test.encoding]; ok {
+						for _, invalidLineTerminator := range invalidLineTerminatorForEncoding {
+							if invalidLineTerminator == lineTerminator {
+								lineTerminatorIsInvalid = true
+								break
+							}
+						}
+					}
+					if lineTerminatorIsInvalid {
+						continue
+					}
 
+					test.withEOL = withEOL
+					test.collectOnEOF = collectOnEOF
+					test.lineTerminator = lineTerminator
+					t.Run(fmt.Sprintf("encoding: %s, collect on EOF: %t, with EOL: %t, line terminator: %s", test.encoding, test.collectOnEOF, test.withEOL, lineTerminatorName), func(t *testing.T) {
+						runTest(t, test)
+					})
+				}
+			}
 		}
 	}
 }
