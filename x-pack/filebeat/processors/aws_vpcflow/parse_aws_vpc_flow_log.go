@@ -36,7 +36,7 @@ var (
 
 type processor struct {
 	config
-	formats []*formatProcessor
+	formats []formatProcessor
 }
 
 // New constructs a new processor built from ucfg config.
@@ -60,13 +60,13 @@ func newParseAWSVPCFlowLog(c config) (*processor, error) {
 		return nil, err
 	}
 
-	var formatProcessors []*formatProcessor
+	var formatProcessors []formatProcessor
 	for _, f := range c.Format {
 		p, err := newFormatProcessor(c, log, f)
 		if err != nil {
 			return nil, err
 		}
-		formatProcessors = append(formatProcessors, p)
+		formatProcessors = append(formatProcessors, *p)
 	}
 
 	return &processor{
