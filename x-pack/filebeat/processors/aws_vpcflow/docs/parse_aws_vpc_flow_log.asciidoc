@@ -95,6 +95,7 @@ transformations applied to derive the ECS field.
 | VPC Flow Log Field | ECS Field |
 | account_id | cloud.account.id |
 | action | event.outcome |
+| action | event.action |
 | az_id | cloud.availability_zone |
 | bytes | network.bytes |
 | bytes | source.bytes |
@@ -108,7 +109,7 @@ transformations applied to derive the ECS field.
 | packets | network.packets |
 | packets | source.packets |
 | protocol | network.iana_number |
-| protocol | network.protocol |
+| protocol | network.transport |
 | region | cloud.region |
 | srcaddr | network.type |
 | srcaddr | source.address |
