@@ -106,7 +106,7 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 				}
 
 				// Consume transformed bytes from input buffer
-				err = r.inBuffer.Advance(sz)
+				_ = r.inBuffer.Advance(sz)
 				r.inBuffer.Reset()
 
 				// output buffer contains untile EOF. Extract
@@ -185,7 +185,7 @@ func (r *LineReader) advance() error {
 		}
 
 		// Write to buffer also in case of err
-		r.inBuffer.Write(r.tempBuffer[:n])
+		_, _ = r.inBuffer.Write(r.tempBuffer[:n])
 
 		if err != nil {
 			return err
@@ -204,7 +204,7 @@ func (r *LineReader) advance() error {
 			// If newLine is found, drop the lines longer than maxBytes
 			for idx != -1 && idx > r.maxBytes {
 				r.logger.Warnf("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, idx)
-				err = r.inBuffer.Advance(idx + len(r.nl))
+				_ = r.inBuffer.Advance(idx + len(r.nl))
 				r.byteCount += idx + len(r.nl)
 				r.inBuffer.Reset()
 				r.inOffset = 0
@@ -272,7 +272,7 @@ func (r *LineReader) skipUntilNewLine() (int, error) {
 			idx = bytes.Index(r.tempBuffer[:n], r.nl)
 
 			if idx != -1 {
-				r.inBuffer.Write(r.tempBuffer[idx+len(r.nl) : n])
+				_, _ = r.inBuffer.Write(r.tempBuffer[idx+len(r.nl) : n])
 				skipped += idx + len(r.nl)
 			} else {
 				skipped += n
@@ -302,8 +302,8 @@ func (r *LineReader) decode(end int) (int, error) {
 		nDst, nSrc, err = r.decoder.Transform(r.tempBuffer, inBytes[start:end], false)
 		if err != nil {
 			// Check if error is different from destination buffer too short
-			if err != transform.ErrShortDst {
-				r.outBuffer.Write(inBytes[0:end])
+			if !errors.Is(err, transform.ErrShortDst) {
+				_, _ = r.outBuffer.Write(inBytes[0:end])
 				start = end
 				break
 			}
@@ -313,7 +313,7 @@ func (r *LineReader) decode(end int) (int, error) {
 		}
 
 		start += nSrc
-		r.outBuffer.Write(r.tempBuffer[:nDst])
+		_, _ = r.outBuffer.Write(r.tempBuffer[:nDst])
 	}
 
 	r.byteCount += start

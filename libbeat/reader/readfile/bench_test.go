@@ -20,6 +20,7 @@ package readfile
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -48,7 +49,7 @@ func BenchmarkEncoderReader(b *testing.B) {
 				for i := 0; ; i++ {
 					msg, err := reader.Next()
 					if err != nil {
-						if err == io.EOF {
+						if errors.Is(err, io.EOF) {
 							b.ReportMetric(float64(i), "processed_lines")
 							break
 						} else {

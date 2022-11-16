@@ -96,9 +96,9 @@ func TestReaderEncodings(t *testing.T) {
 		writer := transform.NewWriter(buffer, codec.NewEncoder())
 		var expectedCount []int
 		for i, line := range test.strings {
-			writer.Write([]byte(line))
+			_, _ = writer.Write([]byte(line))
 			if !test.collectOnEOF || i < len(test.strings)-1 {
-				writer.Write(nl)
+				_, _ = writer.Write(nl)
 			}
 			expectedCount = append(expectedCount, buffer.Len())
 		}
