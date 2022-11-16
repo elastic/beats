@@ -178,6 +178,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
+- Add GCP Redis metadata {pull}33701[33701]
 
 *Packetbeat*
 
