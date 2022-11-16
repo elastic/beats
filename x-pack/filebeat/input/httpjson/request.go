@@ -279,17 +279,17 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 
 func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
 	var (
-		n                 int
-		ids               []string
-		err               error
-		urlCopy           url.URL
-		urlString         string
-		httpResp          *http.Response
-		initialResponse   []*http.Response
-		intermediateResps []*http.Response
-		finalResps        []*http.Response
-		isChainExpected   bool
-		chainIndex        int
+		n                       int
+		ids                     []string
+		err                     error
+		urlCopy                 url.URL
+		urlString               string
+		httpResp                *http.Response
+		initialResponse         []*http.Response
+		intermediateResps       []*http.Response
+		finalResps              []*http.Response
+		isChainWithPageExpected bool
+		chainIndex              int
 	)
 
 	for i, rf := range r.requestFactories {
@@ -319,8 +319,6 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				body:   bodyMap,
 			}
 			trCtx.updateFirstResponse(firstResponse)
-			// since, initially the first response and last response are the same
-			trCtx.updateLastResponse(firstResponse)
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
@@ -330,24 +328,37 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 
 			// if flow of control reaches here, that means there are more than 1 request factories
-			// if a pagination request factory at the root level and a chain step exists, only then we will initialize flags & variables
-			// which are required for chaining with pagination
-			if r.requestFactories[i+1].isChain && r.responseProcessors[i].pagination.requestFactory != nil {
-				isChainExpected = true
+			// if a chain step exists, only then we will initialize flags & variables here which are required for chaining
+			if r.requestFactories[i+1].isChain {
 				chainIndex = i + 1
 				resp, err := cloneResponse(httpResp)
 				if err != nil {
 					return err
 				}
-				initialResponse = append(initialResponse, resp)
+				// the response is cloned and added to finalResps here, since the response of the 1st page (whether pagination exists or not), will
+				// be sent for further processing to check if any response processors can be applied or not and at the same time update the last_response,
+				// first_event & last_event cursor values.
+				finalResps = append(finalResps, resp)
+
+				// if a pagination request factory exists at the root level along with a chain step, only then we will initialize flags & variables here
+				// which are required for chaining with root level pagination
+				if r.responseProcessors[i].pagination.requestFactory != nil {
+					isChainWithPageExpected = true
+					resp, err := cloneResponse(httpResp)
+					if err != nil {
+						return err
+					}
+					initialResponse = append(initialResponse, resp)
+				}
 			}
+
 			intermediateResps = append(intermediateResps, httpResp)
 			ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
 			if err != nil {
 				return err
 			}
-			// we do not clear the trCtx interval data for the 1st root request, if a chain is expected in the request config.
-			events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, !isChainExpected)
+			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
+			events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false)
 			n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
 		} else {
 			if len(ids) == 0 {
@@ -427,8 +438,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 	}
 
 	defer httpResp.Body.Close()
-
-	if isChainExpected {
+	// if pagination exists for the parent request along with chaining, then for each page response the chain is processed
+	if isChainWithPageExpected {
 		n += r.processRemainingChainEvents(stdCtx, trCtx, publisher, initialResponse, chainIndex)
 	}
 	r.log.Infof("request finished: %d events published", n)
@@ -541,6 +552,10 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 				continue
 			}
 			response.Body = io.NopCloser(body)
+
+			// updates the cursor for pagination last_event & last_response when chaining is present
+			trCtx.updateLastEvent(maybeMsg.msg)
+			trCtx.updateCursor()
 
 			// for each pagination response, we repeat all the chain steps / blocks
 			count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)

@@ -904,6 +904,169 @@ func TestInput(t *testing.T) {
 				`{"space":{"world":"moon"}}`,
 			},
 		},
+		{
+			name: "Test if cursor value is updated for root response whith chaining & pagination",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				var serverURL string
+				registerPaginationTransforms()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212", "createdAt":"22/02/2022", 
+						"nextLink":"%s/link1"}`, serverURL)
+					case "/link1":
+						fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213", "createdAt":"24/04/2022"}`)
+					case "/2212/1":
+						matchBody(w, r, `{"createdAt":"22/02/2022","exportId":"2212"}`, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						matchBody(w, r, `{"createdAt":"22/02/2022","exportId":"2212"}`, `{"space":{"cake":"pumpkin"}}`)
+					case "/2213/3":
+						matchBody(w, r, `{"createdAt":"24/04/2022","exportId":"2213"}`, `{"hello":{"cake":"pumpkin"}}`)
+					case "/2213/4":
+						matchBody(w, r, `{"createdAt":"24/04/2022","exportId":"2213"}`, `{"space":{"world":"moon"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				serverURL = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":                            1,
+				"request.method":                      http.MethodPost,
+				"response.request_body_on_pagination": true,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodPost,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,.parent_last_response.body.exportId",
+							"request.transforms": []interface{}{
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.exportId",
+										"value":  "[[ .parent_last_response.body.exportId ]]",
+									},
+								},
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.createdAt",
+										"value":  "[[ .cursor.last_published_login ]]",
+									},
+								},
+							},
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"last_published_login": map[string]interface{}{
+						"value": "[[ .last_event.createdAt ]]",
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+				`{"hello":{"cake":"pumpkin"}}`,
+				`{"space":{"world":"moon"}}`,
+			},
+		},
+		{
+			name: "Test if cursor value is updated for root response whith chaining & pagination along with split operator",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				var serverURL string
+				registerPaginationTransforms()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212","time":[{"timeStamp":"22/02/2022"}], 
+						"nextLink":"%s/link1"}`, serverURL)
+					case "/link1":
+						fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213","time":[{"timeStamp":"24/04/2022"}]}`)
+					case "/2212/1":
+						matchBody(w, r, `{"createdAt":"22/02/2022","exportId":"2212"}`, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						matchBody(w, r, `{"createdAt":"22/02/2022","exportId":"2212"}`, `{"space":{"cake":"pumpkin"}}`)
+					case "/2213/3":
+						matchBody(w, r, `{"createdAt":"24/04/2022","exportId":"2213"}`, `{"hello":{"cake":"pumpkin"}}`)
+					case "/2213/4":
+						matchBody(w, r, `{"createdAt":"24/04/2022","exportId":"2213"}`, `{"space":{"world":"moon"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				serverURL = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":                            1,
+				"request.method":                      http.MethodPost,
+				"response.request_body_on_pagination": true,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"response.split": map[string]interface{}{
+					"target":      "body.time",
+					"type":        "array",
+					"keep_parent": true,
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodPost,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,.parent_last_response.body.exportId",
+							"request.transforms": []interface{}{
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.exportId",
+										"value":  "[[ .parent_last_response.body.exportId ]]",
+									},
+								},
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.createdAt",
+										"value":  "[[ .cursor.last_published_login ]]",
+									},
+								},
+							},
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"last_published_login": map[string]interface{}{
+						"value": "[[ .last_event.time.timeStamp ]]",
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+				`{"hello":{"cake":"pumpkin"}}`,
+				`{"space":{"world":"moon"}}`,
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
