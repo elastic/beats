@@ -1,4 +1,4 @@
-:stack-version: 8.6.0
+:stack-version: 8.7.0
 :doc-branch: main
 :go-version: 1.18.8
 :release-state: unreleased
