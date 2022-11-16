@@ -23,6 +23,7 @@ package readfile
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -39,44 +40,45 @@ import (
 
 // Sample texts are from http://www.columbia.edu/~kermit/utf8.html
 type lineTestCase struct {
-	encoding string
-	strings  []string
+	encoding     string
+	strings      []string
+	collectOnEOF bool
 }
 
 var tests = []lineTestCase{
-	{"plain", []string{"I can", "eat glass"}},
-	{"latin1", []string{"I kå Glas frässa", "ond des macht mr nix!"}},
-	{"utf-16be", []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
-	{"utf-16le", []string{"काचं शक्नोम्यत्तुम् ।", "नोपहिनस्ति माम् ॥"}},
-	{"big5", []string{"我能吞下玻", "璃而不傷身體。"}},
-	{"gb18030", []string{"我能吞下玻璃", "而不傷身。體"}},
-	{"euc-kr", []string{" 나는 유리를 먹을 수 있어요.", " 그래도 아프지 않아요"}},
-	{"euc-jp", []string{"私はガラスを食べられます。", "それは私を傷つけません。"}},
-	{"plain", []string{"I can", "eat glass"}},
-	{"iso8859-1", []string{"Filebeat is my favourite"}},
-	{"iso8859-2", []string{"Filebeat je môj obľúbený"}},                          // slovak: filebeat is my favourite
-	{"iso8859-3", []string{"büyükannem Filebeat kullanıyor"}},                    // turkish: my granmother uses filebeat
-	{"iso8859-4", []string{"Filebeat on mõeldud kõigile"}},                       // estonian: filebeat is for everyone
-	{"iso8859-5", []string{"я люблю кодировки"}},                                 // russian: i love encodings
-	{"iso8859-6", []string{"أنا بحاجة إلى المزيد من الترميزات"}},                 // arabic: i need more encodings
-	{"iso8859-7", []string{"όπου μπορώ να αγοράσω περισσότερες κωδικοποιήσεις"}}, // greek: where can i buy more encodings?
-	{"iso8859-8", []string{"אני צריך קידוד אישי"}},                               // hebrew: i need a personal encoding
-	{"iso8859-9", []string{"kodlamaları pişirebilirim"}},                         // turkish: i can cook encodings
-	{"iso8859-10", []string{"koodaukset jäädyttävät nollaan"}},                   // finnish: encodings freeze below zero
-	{"iso8859-13", []string{"mój pies zjada kodowanie"}},                         // polish: my dog eats encodings
-	{"iso8859-14", []string{"An féidir leat cáise a ionchódú?"}},                 // irish: can you encode a cheese?
-	{"iso8859-15", []string{"bedes du kode", "for min €"}},                       // danish: please encode my euro symbol
-	{"iso8859-16", []string{"rossz karakterkódolást", "használsz"}},              // hungarian: you use the wrong character encoding
-	{"koi8r", []string{"я люблю кодировки"}},                                     // russian: i love encodings
-	{"koi8u", []string{"я люблю кодировки"}},                                     // russian: i love encodings
-	{"windows1250", []string{"Filebeat je môj obľúbený"}},                        // slovak: filebeat is my favourite
-	{"windows1251", []string{"я люблю кодировки"}},                               // russian: i love encodings
-	{"windows1252", []string{"what is better than an encoding?", "a legacy encoding"}},
-	{"windows1253", []string{"όπου μπορώ να αγοράσω", "περισσότερες κωδικοποιήσεις"}}, // greek: where can i buy more encodings?
-	{"windows1254", []string{"kodlamaları", "pişirebilirim"}},                         // turkish: i can cook encodings
-	{"windows1255", []string{"אני צריך קידוד אישי"}},                                  // hebrew: i need a personal encoding
-	{"windows1256", []string{"أنا بحاجة إلى المزيد من الترميزات"}},                    // arabic: i need more encodings
-	{"windows1257", []string{"toite", "kodeerijaid"}},                                 // estonian: feed the encoders
+	{encoding: "plain", strings: []string{"I can", "eat glass"}},
+	{encoding: "latin1", strings: []string{"I kå Glas frässa", "ond des macht mr nix!"}},
+	{encoding: "utf-16be", strings: []string{"Pot să mănânc sticlă", "și ea nu mă rănește."}},
+	{encoding: "utf-16le", strings: []string{"काचं शक्नोम्यत्तुम् ।", "नोपहिनस्ति माम् ॥"}},
+	{encoding: "big5", strings: []string{"我能吞下玻", "璃而不傷身體。"}},
+	{encoding: "gb18030", strings: []string{"我能吞下玻璃", "而不傷身。體"}},
+	{encoding: "euc-kr", strings: []string{" 나는 유리를 먹을 수 있어요.", " 그래도 아프지 않아요"}},
+	{encoding: "euc-jp", strings: []string{"私はガラスを食べられます。", "それは私を傷つけません。"}},
+	{encoding: "plain", strings: []string{"I can", "eat glass"}},
+	{encoding: "iso8859-1", strings: []string{"Filebeat is my favourite"}},
+	{encoding: "iso8859-2", strings: []string{"Filebeat je môj obľúbený"}},                          // slovak: filebeat is my favourite
+	{encoding: "iso8859-3", strings: []string{"büyükannem Filebeat kullanıyor"}},                    // turkish: my granmother uses filebeat
+	{encoding: "iso8859-4", strings: []string{"Filebeat on mõeldud kõigile"}},                       // estonian: filebeat is for everyone
+	{encoding: "iso8859-5", strings: []string{"я люблю кодировки"}},                                 // russian: i love encodings
+	{encoding: "iso8859-6", strings: []string{"أنا بحاجة إلى المزيد من الترميزات"}},                 // arabic: i need more encodings
+	{encoding: "iso8859-7", strings: []string{"όπου μπορώ να αγοράσω περισσότερες κωδικοποιήσεις"}}, // greek: where can i buy more encodings?
+	{encoding: "iso8859-8", strings: []string{"אני צריך קידוד אישי"}},                               // hebrew: i need a personal encoding
+	{encoding: "iso8859-9", strings: []string{"kodlamaları pişirebilirim"}},                         // turkish: i can cook encodings
+	{encoding: "iso8859-10", strings: []string{"koodaukset jäädyttävät nollaan"}},                   // finnish: encodings freeze below zero
+	{encoding: "iso8859-13", strings: []string{"mój pies zjada kodowanie"}},                         // polish: my dog eats encodings
+	{encoding: "iso8859-14", strings: []string{"An féidir leat cáise a ionchódú?"}},                 // irish: can you encode a cheese?
+	{encoding: "iso8859-15", strings: []string{"bedes du kode", "for min €"}},                       // danish: please encode my euro symbol
+	{encoding: "iso8859-16", strings: []string{"rossz karakterkódolást", "használsz"}},              // hungarian: you use the wrong character encoding
+	{encoding: "koi8r", strings: []string{"я люблю кодировки"}},                                     // russian: i love encodings
+	{encoding: "koi8u", strings: []string{"я люблю кодировки"}},                                     // russian: i love encodings
+	{encoding: "windows1250", strings: []string{"Filebeat je môj obľúbený"}},                        // slovak: filebeat is my favourite
+	{encoding: "windows1251", strings: []string{"я люблю кодировки"}},                               // russian: i love encodings
+	{encoding: "windows1252", strings: []string{"what is better than an encoding?", "a legacy encoding"}},
+	{encoding: "windows1253", strings: []string{"όπου μπορώ να αγοράσω", "περισσότερες κωδικοποιήσεις"}}, // greek: where can i buy more encodings?
+	{encoding: "windows1254", strings: []string{"kodlamaları", "pişirebilirim"}},                         // turkish: i can cook encodings
+	{encoding: "windows1255", strings: []string{"אני צריך קידוד אישי"}},                                  // hebrew: i need a personal encoding
+	{encoding: "windows1256", strings: []string{"أنا بحاجة إلى المزيد من الترميزات"}},                    // arabic: i need more encodings
+	{encoding: "windows1257", strings: []string{"toite", "kodeerijaid"}},                                 // estonian: feed the encoders
 }
 
 func TestReaderEncodings(t *testing.T) {
@@ -93,14 +95,16 @@ func TestReaderEncodings(t *testing.T) {
 		// write with encoding to buffer
 		writer := transform.NewWriter(buffer, codec.NewEncoder())
 		var expectedCount []int
-		for _, line := range test.strings {
+		for i, line := range test.strings {
 			writer.Write([]byte(line))
-			writer.Write(nl)
+			if !test.collectOnEOF || i < len(test.strings)-1 {
+				writer.Write(nl)
+			}
 			expectedCount = append(expectedCount, buffer.Len())
 		}
 
 		// create line reader
-		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, LineFeed, unlimited, false})
+		reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, 1024, LineFeed, unlimited, test.collectOnEOF})
 		if err != nil {
 			t.Fatal("failed to initialize reader:", err)
 		}
@@ -112,15 +116,19 @@ func TestReaderEncodings(t *testing.T) {
 		for {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
-				readLines = append(readLines, string(bytes[:len(bytes)-len(nl)]))
-			}
-
-			if err != nil {
-				break
+				offset := len(bytes)
+				if !test.collectOnEOF || err != io.EOF {
+					offset -= len(nl)
+				}
+				readLines = append(readLines, string(bytes[:offset]))
 			}
 
 			current += sz
 			byteCounts = append(byteCounts, current)
+
+			if err != nil {
+				break
+			}
 		}
 
 		// validate lines and byte offsets
@@ -137,9 +145,13 @@ func TestReaderEncodings(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.encoding, func(t *testing.T) {
-			runTest(t, test)
-		})
+		for _, collectOnEOF := range []bool{false, true} {
+			test.collectOnEOF = collectOnEOF
+			t.Run(fmt.Sprintf("enconding: %s, collect on EOF: %t", test.encoding, test.collectOnEOF), func(t *testing.T) {
+				runTest(t, test)
+			})
+
+		}
 	}
 }
 

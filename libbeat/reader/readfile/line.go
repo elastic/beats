@@ -34,6 +34,9 @@ const unlimited = 0
 // LineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
+// If collectOnEOF is set to true (default false) it will return the buffer if EOF reached.
+// If collectOnEOF is set to false it will return 0 content and keep the buffer at the current
+// state of appending data after temporarily EOF.
 type LineReader struct {
 	reader       io.ReadCloser
 	maxBytes     int // max bytes per line limit to avoid OOM with malformatted files
@@ -92,9 +95,10 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 		err := r.advance()
 		if err != nil {
 			if errors.Is(err, io.EOF) && r.collectOnEOF {
-				// Found encoded byte sequence for newline in buffer
+				// Found EOF and collectOnEOF is true
 				// -> decode input sequence into outBuffer
-				sz, err := r.decode(r.inOffset)
+				// let's add back len(r.nl) since we removed it, but we reached EOF and want to read till end of buffer
+				sz, err := r.decode(r.inOffset + len(r.nl))
 				if err != nil {
 					r.logger.Errorf("Error decoding line: %s", err)
 					// In case of error increase size by unencoded length
@@ -105,7 +109,7 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 				err = r.inBuffer.Advance(sz)
 				r.inBuffer.Reset()
 
-				// output buffer contains complete line ending with newline. Extract
+				// output buffer contains untile EOF. Extract
 				// byte slice from buffer and reset output buffer.
 				bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
 				r.outBuffer.Reset()
