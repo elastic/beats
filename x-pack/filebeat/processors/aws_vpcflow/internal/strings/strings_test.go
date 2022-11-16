@@ -66,7 +66,7 @@ func TestFields(t *testing.T) {
 	var smallDst [2]string
 	for _, tt := range fieldstests {
 		n, err := Fields(smallDst[:], tt.s)
-		if err == errTooManySubstrings {
+		if err == errTooManySubstrings { //nolint:errorlint // errTooManySubstrings is never wrapped.
 			if len(tt.a) > len(smallDst) {
 				continue
 			}
@@ -89,6 +89,7 @@ var FieldsFuncTests = []FieldsTest{
 	{"aXXbXXXcX", []string{"a", "b", "c"}},
 }
 
+//nolint:errorlint // errTooManySubstrings is never wrapped.
 func TestFieldsFunc(t *testing.T) {
 	var dst [4]string
 	for _, tt := range fieldstests {
