@@ -36,6 +36,7 @@
             "port": 34210
         },
         "event": {
+            "action": "accept",
             "end": "2021-03-26T03:29:09Z",
             "outcome": "success",
             "start": "2021-03-26T03:28:12Z"
@@ -46,7 +47,7 @@
             "direction": "ingress",
             "iana_number": "6",
             "packets": 14,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -100,6 +101,7 @@
             "port": 80
         },
         "event": {
+            "action": "accept",
             "end": "2021-03-26T03:29:09Z",
             "outcome": "success",
             "start": "2021-03-26T03:28:12Z"
@@ -110,7 +112,7 @@
             "direction": "egress",
             "iana_number": "6",
             "packets": 7,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {

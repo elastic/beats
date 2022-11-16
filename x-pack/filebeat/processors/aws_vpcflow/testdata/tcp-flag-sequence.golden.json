@@ -31,6 +31,7 @@
             "port": 5001
         },
         "event": {
+            "action": "accept",
             "end": "2019-08-26T19:48:53Z",
             "outcome": "success",
             "start": "2019-08-26T19:47:55Z"
@@ -40,7 +41,7 @@
             "bytes": 568,
             "iana_number": "6",
             "packets": 8,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -90,6 +91,7 @@
             "port": 43416
         },
         "event": {
+            "action": "accept",
             "end": "2019-08-26T19:48:53Z",
             "outcome": "success",
             "start": "2019-08-26T19:47:55Z"
@@ -99,7 +101,7 @@
             "bytes": 376,
             "iana_number": "6",
             "packets": 7,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -148,6 +150,7 @@
             "port": 5001
         },
         "event": {
+            "action": "accept",
             "end": "2019-08-26T19:48:53Z",
             "outcome": "success",
             "start": "2019-08-26T19:47:55Z"
@@ -157,7 +160,7 @@
             "bytes": 100701,
             "iana_number": "6",
             "packets": 70,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -207,6 +210,7 @@
             "port": 43418
         },
         "event": {
+            "action": "accept",
             "end": "2019-08-26T19:48:53Z",
             "outcome": "success",
             "start": "2019-08-26T19:47:55Z"
@@ -216,7 +220,7 @@
             "bytes": 632,
             "iana_number": "6",
             "packets": 12,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -265,6 +269,7 @@
             "port": 43418
         },
         "event": {
+            "action": "accept",
             "end": "2019-08-26T19:51:53Z",
             "outcome": "success",
             "start": "2019-08-26T19:48:53Z"
@@ -274,7 +279,7 @@
             "bytes": 63388,
             "iana_number": "6",
             "packets": 1219,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -323,6 +328,7 @@
             "port": 5001
         },
         "event": {
+            "action": "accept",
             "end": "2019-08-26T19:51:53Z",
             "outcome": "success",
             "start": "2019-08-26T19:48:53Z"
@@ -332,7 +338,7 @@
             "bytes": 23294588,
             "iana_number": "6",
             "packets": 15774,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -382,6 +388,7 @@
             "port": 5001
         },
         "event": {
+            "action": "accept",
             "end": "2019-08-27T19:13:13Z",
             "outcome": "success",
             "start": "2019-08-27T19:12:13Z"
@@ -391,7 +398,7 @@
             "bytes": 1260,
             "iana_number": "6",
             "packets": 17,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -442,6 +449,7 @@
             "port": 43638
         },
         "event": {
+            "action": "accept",
             "end": "2019-08-27T19:13:13Z",
             "outcome": "success",
             "start": "2019-08-27T19:12:13Z"
@@ -451,7 +459,7 @@
             "bytes": 967,
             "iana_number": "6",
             "packets": 14,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {

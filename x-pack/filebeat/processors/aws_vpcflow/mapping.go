@@ -103,7 +103,7 @@ var vpcFlowFields = [...]vpcFlowField{
 				},
 			},
 			{
-				Target: "network.protocol",
+				Target: "network.transport",
 				Transform: func(targetField string, value interface{}, event *beat.Event) {
 					var name string
 					switch protocol := value.(int32); protocol {
@@ -188,6 +188,12 @@ var vpcFlowFields = [...]vpcFlowField{
 					if outcome != "" {
 						event.PutValue(targetField, outcome) //nolint:errcheck // This can only fail if 'event' is not an object.
 					}
+				},
+			},
+			{
+				Target: "event.action",
+				Transform: func(targetField string, value interface{}, event *beat.Event) {
+					event.PutValue(targetField, strings.ToLower(value.(string))) //nolint:errcheck // This can only fail if 'event' is not an object.
 				},
 			},
 		},

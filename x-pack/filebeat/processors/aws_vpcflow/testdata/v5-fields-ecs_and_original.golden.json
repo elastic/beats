@@ -53,6 +53,7 @@
             "port": 33004
         },
         "event": {
+            "action": "reject",
             "end": "2021-03-26T03:29:09Z",
             "outcome": "failure",
             "start": "2021-03-26T03:28:12Z"
@@ -63,7 +64,7 @@
             "direction": "ingress",
             "iana_number": "17",
             "packets": 52,
-            "protocol": "udp",
+            "transport": "udp",
             "type": "ipv4"
         },
         "related": {

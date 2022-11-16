@@ -31,12 +31,13 @@
             "port": 80
         },
         "event": {
+            "action": "accept",
             "outcome": "success"
         },
         "message": "3 eni-33333333333333333 123456789010 vpc-abcdefab012345678 subnet-22222222bbbbbbbbb i-01234567890123456 10.20.33.164 10.40.2.236 39812 80 6 3 IPv4 10.20.33.164 10.40.2.236 ACCEPT OK",
         "network": {
             "iana_number": "6",
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -84,12 +85,13 @@
             "port": 39812
         },
         "event": {
+            "action": "accept",
             "outcome": "success"
         },
         "message": "3 eni-33333333333333333 123456789010 vpc-abcdefab012345678 subnet-22222222bbbbbbbbb i-01234567890123456 10.40.2.236 10.20.33.164 80 39812 6 19 IPv4 10.40.2.236 10.20.33.164 ACCEPT OK",
         "network": {
             "iana_number": "6",
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -133,12 +135,13 @@
             "port": 80
         },
         "event": {
+            "action": "accept",
             "outcome": "success"
         },
         "message": "3 eni-11111111111111111 123456789010 vpc-abcdefab012345678 subnet-11111111aaaaaaaaa - 10.40.1.175 10.40.2.236 39812 80 6 3 IPv4 10.20.33.164 10.40.2.236 ACCEPT OK",
         "network": {
             "iana_number": "6",
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -184,12 +187,13 @@
             "port": 39812
         },
         "event": {
+            "action": "accept",
             "outcome": "success"
         },
         "message": "3 eni-22222222222222222 123456789010 vpc-abcdefab012345678 subnet-22222222bbbbbbbbb - 10.40.2.236 10.40.2.31 80 39812 6 19 IPv4 10.40.2.236 10.20.33.164 ACCEPT OK",
         "network": {
             "iana_number": "6",
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {

@@ -19,6 +19,7 @@
             "port": 22
         },
         "event": {
+            "action": "accept",
             "end": "2014-12-14T04:07:50Z",
             "outcome": "success",
             "start": "2014-12-14T04:06:50Z"
@@ -28,7 +29,7 @@
             "bytes": 4249,
             "iana_number": "6",
             "packets": 20,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -65,6 +66,7 @@
             "port": 3389
         },
         "event": {
+            "action": "reject",
             "end": "2014-12-14T04:07:50Z",
             "outcome": "failure",
             "start": "2014-12-14T04:06:50Z"
@@ -74,7 +76,7 @@
             "bytes": 4249,
             "iana_number": "6",
             "packets": 20,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv4"
         },
         "related": {
@@ -151,6 +153,7 @@
             "port": 0
         },
         "event": {
+            "action": "accept",
             "end": "2015-05-29T16:32:22Z",
             "outcome": "success",
             "start": "2015-05-29T16:30:27Z"
@@ -160,7 +163,7 @@
             "bytes": 336,
             "iana_number": "1",
             "packets": 4,
-            "protocol": "icmp",
+            "transport": "icmp",
             "type": "ipv4"
         },
         "related": {
@@ -197,6 +200,7 @@
             "port": 0
         },
         "event": {
+            "action": "reject",
             "end": "2015-05-29T16:32:22Z",
             "outcome": "failure",
             "start": "2015-05-29T16:31:34Z"
@@ -206,7 +210,7 @@
             "bytes": 336,
             "iana_number": "1",
             "packets": 4,
-            "protocol": "icmp",
+            "transport": "icmp",
             "type": "ipv4"
         },
         "related": {
@@ -243,6 +247,7 @@
             "port": 22
         },
         "event": {
+            "action": "accept",
             "end": "2016-10-31T11:37:00Z",
             "outcome": "success",
             "start": "2016-10-31T11:35:08Z"
@@ -252,7 +257,7 @@
             "bytes": 8855,
             "iana_number": "6",
             "packets": 54,
-            "protocol": "tcp",
+            "transport": "tcp",
             "type": "ipv6"
         },
         "related": {

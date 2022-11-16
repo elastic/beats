@@ -109,6 +109,7 @@ func TestProcessorRun(t *testing.T) {
 				"port":    int32(33004),
 			},
 			"event": mapstr.M{
+				"action":  "reject",
 				"end":     end,
 				"outcome": "failure",
 				"start":   start,
@@ -119,7 +120,7 @@ func TestProcessorRun(t *testing.T) {
 				"direction":   "ingress",
 				"iana_number": "17",
 				"packets":     int64(52),
-				"protocol":    "udp",
+				"transport":   "udp",
 				"type":        "ipv4",
 			},
 			"related": mapstr.M{
