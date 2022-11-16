@@ -905,7 +905,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test if cursor value is updated for root response whith chaining & pagination",
+			name: "Test if cursor value is updated for root response with chaining & pagination",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				var serverURL string
 				registerPaginationTransforms()
@@ -984,7 +984,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test if cursor value is updated for root response whith chaining & pagination along with split operator",
+			name: "Test if cursor value is updated for root response with chaining & pagination along with split operator",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				var serverURL string
 				registerPaginationTransforms()
