@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
-	"google.golang.org/genproto/googleapis/monitoring/v3"
+	monitoring "google.golang.org/genproto/googleapis/monitoring/v3"
 )
 
 var fake = &monitoring.TimeSeries{
