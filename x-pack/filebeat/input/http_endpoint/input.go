@@ -164,12 +164,23 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 }
 
 func checkTLSConsistency(addr string, old, new *tlscommon.ServerConfig) error {
+	if old == nil && new == nil {
+		return nil
+	}
 	if (old == nil) != (new == nil) {
 		return fmt.Errorf("inconsistent TLS usage on %s: mixed TLS and unencrypted", addr)
 	}
 	if !reflect.DeepEqual(old, new) {
+		oldRendered := renderTLSConfig(old)
+		newRendered := renderTLSConfig(new)
+		if newRendered < oldRendered {
+			// For testing purposes we need to ensure that the ordering of the
+			// configs is consistent in the face of different orderings of config
+			// execution. Arbitrarily choose old to be lexically first.
+			oldRendered, newRendered = newRendered, oldRendered
+		}
 		return fmt.Errorf("inconsistent TLS configuration on %s: configuration options do not agree: old=%s new=%s",
-			addr, renderTLSConfig(old), renderTLSConfig(new))
+			addr, oldRendered, newRendered)
 	}
 	return nil
 }
