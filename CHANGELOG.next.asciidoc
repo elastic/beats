@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
 
 *Heartbeat*
 
@@ -94,7 +95,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 - Add tags to events based on parsed identifier. {pull}33472[33472]
 - Skip over unsupported filesystems in the system.filesystem metricset instead of failing immediately. Fix debug statement in system.fsstat metricset. {pull}33646[33646]
-
+- Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
 
 *Packetbeat*
 
@@ -157,9 +158,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Improve httpjson documentation for split processor. {pull}33473[33473]
 - Added separation of transform context object inside httpjson. Introduced new clause `.parent_last_response.*` {pull}33499[33499]
 - Cloud Foundry input uses server-side filtering when retrieving logs. {pull}33456[33456]
+- Add `parse_aws_vpc_flow_log` processor. {pull}33656[33656]
+- Update `aws.vpcflow` dataset in AWS module have a configurable log `format` and to produce ECS 8.x fields. {pull}33699[33699]
 - Modified `aws-s3` input to reduce mutex contention when multiple SQS message are being processed concurrently. {pull}33658[33658]
 - Disable "event normalization" processing for the aws-s3 input to reduce allocations. {pull}33673[33673]
 - Add Common Expression Language input. {pull}31233[31233]
+- Add support for http+unix and http+npipe schemes. {issue}33571[33571] {pull}33610[33610]
 - Filter debug logs for `httpjson` templates. {pull}33254[33254]
 
 *Auditbeat*
@@ -218,31 +222,3 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

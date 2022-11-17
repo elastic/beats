@@ -17,7 +17,6 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 const (
@@ -33,10 +32,7 @@ const (
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := requestCfg.Transport.Client(
-		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
-	)
+	netHTTPClient, err := requestCfg.Transport.Client(clientOptions(requestCfg.URL.URL)...)
 	if err != nil {
 		return nil, err
 	}

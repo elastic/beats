@@ -397,6 +397,9 @@ with `auth.oauth2.google.jwt_file` or `auth.oauth2.google.jwt_json`.
 
 The URL of the HTTP API. Required.
 
+The API endpoint may be accessed via unix socket and Windows named pipes by adding  `+unix` or `+npipe`
+to the URL scheme, for example, `http+unix:///var/socket/`.
+
 [float]
 ==== `request.method`
 
