@@ -129,7 +129,7 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, log *
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response) <-chan maybeMsg {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool) <-chan maybeMsg {
 	trCtx.clearIntervalData()
 
 	ch := make(chan maybeMsg)
@@ -158,6 +158,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 					return
 				}
 
+				// last_response context object is updated here organically
 				trCtx.updateLastResponse(*page)
 
 				rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
@@ -191,6 +192,9 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 							return
 						}
 					}
+				}
+				if !paginate {
+					break
 				}
 			}
 		}
