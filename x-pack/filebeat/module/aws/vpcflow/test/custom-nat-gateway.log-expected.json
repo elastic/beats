@@ -6,19 +6,24 @@
         "cloud.provider": "aws",
         "destination.address": "10.0.0.220",
         "destination.ip": "10.0.0.220",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "- eni-1235b8ca123456789 10.0.1.5 10.0.0.220 10.0.1.5 203.0.113.5",
-        "event.type": "flow",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 65,
         "network.type": "ipv4",
         "related.ip": [
             "10.0.0.220",
-            "10.0.1.5"
+            "10.0.1.5",
+            "203.0.113.5"
         ],
         "service.type": "aws",
         "source.address": "10.0.1.5",
@@ -37,12 +42,16 @@
         "cloud.provider": "aws",
         "destination.address": "203.0.113.5",
         "destination.ip": "203.0.113.5",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "i-01234567890123456 eni-1111aaaa2222bbbb3 10.0.1.5 203.0.113.5 10.0.1.5 203.0.113.5",
-        "event.type": "flow",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 130,
