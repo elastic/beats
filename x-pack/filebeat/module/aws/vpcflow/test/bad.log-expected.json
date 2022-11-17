@@ -1,12 +1,13 @@
 [
     {
         "cloud.provider": "aws",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "Phony unsupported log format.",
-        "event.type": "flow",
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 0,

@@ -153,6 +153,32 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 		},
 		{
+			name: "client credential secret may be empty",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"enabled":   true,
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "",
+					},
+				},
+			},
+		},
+		{
+			name:        "client credential secret may not be missing",
+			expectedErr: "both token_url and client credentials must be provided accessing 'auth.oauth2'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"enabled":   true,
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id": "a_client_id",
+					},
+				},
+			},
+		},
+		{
 			name: "if user and password is set oauth2 must use user-password authentication",
 			input: map[string]interface{}{
 				"auth.oauth2": map[string]interface{}{

@@ -75,7 +75,12 @@ described later.
 *`paths`*:: A list of paths (directories or files) to watch. Globs are
 not supported. The specified paths should exist when the metricset is started.
 Paths should be absolute, although the file integrity module will attempt to
-resolve relative path events to their absolute file path.
+resolve relative path events to their absolute file path. Symbolic links will
+be resolved on module start and the link target will be watched if link resolution
+is successful. Changes to the symbolic link after module start will not change
+the watch target. If the link does not resolve to a valid target, the symbolic
+link itself will be watched; if the symlink target becomes valid after module
+start up this will not be picked up by the file system watches.
 
 *`exclude_files`*:: A list of regular expressions used to filter out events
 for unwanted files. The expressions are matched against the full path of every
@@ -114,15 +119,24 @@ units are `b` (default), `kib`, `kb`, `mib`, `mb`, `gib`, `gb`, `tib`, `tb`,
 `pib`, `pb`, `eib`, and `eb`.
 
 *`max_file_size`*:: The maximum size of a file in bytes for which
-{beatname_uc} will compute hashes. Files larger than this size will not be
-hashed. The default value is 100 MiB. For convenience units can be specified as
-a suffix to the value. The supported units are `b` (default), `kib`, `kb`, `mib`,
-`mb`, `gib`, `gb`, `tib`, `tb`, `pib`, `pb`, `eib`, and `eb`.
+{beatname_uc} will compute hashes and run file parsers. Files larger than this
+size will not be hashed or analysed by configured file parsers. The default
+value is 100 MiB. For convenience units can be specified as a suffix to the
+value. The supported units are `b` (default), `kib`, `kb`, `mib`, `mb`, `gib`,
+`gb`, `tib`, `tb`, `pib`, `pb`, `eib`, and `eb`.
 
 *`hash_types`*:: A list of hash types to compute when the file changes.
 The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`,
 `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `sha512_224`, `sha512_256`,
 `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`, and `xxh64`. The default value is `sha1`.
+
+*`file_parsers`*:: A list of `file_integrity` fields under `file` that will be
+populated by file format parsers. The available fields that can be analysed
+are listed in the auditbeat.reference.yml file. File parsers are run on all
+files within the `max_file_size` limit in the configured paths during a scan or
+when a file event involves the file. Files that are not targets of the specific
+file parser are only sniffed to examine whether analysis should proceed. This will
+usually only involve reading a small number of bytes.
 
 *`recursive`*:: By default, the watches set to the paths specified in
 `paths` are not recursive. This means that only changes to the contents

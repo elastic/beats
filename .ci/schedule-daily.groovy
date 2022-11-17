@@ -20,8 +20,8 @@ pipeline {
   stages {
     stage('Nighly beats builds') {
       steps {
-        runMacosBuilds(quietPeriodFactor: 2000, branches: ['main', '8.<minor>', '8.<next-patch>', '7.<minor>'])
-        runIronbankBuilds(quietPeriodFactor: 100, branches: ['main', '8.<minor>', '8.<next-patch>', '7.<minor>'])
+        runMacosBuilds(quietPeriodFactor: 2000, branches: ['main', '8.<next-minor>', '8.<minor>', '8.<next-patch>', '7.<minor>'])
+        runIronbankBuilds(quietPeriodFactor: 100, branches: ['main', '8.<next-minor>', '8.<minor>', '8.<next-patch>', '7.<minor>'])
       }
     }
   }

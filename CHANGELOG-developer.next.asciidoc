@@ -146,6 +146,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Improve compatibility and reduce flakyness of Python tests {pull}31588[31588]
 - Added `.python-version` file {pull}32323[32323]
 - Add support for multiple regions in GCP {pull}32964[32964]
+- Use `T.TempDir` to create temporary test directory {pull}33082[33082]
+- Add an option to disable event normalization when creating a `beat.Client`. {pull}33657[33657]
 
 ==== Deprecated
 

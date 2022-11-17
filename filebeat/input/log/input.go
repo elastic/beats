@@ -456,9 +456,7 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort)
 	}
 
-	if sortFunc != nil {
-		sort.Slice(sortInfos, sortFunc)
-	}
+	sort.Slice(sortInfos, sortFunc)
 
 	return sortInfos, nil
 }

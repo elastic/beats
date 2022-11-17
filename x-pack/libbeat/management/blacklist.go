@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -52,7 +51,7 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	for field, pattern := range cfg.Patterns {
 		exp, err := match.Compile(pattern)
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("Given expression is not a valid regexp: %s", pattern))
+			return nil, fmt.Errorf("given expression is not a valid regexp: %s", pattern)
 		}
 
 		list.patterns[field] = exp

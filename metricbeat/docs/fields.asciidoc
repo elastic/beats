@@ -31878,13 +31878,6 @@ type: long
 
 
 
-*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
 +
 --
@@ -45655,7 +45648,7 @@ type: keyword
 *`kubernetes.node.cpu.allocatable.cores`*::
 +
 --
-Node CPU allocatable cores
+The allocatable CPU cores of a node that are available for pods scheduling
 
 
 type: float
@@ -45676,7 +45669,7 @@ type: long
 *`kubernetes.node.memory.allocatable.bytes`*::
 +
 --
-Node allocatable memory in bytes
+The allocatable memory of a node in bytes that is available for pods scheduling
 
 
 type: long
@@ -63069,6 +63062,30 @@ type: long
 --
 Number of processes for which the state couldn't be retrieved or is unknown.
 
+
+type: long
+
+--
+
+[float]
+=== threads
+
+Counts of individual threads on a system.
+
+
+*`system.process.summary.threads.running`*::
++
+--
+Count of currently running threads.
+
+type: long
+
+--
+
+*`system.process.summary.threads.blocked`*::
++
+--
+Count of threads blocked by I/O.
 
 type: long
 

@@ -137,7 +137,7 @@ func (m *MockResourceGroupsTaggingClient) GetResources(_ context.Context, _ *res
 
 func TestGetListMetricsOutput(t *testing.T) {
 	svcCloudwatch := &MockCloudWatchClient{}
-	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", svcCloudwatch)
+	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(listMetricsOutput))
 	assert.Equal(t, namespace, *listMetricsOutput[0].Namespace)
@@ -149,7 +149,7 @@ func TestGetListMetricsOutput(t *testing.T) {
 
 func TestGetListMetricsOutputWithWildcard(t *testing.T) {
 	svcCloudwatch := &MockCloudWatchClient{}
-	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", svcCloudwatch)
+	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", time.Minute*5, svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(listMetricsOutput))
 	assert.Equal(t, namespace, *listMetricsOutput[0].Namespace)
@@ -257,81 +257,6 @@ func TestCheckTimestampInArray(t *testing.T) {
 		exists, index := CheckTimestampInArray(c.targetTimestamp, timestampArray)
 		assert.Equal(t, c.expectedExists, exists)
 		assert.Equal(t, c.expectedIndex, index)
-	}
-}
-
-func TestFindTimestamp(t *testing.T) {
-	timestamp1 := time.Now()
-	timestamp2 := timestamp1.Add(5 * time.Minute)
-	cases := []struct {
-		getMetricDataResults []cloudwatchtypes.MetricDataResult
-		expectedTimestamp    time.Time
-	}{
-		{
-			getMetricDataResults: []cloudwatchtypes.MetricDataResult{
-				{
-					Id:         &id1,
-					Label:      &label1,
-					StatusCode: cloudwatchtypes.StatusCodeComplete,
-					Timestamps: []time.Time{timestamp1, timestamp2},
-					Values:     []float64{0, 1},
-				},
-				{
-					Id:         &id2,
-					Label:      &label2,
-					StatusCode: cloudwatchtypes.StatusCodeComplete,
-					Timestamps: []time.Time{timestamp1},
-					Values:     []float64{2, 3},
-				},
-			},
-			expectedTimestamp: timestamp1,
-		},
-		{
-			getMetricDataResults: []cloudwatchtypes.MetricDataResult{
-				{
-					Id:         &id1,
-					Label:      &label1,
-					StatusCode: cloudwatchtypes.StatusCodeComplete,
-					Timestamps: []time.Time{timestamp1, timestamp2},
-					Values:     []float64{0, 1},
-				},
-				{
-					Id:         &id2,
-					Label:      &label2,
-					StatusCode: cloudwatchtypes.StatusCodeComplete,
-				},
-			},
-			expectedTimestamp: timestamp1,
-		},
-		{
-			getMetricDataResults: []cloudwatchtypes.MetricDataResult{
-				{
-					Id:         &id1,
-					Label:      &label1,
-					StatusCode: cloudwatchtypes.StatusCodeComplete,
-					Timestamps: []time.Time{timestamp1, timestamp2},
-					Values:     []float64{0, 1},
-				},
-				{
-					Id:         &id2,
-					Label:      &label2,
-					StatusCode: cloudwatchtypes.StatusCodeComplete,
-				},
-				{
-					Id:         &id3,
-					Label:      &label2,
-					StatusCode: cloudwatchtypes.StatusCodeComplete,
-					Timestamps: []time.Time{timestamp2},
-					Values:     []float64{2, 3},
-				},
-			},
-			expectedTimestamp: timestamp2,
-		},
-	}
-
-	for _, c := range cases {
-		outputTimestamp := FindTimestamp(c.getMetricDataResults)
-		assert.Equal(t, c.expectedTimestamp, outputTimestamp)
 	}
 }
 
