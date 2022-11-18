@@ -162,7 +162,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	eventext.MergeEventFields(event, se.ToMap())
 
-	if je.urlFields == nil {
+	if len(je.urlFields) == 0 {
 		if urlFields, err := event.GetValue("url"); err == nil {
 			if ufMap, ok := urlFields.(mapstr.M); ok {
 				je.urlFields = ufMap
