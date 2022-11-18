@@ -25,9 +25,10 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je         *journeyEnricher
-	sFields    stdfields.StdMonitorFields
-	checkGroup string
+	je           *journeyEnricher
+	journeyCount int
+	sFields      stdfields.StdMonitorFields
+	checkGroup   string
 }
 
 func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
@@ -39,8 +40,15 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		senr.je = newJourneyEnricher(senr)
 	}
 
-	eventext.MergeEventFields(event, map[string]interface{}{"monitor": map[string]interface{}{"check_group": senr.checkGroup}})
+	// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
+	if se.Type == JourneyStart {
+		senr.journeyCount++
+		if senr.journeyCount > 1 {
+			senr.checkGroup = makeUuid()
+		}
+	}
 
+	eventext.MergeEventFields(event, map[string]interface{}{"monitor": map[string]interface{}{"check_group": senr.checkGroup}})
 	return senr.je.enrich(event, se)
 }
 
@@ -84,6 +92,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case JourneyStart:
+			je.streamEnricher.checkGroup = makeUuid()
 			je.error = nil
 			je.journey = se.Journey
 			je.start = event.Timestamp
@@ -164,13 +173,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 }
 
 func (je *journeyEnricher) createSummary(event *beat.Event) error {
-	// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
-	defer func() {
-		if je != nil && je.streamEnricher != nil {
-			je.streamEnricher.checkGroup = makeUuid()
-		}
-	}()
-
 	var up, down int
 	if je.errorCount > 0 {
 		up = 0
