@@ -92,7 +92,6 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case JourneyStart:
-			je.streamEnricher.checkGroup = makeUuid()
 			je.error = nil
 			je.journey = se.Journey
 			je.start = event.Timestamp
