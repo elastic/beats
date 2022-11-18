@@ -284,7 +284,8 @@ func (p *s3Poller) Purge() {
 		states := map[string]*state{}
 		latestStoredTimeByBucketAndListPrefix := make(map[string]time.Time, 0)
 
-		for _, state := range p.states.GetStatesByListingID(listingID) {
+		listingStates := p.states.GetStatesByListingID(listingID)
+		for i, state := range listingStates {
 			// it is not stored, keep
 			if !state.Stored {
 				p.log.Debugw("state not stored, skip purge", "state", state)
@@ -292,7 +293,7 @@ func (p *s3Poller) Purge() {
 			}
 
 			var latestStoredTime time.Time
-			states[state.ID] = &state
+			states[state.ID] = &listingStates[i]
 			latestStoredTime, ok := latestStoredTimeByBucketAndListPrefix[state.Bucket+state.ListPrefix]
 			if !ok {
 				var commitWriteState commitWriteState
