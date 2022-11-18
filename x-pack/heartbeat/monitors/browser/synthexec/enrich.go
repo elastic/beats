@@ -92,6 +92,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case JourneyStart:
+			// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
 			je.streamEnricher.checkGroup = makeUuid()
 			je.error = nil
 			je.journey = se.Journey
