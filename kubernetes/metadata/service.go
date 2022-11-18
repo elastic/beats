@@ -32,7 +32,7 @@ type service struct {
 	resource *Resource
 }
 
-// NewServiceMetadataGenerator creates a metagen for namespaced Kubernetes resources, like: Service, Deployment, Cronjob, etc.
+// NewServiceMetadataGenerator creates a metagen for service resources
 func NewServiceMetadataGenerator(cfg *config.C, services cache.Store, namespace MetaGen, client k8s.Interface) MetaGen {
 	return &service{
 		resource: NewNamespaceAwareResourceMetadataGenerator(cfg, client, namespace),
@@ -71,7 +71,6 @@ func (s *service) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) map
 		return nil
 	}
 
-	// resourceName := obj.GetObjectKind().GroupVersionKind().Kind
 	out := s.resource.GenerateK8s("service", obj, opts...)
 
 	selectors := svc.Spec.Selector
