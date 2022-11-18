@@ -15,10 +15,14 @@
     "system": {
         "process": {
             "summary": {
-                "idle": 122,
+                "idle": 110,
                 "running": 1,
-                "sleeping": 222,
-                "total": 345
+                "sleeping": 138,
+                "threads": {
+                    "blocked": 0,
+                    "running": 2
+                },
+                "total": 249
             }
         }
     }
