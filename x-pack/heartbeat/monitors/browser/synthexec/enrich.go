@@ -41,7 +41,7 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	}
 
 	// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
-	if se.Type == JourneyStart {
+	if se != nil && se.Type == JourneyStart {
 		senr.journeyCount++
 		if senr.journeyCount > 1 {
 			senr.checkGroup = makeUuid()
