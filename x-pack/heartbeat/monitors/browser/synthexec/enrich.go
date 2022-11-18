@@ -164,6 +164,11 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 }
 
 func (je *journeyEnricher) createSummary(event *beat.Event) error {
+	// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
+	defer func() {
+		je.streamEnricher.checkGroup = makeUuid()
+	}()
+
 	var up, down int
 	if je.errorCount > 0 {
 		up = 0
@@ -206,10 +211,6 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	if je.journeyComplete {
 		return je.error
 	}
-
-	// create a new check group for the next journey
-	je.streamEnricher.checkGroup = makeUuid()
-
 	return fmt.Errorf("journey did not finish executing, %d steps ran: %w", je.stepCount, je.error)
 }
 
