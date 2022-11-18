@@ -166,7 +166,9 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
 	defer func() {
-		je.streamEnricher.checkGroup = makeUuid()
+		if je != nil && je.streamEnricher != nil {
+			je.streamEnricher.checkGroup = makeUuid()
+		}
 	}()
 
 	var up, down int

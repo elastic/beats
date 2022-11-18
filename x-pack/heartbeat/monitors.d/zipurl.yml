@@ -1,0 +1,12 @@
+
+- name: TDZIP
+  id: tdzip
+  type: browser
+  schedule: "@every 3m"
+  tags: todos-app
+  params:
+    url: "https://elastic.github.io/synthetics-demo/"
+  source:
+    zip_url: 
+      url: "https://github.com/elastic/synthetics-demo/archive/refs/heads/main.zip"
+      folder: "todos"
