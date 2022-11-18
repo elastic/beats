@@ -168,21 +168,26 @@ func checkTLSConsistency(addr string, old, new *tlscommon.ServerConfig) error {
 		return nil
 	}
 	if (old == nil) != (new == nil) {
-		return fmt.Errorf("inconsistent TLS usage on %s: mixed TLS and unencrypted", addr)
+		return invalidTLSStateErr{addr: addr, reason: "mixed TLS and unencrypted", old: old, new: new}
 	}
 	if !reflect.DeepEqual(old, new) {
-		oldRendered := renderTLSConfig(old)
-		newRendered := renderTLSConfig(new)
-		if newRendered < oldRendered {
-			// For testing purposes we need to ensure that the ordering of the
-			// configs is consistent in the face of different orderings of config
-			// execution. Arbitrarily choose old to be lexically first.
-			oldRendered, newRendered = newRendered, oldRendered
-		}
-		return fmt.Errorf("inconsistent TLS configuration on %s: configuration options do not agree: old=%s new=%s",
-			addr, oldRendered, newRendered)
+		return invalidTLSStateErr{addr: addr, reason: "configuration options do not agree", old: old, new: new}
 	}
 	return nil
+}
+
+type invalidTLSStateErr struct {
+	addr     string
+	reason   string
+	old, new *tlscommon.ServerConfig
+}
+
+func (e invalidTLSStateErr) Error() string {
+	if e.old == nil || e.new == nil {
+		return fmt.Sprintf("inconsistent TLS usage on %s: %s", e.addr, e.reason)
+	}
+	return fmt.Sprintf("inconsistent TLS configuration on %s: %s: old=%s new=%s",
+		e.addr, e.reason, renderTLSConfig(e.old), renderTLSConfig(e.new))
 }
 
 func renderTLSConfig(tls *tlscommon.ServerConfig) string {
