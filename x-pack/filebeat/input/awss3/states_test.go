@@ -9,11 +9,37 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/beater"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+type testInputStore struct {
+	registry *statestore.Registry
+}
+
+func openTestStatestore() beater.StateStore {
+	return &testInputStore{
+		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
+	}
+}
+
+func (s *testInputStore) Close() {
+	_ = s.registry.Close()
+}
+
+func (s *testInputStore) Access() (*statestore.Store, error) {
+	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) CleanupInterval() time.Duration {
+	return 24 * time.Hour
+}
 
 var inputCtx = v2.Context{
 	Logger:      logp.NewLogger("test"),
@@ -79,6 +105,139 @@ func TestStatesIsNew(t *testing.T) {
 			states := test.states()
 			isNew := states.IsNew(test.state)
 			assert.Equal(t, test.expected, isNew)
+		})
+	}
+}
+
+func TestMustSkip(t *testing.T) {
+	type stateTestCase struct {
+		states            func() *states
+		state             state
+		mustBeNew         bool
+		persistentStoreKV map[string]interface{}
+		expected          bool
+	}
+	lastModified := time.Date(2022, time.June, 30, 14, 13, 00, 0, time.UTC)
+	tests := map[string]stateTestCase{
+		"with empty states": {
+			states: func() *states {
+				return newStates(inputCtx)
+			},
+			state:    newState("bucket", "key", "etag", "listPrefix", lastModified),
+			expected: false,
+		},
+		"not existing state": {
+			states: func() *states {
+				states := newStates(inputCtx)
+				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
+				return states
+			},
+			state:    newState("bucket1", "key1", "etag1", "listPrefix1", lastModified),
+			expected: false,
+		},
+		"existing state": {
+			states: func() *states {
+				states := newStates(inputCtx)
+				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
+				return states
+			},
+			state:    newState("bucket", "key", "etag", "listPrefix", lastModified),
+			expected: true,
+		},
+		"with different etag": {
+			states: func() *states {
+				states := newStates(inputCtx)
+				states.Update(newState("bucket", "key", "etag1", "listPrefix", lastModified), "")
+				return states
+			},
+			state:    newState("bucket", "key", "etag2", "listPrefix", lastModified),
+			expected: false,
+		},
+		"with different lastmodified": {
+			states: func() *states {
+				states := newStates(inputCtx)
+				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
+				return states
+			},
+			state:    newState("bucket", "key", "etag", "listPrefix", lastModified.Add(1*time.Second)),
+			expected: false,
+		},
+		"with stored state": {
+			states: func() *states {
+				states := newStates(inputCtx)
+				aState := newState("bucket", "key", "etag", "listPrefix", lastModified)
+				aState.Stored = true
+				states.Update(aState, "")
+				return states
+			},
+			state:     newState("bucket", "key", "etag", "listPrefix", lastModified),
+			mustBeNew: true,
+			expected:  true,
+		},
+		"with error state": {
+			states: func() *states {
+				states := newStates(inputCtx)
+				aState := newState("bucket", "key", "etag", "listPrefix", lastModified)
+				aState.Error = true
+				states.Update(aState, "")
+				return states
+			},
+			state:     newState("bucket", "key", "etag", "listPrefix", lastModified),
+			mustBeNew: true,
+			expected:  true,
+		},
+		"before commit write": {
+			states: func() *states {
+				return newStates(inputCtx)
+			},
+			persistentStoreKV: map[string]interface{}{
+				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
+			},
+			state:    newState("bucket", "key", "etag", "listPrefix", lastModified.Add(-1*time.Second)),
+			expected: true,
+		},
+		"same commit write": {
+			states: func() *states {
+				return newStates(inputCtx)
+			},
+			persistentStoreKV: map[string]interface{}{
+				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
+			},
+			state:    newState("bucket", "key", "etag", "listPrefix", lastModified),
+			expected: true,
+		},
+		"after commit write": {
+			states: func() *states {
+				return newStates(inputCtx)
+			},
+			persistentStoreKV: map[string]interface{}{
+				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
+			},
+			state:    newState("bucket", "key", "etag", "listPrefix", lastModified.Add(time.Second)),
+			expected: false,
+		},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			states := test.states()
+			store := openTestStatestore()
+			persistentStore, err := store.Access()
+			if err != nil {
+				t.Fatalf("unexpected err: %v", err)
+			}
+			for key, value := range test.persistentStoreKV {
+				_ = persistentStore.Set(key, value)
+			}
+
+			if test.mustBeNew {
+				test.state.LastModified = test.state.LastModified.Add(1 * time.Second)
+			}
+
+			isNew := states.MustSkip(test.state, persistentStore)
+			assert.Equal(t, test.expected, isNew)
+			_ = persistentStore.Close()
 		})
 	}
 }
