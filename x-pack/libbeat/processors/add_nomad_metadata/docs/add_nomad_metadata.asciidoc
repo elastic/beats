@@ -16,7 +16,7 @@ Each event is annotated with the following information:
 * Allocation name, identifier and status.
 * Job name and type.
 * Namespace where the job is deployed.
-* Datacenter and region where the agent runnning the allocation is located.
+* Datacenter and region where the agent running the allocation is located.
 
 [source,yaml]
 -------------------------------------------------------------------------------
