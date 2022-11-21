@@ -130,8 +130,6 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 		if r.namespace != nil {
 			nsMeta := r.namespace.GenerateFromName(namespaceName)
 			if nsMeta != nil {
-				// Use this in 8.0
-				//out.Put("namespace", meta["namespace"])
 				meta.DeepUpdate(nsMeta)
 			}
 		}
