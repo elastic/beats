@@ -19,8 +19,7 @@ package stats
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -49,7 +48,11 @@ var (
 			"platformRelease": c.Str("platform_release", s.Optional),
 		}),
 		"kibana": c.Ifc("kibana"),
-
+		"elasticsearch_client": c.Dict("elasticsearch_client", s.Schema{
+			"total_active_sockets":  c.Int("total_active_sockets"),
+			"total_idle_sockets":    c.Int("total_idle_sockets"),
+			"total_queued_requests": c.Int("total_queued_requests"),
+		}, c.DictOptional),
 		"uuid":  c.Str("kibana.uuid"),
 		"name":  c.Str("kibana.name"),
 		"index": c.Str("kibana.index"),
@@ -107,12 +110,12 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana Stats API response")
+		return fmt.Errorf("failure parsing Kibana Stats API response: %w", err)
 	}
 
 	dataFields, err := schema.Apply(data)
 	if err != nil {
-		return errors.Wrap(err, "failure to apply stats schema")
+		return fmt.Errorf("failure to apply stats schema: %w", err)
 	}
 
 	event := mb.Event{ModuleFields: mapstr.M{}, RootFields: mapstr.M{}}
@@ -123,7 +126,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
 		return event.Error
 	}
-	event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+	_, _ = event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")
@@ -131,8 +134,8 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("service.id", uuid)
-	dataFields.Delete("uuid")
+	_, _ = event.RootFields.Put("service.id", uuid)
+	_ = dataFields.Delete("uuid")
 
 	// Set service version
 	version, err := dataFields.GetValue("version")
@@ -140,8 +143,8 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("kibana.version", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("service.version", version)
-	dataFields.Delete("version")
+	_, _ = event.RootFields.Put("service.version", version)
+	_ = dataFields.Delete("version")
 
 	// Set service address
 	serviceAddress, err := dataFields.GetValue("kibana.transport_address")
@@ -149,7 +152,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("service.address", serviceAddress)
+	_, _ = event.RootFields.Put("service.address", serviceAddress)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})
@@ -162,9 +165,9 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("process.pid", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("process.pid", int(pid))
+	_, _ = event.RootFields.Put("process.pid", int(pid))
 
-	dataFields.Delete("kibana")
+	_ = dataFields.Delete("kibana")
 
 	event.MetricSetFields = dataFields
 
