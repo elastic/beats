@@ -148,6 +148,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Use `T.TempDir` to create temporary test directory {pull}33082[33082]
 - Add an option to disable event normalization when creating a `beat.Client`. {pull}33657[33657]
+- Add DropFields processor to js API {pull}33458[33458]
 
 ==== Deprecated
 
