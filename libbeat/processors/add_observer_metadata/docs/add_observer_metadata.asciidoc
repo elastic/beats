@@ -45,7 +45,7 @@ It has the following settings:
 `geo.region_iso_code`:: (Optional) ISO region code.
 
 
-The `add_geo_metadata` processor annotates each event with relevant metadata from the observer machine.
+The `add_observer_metadata` processor annotates each event with relevant metadata from the observer machine.
 The fields added to the event look like the following:
 
 [source,json]
