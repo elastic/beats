@@ -17,6 +17,7 @@ import (
 	types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	gomock "github.com/golang/mock/gomock"
 
+	beat "github.com/elastic/beats/v7/libbeat/beat"
 	aws "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	logp "github.com/elastic/elastic-agent-libs/logp"
 )
@@ -444,17 +445,17 @@ func (m *MockS3ObjectHandlerFactory) EXPECT() *MockS3ObjectHandlerFactoryMockRec
 }
 
 // Create mocks base method.
-func (m *MockS3ObjectHandlerFactory) Create(ctx context.Context, log *logp.Logger, acker *aws.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (m *MockS3ObjectHandlerFactory) Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *aws.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, log, acker, obj)
+	ret := m.ctrl.Call(m, "Create", ctx, log, client, acker, obj)
 	ret0, _ := ret[0].(s3ObjectHandler)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockS3ObjectHandlerFactoryMockRecorder) Create(ctx, log, acker, obj interface{}) *gomock.Call {
+func (mr *MockS3ObjectHandlerFactoryMockRecorder) Create(ctx, log, client, acker, obj interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockS3ObjectHandlerFactory)(nil).Create), ctx, log, acker, obj)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockS3ObjectHandlerFactory)(nil).Create), ctx, log, client, acker, obj)
 }
 
 // MockS3ObjectHandler is a mock of s3ObjectHandler interface.
