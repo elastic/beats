@@ -187,6 +187,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add namespace metadata to all namespaced kubernetes resources. {pull}
+- Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 
 *Packetbeat*
 
