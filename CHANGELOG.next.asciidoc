@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix Google workspace pagination and document ID generation. {pull}33666[33666]
 
 *Heartbeat*
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
 - Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
 - Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
 - Fix states client support for output options. {pull}33405[33405]
@@ -117,6 +118,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Beats will now attempt to recover if a lockfile has not been removed {pull}[33169]
 - Add `http.pprof` config options for enabling block and mutex profiling. {issue}33572[33572] {pull}33576[33576]
+- Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 
 *Auditbeat*
 
@@ -164,7 +166,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Modified `aws-s3` input to reduce mutex contention when multiple SQS message are being processed concurrently. {pull}33658[33658]
 - Disable "event normalization" processing for the aws-s3 input to reduce allocations. {pull}33673[33673]
 - Add Common Expression Language input. {pull}31233[31233]
-- Add support for http+unix and http+npipe schemes. {issue}33571[33571] {pull}33610[33610]
+- Add support for http+unix and http+npipe schemes in httpjson input. {issue}33571[33571] {pull}33610[33610]
+- Add support for http+unix and http+npipe schemes in cel input. {issue}33571[33571] {pull}33712[33712]
 
 *Auditbeat*
 
