@@ -47,6 +47,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
@@ -640,10 +641,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	if !wantClient(cfg) {
 		return nil, nil
 	}
-	c, err := cfg.Resource.Transport.Client(
-		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
-	)
+	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL)...)
 	if err != nil {
 		return nil, err
 	}
@@ -684,12 +682,55 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 }
 
 func wantClient(cfg config) bool {
-	switch cfg.Resource.URL.Scheme {
+	switch scheme, _, _ := strings.Cut(cfg.Resource.URL.Scheme, "+"); scheme {
 	case "http", "https":
 		return true
 	default:
 		return false
 	}
+}
+
+// clientOption returns constructed client configuration options, including
+// setting up http+unix and http+npipe transports if requested.
+func clientOptions(u *url.URL) []httpcommon.TransportOption {
+	scheme, trans, ok := strings.Cut(u.Scheme, "+")
+	var dialer transport.Dialer
+	switch {
+	default:
+		fallthrough
+	case !ok:
+		return []httpcommon.TransportOption{
+			httpcommon.WithAPMHTTPInstrumentation(),
+			httpcommon.WithKeepaliveSettings{Disable: true},
+		}
+
+	// We set the host for the unix socket and Windows named
+	// pipes schemes because the http.Transport expects to
+	// have a host and will error out if it is not present.
+	// The values here are just non-zero with a helpful name.
+	// They are not used in any logic.
+	case trans == "unix":
+		u.Host = "unix-socket"
+		dialer = socketDialer{u.Path}
+	case trans == "npipe":
+		u.Host = "windows-npipe"
+		dialer = npipeDialer{u.Path}
+	}
+	u.Scheme = scheme
+	return []httpcommon.TransportOption{
+		httpcommon.WithAPMHTTPInstrumentation(),
+		httpcommon.WithKeepaliveSettings{Disable: true},
+		httpcommon.WithBaseDialer(dialer),
+	}
+}
+
+// socketDialer implements transport.Dialer to a constant socket path.
+type socketDialer struct {
+	path string
+}
+
+func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
+	return net.Dial("unix", d.path)
 }
 
 func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {
