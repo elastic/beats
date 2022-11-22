@@ -617,8 +617,10 @@ github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 h1:lnDkqiRFKm0rxdljqr
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3/go.mod h1:aPqzac6AYkipvp4hufTyMj5PDIphF3+At8zr7r51xjY=
 github.com/elastic/elastic-agent-autodiscover v0.4.0 h1:R1JMLHQpH2KP3GXY8zmgV4dj39uoe1asyPPWGQbGgSk=
 github.com/elastic/elastic-agent-autodiscover v0.4.0/go.mod h1:p3MSf9813JEnolCTD0GyVAr3+Eptg2zQ9aZVFjl4tJ4=
-github.com/elastic/elastic-agent-client/v7 v7.0.0-20221121201703-4b23a52d0ebe h1:fpM0Lw4JTA9XYbQMQhVrMzJ0GrwUaXHVSsrm5n/b23E=
-github.com/elastic/elastic-agent-client/v7 v7.0.0-20221121201703-4b23a52d0ebe/go.mod h1:FEXUbFMfaV62S0CtJgD+FFHGY7+4o4fXkDicyONPSH8=
+github.com/elastic/elastic-agent-autodiscover v0.5.0 h1:fiDJQKB148RsRISqqbGINtJ/ZPupeVjwn0fbPz9ZDOc=
+github.com/elastic/elastic-agent-autodiscover v0.5.0/go.mod h1:p3MSf9813JEnolCTD0GyVAr3+Eptg2zQ9aZVFjl4tJ4=
+github.com/elastic/elastic-agent-client/v7 v7.0.0-20221028150015-05e494d37ccd h1:IuAuac3vcucBrjAXKPQlTJ22H7mBUsSnNWxa7GZYFEg=
+github.com/elastic/elastic-agent-client/v7 v7.0.0-20221028150015-05e494d37ccd/go.mod h1:FEXUbFMfaV62S0CtJgD+FFHGY7+4o4fXkDicyONPSH8=
 github.com/elastic/elastic-agent-libs v0.2.11/go.mod h1:chO3rtcLyGlKi9S0iGVZhYCzDfdDsAQYBc+ui588AFE=
 github.com/elastic/elastic-agent-libs v0.2.13 h1:YQzhO8RaLosGlyt7IHtj/ZxigWiwLcXXlv3gS4QY9CA=
 github.com/elastic/elastic-agent-libs v0.2.13/go.mod h1:0J9lzJh+BjttIiVjYDLncKYCEWUUHiiqnuI64y6C6ss=
