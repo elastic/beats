@@ -141,11 +141,12 @@ func (cm *BeatV2Manager) Stop() {
 }
 
 // CheckRawConfig is currently not implemented for V1.
-func (cm *BeatV2Manager) CheckRawConfig(cfg *conf.C) error {
+func (cm *BeatV2Manager) CheckRawConfig(_ *conf.C) error {
 	// This does not do anything on V1 or V2, but here we are
 	return nil
 }
 
+// RegisterAction adds a V2 client action
 func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
@@ -158,6 +159,7 @@ func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 	}
 }
 
+// UnregisterAction removes a V2 client action
 func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
@@ -170,6 +172,7 @@ func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
 	}
 }
 
+// SetPayload sets the global payload for the V2 client
 func (cm *BeatV2Manager) SetPayload(payload map[string]interface{}) {
 	cm.payload = payload
 }
@@ -319,7 +322,7 @@ func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 // Handle the updated config for an output unit
 func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
-	cm.logger.Debugf("Got Output unit config: %s, ID: %s", rawConfig.Type, rawConfig.Id)
+	cm.logger.Debugf("Got Output unit config: %s, ID: %s", rawConfig.GetType(), rawConfig.GetId())
 
 	reloadConfig, err := groupByOutputs(rawConfig)
 	if err != nil {
@@ -348,7 +351,7 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
 	cm.setMainUnitValue(unit)
-	cm.logger.Debugf("Got Input unit config: %s, ID: %s", rawConfig.Type, rawConfig.Id)
+	cm.logger.Debugf("Got Input unit config: %s, ID: %s", rawConfig.GetType(), rawConfig.GetId())
 
 	// Find the V2 inputs we need to reload
 	// The reloader provides list and non-list types, but all the beats register as lists,
