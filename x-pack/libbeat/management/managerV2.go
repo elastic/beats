@@ -322,7 +322,7 @@ func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 // Handle the updated config for an output unit
 func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
-	cm.logger.Debugf("Got Output unit config: %s, ID: %s", rawConfig.GetType(), rawConfig.GetId())
+	cm.logger.Debugf("Got Output unit config %s", rawConfig.GetId())
 
 	reloadConfig, err := groupByOutputs(rawConfig)
 	if err != nil {
@@ -351,7 +351,7 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
 	cm.setMainUnitValue(unit)
-	cm.logger.Debugf("Got Input unit config: %s, ID: %s", rawConfig.GetType(), rawConfig.GetId())
+	cm.logger.Debugf("Got Input unit config %s", rawConfig.GetId())
 
 	// Find the V2 inputs we need to reload
 	// The reloader provides list and non-list types, but all the beats register as lists,
