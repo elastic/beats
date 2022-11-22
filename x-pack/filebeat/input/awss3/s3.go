@@ -264,7 +264,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 	}
 }
 
-func (p *s3Poller) Purge() {
+func (p *s3Poller) Purge(ctx context.Context) {
 	listingIDs := p.states.GetListingIDs()
 	p.log.Debugw("purging listing.", "listingIDs", listingIDs)
 	for _, listingID := range listingIDs {
@@ -338,7 +338,7 @@ func (p *s3Poller) Purge() {
 
 		// Listing is removed from all states, we can finalize now
 		for _, state := range states {
-			processor, _ := p.createS3ObjectProcessor(context.TODO(), *state)
+			processor, _ := p.createS3ObjectProcessor(ctx, *state)
 			if err := processor.FinalizeS3Object(); err != nil {
 				p.log.Errorw("Failed to finalize S3 object", "key", state.Key, "error", err)
 			}
@@ -371,7 +371,7 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 			}()
 
 			p.GetS3Objects(ctx, s3ObjectPayloadChan)
-			p.Purge()
+			p.Purge(ctx)
 		}()
 
 		workerWg.Add(workers)

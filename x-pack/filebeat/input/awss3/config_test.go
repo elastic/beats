@@ -447,6 +447,19 @@ func TestConfig(t *testing.T) {
 		{
 			"error with same bucket backup and empty backup prefix",
 			"",
+			s3Bucket,
+			"",
+			mapstr.M{
+				"bucket_arn":           s3Bucket,
+				"backup_to_bucket_arn": s3Bucket,
+				"number_of_workers":    5,
+			},
+			"backup_to_bucket_prefix is a required property when source and backup bucket are the same",
+			nil,
+		},
+		{
+			"error with same bucket backup (non-AWS) and empty backup prefix",
+			"",
 			"",
 			nonAWSS3Bucket,
 			mapstr.M{
