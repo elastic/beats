@@ -17,7 +17,7 @@ it with a new string value. You can also use this processor to mask PII
 information.
 
 [discrete]
-== Example
+==== Example
 
 The following example changes the path from `/usr/bin` to `/usr/local/bin`:
 
@@ -33,7 +33,7 @@ The following example changes the path from `/usr/bin` to `/usr/local/bin`:
 -------
 
 [discrete]
-== Configuration settings
+==== Configuration settings
 
 [options="header"]
 |===
