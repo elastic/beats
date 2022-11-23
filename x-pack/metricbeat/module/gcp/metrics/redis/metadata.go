@@ -6,6 +6,7 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -66,9 +67,9 @@ func (s *metadataCollector) ID(ctx context.Context, in *gcp.MetadataCollectorInp
 
 	metadata.ECS.Update(metadata.Labels)
 	if in.Timestamp != nil {
-		metadata.ECS.Put("timestamp", in.Timestamp)
+		_, _ = metadata.ECS.Put("timestamp", in.Timestamp)
 	} else if in.Point != nil {
-		metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
+		_, _ = metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
 	} else {
 		return "", fmt.Errorf("no timestamp information found")
 	}
@@ -195,7 +196,7 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 	})
 	for {
 		instance, err := it.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 
