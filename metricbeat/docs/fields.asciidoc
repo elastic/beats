@@ -42573,6 +42573,39 @@ type: long
 --
 
 [float]
+=== elasticsearch_client
+
+Elasticsearch Client's stats
+
+
+*`kibana.stats.elasticsearch_client.total_active_sockets`*::
++
+--
+Total number of active sockets
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.total_idle_sockets`*::
++
+--
+Total number of idle sockets
+
+type: integer
+
+--
+
+*`kibana.stats.elasticsearch_client.total_queued_requests`*::
++
+--
+Total number of queued requests
+
+type: integer
+
+--
+
+[float]
 === status
 
 Status fields
