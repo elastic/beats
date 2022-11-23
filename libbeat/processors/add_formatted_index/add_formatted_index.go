@@ -19,12 +19,17 @@ package add_formatted_index
 
 import (
 	"fmt"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func init() {
+	processors.RegisterPlugin("add_formatted_index", NewC)
+}
 
 // AddFormattedIndex is a Processor to set an event's "raw_index" metadata field
 // with a given TimestampFormatString. The elasticsearch output interprets
@@ -32,16 +37,33 @@ import (
 // in other outputs it is just included in the metadata.
 type AddFormattedIndex struct {
 	formatString *fmtstr.TimestampFormatString
+	configString *fmtstr.TimestampFormatString
 }
 
 // New returns a new AddFormattedIndex processor.
 func New(formatString *fmtstr.TimestampFormatString) *AddFormattedIndex {
-	return &AddFormattedIndex{formatString}
+	return &AddFormattedIndex{formatString: formatString}
+}
+
+// NewC constructs a new AddFormattedIndex processor from configuration
+func NewC(cfg *conf.C) (processors.Processor, error) {
+	var c config
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, err
+	}
+
+	return &AddFormattedIndex{configString: c.Index}, nil
 }
 
 // Run runs the processor.
 func (p *AddFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
-	index, err := p.formatString.Run(event.Timestamp)
+	var index string
+	var err error
+	if p.configString != nil {
+		index, err = p.configString.RunEvent(event)
+	} else {
+		index, err = p.formatString.Run(event.Timestamp)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -54,5 +76,8 @@ func (p *AddFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *AddFormattedIndex) String() string {
+	if p.configString != nil {
+		fmt.Sprintf("add_index_pattern=%v", p.configString)
+	}
 	return fmt.Sprintf("add_index_pattern=%v", p.formatString)
 }
