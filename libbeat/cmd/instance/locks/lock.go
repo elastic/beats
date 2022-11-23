@@ -111,7 +111,6 @@ func (lock *Locker) Lock() error {
 	}
 	// case: lock could not be obtained.
 	if !isLocked {
-
 		// if we're here, things are probably unrecoverable, as we've previously checked for a lockfile. Exit.
 		return fmt.Errorf("%s: %w", lock.filePath, ErrAlreadyLocked)
 	}
