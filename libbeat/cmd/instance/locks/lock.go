@@ -50,7 +50,7 @@ var (
 	// ErrAlreadyLocked is returned when a lock on the data path is attempted but
 	// unsuccessful because another Beat instance already has the lock on the same
 	// data path.
-	ErrAlreadyLocked = fmt.Errorf("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data).")
+	ErrAlreadyLocked = fmt.Errorf("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data)")
 
 	// ErrLockfileEmpty is returned by readExistingPidfile() when an existing pidfile is found, but the file is empty.
 	ErrLockfileEmpty = fmt.Errorf("lockfile is empty")
@@ -111,8 +111,9 @@ func (lock *Locker) Lock() error {
 	}
 	// case: lock could not be obtained.
 	if !isLocked {
+
 		// if we're here, things are probably unrecoverable, as we've previously checked for a lockfile. Exit.
-		return ErrAlreadyLocked
+		return fmt.Errorf("%s: %w", lock.filePath, ErrAlreadyLocked)
 	}
 
 	return nil
