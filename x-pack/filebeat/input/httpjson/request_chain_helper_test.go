@@ -7,6 +7,7 @@ package httpjson
 import (
 	"bytes"
 	"context"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +17,7 @@ import (
 
 func Test_newChainHTTPClient(t *testing.T) {
 	cfg := defaultChainConfig()
+	cfg.Request.URL = &urlConfig{URL: &url.URL{}}
 	ctx := context.Background()
 	log := logp.NewLogger("newChainClientTestLogger")
 
@@ -119,7 +121,6 @@ func Test_evaluateResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			expression := &valueTpl{}
 			err := expression.Unpack(tt.args.expression)
 			assert.NoError(t, err)
