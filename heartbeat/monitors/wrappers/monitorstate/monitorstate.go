@@ -40,6 +40,8 @@ const (
 
 func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int, flappingEnabled bool) *State {
 	now := time.Now()
+	maxEnd := sf.Schedule.Next(now)
+
 	ms := &State{
 		// ID is unique and sortable by time for easier aggregations
 		// Note that we add an incrementing counter to help with the fact that
@@ -50,6 +52,7 @@ func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int,
 		Status:          status,
 		flappingEnabled: flappingEnabled,
 		ctr:             ctr + 1,
+		initialDuration: (maxEnd.Unix() - now.Unix()) * 1000,
 	}
 	ms.recordCheck(sf, status)
 
@@ -72,10 +75,11 @@ type State struct {
 	Ends            *State `json:"ends"`
 	flappingEnabled bool
 	ctr             int
+	initialDuration int64
 }
 
 func (s *State) incrementCounters(status StateStatus) {
-	s.DurationMs = time.Since(s.StartedAt).Milliseconds()
+	s.DurationMs = time.Since(s.StartedAt).Milliseconds() + s.initialDuration
 	s.Checks++
 	if status == StatusUp {
 		s.Up++
