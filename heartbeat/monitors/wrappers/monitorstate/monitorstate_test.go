@@ -53,7 +53,7 @@ func TestDuration(t *testing.T) {
 	time.Sleep(time.Millisecond * 10)
 	ms.recordCheck(TestSf, StatusUp)
 	// Pretty forgiving upper bound to account for flaky CI
-	require.True(t, ms.DurationMs > 9 && ms.DurationMs < 900, "Expected duration to be ~10ms, got %d", ms.DurationMs)
+	require.True(t, ms.DurationMs > 20009 && ms.DurationMs < 20900, "Expected duration to be ~20010ms, got %d", ms.DurationMs)
 }
 
 // recordFlappingSeries is a helper that should always put the monitor into a flapping state.

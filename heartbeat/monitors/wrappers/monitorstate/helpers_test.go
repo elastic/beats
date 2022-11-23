@@ -17,6 +17,9 @@
 
 package monitorstate
 
-import "github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+import (
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+)
 
-var TestSf stdfields.StdMonitorFields = stdfields.StdMonitorFields{ID: "testID", Type: "testType"}
+var TestSf stdfields.StdMonitorFields = stdfields.StdMonitorFields{ID: "testID", Type: "testType", Schedule: schedule.MustParse("@every 20s")}
