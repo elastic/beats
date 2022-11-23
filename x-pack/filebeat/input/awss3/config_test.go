@@ -473,6 +473,21 @@ func TestConfig(t *testing.T) {
 		{
 			"error with same bucket backup and backup prefix equal to list prefix",
 			"",
+			s3Bucket,
+			"",
+			mapstr.M{
+				"bucket_arn":              s3Bucket,
+				"backup_to_bucket_arn":    s3Bucket,
+				"number_of_workers":       5,
+				"backup_to_bucket_prefix": "processed_",
+				"bucket_list_prefix":      "processed_",
+			},
+			"backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop",
+			nil,
+		},
+		{
+			"error with same bucket backup (non-AWS) and backup prefix equal to list prefix",
+			"",
 			"",
 			nonAWSS3Bucket,
 			mapstr.M{
