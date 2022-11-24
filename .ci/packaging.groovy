@@ -22,7 +22,7 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     PIPELINE_LOG_LEVEL = "INFO"
-    SLACK_CHANNEL = '#beats'
+    SLACK_CHANNEL = '#ingest-notifications'
     NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
     DRA_OUTPUT = 'release-manager.out'
   }
