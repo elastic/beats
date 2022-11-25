@@ -44,7 +44,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-          version: v1.47.2
+          version: v1.50.1
 
           # Give the job more time to execute.
           # Regarding `--whole-files`, the linter is supposed to support linting of changed a patch only but,
