@@ -1,6 +1,7 @@
 # options for analysis running
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
+  go: 1.18
   timeout: 15m
 
 issues:
