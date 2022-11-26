@@ -331,18 +331,10 @@ func getArgs(hostfs resolve.Resolver, pid int) ([]string, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening file %s", path)
 	}
-	bbuf := bytes.NewBuffer(data)
 
-	var args []string
-
-	for {
-		arg, err := bbuf.ReadBytes(0)
-		if err == io.EOF {
-			break
-		}
-		trimmedArg := string(arg[0 : len(arg)-1])
-		args = append(args, trimmedArg)
-	}
+	args := strings.FieldsFunc(string(data), func(r rune) bool {
+		return r == '\u0000'
+	})
 
 	return args, nil
 }
