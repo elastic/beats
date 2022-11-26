@@ -19,8 +19,11 @@ package container
 
 import (
 	"fmt"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/easyops"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -38,6 +41,31 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	mapping = &prometheus.MetricsMapping{
+		AggregateMetrics: []easyops.AggregateMetricMap{
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "pod.memory.allocated.bytes",
+				OriginMetrics: []string{"memory.available.bytes", "memory.usage.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "pod.memory.usage.bytes",
+				OriginMetrics: []string{"memory.usage.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
+			{
+				Type:          easyops.AggregateTypeDiv,
+				Field:         "pod.memory.usage.pct",
+				OriginMetrics: []string{"pod.memory.usage.bytes", "pod.memory.available.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
+		},
+	}
+
+	logger = logp.NewLogger("kubernetes.container")
 )
 
 // init registers the MetricSet with the central registry.
@@ -93,7 +121,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger())
+	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger(), mapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)

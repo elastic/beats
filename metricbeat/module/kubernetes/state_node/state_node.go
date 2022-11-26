@@ -75,7 +75,8 @@ var (
 			)),
 		},
 		Labels: map[string]p.LabelMap{
-			"node": p.KeyLabel("name"),
+			"node":      p.KeyLabel("name"),
+			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 		},
 	}
 )

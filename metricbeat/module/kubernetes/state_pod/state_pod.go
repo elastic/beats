@@ -20,6 +20,7 @@ package state_pod
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/easyops"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -45,6 +46,21 @@ var (
 			"kube_pod_status_phase":     p.LabelMetric("status.phase", "phase", p.OpLowercaseValue()),
 			"kube_pod_status_ready":     p.LabelMetric("status.ready", "condition", p.OpLowercaseValue()),
 			"kube_pod_status_scheduled": p.LabelMetric("status.scheduled", "condition", p.OpLowercaseValue()),
+		},
+
+		AggregateMetrics: []easyops.AggregateMetricMap{
+			{
+				Type:          easyops.AggregateTypeCou,
+				Field:         "status.{}",
+				OriginMetrics: []string{"status.phase"},
+				GroupKeys:     []string{"_module.node.name"},
+			},
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "all.status",
+				OriginMetrics: []string{"status.pending", "status.succeeded", "status.failed", "status.unknown", "status.running"},
+				GroupKeys:     []string{"_module.node.name"},
+			},
 		},
 
 		Labels: map[string]p.LabelMap{

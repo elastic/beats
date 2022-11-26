@@ -21,6 +21,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/easyops"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -39,6 +41,35 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	mapping = &prometheus.MetricsMapping{
+		AggregateMetrics: []easyops.AggregateMetricMap{
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "pod.fs.capacity.bytes",
+				OriginMetrics: []string{"fs.capacity.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "pod.fs.available.bytes",
+				OriginMetrics: []string{"fs.available.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
+			{
+				Type:          easyops.AggregateTypeSub,
+				Field:         "pod.fs.usage.bytes",
+				OriginMetrics: []string{"pod.fs.capacity.bytes", "pod.fs.available.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
+			{
+				Type:          easyops.AggregateTypeDiv,
+				Field:         "pod.fs.usage.pct",
+				OriginMetrics: []string{"pod.fs.usage.bytes", "pod.fs.capacity.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
+		},
+	}
 
 	logger = logp.NewLogger("kubernetes.volume")
 )
@@ -95,7 +126,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("error doing HTTP request to fetch 'volume' Metricset data: %w", err)
 	}
 
-	events, err := eventMapping(body, logger)
+	events, err := eventMapping(body, logger, mapping)
 	if err != nil {
 		return err
 	}

@@ -22,12 +22,14 @@ import (
 	"fmt"
 
 	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/helper/easyops"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte, logger *logp.Logger) (mapstr.M, error) {
+func eventMapping(content []byte, logger *logp.Logger, mapping *prometheus.MetricsMapping) ([]mapstr.M, error) {
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
@@ -111,5 +113,12 @@ func eventMapping(content []byte, logger *logp.Logger) (mapstr.M, error) {
 		kubernetes2.ShouldPut(nodeEvent, "start_time", node.StartTime, logger)
 	}
 
-	return nodeEvent, nil
+	events := []mapstr.M{nodeEvent}
+	for _, am := range mapping.AggregateMetrics {
+		builder := easyops.NewAggregateMetricBuilder(am)
+		es := builder.Build(events)
+		events = append(events, es...)
+	}
+
+	return events, nil
 }
