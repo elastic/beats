@@ -45,9 +45,21 @@ var (
 		AggregateMetrics: []easyops.AggregateMetricMap{
 			{
 				Type:          easyops.AggregateTypeSub,
-				Field:         "memory.allocated.bytes",
+				Field:         "memory.capacity.bytes",
 				OriginMetrics: []string{"memory.available.bytes", "memory.usage.bytes"},
-				GroupKeys:     []string{},
+				GroupKeys:     []string{"name"},
+			},
+			{
+				Type:          easyops.AggregateTypeDiv,
+				Field:         "memory.usage.pct",
+				OriginMetrics: []string{"memory.usage.bytes", "memory.capacity.bytes"},
+				GroupKeys:     []string{"name"},
+			},
+			{
+				Type:          easyops.AggregateTypeDiv,
+				Field:         "fs.used.pct",
+				OriginMetrics: []string{"fs.used.bytes", "fs.capacity.bytes"},
+				GroupKeys:     []string{"name"},
 			},
 		},
 	}
