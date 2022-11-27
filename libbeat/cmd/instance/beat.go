@@ -404,20 +404,19 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
 	// that would be set at runtime.
-	var s *api.Server // buffer reporter may need to attach to the server.
 	if b.Config.HTTP.Enabled() {
-		s, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
-		s.Start()
+		b.API.Start()
 		defer func() {
-			_ = s.Stop()
+			_ = b.API.Stop()
 		}()
 		if b.Config.HTTPPprof.IsEnabled() {
 			pprof.SetRuntimeProfilingParameters(b.Config.HTTPPprof)
 
-			if err := pprof.HttpAttach(b.Config.HTTPPprof, s); err != nil {
+			if err := pprof.HttpAttach(b.Config.HTTPPprof, b.API); err != nil {
 				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
 			}
 		}
@@ -456,7 +455,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 		defer buffReporter.Stop()
 
-		if err := s.AttachHandler("/buffer", buffReporter); err != nil {
+		if err := b.API.AttachHandler("/buffer", buffReporter); err != nil {
 			return err
 		}
 	}
