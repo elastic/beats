@@ -44,7 +44,7 @@ var (
 	mapping = &prometheus.MetricsMapping{
 		AggregateMetrics: []easyops.AggregateMetricMap{
 			{
-				Type:          easyops.AggregateTypeSub,
+				Type:          easyops.AggregateTypeSum,
 				Field:         "memory.capacity.bytes",
 				OriginMetrics: []string{"memory.available.bytes", "memory.usage.bytes"},
 				GroupKeys:     []string{"name"},
