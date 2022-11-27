@@ -55,11 +55,11 @@ var (
 				OriginMetrics: []string{"status.phase"},
 				GroupKeys:     []string{"_module.node.name"},
 				DefaultValues: map[string]interface{}{
-					"status.pending":   0.0,
-					"status.succeeded": 0.0,
-					"status.failed":    0.0,
-					"status.unknown":   0.0,
-					"status.running":   0.0,
+					"pending":   0.0,
+					"succeeded": 0.0,
+					"failed":    0.0,
+					"unknown":   0.0,
+					"running":   0.0,
 				},
 			},
 			{
