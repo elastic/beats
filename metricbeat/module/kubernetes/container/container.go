@@ -59,7 +59,7 @@ var (
 			{
 				Type:          easyops.AggregateTypeDiv,
 				Field:         "pod.memory.usage.pct",
-				OriginMetrics: []string{"pod.memory.usage.bytes", "pod.memory.available.bytes"},
+				OriginMetrics: []string{"pod.memory.usage.bytes", "pod.memory.allocated.bytes"},
 				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
 			},
 			{
