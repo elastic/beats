@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -73,8 +72,7 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 
 	setGoLumberLogger(inputCtx.Logger.Named("go-lumber"))
 
-	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
-	metrics := newInputMetrics(metricRegistry, inputCtx.ID)
+	metrics := newInputMetrics(inputCtx.ID)
 	defer metrics.Close()
 
 	s, err := newServer(i.config, inputCtx.Logger, client.Publish, metrics)

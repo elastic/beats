@@ -7,33 +7,31 @@ package lumberjack
 import (
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 type inputMetrics struct {
-	id          string               // Input ID.
-	parent      *monitoring.Registry // Parent registry holding this input's ID as a key.
-	bindAddress *monitoring.String   // Bind address of input.
+	unregister func()
 
-	batchesReceivedTotal  *monitoring.Uint // Number of Lumberjack batches received (not necessarily processed fully).
-	batchesACKedTotal     *monitoring.Uint // Number of Lumberjack batches ACKed.
-	messagesReceivedTotal *monitoring.Uint // Number of Lumberjack messages received (not necessarily processed fully).
-	batchProcessingTime   metrics.Sample   // Histogram of the elapsed batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
+	bindAddress           *monitoring.String // Bind address of input.
+	batchesReceivedTotal  *monitoring.Uint   // Number of Lumberjack batches received (not necessarily processed fully).
+	batchesACKedTotal     *monitoring.Uint   // Number of Lumberjack batches ACKed.
+	messagesReceivedTotal *monitoring.Uint   // Number of Lumberjack messages received (not necessarily processed fully).
+	batchProcessingTime   metrics.Sample     // Histogram of the elapsed batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 }
 
 // Close removes the metrics from the registry.
 func (m *inputMetrics) Close() {
-	m.parent.Remove(m.id)
+	m.unregister()
 }
 
-func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
-	reg := parent.NewRegistry(id)
-	monitoring.NewString(reg, "input").Set(inputName)
-	monitoring.NewString(reg, "id").Set(id)
+func newInputMetrics(id string, optionalParent ...*monitoring.Registry) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent...)
+
 	out := &inputMetrics{
-		id:                    id,
-		parent:                parent,
+		unregister:            unreg,
 		bindAddress:           monitoring.NewString(reg, "bind_address"),
 		batchesReceivedTotal:  monitoring.NewUint(reg, "batches_received_total"),
 		batchesACKedTotal:     monitoring.NewUint(reg, "batches_acked_total"),

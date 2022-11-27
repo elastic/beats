@@ -41,6 +41,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -104,7 +105,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
-	metrics := newInputMetrics(monitoring.GetNamespace("dataset").GetRegistry(), env.ID)
+	metrics := newInputMetrics(env.ID)
 	defer metrics.Close()
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
@@ -908,8 +909,7 @@ func test(url *url.URL) error {
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	id     string
-	parent *monitoring.Registry
+	unregister func()
 
 	resource            *monitoring.String // URL-ish of input resource
 	executions          *monitoring.Uint   // times the CEL program has been executed
@@ -921,13 +921,10 @@ type inputMetrics struct {
 	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
-	reg := parent.NewRegistry(id)
-	monitoring.NewString(reg, "input").Set(inputName)
-	monitoring.NewString(reg, "id").Set(id)
+func newInputMetrics(id string) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id)
 	out := &inputMetrics{
-		id:                  id,
-		parent:              reg,
+		unregister:          unreg,
 		resource:            monitoring.NewString(reg, "resource"),
 		executions:          monitoring.NewUint(reg, "cel_executions"),
 		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
@@ -946,5 +943,5 @@ func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
 }
 
 func (m *inputMetrics) Close() {
-	m.parent.Remove(m.id)
+	m.unregister()
 }

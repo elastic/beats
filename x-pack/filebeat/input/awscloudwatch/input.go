@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -132,8 +131,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	}
 
 	log := inputContext.Logger
-	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
-	metrics := newInputMetrics(metricRegistry, inputContext.ID)
+	metrics := newInputMetrics(inputContext.ID)
 	cwPoller := newCloudwatchPoller(
 		log.Named("cloudwatch_poller"),
 		metrics,
