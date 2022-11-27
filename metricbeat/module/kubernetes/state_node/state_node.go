@@ -20,6 +20,7 @@ package state_node
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/easyops"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -74,6 +75,22 @@ var (
 				},
 			)),
 		},
+
+		AggregateMetrics: []easyops.AggregateMetricMap{
+			{
+				Type:          easyops.AggregateTypeCou,
+				Field:         "status.ready.{}",
+				OriginMetrics: []string{"status.ready"},
+				GroupKeys:     []string{"name", "_module.namespace"},
+			},
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "normal.status",
+				OriginMetrics: []string{"status.ready.true"},
+				GroupKeys:     []string{"name", "_module.namespace"},
+			},
+		},
+
 		Labels: map[string]p.LabelMap{
 			"node":      p.KeyLabel("name"),
 			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
