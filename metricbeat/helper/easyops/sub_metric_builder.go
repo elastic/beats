@@ -69,11 +69,11 @@ func (builder *subMetricBuilder) sub(events []common.MapStr, originMetric []stri
 				case float64:
 					val = float64(value.(float64))
 				}
-			}
-			if index == 0 {
-				floatResult = val
-			} else {
-				floatResult -= val
+				if index == 0 {
+					floatResult = val
+				} else {
+					floatResult -= val
+				}
 			}
 		}
 	}
