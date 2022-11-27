@@ -54,6 +54,13 @@ var (
 				Field:         "status.{}",
 				OriginMetrics: []string{"status.phase"},
 				GroupKeys:     []string{"_module.node.name"},
+				DefaultValues: map[string]interface{}{
+					"status.pending":   0.0,
+					"status.succeeded": 0.0,
+					"status.failed":    0.0,
+					"status.unknown":   0.0,
+					"status.running":   0.0,
+				},
 			},
 			{
 				Type:          easyops.AggregateTypeSum,

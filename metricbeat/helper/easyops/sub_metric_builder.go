@@ -6,12 +6,13 @@ type subMetricBuilder struct {
 	baseBuilderFields
 }
 
-func newSubMetricBuilder(field string, originMetric []string, groupKeys []string) AggregateMetricBuilder {
+func newSubMetricBuilder(field string, originMetric []string, groupKeys []string, defaultValues map[string]interface{}) AggregateMetricBuilder {
 	return &subMetricBuilder{
 		baseBuilderFields{
 			field:         field,
 			originMetrics: originMetric,
 			groupKeys:     groupKeys,
+			defaultValues: defaultValues,
 		},
 	}
 }

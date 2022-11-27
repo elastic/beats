@@ -11,12 +11,13 @@ type couMetricBuilder struct {
 	baseBuilderFields
 }
 
-func newCouMetricBuilder(field string, originMetric []string, groupKeys []string) AggregateMetricBuilder {
+func newCouMetricBuilder(field string, originMetric []string, groupKeys []string, defaultValues map[string]interface{}) AggregateMetricBuilder {
 	return &couMetricBuilder{
 		baseBuilderFields{
 			field:         field,
 			originMetrics: originMetric,
 			groupKeys:     groupKeys,
+			defaultValues: defaultValues,
 		},
 	}
 }
@@ -34,7 +35,7 @@ func (builder *couMetricBuilder) Build(events []common.MapStr) []common.MapStr {
 			val, _ := es[0].GetValue(groupKey)
 			_, _ = rs.Put(groupKey, val)
 		}
-		counters := builder.count(es, builder.originMetrics)
+		counters := builder.count(es, builder.originMetrics, builder.defaultValues)
 		for val, count := range counters {
 			field := strings.Replace(builder.field, "{}", val, 1)
 			_, _ = rs.Put(field, count)
@@ -44,8 +45,13 @@ func (builder *couMetricBuilder) Build(events []common.MapStr) []common.MapStr {
 	return result
 }
 
-func (builder *couMetricBuilder) count(events []common.MapStr, originMetric []string) map[string]float64 {
+func (builder *couMetricBuilder) count(events []common.MapStr, originMetric []string, defaultValues map[string]interface{}) map[string]float64 {
 	counters := map[string]float64{}
+	for field, defaultValue := range defaultValues {
+		if value, ok := defaultValue.(float64); ok {
+			counters[field] = value
+		}
+	}
 	for _, metric := range originMetric {
 		for _, event := range events {
 			value, err := event.GetValue(metric)

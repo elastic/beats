@@ -6,12 +6,13 @@ type sumMetricBuilder struct {
 	baseBuilderFields
 }
 
-func newSumMetricBuilder(field string, originMetric []string, groupKeys []string) AggregateMetricBuilder {
+func newSumMetricBuilder(field string, originMetric []string, groupKeys []string, defaultValues map[string]interface{}) AggregateMetricBuilder {
 	return &sumMetricBuilder{
 		baseBuilderFields{
 			field:         field,
 			originMetrics: originMetric,
 			groupKeys:     groupKeys,
+			defaultValues: defaultValues,
 		},
 	}
 }

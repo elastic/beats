@@ -10,12 +10,13 @@ type divMetricBuilder struct {
 	baseBuilderFields
 }
 
-func newDivMetricBuilder(field string, originMetric []string, groupKeys []string) AggregateMetricBuilder {
+func newDivMetricBuilder(field string, originMetric []string, groupKeys []string, defaultValues map[string]interface{}) AggregateMetricBuilder {
 	return &divMetricBuilder{
 		baseBuilderFields{
 			field:         field,
 			originMetrics: originMetric,
 			groupKeys:     groupKeys,
+			defaultValues: defaultValues,
 		},
 	}
 }

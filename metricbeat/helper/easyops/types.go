@@ -18,6 +18,7 @@ type AggregateMetricMap struct {
 	Field         string
 	OriginMetrics []string
 	GroupKeys     []string
+	DefaultValues map[string]interface{}
 }
 
 type AggregateMetricBuilder interface {
@@ -28,18 +29,19 @@ type baseBuilderFields struct {
 	field         string
 	originMetrics []string
 	groupKeys     []string
+	defaultValues map[string]interface{}
 }
 
 func NewAggregateMetricBuilder(metricMap AggregateMetricMap) AggregateMetricBuilder {
 	switch metricMap.Type {
 	case AggregateTypeSum:
-		return newSumMetricBuilder(metricMap.Field, metricMap.OriginMetrics, metricMap.GroupKeys)
+		return newSumMetricBuilder(metricMap.Field, metricMap.OriginMetrics, metricMap.GroupKeys, metricMap.DefaultValues)
 	case AggregateTypeDiv:
-		return newDivMetricBuilder(metricMap.Field, metricMap.OriginMetrics, metricMap.GroupKeys)
+		return newDivMetricBuilder(metricMap.Field, metricMap.OriginMetrics, metricMap.GroupKeys, metricMap.DefaultValues)
 	case AggregateTypeSub:
-		return newSubMetricBuilder(metricMap.Field, metricMap.OriginMetrics, metricMap.GroupKeys)
+		return newSubMetricBuilder(metricMap.Field, metricMap.OriginMetrics, metricMap.GroupKeys, metricMap.DefaultValues)
 	case AggregateTypeCou:
-		return newCouMetricBuilder(metricMap.Field, metricMap.OriginMetrics, metricMap.GroupKeys)
+		return newCouMetricBuilder(metricMap.Field, metricMap.OriginMetrics, metricMap.GroupKeys, metricMap.DefaultValues)
 	}
 	return nil
 }
