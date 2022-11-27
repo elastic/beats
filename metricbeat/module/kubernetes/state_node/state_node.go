@@ -81,13 +81,13 @@ var (
 				Type:          easyops.AggregateTypeCou,
 				Field:         "status.ready.{}",
 				OriginMetrics: []string{"status.ready"},
-				GroupKeys:     []string{"name", "_module.namespace"},
+				GroupKeys:     []string{"name"},
 			},
 			{
 				Type:          easyops.AggregateTypeSum,
 				Field:         "normal.status",
 				OriginMetrics: []string{"status.ready.true"},
-				GroupKeys:     []string{"name", "_module.namespace"},
+				GroupKeys:     []string{"name"},
 			},
 		},
 
