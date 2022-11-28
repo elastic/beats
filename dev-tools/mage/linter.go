@@ -31,7 +31,7 @@ import (
 )
 
 const (
-	linterVersion    = "v1.47.2"
+	linterVersion    = "v1.50.1"
 	linterInstallURL = "https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
 )
 

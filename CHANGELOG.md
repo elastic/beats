@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - service: Improve shutdown logs #87
+- dev-tools: upgrade golangci-lint to v1.50.1
 
 ### Deprecated
 
