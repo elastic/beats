@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix panic on memcache transaction with no request or response. {issue}33852[33852] {pull}33853[33853]
 
 *Winlogbeat*
 
