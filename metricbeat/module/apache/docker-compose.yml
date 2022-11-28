@@ -1,11 +1,11 @@
-version: '2.3'
+version: "2.3"
 
 services:
   apache:
-    image: docker.elastic.co/integrations-ci/beats-apache:${APACHE_VERSION:-2.4.20}-1
+    image: docker.elastic.co/integrations-ci/beats-apache:${APACHE_VERSION:-2.4.54}-1
     build:
       context: ./_meta
       args:
-        APACHE_VERSION: ${APACHE_VERSION:-2.4.20}
+        APACHE_VERSION: "${APACHE_VERSION:-2.4.54}"
     ports:
       - 80
