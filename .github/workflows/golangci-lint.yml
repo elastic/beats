@@ -60,19 +60,3 @@ jobs:
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true
-
-
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Fetch Go version from .go-version
-      run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
-    - uses: actions/setup-go@v3
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - name: Run check-default
-      run: |
-        go install github.com/magefile/mage
-        make check-default
