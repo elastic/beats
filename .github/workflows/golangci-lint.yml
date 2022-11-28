@@ -53,10 +53,26 @@ jobs:
           # which can lead to some frustration from developers who would like to
           # fix a single line in an existing codebase and the linter would force them
           # into fixing all linting issues in the whole file instead
-          args: --timeout=30m --whole-files
+          args: --timeout=30m --whole-files -c ../../.golangci.yml
 
           # Optional: if set to true then the action will use pre-installed Go.
           skip-go-installation: true
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true
+
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Fetch Go version from .go-version
+      run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
+    - uses: actions/setup-go@v3
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: Run check-default
+      run: |
+        go install github.com/magefile/mage
+        make check-default
