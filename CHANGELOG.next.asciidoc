@@ -174,12 +174,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for http+unix and http+npipe schemes in cel input. {issue}33571[33571] {pull}33712[33712]
 - Add `decode_duration`, `move_fields` processors. {pull}31301[31301]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
 *Heartbeat*
 
 - Add new states field for internal use by new synthetics app. {pull}30632[30632]
@@ -199,6 +193,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
 - Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}[]
+- Add metrics for UDP packet processing. {pull}33833[33833]
 
 *Functionbeat*
 

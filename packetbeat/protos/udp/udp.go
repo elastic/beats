@@ -19,9 +19,14 @@ package udp
 
 import (
 	"fmt"
+	"time"
+
+	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -34,16 +39,22 @@ type Processor interface {
 type UDP struct {
 	protocols protos.Protocols
 	portMap   map[uint16]protos.Protocol
+
+	metrics *inputMetrics
 }
 
 // NewUDP creates and returns a new UDP.
-func NewUDP(p protos.Protocols) (*UDP, error) {
+func NewUDP(p protos.Protocols, id, device string) (*UDP, error) {
 	portMap, err := buildPortsMap(p.GetAllUDP())
 	if err != nil {
 		return nil, err
 	}
 
-	udp := &UDP{protocols: p, portMap: portMap}
+	udp := &UDP{
+		protocols: p,
+		portMap:   portMap,
+		metrics:   newInputMetrics(monitoring.GetNamespace("dataset").GetRegistry(), id, device),
+	}
 	logp.Debug("udp", "Port map: %v", portMap)
 
 	return udp, nil
@@ -93,6 +104,7 @@ func (udp *UDP) Process(id *flows.FlowID, pkt *protos.Packet) {
 		logp.Debug("udp", "Parsing packet from %v of length %d.",
 			pkt.Tuple.String(), len(pkt.Payload))
 		plugin.ParseUDP(pkt)
+		udp.metrics.log(pkt)
 	}
 }
 
@@ -111,4 +123,71 @@ func (udp *UDP) decideProtocol(tuple *common.IPPortTuple) protos.Protocol {
 	}
 
 	return protos.UnknownProtocol
+}
+
+func (udp *UDP) Close() {
+	if udp.metrics == nil {
+		return
+	}
+	udp.metrics.close()
+}
+
+// inputMetrics handles the input's metric reporting.
+type inputMetrics struct {
+	id     string
+	parent *monitoring.Registry
+
+	lastPacket time.Time
+
+	device         *monitoring.String // name of the device being monitored
+	packets        *monitoring.Uint   // number of packets processed
+	bytes          *monitoring.Uint   // number of bytes processed
+	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between packet arrivals
+	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
+}
+
+// newInputMetrics returns an input metric for the UDP processor. If id is empty
+// a nil inputMetric is returned.
+func newInputMetrics(parent *monitoring.Registry, id, device string) *inputMetrics {
+	if id == "" {
+		return nil
+	}
+	reg := parent.NewRegistry(id)
+	monitoring.NewString(reg, "protocol").Set("udp")
+	monitoring.NewString(reg, "id").Set(id + "::" + device)
+	out := &inputMetrics{
+		id:             id,
+		parent:         reg,
+		device:         monitoring.NewString(reg, "device"),
+		packets:        monitoring.NewUint(reg, "udp_packets"),
+		bytes:          monitoring.NewUint(reg, "udp_bytes"),
+		arrivalPeriod:  metrics.NewUniformSample(1024),
+		processingTime: metrics.NewUniformSample(1024),
+	}
+	_ = adapter.NewGoMetrics(reg, "udp_arrival_period", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
+	_ = adapter.NewGoMetrics(reg, "udp_processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.processingTime))
+
+	out.device.Set(device)
+
+	return out
+}
+
+// log logs metric for the given packet.
+func (m *inputMetrics) log(pkt *protos.Packet) {
+	if m == nil {
+		return
+	}
+	m.processingTime.Update(time.Since(pkt.Ts).Nanoseconds())
+	m.packets.Add(1)
+	m.bytes.Add(uint64(len(pkt.Payload)))
+	if !m.lastPacket.IsZero() {
+		m.arrivalPeriod.Update(pkt.Ts.Sub(m.lastPacket).Nanoseconds())
+	}
+	m.lastPacket = pkt.Ts
+}
+
+func (m *inputMetrics) close() {
+	m.parent.Remove(m.id)
 }
