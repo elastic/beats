@@ -10339,12 +10339,21 @@ Contents of probable licence file $GOMODCACHE/github.com/golang/mock@v1.6.0/LICE
 
 
 --------------------------------------------------------------------------------
+<<<<<<< HEAD
 Dependency : github.com/golang/protobuf
 Version: v1.5.2
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/golang/protobuf@v1.5.2/LICENSE:
+=======
+Dependency : github.com/elastic/elastic-agent-client/v7
+Version: v7.0.1
+Licence type (autodetected): Elastic
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.1/LICENSE.txt:
+>>>>>>> 4f639d7ed6 (Update test versions of NGINX, Apache and MongoDB (#33789))
 
 Copyright 2010 The Go Authors.  All rights reserved.
 
