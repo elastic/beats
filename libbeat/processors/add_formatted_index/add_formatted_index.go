@@ -19,6 +19,7 @@ package add_formatted_index
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -77,7 +78,7 @@ func (p *AddFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 
 func (p *AddFormattedIndex) String() string {
 	if p.configString != nil {
-		fmt.Sprintf("add_index_pattern=%v", p.configString)
+		return fmt.Sprintf("add_index_pattern=%v", p.configString)
 	}
 	return fmt.Sprintf("add_index_pattern=%v", p.formatString)
 }
