@@ -8,9 +8,8 @@
 The `replace` processor takes a list of fields to search for a matching
 value and replaces the matching value with a specified string.
 
-// Reviewers: The following sentence was in the original doc, but doesn't make sense to me. should I remove it?
 
-//The `replace` processor cannot be used to replace value with a completely new value.
+The `replace` processor cannot be used to create a completely new value.
 
 TIP: You can use this processor to truncate a field value or replace
 it with a new string value. You can also use this processor to mask PII
