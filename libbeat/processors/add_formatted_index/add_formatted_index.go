@@ -38,12 +38,12 @@ func init() {
 // in other outputs it is just included in the metadata.
 type AddFormattedIndex struct {
 	formatString *fmtstr.TimestampFormatString
-	configString *fmtstr.TimestampFormatString
+	fullEvent    bool
 }
 
 // New returns a new AddFormattedIndex processor.
 func New(formatString *fmtstr.TimestampFormatString) *AddFormattedIndex {
-	return &AddFormattedIndex{formatString: formatString}
+	return &AddFormattedIndex{formatString, false}
 }
 
 // NewC constructs a new AddFormattedIndex processor from configuration
@@ -53,15 +53,15 @@ func NewC(cfg *conf.C) (processors.Processor, error) {
 		return nil, err
 	}
 
-	return &AddFormattedIndex{configString: c.Index}, nil
+	return &AddFormattedIndex{c.Index, true}, nil
 }
 
 // Run runs the processor.
 func (p *AddFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 	var index string
 	var err error
-	if p.configString != nil {
-		index, err = p.configString.RunEvent(event)
+	if p.fullEvent {
+		index, err = p.formatString.RunEvent(event)
 	} else {
 		index, err = p.formatString.Run(event.Timestamp)
 	}
@@ -77,8 +77,5 @@ func (p *AddFormattedIndex) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *AddFormattedIndex) String() string {
-	if p.configString != nil {
-		return fmt.Sprintf("add_index_pattern=%v", p.configString)
-	}
 	return fmt.Sprintf("add_index_pattern=%v", p.formatString)
 }
