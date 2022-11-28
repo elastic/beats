@@ -162,7 +162,7 @@ var serverPoolTests = []struct {
 				},
 			},
 		},
-		wantErr: errors.New("inconsistent TLS usage on 127.0.0.1:9001: mixed TLS and unencrypted"),
+		wantErr: invalidTLSStateErr{addr: "127.0.0.1:9001", reason: "mixed TLS and unencrypted"},
 	},
 	{
 		name: "inconsistent_tls_config",
@@ -198,10 +198,7 @@ var serverPoolTests = []struct {
 				},
 			},
 		},
-		wantErr: errors.New(`inconsistent TLS configuration on 127.0.0.1:9001: ` +
-			`configuration options do not agree: ` +
-			`old={"ca_sha256":[],"certificate":"","certificate_authorities":[],"cipher_suites":[],"client_authentication":0,"curve_types":[],"key":"","key_passphrase":"","supported_protocols":[],"verification_mode":1} ` +
-			`new={"ca_sha256":[],"certificate":"","certificate_authorities":[],"cipher_suites":[],"client_authentication":0,"curve_types":[],"key":"","key_passphrase":"","supported_protocols":[],"verification_mode":3}`),
+		wantErr: invalidTLSStateErr{addr: "127.0.0.1:9001", reason: "configuration options do not agree"},
 	},
 }
 
@@ -241,7 +238,7 @@ func TestServerPool(t *testing.T) {
 			case err := <-fails:
 				if test.wantErr == nil {
 					t.Errorf("unexpected error calling serve: %#q", err)
-				} else if test.wantErr.Error() != err.Error() {
+				} else if !errors.Is(err, test.wantErr) {
 					t.Errorf("unexpected error calling serve: got=%#q, want=%#q", err, test.wantErr)
 				}
 			default:
@@ -270,6 +267,18 @@ func TestServerPool(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Is is included to simplify testing, but is not exposed to avoid unwanted error
+// matching outside tests.
+func (e invalidTLSStateErr) Is(err error) bool {
+	if err, ok := err.(invalidTLSStateErr); ok { //nolint:errorlint // "An Is method should only shallowly compare err and the target and not call Unwrap on either."
+		// However for our purposes here, we will abuse
+		// the Is convention and also consider the addr
+		// and reason fields.
+		return e.addr == err.addr && e.reason == err.reason
+	}
+	return false
 }
 
 func newCtx(log, id string) (_ v2.Context, cancel func()) {

@@ -16,7 +16,7 @@ Each event is annotated with the following information:
 * Allocation name, identifier and status.
 * Job name and type.
 * Namespace where the job is deployed.
-* Datacenter and region where the agent runnning the allocation is located.
+* Datacenter and region where the agent running the allocation is located.
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -47,11 +47,11 @@ agent {
   policy = "read"
 }
 ----
-`refresh_interval`:: (Optional) Interval used to updated the cached metadata. It
+`refresh_interval`:: (Optional) Interval used to update the cached metadata. It
 defaults to 30 seconds.
 `cleanup_timeout`:: (Optional) After an allocation has been removed, time to
 wait before cleaning up their associated resources. This is useful if you expect
-to receive events after an allocation has been removed, what can happen when
+to receive events after an allocation has been removed, which can happen when
 collecting logs. It defaults to 60 seconds.
 
 
@@ -88,7 +88,7 @@ the pods.
 
 Avaliable indexers are:
 `allocation_name`:: Identifies allocations by its name and namespace (as
-`<namespace>/<name>)
+`<namespace>/<name>`)
 `allocation_uuid`:: Identifies allocations by its unique identifier.
 // Review examples below when new indexers are added with network information.
 
