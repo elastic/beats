@@ -97,7 +97,11 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	for _, pid := range pids.List {
 		inodes, err := findSocketsOfPid("", pid)
 		if err != nil {
-			logp.Err("FindSocketsOfPid: %s", err)
+			if os.IsNotExist(err) {
+				logp.Info("FindSocketsOfPid: %s", err)
+			} else {
+				logp.Err("FindSocketsOfPid: %s", err)
+			}
 			continue
 		}
 
