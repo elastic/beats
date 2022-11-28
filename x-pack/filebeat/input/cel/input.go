@@ -922,7 +922,7 @@ type inputMetrics struct {
 }
 
 func newInputMetrics(id string) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id)
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &inputMetrics{
 		unregister:          unreg,
 		resource:            monitoring.NewString(reg, "resource"),

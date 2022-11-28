@@ -25,7 +25,7 @@ type logProcessor struct {
 
 func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client, ctx context.Context) *logProcessor {
 	if metrics == nil {
-		metrics = newInputMetrics("")
+		metrics = newInputMetrics("", nil)
 	}
 	return &logProcessor{
 		log:       log,

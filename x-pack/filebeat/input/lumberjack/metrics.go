@@ -27,8 +27,8 @@ func (m *inputMetrics) Close() {
 	m.unregister()
 }
 
-func newInputMetrics(id string, optionalParent ...*monitoring.Registry) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent...)
+func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
 
 	out := &inputMetrics{
 		unregister:            unreg,

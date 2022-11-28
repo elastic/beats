@@ -29,18 +29,11 @@ import (
 // the returned cancel function to unregister the metrics. For testing purposes
 // an optional monitoring.Registry may be provided as an alternative to using
 // the global 'dataset' monitoring namespace.
-func NewInputRegistry(inputType, id string, optionalParent ...*monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
-	// Detect developer misuse.
-	if len(optionalParent) > 1 {
-		panic("misuse of NewInputRegistry detected: at most one parent may be specified")
-	}
-
+func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Use the default registry unless one was provided (this would be for testing).
-	var rootRegistry *monitoring.Registry
-	if len(optionalParent) == 0 {
+	rootRegistry := optionalParent
+	if rootRegistry == nil {
 		rootRegistry = globalRegistry()
-	} else {
-		rootRegistry = optionalParent[0]
 	}
 
 	// Sanitize dots from the id because they created nested objects within

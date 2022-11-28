@@ -37,7 +37,7 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	awsRegion string, apiSleep time.Duration,
 	numberOfWorkers int, logStreams []*string, logStreamPrefix string) *cloudwatchPoller {
 	if metrics == nil {
-		metrics = newInputMetrics("")
+		metrics = newInputMetrics("", nil)
 	}
 
 	return &cloudwatchPoller{
