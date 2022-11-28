@@ -71,7 +71,7 @@ func NewInput(
 
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
 		event := createEvent(data, metadata)
-		forwarder.Send(event)
+		_ = forwarder.Send(event)
 	}
 
 	splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
@@ -128,15 +128,18 @@ func (p *Input) Wait() {
 }
 
 func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
-	return beat.Event{
+	evt := beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"message": string(raw),
-			"log": mapstr.M{
-				"source": mapstr.M{
-					"address": metadata.RemoteAddr.String(),
-				},
-			},
 		},
 	}
+	if metadata.RemoteAddr != nil {
+		evt.Fields["log"] = mapstr.M{
+			"source": mapstr.M{
+				"address": metadata.RemoteAddr.String(),
+			},
+		}
+	}
+	return evt
 }
