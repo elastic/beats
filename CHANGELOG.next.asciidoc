@@ -118,6 +118,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Beats will now attempt to recover if a lockfile has not been removed {pull}[33169]
 - Add `http.pprof` config options for enabling block and mutex profiling. {issue}33572[33572] {pull}33576[33576]
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
+- Add `add_formatted_index` processor that allows the resulting index for an event to be changed based on content from the event. {pull}33800[33800]
 
 *Auditbeat*
 
