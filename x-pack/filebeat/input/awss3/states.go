@@ -79,14 +79,14 @@ func (s *states) MustSkip(state state, store *statestore.Store) bool {
 	}
 
 	// the previous state is stored or has error: let's skip
-	if !previousState.IsEmpty() && (previousState.Stored || previousState.Error) {
+	if !previousState.IsEmpty() && previousState.IsProcessed() {
 		s.log.Debugw("previous state is stored or has error", "state", state)
 		return true
 	}
 
 	// we have no previous state or the previous state
 	// is not stored: refresh the state
-	if previousState.IsEmpty() || (!previousState.Stored && !previousState.Error) {
+	if previousState.IsEmpty() || !previousState.IsProcessed() {
 		s.Update(state, "")
 	}
 
@@ -172,7 +172,7 @@ func (s *states) Update(newState state, listingID string) {
 		s.log.Debug("New state added for ", newState.ID)
 	}
 
-	if listingID == "" || (!newState.Stored && !newState.Error) {
+	if listingID == "" || !newState.IsProcessed() {
 		return
 	}
 

@@ -282,7 +282,7 @@ func (p *s3Poller) Purge() {
 
 		for _, state := range p.states.GetStatesByListingID(listingID) {
 			// it is not stored, keep
-			if !state.Stored && !state.Error {
+			if !state.IsProcessed() {
 				p.log.Debugw("state not stored or with error, skip purge", "state", state)
 				continue
 			}
