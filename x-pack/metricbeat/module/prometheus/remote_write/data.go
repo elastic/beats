@@ -13,7 +13,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/model"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -33,7 +32,7 @@ const (
 
 type histogram struct {
 	timestamp  time.Time
-	buckets    []*dto.Bucket
+	buckets    []*p.Bucket
 	labels     mapstr.M
 	metricName string
 }
@@ -168,7 +167,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 				continue
 			}
 			v := uint64(val)
-			b := &dto.Bucket{
+			b := &p.Bucket{
 				CumulativeCount: &v,
 				UpperBound:      &bucket,
 			}
@@ -235,7 +234,7 @@ func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 
 		e := eventList[labelsHash]
 
-		hist := dto.Histogram{
+		hist := p.Histogram{
 			Bucket: histogram.buckets,
 		}
 		name := strings.TrimSuffix(histogram.metricName, "_bucket")

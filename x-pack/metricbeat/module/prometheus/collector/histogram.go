@@ -6,9 +6,8 @@ package collector
 
 import (
 	"fmt"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"math"
-
-	dto "github.com/prometheus/client_model/go"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -27,7 +26,7 @@ import (
 //  - undoing counters accumulation for each bucket (counts)
 //
 // https://www.elastic.co/guide/en/elasticsearch/reference/master/histogram.html
-func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram *dto.Histogram) mapstr.M {
+func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram *p.Histogram) mapstr.M {
 	var values []float64
 	var counts []uint64
 

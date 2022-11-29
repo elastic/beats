@@ -18,15 +18,15 @@
 package collector
 
 import (
+	"github.com/prometheus/prometheus/pkg/labels"
+	"github.com/prometheus/prometheus/pkg/textparse"
 	"regexp"
-
-	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -43,7 +43,7 @@ var (
 	}.Build()
 
 	upMetricName          = "up"
-	upMetricType          = dto.MetricType_GAUGE
+	upMetricType          = textparse.MetricTypeGauge
 	upMetricInstanceLabel = "instance"
 	upMetricJobLabel      = "job"
 	upMetricJobValue      = "prometheus"
@@ -63,7 +63,7 @@ type PromEventsGenerator interface {
 	Start()
 
 	// GeneratePromEvents converts a Prometheus metric family into a list of PromEvents
-	GeneratePromEvents(mf *dto.MetricFamily) []PromEvent
+	GeneratePromEvents(mf *p.MetricFamily) []PromEvent
 
 	// Stop must be called when the generator won't be used anymore
 	Stop()
@@ -195,30 +195,30 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
-func (m *MetricSet) upMetricFamily(value float64) *dto.MetricFamily {
-	gauge := dto.Gauge{
+func (m *MetricSet) upMetricFamily(value float64) *p.MetricFamily {
+	gauge := p.Gauge{
 		Value: &value,
 	}
-	label1 := dto.LabelPair{
-		Name:  &upMetricInstanceLabel,
-		Value: &m.host,
+	label1 := labels.Label{
+		Name:  upMetricInstanceLabel,
+		Value: m.host,
 	}
-	label2 := dto.LabelPair{
-		Name:  &upMetricJobLabel,
-		Value: &upMetricJobValue,
+	label2 := labels.Label{
+		Name:  upMetricJobLabel,
+		Value: upMetricJobValue,
 	}
-	metric := dto.Metric{
+	metric := p.OpenMetric{
 		Gauge: &gauge,
-		Label: []*dto.LabelPair{&label1, &label2},
+		Label: []*labels.Label{&label1, &label2},
 	}
-	return &dto.MetricFamily{
+	return &p.MetricFamily{
 		Name:   &upMetricName,
-		Type:   &upMetricType,
-		Metric: []*dto.Metric{&metric},
+		Type:   textparse.MetricType(upMetricType),
+		Metric: []*p.OpenMetric{&metric},
 	}
 }
 
-func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
+func (m *MetricSet) skipFamily(family *p.MetricFamily) bool {
 	if family == nil {
 		return false
 	}

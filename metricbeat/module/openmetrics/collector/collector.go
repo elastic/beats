@@ -25,6 +25,7 @@ import (
 	"github.com/prometheus/prometheus/pkg/textparse"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -64,7 +65,7 @@ type OpenMetricsEventsGenerator interface {
 	Start()
 
 	// converts a OpenMetrics metric family into a list of OpenMetricsEvents
-	GenerateOpenMetricsEvents(mf *p.OpenMetricFamily) []OpenMetricEvent
+	GenerateOpenMetricsEvents(mf *prometheus.MetricFamily) []OpenMetricEvent
 
 	// Stop must be called when the generator won't be used anymore
 	Stop()
@@ -225,8 +226,8 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
-func (m *MetricSet) upMetricFamily(value float64) *p.OpenMetricFamily {
-	gauge := p.Gauge{
+func (m *MetricSet) upMetricFamily(value float64) *prometheus.MetricFamily {
+	gauge := prometheus.Gauge{
 		Value: &value,
 	}
 	label1 := labels.Label{
@@ -237,18 +238,18 @@ func (m *MetricSet) upMetricFamily(value float64) *p.OpenMetricFamily {
 		Name:  upMetricJobLabel,
 		Value: m.Module().Name(),
 	}
-	metric := p.OpenMetric{
+	metric := prometheus.OpenMetric{
 		Gauge: &gauge,
 		Label: []*labels.Label{&label1, &label2},
 	}
-	return &p.OpenMetricFamily{
+	return &prometheus.MetricFamily{
 		Name:   &upMetricName,
 		Type:   textparse.MetricType(upMetricType),
-		Metric: []*p.OpenMetric{&metric},
+		Metric: []*prometheus.OpenMetric{&metric},
 	}
 }
 
-func (m *MetricSet) skipFamily(family *p.OpenMetricFamily) bool {
+func (m *MetricSet) skipFamily(family *prometheus.MetricFamily) bool {
 	if family == nil || family.Name == nil {
 		return false
 	}

@@ -5,6 +5,7 @@
 package collector
 
 import (
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"math"
 	"strconv"
 
@@ -13,8 +14,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	dto "github.com/prometheus/client_model/go"
 )
 
 func promEventsGeneratorFactory(base mb.BaseMetricSet) (collector.PromEventsGenerator, error) {
@@ -61,7 +60,7 @@ func (g *typedGenerator) Stop() {
 
 // GeneratePromEvents stores all Prometheus metrics using
 // specific Elasticsearch data types.
-func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.PromEvent {
+func (g *typedGenerator) GeneratePromEvents(mf *p.MetricFamily) []collector.PromEvent {
 	var events []collector.PromEvent
 
 	name := *mf.Name
@@ -71,8 +70,8 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 
 		if len(metric.Label) != 0 {
 			for _, label := range metric.Label {
-				if label.GetName() != "" && label.GetValue() != "" {
-					labels[label.GetName()] = label.GetValue()
+				if label.Name != "" && label.Value != "" {
+					labels[label.Name] = label.Value
 				}
 			}
 		}
@@ -149,7 +148,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 			*/
 		}
 
-		untyped := metric.GetUntyped()
+		untyped := metric.GetUnknown()
 		if untyped != nil {
 			if !math.IsNaN(untyped.GetValue()) && !math.IsInf(untyped.GetValue(), 0) {
 				events = append(events, collector.PromEvent{

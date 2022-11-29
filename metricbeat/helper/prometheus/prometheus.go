@@ -24,27 +24,27 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
-
-	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
-	"github.com/prometheus/common/expfmt"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/pkg/errors"
 )
 
 const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
 
+// Content-Type: text/plain; version=0.0.4; charset=utf-8
+
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
 	// GetFamilies requests metric families from prometheus endpoint and returns them
-	GetFamilies() ([]*dto.MetricFamily, error)
+	GetFamilies() ([]*MetricFamily, error)
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]mapstr.M, error)
 
-	ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error)
+	ProcessMetrics(families []*MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error)
 
 	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error
 }
@@ -71,7 +71,7 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
-func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
+func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 	var reader io.Reader
 
 	resp, err := p.FetchResponse()
@@ -99,29 +99,37 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
 
-	format := expfmt.ResponseFormat(resp.Header)
-	if format == "" {
+	//format := expfmt.ResponseFormat(resp.Header)
+	//if format == "" {
+	//	return nil, fmt.Errorf("Invalid format for response of response")
+	//}
+	//
+	//decoder := expfmt.NewDecoder(reader, format)
+	//if decoder == nil {
+	//	return nil, fmt.Errorf("Unable to create decoder to decode response")
+	//}
+	//
+	//families := []*dto.MetricFamily{}
+	//for {
+	//	mf := &dto.MetricFamily{}
+	//	err = decoder.Decode(mf)
+	//	if err != nil {
+	//		if err == io.EOF {
+	//			break
+	//		}
+	//		return nil, errors.Wrap(err, "decoding of metric family failed")
+	//	} else {
+	//		families = append(families, mf)
+	//	}
+	//}
+	contentType := GetContentType(resp.Header)
+	if contentType == "" {
 		return nil, fmt.Errorf("Invalid format for response of response")
 	}
 
-	decoder := expfmt.NewDecoder(reader, format)
-	if decoder == nil {
-		return nil, fmt.Errorf("Unable to create decoder to decode response")
-	}
-
-	families := []*dto.MetricFamily{}
-	for {
-		mf := &dto.MetricFamily{}
-		err = decoder.Decode(mf)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return nil, errors.Wrap(err, "decoding of metric family failed")
-		} else {
-			families = append(families, mf)
-		}
-	}
+	appendTime := time.Now().Round(0)
+	b, err := ioutil.ReadAll(reader)
+	families, err := ParseMetricFamilies(b, contentType, appendTime)
 
 	return families, nil
 }
@@ -141,7 +149,7 @@ type MetricsMapping struct {
 	ExtraFields map[string]string
 }
 
-func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error) {
+func (p *prometheus) ProcessMetrics(families []*MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error) {
 
 	eventsMap := map[string]mapstr.M{}
 	infoMetrics := []*infoMetricData{}
@@ -297,11 +305,11 @@ func getEvent(m map[string]mapstr.M, labels mapstr.M) mapstr.M {
 	return res
 }
 
-func getLabels(metric *dto.Metric) mapstr.M {
+func getLabels(metric *OpenMetric) mapstr.M {
 	labels := mapstr.M{}
 	for _, label := range metric.GetLabel() {
-		if label.GetName() != "" && label.GetValue() != "" {
-			labels.Put(label.GetName(), label.GetValue())
+		if label.Name != "" && label.Value != "" {
+			labels.Put(label.Name, label.Value)
 		}
 	}
 	return labels

@@ -8,12 +8,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
-
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/mitchellh/hashstructure"
+	"github.com/pkg/errors"
 )
 
 // Licensed to Elasticsearch B.V. under one or more contributor
@@ -42,11 +40,11 @@ func init() {
 
 type Module interface {
 	mb.Module
-	GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, time.Time, error)
+	GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, time.Time, error)
 }
 
 type familiesCache struct {
-	sharedFamilies     []*dto.MetricFamily
+	sharedFamilies     []*p.MetricFamily
 	lastFetchErr       error
 	lastFetchTimestamp time.Time
 }
@@ -89,7 +87,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	}
 }
 
-func (m *module) GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, time.Time, error) {
+func (m *module) GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, time.Time, error) {
 	m.containerdMetricsCache.lock.Lock()
 	defer m.containerdMetricsCache.lock.Unlock()
 

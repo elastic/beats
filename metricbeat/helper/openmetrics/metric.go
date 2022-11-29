@@ -19,6 +19,7 @@ package openmetrics
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"math"
 	"strconv"
 	"strings"
@@ -37,7 +38,7 @@ type MetricMap interface {
 	GetField() string
 
 	// GetValue returns the resulting value
-	GetValue(m *OpenMetric) interface{}
+	GetValue(m *prometheus.OpenMetric) interface{}
 	GetNilValue() interface{}
 
 	// GetConfiguration returns the configuration for the metric
@@ -207,7 +208,7 @@ func (m *commonMetric) GetNilValue() interface{} {
 }
 
 // GetValue returns the resulting value
-func (m *commonMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *commonMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	info := metric.GetInfo()
 	if info != nil {
 		if info.HasValidValue() {
@@ -325,7 +326,7 @@ type keywordMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *keywordMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *keywordMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
 		return m.keyword
 	}
@@ -337,7 +338,7 @@ type booleanMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *booleanMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *booleanMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil {
 		return gauge.GetValue() == 1
 	}
@@ -350,14 +351,14 @@ type labelMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *labelMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *labelMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
 		return getLabel(metric, m.label)
 	}
 	return nil
 }
 
-func getLabel(metric *OpenMetric, name string) string {
+func getLabel(metric *prometheus.OpenMetric, name string) string {
 	for _, label := range metric.GetLabel() {
 		if label.Name == name {
 			return label.Value
@@ -371,7 +372,7 @@ type infoMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *infoMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *infoMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	return ""
 }
 

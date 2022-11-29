@@ -23,7 +23,7 @@ import (
 
 	"github.com/prometheus/prometheus/pkg/textparse"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
@@ -71,7 +71,7 @@ func (p *openmetricEventGenerator) Stop()  {}
 
 // Default openmetricEventsGenerator stores all OpenMetrics metrics using
 // only double field type in Elasticsearch.
-func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFamily) []OpenMetricEvent {
+func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily) []OpenMetricEvent {
 	var events []OpenMetricEvent
 
 	name := *mf.Name
