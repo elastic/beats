@@ -15,14 +15,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/aws/smithy-go"
+	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-
-	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
-	"go.uber.org/multierr"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -108,7 +106,7 @@ func newSQSS3EventProcessor(
 	s3 s3ObjectHandlerFactory,
 ) *sqsS3EventProcessor {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", monitoring.NewRegistry())
 	}
 	return &sqsS3EventProcessor{
 		s3ObjectHandler:      s3,
