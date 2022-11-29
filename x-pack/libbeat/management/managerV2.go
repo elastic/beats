@@ -13,6 +13,7 @@ import (
 	"syscall"
 
 	"github.com/gofrs/uuid"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
@@ -27,6 +28,7 @@ type BeatV2Manager struct {
 	config   *Config
 	registry *reload.Registry
 	client   client.V2
+	uuid     uuid.UUID
 
 	logger *logp.Logger
 
@@ -49,11 +51,15 @@ type BeatV2Manager struct {
 	stopChan chan struct{}
 
 	isRunning bool
+
+	// used for the debug callback to report as-running config
+	lastOutputCfg *reload.ConfigWithMeta
+	lastInputCfg  []*reload.ConfigWithMeta
 }
 
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is meant to be used by the management plugin system, which will register this as a callback.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
+func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (lbmanagement.Manager, error) {
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -130,6 +136,7 @@ func (cm *BeatV2Manager) Start() error {
 		return fmt.Errorf("error starting connection to client")
 	}
 
+	cm.client.RegisterDiagnosticHook("config", "the rendered config used by the beat", "beat-rendered-config.yml", "application/yaml", cm.handleDebugYaml)
 	go cm.unitListen()
 	cm.isRunning = true
 	return nil
@@ -141,7 +148,7 @@ func (cm *BeatV2Manager) Stop() {
 }
 
 // CheckRawConfig is currently not implemented for V1.
-func (cm *BeatV2Manager) CheckRawConfig(cfg *conf.C) error {
+func (cm *BeatV2Manager) CheckRawConfig(_ *conf.C) error {
 	// This does not do anything on V1 or V2, but here we are
 	return nil
 }
@@ -335,6 +342,7 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 	}
 
 	_ = unit.UpdateState(client.UnitStateConfiguring, "reloading output component", nil)
+	cm.lastOutputCfg = reloadConfig
 	err = output.Reload(reloadConfig)
 	if err != nil {
 		errString := fmt.Errorf("Failed to reload component: %w", err)
@@ -367,6 +375,11 @@ func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 		return
 	}
 
+	//err = generateYAMLFromConfig(beatCfg)
+	if err != nil {
+		cm.logger.Error("error generating yaml for debug: %s", err)
+	}
+	cm.lastInputCfg = beatCfg
 	err = obj.Reload(beatCfg)
 	if err != nil {
 		errString := fmt.Errorf("Error reloading input: %w", err)
@@ -374,4 +387,40 @@ func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 		return
 	}
 	_ = unit.UpdateState(client.UnitStateHealthy, "beat reloaded", nil)
+}
+
+func (cm *BeatV2Manager) handleDebugYaml() []byte {
+	// generate input
+	inputList := []map[string]interface{}{}
+	for _, module := range cm.lastInputCfg {
+		var inputMap map[string]interface{}
+		err := module.Config.Unpack(&inputMap)
+		if err != nil {
+			cm.logger.Errorf("error unpacking input config for debug callback: %s", err)
+			return nil
+		}
+		inputList = append(inputList, inputMap)
+	}
+
+	// generate output
+	outputCfg := map[string]interface{}{}
+	err := cm.lastOutputCfg.Config.Unpack(&outputCfg)
+	if err != nil {
+		cm.logger.Errorf("error unpacking output config for debug callback: %s", err)
+		return nil
+	}
+	beatCfg := struct {
+		Inputs []map[string]interface{}
+		Output map[string]interface{}
+	}{
+		Inputs: inputList,
+		Output: outputCfg,
+	}
+
+	data, err := yaml.Marshal(beatCfg)
+	if err != nil {
+		cm.logger.Errorf("error generating YAML for input config: %w", err)
+		return nil
+	}
+	return data
 }
