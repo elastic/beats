@@ -65,20 +65,23 @@ func NewInput(
 
 	forwarder := harvester.NewForwarder(out)
 	callback := func(data []byte, metadata inputsource.NetworkMetadata) {
-		forwarder.Send(beat.Event{
+		evt := beat.Event{
 			Timestamp: time.Now(),
 			Meta: mapstr.M{
 				"truncated": metadata.Truncated,
 			},
 			Fields: mapstr.M{
 				"message": string(data),
-				"log": mapstr.M{
-					"source": mapstr.M{
-						"address": metadata.RemoteAddr.String(),
-					},
-				},
 			},
-		})
+		}
+		if metadata.RemoteAddr != nil {
+			evt.Fields["log"] = mapstr.M{
+				"source": mapstr.M{
+					"address": metadata.RemoteAddr.String(),
+				},
+			}
+		}
+		_ = forwarder.Send(evt)
 	}
 
 	udp := udp.New(&config.Config, callback)
