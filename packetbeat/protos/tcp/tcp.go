@@ -23,10 +23,13 @@ import (
 	"time"
 
 	"github.com/google/gopacket/layers"
+	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -39,8 +42,6 @@ const (
 	TCPDirectionOriginal = 1
 )
 
-var droppedBecauseOfGaps = monitoring.NewInt(nil, "tcp.dropped_because_of_gaps")
-
 type Processor interface {
 	Process(flow *flows.FlowID, hdr *layers.TCP, pkt *protos.Packet)
 }
@@ -51,10 +52,12 @@ type TCP struct {
 	portMap      map[uint16]protos.Protocol
 	protocols    protos.Protocols
 	expiredConns expirationQueue
+
+	metrics *inputMetrics
 }
 
 // Creates and returns a new Tcp.
-func NewTCP(p protos.Protocols) (*TCP, error) {
+func NewTCP(p protos.Protocols, id, device string) (*TCP, error) {
 	isDebug = logp.IsDebug("tcp")
 
 	portMap, err := buildPortsMap(p.GetAllTCP())
@@ -65,6 +68,7 @@ func NewTCP(p protos.Protocols) (*TCP, error) {
 	tcp := &TCP{
 		protocols: p,
 		portMap:   portMap,
+		metrics:   newInputMetrics(id, device),
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,
@@ -125,6 +129,9 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			tcpStartSeq, tcpSeq, lastSeq, len(pkt.Payload))
 	}
 
+	if len(pkt.Payload) != 0 {
+		tcp.metrics.log(pkt)
+	}
 	if len(pkt.Payload) > 0 && lastSeq != 0 {
 		if tcpSeqBeforeEq(tcpSeq, lastSeq) {
 			if isDebug {
@@ -147,7 +154,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 				if isDebug {
 					logp.Debug("tcp", "Dropping connection state because of gap")
 				}
-				droppedBecauseOfGaps.Add(1)
+				tcp.metrics.logDrop()
 
 				// drop application layer connection state and
 				// update stream_id for app layer analysers using stream_id for lookups
@@ -166,6 +173,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 
 			pkt.Payload = pkt.Payload[delta:]
 			tcphdr.Seq += delta
+			tcp.metrics.logOverlap()
 		}
 	}
 
@@ -259,6 +267,13 @@ func (tcp *TCP) findStream(k common.HashableIPPortTuple) *TCPConnection {
 		return v.(*TCPConnection)
 	}
 	return nil
+}
+
+func (tcp *TCP) Close() {
+	if tcp.metrics == nil {
+		return
+	}
+	tcp.metrics.close()
 }
 
 type TCPConnection struct {
@@ -370,4 +385,83 @@ type expiredConnection struct {
 
 func (ec *expiredConnection) notify() {
 	ec.mod.Expired(&ec.conn.tcptuple, ec.conn.data)
+}
+
+// inputMetrics handles the input's metric reporting.
+type inputMetrics struct {
+	unregister func()
+
+	lastPacket time.Time
+
+	device         *monitoring.String // name of the device being monitored
+	packets        *monitoring.Uint   // number of packets processed
+	bytes          *monitoring.Uint   // number of bytes processed
+	overlapped     *monitoring.Uint   // number of packets shrunk due to overlap
+	dropped        *monitoring.Int    // number of packets dropped because of gaps
+	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between packet arrivals
+	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
+}
+
+// newInputMetrics returns an input metric for the TCP processor. If id is empty
+// a nil inputMetric is returned.
+func newInputMetrics(id, device string) *inputMetrics {
+	if id == "" {
+		return nil
+	}
+	reg, unreg := inputmon.NewInputRegistry("tcp", id+"::"+device, nil)
+	out := &inputMetrics{
+		unregister:     unreg,
+		device:         monitoring.NewString(reg, "device"),
+		packets:        monitoring.NewUint(reg, "tcp_packets"),
+		bytes:          monitoring.NewUint(reg, "tcp_bytes"),
+		overlapped:     monitoring.NewUint(reg, "tcp_overlaps"),
+		dropped:        monitoring.NewInt(reg, "tcp.dropped_because_of_gaps"), // Name and type retained for compatibility.
+		arrivalPeriod:  metrics.NewUniformSample(1024),
+		processingTime: metrics.NewUniformSample(1024),
+	}
+	_ = adapter.NewGoMetrics(reg, "tcp_arrival_period", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
+	_ = adapter.NewGoMetrics(reg, "tcp_processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.processingTime))
+
+	out.device.Set(device)
+
+	return out
+}
+
+// log logs metric for the given packet.
+func (m *inputMetrics) log(pkt *protos.Packet) {
+	if m == nil {
+		return
+	}
+	m.processingTime.Update(time.Since(pkt.Ts).Nanoseconds())
+	m.packets.Add(1)
+	m.bytes.Add(uint64(len(pkt.Payload)))
+	if !m.lastPacket.IsZero() {
+		m.arrivalPeriod.Update(pkt.Ts.Sub(m.lastPacket).Nanoseconds())
+	}
+	m.lastPacket = pkt.Ts
+}
+
+// logOverlap logs metric for a overlapped packet.
+func (m *inputMetrics) logOverlap() {
+	if m == nil {
+		return
+	}
+	m.overlapped.Add(1)
+}
+
+// logDrop logs metric for a dropped packet.
+func (m *inputMetrics) logDrop() {
+	if m == nil {
+		return
+	}
+	m.dropped.Add(1)
+}
+
+func (m *inputMetrics) close() {
+	if m == nil {
+		return
+	}
+	m.unregister()
 }

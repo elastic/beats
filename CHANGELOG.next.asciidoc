@@ -194,6 +194,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}[]
 - Add metrics for UDP packet processing. {pull}33833[33833]
+- Add metrics for TCP and UDP packet processing. {pull}33833[33833]
 
 *Functionbeat*
 

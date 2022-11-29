@@ -307,7 +307,7 @@ func TestTCSeqPayload(t *testing.T) {
 					parse: makeCollectPayload(&state, true),
 				},
 			},
-		})
+		}, "", "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -343,7 +343,7 @@ func BenchmarkParallelProcess(b *testing.B) {
 	p := protocols{}
 	p.tcp = make(map[protos.Protocol]protos.TCPPlugin)
 	p.tcp[1] = &TestProtocol{Ports: []int{ServerPort}}
-	tcp, _ := NewTCP(p)
+	tcp, _ := NewTCP(p, "", "")
 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {

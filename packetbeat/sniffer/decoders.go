@@ -61,7 +61,7 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 			icmp6 = icmp
 		}
 
-		tcp, err := tcp.NewTCP(protocols)
+		tcp, err := tcp.NewTCP(protocols, id, device)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -78,6 +78,7 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 
 		cleanup := func() {
 			// Close metric collection.
+			tcp.Close()
 			udp.Close()
 		}
 
