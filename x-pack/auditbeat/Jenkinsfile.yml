@@ -31,6 +31,14 @@ stages:
         mage: "mage update build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
+    ubuntu-22:
+      mage: "mage build test"
+      platforms:
+        - "ubuntu-22"
+      when:
+        comments:
+          - "/test auditbeat for ubuntu-22"
+      stage: extended
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
