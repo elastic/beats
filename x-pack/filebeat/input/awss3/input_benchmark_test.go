@@ -199,7 +199,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
 		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics(metricRegistry, "test_id")
+		metrics := newInputMetrics("test_id", metricRegistry)
 		sqsAPI := newConstantSQS()
 		s3API := newConstantS3(t)
 		pipeline := &fakePipeline{}
@@ -290,7 +290,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
 		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics(metricRegistry, "test_id")
+		metrics := newInputMetrics("test_id", metricRegistry)
 
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
 			event.Private.(*awscommon.EventACKTracker).ACK()
