@@ -30,5 +30,4 @@ jobs:
       run: sudo apt-get install -y librpm-dev
     - name: Run check
       run: |
-        go install github.com/magefile/mage
         make check
