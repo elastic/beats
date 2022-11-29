@@ -24,6 +24,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -53,7 +54,7 @@ func NewUDP(p protos.Protocols, id, device string) (*UDP, error) {
 	udp := &UDP{
 		protocols: p,
 		portMap:   portMap,
-		metrics:   newInputMetrics(monitoring.GetNamespace("dataset").GetRegistry(), id, device),
+		metrics:   newInputMetrics(id, device),
 	}
 	logp.Debug("udp", "Port map: %v", portMap)
 
@@ -134,8 +135,7 @@ func (udp *UDP) Close() {
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	id     string
-	parent *monitoring.Registry
+	unregister func()
 
 	lastPacket time.Time
 
@@ -148,16 +148,13 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the UDP processor. If id is empty
 // a nil inputMetric is returned.
-func newInputMetrics(parent *monitoring.Registry, id, device string) *inputMetrics {
+func newInputMetrics(id, device string) *inputMetrics {
 	if id == "" {
 		return nil
 	}
-	reg := parent.NewRegistry(id)
-	monitoring.NewString(reg, "protocol").Set("udp")
-	monitoring.NewString(reg, "id").Set(id + "::" + device)
+	reg, unreg := inputmon.NewInputRegistry("udp", id+"::"+device, nil)
 	out := &inputMetrics{
-		id:             id,
-		parent:         reg,
+		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),
 		packets:        monitoring.NewUint(reg, "udp_packets"),
 		bytes:          monitoring.NewUint(reg, "udp_bytes"),
@@ -189,5 +186,8 @@ func (m *inputMetrics) log(pkt *protos.Packet) {
 }
 
 func (m *inputMetrics) close() {
-	m.parent.Remove(m.id)
+	if m == nil {
+		return
+	}
+	m.unregister()
 }
