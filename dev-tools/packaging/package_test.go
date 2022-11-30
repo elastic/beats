@@ -49,6 +49,7 @@ const (
 )
 
 var (
+	excludedPathsPattern   = regexp.MustCompile(`node_modules`)
 	configFilePattern      = regexp.MustCompile(`/(\w+beat\.yml|apm-server\.yml|elastic-agent\.yml)$`)
 	manifestFilePattern    = regexp.MustCompile(`manifest.yml`)
 	modulesDirPattern      = regexp.MustCompile(`module/.+`)
@@ -572,6 +573,9 @@ func readRPM(rpmFile string) (*packageFile, *rpm.PackageFile, error) {
 	pf := &packageFile{Name: filepath.Base(rpmFile), Contents: map[string]packageEntry{}}
 
 	for _, file := range contents {
+		if excludedPathsPattern.MatchString(file.Name()) {
+			continue
+		}
 		pe := packageEntry{
 			File: file.Name(),
 			Mode: file.Mode(),
@@ -656,6 +660,10 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 			return nil, err
 		}
 
+		if excludedPathsPattern.MatchString(header.Name) {
+			continue
+		}
+
 		p.Contents[header.Name] = packageEntry{
 			File: header.Name,
 			UID:  header.Uid,
@@ -680,6 +688,9 @@ func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFil
 
 	p := &packageFile{Name: filepath.Base(zipFile), Contents: map[string]packageEntry{}}
 	for _, f := range r.File {
+		if excludedPathsPattern.MatchString(f.Name) {
+			continue
+		}
 		p.Contents[f.Name] = packageEntry{
 			File: f.Name,
 			Mode: f.Mode(),
@@ -767,6 +778,9 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 			// Check only files in working dir and entrypoint
 			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
 				p.Contents[name] = entry
+			}
+			if excludedPathsPattern.MatchString(name) {
+				continue
 			}
 			// Add also licenses
 			for _, licenseFile := range licenseFiles {
