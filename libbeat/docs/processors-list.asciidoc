@@ -104,6 +104,9 @@ endif::[]
 ifndef::no_rename_processor[]
 * <<rename-fields,`rename`>>
 endif::[]
+ifndef::no_parse_aws_vpc_flow_log_processor[]
+* <<processor-parse-aws-vpc-flow-log, `parse_aws_vpc_flow_log`>>
+endif::[]
 ifndef::no_script_processor[]
 * <<processor-script,`script`>>
 endif::[]
@@ -230,6 +233,9 @@ include::{libbeat-processors-dir}/registered_domain/docs/registered_domain.ascii
 endif::[]
 ifndef::no_rename_processor[]
 include::{libbeat-processors-dir}/actions/docs/rename.asciidoc[]
+endif::[]
+ifndef::no_parse_aws_vpc_flow_log_processor[]
+include::{x-filebeat-processors-dir}/aws_vpcflow/docs/parse_aws_vpc_flow_log.asciidoc[]
 endif::[]
 ifndef::no_script_processor[]
 include::{libbeat-processors-dir}/script/docs/script.asciidoc[]
