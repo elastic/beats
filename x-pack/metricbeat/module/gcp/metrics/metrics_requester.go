@@ -152,11 +152,11 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 
 		switch {
 		case r.config.Region != "":
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabelZone, strings.TrimSuffix(r.config.Region, "*"))
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabel, strings.TrimSuffix(r.config.Region, "*"))
 		case r.config.Zone != "":
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabelZone, strings.TrimSuffix(r.config.Zone, "*"))
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabel, strings.TrimSuffix(r.config.Zone, "*"))
 		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.ComputeResourceLabelZone)
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.ComputeResourceLabel)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
 	case gcp.ServiceGKE:
@@ -173,7 +173,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 			zone := strings.TrimSuffix(r.config.Zone, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
 		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.GKEResourceLabelLocation)
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.GKEResourceLabel)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
@@ -185,9 +185,9 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 
 		switch {
 		case r.config.Region != "":
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.DataprocResourceLabelLocation, strings.TrimSuffix(r.config.Region, "*"))
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.DataprocResourceLabel, strings.TrimSuffix(r.config.Region, "*"))
 		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.DataprocResourceLabelLocation)
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.DataprocResourceLabel)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
 	case gcp.ServiceStorage:
@@ -199,7 +199,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 		case r.config.Region != "":
 			f = fmt.Sprintf(`%s AND resource.labels.location = "%s"`, f, r.config.Region)
 		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.StorageResourceLabelLocation)
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.StorageResourceLabel)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
 	case gcp.ServiceCloudSQL:
@@ -210,9 +210,9 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 		switch {
 		case r.config.Region != "":
 			region := strings.TrimSuffix(r.config.Region, "*")
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.CloudSQLResourceLabelRegion, region)
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.CloudSQLResourceLabel, region)
 		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.CloudSQLResourceLabelRegion)
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.CloudSQLResourceLabel)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
 	default:
