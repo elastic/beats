@@ -40,9 +40,15 @@ type Config struct {
 	BufferSize int
 	Terminator LineTerminator
 	MaxBytes   int
+	// If CollectOnEOF is set to true (default false) the line reader will return the buffer if EOF reached: this
+	// will ensure full content including last line with no EOL will be returned for fully retrieved content that's
+	// not appended anymore between reads.
+	// If CollectOnEOF is set to false the line reader will return 0 content and keep the buffer at the current
+	// state of appending data after temporarily EOF.
+	CollectOnEOF bool
 }
 
-// New creates a new Encode reader from input reader by applying
+// NewEncodeReader creates a new Encode reader from input reader by applying
 // the given codec.
 func NewEncodeReader(r io.ReadCloser, config Config) (EncoderReader, error) {
 	eReader, err := NewLineReader(r, config)
