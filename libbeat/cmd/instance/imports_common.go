@@ -23,6 +23,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/monitoring/report/elasticsearch" // Register default monitoring reporting
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"              // Register default processors.
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_id"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_locale"
