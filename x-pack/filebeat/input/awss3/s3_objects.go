@@ -277,10 +277,11 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 
 	var reader reader.Reader
 	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
-		Codec:      enc,
-		BufferSize: int(p.readerConfig.BufferSize),
-		Terminator: p.readerConfig.LineTerminator,
-		MaxBytes:   int(p.readerConfig.MaxBytes) * 4,
+		Codec:        enc,
+		BufferSize:   int(p.readerConfig.BufferSize),
+		Terminator:   p.readerConfig.LineTerminator,
+		CollectOnEOF: true,
+		MaxBytes:     int(p.readerConfig.MaxBytes) * 4,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create encode reader: %w", err)
@@ -293,18 +294,32 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
+<<<<<<< HEAD
 		if err == io.EOF {
+=======
+		if len(message.Content) > 0 {
+			event := p.createEvent(string(message.Content), offset)
+			event.Fields.DeepUpdate(message.Fields)
+			offset += int64(message.Bytes)
+			p.publish(p.acker, &event)
+		}
+
+		if errors.Is(err, io.EOF) {
+>>>>>>> 7b45320917 (handle EOF on single line content (#33568))
 			// No more lines
 			break
 		}
 		if err != nil {
 			return fmt.Errorf("error reading message: %w", err)
 		}
+<<<<<<< HEAD
 
 		event := createEvent(string(message.Content), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
 		event.Fields.DeepUpdate(message.Fields)
 		offset += int64(message.Bytes)
 		p.publish(p.acker, &event)
+=======
+>>>>>>> 7b45320917 (handle EOF on single line content (#33568))
 	}
 
 	return nil
