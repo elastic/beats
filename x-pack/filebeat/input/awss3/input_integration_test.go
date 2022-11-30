@@ -39,8 +39,6 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -183,9 +181,6 @@ func TestInputRunSQS(t *testing.T) {
 	// Ensure SQS is empty before testing.
 	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURL)
 
-	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
-
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
@@ -224,20 +219,14 @@ func TestInputRunSQS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
-		monitoring.Full,
-		false))
-	t.Log(snap.StringToPrint())
-
-	assertMetric(t, snap, "sqs_messages_received_total", 8) // S3 could batch notifications.
-	assertMetric(t, snap, "sqs_messages_inflight_gauge", 0)
-	assertMetric(t, snap, "sqs_messages_deleted_total", 7)
-	assertMetric(t, snap, "sqs_messages_returned_total", 1) // Invalid JSON is returned so that it can eventually be DLQed.
-	assertMetric(t, snap, "sqs_visibility_timeout_extensions_total", 0)
-	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
-	assertMetric(t, snap, "s3_objects_requested_total", 7)
-	assertMetric(t, snap, "s3_events_created_total", 12)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReceivedTotal.Get(), 8) // S3 could batch notifications.
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
 }
 
 func TestInputRunS3(t *testing.T) {
@@ -245,9 +234,6 @@ func TestInputRunS3(t *testing.T) {
 
 	// Terraform is used to set up S3 and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
-
-	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
 		"testdata/events-array.json",
@@ -287,23 +273,12 @@ func TestInputRunS3(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
-		monitoring.Full,
-		false))
-	t.Log(snap.StringToPrint())
-
-	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
-	assertMetric(t, snap, "s3_objects_requested_total", 7)
-	assertMetric(t, snap, "s3_objects_listed_total", 8)
-	assertMetric(t, snap, "s3_objects_processed_total", 7)
-	assertMetric(t, snap, "s3_objects_acked_total", 6)
-	assertMetric(t, snap, "s3_events_created_total", 12)
-}
-
-func assertMetric(t *testing.T, snapshot mapstr.M, name string, value interface{}) {
-	n, _ := snapshot.GetValue(inputID + "." + name)
-	assert.EqualValues(t, value, n, name)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsListedTotal.Get(), 8)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsProcessedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsAckedTotal.Get(), 6)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
 }
 
 func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string) {
@@ -462,9 +437,6 @@ func TestInputRunSNS(t *testing.T) {
 	// Ensure SQS is empty before testing.
 	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURLForSNS)
 
-	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
-
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForSNS,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
@@ -502,18 +474,12 @@ func TestInputRunSNS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
-		monitoring.Full,
-		false))
-	t.Log(snap.StringToPrint())
-
-	assertMetric(t, snap, "sqs_messages_received_total", 8) // S3 could batch notifications.
-	assertMetric(t, snap, "sqs_messages_inflight_gauge", 0)
-	assertMetric(t, snap, "sqs_messages_deleted_total", 7)
-	assertMetric(t, snap, "sqs_messages_returned_total", 1) // Invalid JSON is returned so that it can eventually be DLQed.
-	assertMetric(t, snap, "sqs_visibility_timeout_extensions_total", 0)
-	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
-	assertMetric(t, snap, "s3_objects_requested_total", 7)
-	assertMetric(t, snap, "s3_events_created_total", 12)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReceivedTotal.Get(), 8) // S3 could batch notifications.
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
 }
