@@ -36,6 +36,8 @@ import (
 	"strings"
 	"testing"
 
+	"errors"
+
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliercoder/go-rpm"
 )
@@ -48,7 +50,12 @@ const (
 )
 
 var (
+<<<<<<< HEAD
 	configFilePattern      = regexp.MustCompile(`.*beat\.yml$|apm-server\.yml|elastic-agent\.yml$`)
+=======
+	excludedPathsPattern   = regexp.MustCompile(`node_modules`)
+	configFilePattern      = regexp.MustCompile(`/(\w+beat\.yml|apm-server\.yml|elastic-agent\.yml)$`)
+>>>>>>> 3198a686db (Add support for excluded paths in packaging (#33894))
 	manifestFilePattern    = regexp.MustCompile(`manifest.yml`)
 	modulesDirPattern      = regexp.MustCompile(`module/.+`)
 	modulesDDirPattern     = regexp.MustCompile(`modules.d/$`)
@@ -183,6 +190,50 @@ func checkZip(t *testing.T, file string) {
 	checkLicensesPresent(t, "", p)
 }
 
+<<<<<<< HEAD
+=======
+const (
+	npcapLicense    = `Dependency : Npcap \(https://nmap.org/npcap/\)`
+	libpcapLicense  = `Dependency : Libpcap \(http://www.tcpdump.org/\)`
+	winpcapLicense  = `Dependency : Winpcap \(https://www.winpcap.org/\)`
+	radiotapLicense = `Dependency : ieee80211_radiotap.h Header File`
+)
+
+// This reflects the order that the licenses and notices appear in the relevant files.
+var npcapLicensePattern = regexp.MustCompile(
+	"(?s)" + npcapLicense +
+		".*" + libpcapLicense +
+		".*" + winpcapLicense +
+		".*" + radiotapLicense,
+)
+
+func checkNpcapNotices(pkg, file string, contents io.Reader) error {
+	if !strings.Contains(pkg, "packetbeat") {
+		return nil
+	}
+
+	wantNotices := strings.Contains(pkg, "windows") && !strings.Contains(pkg, "oss")
+
+	// If the packetbeat README.md is made to be generated
+	// conditionally then it should also be checked here.
+	pkg = filepath.Base(pkg)
+	file, err := filepath.Rel(pkg[:len(pkg)-len(filepath.Ext(pkg))], file)
+	if err != nil {
+		return err
+	}
+	switch file {
+	case "NOTICE.txt":
+		if npcapLicensePattern.MatchReader(bufio.NewReader(contents)) != wantNotices {
+			if wantNotices {
+				return fmt.Errorf("Npcap license section not found in %s file in %s", file, pkg)
+			}
+			return fmt.Errorf("unexpected Npcap license section found in %s file in %s", file, pkg)
+		}
+	}
+	return nil
+}
+
+>>>>>>> 3198a686db (Add support for excluded paths in packaging (#33894))
 func checkDocker(t *testing.T, file string) {
 	p, info, err := readDocker(file)
 	if err != nil {
@@ -528,6 +579,9 @@ func readRPM(rpmFile string) (*packageFile, *rpm.PackageFile, error) {
 	pf := &packageFile{Name: filepath.Base(rpmFile), Contents: map[string]packageEntry{}}
 
 	for _, file := range contents {
+		if excludedPathsPattern.MatchString(file.Name()) {
+			continue
+		}
 		pe := packageEntry{
 			File: file.Name(),
 			Mode: file.Mode(),
@@ -555,7 +609,7 @@ func readDeb(debFile string, dataBuffer *bytes.Buffer) (*packageFile, error) {
 	for {
 		header, err := arReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, err
@@ -606,10 +660,14 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 	for {
 		header, err := tarReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, err
+		}
+
+		if excludedPathsPattern.MatchString(header.Name) {
+			continue
 		}
 
 		p.Contents[header.Name] = packageEntry{
@@ -632,6 +690,9 @@ func readZip(zipFile string) (*packageFile, error) {
 
 	p := &packageFile{Name: filepath.Base(zipFile), Contents: map[string]packageEntry{}}
 	for _, f := range r.File {
+		if excludedPathsPattern.MatchString(f.Name) {
+			continue
+		}
 		p.Contents[f.Name] = packageEntry{
 			File: f.Name,
 			Mode: f.Mode(),
@@ -662,7 +723,7 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 	for {
 		header, err := tarReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, nil, err
@@ -707,6 +768,9 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 			// Check only files in working dir and entrypoint
 			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
 				p.Contents[name] = entry
+			}
+			if excludedPathsPattern.MatchString(name) {
+				continue
 			}
 			// Add also licenses
 			for _, licenseFile := range licenseFiles {
