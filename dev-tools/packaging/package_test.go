@@ -39,6 +39,7 @@ import (
 
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliercoder/go-rpm"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -186,8 +187,6 @@ func checkZip(t *testing.T, file string) {
 }
 
 const (
-	npcapSettings   = "Windows Npcap installation settings"
-	npcapGrant      = `Insecure.Com LLC \(“The Nmap Project”\) has granted Elasticsearch`
 	npcapLicense    = `Dependency : Npcap \(https://nmap.org/npcap/\)`
 	libpcapLicense  = `Dependency : Libpcap \(http://www.tcpdump.org/\)`
 	winpcapLicense  = `Dependency : Winpcap \(https://www.winpcap.org/\)`
@@ -603,7 +602,7 @@ func readDeb(debFile string, dataBuffer *bytes.Buffer) (*packageFile, error) {
 	for {
 		header, err := arReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, err
@@ -654,7 +653,7 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 	for {
 		header, err := tarReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, err
@@ -733,7 +732,7 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 	for {
 		header, err := tarReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, nil, err
