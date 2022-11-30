@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
 - Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
 - Support for multiline zookeeper logs {issue}2496[2496]
+- Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 
 *Auditbeat*
 
