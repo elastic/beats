@@ -12354,11 +12354,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-sysinfo
-Version: v1.8.1
+Version: v1.9.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.8.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.9.0/LICENSE.txt:
 
 
                                  Apache License
@@ -19018,11 +19018,11 @@ Contents of probable licence file $GOMODCACHE/github.com/prometheus/common@v0.30
 
 --------------------------------------------------------------------------------
 Dependency : github.com/prometheus/procfs
-Version: v0.7.3
+Version: v0.8.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.7.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.8.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
