@@ -37,9 +37,10 @@ import (
 	"strings"
 	"testing"
 
+	"errors"
+
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliercoder/go-rpm"
-	"github.com/pkg/errors"
 )
 
 const (
