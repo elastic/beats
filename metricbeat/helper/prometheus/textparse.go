@@ -19,11 +19,6 @@ package prometheus
 
 import (
 	"fmt"
-	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/pkg/exemplar"
-	"github.com/prometheus/prometheus/pkg/labels"
-	"github.com/prometheus/prometheus/pkg/textparse"
-	"github.com/prometheus/prometheus/pkg/timestamp"
 	"io"
 	"math"
 	"mime"
@@ -31,6 +26,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/pkg/exemplar"
+	"github.com/prometheus/prometheus/pkg/labels"
+	"github.com/prometheus/prometheus/pkg/textparse"
+	"github.com/prometheus/prometheus/pkg/timestamp"
 )
 
 var errNameLabelMandatory = fmt.Errorf("missing metric name (%s label)", labels.MetricName)

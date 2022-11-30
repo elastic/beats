@@ -18,15 +18,17 @@
 package collector
 
 import (
+	"regexp"
+
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
-	"regexp"
+
+	"github.com/pkg/errors"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/pkg/errors"
 )
 
 const (

@@ -22,11 +22,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/mitchellh/hashstructure"
 )
 
 func init() {

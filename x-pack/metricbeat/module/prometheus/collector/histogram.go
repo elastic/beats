@@ -6,8 +6,9 @@ package collector
 
 import (
 	"fmt"
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"math"
+
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

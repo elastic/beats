@@ -19,11 +19,12 @@ package openmetrics
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"math"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"

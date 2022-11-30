@@ -8,10 +8,11 @@ import (
 	"sync"
 	"time"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
+
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Licensed to Elasticsearch B.V. under one or more contributor

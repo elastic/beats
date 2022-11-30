@@ -26,11 +26,12 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/pkg/errors"
 )
 
 const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`

@@ -5,9 +5,10 @@
 package collector
 
 import (
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"math"
 	"strconv"
+
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
