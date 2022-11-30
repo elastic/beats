@@ -569,8 +569,10 @@ loop:
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			if isTotal(metricName) { // Remove suffix _total, get lookup metricname
+			if isTotal(metricName) && contentType == OpenMetricsType { // Remove suffix _total, get lookup metricname
 				lookupMetricName = metricName[:len(metricName)-6]
+			} else {
+				lookupMetricName = metricName
 			}
 			break
 		case textparse.MetricTypeGauge:
