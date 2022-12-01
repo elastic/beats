@@ -215,6 +215,19 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.CloudSQLResourceLabelRegion)
 			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
 		}
+	case gcp.ServiceRedis:
+		if r.config.Region != "" && len(r.config.Regions) != 0 {
+			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
+		}
+
+		switch {
+		case r.config.Region != "":
+			region := strings.TrimSuffix(r.config.Region, "*")
+			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.RedisResourceLabelRegion, region)
+		case len(r.config.Regions) != 0:
+			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.RedisResourceLabelRegion)
+			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
+		}
 	default:
 		if r.config.Region != "" && r.config.Zone != "" {
 			r.logger.Warnf("when region %s and zone %s config parameter "+
