@@ -18,22 +18,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-/*
-const (
-	cacheTTL         = 30 * time.Second
-	initialCacheSize = 13
-)
-*/
-
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
 func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
-		projectID: projectID,
-		zone:      zone,
-		region:    region,
-		regions:   regions,
-		opt:       opt,
-		// instanceCache: common.NewCache(cacheTTL, initialCacheSize),
+		projectID:        projectID,
+		zone:             zone,
+		region:           region,
+		regions:          regions,
+		opt:              opt,
 		computeInstances: make(map[uint64]*compute.Instance),
 		logger:           logp.NewLogger("metrics-compute"),
 	}, nil
@@ -42,12 +34,9 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 // computeMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
 // reading and writing in the same method)
 type computeMetadata struct {
-	// projectID   string
 	zone        string
 	instanceID  string
 	machineType string
-
-	// ts *monitoringpb.TimeSeries
 
 	User     map[string]string
 	Metadata map[string]string
@@ -147,16 +136,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 
 // instance returns data from an instance ID using the cache or making a request
 func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*compute.Instance, error) {
-	/*
-		s.refreshInstanceCache(ctx)
-		instanceCachedData := s.instanceCache.Get(instanceID)
-		if instanceCachedData != nil {
-			if computeInstance, ok := instanceCachedData.(*compute.Instance); ok {
-				return computeInstance, nil
-			}
-		}
-	*/
-
 	s.getComputeInstances(ctx)
 
 	instanceIdInt, _ := strconv.Atoi(instanceID)
@@ -188,14 +167,6 @@ func (s *metadataCollector) instanceZone(ts *monitoringpb.TimeSeries) string {
 }
 
 func (s *metadataCollector) getComputeInstances(ctx context.Context) {
-	/*
-		// only refresh cache if it is empty
-		if s.instanceCache.Size() > 0 {
-			return
-		}
-		s.logger.Debugf("refresh cache with Instances.AggregatedList API")
-	*/
-
 	if len(s.computeInstances) > 0 {
 		return
 	}
@@ -212,7 +183,6 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 	if err := req.Pages(ctx, func(page *compute.InstanceAggregatedList) error {
 		for _, instancesScopedList := range page.Items {
 			for _, instance := range instancesScopedList.Instances {
-				// s.instanceCache.Put(strconv.Itoa(int(instance.Id)), instance)
 				s.computeInstances[instance.Id] = instance
 			}
 		}
