@@ -84,7 +84,7 @@ On start the `state` is will be something like this:
     "cursor": { ... },
     ...
 }
----
+----
 
 The `state.url` field will be present and may be an HTTP end-point or a file path.
 It is the responsibility of the CEL program to handle removing the scheme from a file URL if it is present.
@@ -101,38 +101,32 @@ After completion of a program's execution it should return a single object with 
 ["source","json",subs="attributes"]
 ----
 {
-    "cursor": [ <2>
-        {...},
-        ...
-    ],
     "events": [ <1>
         {...},
         ...
     ],
-    "url": <resource address>, <3>
-    "status_code": <HTTP request status code if a network request>, <4>
-    "header": <HTTP response headers if a network request>, <5>
-    "rate_limit": <HTTP rate limit map if required by API>, <6>
-    "want_more": false <7>
+    "cursor": [ <2>
+        {...},
+        ...
+    ],
+    "url": <resource address>,
+    "status_code": <HTTP request status code if a network request>,
+    "header": <HTTP response headers if a network request>,
+    "rate_limit": <HTTP rate limit map if required by API>, <3>
+    "want_more": false <4>
 }
 ----
 
-
-<1> The `events` field must be present, but may be empty or null.
-If it is not empty, it must only have objects as elements.
+<1> The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements.
 The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged.
 
 <2> If `cursor` is present it must be either be a single object or an array with the same length as events; each element _i_ of the `cursor` will be the details for obtaining the events at and beyond event _i_ in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
 
-If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`.
-The `rate_limit` field may also have a string `error` field and other fields which will be logged.
-If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior.
-The https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Limit[Limit], and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#OktaRateLimit[Okta Rate Limit policy] and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#DraftRateLimit[Draft Rate Limit policy] documentation show how to construct this field.
+<3> If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Limit[Limit], and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#OktaRateLimit[Okta Rate Limit policy] and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#DraftRateLimit[Draft Rate Limit policy] documentation show how to construct this field.
 
-The `status_code`, `header` and `rate_limit` values may be omitted if the program is not interacting with an HTTP API end-point and so will not contribute to program control.
+<4> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned.
 
-<7> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned.
-
+The `status_code`, `header` and `rate_limit` values may be omitted if the program is not interacting with an HTTP API end-point and so will not be needed to contribute to program control.
 
 ==== Debug state logging
 
@@ -250,7 +244,7 @@ filebeat.inputs:
   resource.url: http://localhost
 ----
 
-[[input-state]]
+[[input-state-cel]]
 ==== Input state
 
 The `cel` input keeps a runtime state between requests. This state can be accessed by the CEL program and may contain arbitrary objects.
@@ -515,7 +509,7 @@ Whether to use the host's local time rather that UTC for timestamping rotated lo
 
 This determines whether rotated logs should be gzip compressed.
 
-[[cursor]]
+[[cursor-cel]]
 [float]
 ==== `cursor`
 
