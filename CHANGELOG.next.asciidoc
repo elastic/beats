@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
 
 *Heartbeat*
 
