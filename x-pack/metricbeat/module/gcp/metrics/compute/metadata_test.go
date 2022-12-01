@@ -65,7 +65,6 @@ var fake = &monitoring.TimeSeries{
 
 var m = &metadataCollector{
 	projectID: "projectID",
-	// instanceCache: common.NewCache(30*time.Second, 13),
 }
 
 func TestInstanceID(t *testing.T) {

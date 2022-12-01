@@ -45,12 +45,11 @@ type computeMetadata struct {
 }
 
 type metadataCollector struct {
-	projectID string
-	zone      string
-	region    string
-	regions   []string
-	opt       []option.ClientOption
-	// instanceCache *common.Cache
+	projectID        string
+	zone             string
+	region           string
+	regions          []string
+	opt              []option.ClientOption
 	computeInstances map[uint64]*compute.Instance
 	logger           *logp.Logger
 }
