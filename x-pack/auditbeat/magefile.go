@@ -223,6 +223,11 @@ func installDependencies(arch string, pkgs ...string) error {
 		return err
 	}
 
-	args := append([]string{"install", "-y", "--no-install-recommends"}, pkgs...)
+	// Due to the expired GPG keys in the old Debian version we must use `--force-yes` additionally to `-y`.
+	args := append([]string{
+		"install", "-y", "--force-yes",
+		"--allow-unauthenticated",
+		"--no-install-recommends",
+	}, pkgs...)
 	return sh.Run("apt-get", args...)
 }
