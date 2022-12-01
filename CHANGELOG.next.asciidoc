@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
 - Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
 - Support for multiline zookeeper logs {issue}2496[2496]
+- Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 
 *Auditbeat*
 
@@ -168,6 +169,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Modified `aws-s3` input to reduce mutex contention when multiple SQS message are being processed concurrently. {pull}33658[33658]
 - Disable "event normalization" processing for the aws-s3 input to reduce allocations. {pull}33673[33673]
 - Add Common Expression Language input. {pull}31233[31233]
+- Add support for http+unix and http+npipe schemes in httpjson input. {issue}33571[33571] {pull}33610[33610]
+- Add support for http+unix and http+npipe schemes in cel input. {issue}33571[33571] {pull}33712[33712]
+- Add `decode_duration`, `move_fields` processors. {pull}31301[31301]
 
 *Auditbeat*
 
