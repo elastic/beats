@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	monitoringpb "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	redisa "cloud.google.com/go/redis/apiv1"
+	redis "cloud.google.com/go/redis/apiv1"
 	"cloud.google.com/go/redis/apiv1/redispb"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -182,7 +182,7 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 
 	s.logger.Debug("get redis instances with ListInstances API")
 
-	client, err := redisa.NewCloudRedisClient(ctx, s.opt...)
+	client, err := redis.NewCloudRedisClient(ctx, s.opt...)
 	if err != nil {
 		s.logger.Errorf("error getting client from redis service: %v", err)
 		return
