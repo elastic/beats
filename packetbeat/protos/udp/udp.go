@@ -156,14 +156,14 @@ func newInputMetrics(id, device string) *inputMetrics {
 	out := &inputMetrics{
 		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),
-		packets:        monitoring.NewUint(reg, "udp_packets"),
-		bytes:          monitoring.NewUint(reg, "udp_bytes"),
+		packets:        monitoring.NewUint(reg, "received_events_total"),
+		bytes:          monitoring.NewUint(reg, "received_bytes_total"),
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "udp_arrival_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "udp_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.device.Set(device)

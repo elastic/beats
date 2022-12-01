@@ -412,16 +412,16 @@ func newInputMetrics(id, device string) *inputMetrics {
 	out := &inputMetrics{
 		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),
-		packets:        monitoring.NewUint(reg, "tcp_packets"),
-		bytes:          monitoring.NewUint(reg, "tcp_bytes"),
+		packets:        monitoring.NewUint(reg, "received_events_total"),
+		bytes:          monitoring.NewUint(reg, "received_bytes_total"),
 		overlapped:     monitoring.NewUint(reg, "tcp_overlaps"),
 		dropped:        monitoring.NewInt(reg, "tcp.dropped_because_of_gaps"), // Name and type retained for compatibility.
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "tcp_arrival_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "tcp_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.device.Set(device)
