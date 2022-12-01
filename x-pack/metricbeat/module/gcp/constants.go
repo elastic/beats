@@ -25,6 +25,7 @@ const (
 	ServiceFirestore      = "firestore"
 	ServiceDataproc       = "dataproc"
 	ServiceCloudSQL       = "cloudsql"
+	ServiceRedis          = "redis"
 )
 
 // Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
@@ -84,6 +85,7 @@ const (
 	StorageResourceLabel  = "resource.label.location"
 	CloudSQLResourceLabel = "resource.labels.region"
 	DataprocResourceLabel = "resource.label.region"
+	RedisResourceLabel    = "resource.label.region"
 )
 
 // AlignersMapToGCP map contains available perSeriesAligner
