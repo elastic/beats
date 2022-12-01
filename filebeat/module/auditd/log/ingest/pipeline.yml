@@ -102,6 +102,8 @@ processors:
         def audit = ctx.auditd.get("log");
         Iterator entries = audit.entrySet().iterator();
 
+        Pattern argRegex = /^a([0-9]+)(.*)$/;
+
         while (entries.hasNext()) {
             def e = entries.next();
             def k = e.getKey();
@@ -117,6 +119,13 @@ processors:
             if (possibleHexKeys.contains(k) && isHexAscii(v)) {
                 v = convertHexToString(v);
                 audit.put(k, v);
+            }
+
+            if (argRegex.matcher(k).matches()) {
+              if (v.charAt(0) != "\"" ) {
+                v = convertHexToString(v);
+                audit.put(k, v);
+              }
             }
 
             // Trim quotes.
@@ -2132,7 +2141,7 @@ processors:
                   .filter(x -> x[0].group(2) != "_len")
                   /* List<Matcher, Value> to List<[Int, Value]>
                      where the Int is the argument index */
-                  .map(x -> [Integer.parseInt(x[0].group(1)), isHexAscii(x[1]) ? convertHexToString(x[1]) : x[1]])
+                  .map(x -> [Integer.parseInt(x[0].group(1)), x[1]])
                   /* Sort by numeric argument index */
                   .sorted((lhs, rhs) -> lhs[0].compareTo(rhs[0]))
                   /* Save as List<[Index, Value]> */
