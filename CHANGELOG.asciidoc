@@ -3,7 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
 =======
 [[release-notes-8.5.3]]
 === Beats version 8.5.3
@@ -76,7 +75,6 @@ https://github.com/elastic/beats/compare/v8.5.0\...v8.5.1[View commits]
 
 - Beats will now attempt to recover if a lockfile has not been removed. {pull}[33169]
 
->>>>>>> a17b26bd0a (docs: Prepare Changelog for 8.5.3 (#33878))
 [[release-notes-8.5.0]]
 === Beats version 8.5.0
 https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
