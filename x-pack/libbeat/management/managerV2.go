@@ -57,6 +57,10 @@ type BeatV2Manager struct {
 	lastInputCfg  []*reload.ConfigWithMeta
 }
 
+// ================================
+// Init Functions
+// ================================
+
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is meant to be used by the management plugin system, which will register this as a callback.
 func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (lbmanagement.Manager, error) {
@@ -136,7 +140,7 @@ func (cm *BeatV2Manager) Start() error {
 		return fmt.Errorf("error starting connection to client")
 	}
 
-	cm.client.RegisterDiagnosticHook("config", "the rendered config used by the beat", "beat-rendered-config.yml", "application/yaml", cm.handleDebugYaml)
+	cm.client.RegisterDiagnosticHook("beat-rendered-config", "the rendered config used by the beat", "beat-rendered-config.yml", "application/yaml", cm.handleDebugYaml)
 	go cm.unitListen()
 	cm.isRunning = true
 	return nil
@@ -378,7 +382,6 @@ func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 		return
 	}
 
-	//err = generateYAMLFromConfig(beatCfg)
 	if err != nil {
 		cm.logger.Error("error generating yaml for debug: %s", err)
 	}
@@ -412,17 +415,20 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 		cm.logger.Errorf("error unpacking output config for debug callback: %s", err)
 		return nil
 	}
+	// combine the two in a somewhat coherent way
+	// This isn't perfect, but generating a config that can actually be fed back into the beat
+	// would require
 	beatCfg := struct {
-		Inputs []map[string]interface{}
-		Output map[string]interface{}
+		Inputs  []map[string]interface{}
+		Outputs map[string]interface{}
 	}{
-		Inputs: inputList,
-		Output: outputCfg,
+		Inputs:  inputList,
+		Outputs: outputCfg,
 	}
 
 	data, err := yaml.Marshal(beatCfg)
 	if err != nil {
-		cm.logger.Errorf("error generating YAML for input config: %w", err)
+		cm.logger.Errorf("error generating YAML for input debug callback: %w", err)
 		return nil
 	}
 	return data
