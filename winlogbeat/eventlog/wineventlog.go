@@ -181,6 +181,8 @@ type winEventLog struct {
 	winMetaCache // Cached WinMeta tables by provider.
 
 	logPrefix string // String to prefix on log messages.
+
+	metrics *inputMetrics
 }
 
 func newEventLogging(options *conf.C) (EventLog, error) {
@@ -251,6 +253,7 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
 		winMetaCache: newWinMetaCache(metaTTL),
 		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
+		metrics:      newInputMetrics(c.Name, id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more
@@ -288,6 +291,7 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
 	}
 	if err != nil {
+		l.metrics.logError(err)
 		return err
 	}
 	defer win.Close(bookmark)
@@ -303,6 +307,7 @@ func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtH
 
 	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
+		l.metrics.logError(err)
 		return fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
 	}
 
@@ -322,12 +327,14 @@ func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtH
 			logp.Warn("%s Failed to seek to bookmarked location in %v (error: %v). "+
 				"Recovering by reading the log from the beginning. (Did the file "+
 				"change since it was last read?)", l.logPrefix, path, err)
+			l.metrics.logError(err)
 			if seekErr := win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst); seekErr != nil {
 				err = fmt.Errorf("failed to seek to beginning of log: %w", seekErr)
 			}
 		}
 
 		if err != nil {
+			l.metrics.logError(err)
 			return err
 		}
 	}
@@ -341,6 +348,7 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
 	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
 	if err != nil {
+		l.metrics.logError(err)
 		return err
 	}
 	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
@@ -368,11 +376,13 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION):
 		debugf("%s error subscribing (first chance): %v", l.logPrefix, err)
 		// The bookmarked event was not found, we retry the subscription from the start.
+		l.metrics.logError(err)
 		incrementMetric(readErrors, err)
 		subscriptionHandle, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
 	}
 
 	if err != nil {
+		l.metrics.logError(err)
 		debugf("%s error subscribing (final): %v", l.logPrefix, err)
 		return err
 	}
@@ -386,14 +396,16 @@ func (l *winEventLog) Read() ([]Record, error) {
 	if err != nil || len(handles) == 0 {
 		return nil, err
 	}
+
+	var records []Record
 	defer func() {
+		l.metrics.log(records)
 		for _, h := range handles {
 			win.Close(h)
 		}
 	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
-	var records []Record
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
@@ -405,8 +417,10 @@ func (l *winEventLog) Read() ([]Record, error) {
 			l.outputBuf.Reset()
 			err = l.render(h, l.outputBuf)
 		}
+		l.metrics.logError(err)
 		if err != nil && l.outputBuf.Len() == 0 {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
+			l.metrics.logDropped(err)
 			incrementMetric(dropReasons, err)
 			continue
 		}
@@ -418,11 +432,13 @@ func (l *winEventLog) Read() ([]Record, error) {
 			Timestamp:    r.TimeCreated.SystemTime,
 		}
 		if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
+			l.metrics.logError(err)
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
 		}
 		if r.Message == "" {
 			r.Message, err = l.message(h)
 			if err != nil {
+				l.metrics.logError(err)
 				logp.Warn("%s error salvaging message (event id=%d qualifier=%d provider=%q created at %s will be included without a message): %v",
 					l.logPrefix, r.EventIdentifier.ID, r.EventIdentifier.Qualifiers, r.Provider.Name, r.TimeCreated.SystemTime, err)
 			}
@@ -452,6 +468,7 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		return nil, maxRead, nil
 	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
+		l.metrics.logError(err)
 		if err := l.Close(); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
@@ -460,6 +477,7 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 		}
 		return l.eventHandles(maxRead / 2)
 	default:
+		l.metrics.logError(err)
 		incrementMetric(readErrors, err)
 		logp.Warn("%s EventHandles returned error %v", l.logPrefix, err)
 		return nil, 0, err
@@ -529,6 +547,7 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
+	l.metrics.close()
 	return win.Close(l.subscription)
 }
 

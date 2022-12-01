@@ -190,6 +190,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Add metrics for log event processing. {pull}33922[33922]
 
 *Elastic Log Driver*
 

@@ -64,6 +64,8 @@ type winEventLogExp struct {
 
 	iterator *win.EventIterator
 	renderer *win.Renderer
+
+	metrics *inputMetrics
 }
 
 // newWinEventLogExp creates and returns a new EventLog for reading event logs
@@ -128,6 +130,7 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 		maxRead:     c.BatchReadSize,
 		renderer:    renderer,
 		log:         log,
+		metrics:     newInputMetrics(c.Name, id),
 	}
 
 	return l, nil
@@ -245,11 +248,16 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 
 func (l *winEventLogExp) Read() ([]Record, error) {
 	var records []Record
+	defer func() {
+		l.metrics.log(records)
+	}()
 
 	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
 		record, err := l.processHandle(h)
 		if err != nil {
+			l.metrics.logError(err)
 			l.log.Warnw("Dropping event due to rendering error.", "error", err)
+			l.metrics.logDropped(err)
 			incrementMetric(dropReasons, err)
 			continue
 		}
@@ -263,6 +271,7 @@ func (l *winEventLogExp) Read() ([]Record, error) {
 
 	// An error occurred while retrieving more events.
 	if err := l.iterator.Err(); err != nil {
+		l.metrics.logError(err)
 		return records, err
 	}
 
@@ -304,6 +313,7 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 		Timestamp:    r.TimeCreated.SystemTime,
 	}
 	if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
+		l.metrics.logError(err)
 		l.log.Warnw("Failed creating bookmark.", "error", err)
 	}
 	l.lastRead = r.Offset
@@ -322,6 +332,7 @@ func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 
 func (l *winEventLogExp) Close() error {
 	l.log.Debug("Closing event log reader handles.")
+	l.metrics.close()
 	return multierr.Combine(
 		l.iterator.Close(),
 		l.renderer.Close(),
