@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 type PackageInstaller struct {
@@ -114,7 +113,7 @@ func installDependencies(arch string, pkgs ...string) error {
 	if arch != "" {
 		err := sh.Run("dpkg", "--add-architecture", arch)
 		if err != nil {
-			return errors.Wrap(err, "error while adding architecture")
+			return fmt.Errorf("error while adding architecture: %w", err)
 		}
 	}
 
@@ -122,7 +121,7 @@ func installDependencies(arch string, pkgs ...string) error {
 		return err
 	}
 
-	params := append([]string{"install", "-y",
+	params := append([]string{"install", "-y", "--force-yes",
 		"--no-install-recommends",
 
 		// Journalbeat is built with old versions of Debian that don't update
