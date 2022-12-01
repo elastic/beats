@@ -20,7 +20,9 @@ func filebeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) (
 	}
 
 	for iter := range modules {
-		modules[iter]["module"] = rawIn.Type
+		if _, ok := modules[iter]["type"]; !ok {
+			modules[iter]["type"] = rawIn.Type
+		}
 	}
 
 	// format for the reloadable list needed bythe cm.Reload() method

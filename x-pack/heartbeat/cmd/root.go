@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	heartbeatCmd "github.com/elastic/beats/v7/heartbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd"
@@ -23,13 +24,22 @@ var RootCmd *cmd.BeatsRootCmd
 // heartbeatCfg is a callback registered via SetTransform that returns a Elastic Agent client.Unit
 // configuration generated from a raw Elastic Agent config
 func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	//grab and properly format the input streams
-	inputStreams, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
+	modules, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
 	if err != nil {
-		return nil, fmt.Errorf("error generating new stream config: %w", err)
+		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
 
-	configList, err := management.CreateReloadConfigFromInputs(inputStreams)
+	// Extract the stream-level type from the input
+	typeField := strings.Split(rawIn.Type, "/")[1]
+
+	for iter := range modules {
+		if _, ok := modules[iter]["type"]; !ok {
+			modules[iter]["type"] = typeField
+		}
+	}
+
+	// format for the reloadable list needed bythe cm.Reload() method
+	configList, err := management.CreateReloadConfigFromInputs(modules)
 	if err != nil {
 		return nil, fmt.Errorf("error creating reloader config: %w", err)
 	}
