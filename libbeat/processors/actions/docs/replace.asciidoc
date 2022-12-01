@@ -5,25 +5,23 @@
 <titleabbrev>replace</titleabbrev>
 ++++
 
-The `replace` processor takes a list of fields to replace the field value
-matching a pattern with replacement string. Under the `fields` key, each entry
-contains a `field: field-name`, `pattern: regex-pattern` and
-`replacement: replacement-string`, where:
+The `replace` processor takes a list of fields to search for a matching
+value and replaces the matching value with a specified string.
 
-* `field` is the original field name. It's supported to use `@metadata.` prefix for the fields and replace values in the event metadata instead of event fields.
-* `pattern` is the regex pattern to match the field's value
-* `replacement` is the replacement string to use to update the field's value
 
-The `replace` processor cannot be used to replace value with a completely new value.
+The `replace` processor cannot be used to create a completely new value.
 
-TIP: The `replacement` field value can be used to truncate the `field` value or replace
-it with a new string. It can also be used for masking PII information.
+TIP: You can use this processor to truncate a field value or replace
+it with a new string value. You can also use this processor to mask PII
+information.
 
-The following example will change path from /usr/bin to /usr/local/bin:
+[discrete]
+==== Example
+
+The following example changes the path from `/usr/bin` to `/usr/local/bin`:
 
 [source,yaml]
 -------
-processors:
   - replace:
       fields:
         - field: "file.path"
@@ -33,16 +31,35 @@ processors:
       fail_on_error: true
 -------
 
-The `replace` processor has following configuration settings:
+[discrete]
+==== Configuration settings
 
-`ignore_missing`:: (Optional) If set to `true`, no error is logged if the specified field
-is missing. The default is `false`.
+[options="header"]
+|===
+| Name | Required | Default | Description
 
-`fail_on_error`:: (Optional) If set to `true` and there's an error, the replacement of
-field values is stopped and the original event is returned. If set to `false`, replacement
-continues even if an error occurs during replacement. The default is `true`.
+| `fields`
+| Yes
+|
+a| List of one or more items. Each item contains a `field: field-name`,
+`pattern: regex-pattern`, and `replacement: replacement-string`, where:
+
+* `field` is the original field name. You can use the `@metadata.` prefix in this field to replace values in the event metadata instead of event fields.
+* `pattern` is the regex pattern to match the field's value
+* `replacement` is the replacement string to use to update the field's value
+
+| `ignore_missing`
+| No
+| `false`
+| Whether to ignore missing fields. If `true`, no error is logged if the specified field is missing.
+
+|`fail_on_error`
+| No
+| `true`
+| Whether to fail replacement of field values if an error occurs.
+If `true` and there's an error, the replacement of field values is stopped, and the original event is returned.
+If `false`, replacement continues even if an error occurs during replacement.
+
+|===
 
 See <<conditions>> for a list of supported conditions.
-
-You can specify multiple `ignore_missing` processors under the `processors`
-section.
