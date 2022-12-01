@@ -3,7 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-=======
 [[release-notes-8.5.3]]
 === Beats version 8.5.3
 https://github.com/elastic/beats/compare/v8.5.2\...v8.5.3[View commits]
