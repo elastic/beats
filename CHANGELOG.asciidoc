@@ -3,6 +3,24 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.5.3]]
+=== Beats version 8.5.3
+https://github.com/elastic/beats/compare/v8.5.2\...v8.5.3[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
+
+==== Bugfixes
+
+*Heartbeat*
+
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+
+
 [[release-notes-8.5.2]]
 === Beats version 8.5.2
 https://github.com/elastic/beats/compare/v8.5.1\...v8.5.2[View commits]
