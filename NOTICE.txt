@@ -17472,11 +17472,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.0.0-20211020060615-d418f374d309
+Version: v0.0.0-20220425223048-2871e0cb64e4
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20211020060615-d418f374d309/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20220425223048-2871e0cb64e4/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -17768,11 +17768,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto
-Version: v0.0.0-20211208223120-3a66f561d7aa
+Version: v0.0.0-20220426171045-31bebdecfb46
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20211208223120-3a66f561d7aa/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20220426171045-31bebdecfb46/LICENSE:
 
 
                                  Apache License
@@ -17980,11 +17980,11 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/grpc
-Version: v1.42.0
+Version: v1.46.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.42.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.46.0/LICENSE:
 
 
                                  Apache License
@@ -18192,11 +18192,11 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.42.0/LIC
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/protobuf
-Version: v1.27.1
+Version: v1.28.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/protobuf@v1.27.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/protobuf@v1.28.0/LICENSE:
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -25441,11 +25441,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/envoyproxy/go-control-plane
-Version: v0.10.1
+Version: v0.10.2-0.20220325020618-49ff273808a1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/envoyproxy/go-control-plane@v0.10.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/envoyproxy/go-control-plane@v0.10.2-0.20220325020618-49ff273808a1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -35925,11 +35925,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.0.0-20210220032956-6a3ed077a48d
+Version: v0.0.0-20210927222741-03fcf44c2211
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.0.0-20210220032956-6a3ed077a48d/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.0.0-20210927222741-03fcf44c2211/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
