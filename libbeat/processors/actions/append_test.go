@@ -100,6 +100,28 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			description: "processor with no fields or values",
+			args: args{
+				target: "target",
+				event: &beat.Event{
+					Meta: mapstr.M{},
+					Fields: mapstr.M{
+						"field": "value",
+					},
+				},
+			},
+			fields: fields{
+				logger: log,
+				config: appendProcessorConfig{
+					IgnoreEmptyValues: false,
+					IgnoreMissing:     false,
+					AllowDuplicate:    true,
+					FailOnError:       true,
+				},
+			},
+			wantErr: false,
+		},
+		{
 			description: "append value in the arrays from an unknown field",
 			args: args{
 				target: "target",
@@ -361,7 +383,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				Meta: mapstr.M{},
 				Fields: mapstr.M{
 					"error": mapstr.M{
-						"message": "failed to append fields in append_processor processor: could not fetch value for key: missing-field, Error: key not found",
+						"message": "failed to append fields in append processor: could not fetch value for key: missing-field, Error: key not found",
 					},
 				},
 			},
