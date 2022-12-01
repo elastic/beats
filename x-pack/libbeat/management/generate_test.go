@@ -130,6 +130,20 @@ func TestOutputGen(t *testing.T) {
 
 }
 
+func TestOutputIndex(t *testing.T) {
+	inputType := "unused"
+	stream := &proto.Stream{
+		DataStream: &proto.DataStream{
+			Type:      "synthetics",
+			Dataset:   "icmp",
+			Namespace: "default",
+		},
+	}
+	inStream := map[string]interface{}{}
+	outStream := injectIndexStream(inputType, stream, inStream)
+	require.Equal(t, "synthetics-icmp-default", outStream["index"])
+}
+
 func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {

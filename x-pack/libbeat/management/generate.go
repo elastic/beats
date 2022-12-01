@@ -14,13 +14,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// DefaultNamespaceName is the fallback default namespace for data stream info
 var DefaultNamespaceName = "default"
+
+// DefaultDatasetName is the fallback default dataset for data stream info
 var DefaultDatasetName = "generic"
 
 // ===========
 // Config Transformation Registry
 // ===========
 
+// ConfigTransform is the global registry value for beat's config transformation callback
 var ConfigTransform = TransformRegister{}
 
 // TransformRegister is a hack that allows an individual beat to set a transform function
@@ -37,7 +41,7 @@ func (r *TransformRegister) SetTransform(transform func(*proto.UnitExpectedConfi
 	r.transformFunc = transform
 }
 
-// SetTransform sets a transform function callback
+// Transform sets a transform function callback
 func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	// If no transform is registered, fallback to a basic setup
 	if r.transformFunc == nil {
@@ -69,7 +73,7 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 	for iter, stream := range raw.GetStreams() {
 		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
 
-		streamSource = injectIndexStream(raw, inputType, stream, streamSource)
+		streamSource = injectIndexStream(inputType, stream, streamSource)
 		streamSource, err := injectStreamProcessors(raw, inputType, stream, streamSource)
 		if err != nil {
 			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
@@ -130,8 +134,8 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 }
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
-func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, streamExpected *proto.Stream, stream map[string]interface{}) map[string]interface{} {
-	streamType := expected.GetDataStream().GetType()
+func injectIndexStream(inputType string, streamExpected *proto.Stream, stream map[string]interface{}) map[string]interface{} {
+	streamType := streamExpected.GetDataStream().GetType()
 	if streamType == "" {
 		streamType = inputType
 	}
@@ -142,7 +146,7 @@ func injectIndexStream(expected *proto.UnitExpectedConfig, inputType string, str
 	}
 
 	namespace := DefaultNamespaceName
-	if testNamespace := expected.GetDataStream().GetNamespace(); testNamespace != "" {
+	if testNamespace := streamExpected.GetDataStream().GetNamespace(); testNamespace != "" {
 		namespace = testNamespace
 	}
 
@@ -171,8 +175,8 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string
 	// for reasons I can't understand, as it just ends up shuffling it around
 	// to individual metricsets anyway, at least on metricbeat
 	if expectedID := expected.GetId(); expectedID != "" {
-		inputId := generateAddFieldsProcessor(mapstr.M{"input_id": expectedID}, "@metadata")
-		processors = append(processors, inputId)
+		inputID := generateAddFieldsProcessor(mapstr.M{"input_id": expectedID}, "@metadata")
+		processors = append(processors, inputID)
 	}
 
 	procInputDataset := DefaultDatasetName
