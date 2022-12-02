@@ -171,17 +171,19 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
 		return f
 	case gcp.ServiceCompute:
-		serviceLabel = gcp.ComputeResourceLabelZone
+		serviceLabel = gcp.ComputeResourceLabel
 	case gcp.ServiceGKE:
-		serviceLabel = gcp.GKEResourceLabelLocation
+		serviceLabel = gcp.GKEResourceLabel
 	case gcp.ServiceDataproc:
-		serviceLabel = gcp.DataprocResourceLabelLocation
+		serviceLabel = gcp.DataprocResourceLabel
 	case gcp.ServiceStorage:
-		serviceLabel = gcp.StorageResourceLabelLocation
+		serviceLabel = gcp.StorageResourceLabel
 	case gcp.ServiceCloudSQL:
-		serviceLabel = gcp.CloudSQLResourceLabelRegion
+		serviceLabel = gcp.CloudSQLResourceLabel
+	case gcp.ServiceRedis:
+		serviceLabel = gcp.RedisResourceLabel
 	default:
-		serviceLabel = gcp.DefaultResourceLabelZone
+		serviceLabel = gcp.DefaultResourceLabel
 	}
 
 	f = r.buildLocationFilter(serviceLabel, f)

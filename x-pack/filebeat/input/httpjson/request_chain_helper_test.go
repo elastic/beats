@@ -7,6 +7,7 @@ package httpjson
 import (
 	"bytes"
 	"context"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +17,7 @@ import (
 
 func Test_newChainHTTPClient(t *testing.T) {
 	cfg := defaultChainConfig()
+	cfg.Request.URL = &urlConfig{URL: &url.URL{}}
 	ctx := context.Background()
 	log := logp.NewLogger("newChainClientTestLogger")
 
@@ -119,7 +121,6 @@ func Test_evaluateResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			expression := &valueTpl{}
 			err := expression.Unpack(tt.args.expression)
 			assert.NoError(t, err)
@@ -131,5 +132,33 @@ func Test_evaluateResponse(t *testing.T) {
 				assert.Equal(t, tt.want, got)
 			}
 		})
+	}
+}
+
+func TestProcessExpression(t *testing.T) {
+	tests := []struct {
+		in   string
+		want []string
+	}{
+		// Cursor values.
+		{in: ".first_response.foo", want: []string{"first_response", "foo"}},
+		{in: ".first_response.", want: []string{"first_response", ""}},
+		{in: ".last_response.foo", want: []string{"last_response", "foo"}},
+		{in: ".last_response.", want: []string{"last_response", ""}},
+		{in: ".parent_last_response.foo", want: []string{"parent_last_response", "foo"}},
+		{in: ".parent_last_response.", want: []string{"parent_last_response", ""}},
+
+		// Literal values.
+		{in: ".literal_foo", want: []string{".literal_foo"}},
+		{in: ".literal_foo.bar", want: []string{".literal_foo.bar"}},
+		{in: "literal.foo.bar", want: []string{"literal.foo.bar"}},
+		{in: "first_response.foo", want: []string{"first_response.foo"}},
+		{in: ".first_response", want: []string{".first_response"}},
+		{in: ".last_response", want: []string{".last_response"}},
+		{in: ".parent_last_response", want: []string{".parent_last_response"}},
+	}
+	for _, test := range tests {
+		got := processExpression(test.in)
+		assert.Equal(t, test.want, got)
 	}
 }
