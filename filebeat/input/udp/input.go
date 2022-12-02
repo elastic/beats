@@ -217,7 +217,7 @@ func (m *inputMetrics) log(data []byte, timestamp time.Time) {
 }
 
 func (m *inputMetrics) close() {
-	if m != nil {
+	if m == nil {
 		return
 	}
 	m.unregister()
