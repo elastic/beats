@@ -147,6 +147,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Added `.python-version` file {pull}32323[32323]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Use `T.TempDir` to create temporary test directory {pull}33082[33082]
+- Add an option to disable event normalization when creating a `beat.Client`. {pull}33657[33657]
+- Add the file path of the instance lock on the error when it's is already locked {pull}33788[33788]
 
 ==== Deprecated
 

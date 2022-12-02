@@ -1,0 +1,543 @@
+[role="xpack"]
+
+:type: cel
+
+[id="{beatname_lc}-input-{type}"]
+=== Common Expression Language input
+
+experimental[]
+
+++++
+<titleabbrev>CEL</titleabbrev>
+++++
+
+Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the https://opensource.google.com/projects/cel[Common Expression Language (CEL)] and the https://pkg.go.dev/github.com/elastic/mito/lib[mito] and https://pkg.go.dev/github.com/google/cel-go@v0.12.5/ext#Strings[ext Strings] CEL extension libraries.
+
+CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can incled with the mito extension library file and API endpoints.
+The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation.
+Optionally the CEL program may return cursor states that will be provided to the next execution of the CEL program.
+The cursor states may be used to control the behaviour of the program.
+
+This input supports:
+
+* Auth
+** Basic
+** OAuth2
+* Retrieval at a configurable interval
+* Pagination
+* Retries
+* Rate limiting
+* Proxying
+
+Example configurations:
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Fetch your public IP every minute.
+- type: cel
+  interval: 1m
+  resource.url: https://api.ipify.org/?format=json
+  program: |
+    bytes(get(state.url).Body).as(body, {
+        "events": [body.decode_json()]
+    })
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  resource.url: http://localhost:9200/_search
+  state:
+    scroll: 5m
+  program: |
+    (
+        !has(state.cursor) || !has(state.cursor.scroll_id) ?
+            post(state.url+"?scroll=5m", "", "")
+        :
+            post(
+                state.url+"/scroll?"+{"scroll_id": [state.cursor.scroll_id]}.format_query(),
+                "application/json",
+                {"scroll": state.scroll}.encode_json()
+            )
+    ).as(resp, bytes(resp.Body).decode_json().as(body, {
+            "events": body.hits.hits,
+            "cursor": {"scroll_id": body._scroll_id},
+    }))
+----
+
+
+==== Execution
+
+The execution environment provided for the input includes includes the function, macros and global variables provided by the mito and ext.Strings libraries.
+A single JSON object is provided as an input accessible through a `state` variable.
+`state` contains a string `url` field and may contain arbitrary other fields configured via the input's `state` configuration.
+If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
+
+On start the `state` is will be something like this:
+
+["source","json",subs="attributes"]
+----
+{
+    "url": <resource address>,
+    "cursor": { ... },
+    ...
+}
+----
+
+The `state.url` field will be present and may be an HTTP end-point or a file path.
+It is the responsibility of the CEL program to handle removing the scheme from a file URL if it is present.
+The `state.url` field may be mutated during execution of the program, but the mutated state will not be persisted between restarts The `state.url` field must be present in the returned value to ensure that it is available in the next evaluation unless the program has the resource address hard-coded in or it is available from the cursor.
+
+Additional fields may be present at the root of the object and if the program tolerates it, the cursor value may be absent.
+Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
+
+If the cursor is present the program should perform and process requests based on its value.
+If cursor is not present the program must have alternative logic to determine what requests to make.
+
+After completion of a program's execution it should return a single object with a structure looking like this:
+
+["source","json",subs="attributes"]
+----
+{
+    "events": [ <1>
+        {...},
+        ...
+    ],
+    "cursor": [ <2>
+        {...},
+        ...
+    ],
+    "url": <resource address>,
+    "status_code": <HTTP request status code if a network request>,
+    "header": <HTTP response headers if a network request>,
+    "rate_limit": <HTTP rate limit map if required by API>, <3>
+    "want_more": false <4>
+}
+----
+
+<1> The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements.
+The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged.
+
+<2> If `cursor` is present it must be either be a single object or an array with the same length as events; each element _i_ of the `cursor` will be the details for obtaining the events at and beyond event _i_ in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
+
+<3> If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Limit[Limit], and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#OktaRateLimit[Okta Rate Limit policy] and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#DraftRateLimit[Draft Rate Limit policy] documentation show how to construct this field.
+
+<4> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned.
+
+The `status_code`, `header` and `rate_limit` values may be omitted if the program is not interacting with an HTTP API end-point and so will not be needed to contribute to program control.
+
+==== Debug state logging
+
+The CEL input will log the complete state after evaluation when logging at the DEBUG level.
+This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object.
+
+
+==== CEL extension libraries
+
+As noted above the `cel` input provides function, macro and global variables to extend the language.
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Collections[Collections]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Collate[Collate]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Drop[Drop]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Drop_Empty[Drop Empty]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Flatten[Flatten]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Max[Max]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Min[Min]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-With[With]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-With_Replace[With Replace]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-With_Update[With Update]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Crypto[Crypto]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Base64[Base64]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Base64_Raw[Base64 Raw]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Hex[Hex]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-SHA_1[SHA-1]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-SHA_256[SHA-256]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-HMAC[HMAC]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-UUID[UUID]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#File[File]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Dir[Dir]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-File[File]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#HTTP[HTTP]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-HEAD[HEAD]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-GET[GET]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-GET_Request[GET Request]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-POST[POST]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-POST_Request[POST Request]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Request[Request]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Do_Request[Do Request]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Parse_URL[Parse URL]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Format_URL[Format URL]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Parse_Query[Parse Query]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Format_Query[Format Query]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#File[File] — the file extension is initialized with MIME handlers for "application/gzip", https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#NDJSON["application/x-ndjson"] and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Zip["application/zip"].
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Encode_JSON[Encode JSON]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Decode_JSON[Decode JSON]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Decode_JSON_Stream[Decode JSON Stream]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Limit[Limit] — the rate limit extension is initialized with https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#OktaRateLimit[Okta (as "okta")] and the https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#DraftRateLimit[Draft Rate Limit (as "draft")] policies.
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Rate_Limit[Rate Limit]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#MIME[MIME] — the MIME extension is initialized with MIME handlers for "application/gzip", https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#NDJSON["application/x-ndjson"] and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Zip["application/zip"].
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-MIME[MIME]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Regexp[Regexp] — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-RE_Match[RE Match]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-RE_Find[RE Find]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-RE_Find_All[RE Find All]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-RE_Find_Submatch[RE Find Submatch]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-RE_Find_All_Submatch[RE Find All Submatch]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-RE_Replace_All[RE Replace All]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Time[Time]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Format[Format]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Parse_Time[Parse Time]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Global_Variables[Global Variables]
+
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#Try[Try]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Try[Try]
+** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20221025013803-2ab0322317ce/lib#hdr-Is_Error[Is Error]
+
+In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the {beatname_lc} user-agent string.
+
+Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
+
+Example configurations with authentication:
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  resource.url: http://localhost
+  request.transforms:
+    - set:
+        target: header.Authorization
+        value: 'Basic aGVsbG86d29ybGQ='
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  auth.oauth2:
+    client.id: 12345678901234567890abcdef
+    client.secret: abcdef12345678901234567890
+    token_url: http://localhost/oauth2/token
+  resource.url: http://localhost
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  auth.oauth2:
+    client.id: 12345678901234567890abcdef
+    client.secret: abcdef12345678901234567890
+    token_url: http://localhost/oauth2/token
+    user: user@domain.tld
+    password: P@$$W0₹D
+  resource.url: http://localhost
+----
+
+[[input-state-cel]]
+==== Input state
+
+The `cel` input keeps a runtime state between requests. This state can be accessed by the CEL program and may contain arbitrary objects.
+
+The state must contain a `url` string and may contain any object the user wishes to store in it.
+
+All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
+
+==== Configuration options
+
+The `cel` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `interval`
+
+Duration between repeated requests. It may make additional pagination requests in response to the initial request if pagination is enabled. Default: `60s`.
+
+[float]
+==== `auth.basic.enabled`
+
+When set to `false`, disables the basic auth configuration. Default: `true`.
+
+NOTE: Basic auth settings are disabled if either `enabled` is set to `false` or
+the `auth.basic` section is missing.
+
+[float]
+==== `auth.basic.user`
+
+The user to authenticate with.
+
+[float]
+==== `auth.basic.password`
+
+The password to use.
+
+[float]
+==== `auth.oauth2.enabled`
+
+When set to `false`, disables the oauth2 configuration. Default: `true`.
+
+NOTE: OAuth2 settings are disabled if either `enabled` is set to `false` or
+the `auth.oauth2` section is missing.
+
+[float]
+==== `auth.oauth2.provider`
+
+Used to configure supported oauth2 providers.
+Each supported provider will require specific settings. It is not set by default.
+Supported providers are: `azure`, `google`.
+
+[float]
+==== `auth.oauth2.client.id`
+
+The client ID used as part of the authentication flow. It is always required
+except if using `google` as provider. Required for providers: `default`, `azure`.
+
+[float]
+==== `auth.oauth2.client.secret`
+
+The client secret used as part of the authentication flow. It is always required
+except if using `google` as provider. Required for providers: `default`, `azure`.
+
+[float]
+==== `auth.oauth2.user`
+
+The user used as part of the authentication flow. It is required for authentication
+ - grant type password. It is only available for provider `default`.
+
+[float]
+==== `auth.oauth2.password`
+
+The password used as part of the authentication flow. It is required for authentication
+ - grant type password. It is only available for provider `default`.
+
+NOTE: user and password are required for grant_type password. If user and
+password is not used then it will automatically use the `token_url` and
+`client credential` method.
+
+[float]
+==== `auth.oauth2.scopes`
+
+A list of scopes that will be requested during the oauth2 flow.
+It is optional for all providers.
+
+[float]
+==== `auth.oauth2.token_url`
+
+The endpoint that will be used to generate the tokens during the oauth2 flow. It is required if no provider is specified.
+
+NOTE: For `azure` provider either `token_url` or `azure.tenant_id` is required.
+
+[float]
+==== `auth.oauth2.endpoint_params`
+
+Set of values that will be sent on each request to the `token_url`. Each param key can have multiple values.
+Can be set for all providers except `google`.
+
+["source","yaml",subs="attributes"]
+----
+- type: cel
+  auth.oauth2:
+    endpoint_params:
+      Param1:
+        - ValueA
+        - ValueB
+      Param2:
+        - Value
+----
+
+[float]
+==== `auth.oauth2.azure.tenant_id`
+
+Used for authentication when using `azure` provider.
+Since it is used in the process to generate the `token_url`, it can't be used in
+combination with it. It is not required.
+
+For information about where to find it, you can refer to
+https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal.
+
+[float]
+==== `auth.oauth2.azure.resource`
+
+The accessed WebAPI resource when using `azure` provider.
+It is not required.
+
+[float]
+==== `auth.oauth2.google.credentials_file`
+
+The credentials file for Google.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `auth.oauth2.google.credentials_json`
+
+Your credentials information as raw JSON.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `auth.oauth2.google.jwt_file`
+
+The JWT Account Key file for Google.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `auth.oauth2.google.jwt_json`
+
+The JWT Account Key file as raw JSON.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `auth.oauth2.google.delegated_account`
+
+Email of the delegated account used to create the credentials (usually an admin). Used in combination
+with `auth.oauth2.google.jwt_file` or `auth.oauth2.google.jwt_json`.
+
+[[resource-parameters]]
+[float]
+==== `resource.url`
+
+The URL of the HTTP API. Required.
+
+The API endpoint may be accessed via unix socket and Windows named pipes by adding  `+unix` or `+npipe`
+to the URL scheme, for example, `http+unix:///var/socket/`.
+
+[float]
+==== `resource.timeout`
+
+Duration before declaring that the HTTP client connection has timed out. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Default: `30s`.
+
+[float]
+==== `resource.ssl`
+
+This specifies SSL/TLS configuration. If the ssl section is missing, the host's
+CAs are used for HTTPS connections. See <<configuration-ssl>> for more
+information.
+
+[float]
+==== `resource.retry.max_attempts`
+
+The maximum number of retries for the HTTP client. Default: `5`.
+
+[float]
+==== `resource.retry.wait_min`
+
+The minimum time to wait before a retry is attempted. Default: `1s`.
+
+[float]
+==== `resource.retry.wait_max`
+
+The maximum time to wait before a retry is attempted. Default: `60s`.
+
+[float]
+==== `resource.redirect.forward_headers`
+
+When set to `true` request headers are forwarded in case of a redirect. Default: `false`.
+
+[float]
+==== `resource.redirect.headers_ban_list`
+
+When `redirect.forward_headers` is set to `true`, all headers __except__ the ones defined in this list will be forwarded. Default: `[]`.
+
+[float]
+==== `resource.redirect.max_redirects`
+
+The maximum number of redirects to follow for a request. Default: `10`.
+
+[[resource-rate-limit]]
+[float]
+==== `resource.rate_limit.limit`
+
+The value of the response that specifies the maximum overall resource request rate.
+
+[float]
+==== `resource.rate_limit.burst`
+
+The maximum burst size. Burst is the maximum number of resource requests that can be made above the overall rate limit.
+
+[float]
+==== `resource.tracer.filename`
+
+It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations.
+This option is enabled by setting the `resource.tracer.filename` value. Additional options are available to
+tune log rotation behavior.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `resource.tracer.maxsize`
+
+This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
+logs are allowed to reach 1MB before rotation.
+
+[float]
+==== `resource.tracer.maxage`
+
+This specifies the number days to retain rotated log files. If it is not set, log files are retained
+indefinitely.
+
+[float]
+==== `resource.tracer.maxbackups`
+
+The number of old logs to retain. If it is not set all old logs are retained subject to the `resource.tracer.maxage`
+setting.
+
+[float]
+==== `resource.tracer.localtime`
+
+Whether to use the host's local time rather that UTC for timestamping rotated log file names.
+
+[float]
+==== `resource.tracer.compress`
+
+This determines whether rotated logs should be gzip compressed.
+
+[[cursor-cel]]
+[float]
+==== `cursor`
+
+Cursor is an object available as `state.cursor` where arbitrary values may be stored. Cursor state is kept between input restarts and updated after each event of a request has been published. When a cursor is used the CEL program must create a cursor state for each event that is returned by the program.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Fetch your public IP every minute and note when the last request was made.
+- type: cel
+  interval: 1m
+  resource.url: https://api.ipify.org/?format=json
+  program: |
+    bytes(get(state.url).Body).as(body, {
+        "events": [body.decode_json().with({
+            "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
+                state.cursor.last_requested_at
+            :
+                now
+        })],
+        "cursor": {"last_requested_at": now}
+    })
+----
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:

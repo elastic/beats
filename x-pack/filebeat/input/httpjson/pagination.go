@@ -7,7 +7,7 @@ package httpjson
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -159,7 +159,7 @@ func (iter *pageIterator) next() (*response, bool, error) {
 }
 
 func (iter *pageIterator) getPage() (*response, error) {
-	bodyBytes, err := ioutil.ReadAll(iter.resp.Body)
+	bodyBytes, err := io.ReadAll(iter.resp.Body)
 	if err != nil {
 		return nil, err
 	}
