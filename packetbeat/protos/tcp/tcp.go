@@ -402,10 +402,13 @@ type inputMetrics struct {
 	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
 }
 
-// newInputMetrics returns an input metric for the TCP processor. If id is empty
-// a nil inputMetric is returned.
+// newInputMetrics returns an input metric for the TCP processor. If id or
+// device is empty a nil inputMetric is returned.
 func newInputMetrics(id, device string) *inputMetrics {
-	if id == "" {
+	if id == "" || device == "" {
+		// An empty id signals to not record metrics,
+		// while an empty device means we are reading
+		// from a pcap file and no metrics are needed.
 		return nil
 	}
 	reg, unreg := inputmon.NewInputRegistry("tcp", id+"::"+device, nil)
