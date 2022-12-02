@@ -9,13 +9,13 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 type inputMetrics struct {
-	id     string               // Input ID.
-	parent *monitoring.Registry // Parent registry holding this input's ID as a key.
+	unregister func()
 
 	sqsMessagesReceivedTotal            *monitoring.Uint // Number of SQS messages received (not necessarily processed fully).
 	sqsVisibilityTimeoutExtensionsTotal *monitoring.Uint // Number of SQS visibility timeout extensions.
@@ -25,12 +25,9 @@ type inputMetrics struct {
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 
 	s3ObjectsRequestedTotal *monitoring.Uint // Number of S3 objects downloaded.
-	// s3ObjectsAckedTotal is the number of S3 objects processed that were fully ACKed.
-	s3ObjectsAckedTotal *monitoring.Uint
-	// s3ObjectsListedTotal is the number of S3 objects returned by list operations.
-	s3ObjectsListedTotal *monitoring.Uint
-	// s3ObjectsProcessedTotal is the number of S3 objects that matched file_selectors rules.
-	s3ObjectsProcessedTotal *monitoring.Uint
+	s3ObjectsAckedTotal     *monitoring.Uint // Number of S3 objects processed that were fully ACKed.
+	s3ObjectsListedTotal    *monitoring.Uint // Number of S3 objects returned by list operations.
+	s3ObjectsProcessedTotal *monitoring.Uint // Number of S3 objects that matched file_selectors rules.
 	s3BytesProcessedTotal   *monitoring.Uint // Number of S3 bytes processed.
 	s3EventsCreatedTotal    *monitoring.Uint // Number of events created from processing S3 data.
 	s3ObjectsInflight       *monitoring.Uint // Number of S3 objects inflight (gauge).
@@ -39,16 +36,14 @@ type inputMetrics struct {
 
 // Close removes the metrics from the registry.
 func (m *inputMetrics) Close() {
-	m.parent.Remove(m.id)
+	m.unregister()
 }
 
-func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
-	reg := parent.NewRegistry(id)
-	monitoring.NewString(reg, "input").Set(inputName)
-	monitoring.NewString(reg, "id").Set(id)
+func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+
 	out := &inputMetrics{
-		id:                                  id,
-		parent:                              parent,
+		unregister:                          unreg,
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
@@ -65,9 +60,9 @@ func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
 		s3ObjectProcessingTime:              metrics.NewUniformSample(1024),
 	}
 	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime))
+		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime))
+		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	return out
 }
 

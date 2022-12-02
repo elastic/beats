@@ -9867,11 +9867,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-a
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-client/v7
-Version: v7.0.1
+Version: v7.0.2-0.20221129150247-15881a8e64ef
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.2-0.20221129150247-15881a8e64ef/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
@@ -11931,11 +11931,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-seccomp-bpf
-Version: v1.2.0
+Version: v1.3.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@v1.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@v1.3.0/LICENSE.txt:
 
 
                                  Apache License
@@ -12354,11 +12354,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-sysinfo
-Version: v1.8.1
+Version: v1.9.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.8.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.9.0/LICENSE.txt:
 
 
                                  Apache License
@@ -19018,11 +19018,11 @@ Contents of probable licence file $GOMODCACHE/github.com/prometheus/common@v0.30
 
 --------------------------------------------------------------------------------
 Dependency : github.com/prometheus/procfs
-Version: v0.7.3
+Version: v0.8.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.7.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.8.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -19861,11 +19861,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/testify
-Version: v1.8.0
+Version: v1.8.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.8.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.8.1/LICENSE:
 
 MIT License
 
@@ -22064,11 +22064,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.0.0-20220826154423-83b083e8dc8b
+Version: v0.2.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20220826154423-83b083e8dc8b/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.2.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -22175,11 +22175,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.0.0-20220829200755-d48e67d00261
+Version: v0.2.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20220829200755-d48e67d00261/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.2.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -22212,11 +22212,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/text
-Version: v0.3.7
+Version: v0.4.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.3.7/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.4.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -43666,11 +43666,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/objx
-Version: v0.4.0
+Version: v0.5.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/objx@v0.4.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/objx@v0.5.0/LICENSE:
 
 The MIT License
 
@@ -45737,11 +45737,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.0.0-20210927222741-03fcf44c2211
+Version: v0.2.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.0.0-20210927222741-03fcf44c2211/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.2.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
