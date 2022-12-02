@@ -84,12 +84,6 @@ func (s *states) MustSkip(state state, store *statestore.Store) bool {
 		return true
 	}
 
-	// we have no previous state or the previous state
-	// is not stored: refresh the state
-	if previousState.IsEmpty() || !previousState.IsProcessed() {
-		s.Update(state, "")
-	}
-
 	return false
 }
 

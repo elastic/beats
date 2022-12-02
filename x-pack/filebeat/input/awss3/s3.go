@@ -208,7 +208,12 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 				continue
 			}
 
-			p.states.Update(state, "")
+			// we have no previous state or the previous state
+			// is not stored: refresh the state
+			previousState := p.states.FindPrevious(state)
+			if previousState.IsEmpty() || !previousState.IsProcessed() {
+				p.states.Update(state, "")
+			}
 
 			event := s3EventV2{}
 			event.AWSRegion = p.region

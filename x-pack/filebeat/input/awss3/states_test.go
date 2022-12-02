@@ -46,76 +46,14 @@ var inputCtx = v2.Context{
 	Cancelation: context.Background(),
 }
 
-func TestStatesIsNew(t *testing.T) {
-	type stateTestCase struct {
-		states   func() *states
-		state    state
-		expected bool
-	}
-	lastModified := time.Date(2022, time.June, 30, 14, 13, 00, 0, time.UTC)
-	tests := map[string]stateTestCase{
-		"with empty states": {
-			states: func() *states {
-				return newStates(inputCtx)
-			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified),
-			expected: true,
-		},
-		"not existing state": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
-			},
-			state:    newState("bucket1", "key1", "etag1", "listPrefix1", lastModified),
-			expected: true,
-		},
-		"existing state": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
-			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified),
-			expected: false,
-		},
-		"with different etag": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag1", "listPrefix", lastModified), "")
-				return states
-			},
-			state:    newState("bucket", "key", "etag2", "listPrefix", lastModified),
-			expected: true,
-		},
-		"with different lastmodified": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
-			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified.Add(1*time.Second)),
-			expected: true,
-		},
-	}
-
-	for name, test := range tests {
-		test := test
-		t.Run(name, func(t *testing.T) {
-			states := test.states()
-			isNew := states.IsNew(test.state)
-			assert.Equal(t, test.expected, isNew)
-		})
-	}
-}
-
-func TestMustSkip(t *testing.T) {
+func TestStatesIsNewAndMustSkip(t *testing.T) {
 	type stateTestCase struct {
 		states            func() *states
 		state             state
 		mustBeNew         bool
 		persistentStoreKV map[string]interface{}
-		expected          bool
+		expectedMustSkip  bool
+		expectedIsNew     bool
 	}
 	lastModified := time.Date(2022, time.June, 30, 14, 13, 00, 0, time.UTC)
 	tests := map[string]stateTestCase{
@@ -123,8 +61,9 @@ func TestMustSkip(t *testing.T) {
 			states: func() *states {
 				return newStates(inputCtx)
 			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified),
-			expected: false,
+			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
+			expectedMustSkip: false,
+			expectedIsNew:    true,
 		},
 		"not existing state": {
 			states: func() *states {
@@ -132,8 +71,9 @@ func TestMustSkip(t *testing.T) {
 				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
 				return states
 			},
-			state:    newState("bucket1", "key1", "etag1", "listPrefix1", lastModified),
-			expected: false,
+			state:            newState("bucket1", "key1", "etag1", "listPrefix1", lastModified),
+			expectedMustSkip: false,
+			expectedIsNew:    true,
 		},
 		"existing state": {
 			states: func() *states {
@@ -141,8 +81,9 @@ func TestMustSkip(t *testing.T) {
 				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
 				return states
 			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified),
-			expected: true,
+			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
+			expectedMustSkip: true,
+			expectedIsNew:    false,
 		},
 		"with different etag": {
 			states: func() *states {
@@ -150,8 +91,9 @@ func TestMustSkip(t *testing.T) {
 				states.Update(newState("bucket", "key", "etag1", "listPrefix", lastModified), "")
 				return states
 			},
-			state:    newState("bucket", "key", "etag2", "listPrefix", lastModified),
-			expected: false,
+			state:            newState("bucket", "key", "etag2", "listPrefix", lastModified),
+			expectedMustSkip: false,
+			expectedIsNew:    true,
 		},
 		"with different lastmodified": {
 			states: func() *states {
@@ -159,8 +101,9 @@ func TestMustSkip(t *testing.T) {
 				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
 				return states
 			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified.Add(1*time.Second)),
-			expected: false,
+			state:            newState("bucket", "key", "etag", "listPrefix", lastModified.Add(1*time.Second)),
+			expectedMustSkip: false,
+			expectedIsNew:    true,
 		},
 		"with stored state": {
 			states: func() *states {
@@ -170,9 +113,10 @@ func TestMustSkip(t *testing.T) {
 				states.Update(aState, "")
 				return states
 			},
-			state:     newState("bucket", "key", "etag", "listPrefix", lastModified),
-			mustBeNew: true,
-			expected:  true,
+			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
+			mustBeNew:        true,
+			expectedMustSkip: true,
+			expectedIsNew:    true,
 		},
 		"with error state": {
 			states: func() *states {
@@ -182,9 +126,10 @@ func TestMustSkip(t *testing.T) {
 				states.Update(aState, "")
 				return states
 			},
-			state:     newState("bucket", "key", "etag", "listPrefix", lastModified),
-			mustBeNew: true,
-			expected:  true,
+			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
+			mustBeNew:        true,
+			expectedMustSkip: true,
+			expectedIsNew:    true,
 		},
 		"before commit write": {
 			states: func() *states {
@@ -193,8 +138,9 @@ func TestMustSkip(t *testing.T) {
 			persistentStoreKV: map[string]interface{}{
 				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
 			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified.Add(-1*time.Second)),
-			expected: true,
+			state:            newState("bucket", "key", "etag", "listPrefix", lastModified.Add(-1*time.Second)),
+			expectedMustSkip: true,
+			expectedIsNew:    true,
 		},
 		"same commit write": {
 			states: func() *states {
@@ -203,8 +149,9 @@ func TestMustSkip(t *testing.T) {
 			persistentStoreKV: map[string]interface{}{
 				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
 			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified),
-			expected: true,
+			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
+			expectedMustSkip: true,
+			expectedIsNew:    true,
 		},
 		"after commit write": {
 			states: func() *states {
@@ -213,8 +160,9 @@ func TestMustSkip(t *testing.T) {
 			persistentStoreKV: map[string]interface{}{
 				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
 			},
-			state:    newState("bucket", "key", "etag", "listPrefix", lastModified.Add(time.Second)),
-			expected: false,
+			state:            newState("bucket", "key", "etag", "listPrefix", lastModified.Add(time.Second)),
+			expectedMustSkip: false,
+			expectedIsNew:    true,
 		},
 	}
 
@@ -235,9 +183,11 @@ func TestMustSkip(t *testing.T) {
 				test.state.LastModified = test.state.LastModified.Add(1 * time.Second)
 			}
 
-			isNew := states.MustSkip(test.state, persistentStore)
-			assert.Equal(t, test.expected, isNew)
-			_ = persistentStore.Close()
+			isNew := states.IsNew(test.state)
+			assert.Equal(t, test.expectedIsNew, isNew)
+
+			mustSkip := states.MustSkip(test.state, persistentStore)
+			assert.Equal(t, test.expectedMustSkip, mustSkip)
 		})
 	}
 }
