@@ -61,7 +61,7 @@ func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *
 }
 
 // ===========
-// Stream and Input processors
+// Public config transformation
 // ===========
 
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
@@ -73,7 +73,7 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 	for iter, stream := range raw.GetStreams() {
 		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
 
-		streamSource = injectIndexStream(inputType, stream, streamSource)
+		streamSource = injectIndexStream(inputType, raw, stream, streamSource)
 		streamSource, err := injectStreamProcessors(raw, inputType, stream, streamSource)
 		if err != nil {
 			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
@@ -103,7 +103,12 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 	return configList, nil
 }
 
+// ===========
+// config injection
+// ===========
+
 // Emulates the InjectAgentInfoRule and InjectHeadersRule ast rules
+// adds processors for agent-related metadata
 func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentInfo) (map[string]interface{}, error) {
 	// upstream API can sometimes return a nil agent info
 	if agentInfo == nil {
@@ -134,54 +139,29 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 }
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
-func injectIndexStream(inputType string, streamExpected *proto.Stream, stream map[string]interface{}) map[string]interface{} {
-	streamType := streamExpected.GetDataStream().GetType()
-	if streamType == "" {
-		streamType = inputType
-	}
-
-	dataset := DefaultDatasetName
-	if testDataset := streamExpected.GetDataStream().GetDataset(); testDataset != "" {
-		dataset = testDataset
-	}
-
-	namespace := DefaultNamespaceName
-	if testNamespace := streamExpected.GetDataStream().GetNamespace(); testNamespace != "" {
-		namespace = testNamespace
-	}
-
+// this adds the `index` field, based on the data_stream info we get from the config
+func injectIndexStream(dataStreamType string, expected *proto.UnitExpectedConfig, streamExpected *proto.Stream, stream map[string]interface{}) map[string]interface{} {
+	streamType, dataset, namespace := metadataFromDatastreamValues(dataStreamType, expected, streamExpected)
 	index := fmt.Sprintf("%s-%s-%s", streamType, dataset, namespace)
 	stream["index"] = index
 	return stream
 }
 
 //injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
-func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string, streamExpected *proto.Stream, stream map[string]interface{}) (map[string]interface{}, error) {
+// this adds a variety of processors foe metadata related to the dataset and input config.
+func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}) (map[string]interface{}, error) {
 	//1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
-	procInputType := inputType
-	if testInputType := expected.GetDataStream().GetType(); testInputType != "" {
-		procInputType = testInputType
-	}
-
-	procInputNamespace := DefaultNamespaceName
-	if testInputNamespace := expected.GetDataStream().GetNamespace(); testInputNamespace != "" {
-		procInputNamespace = testInputNamespace
-	}
+	procInputType, procInputDataset, procInputNamespace := metadataFromDatastreamValues(dataStreamType, expected, streamExpected)
 
 	var processors = []interface{}{}
 
-	// the AST injects input_id at the input level and not the stream level,
+	// In V1, AST injects input_id at the input level and not the stream level,
 	// for reasons I can't understand, as it just ends up shuffling it around
 	// to individual metricsets anyway, at least on metricbeat
 	if expectedID := expected.GetId(); expectedID != "" {
 		inputID := generateAddFieldsProcessor(mapstr.M{"input_id": expectedID}, "@metadata")
 		processors = append(processors, inputID)
-	}
-
-	procInputDataset := DefaultDatasetName
-	if testStreamDataset := streamExpected.GetDataStream().GetDataset(); testStreamDataset != "" {
-		procInputDataset = testStreamDataset
 	}
 
 	//2. Actually add the processors
@@ -220,6 +200,23 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, inputType string
 // Config Processors
 // ===========
 
+// This generates an opaque config blob used by all the beats
+// This has to handle both universal config changes and changes specific to the beats
+// This is a replacement for the AST code that lived in V1
+func generateBeatConfig(unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
+
+	// Generate the config that's unique to a beat
+	metaConfig, err := ConfigTransform.Transform(unitRaw, agentInfo)
+	if err != nil {
+		return nil, fmt.Errorf("error transforming config for beats: %w", err)
+	}
+	return metaConfig, nil
+}
+
+// ===========
+// helpers
+// ===========
+
 func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 	return mapstr.M{
 		"add_fields": mapstr.M{
@@ -229,31 +226,42 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 	}
 }
 
-// This generates an opaque config blob used by all the beats
-// This has to handle both universal config changes and changes specific to the beats
-// This is a replacement for the AST code that lived in V1
-func generateBeatConfig(unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	// We aren't guaranteed a DataStream field from the config
-	if unitRaw.GetDataStream() == nil {
-		unitRaw.DataStream = &proto.DataStream{
-			Namespace: DefaultNamespaceName,
-			Dataset:   DefaultDatasetName,
-		}
-	} else {
-		if unitRaw.GetDataStream().GetNamespace() == "" {
-			unitRaw.DataStream.Namespace = DefaultNamespaceName
-		}
-		if unitRaw.GetDataStream().GetDataset() == "" {
-			unitRaw.DataStream.Dataset = DefaultDatasetName
-		}
+// metadataFromDatastreamValues takes the various data_stream values from across the expected config and returns a set of "good" that can be used to add fields
+// to the final beat config. The underlying logic follows a series of steps:
+// 1) start with a set of default values, including the specified defaultDataStream
+// 2) set the values based on the data_stream fields at the input level (i.e, the UnitExpectedConfig)
+// 3) set the values based on the data_stream fields at the stream level (i.e., the proto.Stream)
+// This returns: type, dataset, namespace
+func metadataFromDatastreamValues(defaultDataStreamType string, expected *proto.UnitExpectedConfig, streamExpected *proto.Stream) (string, string, string) {
+	// type
+	setType := defaultDataStreamType
+	if newType := streamExpected.GetDataStream().GetType(); newType != "" {
+		setType = newType
+	}
+	// if we get a unit-level value, but it's the default, don't overwrite
+	if newType := expected.GetDataStream().GetType(); newType != "" && newType != defaultDataStreamType {
+		setType = newType
 	}
 
-	// Generate the config that's unique to a beat
-	metaConfig, err := ConfigTransform.Transform(unitRaw, agentInfo)
-	if err != nil {
-		return nil, fmt.Errorf("error transforming config for beats: %w", err)
+	// dataset
+	setDataset := DefaultDatasetName
+	if newDataset := streamExpected.GetDataStream().GetDataset(); newDataset != "" {
+		setDataset = newDataset
 	}
-	return metaConfig, nil
+	if newDataset := expected.GetDataStream().GetDataset(); newDataset != "" && newDataset != DefaultDatasetName {
+		setDataset = newDataset
+	}
+
+	// namespace
+	setNamespace := DefaultNamespaceName
+	if newNamespace := streamExpected.GetDataStream().GetNamespace(); newNamespace != "" {
+		setNamespace = newNamespace
+	}
+	if newNamespace := expected.GetDataStream().GetNamespace(); newNamespace != "" && newNamespace != DefaultDatasetName {
+		setNamespace = newNamespace
+	}
+
+	return setType, setDataset, setNamespace
 }
 
 // generate the output config, including shuffling around the `type` key
