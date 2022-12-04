@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
@@ -121,6 +122,11 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 		return nil, err
 	}
 
+	var poll time.Duration
+	forwarded := (c.Forwarded == nil && c.Name == "ForwardedEvents") || (c.Forwarded != nil && *c.Forwarded)
+	if !forwarded {
+		poll = defaultLagPolling
+	}
 	l := &winEventLogExp{
 		config:      c,
 		query:       xmlQuery,
@@ -130,7 +136,7 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 		maxRead:     c.BatchReadSize,
 		renderer:    renderer,
 		log:         log,
-		metrics:     newInputMetrics(c.Name, id),
+		metrics:     newInputMetrics(c.Name, id, poll),
 	}
 
 	return l, nil

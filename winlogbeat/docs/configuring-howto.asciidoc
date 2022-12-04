@@ -68,7 +68,8 @@ These metrics are exposed under the `/dataset` path.
 | `errors_total`           | Total number of errors encountered by the input.
 | `batch_read_period`      | A histogram of intervals between non-empty event batch reads.
 | `received_events_count`  | A histogram of the number of events read in each batch.
-| `source_lag_time`        | The difference between the timestamp recorded in each event and the time when it was read.
+| `source_lag_count`       | A histogram of the difference between the consumer's log offset and the producer's log offset.
+| `source_lag_time`        | A histogram of the difference between the timestamp recorded in each event and the time when it was read.
 |=======
 
 include::{libbeat-dir}/shared-instrumentation.asciidoc[]
