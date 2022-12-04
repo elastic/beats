@@ -122,7 +122,6 @@ is best used with load balancing mode enabled. Example: If you have 2 hosts and
 
 The default value is `1`.
 
-[[loadbalance]]
 ===== `loadbalance`
 
 If set to true and multiple {es} hosts are configured, the output plugin
