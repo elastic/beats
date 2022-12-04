@@ -122,6 +122,23 @@ is best used with load balancing mode enabled. Example: If you have 2 hosts and
 
 The default value is `1`.
 
+[[loadbalance]]
+===== `loadbalance`
+
+If set to true and multiple {es} hosts are configured, the output plugin
+load balances published events onto all {es} hosts. If set to false,
+the output plugin sends all events to only one host (determined at random) and
+will switch to another host if the selected one becomes unresponsive.
+
+The default value is `true`.
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost:9200", "localhost:9201"]
+  loadbalance: true
+------------------------------------------------------------------------------
+
 ===== `api_key`
 
 Instead of using a username and password, you can use API keys to secure communication
