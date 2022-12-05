@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/gofrs/uuid"
-	protobuf "github.com/golang/protobuf/proto"
+	protobuf "github.com/golang/protobuf/proto" //nolint:staticcheck // won't update the package for now
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
@@ -108,8 +108,6 @@ type Server struct {
 	watchdogWG   sync.WaitGroup
 
 	apps sync.Map
-
-	lockServer *sync.Mutex
 
 	// overridden in tests
 	watchdogCheckInterval time.Duration
