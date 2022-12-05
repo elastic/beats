@@ -6,15 +6,12 @@ package compute
 
 import (
 	"testing"
-	"time"
 
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
-	"google.golang.org/genproto/googleapis/monitoring/v3"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	monitoring "google.golang.org/genproto/googleapis/monitoring/v3"
 )
 
 var fake = &monitoring.TimeSeries{
@@ -67,8 +64,7 @@ var fake = &monitoring.TimeSeries{
 }
 
 var m = &metadataCollector{
-	projectID:     "projectID",
-	instanceCache: common.NewCache(30*time.Second, 13),
+	projectID: "projectID",
 }
 
 func TestInstanceID(t *testing.T) {
