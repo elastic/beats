@@ -126,6 +126,7 @@ func New(logger *logger.Logger, listenAddr string, handler Handler) (*Server, er
 		ca:                    ca,
 		listenAddr:            listenAddr,
 		handler:               handler,
+		serverLock:            &sync.Mutex{},
 		watchdogCheckInterval: WatchdogCheckLoop,
 		checkInMinTimeout:     client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
 	}, nil
