@@ -62,13 +62,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
 - Fix splitting array of strings/arrays in httpjson input {issue}30345[30345] {pull}33609[33609]
 - Fix Google workspace pagination and document ID generation. {pull}33666[33666]
-- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
-- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
-- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
-- Fix handling of empty array in httpjson input. {pull}32001[32001]
-- Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
-- Fix splitting array of strings/arrays in httpjson input {issue}30345[30345] {pull}33609[33609]
-- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
 - Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
 
 *Heartbeat*
