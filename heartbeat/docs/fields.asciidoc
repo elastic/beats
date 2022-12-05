@@ -16386,6 +16386,15 @@ Object is not enabled.
 
 --
 
+*`state.initial_duration`*::
++
+--
+length of time the first check took, used internally for time calculations
+
+type: integer
+
+--
+
 *`state.ends`*::
 +
 --

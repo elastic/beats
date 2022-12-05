@@ -128,6 +128,9 @@
           description: total down checks run
         - name: flap_history
           enabled: false
+        - name: initial_duration
+          type: integer
+          description: length of time the first check took, used internally for time calculations
         - name: ends
           type: object
           description: the state that was ended by this state
