@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Fix panic on memcache transaction with no request or response. {issue}33852[33852] {pull}33853[33853]
 
 *Winlogbeat*
 
