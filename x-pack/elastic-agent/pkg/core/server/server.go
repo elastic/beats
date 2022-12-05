@@ -109,6 +109,8 @@ type Server struct {
 
 	apps sync.Map
 
+	lockServer *sync.Mutex
+
 	// overridden in tests
 	watchdogCheckInterval time.Duration
 	checkInMinTimeout     time.Duration
@@ -156,9 +158,13 @@ func (s *Server) Start() error {
 
 	// start serving GRPC connections
 	go func() {
+		if s.server == nil { // Server.Stop was called before this goroutine run
+			s.logger.Error("cannot start gRPC server, server is nil. Did you call Stop before the initialization has completed?")
+			return
+		}
 		err := s.server.Serve(lis)
 		if err != nil {
-			s.logger.Errorf("error listening for GRPC: %s", err)
+			s.logger.Errorf("error listening for GRPC: %v", err)
 		}
 	}()
 
