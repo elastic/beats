@@ -8,45 +8,58 @@ import (
 	"context"
 	"strconv"
 	"strings"
-	"time"
 
+<<<<<<< HEAD
 	"github.com/pkg/errors"
 	"google.golang.org/api/compute/v1"
+=======
+	compute "google.golang.org/api/compute/v1"
+>>>>>>> 74edd05ef4 ([metricbeat] [gcp] remove compute metadata cache (#33655))
 	"google.golang.org/api/option"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-const (
-	cacheTTL         = 30 * time.Second
-	initialCacheSize = 13
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
 func NewMetadataService(projectID, zone string, region string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
+<<<<<<< HEAD
 		projectID:     projectID,
 		zone:          zone,
 		region:        region,
 		opt:           opt,
 		instanceCache: common.NewCache(cacheTTL, initialCacheSize),
 		logger:        logp.NewLogger("metrics-compute"),
+=======
+		projectID:        projectID,
+		zone:             zone,
+		region:           region,
+		regions:          regions,
+		opt:              opt,
+		computeInstances: make(map[uint64]*compute.Instance),
+		logger:           logp.NewLogger("metrics-compute"),
+>>>>>>> 74edd05ef4 ([metricbeat] [gcp] remove compute metadata cache (#33655))
 	}, nil
 }
 
 // computeMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
 // reading and writing in the same method)
 type computeMetadata struct {
+<<<<<<< HEAD
 	projectID   string
+=======
+>>>>>>> 74edd05ef4 ([metricbeat] [gcp] remove compute metadata cache (#33655))
 	zone        string
 	instanceID  string
 	machineType string
 
+<<<<<<< HEAD
 	ts *monitoringpb.TimeSeries
 
+=======
+>>>>>>> 74edd05ef4 ([metricbeat] [gcp] remove compute metadata cache (#33655))
 	User     map[string]string
 	Metadata map[string]string
 	Metrics  interface{}
@@ -54,12 +67,22 @@ type computeMetadata struct {
 }
 
 type metadataCollector struct {
+<<<<<<< HEAD
 	projectID     string
 	zone          string
 	region        string
 	opt           []option.ClientOption
 	instanceCache *common.Cache
 	logger        *logp.Logger
+=======
+	projectID        string
+	zone             string
+	region           string
+	regions          []string
+	opt              []option.ClientOption
+	computeInstances map[uint64]*compute.Instance
+	logger           *logp.Logger
+>>>>>>> 74edd05ef4 ([metricbeat] [gcp] remove compute metadata cache (#33655))
 }
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Compute TimeSeries single point of data.
@@ -118,6 +141,7 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 	}
 
 	if instance == nil {
+		s.logger.Debugf("couldn't find instance %s, call Instances.AggregatedList", instanceID)
 		return computeMetadata, nil
 	}
 
@@ -142,13 +166,16 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 
 // instance returns data from an instance ID using the cache or making a request
 func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*compute.Instance, error) {
-	s.refreshInstanceCache(ctx)
-	instanceCachedData := s.instanceCache.Get(instanceID)
-	if instanceCachedData != nil {
-		if computeInstance, ok := instanceCachedData.(*compute.Instance); ok {
-			return computeInstance, nil
-		}
+	s.getComputeInstances(ctx)
+
+	instanceIdInt, _ := strconv.Atoi(instanceID)
+	computeInstance, ok := s.computeInstances[uint64(instanceIdInt)]
+	if ok {
+		return computeInstance, nil
 	}
+
+	// Remake the compute instances map to avoid having stale data.
+	s.computeInstances = make(map[uint64]*compute.Instance)
 
 	return nil, nil
 }
@@ -169,12 +196,13 @@ func (s *metadataCollector) instanceZone(ts *monitoringpb.TimeSeries) string {
 	return ""
 }
 
-func (s *metadataCollector) refreshInstanceCache(ctx context.Context) {
-	// only refresh cache if it is empty
-	if s.instanceCache.Size() > 0 {
+func (s *metadataCollector) getComputeInstances(ctx context.Context) {
+	if len(s.computeInstances) > 0 {
 		return
 	}
-	s.logger.Debugf("refresh cache with Instances.AggregatedList API")
+
+	s.logger.Debug("Compute API Instances.AggregatedList")
+
 	computeService, err := compute.NewService(ctx, s.opt...)
 	if err != nil {
 		s.logger.Errorf("error getting client from Compute service: %v", err)
@@ -185,7 +213,7 @@ func (s *metadataCollector) refreshInstanceCache(ctx context.Context) {
 	if err := req.Pages(ctx, func(page *compute.InstanceAggregatedList) error {
 		for _, instancesScopedList := range page.Items {
 			for _, instance := range instancesScopedList.Instances {
-				s.instanceCache.Put(strconv.Itoa(int(instance.Id)), instance)
+				s.computeInstances[instance.Id] = instance
 			}
 		}
 		return nil
