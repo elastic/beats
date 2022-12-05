@@ -31,8 +31,6 @@ import (
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
-var NodeChildProcCred *syscall.Credential = nil
-
 func init() {
 	// Here we set a bunch of linux specific security stuff.
 	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
