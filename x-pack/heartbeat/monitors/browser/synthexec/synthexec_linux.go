@@ -10,9 +10,10 @@ import (
 	"os"
 	"os/exec"
 
+	"golang.org/x/sys/unix"
+
 	"github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"golang.org/x/sys/unix"
 )
 
 func init() {
