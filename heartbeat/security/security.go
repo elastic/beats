@@ -28,6 +28,7 @@ import (
 	"syscall"
 
 	sysinfo "github.com/elastic/go-sysinfo"
+
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
