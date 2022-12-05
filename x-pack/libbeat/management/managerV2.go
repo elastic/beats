@@ -395,6 +395,8 @@ func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 	_ = unit.UpdateState(client.UnitStateHealthy, "beat reloaded", nil)
 }
 
+// this function is registered as a debug hook
+// it prints the last known configuration genreated by the beat
 func (cm *BeatV2Manager) handleDebugYaml() []byte {
 	// generate input
 	inputList := []map[string]interface{}{}
