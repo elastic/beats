@@ -158,6 +158,9 @@
             - name: down
               type: integer
               description: total down checks run
+            - name: initial_duration
+              type: integer
+              description: length of time the first check took, used internally for time calculations
 
 - key: summary
   title: "Monitor summary"

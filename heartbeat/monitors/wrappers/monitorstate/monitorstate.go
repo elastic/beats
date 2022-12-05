@@ -77,7 +77,7 @@ type State struct {
 	// we need to track this because the duration formula is
 	// time.Now() - StartedAt + InitialDuration
 	// due to the fact that we don't want the first event to have a duration of zero
-	InitialDuration int64
+	InitialDuration int64 `json:"initial_duration"`
 	flappingEnabled bool
 	ctr             int
 }
