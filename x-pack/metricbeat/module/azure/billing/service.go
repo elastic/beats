@@ -174,11 +174,13 @@ func (service *UsageService) GetUsageDetails(
 	endDate string,
 ) (armconsumption.UsageDetailsListResult, error) {
 	pager := service.usageDetailsClient.NewListPager(scope, &armconsumption.UsageDetailsClientListOptions{
-		Expand:    &expand,
-		Filter:    &filter,
-		Metric:    &metrictype,
-		Skiptoken: &skipToken,
-		Top:       top,
+		Expand: &expand,
+		Filter: &filter,
+		Metric: &metrictype,
+		// Skiptoken: &skipToken,
+		// Top:       top,
+		StartDate: &startDate,
+		EndDate:   &endDate,
 	})
 
 	usageDetails := armconsumption.UsageDetailsListResult{}
