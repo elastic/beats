@@ -230,11 +230,18 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 		tg = &timegrain
 	}
 
-	orderBy := ""
+	// orderBy := ""
 	resultTypeData := armmonitor.ResultTypeData
 
 	// check for limit of requested metrics (20)
 	var metrics []armmonitor.Metric
+
+	// API fails with bad request if filter value is sent empty.
+	var metricsFilter *string
+
+	if filter != "" {
+		metricsFilter = &filter
+	}
 
 	for i := 0; i < len(metricNames); i += metricNameLimit {
 		end := i + metricNameLimit
@@ -247,14 +254,14 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 
 		resp, err := service.metricsClient.List(service.context, resourceId, &armmonitor.MetricsClientListOptions{
 			Aggregation:     &aggregations,
-			Filter:          &filter,
+			Filter:          metricsFilter,
 			Interval:        tg,
 			Metricnames:     &metricNames,
 			Metricnamespace: &namespace,
 			Timespan:        &timespan,
 			Top:             nil,
-			Orderby:         &orderBy,
-			ResultType:      &resultTypeData,
+			// Orderby:         &orderBy,
+			ResultType: &resultTypeData,
 		})
 
 		// check for applied charges before returning any errors
