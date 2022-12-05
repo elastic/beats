@@ -28,7 +28,6 @@ type BeatV2Manager struct {
 	config   *Config
 	registry *reload.Registry
 	client   client.V2
-	uuid     uuid.UUID
 
 	logger *logp.Logger
 
