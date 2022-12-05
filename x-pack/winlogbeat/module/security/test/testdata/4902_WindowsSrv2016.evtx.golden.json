@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "The Per-user audit policy table was created.\n\nNumber of Elements:\t0\nPolicy ID:\t0x9FD2",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",

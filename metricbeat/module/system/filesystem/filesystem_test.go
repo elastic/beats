@@ -26,18 +26,26 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/logp"
+	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
-
+	err := logp.DevelopmentSetup()
+	assert.NoError(t, err)
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("system", "filesystem").Fields.StringToPrint())
+	for _, event := range events {
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+			event.BeatEvent("system", "filesystem").Fields.StringToPrint())
+	}
+
 }
 
 func TestData(t *testing.T) {
@@ -49,7 +57,7 @@ func TestData(t *testing.T) {
 }
 
 func getConfig() map[string]interface{} {
-	ignoreTypes := append(DefaultIgnoredTypes(), "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs")
+	ignoreTypes := append(fs.DefaultIgnoredTypes(resolve.NewTestResolver("")), "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs")
 	return map[string]interface{}{
 		"module":                  "system",
 		"metricsets":              []string{"filesystem"},

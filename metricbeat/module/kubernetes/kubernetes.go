@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 func init() {
@@ -41,6 +42,7 @@ type Module interface {
 	mb.Module
 	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
 	GetKubeletStats(http *helper.HTTP) ([]byte, error)
+	GetMetricsRepo() *util.MetricsRepo
 }
 
 type familiesCache struct {
@@ -84,6 +86,7 @@ type module struct {
 
 	kubeStateMetricsCache *kubeStateMetricsCache
 	kubeletStatsCache     *kubeletStatsCache
+	metricsRepo           *util.MetricsRepo
 	cacheHash             uint64
 }
 
@@ -94,15 +97,18 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	kubeletStatsCache := &kubeletStatsCache{
 		cacheMap: make(map[uint64]*statsCache),
 	}
+	metricsRepo := util.NewMetricsRepo()
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
 			return nil, errors.Wrap(err, "error generating cache hash for kubeStateMetricsCache")
 		}
+
 		m := module{
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
 			kubeletStatsCache:     kubeletStatsCache,
+			metricsRepo:           metricsRepo,
 			cacheHash:             hash,
 		}
 		return &m, nil
@@ -152,4 +158,8 @@ func generateCacheHash(host []string) (uint64, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+func (m *module) GetMetricsRepo() *util.MetricsRepo {
+	return m.metricsRepo
 }

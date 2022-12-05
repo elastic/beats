@@ -104,6 +104,13 @@ inputs:
       data_stream:
         dataset: packet.icmp
         type: logs
+    - id: packet-network_traffic.redis-387bdc6a-0acb-4ef2-9552-c21e524a2d21
+      type: redis
+      data_stream:
+        dataset: network_traffic.redis
+        type: logs
+      ports:
+        - 6379
 - id: endpoint-id
   type: endpoint
   name: endpoint-1

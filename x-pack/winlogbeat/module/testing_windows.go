@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
+	"github.com/elastic/go-sysinfo/providers/windows"
 
 	// Register javascript modules.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
@@ -40,7 +41,7 @@ type params struct {
 }
 
 // WithFieldFilter filters the specified fields from the event prior to
-// creating the golden file.
+// comparison of values, but retains them in the written golden files.
 func WithFieldFilter(filter []string) Option {
 	return func(p *params) {
 		p.ignoreFields = filter
@@ -51,6 +52,17 @@ func WithFieldFilter(filter []string) Option {
 // and processing them with the pipeline. Then it compares the results against
 // a saved golden file. Use -update to regenerate the golden files.
 func TestPipeline(t *testing.T, evtx string, pipeline string, opts ...Option) {
+	// FIXME: We cannot generate golden files on Windows 2022.
+	if *update {
+		os, err := windows.OperatingSystem()
+		if err != nil {
+			t.Fatalf("failed to get operating system info: %v", err)
+		}
+		if strings.Contains(os.Name, "2022") {
+			t.Fatal("cannot generate golden files on Windows 2022: see note in powershell/test/powershell_windows_test.go")
+		}
+	}
+
 	files, err := filepath.Glob(evtx)
 	if err != nil {
 		t.Fatal(err)
@@ -141,7 +153,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 				evt.Fields["@timestamp"] = evt.Timestamp.UTC()
 			}
 
-			events = append(events, filterEvent(evt.Fields, p.ignoreFields))
+			events = append(events, evt.Fields)
 		}
 	}
 
@@ -155,7 +167,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 		return
 	}
 	for i, e := range events {
-		assertEqual(t, expected[i], normalize(t, e))
+		assertEqual(t, filterEvent(expected[i], p.ignoreFields), normalize(t, filterEvent(e, p.ignoreFields)))
 	}
 }
 

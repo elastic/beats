@@ -13,14 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
-        make: |
-          make -C x-pack/heartbeat check;
-          make -C x-pack/heartbeat update;
-          make -C heartbeat check;
-          make -C heartbeat update;
-          make check-no-changes;
-        stage: lint
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
@@ -30,7 +22,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "orka && darwin && poc"
+          - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/heartbeat for macos"

@@ -326,6 +326,15 @@ func Package() {
 	packageAgent(requiredPackages, devtools.UseElasticAgentPackaging)
 }
 
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	start := time.Now()
+	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
+	return devtools.Ironbank()
+}
+
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
 	for _, pkg := range requiredPackages {
 		if _, ok := os.LookupEnv(snapshotEnv); ok {

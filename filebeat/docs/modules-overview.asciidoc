@@ -26,6 +26,11 @@ log files.
 {beatname_uc} automatically adjusts these configurations based on your environment
 and loads them to the respective {stack} components.
 
+If a module configuration is updated, the {es} ingest pipeline
+definition is not reloaded automatically. To reload the ingest
+pipeline, set `filebeat.overwrite_pipelines: true` and manually
+<<load-ingest-pipelines, load the ingest pipelines>>.
+
 [float]
 === Get started
 

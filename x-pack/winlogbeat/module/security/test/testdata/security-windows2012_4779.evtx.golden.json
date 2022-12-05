@@ -22,6 +22,7 @@
     "log": {
       "level": "information"
     },
+    "message": "A session was disconnected from a Window Station.\n\nSubject:\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x60D1CCB\n\nSession:\n\tSession Name:\t\tRDP-Tcp#116\n\nAdditional Information:\n\tClient Name:\t\tEQP01777\n\tClient Address:\t\t10.100.150.17\n\n\nThis event is generated when a user disconnects from an existing Terminal Services session, or when a user switches away from an existing desktop using Fast User Switching.",
     "related": {
       "ip": "10.100.150.17",
       "user": "at_adm"

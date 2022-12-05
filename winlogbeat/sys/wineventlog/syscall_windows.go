@@ -492,7 +492,7 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 	case EvtVarTypeEvtHandle:
 		return EvtHandle(v.ValueAsUintPtr()), nil
 	default:
-		return nil, errors.Errorf("unhandled type: %d", typ)
+		return nil, fmt.Errorf("unhandled type: %d", typ)
 	}
 }
 
@@ -547,8 +547,8 @@ const (
 func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, propertyID EvtPublisherMetadataPropertyID) (interface{}, error) {
 	var bufferUsed uint32
 	err := _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return "", errors.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %v", err)
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return "", fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#v)", err, err)
 	}
 
 	buf := make([]byte, bufferUsed)
@@ -609,8 +609,8 @@ func EvtGetObjectArraySize(handle EvtObjectArrayPropertyHandle) (uint32, error) 
 func GetEventMetadataProperty(metadataHandle EvtHandle, propertyID EvtEventMetadataPropertyID) (interface{}, error) {
 	var bufferUsed uint32
 	err := _EvtGetEventMetadataProperty(metadataHandle, 8, 0, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return nil, errors.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %v", err)
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return nil, fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#v)", err, err)
 	}
 
 	buf := make([]byte, bufferUsed)

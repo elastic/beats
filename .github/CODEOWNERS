@@ -7,6 +7,11 @@
 
 * @elastic/elastic-agent-data-plane
 
+# List the CHANGELOG files without an owner. This will prevent the data plane team from being added
+# as a reviewer every time a change to files they do not own also adds a changelog entry.
+# https://github.community/t/codeowners-file-with-a-not-file-type-condition/1423/9
+CHANGELOG*
+
 /.ci/ @elastic/elastic-agent-data-plane
 /.github/ @elastic/elastic-agent-data-plane
 /auditbeat/ @elastic/security-external-integrations
@@ -15,6 +20,7 @@
 /dev-tools/ @elastic/elastic-agent-data-plane
 /docs/ @elastic/elastic-agent-data-plane
 /filebeat @elastic/elastic-agent-data-plane
+/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /filebeat/input/syslog/ @elastic/security-external-integrations
 /filebeat/input/winlog/ @elastic/security-external-integrations
 /filebeat/module/ @elastic/integrations
@@ -52,6 +58,7 @@
 /libbeat/processors/translate_sid/ @elastic/security-external-integrations
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
+/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /metricbeat/module/ @elastic/integrations
 /metricbeat/module/beat/ @elastic/infra-monitoring-ui
 /metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
@@ -66,9 +73,13 @@
 /x-pack/auditbeat/ @elastic/security-external-integrations
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
+/x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
+/x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
 /x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
+/x-pack/filebeat/input/lumberjack/ @elastic/security-external-integrations
 /x-pack/filebeat/input/netflow/ @elastic/security-external-integrations
 /x-pack/filebeat/input/o365audit/ @elastic/security-external-integrations
 /x-pack/filebeat/module/ @elastic/integrations
@@ -123,6 +134,7 @@
 /x-pack/filebeat/processors/decode_cef/ @elastic/security-external-integrations
 /x-pack/heartbeat/ @elastic/uptime
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
+/x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/ @elastic/integrations
 /x-pack/packetbeat/ @elastic/security-external-integrations
 /x-pack/winlogbeat/ @elastic/security-external-integrations

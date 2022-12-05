@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "System security access was removed from an account.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nAccount Modified:\n\tAccount Name:\t\tS-1-5-32-545\n\nAccess Removed:\n\tAccess Right:\t\tSeNetworkLogonRight",
     "related": {
       "user": "WIN-BVM4LI1L1Q6$"
     },

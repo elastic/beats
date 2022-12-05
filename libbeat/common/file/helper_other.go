@@ -27,7 +27,6 @@ import (
 
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
 func SafeFileRotate(path, tempfile string) error {
-	parent := filepath.Dir(path)
 
 	if e := os.Rename(tempfile, path); e != nil {
 		return e
@@ -36,9 +35,17 @@ func SafeFileRotate(path, tempfile string) error {
 	// best-effort fsync on parent directory. The fsync is required by some
 	// filesystems, so to update the parents directory metadata to actually
 	// contain the new file being rotated in.
+	return SyncParent(path)
+}
+
+// SyncParent fsyncs parent directory
+func SyncParent(path string) error {
+	parent := filepath.Dir(path)
 	f, err := os.Open(parent)
+
+	// nolint: nilerr // ignore error
 	if err != nil {
-		return nil // ignore error
+		return nil
 	}
 	defer f.Close()
 

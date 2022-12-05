@@ -18,6 +18,44 @@ rules:
     on_conflict: insert_after
     type: logs
 
+# Input filtering needs to happen before any other input transformations.
+# See https://github.com/elastic/elastic-agent/issues/427.
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - aws-cloudwatch
+    - aws-s3
+    - azure-eventhub
+    - cloudfoundry
+    - container
+    - docker
+    - event/file
+    - event/stdin
+    - event/tcp
+    - event/udp
+    - filestream
+    - gcp-pubsub
+    - http_endpoint
+    - httpjson
+    - journald
+    - kafka
+    - log
+    - log/docker
+    - log/redis_slowlog
+    - log/syslog
+    - logfile
+    - mqtt
+    - netflow
+    - o365audit
+    - redis
+    - stdin
+    - syslog
+    - tcp
+    - udp
+    - unix
+    - winlog
+
 - map:
     path: inputs
     rules:
@@ -61,34 +99,6 @@ rules:
         key: data_stream.namespace
     - remove_key:
         key: data_stream.dataset
-
-- filter_values:
-    selector: inputs
-    key: type
-    values:
-    - aws-cloudwatch
-    - aws-s3
-    - azure-eventhub
-    - cloudfoundry
-    - container
-    - docker
-    - gcp-pubsub
-    - http_endpoint
-    - httpjson
-    - journald
-    - kafka
-    - log
-    - mqtt
-    - netflow
-    - o365audit
-    - redis
-    - stdin
-    - syslog
-    - tcp
-    - udp
-    - unix
-    - winlog
-    - filestream
 
 - filter_values:
     selector: inputs

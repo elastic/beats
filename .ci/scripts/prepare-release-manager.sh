@@ -15,7 +15,7 @@ FINAL_VERSION=$VERSION-SNAPSHOT
 if [ "$TYPE" != "snapshot" ] ; then
   FINAL_VERSION=$VERSION
 fi
-VERSION=$(make get-version)
+echo "Rename dependencies to $FINAL_VERSION"
 mv build/distributions/dependencies.csv \
    build/distributions/dependencies-"$FINAL_VERSION".csv
 
@@ -36,3 +36,6 @@ find build/distributions -name '*linux-amd64.docker.tar.gz*' -print0 |
     echo "Rename file $file"
     mv "$file" "${file/linux-amd64.docker.tar.gz/docker-image-linux-amd64.tar.gz}"
   done
+
+echo 'List all the files'
+find build/distributions -type f -ls || true

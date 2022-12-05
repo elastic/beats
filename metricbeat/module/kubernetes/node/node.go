@@ -79,7 +79,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Node{}, false),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Node{}, mod.GetMetricsRepo(), false),
 		mod:           mod,
 	}, nil
 }

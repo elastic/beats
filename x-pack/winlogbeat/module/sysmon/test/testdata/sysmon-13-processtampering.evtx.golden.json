@@ -36,6 +36,7 @@
         "Type": "Image is replaced"
       },
       "event_id": "25",
+      "opcode": "Info",
       "process": {
         "pid": 3800,
         "thread": {
@@ -46,7 +47,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 10737797,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 5
     }

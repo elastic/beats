@@ -14,6 +14,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/pkg/errors"
+	"golang.org/x/time/rate"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 
@@ -30,6 +31,9 @@ import (
 const (
 	inputName    = "gcp-pubsub"
 	oldInputName = "google-pubsub"
+
+	// retryInterval is the minimum duration between pub/sub client retries.
+	retryInterval = 30 * time.Second
 )
 
 func init() {
@@ -137,9 +141,28 @@ func (in *pubsubInput) Run() {
 			defer in.log.Info("Pub/Sub input worker has stopped.")
 			defer in.workerWg.Done()
 			defer in.workerCancel()
-			if err := in.run(); err != nil {
-				in.log.Error(err)
-				return
+
+			// Throttle pubsub client restarts.
+			rt := rate.NewLimiter(rate.Every(retryInterval), 1)
+
+			// Watchdog to keep the worker operating after an error.
+			for in.workerCtx.Err() == nil {
+				// Rate limit.
+				if err := rt.Wait(in.workerCtx); err != nil {
+					continue
+				}
+
+				if err := in.run(); err != nil {
+					if in.workerCtx.Err() == nil {
+						in.log.Warnw("Restarting failed Pub/Sub input worker.", "error", err)
+						continue
+					}
+
+					// Log any non-cancellation error before stopping.
+					if !errors.Is(err, context.Canceled) {
+						in.log.Errorw("Pub/Sub input worker failed.", "error", err)
+					}
+				}
 			}
 		}()
 	})

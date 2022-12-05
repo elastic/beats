@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
-var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil)
+var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, nil)
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -90,7 +90,7 @@ func TestPodIndexer(t *testing.T) {
 func TestPodUIDIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil)
+	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, nil)
 
 	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
 	assert.Nil(t, err)
@@ -230,7 +230,7 @@ func TestContainerIndexer(t *testing.T) {
 	assert.Equal(t, indices[1], "fghij")
 	assert.Equal(t, indices[2], "klmno")
 
-	expected.Put("kubernetes.container",
+	_, _ = expected.Put("kubernetes.container",
 		common.MapStr{
 			"name":    container,
 			"image":   containerImage,
@@ -239,7 +239,7 @@ func TestContainerIndexer(t *testing.T) {
 		})
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
 
-	expected.Put("kubernetes.container",
+	_, _ = expected.Put("kubernetes.container",
 		common.MapStr{
 			"name":    initContainer,
 			"image":   initContainerImage,
@@ -248,7 +248,7 @@ func TestContainerIndexer(t *testing.T) {
 		})
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
 
-	expected.Put("kubernetes.container",
+	_, _ = expected.Put("kubernetes.container",
 		common.MapStr{
 			"name":    ephemeralContainer,
 			"image":   ephemeralContainerImage,
@@ -301,7 +301,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil)
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, nil)
 
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
@@ -338,7 +338,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil)
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, nil)
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
@@ -475,7 +475,7 @@ func TestIpPortIndexer(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s:%d", ip, port), indices[1])
 
 	assert.Equal(t, expected.String(), indexers[0].Data.String())
-	expected.Put("kubernetes.container",
+	_, _ = expected.Put("kubernetes.container",
 		common.MapStr{
 			"name":    container,
 			"image":   containerImage,

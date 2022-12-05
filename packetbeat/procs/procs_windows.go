@@ -31,6 +31,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 var machineEndiannes = getMachineEndiannes()
@@ -64,6 +65,11 @@ var tablesByTransport = map[applayer.Transport][]struct {
 		{windows.AF_INET, _GetExtendedUdpTable, UDP_TABLE_OWNER_PID, extractUDPRowOwnerPID},
 		{windows.AF_INET6, _GetExtendedUdpTable, UDP_TABLE_OWNER_PID, extractUDP6RowOwnerPID},
 	},
+}
+
+// procName returns the name for the process.
+func procName(info types.ProcessInfo) string {
+	return info.Name
 }
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
@@ -103,7 +109,7 @@ func getNetTable(fn GetExtendedTableFn, order bool, family uint32, tableClass ui
 			ptr = make([]byte, size)
 			addr = uintptr(unsafe.Pointer(&ptr[0]))
 		} else {
-			return nil, fmt.Errorf("getNetTable failed: code=%v err=%v", code, err)
+			return nil, fmt.Errorf("getNetTable failed: code=%v err=%w", code, err)
 		}
 	}
 }

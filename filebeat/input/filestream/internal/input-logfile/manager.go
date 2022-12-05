@@ -71,6 +71,7 @@ type InputManager struct {
 	store      *store
 	ackUpdater *updateWriter
 	ackCH      *updateChan
+	idsMux     sync.Mutex
 	ids        map[string]struct{}
 }
 
@@ -167,7 +168,7 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 		ID             string        `config:"id"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{ID: "", CleanTimeout: cim.DefaultCleanTimeout, HarvesterLimit: 0}
+	}{CleanTimeout: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
@@ -177,12 +178,14 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 			" duplication, please add an ID and restart Filebeat")
 	}
 
+	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
 		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
 			"will lead to data duplication, please use a different ID", settings.ID)
 	}
 
 	cim.ids[settings.ID] = struct{}{}
+	cim.idsMux.Unlock()
 
 	prospector, harvester, err := cim.Configure(config)
 	if err != nil {
@@ -225,6 +228,13 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 		cleanTimeout:     settings.CleanTimeout,
 		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
+}
+
+// StopInput peforms all necessary clean up when an input finishes.
+func (cim *InputManager) StopInput(id string) {
+	cim.idsMux.Lock()
+	delete(cim.ids, id)
+	cim.idsMux.Unlock()
 }
 
 func (cim *InputManager) getRetainedStore() *store {

@@ -53,7 +53,7 @@ func TestGenerateData(t *testing.T) {
 						"co_elastic_logs/disable": "true",
 					},
 				},
-				"to": "container",
+				"target": "container",
 			},
 		},
 	}

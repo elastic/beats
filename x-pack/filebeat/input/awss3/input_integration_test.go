@@ -16,6 +16,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -86,7 +87,6 @@ file_selectors:
 -
   regex: 'events-array.json$'
   expand_event_list_from_field: Events
-  content_type: application/json
   include_s3_metadata:
     - last-modified
     - x-amz-version-id
@@ -95,7 +95,6 @@ file_selectors:
     - Content-Type
 -
   regex: '\.(?:nd)?json(\.gz)?$'
-  content_type: application/json
 -
   regex: 'multiline.txt$'
   parsers:
@@ -115,7 +114,6 @@ file_selectors:
 -
   regex: 'events-array.json$'
   expand_event_list_from_field: Events
-  content_type: application/json
   include_s3_metadata:
     - last-modified
     - x-amz-version-id
@@ -124,7 +122,6 @@ file_selectors:
     - Content-Type
 -
   regex: '\.(?:nd)?json(\.gz)?$'
-  content_type: application/json
 -
   regex: 'multiline.txt$'
   parsers:
@@ -211,7 +208,7 @@ func TestInputRunSQS(t *testing.T) {
 	go func() {
 		for event := range client.Channel {
 			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		}
 	}()
 
@@ -274,7 +271,7 @@ func TestInputRunS3(t *testing.T) {
 	go func() {
 		for event := range client.Channel {
 			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		}
 	}()
 
@@ -324,11 +321,19 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 			t.Fatalf("Failed to open file %q, %v", filename, err)
 		}
 
+		contentType := ""
+		if strings.HasSuffix(filename, "ndjson") || strings.HasSuffix(filename, "ndjson.gz") {
+			contentType = contentTypeNDJSON + "; charset=UTF-8"
+		} else if strings.HasSuffix(filename, "json") || strings.HasSuffix(filename, "json.gz") {
+			contentType = contentTypeJSON + "; charset=UTF-8"
+		}
+
 		// Upload the file to S3.
 		result, err := uploader.Upload(&s3manager.UploadInput{
-			Bucket: aws.String(bucket),
-			Key:    aws.String(filepath.Base(filename)),
-			Body:   bytes.NewReader(data),
+			Bucket:      aws.String(bucket),
+			Key:         aws.String(filepath.Base(filename)),
+			Body:        bytes.NewReader(data),
+			ContentType: aws.String(contentType),
 		})
 		if err != nil {
 			t.Fatalf("Failed to upload file %q: %v", filename, err)
@@ -474,7 +479,7 @@ func TestInputRunSNS(t *testing.T) {
 	defer close(client.Channel)
 	go func() {
 		for event := range client.Channel {
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		}
 	}()
 

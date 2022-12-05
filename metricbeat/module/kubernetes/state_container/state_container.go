@@ -121,7 +121,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-		enricher:      util.NewContainerMetadataEnricher(base, false),
+		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), false),
 		mod:           mod,
 	}, nil
 }

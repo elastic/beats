@@ -68,7 +68,7 @@ type ClusterConfiguration struct {
 // WithFields FieldOption allows adding specific fields into the generated metadata
 func WithFields(key string, value interface{}) FieldOptions {
 	return func(meta common.MapStr) {
-		safemapstr.Put(meta, key, value)
+		_ = safemapstr.Put(meta, key, value)
 	}
 }
 
@@ -77,10 +77,10 @@ func WithFields(key string, value interface{}) FieldOptions {
 func WithMetadata(kind string) FieldOptions {
 	return func(meta common.MapStr) {
 		if meta["labels"] != nil {
-			safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
+			_ = safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
 		}
 		if meta["annotations"] != nil {
-			safemapstr.Put(meta, strings.ToLower(kind)+".annotations", meta["annotations"])
+			_ = safemapstr.Put(meta, strings.ToLower(kind)+".annotations", meta["annotations"])
 		}
 	}
 }
@@ -101,7 +101,7 @@ func GetPodMetaGen(
 	if namespaceWatcher != nil && metaConf.Namespace.Enabled() {
 		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), namespaceWatcher.Client())
 	}
-	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen)
+	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen, metaConf)
 
 	return metaGen
 }
@@ -110,7 +110,7 @@ func GetPodMetaGen(
 func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
 	// try with kube config file
 	var config Config
-	config.Unmarshal(cfg)
+	_ = config.Unmarshal(cfg)
 	clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
 	if err == nil {
 		return clusterInfo, nil
@@ -130,7 +130,7 @@ func getClusterInfoFromKubeadmConfigMap(client k8sclient.Interface) (ClusterInfo
 	}
 	cm, err := client.CoreV1().ConfigMaps("kube-system").Get(context.TODO(), "kubeadm-config", metav1.GetOptions{})
 	if err != nil {
-		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config: %+v", err)
+		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config: %w", err)
 	}
 	p, ok := cm.Data["ClusterConfiguration"]
 	if !ok {
@@ -163,12 +163,12 @@ func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
 
 	cfg, err := kubernetes.BuildConfig(kubeconfig)
 	if err != nil {
-		return ClusterInfo{}, fmt.Errorf("unable to build kube config due to error: %+v", err)
+		return ClusterInfo{}, fmt.Errorf("unable to build kube config due to error: %w", err)
 	}
 
 	kube_cfg, err := clientcmd.LoadFromFile(kubeconfig)
 	if err != nil {
-		return ClusterInfo{}, fmt.Errorf("unable to load kube_config due to error: %+v", err)
+		return ClusterInfo{}, fmt.Errorf("unable to load kube_config due to error: %w", err)
 	}
 
 	for key, element := range kube_cfg.Clusters {

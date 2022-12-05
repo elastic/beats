@@ -31,6 +31,13 @@ class TimeoutError(Exception):
     pass
 
 
+class WaitTimeoutError(Exception):
+    """
+    WaitTimeoutError is raised by the wait_until function if the `until` logic passes its timeout.
+    """
+    pass
+
+
 class Proc(object):
     """
     Slim wrapper on subprocess.Popen that redirects

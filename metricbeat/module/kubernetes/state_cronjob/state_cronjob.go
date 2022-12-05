@@ -115,6 +115,5 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) error {
 			return nil
 		}
 	}
-
 	return nil
 }
