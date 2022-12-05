@@ -27,6 +27,7 @@ type transforms []transform
 type transformContext struct {
 	lock          sync.RWMutex
 	cursor        *cursor
+	parentTrCtx   *transformContext
 	firstEvent    *mapstr.M
 	lastEvent     *mapstr.M
 	lastResponse  *response
@@ -91,7 +92,6 @@ func (ctx *transformContext) updateCursor() {
 
 func (ctx *transformContext) clone() *transformContext {
 	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
 
 	newCtx := emptyTransformContext()
 	newCtx.lastEvent = ctx.lastEvent
@@ -99,7 +99,9 @@ func (ctx *transformContext) clone() *transformContext {
 	newCtx.lastResponse = ctx.lastResponse
 	newCtx.firstResponse = ctx.firstResponse
 	newCtx.cursor = ctx.cursor
+	newCtx.parentTrCtx = ctx
 
+	ctx.lock.Unlock()
 	return newCtx
 }
 
@@ -129,10 +131,10 @@ func (ctx *transformContext) updateFirstResponse(r response) {
 
 func (ctx *transformContext) clearIntervalData() {
 	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
 	ctx.lastEvent = &mapstr.M{}
 	ctx.firstEvent = &mapstr.M{}
 	ctx.lastResponse = &response{}
+	ctx.lock.Unlock()
 }
 
 type transformable mapstr.M

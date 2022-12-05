@@ -376,3 +376,6 @@
 
     # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
     #var.ssl:
+
+    # Specify a custom VPC flow log format.
+    #var.format:
