@@ -27,9 +27,11 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/elastic/go-sysinfo"
+	sysinfo "github.com/elastic/go-sysinfo"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
+
+var NodeChildProcCred *syscall.Credential = nil
 
 func init() {
 	// Here we set a bunch of linux specific security stuff.

@@ -17,6 +17,6 @@
 
 package security
 
-import "syscall"
-
-var NodeChildProcCred *syscall.Credential = nil
+// Empty file so that non-linux platforms have *something*
+// to import, thus preventing mage from complaining
+// no files are imported from the package
