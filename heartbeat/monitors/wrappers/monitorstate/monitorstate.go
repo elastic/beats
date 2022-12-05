@@ -52,7 +52,7 @@ func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int,
 		Status:          status,
 		flappingEnabled: flappingEnabled,
 		ctr:             ctr + 1,
-		initialDuration: (maxEnd.Unix() - now.Unix()) * 1000,
+		InitialDuration: (maxEnd.Unix() - now.Unix()) * 1000,
 	}
 	ms.recordCheck(sf, status)
 
@@ -72,14 +72,18 @@ type State struct {
 	// computation if loading from ES or another source
 	FlapHistory []StateStatus `json:"flap_history"`
 	// Ends is a pointer to the prior state if this is the start of a new state
-	Ends            *State `json:"ends"`
+	Ends *State `json:"ends"`
+	// Initial Duration tracks how long this monitor was set to run for on the first run
+	// we need to track this because the duration formula is
+	// time.Now() - StartedAt + InitialDuration
+	// due to the fact that we don't want the first event to have a duration of zero
+	InitialDuration int64
 	flappingEnabled bool
 	ctr             int
-	initialDuration int64
 }
 
 func (s *State) incrementCounters(status StateStatus) {
-	s.DurationMs = time.Since(s.StartedAt).Milliseconds() + s.initialDuration
+	s.DurationMs = time.Since(s.StartedAt).Milliseconds() + s.InitialDuration
 	s.Checks++
 	if status == StatusUp {
 		s.Up++
