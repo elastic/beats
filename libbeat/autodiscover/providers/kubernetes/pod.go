@@ -86,7 +86,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
 
 	options := kubernetes.WatchOptions{
@@ -97,9 +97,6 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		options.Namespace = config.Namespace
 	}
 	metaConf := config.AddResourceMetadata
-	if metaConf == nil {
-		metaConf = metadata.GetDefaultResourceMetadataConfig()
-	}
 	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
@@ -395,7 +392,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 	var events []bus.Event
 	portsMap := common.MapStr{}
 
-	meta.Put("container", cmeta)
+	_, _ = meta.Put("container", cmeta)
 
 	for _, port := range ports {
 		event := bus.Event{
@@ -461,7 +458,7 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, in
 func podAnnotations(pod *kubernetes.Pod) common.MapStr {
 	annotations := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		_ = safemapstr.Put(annotations, k, v)
 	}
 	return annotations
 }
@@ -484,7 +481,7 @@ func podNamespaceAnnotations(pod *kubernetes.Pod, watcher kubernetes.Watcher) co
 
 	annotations := common.MapStr{}
 	for k, v := range namespace.GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		_ = safemapstr.Put(annotations, k, v)
 	}
 	return annotations
 }

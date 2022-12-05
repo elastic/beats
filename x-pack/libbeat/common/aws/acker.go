@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package awss3
+package aws
 
 import (
 	"context"
@@ -12,40 +12,40 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 )
 
-// eventACKTracker tracks the publishing state of S3 objects. Specifically
+// EventACKTracker tracks the publishing state of S3 objects. Specifically
 // it tracks the number of message acknowledgements that are pending from the
 // output. It can be used to wait until all ACKs have been received for one or
 // more S3 objects.
-type eventACKTracker struct {
+type EventACKTracker struct {
 	sync.Mutex
-	pendingACKs int64
+	PendingACKs int64
 	ctx         context.Context
 	cancel      context.CancelFunc
 }
 
-func newEventACKTracker(ctx context.Context) *eventACKTracker {
+func NewEventACKTracker(ctx context.Context) *EventACKTracker {
 	ctx, cancel := context.WithCancel(ctx)
-	return &eventACKTracker{ctx: ctx, cancel: cancel}
+	return &EventACKTracker{ctx: ctx, cancel: cancel}
 }
 
 // Add increments the number of pending ACKs.
-func (a *eventACKTracker) Add() {
+func (a *EventACKTracker) Add() {
 	a.Lock()
-	a.pendingACKs++
+	a.PendingACKs++
 	a.Unlock()
 }
 
 // ACK decrements the number of pending ACKs.
-func (a *eventACKTracker) ACK() {
+func (a *EventACKTracker) ACK() {
 	a.Lock()
 	defer a.Unlock()
 
-	if a.pendingACKs <= 0 {
+	if a.PendingACKs <= 0 {
 		panic("misuse detected: negative ACK counter")
 	}
 
-	a.pendingACKs--
-	if a.pendingACKs == 0 {
+	a.PendingACKs--
+	if a.PendingACKs == 0 {
 		a.cancel()
 	}
 }
@@ -55,11 +55,11 @@ func (a *eventACKTracker) ACK() {
 // `Add` calls are made. Failing to do so could reset the pendingACKs
 // property to 0 and would results in Wait returning after additional
 // calls to `Add` are made without a corresponding `ACK` call.
-func (a *eventACKTracker) Wait() {
+func (a *EventACKTracker) Wait() {
 	// If there were never any pending ACKs then cancel the context. (This can
 	// happen when a document contains no events or cannot be read due to an error).
 	a.Lock()
-	if a.pendingACKs == 0 {
+	if a.PendingACKs == 0 {
 		a.cancel()
 	}
 	a.Unlock()
@@ -68,15 +68,15 @@ func (a *eventACKTracker) Wait() {
 	<-a.ctx.Done()
 }
 
-// newEventACKHandler returns a beat ACKer that can receive callbacks when
+// NewEventACKHandler returns a beat ACKer that can receive callbacks when
 // an event has been ACKed an output. If the event contains a private metadata
 // pointing to an eventACKTracker then it will invoke the trackers ACK() method
 // to decrement the number of pending ACKs.
-func newEventACKHandler() beat.ACKer {
+func NewEventACKHandler() beat.ACKer {
 	return acker.ConnectionOnly(
 		acker.EventPrivateReporter(func(_ int, privates []interface{}) {
 			for _, private := range privates {
-				if ack, ok := private.(*eventACKTracker); ok {
+				if ack, ok := private.(*EventACKTracker); ok {
 					ack.ACK()
 				}
 			}

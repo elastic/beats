@@ -29,11 +29,12 @@ import (
 )
 
 type pod struct {
-	store     cache.Store
-	client    k8s.Interface
-	node      MetaGen
-	namespace MetaGen
-	resource  *Resource
+	store               cache.Store
+	client              k8s.Interface
+	node                MetaGen
+	namespace           MetaGen
+	resource            *Resource
+	addResourceMetadata *AddResourceMetadataConfig
 }
 
 // NewPodMetadataGenerator creates a metagen for pod resources
@@ -42,13 +43,19 @@ func NewPodMetadataGenerator(
 	pods cache.Store,
 	client k8s.Interface,
 	node MetaGen,
-	namespace MetaGen) MetaGen {
+	namespace MetaGen,
+	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
+
+	if addResourceMetadata == nil {
+		addResourceMetadata = GetDefaultResourceMetadataConfig()
+	}
 	return &pod{
-		resource:  NewResourceMetadataGenerator(cfg, client),
-		store:     pods,
-		node:      node,
-		namespace: namespace,
-		client:    client,
+		resource:            NewResourceMetadataGenerator(cfg, client),
+		store:               pods,
+		node:                node,
+		namespace:           namespace,
+		client:              client,
+		addResourceMetadata: addResourceMetadata,
 	}
 }
 
@@ -88,19 +95,19 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	if rsName, ok := rsName.(string); ok {
 		dep := p.getRSDeployment(rsName, po.GetNamespace())
 		if dep != "" {
-			out.Put("deployment.name", dep)
+			_, _ = out.Put("deployment.name", dep)
 		}
 	}
 
 	if p.node != nil {
 		meta := p.node.GenerateFromName(po.Spec.NodeName, WithMetadata("node"))
 		if meta != nil {
-			out.Put("node", meta["node"])
+			_, _ = out.Put("node", meta["node"])
 		} else {
-			out.Put("node.name", po.Spec.NodeName)
+			_, _ = out.Put("node.name", po.Spec.NodeName)
 		}
 	} else {
-		out.Put("node.name", po.Spec.NodeName)
+		_, _ = out.Put("node.name", po.Spec.NodeName)
 	}
 
 	if p.namespace != nil {
@@ -113,7 +120,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	}
 
 	if po.Status.PodIP != "" {
-		out.Put("pod.ip", po.Status.PodIP)
+		_, _ = out.Put("pod.ip", po.Status.PodIP)
 	}
 
 	return out

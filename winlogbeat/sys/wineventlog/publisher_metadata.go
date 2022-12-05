@@ -21,6 +21,7 @@
 package wineventlog
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 
@@ -548,8 +549,8 @@ type EventMetadataIterator struct {
 
 func NewEventMetadataIterator(publisher *PublisherMetadata) (*EventMetadataIterator, error) {
 	eventMetadataEnumHandle, err := _EvtOpenEventMetadataEnum(publisher.Handle, 0)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open event metadata enumerator with EvtOpenEventMetadataEnum")
+	if err != nil && err != windows.ERROR_FILE_NOT_FOUND { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return nil, fmt.Errorf("failed to open event metadata enumerator with EvtOpenEventMetadataEnum: %w (%#v)", err, err)
 	}
 
 	return &EventMetadataIterator{
@@ -569,6 +570,10 @@ func (itr *EventMetadataIterator) Close() error {
 // no more items or an error occurred. You should call Err() to check for an
 // error.
 func (itr *EventMetadataIterator) Next() bool {
+	if itr.eventMetadataEnumHandle == 0 {
+		// This is only the case when we could not find the event metadata file.
+		return false
+	}
 	// Close existing handle.
 	itr.currentEvent.Close()
 

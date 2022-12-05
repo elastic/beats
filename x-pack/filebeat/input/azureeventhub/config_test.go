@@ -6,6 +6,8 @@ package azureeventhub
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStorageContainerValidate(t *testing.T) {
@@ -17,6 +19,8 @@ func TestStorageContainerValidate(t *testing.T) {
 		{"a", false},
 		{"a-name-that-is-really-too-long-to-be-valid-and-should-never-be-used-no-matter-what", false},
 		{"-not-valid", false},
+		{"not-valid-", false},
+		{"not--valid", false},
 		{"capital-A-not-valid", false},
 		{"no_underscores_either", false},
 	}
@@ -26,4 +30,27 @@ func TestStorageContainerValidate(t *testing.T) {
 			t.Errorf("storageContainerValidate(%s) = %v", test.input, err)
 		}
 	}
+}
+
+func TestValidate(t *testing.T) {
+	t.Run("Sanitize storage account containers with underscores", func(t *testing.T) {
+		config := azureInputConfig{
+			ConnectionString: "sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET",
+			EventHubName:     "event_hub_00",
+			SAName:           "teststorageaccount",
+			SAKey:            "secret",
+			SAContainer:      "filebeat-activitylogs-event_hub_00",
+		}
+
+		if err := config.Validate(); err != nil {
+			t.Fatalf("unexpected validation error: %v", err)
+		}
+
+		assert.Equal(
+			t,
+			"filebeat-activitylogs-event-hub-00",
+			config.SAContainer,
+			"underscores (_) not replaced with hyphens (-)",
+		)
+	})
 }

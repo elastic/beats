@@ -10,7 +10,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -76,7 +75,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -142,7 +140,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -276,7 +273,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -342,7 +338,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -408,7 +403,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -474,7 +468,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -540,7 +533,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -712,7 +704,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -778,7 +769,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -844,7 +834,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -910,7 +899,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -976,7 +964,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1042,7 +1029,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1121,7 +1107,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1187,7 +1172,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1321,7 +1305,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1387,7 +1370,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1453,7 +1435,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1519,7 +1500,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1585,7 +1565,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1719,7 +1698,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1785,7 +1763,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1851,7 +1828,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1917,7 +1893,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -1983,7 +1958,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2117,7 +2091,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2183,7 +2156,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2249,7 +2221,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2366,7 +2337,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2432,7 +2402,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2498,7 +2467,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2564,7 +2532,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2630,7 +2597,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -2764,7 +2730,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",

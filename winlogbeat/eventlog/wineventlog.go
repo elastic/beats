@@ -27,6 +27,7 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -53,7 +54,19 @@ const (
 	// eventLoggingAPIName is the name used to identify the Event Logging API
 	// as both an event type and an API.
 	eventLoggingAPIName = "eventlogging"
+
+	// metaTTL is the length of time a WinMeta value is valid in the cache.
+	metaTTL = time.Hour
 )
+
+func init() {
+	// Register wineventlog API if it is available.
+	available, _ := win.IsAvailable()
+	if available {
+		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
+		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
+	}
+}
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
@@ -160,9 +173,12 @@ type winEventLog struct {
 	lastRead     checkpoint.EventLogState // Record number of the last read event.
 
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+	message   func(event win.EvtHandle) (string, error)      // Message fallback function.
 	renderBuf []byte                                         // Buffer used for rendering event.
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
+
+	winMetaCache // Cached WinMeta tables by provider.
 
 	logPrefix string // String to prefix on log messages.
 }
@@ -198,7 +214,7 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 	if err != nil {
 		return err
 	}
-	defer func() { _ = windows.CloseHandle(signalEvent) }()
+	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
@@ -286,13 +302,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
-	//nolint: prealloc // some handles can be skipped, the final size is unknown
-	var records []Record
+	var records []Record //nolint:prealloc // This linter gives bad advice and does not take into account conditionals in loops.
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
 		var bufErr sys.InsufficientBufferError
-		if ok := errors.As(err, &bufErr); ok {
+		if errors.As(err, &bufErr) {
 			detailf("%s Increasing render buffer size to %d", l.logPrefix,
 				bufErr.RequiredSize)
 			l.renderBuf = make([]byte, bufErr.RequiredSize)
@@ -314,6 +329,13 @@ func (l *winEventLog) Read() ([]Record, error) {
 		if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
 		}
+		if r.Message == "" {
+			r.Message, err = l.message(h)
+			if err != nil {
+				logp.Warn("%s error salvaging message (event id=%d qualifier=%d provider=%q created at %s will be included without a message): %v",
+					l.logPrefix, r.EventIdentifier.ID, r.EventIdentifier.Qualifiers, r.Provider.Name, r.TimeCreated.SystemTime, err)
+			}
+		}
 		records = append(records, r)
 		l.lastRead = r.Offset
 	}
@@ -329,20 +351,20 @@ func (l *winEventLog) Close() error {
 
 func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	handles, err := win.EventHandles(l.subscription, maxRead)
-	switch {
-	case err == nil:
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil:
 		if l.maxRead > maxRead {
 			debugf("%s Recovered from RPC_S_INVALID_BOUND error (errno 1734) "+
 				"by decreasing batch_read_size to %v", l.logPrefix, maxRead)
 		}
 		return handles, maxRead, nil
-	case errors.Is(err, win.ERROR_NO_MORE_ITEMS):
+	case win.ERROR_NO_MORE_ITEMS:
 		detailf("%s No more events", l.logPrefix)
 		if l.config.NoMoreEvents == Stop {
 			return nil, maxRead, io.EOF
 		}
 		return nil, maxRead, nil
-	case errors.Is(err, win.RPC_S_INVALID_BOUND):
+	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
@@ -381,13 +403,15 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
 	}
 
+	// Get basic string values for raw fields.
+	winevent.EnrichRawValuesWithNames(l.winMeta(e.Provider.Name), &e)
 	if e.Level == "" {
 		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
 		e.Level = win.EventLevel(e.LevelRaw).String()
 	}
 
 	if logp.IsDebug(detailSelector) {
-		detailf("%s XML=%s Event=%+v", l.logPrefix, string(x), e)
+		detailf("%s XML=%s Event=%+v", l.logPrefix, x, e)
 	}
 
 	r := Record{
@@ -404,6 +428,56 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	}
 
 	return r
+}
+
+// winMetaCache retrieves and caches WinMeta tables by provider name.
+// It is a cut down version of the PublisherMetadataStore caching in wineventlog.Renderer.
+type winMetaCache struct {
+	ttl    time.Duration
+	logger *logp.Logger
+
+	mu    sync.RWMutex
+	cache map[string]winMetaCacheEntry
+}
+
+type winMetaCacheEntry struct {
+	expire time.Time
+	*winevent.WinMeta
+}
+
+func newWinMetaCache(ttl time.Duration) winMetaCache {
+	return winMetaCache{cache: make(map[string]winMetaCacheEntry), ttl: ttl, logger: logp.L()}
+}
+
+func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
+	c.mu.RLock()
+	e, ok := c.cache[provider]
+	c.mu.RUnlock()
+	if ok && time.Until(e.expire) > 0 {
+		return e.WinMeta
+	}
+
+	// Upgrade lock.
+	defer c.mu.Unlock()
+	c.mu.Lock()
+
+	// Did the cache get updated during lock upgrade?
+	// No need to check expiry here since we must have a new entry
+	// if there is an entry at all.
+	if e, ok := c.cache[provider]; ok {
+		return e.WinMeta
+	}
+
+	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, c.logger)
+	if err != nil {
+		// Return an empty store on error (can happen in cases where the
+		// log was forwarded and the provider doesn't exist on collector).
+		s = win.NewEmptyPublisherMetadataStore(provider, c.logger)
+		logp.Warn("failed to load publisher metadata for %v (returning an empty metadata store): %v", provider, err)
+	}
+	s.Close()
+	c.cache[provider] = winMetaCacheEntry{expire: time.Now().Add(c.ttl), WinMeta: &s.WinMeta}
+	return &s.WinMeta
 }
 
 func newEventLogging(options *common.Config) (EventLog, error) {
@@ -463,16 +537,17 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	}
 
 	l := &winEventLog{
-		id:          id,
-		config:      c,
-		query:       xmlQuery,
-		channelName: c.Name,
-		file:        filepath.IsAbs(c.Name),
-		maxRead:     c.BatchReadSize,
-		renderBuf:   make([]byte, renderBufferSize),
-		outputBuf:   sys.NewByteBuffer(renderBufferSize),
-		cache:       newMessageFilesCache(id, eventMetadataHandle, freeHandle),
-		logPrefix:   fmt.Sprintf("WinEventLog[%s]", id),
+		id:           id,
+		config:       c,
+		query:        xmlQuery,
+		channelName:  c.Name,
+		file:         filepath.IsAbs(c.Name),
+		maxRead:      c.BatchReadSize,
+		renderBuf:    make([]byte, renderBufferSize),
+		outputBuf:    sys.NewByteBuffer(renderBufferSize),
+		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
+		winMetaCache: newWinMetaCache(metaTTL),
+		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more
@@ -489,6 +564,9 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
 	}
+	l.message = func(event win.EvtHandle) (string, error) {
+		return win.Message(event, l.renderBuf, l.cache.get)
+	}
 
 	return l, nil
 }
@@ -502,13 +580,4 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
 	win.Close(bmHandle)
 	return string(l.outputBuf.Bytes()), err
-}
-
-func init() {
-	// Register wineventlog API if it is available.
-	available, _ := win.IsAvailable()
-	if available {
-		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
-		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
-	}
 }

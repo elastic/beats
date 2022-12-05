@@ -33,7 +33,7 @@ var (
 )
 
 func TestDecodeXML(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		description  string
 		config       decodeXMLConfig
 		Input        common.MapStr
@@ -258,6 +258,33 @@ func TestDecodeXML(t *testing.T) {
 								"id":          "bk102",
 								"test2":       "Ralls, Kim",
 							},
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "Decoding with utf-16 proc inst utf-8 encoding",
+			config: decodeXMLConfig{
+				Field: "message",
+			},
+			Input: common.MapStr{
+				"message": `<?xml version="1.0" encoding="UTF-16"?>
+				<catalog>
+					<book>
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+					</book>
+				</catalog>`,
+			},
+			Output: common.MapStr{
+				"message": common.MapStr{
+					"catalog": map[string]interface{}{
+						"book": map[string]interface{}{
+							"author": "William H. Gaddis",
+							"review": "One of the great seminal American novels of the 20th century.",
+							"title":  "The Recognitions",
 						},
 					},
 				},

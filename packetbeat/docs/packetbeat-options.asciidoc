@@ -270,7 +270,7 @@ see the following published transactions (when `ignore_outgoing` is true):
  - Beat2: t1
  - Beat3: t2
 
- [float]
+[float]
 ==== `internal_networks`
 
 If the `internal_networks` option is specified, when monitoring network taps or mirror ports, Packetbeat

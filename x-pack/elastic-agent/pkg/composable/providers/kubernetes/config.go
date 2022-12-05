@@ -60,6 +60,7 @@ func (c *Config) InitDefaults() {
 	c.IncludeCreatorMetadata = true
 	c.LabelsDedot = true
 	c.AnnotationsDedot = true
+	c.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
 }
 
 // Validate ensures correctness of config

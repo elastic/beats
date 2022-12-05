@@ -40,12 +40,25 @@ func TestEventMapping(t *testing.T) {
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	cache := util.NewPerfMetricsCache()
-	cache.NodeCoresAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 2)
-	cache.NodeMemAllocatable.Set("gke-beats-default-pool-a5b33e2e-hdww", 146227200)
-	cache.ContainerMemLimit.Set(util.ContainerUID("default", "nginx-deployment-2303442956-pcqfc", "nginx"), 14622720)
+	metricsRepo := util.NewMetricsRepo()
 
-	events, err := eventMapping(body, cache)
+	nodeName := "gke-beats-default-pool-a5b33e2e-hdww"
+
+	nodeMetrics := util.NewNodeMetrics()
+	nodeMetrics.CoresAllocatable = util.NewFloat64Metric(2)
+	nodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
+	addNodeMetric(metricsRepo, nodeName, nodeMetrics)
+
+	namespace := "default"
+	podName := "nginx-deployment-2303442956-pcqfc"
+	podId := util.NewPodId(namespace, podName)
+	containerName := "nginx"
+
+	containerMetrics := util.NewContainerMetrics()
+	containerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+	addContainerMetric(metricsRepo, nodeName, podId, containerName, containerMetrics)
+
+	events, err := eventMapping(body, metricsRepo)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
@@ -91,4 +104,16 @@ func testValue(t *testing.T, event common.MapStr, field string, value interface{
 	data, err := event.GetValue(field)
 	assert.NoError(t, err, "Could not read field "+field)
 	assert.EqualValues(t, data, value, "Wrong value for field "+field)
+}
+
+func addContainerMetric(metricsRepo *util.MetricsRepo, nodeName string, podId util.PodId, containerName string, metrics *util.ContainerMetrics) {
+	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+	podStore, _ := nodeStore.AddPodStore(podId)
+	containerStore, _ := podStore.AddContainerStore(containerName)
+	containerStore.SetContainerMetrics(metrics)
+}
+
+func addNodeMetric(metricsRepo *util.MetricsRepo, nodeName string, nodeMetrics *util.NodeMetrics) {
+	nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
+	nodeStore.SetNodeMetrics(nodeMetrics)
 }

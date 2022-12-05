@@ -116,7 +116,7 @@ func TestResource_Generate(t *testing.T) {
 	}
 
 	var cfg Config
-	ucfg.New().Unpack(&cfg)
+	_ = ucfg.New().Unpack(&cfg)
 	metagen := &Resource{
 		config: &cfg,
 	}

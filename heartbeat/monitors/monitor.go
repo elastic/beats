@@ -175,6 +175,8 @@ func newMonitorUnsafe(
 		// Note, needed to hoist err to this scope, not just to add a prefix
 		fullErr := fmt.Errorf("job could not be initialized: %s", err)
 		// A placeholder job that always returns an error
+
+		logp.L().Error(fullErr)
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
 			return nil, fullErr
 		}}
@@ -237,9 +239,9 @@ func (m *Monitor) Start() {
 
 	for _, t := range m.configuredJobs {
 		if m.runOnce {
-			client, err := pipeline.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
+			client, err := pipeline.NewSyncClient(logp.L(), t.monitor.pipelineConnector, beat.ClientConfig{})
 			if err != nil {
-				logp.Err("could not start monitor: %v", err)
+				logp.L().Errorf("could not start monitor: %v", err)
 				continue
 			}
 			t.Start(&WrappedClient{
@@ -252,7 +254,7 @@ func (m *Monitor) Start() {
 		} else {
 			client, err := m.pipelineConnector.Connect()
 			if err != nil {
-				logp.Err("could not start monitor: %v", err)
+				logp.L().Errorf("could not start monitor: %v", err)
 				continue
 			}
 			t.Start(&WrappedClient{
@@ -284,7 +286,7 @@ func (m *Monitor) Stop() {
 	if m.close != nil {
 		err := m.close()
 		if err != nil {
-			logp.Error(fmt.Errorf("error closing monitor %s: %w", m.String(), err))
+			logp.L().Error("error closing monitor %s: %w", m.String(), err)
 		}
 	}
 

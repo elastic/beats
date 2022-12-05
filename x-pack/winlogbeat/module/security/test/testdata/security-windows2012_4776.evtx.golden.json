@@ -21,6 +21,7 @@
     "log": {
       "level": "information"
     },
+    "message": "The computer attempted to validate the credentials for an account.\n\nAuthentication Package:\tMICROSOFT_AUTHENTICATION_PACKAGE_V1_0\nLogon Account:\tat_adm\nSource Workstation:\tEQP01777\nError Code:\t0x0",
     "related": {
       "user": "at_adm"
     },

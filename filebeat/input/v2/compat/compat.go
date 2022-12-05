@@ -104,11 +104,13 @@ func (f *factory) Create(
 func (r *runner) String() string { return r.input.Name() }
 
 func (r *runner) Start() {
+	r.wg.Add(1)
 	log := r.log
 	name := r.input.Name()
 
 	go func() {
-		log.Infof("Input %v starting", name)
+		defer r.wg.Done()
+		log.Infof("Input '%s' starting", name)
 		err := r.input.Run(
 			v2.Context{
 				ID:          r.id,
@@ -119,9 +121,9 @@ func (r *runner) Start() {
 			r.connector,
 		)
 		if err != nil {
-			log.Errorf("Input '%v' failed with: %+v", name, err)
+			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {
-			log.Infof("Input '%v' stopped", name)
+			log.Infof("Input '%s' stopped (goroutine)", name)
 		}
 	}()
 }
@@ -129,7 +131,7 @@ func (r *runner) Start() {
 func (r *runner) Stop() {
 	r.sig.Cancel()
 	r.wg.Wait()
-	r.log.Infof("Input '%v' stopped", r.input.Name())
+	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
 }
 
 func configID(config *common.Config) (string, error) {

@@ -56,7 +56,7 @@ func NewHeartbeatHints(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
 	}
 
-	return &heartbeatHints{config, logp.NewLogger("hints.builder")}, nil
+	return &heartbeatHints{config, logp.L()}, nil
 }
 
 // Create config based on input hints in the bus event

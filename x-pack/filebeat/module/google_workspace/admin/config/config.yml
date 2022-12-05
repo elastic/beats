@@ -17,7 +17,7 @@ request.proxy_url: {{ .proxy_url }}
 request.transforms:
   - set:
       target: url.params.startTime
-      value: "[[.cursor.last_execution_datetime]]"
+      value: '[[.cursor.last_execution_datetime]]'
       default: '[[formatDate (now (parseDuration "-{{.initial_interval}}"))]]'
 response.split:
   target: body.items
@@ -26,12 +26,33 @@ response.split:
     keep_parent: true
 response.pagination:
   - set:
+      target: url.params.startTime
+      value: '[[.last_response.url.params.Get "startTime"]]'
+      fail_on_template_error: true
+  - set:
       target: url.params.pageToken
-      value: "[[.last_response.body.nextPageToken]]"
+      value: >-
+        [[- if index .last_response.body "nextPageToken" -]]
+          [[- .last_response.body.nextPageToken -]]
+        [[- end -]]
       fail_on_template_error: true
 cursor:
   last_execution_datetime:
-    value: "[[formatDate now]]"
+    value: >-
+      [[- $time := .last_event.id.time -]]
+      [[- if not (parseDate $time "RFC3339").IsZero -]]
+        [[- $time -]]
+      [[- else if not (parseDate $time "2006-01-02T15:04:05").IsZero -]]
+        [[- formatDate (parseDate $time "2006-01-02T15:04:05") -]]
+      [[- else if not (parseDate $time "2006-01-02T15:04:05Z").IsZero -]]
+        [[- formatDate (parseDate $time "2006-01-02T15:04:05Z") -]]
+      [[- else if not (parseDate $time "2006-01-02T15:04:05.999Z").IsZero -]]
+        [[- formatDate (parseDate $time "2006-01-02T15:04:05.999Z") -]]
+      [[- else if not (parseDate $time "2006-01-02T15:04:05 MST").IsZero -]]
+        [[- formatDate (parseDate $time "2006-01-02T15:04:05 MST") -]]
+      [[- else -]]
+        [[- formatDate now -]]
+      [[- end -]]
 
 {{ else if eq .input "file" }}
 type: log

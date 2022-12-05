@@ -6,6 +6,7 @@ package v2
 
 import (
 	"context"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -124,9 +125,9 @@ func (iter *pageIterator) next() (*response, bool, error) {
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
 	if err != nil {
-		if err == errNewURLValueNotSet ||
-			err == errEmptyTemplateResult ||
-			err == errExecutingTemplate {
+		if errors.Is(err, errNewURLValueNotSet) ||
+			errors.Is(err, errEmptyTemplateResult) ||
+			errors.Is(err, errExecutingTemplate) {
 			// if this error happens here it means a transform
 			// did not find any new value and we can stop paginating without error
 			iter.done = true
@@ -162,12 +163,15 @@ func (iter *pageIterator) getPage() (*response, error) {
 		return nil, err
 	}
 	iter.resp.Body.Close()
-	iter.n += 1
 
 	var r response
 	r.header = iter.resp.Header
 	r.url = *iter.resp.Request.URL
+
+	// we set the page number before increasing its value
+	// because the first page needs to be 0 for every interval
 	r.page = iter.n
+	iter.n++
 
 	if len(bodyBytes) > 0 {
 		if iter.pagination.decoder != nil {

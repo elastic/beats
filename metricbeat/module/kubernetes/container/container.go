@@ -77,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewContainerMetadataEnricher(base, true),
+		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), true),
 		mod:           mod,
 	}, nil
 }
@@ -95,7 +95,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, util.PerfMetrics)
+	events, err := eventMapping(body, m.mod.GetMetricsRepo())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)

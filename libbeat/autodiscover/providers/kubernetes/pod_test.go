@@ -1907,7 +1907,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil)
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil, nil)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
@@ -2040,7 +2040,7 @@ func getNestedAnnotations(in common.MapStr) common.MapStr {
 	out := common.MapStr{}
 
 	for k, v := range in {
-		out.Put(k, v)
+		_, _ = out.Put(k, v)
 	}
 	return out
 }

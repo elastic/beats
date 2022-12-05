@@ -49,7 +49,7 @@ func TestIgnoreOlderQuery(t *testing.T) {
 	q, err := Query{Log: "Application", IgnoreOlder: time.Hour}.Build()
 	if assert.NoError(t, err) {
 		assert.Equal(t, expected, q)
-		fmt.Println(q)
+		t.Log(q)
 	}
 }
 
@@ -64,7 +64,7 @@ func TestEventIDQuery(t *testing.T) {
 	q, err := Query{Log: "Application", EventID: "1, 1-100, -75"}.Build()
 	if assert.NoError(t, err) {
 		assert.Equal(t, expected, q)
-		fmt.Println(q)
+		t.Log(q)
 	}
 }
 
@@ -78,7 +78,7 @@ func TestLevelQuery(t *testing.T) {
 	q, err := Query{Log: "Application", Level: "Verbose"}.Build()
 	if assert.NoError(t, err) {
 		assert.Equal(t, expected, q)
-		fmt.Println(q)
+		t.Log(q)
 	}
 }
 
@@ -92,7 +92,7 @@ func TestProviderQuery(t *testing.T) {
 	q, err := Query{Log: "Application", Provider: []string{"mysrc"}}.Build()
 	if assert.NoError(t, err) {
 		assert.Equal(t, expected, q)
-		fmt.Println(q)
+		t.Log(q)
 	}
 }
 
@@ -112,7 +112,7 @@ func TestCombinedQuery(t *testing.T) {
 	}.Build()
 	if assert.NoError(t, err) {
 		assert.Equal(t, expected, q)
-		fmt.Println(q)
+		t.Log(q)
 	}
 }
 
@@ -126,6 +126,6 @@ func TestQueryNoParams(t *testing.T) {
 	q, err := Query{Log: "Application"}.Build()
 	if assert.NoError(t, err) {
 		assert.Equal(t, expected, q)
-		fmt.Println(q)
+		t.Log(q)
 	}
 }

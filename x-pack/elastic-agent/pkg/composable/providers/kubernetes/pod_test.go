@@ -28,7 +28,9 @@ func TestGeneratePodData(t *testing.T) {
 			UID:       types.UID(uid),
 			Namespace: "testns",
 			Labels: map[string]string{
-				"foo": "bar",
+				"foo":        "bar",
+				"with-dash":  "dash-value",
+				"with/slash": "some/path",
 			},
 			Annotations: map[string]string{
 				"app": "production",
@@ -60,7 +62,9 @@ func TestGeneratePodData(t *testing.T) {
 			"nsa": "nsb",
 		},
 		"labels": common.MapStr{
-			"foo": "bar",
+			"foo":        "bar",
+			"with-dash":  "dash-value",
+			"with/slash": "some/path",
 		},
 		"annotations": common.MapStr{
 			"app": "production",
@@ -75,7 +79,9 @@ func TestGeneratePodData(t *testing.T) {
 		}, "kubernetes": common.MapStr{
 			"namespace": "testns",
 			"labels": common.MapStr{
-				"foo": "bar",
+				"foo":        "bar",
+				"with-dash":  "dash-value",
+				"with/slash": "some/path",
 			},
 			"annotations": common.MapStr{"app": "production"},
 			"pod": common.MapStr{
@@ -121,7 +127,9 @@ func TestGenerateContainerPodData(t *testing.T) {
 			UID:       types.UID(uid),
 			Namespace: "testns",
 			Labels: map[string]string{
-				"foo": "bar",
+				"foo":        "bar",
+				"with-dash":  "dash-value",
+				"with/slash": "some/path",
 			},
 			Annotations: map[string]string{
 				"app": "production",
@@ -178,7 +186,9 @@ func TestGenerateContainerPodData(t *testing.T) {
 			"app": "production",
 		},
 		"labels": common.MapStr{
-			"foo": "bar",
+			"foo":        "bar",
+			"with-dash":  "dash-value",
+			"with/slash": "some/path",
 		},
 	}
 
@@ -194,7 +204,11 @@ func TestGenerateContainerPodData(t *testing.T) {
 		}, "kubernetes": common.MapStr{
 			"namespace":   "testns",
 			"annotations": common.MapStr{"app": "production"},
-			"labels":      common.MapStr{"foo": "bar"},
+			"labels": common.MapStr{
+				"foo":        "bar",
+				"with-dash":  "dash-value",
+				"with/slash": "some/path",
+			},
 			"pod": common.MapStr{
 				"ip":   "127.0.0.5",
 				"name": "testpod",
@@ -236,7 +250,9 @@ func TestEphemeralContainers(t *testing.T) {
 			UID:       types.UID(uid),
 			Namespace: "testns",
 			Labels: map[string]string{
-				"foo": "bar",
+				"foo":        "bar",
+				"with-dash":  "dash-value",
+				"with/slash": "some/path",
 			},
 			Annotations: map[string]string{
 				"app": "production",
@@ -279,7 +295,9 @@ func TestEphemeralContainers(t *testing.T) {
 			"ip":   pod.Status.PodIP,
 		},
 		"labels": common.MapStr{
-			"foo": "bar",
+			"foo":        "bar",
+			"with-dash":  "dash-value",
+			"with/slash": "some/path",
 		},
 		"container": common.MapStr{
 			"id":      "asdfghdeadbeef",
@@ -305,8 +323,12 @@ func TestEphemeralContainers(t *testing.T) {
 				"name": "devcluster",
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
-			"namespace":   "testns",
-			"labels":      common.MapStr{"foo": "bar"},
+			"namespace": "testns",
+			"labels": common.MapStr{
+				"foo":        "bar",
+				"with-dash":  "dash-value",
+				"with/slash": "some/path",
+			},
 			"annotations": common.MapStr{"app": "production"},
 			"pod": common.MapStr{
 				"ip":   "127.0.0.5",
@@ -388,7 +410,9 @@ func (p *podMeta) GenerateK8s(obj kubernetes.Resource, opts ...metadata.FieldOpt
 			"ip":   k8sPod.Status.PodIP,
 		},
 		"labels": common.MapStr{
-			"foo": "bar",
+			"foo":        "bar",
+			"with-dash":  "dash-value",
+			"with/slash": "some/path",
 		},
 		"annotations": common.MapStr{
 			"app": "production",

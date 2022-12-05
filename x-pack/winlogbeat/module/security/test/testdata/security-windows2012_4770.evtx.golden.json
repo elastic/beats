@@ -21,6 +21,7 @@
     "log": {
       "level": "information"
     },
+    "message": "A Kerberos service ticket was renewed.\n\nAccount Information:\n\tAccount Name:\t\tDC_TEST2K12$@TEST.SAAS\n\tAccount Domain:\t\tTEST.SAAS\n\nService Information:\n\tService Name:\t\tkrbtgt\n\tService ID:\t\tS-1-5-21-1717121054-434620538-60925301-502\n\nNetwork Information:\n\tClient Address:\t\t::1\n\tClient Port:\t\t0\n\nAdditional Information:\n\tTicket Options:\t\t0x10002\n\tTicket Encryption Type:\t0x12\n\nTicket options and encryption types are defined in RFC 4120.",
     "related": {
       "ip": "::1",
       "user": "DC_TEST2K12$"

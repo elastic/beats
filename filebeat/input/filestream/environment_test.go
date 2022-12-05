@@ -200,11 +200,16 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 	}
 
 	id := getIDFromPath(filepath, inputID, fi)
-	entry, err := e.getRegistryState(id)
-	if err != nil {
-		e.t.Fatalf(err.Error())
-	}
+	var entry registryEntry
+	require.Eventually(e.t, func() bool {
+		entry, err = e.getRegistryState(id)
+		if err != nil {
+			return true
+		}
 
+		return expectedOffset == entry.Cursor.Offset
+	}, time.Second, time.Millisecond)
+	require.NoError(e.t, err)
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
 

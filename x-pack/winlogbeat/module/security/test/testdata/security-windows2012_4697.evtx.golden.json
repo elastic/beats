@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "A service was installed in the system.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x4C323\n\nService Information:\n\tService Name: \t\twinlogbeat\n\tService File Name:\t\"C:\\Program Files\\Winlogbeat\\winlogbeat.exe\" -c \"C:\\Program Files\\Winlogbeat\\winlogbeat.yml\" -path.home \"C:\\Program Files\\Winlogbeat\" -path.data \"C:\\ProgramData\\winlogbeat\" -path.logs \"C:\\ProgramData\\winlogbeat\\logs\" -E logging.files.redirect_stderr=true\n\tService Type: \t\t0x10\n\tService Start Type:\t2\n\tService Account: \t\tLocalSystem",
     "related": {
       "user": "Administrator"
     },

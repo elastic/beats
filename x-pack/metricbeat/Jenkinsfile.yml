@@ -1,26 +1,19 @@
 when:
-    branches: true             ## for all the branches
-    changeset:                 ## when PR contains any of those entries in the changeset
+    branches: true                   ## for all the branches
+    changeset:                       ## when PR contains any of those entries in the changeset
         - "^x-pack/metricbeat/.*"
-        - "@ci"                ## special token regarding the changeset for the ci
-        - "@xpack"             ## special token regarding the changeset for the xpack
-    comments:                  ## when PR comment contains any of those entries
+        - "^x-pack/elastic-agent/.*" ## build when elastic-agent has changes to allow e2e tests to run properly
+        - "@ci"                      ## special token regarding the changeset for the ci
+        - "@xpack"                   ## special token regarding the changeset for the xpack
+    comments:                        ## when PR comment contains any of those entries
         - "/test x-pack/metricbeat"
-    labels:                    ## when PR labels matches any of those entries
+    labels:                          ## when PR labels matches any of those entries
         - "x-pack-metricbeat"
-    parameters:                ## when parameter was selected in the UI.
+    parameters:                      ## when parameter was selected in the UI.
         - "x-pack-metricbeat"
-    tags: true                 ## for all the tags
-platform: "immutable && ubuntu-18" ## default label for all the stages
+    tags: true                       ## for all the tags
+platform: "immutable && ubuntu-18"   ## default label for all the stages
 stages:
-    lint:
-        make: |
-          make -C x-pack/metricbeat check;
-          make -C x-pack/metricbeat update;
-          make -C metricbeat check;
-          make -C metricbeat update;
-          make check-no-changes;
-        stage: lint
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
@@ -60,7 +53,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "orka && darwin && poc"
+          - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/metricbeat for macos"
@@ -90,11 +83,12 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
         stage: extended_win
-    windows-2008:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2008-r2"
-        stage: extended_win
+    # EOL: can't install terraform https://github.com/elastic/beats/issues/32327
+    # windows-2008:
+    #     mage: "mage build unitTest"
+    #     platforms:             ## override default labels in this specific stage.
+    #         - "windows-2008-r2"
+    #     stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

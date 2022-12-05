@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -104,7 +105,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		gomock.InOrder(
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-				Do(func(ctx context.Context, _ *logp.Logger, _ *eventACKTracker, _ s3EventV2) {
+				Do(func(ctx context.Context, _ *logp.Logger, _ *awscommon.EventACKTracker, _ s3EventV2) {
 					timed.Wait(ctx, 5*visibilityTimeout)
 				}).Return(mockS3Handler),
 			mockS3Handler.EXPECT().ProcessS3Object().Return(nil),

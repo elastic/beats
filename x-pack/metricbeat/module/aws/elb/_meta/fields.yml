@@ -127,6 +127,12 @@
         - name: ConsumedLCUs.avg
           type: double
           description: The number of load balancer capacity units (LCU) used by your load balancer.
+        - name: HealthyHostCount.max
+          type: long
+          description: The number of targets that are considered healthy.
+        - name: UnHealthyHostCount.max
+          type: long
+          description: The number of targets that are considered unhealthy.
 - name: networkelb
   type: group
   description: >

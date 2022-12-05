@@ -100,7 +100,7 @@ The state has the following elements:
 - `last_response.url.params`: A https://pkg.go.dev/net/url#Values[`url.Values`] of the params from the URL in `last_response.url.value`.  Can be queried with the https://pkg.go.dev/net/url#Values.Get[`Get`] function.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
-- `last_response.page`: A number indicating the page number of the last response.
+- `last_response.page`: A number indicating the page number of the last response. It starts with the value `0` at every interval.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
 - `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
 - `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
@@ -350,6 +350,11 @@ The JWT Account Key file for Google.
 NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
 default credentials from the environment will be attempted via ADC. For more information about
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `auth.oauth2.google.delegated_account`
+
+Email of the delegated account used to create the credentials (usually an admin).
 
 [float]
 ==== `request.url`

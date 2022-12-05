@@ -86,7 +86,7 @@ func NewServiceMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"hostname":         p.Label("ingress_hostname"),
 			},
 		},
-		enricher: util.NewResourceMetadataEnricher(base, &kubernetes.Service{}, false),
+		enricher: util.NewResourceMetadataEnricher(base, &kubernetes.Service{}, mod.GetMetricsRepo(), false),
 	}, nil
 }
 
@@ -122,7 +122,6 @@ func (m *ServiceMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-	return
 }
 
 // Close stops this metricset

@@ -123,7 +123,7 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
+		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %w", err)
 	}
 
 	//Load and append default indexer configs
@@ -191,9 +191,6 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		}
 
 		metaConf := config.AddResourceMetadata
-		if metaConf == nil {
-			metaConf = metadata.GetDefaultResourceMetadataConfig()
-		}
 
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
@@ -280,11 +277,11 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	metaClone := metadata.Clone()
-	metaClone.Delete("kubernetes.container.name")
+	_ = metaClone.Delete("kubernetes.container.name")
 	containerImage, err := metadata.GetValue("kubernetes.container.image")
 	if err == nil {
-		metaClone.Delete("kubernetes.container.image")
-		metaClone.Put("kubernetes.container.image.name", containerImage)
+		_ = metaClone.Delete("kubernetes.container.image")
+		_, _ = metaClone.Put("kubernetes.container.image.name", containerImage)
 	}
 	cmeta, err := metaClone.Clone().GetValue("kubernetes.container")
 	if err == nil {
@@ -295,9 +292,9 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 
 	kubeMeta := metadata.Clone()
 	// remove container meta from kubernetes.container.*
-	kubeMeta.Delete("kubernetes.container.id")
-	kubeMeta.Delete("kubernetes.container.runtime")
-	kubeMeta.Delete("kubernetes.container.image")
+	_ = kubeMeta.Delete("kubernetes.container.id")
+	_ = kubeMeta.Delete("kubernetes.container.runtime")
+	_ = kubeMeta.Delete("kubernetes.container.image")
 	event.Fields.DeepUpdate(kubeMeta)
 
 	return event, nil

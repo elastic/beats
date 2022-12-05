@@ -17604,17 +17604,6 @@ type: keyword
 
 --
 
-
-*`socket.entity_id`*::
-+
---
-ID uniquely identifying the socket. It is computed as a SHA-256 hash of the host ID, socket inode, local IP, local port, remote IP, and remote port.
-
-
-type: keyword
-
---
-
 [float]
 === system.audit
 
