@@ -160,14 +160,15 @@ func (s *Server) Start() error {
 	// start serving GRPC connections
 	go func() {
 		s.serverLock.Lock()
-		defer s.serverLock.Unlock()
+		server := s.server
+		s.serverLock.Unlock()
 
-		if s.server == nil { // Server.Stop was called before this goroutine run
+		if server == nil { // Server.Stop was called before this goroutine run
 			s.logger.Error("cannot start gRPC server, server is nil. Did you call Stop before the initialization has completed?")
 			return
 		}
-		
-		err := s.server.Serve(lis)
+
+		err := server.Serve(lis)
 		if err != nil {
 			s.logger.Errorf("error listening for GRPC: %v", err)
 		}
