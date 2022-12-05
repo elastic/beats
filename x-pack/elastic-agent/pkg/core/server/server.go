@@ -104,6 +104,7 @@ type Server struct {
 
 	listener     net.Listener
 	server       *grpc.Server
+	serverLock   *sync.Mutex
 	watchdogDone chan bool
 	watchdogWG   sync.WaitGroup
 
@@ -151,15 +152,21 @@ func (s *Server) Start() error {
 		ClientCAs:      certPool,
 		GetCertificate: s.getCertificate,
 	})
+	s.serverLock.Lock()
 	s.server = grpc.NewServer(grpc.Creds(creds))
+	s.serverLock.Unlock()
 	proto.RegisterElasticAgentServer(s.server, s)
 
 	// start serving GRPC connections
 	go func() {
+		s.serverLock.Lock()
+		defer s.serverLock.Unlock()
+
 		if s.server == nil { // Server.Stop was called before this goroutine run
 			s.logger.Error("cannot start gRPC server, server is nil. Did you call Stop before the initialization has completed?")
 			return
 		}
+		
 		err := s.server.Serve(lis)
 		if err != nil {
 			s.logger.Errorf("error listening for GRPC: %v", err)
@@ -176,6 +183,9 @@ func (s *Server) Start() error {
 
 // Stop stops the GRPC endpoint.
 func (s *Server) Stop() {
+	s.serverLock.Lock()
+	defer s.serverLock.Unlock()
+
 	if s.server != nil {
 		close(s.watchdogDone)
 		s.server.Stop()
