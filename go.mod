@@ -70,7 +70,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.0.0-20221121201703-4b23a52d0ebe
+	github.com/elastic/elastic-agent-client/v7 v7.0.2-0.20221129150247-15881a8e64ef
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.2
 	github.com/elastic/go-licenser v0.4.0
@@ -79,7 +79,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.3.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.8.1
+	github.com/elastic/go-sysinfo v1.9.0
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -133,7 +133,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.30.0
-	github.com/prometheus/procfs v0.7.3
+	github.com/prometheus/procfs v0.8.0
 	github.com/prometheus/prometheus v1.8.2-0.20210701133801-b0944590a1c9
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
