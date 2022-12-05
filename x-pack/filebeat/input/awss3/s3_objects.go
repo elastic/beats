@@ -20,16 +20,15 @@ import (
 	"strings"
 	"time"
 
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -48,7 +47,7 @@ type s3ObjectProcessorFactory struct {
 
 func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", monitoring.NewRegistry())
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{
@@ -287,10 +286,11 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 
 	var reader reader.Reader
 	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
-		Codec:      enc,
-		BufferSize: int(p.readerConfig.BufferSize),
-		Terminator: p.readerConfig.LineTerminator,
-		MaxBytes:   int(p.readerConfig.MaxBytes) * 4,
+		Codec:        enc,
+		BufferSize:   int(p.readerConfig.BufferSize),
+		Terminator:   p.readerConfig.LineTerminator,
+		CollectOnEOF: true,
+		MaxBytes:     int(p.readerConfig.MaxBytes) * 4,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create encode reader: %w", err)
@@ -303,6 +303,13 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
+		if len(message.Content) > 0 {
+			event := p.createEvent(string(message.Content), offset)
+			event.Fields.DeepUpdate(message.Fields)
+			offset += int64(message.Bytes)
+			p.publish(p.acker, &event)
+		}
+
 		if errors.Is(err, io.EOF) {
 			// No more lines
 			break
@@ -310,11 +317,6 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 		if err != nil {
 			return fmt.Errorf("error reading message: %w", err)
 		}
-
-		event := p.createEvent(string(message.Content), offset)
-		event.Fields.DeepUpdate(message.Fields)
-		offset += int64(message.Bytes)
-		p.publish(p.acker, &event)
 	}
 
 	return nil

@@ -77,7 +77,7 @@ func newS3Poller(log *logp.Logger,
 	bucketPollInterval time.Duration,
 ) *s3Poller {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", monitoring.NewRegistry())
 	}
 	return &s3Poller{
 		numberOfWorkers:      numberOfWorkers,
