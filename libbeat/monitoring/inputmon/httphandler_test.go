@@ -47,6 +47,7 @@ var testCases = []TestCase{
 	{request: "/inputs/?pretty", status: http.StatusOK},
 	{request: "/inputs/?type", status: http.StatusBadRequest},
 	{request: "/inputs/?type=udp", status: http.StatusOK, body: `[]`},
+	{request: "/inputs/?type=FOO", status: http.StatusOK, body: `[{"gauge":13344,"id":"123abc","input":"foo"}]`},
 	{request: "/inputs/XX", status: http.StatusNotFound},
 }
 

@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -73,7 +74,7 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if requestedType != "" {
-			if typ, ok := m["input"].(string); ok && typ != requestedType {
+			if typ, ok := m["input"].(string); ok && !strings.EqualFold(typ, requestedType) {
 				continue
 			}
 		}
@@ -119,7 +120,7 @@ func getType(req *http.Request) (string, error) {
 	case "":
 		return "", errors.New(`"type" requires a non-empty value`)
 	default:
-		return typ, nil
+		return strings.ToLower(typ), nil
 	}
 }
 
