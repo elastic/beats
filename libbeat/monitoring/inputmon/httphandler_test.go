@@ -73,7 +73,7 @@ func TestHandler(t *testing.T) {
 		}
 
 		t.Run(tc.method+" "+strings.ReplaceAll(tc.request, "/", "_"), func(t *testing.T) {
-			req, err := http.NewRequestWithContext(context.TODO(), tc.method, s.URL+tc.request, nil)
+			req, err := http.NewRequestWithContext(context.Background(), tc.method, s.URL+tc.request, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
