@@ -20,7 +20,6 @@ package inputmon
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/handlers"
@@ -54,13 +53,13 @@ func attachHandler(r *mux.Router, registry *monitoring.Registry) error {
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 	requestedPretty, err := getPretty(req)
 	if err != nil {
-		serveError(w, http.StatusBadRequest, err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	requestedType, err := getType(req)
 	if err != nil {
-		serveError(w, http.StatusBadRequest, err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -94,12 +93,6 @@ func serveJSON(w http.ResponseWriter, value any, pretty bool) {
 		enc.SetIndent("", "  ")
 	}
 	_ = enc.Encode(value)
-}
-
-func serveError(w http.ResponseWriter, status int, txt string) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(status)
-	fmt.Fprintln(w, txt)
 }
 
 func getPretty(req *http.Request) (bool, error) {
@@ -146,7 +139,7 @@ func newQueryParamHandler(queryParams []string, h http.Handler) http.Handler {
 func (h queryParamHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for q := range req.URL.Query() {
 		if _, found := h.allowedParams[q]; !found {
-			serveError(w, http.StatusBadRequest, "Unknown query param "+q)
+			http.Error(w, "Unknown query param "+q, http.StatusBadRequest)
 			return
 		}
 	}
