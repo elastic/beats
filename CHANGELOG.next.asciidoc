@@ -10,6 +10,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+ - Add extra protection on gRPC server start process to avoid trying to start a nil server
+
 *Auditbeat*
 
 *Filebeat*
