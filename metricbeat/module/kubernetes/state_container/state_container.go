@@ -81,6 +81,12 @@ var (
 				OriginMetrics: []string{"cpu.request.cores"},
 				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
 			},
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "pod.memory.limit.bytes",
+				OriginMetrics: []string{"memory.limit.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
 		},
 
 		Labels: map[string]p.LabelMap{
