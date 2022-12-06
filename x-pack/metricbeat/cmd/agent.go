@@ -20,7 +20,8 @@ func metricbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo)
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
 
-	// Extract the module name from the type, usually in the form system/metric
+	// Extract the module name from the stream-level type
+	// these types are defined in the elastic-agent's specfiles
 	module := strings.Split(rawIn.Type, "/")[0]
 
 	for iter := range modules {
