@@ -38,6 +38,27 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+- Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
+- Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
+
+*Heartbeat*
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
 
 *Heartbeat*
 
