@@ -45,12 +45,10 @@ func (service *MockService) GetUsageDetails(
 	scope string,
 	expand string,
 	filter string,
-	skiptoken string,
-	top *int32,
 	metricType armconsumption.Metrictype,
 	startDate string,
 	endDate string,
 ) (armconsumption.UsageDetailsListResult, error) {
-	args := service.Called(scope, expand, filter, skiptoken, top, metricType, startDate, endDate)
+	args := service.Called(scope, expand, filter, metricType, startDate, endDate)
 	return args.Get(0).(armconsumption.UsageDetailsListResult), args.Error(1)
 }
