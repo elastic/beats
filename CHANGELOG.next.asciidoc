@@ -38,22 +38,20 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Re-enable build optimizations to reduce binary size and improve performance. {pull}33620[33620]
 - Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
 - Fix namespacing on self-monitoring {pull}32336[32336]
-- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
-- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
-- Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
 - Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
 - Support for multiline zookeeper logs {issue}2496[2496]
+- Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 
 *Auditbeat*
 
 
 *Filebeat*
 
+- Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
 - Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
 - Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
 - Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
@@ -61,15 +59,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
 - Fix splitting array of strings/arrays in httpjson input {issue}30345[30345] {pull}33609[33609]
 - Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+- Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
+- Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
 
 *Heartbeat*
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
-- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
-- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
-- Fix states client support for output options. {pull}33405[33405]
-- Fix states client reloader under managed mode. {pull}33405[33405]
 - Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+
 
 *Auditbeat*
 
@@ -96,12 +93,11 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add GCP CloudSQL region filter {pull}32943[32943]
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
-- Add tags to events based on parsed identifier. {pull}33472[33472]
-- Skip over unsupported filesystems in the system.filesystem metricset instead of failing immediately. Fix debug statement in system.fsstat metricset. {pull}33646[33646]
 - Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
 
 *Packetbeat*
 
+- Fix panic on memcache transaction with no request or response. {issue}33852[33852] {pull}33853[33853]
 
 *Winlogbeat*
 
@@ -121,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add `http.pprof` config options for enabling block and mutex profiling. {issue}33572[33572] {pull}33576[33576]
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 - Add `add_formatted_index` processor that allows the resulting index for an event to be changed based on content from the event. {pull}33800[33800]
+- deps: Updated to github.com/elastic/go-sysinfo v1.9.0. {pull}33864[33864]
 
 *Auditbeat*
 
@@ -171,6 +168,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for http+unix and http+npipe schemes in httpjson input. {issue}33571[33571] {pull}33610[33610]
 - Add support for http+unix and http+npipe schemes in cel input. {issue}33571[33571] {pull}33712[33712]
 - Add `decode_duration`, `move_fields` processors. {pull}31301[31301]
+- Add metrics for UDP packet processing. {pull}33870[33870]
 
 *Auditbeat*
 
@@ -189,6 +187,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
+- Remove GCP Compute metadata cache {pull}33655[33655]
+- Add support for multiple regions in GCP {pull}32964[32964]
+- Add GCP Redis regions support {pull}33728[33728]
 
 *Packetbeat*
 
@@ -196,6 +197,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
 - Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
 - Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
+- Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}[]
 
 *Functionbeat*
 
@@ -228,3 +230,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
+
