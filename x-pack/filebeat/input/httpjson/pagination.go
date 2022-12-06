@@ -7,7 +7,7 @@ package httpjson
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -138,7 +138,7 @@ func (iter *pageIterator) next() (*response, bool, error) {
 		return nil, false, err
 	}
 
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq) //nolint:bodyclose // Bad linter! The body is closed in the call.
+	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq)
 	if err != nil {
 		return nil, false, err
 	}
@@ -159,17 +159,20 @@ func (iter *pageIterator) next() (*response, bool, error) {
 }
 
 func (iter *pageIterator) getPage() (*response, error) {
-	bodyBytes, err := ioutil.ReadAll(iter.resp.Body)
+	bodyBytes, err := io.ReadAll(iter.resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	iter.resp.Body.Close()
-	iter.n += 1
 
 	var r response
 	r.header = iter.resp.Header
 	r.url = *iter.resp.Request.URL
+
+	// we set the page number before increasing its value
+	// because the first page needs to be 0 for every interval
 	r.page = iter.n
+	iter.n++
 
 	if len(bodyBytes) > 0 {
 		if iter.pagination.decoder != nil {

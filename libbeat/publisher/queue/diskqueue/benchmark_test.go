@@ -31,7 +31,6 @@ package diskqueue
 
 import (
 	"math/rand"
-	"os"
 	"testing"
 	"time"
 
@@ -61,7 +60,7 @@ var (
 	}
 )
 
-//makePublisherEvent creates a sample publisher.Event, using a random message from msgs list
+// makePublisherEvent creates a sample publisher.Event, using a random message from msgs list
 func makePublisherEvent() publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{
@@ -73,7 +72,7 @@ func makePublisherEvent() publisher.Event {
 	}
 }
 
-//makeMessagesEvent creates a sample *messages.Event, using a random message from msgs list
+// makeMessagesEvent creates a sample *messages.Event, using a random message from msgs list
 func makeMessagesEvent() *messages.Event {
 	return &messages.Event{
 		Timestamp: timestamppb.New(eventTime),
@@ -89,17 +88,13 @@ func makeMessagesEvent() *messages.Event {
 	}
 }
 
-//setup creates the disk queue, including a temporary directory to
+// setup creates the disk queue, including a temporary directory to
 // hold the queue.  Location of the temporary directory is stored in
 // the queue settings.  Call `cleanup` when done with the queue to
 // close the queue and remove the temp dir.
-func setup(encrypt bool, compress bool, protobuf bool) (*diskQueue, queue.Producer) {
-	dir, err := os.MkdirTemp("", "benchmark")
-	if err != nil {
-		panic(err)
-	}
+func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue, queue.Producer) {
 	s := DefaultSettings()
-	s.Path = dir
+	s.Path = b.TempDir()
 	if encrypt {
 		s.EncryptionKey = []byte("testtesttesttest")
 	}
@@ -107,21 +102,18 @@ func setup(encrypt bool, compress bool, protobuf bool) (*diskQueue, queue.Produc
 	s.UseProtobuf = protobuf
 	q, err := NewQueue(logp.L(), s)
 	if err != nil {
-		os.RemoveAll(dir)
 		panic(err)
 	}
 	p := q.Producer(queue.ProducerConfig{})
-	return q, p
-}
 
-//clean closes the queue and deletes the temporory directory that
-// holds the queue.
-func cleanup(q *diskQueue) {
-	err := q.Close()
-	os.RemoveAll(q.settings.directoryPath())
-	if err != nil {
-		panic(err)
-	}
+	b.Cleanup(func() {
+		err := q.Close()
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	return q, p
 }
 
 func publishEvents(p queue.Producer, num int, protobuf bool) {
@@ -154,7 +146,7 @@ func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 	}
 }
 
-//produceAndConsume generates and publishes events in a go routine, in
+// produceAndConsume generates and publishes events in a go routine, in
 // the main go routine it consumes and acks them.  This interleaves
 // publish and consume.
 func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, protobuf bool) error {
@@ -162,14 +154,14 @@ func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_siz
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
-//produceThenConsume generates and publishes events, when all events
+// produceThenConsume generates and publishes events, when all events
 // are published it consumes and acks them.
 func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, protobuf bool) error {
 	publishEvents(p, num_events, protobuf)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
-//benchmarkQueue is a wrapper for produceAndConsume, it tries to limit
+// benchmarkQueue is a wrapper for produceAndConsume, it tries to limit
 // timers to just produceAndConsume
 func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool, async bool, protobuf bool, b *testing.B) {
 	b.ResetTimer()
@@ -178,20 +170,17 @@ func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool,
 	for n := 0; n < b.N; n++ {
 		b.StopTimer()
 		rand.Seed(1)
-		q, p := setup(encrypt, compress, protobuf)
+		q, p := setup(b, encrypt, compress, protobuf)
 		b.StartTimer()
 		if async {
 			if err = produceAndConsume(p, q, num_events, batch_size, protobuf); err != nil {
-				cleanup(q)
 				break
 			}
 		} else {
 			if err = produceThenConsume(p, q, num_events, batch_size, protobuf); err != nil {
-				cleanup(q)
 				break
 			}
 		}
-		cleanup(q)
 	}
 	if err != nil {
 		b.Errorf("Error producing/consuming events: %v", err)

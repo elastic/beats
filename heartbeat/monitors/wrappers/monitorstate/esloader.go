@@ -18,21 +18,19 @@
 package monitorstate
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/esapi"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/heartbeat/esutil"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
-func MakeESLoader(esc *elasticsearch.Client, indexPattern string, beatLocation *config.LocationWithID) StateLoader {
+func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation *config.LocationWithID) StateLoader {
 	if indexPattern == "" {
 		// Should never happen, but if we ever make a coding error...
 		logp.L().Warn("ES state loader initialized with no index pattern, will not load states from ES")
@@ -61,25 +59,19 @@ func MakeESLoader(esc *elasticsearch.Client, indexPattern string, beatLocation *
 				"match": mapstr.M{"observer.name": sf.RunFrom.ID},
 			})
 		}
-
-		reqBody, err := json.Marshal(mapstr.M{
+		reqBody := mapstr.M{
 			"sort": mapstr.M{"@timestamp": "desc"},
 			"query": mapstr.M{
 				"bool": mapstr.M{
 					"must": queryMustClauses,
 				},
 			},
-		})
-		if err != nil {
-			return nil, fmt.Errorf("could not serialize query for state save: %w", err)
 		}
 
-		r, err := esc.Search(func(sr *esapi.SearchRequest) {
-			sr.Index = []string{indexPattern}
-			size := 1
-			sr.Size = &size
-			sr.Body = bytes.NewReader(reqBody)
-		})
+		status, body, err := esc.Request("POST", strings.Join([]string{"/", indexPattern, "/", "_search", "?size=1"}, ""), "", nil, reqBody)
+		if err != nil || status > 299 {
+			return nil, fmt.Errorf("error executing state search for %s: %w", sf.ID, err)
+		}
 
 		type stateHits struct {
 			Hits struct {
@@ -92,13 +84,8 @@ func MakeESLoader(esc *elasticsearch.Client, indexPattern string, beatLocation *
 			} `json:"hits"`
 		}
 
-		respBody, err := esutil.CheckRetResp(r, err)
-		if err != nil {
-			return nil, fmt.Errorf("error executing state search for %s: %w", sf.ID, err)
-		}
-
 		sh := stateHits{}
-		err = json.Unmarshal(respBody, &sh)
+		err = json.Unmarshal(body, &sh)
 		if err != nil {
 			return nil, fmt.Errorf("could not unmarshal state hits for %s: %w", sf.ID, err)
 		}

@@ -16,7 +16,6 @@ import (
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type cloudwatchPoller struct {
@@ -38,7 +37,7 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	awsRegion string, apiSleep time.Duration,
 	numberOfWorkers int, logStreams []*string, logStreamPrefix string) *cloudwatchPoller {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", nil)
 	}
 
 	return &cloudwatchPoller{
@@ -99,7 +98,6 @@ func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTim
 		LogGroupName: awssdk.String(logGroup),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
-		Limit:        awssdk.Int32(100),
 	}
 
 	if len(p.logStreams) > 0 {

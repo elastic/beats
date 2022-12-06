@@ -20,44 +20,41 @@ package actions
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type appendProcessor struct {
-	config appendConfig
+	config appendProcessorConfig
 	logger *logp.Logger
 }
 
-type appendConfig struct {
-	Fields            []string `config:"fields"`
-	TargetField       string   `config:"target_field"`
-	Values            []string `config:"values"`
-	IgnoreMissing     bool     `config:"ignore_missing"`
-	IgnoreEmptyValues bool     `config:"ignore_empty_values"`
-	FailOnError       bool     `config:"fail_on_error"`
-	AllowDuplicate    bool     `config:"allow_duplicate"`
+type appendProcessorConfig struct {
+	Fields            []string      `config:"fields"`
+	TargetField       string        `config:"target_field"`
+	Values            []interface{} `config:"values"`
+	IgnoreMissing     bool          `config:"ignore_missing"`
+	IgnoreEmptyValues bool          `config:"ignore_empty_values"`
+	FailOnError       bool          `config:"fail_on_error"`
+	AllowDuplicate    bool          `config:"allow_duplicate"`
 }
 
 func init() {
-	processors.RegisterPlugin("append_processor",
-		checks.ConfigChecked(NewAppend,
+	processors.RegisterPlugin("append",
+		checks.ConfigChecked(NewAppendProcessor,
 			checks.RequireFields("target_field"),
 		),
 	)
-	jsprocessor.RegisterPlugin("Append", NewAppend)
+	jsprocessor.RegisterPlugin("AppendProcessor", NewAppendProcessor)
 }
 
-// NewAppend returns a new append_processor processor.
-func NewAppend(c *conf.C) (processors.Processor, error) {
-	config := appendConfig{
+// NewAppendProcessor returns a new append processor.
+func NewAppendProcessor(c *conf.C) (processors.Processor, error) {
+	config := appendProcessorConfig{
 		IgnoreMissing:     false,
 		IgnoreEmptyValues: false,
 		FailOnError:       true,
@@ -65,12 +62,12 @@ func NewAppend(c *conf.C) (processors.Processor, error) {
 	}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unpack the configuration of append processor: %s", err)
+		return nil, fmt.Errorf("failed to unpack the configuration of append processor: %w", err)
 	}
 
 	f := &appendProcessor{
 		config: config,
-		logger: logp.NewLogger("append_processor"),
+		logger: logp.NewLogger("append"),
 	}
 	return f, nil
 }
@@ -83,11 +80,13 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 	err := f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, event)
 	if err != nil {
-		errMsg := fmt.Errorf("failed to append fields in append_processor processor: %s", err)
+		errMsg := fmt.Errorf("failed to append fields in append processor: %w", err)
 		f.logger.Debug(errMsg.Error())
 		if f.config.FailOnError {
 			event = backup
-			event.PutValue("error.message", errMsg.Error())
+			if _, err := event.PutValue("error.message", errMsg.Error()); err != nil {
+				return nil, fmt.Errorf("failed to append fields in append processor: %w", err)
+			}
 			return event, err
 		}
 	}
@@ -95,33 +94,86 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *appendProcessor) appendValues(target string, fields []string, values []string, event *beat.Event) error {
+func (f *appendProcessor) appendValues(target string, fields []string, values []interface{}, event *beat.Event) error {
 	var arr []interface{}
 
-	val, err := event.GetValue(target)
-	if err == nil {
-		return fmt.Errorf("could not fetch value for key: %s, Error: %s", target, err)
+	// get the existing value of target field
+	targetVal, err := event.GetValue(target)
+	if err != nil {
+		f.logger.Debugf("could not fetch value for key: '%s'. Therefore, all the values will be appended in a new key %s.", target, target)
+	} else {
+		targetArr, ok := targetVal.([]interface{})
+		if ok {
+			arr = append(arr, targetArr...)
+		} else {
+			arr = append(arr, targetVal)
+		}
 	}
-	arr = append(arr, val)
 
+	// append the values of all the fields listed under 'fields' section
 	for _, field := range fields {
 		val, err := event.GetValue(field)
-		if err == nil {
-			if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
-				return nil
+		if err != nil {
+			if f.config.IgnoreMissing && err.Error() == "key not found" {
+				continue
 			}
-			return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)
+			return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
 		}
-		arr = append(arr, val)
+		valArr, ok := val.([]interface{})
+		if ok {
+			arr = append(arr, valArr...)
+		} else {
+			arr = append(arr, val)
+		}
 	}
 
-	arr = append(arr, values)
+	// append all the static values from 'values' section
+	arr = append(arr, values...)
 
-	event.Delete(target)
-	event.PutValue(target, arr)
+	// remove empty strings and nil from the array
+	if f.config.IgnoreEmptyValues {
+		arr = cleanEmptyValues(arr)
+	}
+
+	// remove duplicate values from the array
+	if !f.config.AllowDuplicate {
+		arr = removeDuplicates(arr)
+	}
+
+	// replace the existing target with new array
+	if err := event.Delete(target); err != nil && !(err.Error() == "key not found") {
+		return fmt.Errorf("unable to delete the target field %s due to error: %w", target, err)
+	}
+	if _, err := event.PutValue(target, arr); err != nil {
+		return fmt.Errorf("unable to put values in the target field %s due to error: %w", target, err)
+	}
+
 	return nil
 }
 
 func (f *appendProcessor) String() string {
-	return "append_processor=" + fmt.Sprintf("%+v", f.config.Fields)
+	return "append=" + fmt.Sprintf("%+v", f.config.TargetField)
+}
+
+// this function will remove all the empty strings and nil values from the array
+func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
+	for _, val := range dirtyArr {
+		if val == "" || val == nil {
+			continue
+		}
+		cleanArr = append(cleanArr, val)
+	}
+	return cleanArr
+}
+
+// this function will remove all the duplicate values from the array
+func removeDuplicates(dirtyArr []interface{}) (cleanArr []interface{}) {
+	set := make(map[interface{}]bool, 0)
+	for _, val := range dirtyArr {
+		if _, ok := set[val]; !ok {
+			set[val] = true
+			cleanArr = append(cleanArr, val)
+		}
+	}
+	return cleanArr
 }

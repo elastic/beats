@@ -1,0 +1,23 @@
+[[add-locale]]
+=== Add formatted index
+
+++++
+<titleabbrev>add_formatted_index</titleabbrev>
+++++
+
+The `add_formatted_index` processor allows the destination index for the event to
+be changed based on a formatted string that can use values from fields defined on
+the event.
+
+For example, this configuration uses a custom field, fields.log_type, to set the index:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+  - add_formatted_index:
+      index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+-------------------------------------------------------------------------------
+
+With this configuration, all events with log_type: normal are sent to an index named
+normal-7.10.2-2022-11-18, and all events with log_type: critical are sent to an index
+named critical-7.10.2-2022-11-18.
