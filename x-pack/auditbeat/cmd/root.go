@@ -29,7 +29,7 @@ var RootCmd *cmd.BeatsRootCmd
 // auditbeatCfg is a callback registered with central management to perform any needed config transformations
 // before agent configs are sent to a beat
 func auditbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	modules, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
+	modules, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}

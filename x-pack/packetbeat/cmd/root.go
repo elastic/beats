@@ -31,7 +31,7 @@ var RootCmd *cmd.BeatsRootCmd
 // configuration generated from a raw Elastic Agent config
 func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	//grab and properly format the input streams
-	inputStreams, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
+	inputStreams, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error generating new stream config: %w", err)
 	}
