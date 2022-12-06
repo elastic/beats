@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
-// oldestEvent is a no-op on non-Windows systems.
-func oldestEvent(_ []byte, _ *sys.ByteBuffer) (winevent.Event, error) {
+// lastEvent is a no-op on non-Windows systems.
+func lastEvent(_ string, _ []byte, _ *sys.ByteBuffer) (winevent.Event, error) {
 	return winevent.Event{}, nil
 }

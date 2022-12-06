@@ -19,7 +19,6 @@ package eventlog
 
 import (
 	"expvar"
-	"io"
 	"runtime"
 	"strconv"
 	"syscall"
@@ -200,7 +199,7 @@ func newInputMetrics(name, id string, poll time.Duration) *inputMetrics {
 		out.lastRecordID = &atomic.Uint64{}
 		_ = adapter.NewGoMetrics(reg, "source_lag_count", adapter.Accept).
 			Register("histogram", metrics.NewHistogram(out.sourceLagN))
-		go out.poll(poll)
+		go out.poll(name, poll)
 	}
 
 	return out
@@ -259,7 +258,7 @@ func (m *inputMetrics) logDropped(_ error) {
 // event that has been read by the input, logging the difference to the
 // source_lag_count metric. Polling is best effort only and no metrics are logged
 // for the operations required to get the event record.
-func (m *inputMetrics) poll(each time.Duration) {
+func (m *inputMetrics) poll(name string, each time.Duration) {
 	const renderBufferSize = 1 << 14
 	var (
 		work [renderBufferSize]byte
@@ -269,17 +268,12 @@ func (m *inputMetrics) poll(each time.Duration) {
 	for {
 		select {
 		case <-t.C:
-			oldest, err := oldestEvent(work[:], buf)
+			last, err := lastEvent(name, work[:], buf)
 			if err != nil {
-				if err == io.EOF {
-					// We are up-to-date.
-					m.sourceLagN.Update(0)
-				} else {
-					m.logError(err)
-				}
+				m.logError(err)
 				continue
 			}
-			delta := int64(oldest.RecordID - m.lastRecordID.Load())
+			delta := int64(last.RecordID - m.lastRecordID.Load())
 			if delta < 0 {
 				// We have lost a race with the reader goroutine
 				// so we are completely up-to-date.
