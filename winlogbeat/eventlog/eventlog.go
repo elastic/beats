@@ -196,6 +196,7 @@ func newInputMetrics(name, id string, poll time.Duration) *inputMetrics {
 		Register("histogram", metrics.NewHistogram(out.batchPeriod))
 
 	if poll > 0 && runtime.GOOS == "windows" {
+		out.sourceLagN = metrics.NewUniformSample(15)
 		out.lastRecordID = &atomic.Uint64{}
 		_ = adapter.NewGoMetrics(reg, "source_lag_count", adapter.Accept).
 			Register("histogram", metrics.NewHistogram(out.sourceLagN))
