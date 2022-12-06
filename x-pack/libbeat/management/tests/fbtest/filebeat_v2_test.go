@@ -22,7 +22,7 @@ var expectedFBStreams = &proto.UnitExpectedConfig{
 	DataStream: &proto.DataStream{
 		Namespace: "default",
 	},
-	Type:     "logfile",
+	Type:     "log",
 	Id:       "logfile-system-default-system",
 	Name:     "system-1",
 	Revision: 1,
