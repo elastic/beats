@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -67,6 +68,7 @@ type Filebeat struct {
 	moduleRegistry *fileset.ModuleRegistry
 	pluginFactory  PluginFactory
 	done           chan struct{}
+	stopOnce       sync.Once // wraps the Stop() method
 	pipeline       beat.PipelineConnector
 }
 
@@ -431,7 +433,7 @@ func (fb *Filebeat) Stop() {
 	logp.Info("Stopping filebeat")
 
 	// Stop Filebeat
-	close(fb.done)
+	fb.stopOnce.Do(func() { close(fb.done) })
 }
 
 // Create a new pipeline loader (es client) factory
