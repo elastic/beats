@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestData(t *testing.T) {
@@ -42,7 +43,8 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	require.NoError(t, err)
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -52,13 +54,14 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		event.StringToPrint())
 
-	_, err := event.GetValue("system.process.summary")
+	_, err = event.GetValue("system.process.summary")
 	require.NoError(t, err)
 
 }
 
 func TestStateNames(t *testing.T) {
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	require.NoError(t, err)
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -81,6 +84,9 @@ func TestStateNames(t *testing.T) {
 		if key == "total" {
 			continue
 		}
+		if _, ok := val.(int); !ok {
+			continue
+		}
 		// Check to make sure the values we got actually exist
 		exists := false
 		for _, proc := range process.PidStates {
@@ -95,6 +101,15 @@ func TestStateNames(t *testing.T) {
 	}
 	assert.Equal(t, total, sum)
 
+}
+
+func TestThreads(t *testing.T) {
+	root := resolve.NewTestResolver("_meta/testdata")
+	stats, err := threadStats(root)
+	require.NoError(t, err)
+	require.Equal(t, int64(1), stats["blocked"])
+	require.Equal(t, int64(3), stats["running"])
+	t.Logf("metrics: %#v", stats)
 }
 
 func getConfig() map[string]interface{} {
