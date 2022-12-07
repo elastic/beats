@@ -61,9 +61,7 @@ func defaultConfig() config {
 	return config{
 		Config: udp.Config{
 			MaxMessageSize: 10 * humanize.KiByte,
-			// TODO: What should be default port?
 			Host: "localhost:8080",
-			// TODO: What should be the default timeout?
 			Timeout: time.Minute * 5,
 		},
 	}
@@ -93,7 +91,7 @@ func (s *server) Test(_ input.TestContext) error {
 }
 
 func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
-	log := ctx.Logger.Named("udp").With("host", s.config.Config.Host)
+	log := ctx.Logger.With("host", s.config.Config.Host)
 
 	log.Info("starting udp socket input")
 	defer log.Info("udp input stopped")
@@ -126,7 +124,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		metrics.log(data, evt.Timestamp)
 	})
 
-	log.Debugf("udp input '%v' initialized", ctx.ID)
+	log.Debug("udp input initialized")
 
 	err := server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 	// Ignore error from 'Run' in case shutdown was signaled.
