@@ -574,11 +574,11 @@ func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
 }
 
 func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
-	_, ok := mu.table[s.Name()]
+	meta, ok := mu.table[s.Name()]
 	if !ok {
-		return fmt.Errorf("no such id")
+		return fmt.Errorf("no such id [%q]", s.Name())
 	}
-	return nil
+	return typeconv.Convert(v, meta)
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
@@ -653,4 +653,75 @@ func mustPathIdentifier(renamed bool) fileIdentifier {
 		return &renamedPathIdentifier{pathIdentifier}
 	}
 	return pathIdentifier
+}
+
+func TestOnRenameIdentifierMustNotChange(t *testing.T) {
+	events := []loginp.FSEvent{
+		{
+			Op:      loginp.OpRename,
+			OldPath: "/old/path/to/file",
+			NewPath: "/new/path/to/file",
+			Info:    testFileInfo{},
+		},
+	}
+
+	p := fileProspector{
+		filewatcher:       newMockFileWatcher(events, len(events)),
+		identifier:        mustPathIdentifier(true),
+		stateChangeCloser: stateChangeCloserConfig{Renamed: true},
+	}
+	ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
+	path := "/new/path/to/file"
+	expectedIdentifier := "foo"
+	id := expectedIdentifier + "::" + path
+
+	testStore := newMockMetadataUpdater()
+	testStore.table[id] = fileMeta{Source: path, IdentifierName: expectedIdentifier}
+
+	hg := newTestHarvesterGroup()
+	p.Run(ctx, testStore, hg)
+
+	got := testStore.table[id]
+	meta := fileMeta{}
+	typeconv.Convert(&meta, got)
+
+	if meta.IdentifierName != expectedIdentifier {
+		t.Errorf("fileMeta.IdentifierName must not change, expecting: %q, got: %q", expectedIdentifier, meta.IdentifierName)
+	}
+}
+
+func TestOnRenameFindCursorMetaErrorUseProspectorIdentifier(t *testing.T) {
+	events := []loginp.FSEvent{
+		{
+			Op:      loginp.OpRename,
+			OldPath: "/old/path/to/file",
+			NewPath: "/new/path/to/file",
+			Info:    testFileInfo{},
+		},
+	}
+
+	p := fileProspector{
+		filewatcher:       newMockFileWatcher(events, len(events)),
+		identifier:        mustPathIdentifier(true),
+		stateChangeCloser: stateChangeCloserConfig{Renamed: true},
+	}
+	ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
+	path := "/new/path/to/file"
+	expectedIdentifier := "path"
+	id := expectedIdentifier + "::" + path
+
+	testStore := newMockMetadataUpdater()
+
+	hg := newTestHarvesterGroup()
+	p.Run(ctx, testStore, hg)
+
+	got := testStore.table[id]
+	meta := fileMeta{}
+	typeconv.Convert(&meta, got)
+
+	if meta.IdentifierName != expectedIdentifier {
+		t.Errorf("fileMeta.IdentifierName must not change, expecting: %q, got: %q", expectedIdentifier, meta.IdentifierName)
+	}
 }
