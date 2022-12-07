@@ -48,7 +48,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
-
+- [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}here[here]
 - Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
 - Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
 - Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
