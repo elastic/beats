@@ -31,6 +31,8 @@ func TestEventMapping(t *testing.T) {
 	//
 
 	charge := 8.123456
+	unitPrice := 1.25
+	quantity := 12.5
 
 	var props = armconsumption.LegacyUsageDetailProperties{
 		BillingAccountID:       &billingAccountId,
@@ -40,6 +42,8 @@ func TestEventMapping(t *testing.T) {
 		Cost:                   &charge,
 		InvoiceSection:         &name,
 		Product:                &name,
+		UnitPrice:              &unitPrice,
+		Quantity:               &quantity,
 	}
 	var legacy = &armconsumption.LegacyUsageDetail{
 		ID:         &ID,
