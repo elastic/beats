@@ -47,10 +47,19 @@ type UsageService struct {
 
 // NewService builds a new UsageService using the given config.
 func NewService(config azure.Config) (*UsageService, error) {
+	cloudServicesConfig := cloud.AzurePublic.Services
+
+	if config.ResourceManagerEndpoint != "" && config.ResourceManagerEndpoint != azure.DefaultBaseURI {
+		cloudServicesConfig[cloud.ResourceManager] = cloud.ServiceConfiguration{
+			Audience: config.ResourceManagerEndpoint,
+			Endpoint: config.ResourceManagerEndpoint,
+		}
+	}
+
 	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret, &azidentity.ClientSecretCredentialOptions{
 		ClientOptions: policy.ClientOptions{
 			Cloud: cloud.Configuration{
-				Services:                     cloud.AzurePublic.Services,
+				Services:                     cloudServicesConfig,
 				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 			},
 		},
@@ -62,7 +71,7 @@ func NewService(config azure.Config) (*UsageService, error) {
 	usageDetailsClient, err := armconsumption.NewUsageDetailsClient(credential, &arm.ClientOptions{
 		ClientOptions: policy.ClientOptions{
 			Cloud: cloud.Configuration{
-				Services:                     cloud.AzurePublic.Services,
+				Services:                     cloudServicesConfig,
 				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 			},
 		},
@@ -74,7 +83,7 @@ func NewService(config azure.Config) (*UsageService, error) {
 	forecastsClient, err := armcostmanagement.NewForecastClient(credential, &arm.ClientOptions{
 		ClientOptions: policy.ClientOptions{
 			Cloud: cloud.Configuration{
-				Services:                     cloud.AzurePublic.Services,
+				Services:                     cloudServicesConfig,
 				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 			},
 		},

@@ -36,11 +36,20 @@ const (
 
 // NewService instantiates the Azure monitoring service
 func NewService(config Config) (*MonitorService, error) {
+	cloudServicesConfig := cloud.AzurePublic.Services
+
+	if config.ResourceManagerEndpoint != "" && config.ResourceManagerEndpoint != DefaultBaseURI {
+		cloudServicesConfig[cloud.ResourceManager] = cloud.ServiceConfiguration{
+			Audience: config.ResourceManagerEndpoint,
+			Endpoint: config.ResourceManagerEndpoint,
+		}
+	}
+
 	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret,
 		&azidentity.ClientSecretCredentialOptions{
 			ClientOptions: policy.ClientOptions{
 				Cloud: cloud.Configuration{
-					Services:                     cloud.AzurePublic.Services,
+					Services:                     cloudServicesConfig,
 					ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 				},
 			},
@@ -52,7 +61,7 @@ func NewService(config Config) (*MonitorService, error) {
 	metricsClient, err := armmonitor.NewMetricsClient(credential, &arm.ClientOptions{
 		ClientOptions: policy.ClientOptions{
 			Cloud: cloud.Configuration{
-				Services:                     cloud.AzurePublic.Services,
+				Services:                     cloudServicesConfig,
 				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 			},
 		},
@@ -64,7 +73,7 @@ func NewService(config Config) (*MonitorService, error) {
 	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(credential, &arm.ClientOptions{
 		ClientOptions: policy.ClientOptions{
 			Cloud: cloud.Configuration{
-				Services:                     cloud.AzurePublic.Services,
+				Services:                     cloudServicesConfig,
 				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 			},
 		},
@@ -76,7 +85,7 @@ func NewService(config Config) (*MonitorService, error) {
 	resourceClient, err := armresources.NewClient(config.SubscriptionId, credential, &arm.ClientOptions{
 		ClientOptions: policy.ClientOptions{
 			Cloud: cloud.Configuration{
-				Services:                     cloud.AzurePublic.Services,
+				Services:                     cloudServicesConfig,
 				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 			},
 		},
@@ -88,7 +97,7 @@ func NewService(config Config) (*MonitorService, error) {
 	metricNamespaceClient, err := armmonitor.NewMetricNamespacesClient(credential, &arm.ClientOptions{
 		ClientOptions: policy.ClientOptions{
 			Cloud: cloud.Configuration{
-				Services:                     cloud.AzurePublic.Services,
+				Services:                     cloudServicesConfig,
 				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 			},
 		},
