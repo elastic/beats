@@ -613,11 +613,18 @@ github.com/elastic/bayeux v1.0.5 h1:UceFq01ipmT3S8DzFK+uVAkbCdiPR0Bqei8qIGmUeY0=
 github.com/elastic/bayeux v1.0.5/go.mod h1:CSI4iP7qeo5MMlkznGvYKftp8M7qqP/3nzmVZoXHY68=
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 h1:lnDkqiRFKm0rxdljqrj3lotWinO9+jFmeDXIC4gvIQs=
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3/go.mod h1:aPqzac6AYkipvp4hufTyMj5PDIphF3+At8zr7r51xjY=
+<<<<<<< HEAD
 github.com/elastic/elastic-agent-autodiscover v0.3.0 h1:kdpNnIDnVk7gvQxxR6PzZY7aM8LyMTRkwI/p+FNS17s=
 github.com/elastic/elastic-agent-autodiscover v0.3.0/go.mod h1:p3MSf9813JEnolCTD0GyVAr3+Eptg2zQ9aZVFjl4tJ4=
 github.com/elastic/elastic-agent-client/v7 v7.0.1 h1:RDiozMRkjVfsn1vZ5tc1YzRC+g4w4QTsXIOPEsVDyIY=
 github.com/elastic/elastic-agent-client/v7 v7.0.1/go.mod h1:cHviLpA5fAwMbfBIHBVNl16qp90bO7pKHMAQaG+9raU=
 github.com/elastic/elastic-agent-libs v0.2.11 h1:ZeYn35Kxt+IdtMPmE01TaDeaahCg/z7MkGPVWUo6Lp4=
+=======
+github.com/elastic/elastic-agent-autodiscover v0.5.0 h1:fiDJQKB148RsRISqqbGINtJ/ZPupeVjwn0fbPz9ZDOc=
+github.com/elastic/elastic-agent-autodiscover v0.5.0/go.mod h1:p3MSf9813JEnolCTD0GyVAr3+Eptg2zQ9aZVFjl4tJ4=
+github.com/elastic/elastic-agent-client/v7 v7.0.2-0.20221129150247-15881a8e64ef h1:+3AWaimDL826eoU06qOFBtA3xmyuTr9YUMVWvnim4mU=
+github.com/elastic/elastic-agent-client/v7 v7.0.2-0.20221129150247-15881a8e64ef/go.mod h1:cHviLpA5fAwMbfBIHBVNl16qp90bO7pKHMAQaG+9raU=
+>>>>>>> 951b244e0e (Use NamespaceAwareResourceMetaGenerator for all generic kubernetes resources (#33763))
 github.com/elastic/elastic-agent-libs v0.2.11/go.mod h1:chO3rtcLyGlKi9S0iGVZhYCzDfdDsAQYBc+ui588AFE=
 github.com/elastic/elastic-agent-shipper-client v0.4.0 h1:nsTJF9oo4RHLl+zxFUZqNHaE86C6Ba5aImfegcEf6Sk=
 github.com/elastic/elastic-agent-shipper-client v0.4.0/go.mod h1:OyI2W+Mv3JxlkEF3OeT7K0dbuxvwew8ke2Cf4HpLa9Q=

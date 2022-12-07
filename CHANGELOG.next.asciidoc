@@ -99,6 +99,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add Data Granularity option to AWS module to allow for for fewer API calls of longer periods and keep small intervals. {issue}33133[33133] {pull}33166[33166]
+- Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
+- Add per-thread metrics to system_summary {pull}33614[33614]
+- Add GCP CloudSQL metadata {pull}33066[33066]
+- Remove GCP Compute metadata cache {pull}33655[33655]
+- Add support for multiple regions in GCP {pull}32964[32964]
+- Add GCP Redis regions support {pull}33728[33728]
+- Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 
 *Packetbeat*
 
