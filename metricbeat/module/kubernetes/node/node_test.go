@@ -27,8 +27,10 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/assert"
 )
 
 // this file is used for the tests to compare expected result
@@ -53,11 +55,18 @@ func (s *NodeTestSuite) ReadTestFile(testFile string) []byte {
 	return body
 }
 
+//=======
+//	events, err := eventMapping(body, &prometheus.MetricsMapping{})
+//	assert.NoError(t, err, "error mapping "+testFile)
+//	assert.Equal(t, len(events), 1)
+//>>>>>>> 99ddfa11c9 (chore(): new k8s node metrics refs MONITOR-4095)
+
 func (s *NodeTestSuite) TestEventMapping() {
 	body := s.ReadTestFile(testFile)
-	event, err := eventMapping(body, s.Logger)
-
-	s.basicTests(event, err)
+	events, err := eventMapping(body, s.Logger, &prometheus.MetricsMapping{})
+	assert.NoError(s.T(), err, "error mapping "+testFile)
+	assert.Equal(s.T(), len(events), 1)
+	s.basicTests(events[0], err)
 }
 
 func (s *NodeTestSuite) testValue(event mapstr.M, field string, expected interface{}) {

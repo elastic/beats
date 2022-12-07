@@ -99,6 +99,18 @@ var (
 				OriginMetrics: []string{"status.restarts"},
 				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
 			},
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "node.cpu.request.cores",
+				OriginMetrics: []string{"pod.cpu.request.cores"},
+				GroupKeys:     []string{"_module.node.name"},
+			},
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "node.memory.request.bytes",
+				OriginMetrics: []string{"pod.memory.request.bytes"},
+				GroupKeys:     []string{"_module.node.name"},
+			},
 		},
 
 		Labels: map[string]p.LabelMap{

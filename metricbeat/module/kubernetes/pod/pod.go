@@ -19,8 +19,9 @@ package pod
 
 import (
 	"fmt"
-
 	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/helper/easyops"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -39,6 +40,17 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	mapping = &prometheus.MetricsMapping{
+		AggregateMetrics: []easyops.AggregateMetricMap{
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "node.cpu.usage.pct",
+				OriginMetrics: []string{"cpu.usage.node.pct"},
+				GroupKeys:     []string{"_module.node.name"},
+			},
+		},
+	}
 )
 
 // init registers the MetricSet with the central registry.
@@ -95,7 +107,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger())
+	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger(), mapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
