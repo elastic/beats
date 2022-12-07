@@ -5,6 +5,7 @@
 package cel
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -59,7 +60,7 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, err = newProgram(c.Program, root, client, nil, patterns)
+	_, err = newProgram(context.Background(), c.Program, root, client, nil, patterns)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
