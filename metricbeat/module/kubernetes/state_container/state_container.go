@@ -79,13 +79,13 @@ var (
 				Type:          easyops.AggregateTypeSum,
 				Field:         "pod.cpu.request.cores",
 				OriginMetrics: []string{"cpu.request.cores"},
-				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name", "_module.node.name"},
 			},
 			{
 				Type:          easyops.AggregateTypeSum,
 				Field:         "pod.memory.request.bytes",
 				OriginMetrics: []string{"memory.request.bytes"},
-				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name", "_module.node.name"},
 			},
 			{
 				Type:          easyops.AggregateTypeSum,
