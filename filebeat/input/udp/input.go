@@ -61,8 +61,8 @@ func defaultConfig() config {
 	return config{
 		Config: udp.Config{
 			MaxMessageSize: 10 * humanize.KiByte,
-			Host: "localhost:8080",
-			Timeout: time.Minute * 5,
+			Host:           "localhost:8080",
+			Timeout:        time.Minute * 5,
 		},
 	}
 }
