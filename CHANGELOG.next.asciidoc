@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
 - Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
 - Fix input cancellation handling when HTTP client does not support contexts. {issue}33962[33962] {pull}33968[33968]
+- Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
 
 *Heartbeat*
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
