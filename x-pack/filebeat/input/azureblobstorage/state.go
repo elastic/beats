@@ -57,11 +57,7 @@ func (s *state) save(name string, lastModifiedOn time.Time) {
 // savePartial, partially saves/updates the current state for cursor checkpoint
 func (s *state) savePartial(name string, offset int64, lastModifiedOn *time.Time) {
 	s.mu.Lock()
-	if _, ok := s.cp.PartiallyProcessed[name]; !ok {
-		s.cp.PartiallyProcessed[name] = offset
-	} else {
-		s.cp.PartiallyProcessed[name] = offset
-	}
+	s.cp.PartiallyProcessed[name] = offset
 	s.mu.Unlock()
 }
 
