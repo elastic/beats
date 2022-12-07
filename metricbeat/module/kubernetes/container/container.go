@@ -68,6 +68,12 @@ var (
 				OriginMetrics: []string{"cpu.usage.node.pct"},
 				GroupKeys:     []string{"_module.node.name"},
 			},
+			{
+				Type:          easyops.AggregateTypeSum,
+				Field:         "pod.rootfs.used.bytes",
+				OriginMetrics: []string{"rootfs.used.bytes"},
+				GroupKeys:     []string{"_module.namespace", "_module.pod.name"},
+			},
 		},
 	}
 
