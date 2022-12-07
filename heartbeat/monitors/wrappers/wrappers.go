@@ -396,7 +396,7 @@ func addBrowserSummary(sf stdfields.StdMonitorFields, match EventMatcher) jobs.J
 
 			up, down := 1, 0
 			if monitorstate.StateStatus(status.(string)) == monitorstate.StatusDown {
-				down, up = up, down
+				up, down = 0, 1
 			}
 
 			eventext.MergeEventFields(event, mapstr.M{
