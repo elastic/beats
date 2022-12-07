@@ -5,8 +5,13 @@
 package azureblobstorage
 
 import (
+	"bufio"
 	"bytes"
+	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"time"
@@ -25,6 +30,8 @@ type job struct {
 	client    *azblob.BlobClient
 	blob      *azblob.BlobItemInternal
 	blobURL   string
+	hash      string
+	offset    int64
 	state     *state
 	src       *Source
 	publisher cursor.Publisher
@@ -39,6 +46,7 @@ func newJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL st
 		client:    client,
 		blob:      blob,
 		blobURL:   blobURL,
+		hash:      azureObjectHash(src, blob),
 		state:     state,
 		src:       src,
 		publisher: publisher,
@@ -50,21 +58,11 @@ func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
 
 	if allowedContentTypes[*j.blob.Properties.ContentType] {
-		data, err := j.extractData(ctx)
+		err := j.processAndPublishData(ctx, id)
 		if err != nil {
 			j.log.Errorf(jobErrString, id, err)
 			return
 		}
-
-		reader := io.NopCloser(bytes.NewReader(data.Bytes()))
-		defer func() {
-			err = reader.Close()
-			if err != nil {
-				j.log.Errorf("failed to close io reader with error: %w", err)
-			}
-		}()
-
-		fields = j.createEventFields(data.String())
 
 	} else {
 		err := fmt.Errorf("job with jobId %s encountered an error: content-type %s not supported", id, *j.blob.Properties.ContentType)
@@ -74,19 +72,16 @@ func (j *job) do(ctx context.Context, id string) {
 				"kind": "publish_error",
 			},
 		}
+		event := beat.Event{
+			Timestamp: time.Now(),
+			Fields:    fields,
+		}
+		event.SetID(objectID(j.hash, 0))
+		j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
+		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
+			j.log.Errorf(jobErrString, id, err)
+		}
 	}
-
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields:    fields,
-	}
-	event.SetID(id)
-
-	j.state.save(*j.blob.Name, j.blob.Properties.LastModified)
-	if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
-		j.log.Errorf(jobErrString, id, err)
-	}
-
 }
 
 func (j *job) name() string {
@@ -97,15 +92,14 @@ func (j *job) timestamp() *time.Time {
 	return j.blob.Properties.LastModified
 }
 
-func (j *job) extractData(ctx context.Context) (*bytes.Buffer, error) {
+func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	var err error
 
-	get, err := j.client.Download(ctx, nil)
+	get, err := j.client.Download(ctx, &azblob.BlobDownloadOptions{Offset: &j.offset})
 	if err != nil {
-		return nil, fmt.Errorf("failed to download data from blob with error: %w", err)
+		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
 
-	downloadedData := &bytes.Buffer{}
 	reader := get.Body(&azblob.RetryReaderOptions{})
 	defer func() {
 		err = reader.Close()
@@ -114,38 +108,120 @@ func (j *job) extractData(ctx context.Context) (*bytes.Buffer, error) {
 		}
 	}()
 
-	_, err = downloadedData.ReadFrom(reader)
+	updatedReader, err := j.addGzipDecoderIfNeeded(reader)
+	err = j.readJsonAndPublish(ctx, updatedReader, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read data from blob with error: %w", err)
+		return fmt.Errorf("failed to read data from blob with error: %w", err)
 	}
 
-	return downloadedData, err
+	return err
 }
 
-func (j *job) createEventFields(message string) mapstr.M {
-	return mapstr.M{
-		"message": message, // original stringified data
-		"log": mapstr.M{
-			"file": mapstr.M{
-				"path": j.blobURL,
-			},
-		},
-		"azure": mapstr.M{
-			"storage": mapstr.M{
-				"container": mapstr.M{
-					"name": j.src.ContainerName,
+func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
+	dec := json.NewDecoder(r)
+	dec.UseNumber()
+	var offset int64
+	for dec.More() && ctx.Err() == nil {
+		var item json.RawMessage
+		offset = dec.InputOffset()
+		if err := dec.Decode(&item); err != nil {
+			return fmt.Errorf("failed to decode json: %w", err)
+		}
+
+		data, err := item.MarshalJSON()
+		if err != nil {
+			return err
+		}
+		evt := j.createEvent(string(data), offset)
+		// updates the offset after reading the file
+		// this avoids duplicates for the last read when resuming operation
+		offset = dec.InputOffset()
+		if !dec.More() {
+			// if this is the last object, then peform a complete state save
+			j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
+		} else {
+			// partially saves read state using offset
+			j.state.savePartial(*j.blob.Name, offset, j.blob.Properties.LastModified)
+		}
+		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
+			j.log.Errorf(jobErrString, id, err)
+		}
+	}
+	return nil
+}
+
+func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
+	bufReader := bufio.NewReader(body)
+
+	gzipped, err := isStreamGzipped(bufReader)
+	if err != nil {
+		return nil, err
+	}
+	if !gzipped {
+		return bufReader, nil
+	}
+
+	return gzip.NewReader(bufReader)
+}
+
+func (j *job) createEvent(message string, offset int64) beat.Event {
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields: mapstr.M{
+			"message": message,
+			"log": mapstr.M{
+				"offset": offset,
+				"file": mapstr.M{
+					"path": j.blobURL,
 				},
-				"blob": mapstr.M{
-					"name":         j.blob.Name,
-					"content_type": j.blob.Properties.ContentType,
+			},
+			"azure": mapstr.M{
+				"storage": mapstr.M{
+					"container": mapstr.M{
+						"name": j.src.ContainerName,
+					},
+					"blob": mapstr.M{
+						"name":         j.blob.Name,
+						"content_type": j.blob.Properties.ContentType,
+					},
 				},
 			},
-		},
-		"cloud": mapstr.M{
-			"provider": "azure",
-		},
-		"event": mapstr.M{
-			"kind": "publish_data",
+			"cloud": mapstr.M{
+				"provider": "azure",
+			},
+			"event": mapstr.M{
+				"kind": "publish_data",
+			},
 		},
 	}
+	event.SetID(objectID(j.hash, offset))
+
+	return event
+}
+
+func objectID(objectHash string, offset int64) string {
+	return fmt.Sprintf("%s-%012d", objectHash, offset)
+}
+
+// azureObjectHash returns a short sha256 hash of the container name + blob name.
+func azureObjectHash(src *Source, blob *azblob.BlobItemInternal) string {
+	h := sha256.New()
+	h.Write([]byte(src.ContainerName))
+	h.Write([]byte((*blob.Name)))
+	prefix := hex.EncodeToString(h.Sum(nil))
+	return prefix[:10]
+}
+
+// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents gzipped content or not. A buffered reader is used so the function can peek into the byte
+// stream without consuming it. This makes it convenient for code executed after this function call
+// to consume the stream if it wants.
+func isStreamGzipped(r *bufio.Reader) (bool, error) {
+	buf, err := r.Peek(3)
+	if err != nil && err != io.EOF {
+		return false, err
+	}
+
+	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
+	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
 }

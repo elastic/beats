@@ -27,7 +27,9 @@ func (s *Source) Name() string {
 const (
 	sharedKeyType        string = "sharedKeyType"
 	connectionStringType string = "connectionStringType"
-	json                 string = "application/json"
+	jsonType             string = "application/json"
+	octetType            string = "application/octet-stream"
+	ndJsonType           string = "application/x-ndjson"
 )
 
 // currently only shared key & connection string types of credentials are supported
@@ -44,5 +46,7 @@ type blobCredentials struct {
 }
 
 var allowedContentTypes = map[string]bool{
-	json: true,
+	jsonType:   true,
+	octetType:  true,
+	ndJsonType: true,
 }

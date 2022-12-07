@@ -28,7 +28,7 @@ even though it can get expensive with dealing with a very large number of files.
     describing said error.
 
 [id="supported-types"]
-NOTE: Currently only `JSON` is supported with respect to blob/file formats. As for authentication types, we currently have support for 
+NOTE: Currently only `JSON, NDJSON & JSON.GZ` are supported with respect to blob/file formats. As for authentication types, we currently have support for 
 `shared access keys` and `connection strings`.
 
 [id="basic-config"]
@@ -92,6 +92,7 @@ processing a certain number of files, decided by the `maximum available workers`
         "type": "azure-blob-storage"
     },
     "log": {
+        "offset": 200,
         "file": {
             "path": "https://beatsblobstorage1.blob.core.windows.net/beatscontainer/data_3.json"
         }
