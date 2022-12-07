@@ -175,18 +175,21 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 		log.Info("process repeated request")
 		var waitUntil time.Time
 		for {
-			// We have a special-case wait for when we have a zero limit.
-			// x/time/rate allow a burst through even when the limit is zero
-			// so in order to ensure that we don't try until we are out of
-			// purgatory we calculate how long we should wait according to
-			// the retry after for a 429 and rate limit headers if we have
-			// a zero rate quota. See handleResponse below.
 			if wait := time.Until(waitUntil); wait > 0 {
+				// We have a special-case wait for when we have a zero limit.
+				// x/time/rate allow a burst through even when the limit is zero
+				// so in order to ensure that we don't try until we are out of
+				// purgatory we calculate how long we should wait according to
+				// the retry after for a 429 and rate limit headers if we have
+				// a zero rate quota. See handleResponse below.
 				select {
 				case <-ctx.Done():
 					return ctx.Err()
 				case <-time.After(wait):
 				}
+			} else if err = ctx.Err(); err != nil {
+				// Otherwise exit if we have been cancelled.
+				return err
 			}
 
 			// Process a set of event requests.
@@ -804,14 +807,12 @@ func newProgram(src, root string, client *http.Client, limiter *rate.Limiter, pa
 
 func evalWith(ctx context.Context, prg cel.Program, input map[string]interface{}) (map[string]interface{}, error) {
 	out, _, err := prg.ContextEval(ctx, input)
+	if e := ctx.Err(); e != nil {
+		err = e
+	}
 	if err != nil {
 		input["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed eval: %v", err)}
 		return input, fmt.Errorf("failed eval: %w", err)
-	}
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	default:
 	}
 
 	v, err := out.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
