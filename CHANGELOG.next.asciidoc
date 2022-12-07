@@ -59,6 +59,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix Google workspace pagination and document ID generation. {pull}33666[33666]
 - Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
 - Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
+- Fix input cancellation handling when HTTP client does not support contexts. {issue}33962[33962] {pull}33968[33968]
+- Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
 
 *Heartbeat*
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
@@ -168,6 +170,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for http+unix and http+npipe schemes in cel input. {issue}33571[33571] {pull}33712[33712]
 - Add `decode_duration`, `move_fields` processors. {pull}31301[31301]
 - Add metrics for UDP packet processing. {pull}33870[33870]
+- Convert UDP input to v2 input. {pull}33930[33930]
 
 *Auditbeat*
 
@@ -189,6 +192,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Remove GCP Compute metadata cache {pull}33655[33655]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add GCP Redis regions support {pull}33728[33728]
+- Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 
 *Packetbeat*
 
