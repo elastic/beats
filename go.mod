@@ -196,8 +196,35 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.2.11
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
+=======
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
+	github.com/Azure/go-autorest/autorest/adal v0.9.14
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
+	github.com/aws/smithy-go v1.12.0
+	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
+	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/elastic-agent-autodiscover v0.5.0
+	github.com/elastic/elastic-agent-libs v0.2.15
+	github.com/elastic/elastic-agent-shipper-client v0.4.0
+	github.com/elastic/elastic-agent-system-metrics v0.4.5-0.20220927192933-25a985b07d51
+	github.com/elastic/go-elasticsearch/v8 v8.2.0
+	github.com/elastic/mito v0.0.0-20221207004749-2f0f2875e464
+	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
+	github.com/google/cel-go v0.12.5
+	github.com/googleapis/gax-go/v2 v2.5.1
+	github.com/pierrec/lz4/v4 v4.1.15
+	github.com/shirou/gopsutil/v3 v3.21.12
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
+	go.elastic.co/apm/v2 v2.0.0
+	go.mongodb.org/mongo-driver v1.5.1
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+>>>>>>> 951b244e0e (Use NamespaceAwareResourceMetaGenerator for all generic kubernetes resources (#33763))
 )
 
 require (
