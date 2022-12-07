@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for http+unix and http+npipe schemes in cel input. {issue}33571[33571] {pull}33712[33712]
 - Add `decode_duration`, `move_fields` processors. {pull}31301[31301]
 - Add metrics for UDP packet processing. {pull}33870[33870]
+- Convert UDP input to v2 input. {pull}33930[33930]
 
 *Auditbeat*
 
