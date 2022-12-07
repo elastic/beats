@@ -104,6 +104,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix panic in FormatEventString that was observed on Windows 2022 hosts. {pull}34005[34005]
+
 
 *Functionbeat*
 

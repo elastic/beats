@@ -68,7 +68,7 @@ func TestWinEventLog(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer Close(h) //nolint:errcheck // This is just a resource release.
+				defer h.Close() //nolint:errcheck // This is just a resource release.
 			})
 
 			t.Run("EvtQuery", func(t *testing.T) {
@@ -76,7 +76,7 @@ func TestWinEventLog(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer Close(h) //nolint:errcheck // This is just a resource release.
+				defer h.Close() //nolint:errcheck // This is just a resource release.
 			})
 
 			t.Run("ReadEvtx", func(t *testing.T) {
@@ -85,10 +85,9 @@ func TestWinEventLog(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer Close(h) //nolint:errcheck // This is just a resource release.
+				defer h.Close() //nolint:errcheck // This is just a resource release.
 
 				// Get handles to events.
-				buf := make([]byte, 32*1024)
 				var out io.Writer
 				if *updateXML {
 					f, err := os.Create(xmlPath)
@@ -113,10 +112,10 @@ func TestWinEventLog(t *testing.T) {
 
 					// Read events.
 					for _, h := range handles {
-						if err = RenderEventXML(h, buf, out); err != nil {
+						if err = RenderEventXML(h, out); err != nil {
 							t.Fatal(err)
 						}
-						Close(h) //nolint:errcheck // This is just a resource release.
+						h.Close() //nolint:errcheck // This is just a resource release.
 						fmt.Fprintln(out)
 						count++
 					}

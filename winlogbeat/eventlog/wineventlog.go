@@ -174,7 +174,6 @@ type winEventLog struct {
 
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
 	message   func(event win.EvtHandle) (string, error)      // Message fallback function.
-	renderBuf []byte                                         // Buffer used for rendering event.
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
 
@@ -189,22 +188,22 @@ func (l *winEventLog) Name() string {
 }
 
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
-	var bookmark win.EvtHandle
-	var err error
-	if len(state.Bookmark) > 0 {
-		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
-	} else if state.RecordNumber > 0 && l.channelName != "" {
-		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
+	xml := state.Bookmark
+	if xml == "" {
+		xml = fmt.Sprintf(`<BookmarkList><Bookmark Channel="%s" RecordId="%d" `+
+			`IsCurrent="True"/></BookmarkList>`, l.channelName, state.RecordNumber)
 	}
+
+	bookmark, err := win.NewBookmarkFromXML(state.Bookmark)
 	if err != nil {
 		return err
 	}
-	defer win.Close(bookmark)
+	defer bookmark.Close()
 
 	if l.file {
-		return l.openFile(state, bookmark)
+		return l.openFile(state, win.EvtHandle(bookmark))
 	}
-	return l.openChannel(bookmark)
+	return l.openChannel(win.EvtHandle(bookmark))
 }
 
 func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
@@ -297,7 +296,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 	}
 	defer func() {
 		for _, h := range handles {
-			win.Close(h)
+			h.Close()
 		}
 	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
@@ -306,14 +305,6 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
-		var bufErr sys.InsufficientBufferError
-		if errors.As(err, &bufErr) {
-			detailf("%s Increasing render buffer size to %d", l.logPrefix,
-				bufErr.RequiredSize)
-			l.renderBuf = make([]byte, bufErr.RequiredSize)
-			l.outputBuf.Reset()
-			err = l.render(h, l.outputBuf)
-		}
 		if err != nil && l.outputBuf.Len() == 0 {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
 			incrementMetric(dropReasons, err)
@@ -346,7 +337,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
-	return win.Close(l.subscription)
+	return l.subscription.Close()
 }
 
 func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
@@ -529,7 +520,7 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	}
 
 	freeHandle := func(handle uintptr) error {
-		return win.Close(win.EvtHandle(handle))
+		return win.EvtHandle(handle).Close()
 	}
 
 	if filepath.IsAbs(c.Name) {
@@ -543,7 +534,6 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		channelName:  c.Name,
 		file:         filepath.IsAbs(c.Name),
 		maxRead:      c.BatchReadSize,
-		renderBuf:    make([]byte, renderBufferSize),
 		outputBuf:    sys.NewByteBuffer(renderBufferSize),
 		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
 		winMetaCache: newWinMetaCache(metaTTL),
@@ -557,27 +547,26 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	case c.Forwarded == nil && c.Name == "ForwardedEvents",
 		c.Forwarded != nil && *c.Forwarded:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEventXML(event, l.renderBuf, out)
+			return win.RenderEventXML(event, out)
 		}
 	default:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
+			return win.RenderEvent(event, c.EventLanguage, l.cache.get, out)
 		}
 	}
 	l.message = func(event win.EvtHandle) (string, error) {
-		return win.Message(event, l.renderBuf, l.cache.get)
+		return win.Message(event, l.cache.get)
 	}
 
 	return l, nil
 }
 
 func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
-	bmHandle, err := win.CreateBookmarkFromEvent(evtHandle)
+	bookmark, err := win.NewBookmarkFromEvent(evtHandle)
 	if err != nil {
 		return "", err
 	}
-	l.outputBuf.Reset()
-	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
-	win.Close(bmHandle)
-	return string(l.outputBuf.Bytes()), err
+	defer bookmark.Close()
+
+	return bookmark.XML()
 }
