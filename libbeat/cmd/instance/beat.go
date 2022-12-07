@@ -387,8 +387,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer svc.NotifyTermination()
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
-	// sharing same data path.
-
+	// sharing same data path. This is disabled under elastic-agent.
 	if !fleetmode.Enabled() {
 		bl := locks.New(b.Info)
 		err := bl.Lock()
