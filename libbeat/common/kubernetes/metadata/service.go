@@ -78,7 +78,7 @@ func (s *service) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) com
 	}
 	svcMap := GenerateMap(selectors, s.resource.config.LabelsDedot)
 	if len(svcMap) != 0 {
-		safemapstr.Put(out, "selectors", svcMap)
+		_ = safemapstr.Put(out, "selectors", svcMap)
 	}
 
 	return out
