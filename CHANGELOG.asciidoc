@@ -20,6 +20,122 @@ https://github.com/elastic/beats/compare/v8.5.2\...v8.5.3[View commits]
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
 
+==== Known issues
+
+*Heartbeat*
+
+Airgapped users of the beta Elastic Synthetics Integration package and beta private locations in Uptime Monitor Management may observe that `observer.geo.name` is not indexed with their heartbeat documents, resulting in location data missing from the Uptime app.
+
+This issue does not impact clusters with external network access. This issue will be fixed in the next release. 
+
+Suggested resolution: Manually add custom ingest pipelines to the synthetics-* data streams. The instructions provided below assume `manage_pipeline` cluster privilege.
+
+Execute the following request in Kibana `Dev Tools`
+
+[source,json]
+--
+PUT _ingest/pipeline/synthetics-browser.screenshot@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/synthetics-browser.network@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/synthetics-browser@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/synthetics-http@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+
+PUT _ingest/pipeline/synthetics-tcp@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/synthetics-icmp@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+--
+
+Check that each request is acknowledged
+
+[source,json]
+----
+{
+  "acknowledged": true
+}
+----
+
+After navigating back to Uptime, you should now see the appropriate location name for your monitor.
 
 [[release-notes-8.5.2]]
 === Beats version 8.5.2
