@@ -195,8 +195,8 @@ The period after which to log the internal metrics. The default is 30s.
 ==== `logging.metrics.namespaces`
 
 A list of metrics namespaces to report in the logs. Defaults to `[stats]`.
-`stats` contains general Beat metrics. `dataset` may be present in some
-Beats and contains module or input metrics.
+`stats` contains general Beat metrics. `dataset` and `inputs` may be present in
+some Beats and contains module or input metrics.
 
 ifndef::serverless[]
 [float]
