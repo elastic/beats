@@ -28,7 +28,9 @@ Airgapped users of the beta Elastic Synthetics Integration package and beta priv
 
 This issue does not impact clusters with external network access. This issue will be fixed in the next release. 
 
-Suggested resolution: Manually add custom ingest pipelines to the synthetics-* data streams. The instructions provided below assume `manage_pipeline` cluster privilege.
+Suggested resolution: Manually add custom ingest pipelines to the synthetics-* data streams. 
+
+NOTE: The instructions provided below assume `manage_pipeline` cluster privilege.
 
 Execute the following request in Kibana `Dev Tools`
 
