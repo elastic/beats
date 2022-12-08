@@ -104,6 +104,9 @@ endif::[]
 ifndef::no_rename_processor[]
 * <<rename-fields,`rename`>>
 endif::[]
+ifndef::no_replace_processor[]
+* <<replace-fields,`replace`>>
+endif::[]
 ifndef::no_script_processor[]
 * <<processor-script,`script`>>
 endif::[]
@@ -230,6 +233,9 @@ include::{libbeat-processors-dir}/registered_domain/docs/registered_domain.ascii
 endif::[]
 ifndef::no_rename_processor[]
 include::{libbeat-processors-dir}/actions/docs/rename.asciidoc[]
+endif::[]
+ifndef::no_replace_processor[]
+include::{libbeat-processors-dir}/actions/docs/replace.asciidoc[]
 endif::[]
 ifndef::no_script_processor[]
 include::{libbeat-processors-dir}/script/docs/script.asciidoc[]

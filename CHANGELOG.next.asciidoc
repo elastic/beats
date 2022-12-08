@@ -16,7 +16,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
 
 *Heartbeat*
 
@@ -43,16 +42,10 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
 
 *Heartbeat*
 
-- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
-- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
-- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
-- Fix states client support for output options. {pull}33405[33405]
-- Fix states client reloader under managed mode. {pull}33405[33405]
-- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
-- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
 
 *Auditbeat*
 
@@ -142,6 +135,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
