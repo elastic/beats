@@ -19,7 +19,6 @@ package eventlog
 
 import (
 	"expvar"
-	"runtime"
 	"strconv"
 	"syscall"
 	"time"
@@ -27,10 +26,8 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic" // TODO: Replace with sync/atomic when go1.19 is supported.
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -147,16 +144,11 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 	}
 }
 
-// defaultLagPolling is the default polling period for inputMetrics.sourceLagN.
-const defaultLagPolling = time.Minute
-
 // inputMetrics handles event log metric reporting.
 type inputMetrics struct {
 	unregister func()
-	done       chan struct{}
 
-	lastBatch    time.Time
-	lastRecordID *atomic.Uint64
+	lastBatch time.Time
 
 	name        *monitoring.String // name of the provider being read
 	events      *monitoring.Uint   // total number of events received
@@ -164,21 +156,18 @@ type inputMetrics struct {
 	errors      *monitoring.Uint   // total number of errors
 	batchSize   metrics.Sample     // histogram of the number of events in each non-zero batch
 	sourceLag   metrics.Sample     // histogram of the difference between timestamped event's creation and reading
-	sourceLagN  metrics.Sample     // histogram of difference between the consumer's log offset and the producer's log offset
 	batchPeriod metrics.Sample     // histogram of the elapsed time between non-zero batch reads
 }
 
 // newInputMetrics returns an input metric for windows event logs. If id is empty
-// a nil inputMetric is returned. The ID delta between OS events and read events
-// will be polled each poll duration.
-func newInputMetrics(name, id string, poll time.Duration) *inputMetrics {
+// a nil inputMetric is returned.
+func newInputMetrics(name, id string) *inputMetrics {
 	if id == "" {
 		return nil
 	}
 	reg, unreg := inputmon.NewInputRegistry(name, id, nil)
 	out := &inputMetrics{
 		unregister:  unreg,
-		done:        make(chan struct{}),
 		name:        monitoring.NewString(reg, "provider"),
 		events:      monitoring.NewUint(reg, "received_events_total"),
 		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
@@ -194,14 +183,6 @@ func newInputMetrics(name, id string, poll time.Duration) *inputMetrics {
 		Register("histogram", metrics.NewHistogram(out.sourceLag))
 	_ = adapter.NewGoMetrics(reg, "batch_read_period", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchPeriod))
-
-	if poll > 0 && runtime.GOOS == "windows" {
-		out.sourceLagN = metrics.NewUniformSample(15)
-		out.lastRecordID = &atomic.Uint64{}
-		_ = adapter.NewGoMetrics(reg, "source_lag_count", adapter.Accept).
-			Register("histogram", metrics.NewHistogram(out.sourceLagN))
-		go out.poll(name, poll)
-	}
 
 	return out
 }
@@ -220,9 +201,6 @@ func (m *inputMetrics) log(batch []Record) {
 		m.batchPeriod.Update(now.Sub(m.lastBatch).Nanoseconds())
 	}
 	m.lastBatch = now
-	if m.lastRecordID != nil {
-		m.lastRecordID.Store(batch[len(batch)-1].RecordID)
-	}
 
 	m.events.Add(uint64(len(batch)))
 	m.batchSize.Update(int64(len(batch)))
@@ -254,47 +232,9 @@ func (m *inputMetrics) logDropped(_ error) {
 	m.dropped.Inc()
 }
 
-// poll gets the oldest event held in the system event log each time.Duration
-// and logs the difference between its record ID and the record ID of the oldest
-// event that has been read by the input, logging the difference to the
-// source_lag_count metric. Polling is best effort only and no metrics are logged
-// for the operations required to get the event record.
-func (m *inputMetrics) poll(name string, each time.Duration) {
-	const renderBufferSize = 1 << 14
-	var (
-		work [renderBufferSize]byte
-		buf  = sys.NewByteBuffer(renderBufferSize)
-	)
-	t := time.NewTicker(each)
-	for {
-		select {
-		case <-t.C:
-			last, err := lastEvent(name, work[:], buf)
-			if err != nil {
-				m.logError(err)
-				continue
-			}
-			delta := int64(last.RecordID - m.lastRecordID.Load())
-			if delta < 0 {
-				// We have lost a race with the reader goroutine
-				// so we are completely up-to-date.
-				delta = 0
-			}
-			m.sourceLagN.Update(delta)
-		case <-m.done:
-			t.Stop()
-			return
-		}
-	}
-}
-
 func (m *inputMetrics) close() {
 	if m == nil {
 		return
-	}
-	if m.lastRecordID != nil {
-		// Shut down poller and wait until done before unregistering metrics.
-		m.done <- struct{}{}
 	}
 	m.unregister()
 }

@@ -241,12 +241,6 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		c.Name = filepath.Clean(c.Name)
 	}
 
-	forwarded := (c.Forwarded == nil && c.Name == "ForwardedEvents") || (c.Forwarded != nil && *c.Forwarded)
-
-	var poll time.Duration
-	if !forwarded {
-		poll = defaultLagPolling
-	}
 	l := &winEventLog{
 		id:           id,
 		config:       c,
@@ -259,17 +253,19 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
 		winMetaCache: newWinMetaCache(metaTTL),
 		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
-		metrics:      newInputMetrics(c.Name, id, poll),
+		metrics:      newInputMetrics(c.Name, id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more
 	// efficient and does not attempt to use local message files for rendering
 	// the event's message.
-	if forwarded {
+	switch {
+	case c.Forwarded == nil && c.Name == "ForwardedEvents",
+		c.Forwarded != nil && *c.Forwarded:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEventXML(event, l.renderBuf, out)
 		}
-	} else {
+	default:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
