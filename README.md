@@ -20,3 +20,4 @@ Provided packages:
 * `github.com/elastic/elastic-agent-libs/testing` Testing helpers for network communication and outputs.
 * `github.com/elastic/elastic-agent-libs/transport/tlscommon` TLS configuration and validation, CA pinning, etc.
 * `github.com/elastic/elastic-agent-libs/transport` Dialers for testing, TLS, etc.
+* `github.com/elastic/elastic-agent-libs/loader` Helpers for loading a main elastic-agent config file.
