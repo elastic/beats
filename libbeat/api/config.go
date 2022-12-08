@@ -28,14 +28,12 @@ type Config struct {
 	SecurityDescriptor string `config:"named_pipe.security_descriptor"`
 }
 
-var (
-	// DefaultConfig is the default configuration used by the API endpoint.
-	DefaultConfig = Config{
-		Enabled: false,
-		Host:    "localhost",
-		Port:    5066,
-	}
-)
+// DefaultConfig is the default configuration used by the API endpoint.
+var DefaultConfig = Config{
+	Enabled: false,
+	Host:    "localhost",
+	Port:    5066,
+}
 
 // File mode for the socket file, owner of the process can do everything, member of the group can read.
-const socketFileMode = os.FileMode(0740)
+const socketFileMode = os.FileMode(0o740)
