@@ -212,7 +212,7 @@ func (cm *BeatV2Manager) setMainUnitValue(unit *client.Unit) {
 	cm.unitsMut.Lock()
 	defer cm.unitsMut.Unlock()
 	if cm.mainUnit == "" {
-		cm.logger.Debugf("Set main input unit to ID %s", unit.ID)
+		cm.logger.Debugf("Set main input unit to ID %s", unit.ID())
 		cm.mainUnit = unit.ID()
 	}
 }
@@ -332,7 +332,10 @@ func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
 // Handle the updated config for an output unit
 func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
-	cm.logger.Debugf("Got Output unit config %s", rawConfig.GetId())
+	if rawConfig == nil {
+		cm.logger.Warnf("got output update with no config, ignoring")
+	}
+	cm.logger.Debugf("Got Output unit config '%s'", rawConfig.GetId())
 
 	reloadConfig, err := groupByOutputs(rawConfig)
 	if err != nil {
@@ -361,6 +364,9 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 // handle the updated config for an input unit
 func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
+	if rawConfig == nil {
+		cm.logger.Warnf("got input update with no config, ignoring")
+	}
 	cm.setMainUnitValue(unit)
 	cm.logger.Debugf("Got Input unit config %s", rawConfig.GetId())
 
