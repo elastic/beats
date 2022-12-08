@@ -31,6 +31,7 @@ const (
 	octetType            = "application/octet-stream"
 	ndJsonType           = "application/x-ndjson"
 	gzType               = "application/x-gzip"
+	encodingGzip         = "gzip"
 )
 
 // currently only shared key & connection string types of credentials are supported

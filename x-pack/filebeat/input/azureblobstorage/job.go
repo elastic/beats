@@ -27,15 +27,16 @@ import (
 const jobErrString = "job with jobId %s encountered an error: %w"
 
 type job struct {
-	client    *azblob.BlobClient
-	blob      *azblob.BlobItemInternal
-	blobURL   string
-	hash      string
-	offset    int64
-	state     *state
-	src       *Source
-	publisher cursor.Publisher
-	log       *logp.Logger
+	client       *azblob.BlobClient
+	blob         *azblob.BlobItemInternal
+	blobURL      string
+	hash         string
+	offset       int64
+	isCompressed bool
+	state        *state
+	src          *Source
+	publisher    cursor.Publisher
+	log          *logp.Logger
 }
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
@@ -67,6 +68,9 @@ func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
 
 	if allowedContentTypes[*j.blob.Properties.ContentType] {
+		if *j.blob.Properties.ContentType == gzType || *j.blob.Properties.ContentEncoding == encodingGzip {
+			j.isCompressed = true
+		}
 		err := j.processAndPublishData(ctx, id)
 		if err != nil {
 			j.log.Errorf(jobErrString, id, err)
@@ -103,8 +107,12 @@ func (j *job) timestamp() *time.Time {
 
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	var err error
+	downloadOptions := &azblob.BlobDownloadOptions{}
+	if !j.isCompressed {
+		downloadOptions.Offset = &j.offset
+	}
 
-	get, err := j.client.Download(ctx, &azblob.BlobDownloadOptions{})
+	get, err := j.client.Download(ctx, downloadOptions)
 	if err != nil {
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
@@ -156,13 +164,21 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 	var offset int64
+	var relativeOffset int64
+	// uncompressed files use the client to directly set the offset, this
+	// in turn causes the offset to reset to 0 for the new stream, hence why
+	// we need to keep relative offsets to keep track of the actual offset
+	if !j.isCompressed {
+		relativeOffset = j.offset
+	}
 	for dec.More() && ctx.Err() == nil {
 		var item json.RawMessage
 		offset = dec.InputOffset()
 		if err := dec.Decode(&item); err != nil {
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
-		if offset < j.offset {
+		// manually seek offset only if file is compressed
+		if j.isCompressed && offset < j.offset {
 			continue
 		}
 
@@ -170,7 +186,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		if err != nil {
 			return err
 		}
-		evt := j.createEvent(string(data), offset)
+		evt := j.createEvent(string(data), offset+relativeOffset)
 		// updates the offset after reading the file
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
@@ -179,7 +195,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
 		} else {
 			// partially saves read state using offset
-			j.state.savePartial(*j.blob.Name, offset, j.blob.Properties.LastModified)
+			j.state.savePartial(*j.blob.Name, offset+relativeOffset, j.blob.Properties.LastModified)
 		}
 		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
 			j.log.Errorf(jobErrString, id, err)

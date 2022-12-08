@@ -204,7 +204,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 
 	// in a senario where there are some jobs which have a later time stamp
 	// but lesser alphanumeric order and some jobs have greater alphanumeric order
-	// than the current checkpoint
+	// than the current checkpoint or partially completed jobs are present
 	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
 		jobsToReturn = append(latestJobs, jobsToReturn...)
 	}
