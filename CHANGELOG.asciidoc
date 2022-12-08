@@ -7,26 +7,6 @@
 === Beats version 7.17.8
 https://github.com/elastic/beats/compare/v7.17.7\...v7.17.8[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
 
 ==== Bugfixes
 
@@ -34,15 +14,9 @@ https://github.com/elastic/beats/compare/v7.17.7\...v7.17.8[View commits]
 
 - Re-enable build optimizations to reduce binary size and improve performance. {pull}33620[33620]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Fix Google workspace pagination and document ID generation. {pull}33666[33666]
-
-*Heartbeat*
-
 
 *Metricbeat*
 
@@ -52,20 +26,11 @@ https://github.com/elastic/beats/compare/v7.17.7\...v7.17.8[View commits]
 
 - Fix panic on memcache transaction with no request or response. {issue}33852[33852] {pull}33853[33853]
 
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
 *Affecting all Beats*
 
 - Beats will now attempt to recover if a lockfile has not been removed {pull}[33169]
-
 
 *Auditbeat*
 
@@ -101,68 +66,10 @@ https://github.com/elastic/beats/compare/v7.17.7\...v7.17.8[View commits]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
 - Cloud Foundry input uses server-side filtering when retrieving logs. {pull}33456[33456]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
 *Metricbeat*
 
 - Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
 - Azure Billing: switch to Cost Management API for forecast data {pull}32589[32589]
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 [[release-notes-7.17.7]]
