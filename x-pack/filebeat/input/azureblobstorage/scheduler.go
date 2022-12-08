@@ -179,9 +179,9 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	ignore := false
 
 	for _, job := range jobs {
-		switch {
-		case isJobPartial(s.state, job):
-			job.offset = s.state.cp.PartiallyProcessed[*job.blob.Name]
+		switch offset, isPartial := s.state.cp.PartiallyProcessed[*job.blob.Name]; {
+		case isPartial:
+			job.offset = offset
 			latestJobs = append(latestJobs, job)
 		case job.timestamp().After(s.state.checkpoint().LatestEntryTime):
 			latestJobs = append(latestJobs, job)
@@ -210,9 +210,4 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	}
 
 	return jobsToReturn
-}
-
-func isJobPartial(state *state, job *job) bool {
-	_, ok := state.cp.PartiallyProcessed[*job.blob.Name]
-	return ok
 }

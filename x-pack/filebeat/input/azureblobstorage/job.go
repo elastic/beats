@@ -54,6 +54,15 @@ func newJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL st
 	}
 }
 
+// azureObjectHash returns a short sha256 hash of the container name + blob name.
+func azureObjectHash(src *Source, blob *azblob.BlobItemInternal) string {
+	h := sha256.New()
+	h.Write([]byte(src.ContainerName))
+	h.Write([]byte((*blob.Name)))
+	prefix := hex.EncodeToString(h.Sum(nil))
+	return prefix[:10]
+}
+
 func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
 
@@ -95,7 +104,7 @@ func (j *job) timestamp() *time.Time {
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	var err error
 
-	get, err := j.client.Download(ctx, &azblob.BlobDownloadOptions{Offset: &j.offset})
+	get, err := j.client.Download(ctx, &azblob.BlobDownloadOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
@@ -117,6 +126,32 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	return err
 }
 
+// addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents gzipped content or not and adds gzipped decoder if needed. A buffered reader is used
+// so the function can peek into the byte  stream without consuming it. This makes it convenient for
+// code executed after this function call to consume the stream if it wants.
+func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
+	bufReader := bufio.NewReader(body)
+	isStreamGzipped := false
+	// check if stream is gziped or not
+	buf, err := bufReader.Peek(3)
+	if err != nil {
+		if err == io.EOF {
+			err = nil
+		}
+		return bufReader, err
+	}
+
+	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
+	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
+
+	if !isStreamGzipped {
+		return bufReader, nil
+	}
+
+	return gzip.NewReader(bufReader)
+}
+
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
@@ -126,6 +161,9 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		offset = dec.InputOffset()
 		if err := dec.Decode(&item); err != nil {
 			return fmt.Errorf("failed to decode json: %w", err)
+		}
+		if offset < j.offset {
+			continue
 		}
 
 		data, err := item.MarshalJSON()
@@ -148,20 +186,6 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		}
 	}
 	return nil
-}
-
-func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
-	bufReader := bufio.NewReader(body)
-
-	gzipped, err := isStreamGzipped(bufReader)
-	if err != nil {
-		return nil, err
-	}
-	if !gzipped {
-		return bufReader, nil
-	}
-
-	return gzip.NewReader(bufReader)
 }
 
 func (j *job) createEvent(message string, offset int64) beat.Event {
@@ -201,27 +225,4 @@ func (j *job) createEvent(message string, offset int64) beat.Event {
 
 func objectID(objectHash string, offset int64) string {
 	return fmt.Sprintf("%s-%012d", objectHash, offset)
-}
-
-// azureObjectHash returns a short sha256 hash of the container name + blob name.
-func azureObjectHash(src *Source, blob *azblob.BlobItemInternal) string {
-	h := sha256.New()
-	h.Write([]byte(src.ContainerName))
-	h.Write([]byte((*blob.Name)))
-	prefix := hex.EncodeToString(h.Sum(nil))
-	return prefix[:10]
-}
-
-// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not. A buffered reader is used so the function can peek into the byte
-// stream without consuming it. This makes it convenient for code executed after this function call
-// to consume the stream if it wants.
-func isStreamGzipped(r *bufio.Reader) (bool, error) {
-	buf, err := r.Peek(3)
-	if err != nil && err != io.EOF {
-		return false, err
-	}
-
-	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
 }

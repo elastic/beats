@@ -25,11 +25,12 @@ func (s *Source) Name() string {
 }
 
 const (
-	sharedKeyType        string = "sharedKeyType"
-	connectionStringType string = "connectionStringType"
-	jsonType             string = "application/json"
-	octetType            string = "application/octet-stream"
-	ndJsonType           string = "application/x-ndjson"
+	sharedKeyType        = "sharedKeyType"
+	connectionStringType = "connectionStringType"
+	jsonType             = "application/json"
+	octetType            = "application/octet-stream"
+	ndJsonType           = "application/x-ndjson"
+	gzType               = "application/x-gzip"
 )
 
 // currently only shared key & connection string types of credentials are supported
@@ -49,4 +50,5 @@ var allowedContentTypes = map[string]bool{
 	jsonType:   true,
 	octetType:  true,
 	ndJsonType: true,
+	gzType:     true,
 }
