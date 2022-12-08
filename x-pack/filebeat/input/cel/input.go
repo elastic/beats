@@ -529,10 +529,14 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 					waitUntil = t
 				}
 			}
-			fallthrough
-		default:
-			delete(state, "events")
 			return false, waitUntil, nil
+		default:
+			status := http.StatusText(statusCode)
+			if status == "" {
+				status = "unknown status code"
+			}
+			state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed http request with %s: %d", status, statusCode)}
+			return true, time.Time{}, nil
 		}
 	}
 	return true, waitUntil, nil
