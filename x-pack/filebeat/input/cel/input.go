@@ -535,7 +535,7 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 			if status == "" {
 				status = "unknown status code"
 			}
-			state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed http request with %s: %d", status, statusCode)}
+			state["events"] = errorMessage(fmt.Sprintf("failed http request with %s: %d", status, statusCode))
 			return true, time.Time{}, nil
 		}
 	}
@@ -853,27 +853,31 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 		err = e
 	}
 	if err != nil {
-		state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed eval: %v", err)}
+		state["events"] = errorMessage(fmt.Sprintf("failed eval: %v", err))
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
 	v, err := out.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
 	if err != nil {
-		state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed proto conversion: %v", err)}
+		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
 		return state, fmt.Errorf("failed proto conversion: %w", err)
 	}
 	b, err := protojson.MarshalOptions{Indent: ""}.Marshal(v.(proto.Message))
 	if err != nil {
-		state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed native conversion: %v", err)}
+		state["events"] = errorMessage(fmt.Sprintf("failed native conversion: %v", err))
 		return state, fmt.Errorf("failed native conversion: %w", err)
 	}
 	var res map[string]interface{}
 	err = json.Unmarshal(b, &res)
 	if err != nil {
-		state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed json conversion: %v", err)}
+		state["events"] = errorMessage(fmt.Sprintf("failed json conversion: %v", err))
 		return state, fmt.Errorf("failed json conversion: %w", err)
 	}
 	return res, nil
+}
+
+func errorMessage(msg string) map[string]interface{} {
+	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.
