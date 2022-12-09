@@ -44,19 +44,20 @@ func (builder *divMetricBuilder) div(events []common.MapStr, originMetric []stri
 	var floatResult float64 = 0
 MetricLoop:
 	for index, metric := range originMetric {
+		metricSum := 0.0
 		for _, event := range events {
 			value, err := event.GetValue(metric)
 			if err == nil {
-				val := ConvertNumericValue(value)
-				if index == 0 {
-					floatResult = val
-				} else if val != 0 {
-					floatResult /= val
-				} else {
-					floatResult = math.MaxFloat64
-					break MetricLoop
-				}
+				metricSum += ConvertNumericValue(value)
 			}
+		}
+		if index == 0 {
+			floatResult = metricSum
+		} else if metricSum != 0 {
+			floatResult /= metricSum
+		} else {
+			floatResult = math.MaxFloat64
+			break MetricLoop
 		}
 	}
 	return floatResult
