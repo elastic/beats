@@ -1,0 +1,17 @@
+- name: ingest.pipeline
+  type: group
+  release: beta
+  fields:
+    - name: name
+      type: wildcard
+    - name: total
+      type: group
+      fields:
+        - name: count
+          type: long
+        - name: failed
+          type: long
+        - name: total_cpu_time
+          type: long
+        - name: self_cpu_time
+          type: long

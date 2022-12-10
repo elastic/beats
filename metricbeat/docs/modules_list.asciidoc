@@ -98,12 +98,13 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-dropwizard,Dropwizard>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>>   
 |<<metricbeat-module-elasticsearch,Elasticsearch>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.11+| .11+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
+.12+| .12+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
 |<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>   
 |<<metricbeat-metricset-elasticsearch-enrich,enrich>>   
 |<<metricbeat-metricset-elasticsearch-index,index>>   
 |<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>   
 |<<metricbeat-metricset-elasticsearch-index_summary,index_summary>>   
+|<<metricbeat-metricset-elasticsearch-ingest,ingest>> beta[]  
 |<<metricbeat-metricset-elasticsearch-ml_job,ml_job>>   
 |<<metricbeat-metricset-elasticsearch-node,node>>   
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>>   

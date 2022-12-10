@@ -1,0 +1,1 @@
+This is the ingest metricset of the module elasticsearch.

@@ -59,6 +59,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_summary"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ingest"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"

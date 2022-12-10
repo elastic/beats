@@ -49,6 +49,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"ccr",
 		"enrich",
 		"cluster_stats",
+		"ingest",
 		"index",
 		"index_recovery",
 		"index_summary",

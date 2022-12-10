@@ -97,6 +97,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-index_summary,index_summary>>
 
+* <<metricbeat-metricset-elasticsearch-ingest,ingest>>
+
 * <<metricbeat-metricset-elasticsearch-ml_job,ml_job>>
 
 * <<metricbeat-metricset-elasticsearch-node,node>>
@@ -118,6 +120,8 @@ include::elasticsearch/index.asciidoc[]
 include::elasticsearch/index_recovery.asciidoc[]
 
 include::elasticsearch/index_summary.asciidoc[]
+
+include::elasticsearch/ingest.asciidoc[]
 
 include::elasticsearch/ml_job.asciidoc[]
 

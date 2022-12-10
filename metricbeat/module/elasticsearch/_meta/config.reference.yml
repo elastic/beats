@@ -5,6 +5,7 @@
     #- index
     #- index_recovery
     #- index_summary
+    #- ingest
     #- shard
     #- ml_job
   period: 10s
