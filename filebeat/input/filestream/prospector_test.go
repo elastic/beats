@@ -655,73 +655,69 @@ func mustPathIdentifier(renamed bool) fileIdentifier {
 	return pathIdentifier
 }
 
-func TestOnRenameIdentifierMustNotChange(t *testing.T) {
-	events := []loginp.FSEvent{
-		{
-			Op:      loginp.OpRename,
-			OldPath: "/old/path/to/file",
-			NewPath: "/new/path/to/file",
-			Info:    testFileInfo{},
+func TestOnRenameFileIdentity(t *testing.T) {
+	testCases := map[string]struct {
+		identifier    string
+		events        []loginp.FSEvent
+		populateStore bool
+		errMsg        string
+	}{
+		"identifier name from meta is kept": {
+			identifier:    "foo",
+			errMsg:        "must be the same as in the registry",
+			populateStore: true,
+			events: []loginp.FSEvent{
+				{
+					Op:      loginp.OpRename,
+					OldPath: "/old/path/to/file",
+					NewPath: "/new/path/to/file",
+					Info:    testFileInfo{},
+				},
+			},
+		},
+		"identifier from prospector is used": {
+			identifier:    "path",
+			errMsg:        "must come from prospector configuration",
+			populateStore: false,
+			events: []loginp.FSEvent{
+				{
+					Op:      loginp.OpRename,
+					OldPath: "/old/path/to/file",
+					NewPath: "/new/path/to/file",
+					Info:    testFileInfo{},
+				},
+			},
 		},
 	}
 
-	p := fileProspector{
-		filewatcher:       newMockFileWatcher(events, len(events)),
-		identifier:        mustPathIdentifier(true),
-		stateChangeCloser: stateChangeCloserConfig{Renamed: true},
-	}
-	ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+	for k, tc := range testCases {
+		t.Run(k, func(t *testing.T) {
+			p := fileProspector{
+				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
+				identifier:        mustPathIdentifier(true),
+				stateChangeCloser: stateChangeCloserConfig{Renamed: true},
+			}
+			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
-	path := "/new/path/to/file"
-	expectedIdentifier := "foo"
-	id := expectedIdentifier + "::" + path
+			path := "/new/path/to/file"
+			expectedIdentifier := tc.identifier
+			id := "path" + "::" + path
 
-	testStore := newMockMetadataUpdater()
-	testStore.table[id] = fileMeta{Source: path, IdentifierName: expectedIdentifier}
+			testStore := newMockMetadataUpdater()
+			if tc.populateStore {
+				testStore.table[id] = fileMeta{Source: path, IdentifierName: expectedIdentifier}
+			}
 
-	hg := newTestHarvesterGroup()
-	p.Run(ctx, testStore, hg)
+			hg := newTestHarvesterGroup()
+			p.Run(ctx, testStore, hg)
 
-	got := testStore.table[id]
-	meta := fileMeta{}
-	typeconv.Convert(&meta, got)
+			got := testStore.table[id]
+			meta := fileMeta{}
+			typeconv.Convert(&meta, got)
 
-	if meta.IdentifierName != expectedIdentifier {
-		t.Errorf("fileMeta.IdentifierName must not change, expecting: %q, got: %q", expectedIdentifier, meta.IdentifierName)
-	}
-}
-
-func TestOnRenameFindCursorMetaErrorUseProspectorIdentifier(t *testing.T) {
-	events := []loginp.FSEvent{
-		{
-			Op:      loginp.OpRename,
-			OldPath: "/old/path/to/file",
-			NewPath: "/new/path/to/file",
-			Info:    testFileInfo{},
-		},
-	}
-
-	p := fileProspector{
-		filewatcher:       newMockFileWatcher(events, len(events)),
-		identifier:        mustPathIdentifier(true),
-		stateChangeCloser: stateChangeCloserConfig{Renamed: true},
-	}
-	ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
-
-	path := "/new/path/to/file"
-	expectedIdentifier := "path"
-	id := expectedIdentifier + "::" + path
-
-	testStore := newMockMetadataUpdater()
-
-	hg := newTestHarvesterGroup()
-	p.Run(ctx, testStore, hg)
-
-	got := testStore.table[id]
-	meta := fileMeta{}
-	typeconv.Convert(&meta, got)
-
-	if meta.IdentifierName != expectedIdentifier {
-		t.Errorf("fileMeta.IdentifierName must not change, expecting: %q, got: %q", expectedIdentifier, meta.IdentifierName)
+			if meta.IdentifierName != expectedIdentifier {
+				t.Errorf("fileMeta.IdentifierName %s, expecting: %q, got: %q", tc.errMsg, expectedIdentifier, meta.IdentifierName)
+			}
+		})
 	}
 }
