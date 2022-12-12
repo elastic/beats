@@ -28,7 +28,7 @@ even though it can get expensive with dealing with a very large number of files.
     describing said error.
 
 [id="supported-types"]
-NOTE: Currently only `JSON`, `NDJSON` are supported with respect to blob/file formats. Blobs/files may be also be gzip compressed.
+NOTE: NOTE: Currently only `JSON` and `NDJSON` are supported blob/file formats. Blobs/files may be also be gzip compressed.
 As for authentication types, we currently have support for `shared access keys` and `connection strings`.
 
 [id="basic-config"]
