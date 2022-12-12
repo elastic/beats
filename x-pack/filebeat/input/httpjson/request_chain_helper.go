@@ -17,20 +17,22 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 const (
-	lastResponse  = "last_response"
+	// This is generally updated with chain responses, if present, as they continue to occur
+	// Otherwise this is always the last response of the root request w.r.t pagination
+	lastResponse = "last_response"
+	// This is always the first root response
 	firstResponse = "first_response"
+	// This is always the last response of the parent (root) request w.r.t pagination
+	// This is only set if chaining is used
+	parentLastResponse = "parent_last_response"
 )
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := requestCfg.Transport.Client(
-		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
-	)
+	netHTTPClient, err := requestCfg.Transport.Client(clientOptions(requestCfg.URL.URL)...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,9 +100,18 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 func fetchValueFromContext(trCtx *transformContext, expression string) (string, bool, error) {
 	var val interface{}
 
-	switch keys := strings.Split(expression, "."); keys[0] {
+	switch keys := processExpression(expression); keys[0] {
 	case lastResponse:
-		respMap, err := responseToMap(trCtx.lastResponse, true)
+		respMap, err := responseToMap(trCtx.lastResponse)
+		if err != nil {
+			return "", false, err
+		}
+		val, err = iterateRecursive(respMap, keys[1:], 0)
+		if err != nil {
+			return "", false, err
+		}
+	case parentLastResponse:
+		respMap, err := responseToMap(trCtx.parentTrCtx.lastResponse)
 		if err != nil {
 			return "", false, err
 		}
@@ -110,7 +121,7 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 		}
 	case firstResponse:
 		// since first response body is already a map, we do not need to transform it
-		respMap, err := responseToMap(trCtx.firstResponse, false)
+		respMap, err := responseToMap(trCtx.firstResponse)
 		if err != nil {
 			return "", false, err
 		}
@@ -118,14 +129,17 @@ func fetchValueFromContext(trCtx *transformContext, expression string) (string, 
 		if err != nil {
 			return "", false, err
 		}
+	// In this scenario we treat the expression as a hardcoded value, with which we will replace the fixed-pattern
+	case expression:
+		return expression, true, nil
 	default:
-		return "", false, fmt.Errorf("context value not supported: %q in %q", keys[0], expression)
+		return "", false, fmt.Errorf("context value not supported for key: %q in expression %q", keys[0], expression)
 	}
 
 	return fmt.Sprint(val), true, nil
 }
 
-func responseToMap(r *response, mapBody bool) (mapstr.M, error) {
+func responseToMap(r *response) (mapstr.M, error) {
 	if r.body == nil {
 		return nil, fmt.Errorf("response body is empty for request url: %s", &r.url)
 	}
@@ -139,16 +153,7 @@ func responseToMap(r *response, mapBody bool) (mapstr.M, error) {
 			key: value,
 		}
 	}
-	if mapBody {
-		var bodyMap mapstr.M
-		err := json.Unmarshal(r.body.([]byte), &bodyMap)
-		if err != nil {
-			return nil, err
-		}
-		respMap["body"] = bodyMap
-	} else {
-		respMap["body"] = r.body
-	}
+	respMap["body"] = r.body
 
 	return respMap, nil
 }
@@ -157,7 +162,7 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 	val := m[keys[depth]]
 
 	if val == nil {
-		return nil, fmt.Errorf("value of expression could not be determined for %s", strings.Join(keys[:depth+1], "."))
+		return nil, fmt.Errorf("value of expression could not be determined for key %s", strings.Join(keys[:depth+1], "."))
 	}
 
 	switch v := reflect.ValueOf(val); v.Kind() {
@@ -172,7 +177,7 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 	case reflect.String:
 		return v.String(), nil
 	case reflect.Map:
-		nextMap, ok := v.Interface().(mapstr.M)
+		nextMap, ok := v.Interface().(map[string]interface{})
 		if !ok {
 			return nil, errors.New("unable to parse the value of the given expression")
 		}
@@ -183,6 +188,24 @@ func iterateRecursive(m mapstr.M, keys []string, depth int) (interface{}, error)
 		return iterateRecursive(nextMap, keys, depth)
 	default:
 		return nil, fmt.Errorf("unable to parse the value of the expression %s: type %T is not handled", strings.Join(keys[:depth+1], "."), val)
+	}
+}
+
+// processExpression, splits the expression string based on the separator and looks for
+// supported keywords. If present, returns an expression array containing separated elements.
+// If no keywords are present, the expression is treated as a hardcoded value and returned
+// as a merged string which is the only array element.
+func processExpression(expression string) []string {
+	if !strings.HasPrefix(expression, ".") {
+		return []string{expression}
+	}
+	switch {
+	case strings.HasPrefix(expression, "."+firstResponse+"."),
+		strings.HasPrefix(expression, "."+lastResponse+"."),
+		strings.HasPrefix(expression, "."+parentLastResponse+"."):
+		return strings.Split(expression, ".")[1:]
+	default:
+		return []string{expression}
 	}
 }
 

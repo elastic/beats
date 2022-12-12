@@ -7,7 +7,7 @@ package httpjson
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -38,7 +38,7 @@ func TestInput(t *testing.T) {
 				"interval":       1,
 				"request.method": http.MethodGet,
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -49,7 +49,7 @@ func TestInput(t *testing.T) {
 				"request.method":                http.MethodGet,
 				"request.ssl.verification_mode": "none",
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -85,7 +85,7 @@ func TestInput(t *testing.T) {
 					"test": "abc",
 				},
 			},
-			handler:  defaultHandler(http.MethodPost, `{"test":"abc"}`),
+			handler:  defaultHandler(http.MethodPost, `{"test":"abc"}`, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -95,7 +95,7 @@ func TestInput(t *testing.T) {
 				"interval":       "100ms",
 				"request.method": http.MethodPost,
 			},
-			handler: defaultHandler(http.MethodPost, ""),
+			handler: defaultHandler(http.MethodPost, "", ""),
 			expected: []string{
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
@@ -111,7 +111,7 @@ func TestInput(t *testing.T) {
 					"target": "body.hello",
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
@@ -125,11 +125,38 @@ func TestInput(t *testing.T) {
 					"keep_parent": true,
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"hello":{"space":[{"cake":"pumpkin"}]}}`,
 			},
+		},
+		{
+			name:        "Test split on empty array without ignore_empty_value",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target": "body.response.empty",
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", `{"response":{"empty":[]}}`),
+			expected: []string{`{"response":{"empty":[]}}`},
+		},
+		{
+			name:        "Test split on empty array with ignore_empty_value",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target":             "body.response.empty",
+					"ignore_empty_value": true,
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", `{"response":{"empty":[]}}`),
+			expected: nil,
 		},
 		{
 			name:        "Test nested split",
@@ -145,7 +172,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"world":"moon"}`,
 				`{"space":{"cake":"pumpkin"}}`,
@@ -161,7 +188,7 @@ func TestInput(t *testing.T) {
 					"target": "body.unknown",
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{},
 		},
 		{
@@ -366,7 +393,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodPost, `{"bar":"foo","url":{"path":"/test-path"}}`),
+			handler:  defaultHandler(http.MethodPost, `{"bar":"foo","url":{"path":"/test-path"}}`, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -399,7 +426,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -417,7 +444,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -457,7 +484,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -532,7 +559,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, ""),
+			handler:  defaultHandler(http.MethodGet, "", ""),
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
@@ -554,7 +581,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"hello":{"space":[{"cake":"pumpkin"}]}}`,
@@ -585,7 +612,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"world":"moon"}`,
 				`{"space":{"cake":"pumpkin"}}`,
@@ -615,7 +642,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
+			handler: defaultHandler(http.MethodGet, "", ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"space":{"cake":"pumpkin"}}`,
@@ -656,15 +683,388 @@ func TestInput(t *testing.T) {
 						"step": map[string]interface{}{
 							"request.method": http.MethodGet,
 							"replace":        "$.files[:].id",
-							"replace_with":   "$.exportId,first_response.body.exportId",
+							"replace_with":   "$.exportId,.first_response.body.exportId",
 						},
 					},
 				},
 			},
-			handler: defaultHandler(http.MethodGet, ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test replace_with clause with hardcoded value_1",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/2212/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,2212",
+						},
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test replace_with clause with hardcoded value (no dot prefix)",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/first_response.body.id/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/first_response.body.id/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,first_response.body.id",
+						},
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test replace_with clause with hardcoded value (more than one dot prefix)",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/..first_response.body.id/1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/..first_response.body.id/2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,..first_response.body.id",
+						},
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test replace_with clause with hardcoded value containing '.' (dots)",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"files":[{"id":"1"},{"id":"2"}]}`)
+					case "/.xyz.2212.abc./1":
+						fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+					case "/.xyz.2212.abc./2":
+						fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,.xyz.2212.abc.",
+						},
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
+		},
+		{
+			name: "Test global transform context separation with parent_last_response object",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				var serverURL string
+				registerPaginationTransforms()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212", "nextLink":"%s/link1"}`, serverURL)
+					case "/link1":
+						fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213"}`)
+					case "/2212/1":
+						matchBody(w, r, `{"exportId":"2212"}`, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						matchBody(w, r, `{"exportId":"2212"}`, `{"space":{"cake":"pumpkin"}}`)
+					case "/2213/3":
+						matchBody(w, r, `{"exportId":"2213"}`, `{"hello":{"cake":"pumpkin"}}`)
+					case "/2213/4":
+						matchBody(w, r, `{"exportId":"2213"}`, `{"space":{"world":"moon"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				serverURL = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":                            1,
+				"request.method":                      http.MethodPost,
+				"response.request_body_on_pagination": true,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodPost,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,.parent_last_response.body.exportId",
+							"request.transforms": []interface{}{
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.exportId",
+										"value":  "[[ .parent_last_response.body.exportId ]]",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+				`{"hello":{"cake":"pumpkin"}}`,
+				`{"space":{"world":"moon"}}`,
+			},
+		},
+		{
+			name: "Test if cursor value is updated for root response with chaining & pagination",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				var serverURL string
+				registerPaginationTransforms()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212", "createdAt":"22/02/2022", 
+						"nextLink":"%s/link1"}`, serverURL)
+					case "/link1":
+						fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213", "createdAt":"24/04/2022"}`)
+					case "/2212/1":
+						matchBody(w, r, `{"createdAt":"22/02/2022","exportId":"2212"}`, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						matchBody(w, r, `{"createdAt":"22/02/2022","exportId":"2212"}`, `{"space":{"cake":"pumpkin"}}`)
+					case "/2213/3":
+						matchBody(w, r, `{"createdAt":"24/04/2022","exportId":"2213"}`, `{"hello":{"cake":"pumpkin"}}`)
+					case "/2213/4":
+						matchBody(w, r, `{"createdAt":"24/04/2022","exportId":"2213"}`, `{"space":{"world":"moon"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				serverURL = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":                            1,
+				"request.method":                      http.MethodPost,
+				"response.request_body_on_pagination": true,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodPost,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,.parent_last_response.body.exportId",
+							"request.transforms": []interface{}{
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.exportId",
+										"value":  "[[ .parent_last_response.body.exportId ]]",
+									},
+								},
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.createdAt",
+										"value":  "[[ .cursor.last_published_login ]]",
+									},
+								},
+							},
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"last_published_login": map[string]interface{}{
+						"value": "[[ .last_event.createdAt ]]",
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+				`{"hello":{"cake":"pumpkin"}}`,
+				`{"space":{"world":"moon"}}`,
+			},
+		},
+		{
+			name: "Test if cursor value is updated for root response with chaining & pagination along with split operator",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				var serverURL string
+				registerPaginationTransforms()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212","time":[{"timeStamp":"22/02/2022"}], 
+						"nextLink":"%s/link1"}`, serverURL)
+					case "/link1":
+						fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213","time":[{"timeStamp":"24/04/2022"}]}`)
+					case "/2212/1":
+						matchBody(w, r, `{"createdAt":"22/02/2022","exportId":"2212"}`, `{"hello":{"world":"moon"}}`)
+					case "/2212/2":
+						matchBody(w, r, `{"createdAt":"22/02/2022","exportId":"2212"}`, `{"space":{"cake":"pumpkin"}}`)
+					case "/2213/3":
+						matchBody(w, r, `{"createdAt":"24/04/2022","exportId":"2213"}`, `{"hello":{"cake":"pumpkin"}}`)
+					case "/2213/4":
+						matchBody(w, r, `{"createdAt":"24/04/2022","exportId":"2213"}`, `{"space":{"world":"moon"}}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				serverURL = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.files[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":                            1,
+				"request.method":                      http.MethodPost,
+				"response.request_body_on_pagination": true,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"response.split": map[string]interface{}{
+					"target":      "body.time",
+					"type":        "array",
+					"keep_parent": true,
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodPost,
+							"replace":        "$.files[:].id",
+							"replace_with":   "$.exportId,.parent_last_response.body.exportId",
+							"request.transforms": []interface{}{
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.exportId",
+										"value":  "[[ .parent_last_response.body.exportId ]]",
+									},
+								},
+								map[string]interface{}{
+									"set": map[string]interface{}{
+										"target": "body.createdAt",
+										"value":  "[[ .cursor.last_published_login ]]",
+									},
+								},
+							},
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"last_published_login": map[string]interface{}{
+						"value": "[[ .last_event.time.timeStamp ]]",
+					},
+				},
+			},
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"space":{"cake":"pumpkin"}}`,
+				`{"hello":{"cake":"pumpkin"}}`,
+				`{"space":{"world":"moon"}}`,
 			},
 		},
 	}
@@ -699,6 +1099,11 @@ func TestInput(t *testing.T) {
 			t.Cleanup(func() { _ = timeout.Stop() })
 
 			if len(tc.expected) == 0 {
+				select {
+				case <-timeout.C:
+				case got := <-chanClient.Channel:
+					t.Errorf("unexpected event: %v", got)
+				}
 				cancel()
 				assert.NoError(t, g.Wait())
 				return
@@ -794,16 +1199,27 @@ func newV2Context() (v2.Context, func()) {
 	}, cancel
 }
 
-func defaultHandler(expectedMethod, expectedBody string) http.HandlerFunc {
+//nolint:errcheck // We can safely ignore errors here
+func matchBody(w io.Writer, req *http.Request, match, response string) {
+	body, _ := io.ReadAll(req.Body)
+	req.Body.Close()
+	if string(body) == match {
+		w.Write([]byte(response))
+	}
+}
+
+func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-type", "application/json")
-		msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+		if msg == "" {
+			msg = `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+		}
 		switch {
 		case r.Method != expectedMethod:
 			w.WriteHeader(http.StatusBadRequest)
 			msg = fmt.Sprintf(`{"error":"expected method was %q"}`, expectedMethod)
 		case expectedBody != "":
-			body, _ := ioutil.ReadAll(r.Body)
+			body, _ := io.ReadAll(r.Body)
 			r.Body.Close()
 			if expectedBody != string(body) {
 				w.WriteHeader(http.StatusBadRequest)

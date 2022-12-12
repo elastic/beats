@@ -19,6 +19,7 @@ package beater
 
 import (
 	"flag"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -77,9 +78,10 @@ func initialConfig() config.Config {
 
 // Beater object. Contains all objects needed to run the beat
 type packetbeat struct {
-	config  *conf.C
-	factory *processorFactory
-	done    chan struct{}
+	config   *conf.C
+	factory  *processorFactory
+	done     chan struct{}
+	stopOnce sync.Once
 }
 
 // New returns a new Packetbeat beat.Beater.
@@ -153,7 +155,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 // the runner by starting the beat's manager. It returns on the first fatal error.
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
-	reload.Register.MustRegisterList("inputs", runner)
+	reload.RegisterV2.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
 
 	// Start the manager after all the hooks are registered and terminates when
@@ -186,5 +188,5 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 // Called by the Beat stop function
 func (pb *packetbeat) Stop() {
 	logp.Info("Packetbeat send stop signal")
-	close(pb.done)
+	pb.stopOnce.Do(func() { close(pb.done) })
 }

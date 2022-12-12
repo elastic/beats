@@ -506,8 +506,7 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
-  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
-  # `add_resource_metadata` can be defined.
+  # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
   #   namespace:
@@ -553,8 +552,7 @@ metricbeat.modules:
   #kube_config: ~/.kube/config
   # Set the namespace to watch for resources
   #namespace: staging
-  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
-  # `add_resource_metadata` can be defined.
+  # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
   #   namespace:
@@ -2476,6 +2474,18 @@ logging.files:
 # Defines if the HTTP pprof endpoints are enabled.
 # It is recommended that this is only enabled on localhost as these endpoints may leak data.
 #http.pprof.enabled: false
+
+# Controls the fraction of goroutine blocking events that are reported in the
+# blocking profile.
+#http.pprof.block_profile_rate: 0
+
+# Controls the fraction of memory allocations that are recorded and reported in
+# the memory profile.
+#http.pprof.mem_profile_rate: 524288
+
+# Controls the fraction of mutex contention events that are reported in the
+# mutex profile.
+#http.pprof.mutex_profile_rate: 0
 
 # ============================== Process Security ==============================
 

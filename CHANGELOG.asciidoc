@@ -3,6 +3,149 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.5.3]]
+=== Beats version 8.5.3
+https://github.com/elastic/beats/compare/v8.5.2\...v8.5.3[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
+
+==== Bugfixes
+
+*Heartbeat*
+
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+
+
+[[release-notes-8.5.2]]
+=== Beats version 8.5.2
+https://github.com/elastic/beats/compare/v8.5.1\...v8.5.2[View commits]
+
+[[release-notes-8.5.1]]
+=== Beats version 8.5.1
+https://github.com/elastic/beats/compare/v8.5.0\...v8.5.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Re-enable build optimizations to reduce binary size and improve performance. {pull}33620[33620]
+- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
+- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+- Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
+
+*Filebeat*
+
+- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled. {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+- Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
+- Fix splitting array of strings/arrays in httpjson input. {issue}30345[30345] {pull}33609[33609]
+- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+
+*Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix states client support for output options. {pull}33405[33405]
+- Fix states client reloader under managed mode. {pull}33405[33405]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+
+==== Bugfixes
+
+*Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix states client support for output options. {pull}33405[33405]
+- Fix states client reloader under managed mode. {pull}33405[33405]
+
+*Metricbeat*
+
+- Add tags to events based on parsed identifier. {pull}33472[33472]
+- Skip over unsupported filesystems in the system.filesystem metricset instead of failing immediately. Fix debug statement in system.fsstat metricset. {pull}33646[33646]
+
+==== Added
+
+*Affecting all Beats*
+
+- Beats will now attempt to recover if a lockfile has not been removed. {pull}[33169]
+
+[[release-notes-8.5.0]]
+=== Beats version 8.5.0
+https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
+- Fix formatting of MAC hardware addresses populated by the add_host_metadata processor. {issue}32264[32264] {pull}32265[32265]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix metric namespacing for self-monitoring to correct some process incorrectly reading as zero. {pull}32336[32336]
+
+*Auditbeat*
+
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+
+*Filebeat*
+
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+- Import dashboards from CEF integration. {pull}32766[32766]
+- Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
+- Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
+- Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3, aws-cloudwatch, and lumberjack inputs. {pull}33259[33259]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+
+*Heartbeat*
+- Fix bug affecting Let's Encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for Kibana-configured monitors. {pull}33293[33293]
+
+*Metricbeat*
+
+- Fix GCP storage field naming {pull}32806[32806]
+- In `module/windows/perfmon`, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
+- Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call. {pull}33105[33105]
+- Add GCP CloudSQL region filter. {pull}32943[32943]
+- Fix Logstash cgroup mappings. {pull}33131[33131]
+- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping. {pull}33263[33263]
+
+*Packetbeat*
+
+- Fix formatting of debug logs. {pull}32698[32698]
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+
+*Winlogbeat*
+
+- Reduce severity of message salvage failure logging. {pull}32697[32697]
+
+==== Added
+
+*Filebeat*
+- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
+
+*Heartbeat*
+- Add new states field for internal use by new synthetics app. {pull}30632[30632]
+
+*Packetbeat*
+- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
+- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
+- Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
+
+==== Deprecated
+
+*Heartbeat*
+- Deprecate `zip_url` and local monitor options. {pull}33123[33123]
+
 [[release-notes-8.4.3]]
 === Beats version 8.4.3
 https://github.com/elastic/beats/compare/v8.4.2\...v8.4.3[View commits]

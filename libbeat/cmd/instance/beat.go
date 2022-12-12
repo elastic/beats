@@ -59,6 +59,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/plugin"
+	"github.com/elastic/beats/v7/libbeat/pprof"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -109,7 +110,7 @@ type beatConfig struct {
 
 	// beat internal components configurations
 	HTTP            *config.C              `config:"http"`
-	HTTPPprof       *config.C              `config:"http.pprof"`
+	HTTPPprof       *pprof.Config          `config:"http.pprof"`
 	BufferConfig    *config.C              `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
 	Logging         *config.C              `config:"logging"`
@@ -351,7 +352,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	reload.Register.MustRegister("output", b.makeOutputReloader(publisher.OutputReloader()))
+	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
@@ -403,18 +404,21 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
 	// that would be set at runtime.
-	var s *api.Server // buffer reporter may need to attach to the server.
 	if b.Config.HTTP.Enabled() {
-		s, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
-		s.Start()
+		b.API.Start()
 		defer func() {
-			_ = s.Stop()
+			_ = b.API.Stop()
 		}()
-		if b.Config.HTTPPprof.Enabled() {
-			s.AttachPprof()
+		if b.Config.HTTPPprof.IsEnabled() {
+			pprof.SetRuntimeProfilingParameters(b.Config.HTTPPprof)
+
+			if err := pprof.HttpAttach(b.Config.HTTPPprof, b.API); err != nil {
+				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
+			}
 		}
 	}
 
@@ -451,7 +455,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 		defer buffReporter.Stop()
 
-		if err := s.AttachHandler("/buffer", buffReporter); err != nil {
+		if err := b.API.AttachHandler("/buffer", buffReporter); err != nil {
 			return err
 		}
 	}
@@ -716,7 +720,7 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.Register, b.Beat.Info.ID)
+	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
 	if err != nil {
 		return err
 	}
@@ -895,7 +899,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) checkElasticsearchVersion() {
-	if !isElasticsearchOutput(b.Config.Output.Name()) || b.isConnectionToOlderVersionAllowed() {
+	if b.isConnectionToOlderVersionAllowed() {
 		return
 	}
 
@@ -926,7 +930,7 @@ func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
-	if !isElasticsearchOutput(b.Config.Output.Name()) || !b.IdxSupporter.Enabled() {
+	if !b.IdxSupporter.Enabled() {
 		return nil
 	}
 
@@ -973,10 +977,8 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 }
 
 func (b *Beat) registerClusterUUIDFetching() {
-	if isElasticsearchOutput(b.Config.Output.Name()) {
-		callback := b.clusterUUIDFetchingCallback()
-		_, _ = elasticsearch.RegisterConnectCallback(callback)
-	}
+	callback := b.clusterUUIDFetchingCallback()
+	_, _ = elasticsearch.RegisterConnectCallback(callback)
 }
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring

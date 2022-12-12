@@ -33,6 +33,22 @@ current user.
 `http.named_pipe.security_descriptor`:: (Optional) Windows Security descriptor string defined in the SDDL format. Default to
 read and write permission for the current user.
 `http.pprof.enabled`:: (Optional) Enable the `/debug/pprof/` endpoints when serving HTTP. It is recommended that this is only enabled on localhost as these endpoints may leak data. Default is `false`.
+`http.pprof.block_profile_rate`:: (Optional) `block_profile_rate` controls the
+fraction of goroutine blocking events that are reported in the blocking profile
+available from `/debug/pprof/block`. The profiler aims to sample an average of
+one blocking event per rate nanoseconds spent blocked. To include every blocking
+event in the profile, pass rate = 1. To turn off profiling entirely, pass rate
+<= 0. Defaults to 0.
+`http.pprof.mem_profile_rate`:: (Optional) `mem_profile_rate` controls the
+fraction of memory allocations that are recorded and reported in the memory
+profile available from `/debug/pprof/heap`. The profiler aims to sample an
+average of one allocation per `mem_profile_rate` bytes allocated. To include
+every allocated block in the profile, set `mem_profile_rate` to 1. To turn off
+profiling entirely, set `mem_profile_rate` to 0. Defaults to 524288.
+`http.pprof.mutex_profile_rate`:: (Optional) `mutex_profile_rate` controls the
+fraction of mutex contention events that are reported in the mutex profile
+available from `/debug/pprof/mutex`. On average 1/rate events are reported.
+To turn off profiling entirely, pass rate 0. The default value is 0.
 
 This is the list of paths you can access. For pretty JSON output append `?pretty` to the URL.
 
@@ -181,3 +197,27 @@ curl -XGET 'localhost:5066/stats?pretty'
 ----
 
 The actual output may contain more metrics specific to {beatname_uc}
+
+ifdef::has_inputs_endpoint[]
+[float]
+=== Inputs
+
+`/inputs/` returns metrics related to input instances. It returns a list of
+objects where each object contains metrics for an instance of an input. Each
+object will minimally contain an `input` field that identifies the type of input
+(e.g. `aws-s3`) and an `id` field that is the unique identifier for the input
+instance.
+
+A request may optionally specify a `type` query parameter to request metrics
+for a specific type of input. And `pretty` may be included to have the
+returned JSON be pretty formatted.
+
+[source,js]
+----
+curl 'http://localhost:5066/inputs/'
+curl 'http://localhost:5066/inputs/?pretty'
+curl 'http://localhost:5066/inputs/?type=aws-s3&pretty'
+----
+
+["source","js",subs="attributes"]
+endif::has_inputs_endpoint[]

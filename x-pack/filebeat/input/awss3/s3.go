@@ -15,6 +15,7 @@ import (
 	"github.com/gofrs/uuid"
 	"go.uber.org/multierr"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -53,6 +54,7 @@ type s3Poller struct {
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
+	client               beat.Client
 	s3ObjectHandler      s3ObjectHandlerFactory
 	states               *states
 	store                *statestore.Store
@@ -63,6 +65,7 @@ type s3Poller struct {
 func newS3Poller(log *logp.Logger,
 	metrics *inputMetrics,
 	s3 s3API,
+	client beat.Client,
 	s3ObjectHandler s3ObjectHandlerFactory,
 	states *states,
 	store *statestore.Store,
@@ -71,9 +74,10 @@ func newS3Poller(log *logp.Logger,
 	awsRegion string,
 	provider string,
 	numberOfWorkers int,
-	bucketPollInterval time.Duration) *s3Poller {
+	bucketPollInterval time.Duration,
+) *s3Poller {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", monitoring.NewRegistry())
 	}
 	return &s3Poller{
 		numberOfWorkers:      numberOfWorkers,
@@ -86,6 +90,7 @@ func newS3Poller(log *logp.Logger,
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,
+		client:               client,
 		s3ObjectHandler:      s3ObjectHandler,
 		states:               states,
 		store:                store,
@@ -203,7 +208,12 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 				continue
 			}
 
-			p.states.Update(state, "")
+			// we have no previous state or the previous state
+			// is not stored: refresh the state
+			previousState := p.states.FindPrevious(state)
+			if previousState.IsEmpty() || !previousState.IsProcessed() {
+				p.states.Update(state, "")
+			}
 
 			event := s3EventV2{}
 			event.AWSRegion = p.region
@@ -214,7 +224,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 
 			acker := awscommon.NewEventACKTracker(ctx)
 
-			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
+			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, p.client, acker, event)
 			if s3Processor == nil {
 				p.log.Debugw("empty s3 processor.", "state", state)
 				continue
@@ -277,8 +287,8 @@ func (p *s3Poller) Purge() {
 
 		for _, state := range p.states.GetStatesByListingID(listingID) {
 			// it is not stored, keep
-			if !state.Stored {
-				p.log.Debugw("state not stored, skip purge", "state", state)
+			if !state.IsProcessed() {
+				p.log.Debugw("state not stored or with error, skip purge", "state", state)
 				continue
 			}
 
@@ -289,7 +299,7 @@ func (p *s3Poller) Purge() {
 				var commitWriteState commitWriteState
 				err := p.store.Get(awsS3WriteCommitPrefix+state.Bucket+state.ListPrefix, &commitWriteState)
 				if err == nil {
-					// we have no entry in the map and we have no entry in the store
+					// we have no entry in the map, and we have no entry in the store
 					// set zero time
 					latestStoredTime = time.Time{}
 					p.log.Debugw("last stored time is zero time", "bucket", state.Bucket, "listPrefix", state.ListPrefix)

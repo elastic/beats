@@ -397,6 +397,9 @@ with `auth.oauth2.google.jwt_file` or `auth.oauth2.google.jwt_json`.
 
 The URL of the HTTP API. Required.
 
+The API endpoint may be accessed via unix socket and Windows named pipes by adding  `+unix` or `+npipe`
+to the URL scheme, for example, `http+unix:///var/socket/`.
+
 [float]
 ==== `request.method`
 
@@ -531,7 +534,7 @@ List of transforms to apply to the request before each execution.
 
 Available transforms for request: [`append`, `delete`, `set`].
 
-Can read state from: [`.first_response.*`,`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
+Can read state from: [`.first_response.*`,`.last_response.*`, `.parent_last_response.*` `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 
@@ -546,6 +549,47 @@ filebeat.inputs:
         target: body.from
         value: '[[now (parseDuration "-1h")]]'
 ----
+
+NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination 
+does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains. You can look at this 
+**example** below for a better idea.
+
+**Example Config:**
+["source","yaml",subs="attributes"]
+  filebeat.inputs:
+  - type: httpjson
+    enabled: true
+    id: my-httpjson-id
+    request.url: http://xyz.com/services/data/v1.0/export_ids/page
+    request.method: POST
+    interval: 1h
+    request.retry.max_attempts: 2
+    request.retry.wait_min: 5s
+    request.transforms:
+    - set:
+        target: body.page
+        value: 0
+    response.request_body_on_pagination: true
+    response.pagination:
+      - set:
+          target: body.page
+          value: '[[ .last_response.body.page ]]'
+          fail_on_template_error: true 
+    chain: 
+    - step:
+          request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
+          request.method: POST
+          request.transforms:
+          - set:
+              target: body.exportId
+              value: '[[ .parent_last_response.body.exportId ]]'
+          replace: $.files[:].id
+          replace_with: '$.exportId,.parent_last_response.body.exportId'
+
+Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request.
+However if `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is 
+because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the
+`first_response` object always stores the very first response in the process chain.
 
 [float]
 ==== `request.tracer.filename`
@@ -633,6 +677,7 @@ filebeat.inputs:
 ==== `response.split`
 
 Split operation to apply to the response once it is received. A split can convert a map, array, or string into multiple events.
+If the split target is empty the parent document will be kept. If documents with empty splits should be dropped, the `ignore_empty_value` option should be set to `true`.
 
 [float]
 ==== `response.split[].target`
@@ -1140,7 +1185,7 @@ Collect and make events from response in any format supported by httpjson for al
 
 The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value. 
 The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables 
-like [`.last_response.*`, `.first_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
+like [`.last_response.*`, `.first_response.*`, `.parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
 thus providing a lot of flexibility in the logic of chain requests.
 
 Example:
@@ -1166,7 +1211,7 @@ filebeat.inputs:
     - step:
       request.url: https://example.com/services/data/v1.0/$.exportId/files
       request.method: GET
-      replace_with: '$.exportId,first_response.body.exportId'
+      replace_with: '$.exportId,.first_response.body.exportId'
 ----
 
 Example:
@@ -1216,8 +1261,19 @@ response_json using exportId as '2212':
 ----
 This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
 
-NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the 
-`replace_with` processor with exact string matching.
+**Some useful points to remember:- **
+  
+    1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a 
+    **single '.' (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal 
+    processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one '.' (dot) as prefix) or  
+    `replace_with:'$.exportId,first_response.body.exportId'` (no '.' dot as prefix)
+   
+   2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with: 
+    '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from
+    the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be 
+    extrated becomes `"" (an empty string)`, which has no definition within any context variable.
+
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching.
 
 [float]
 ==== `chain[].while`

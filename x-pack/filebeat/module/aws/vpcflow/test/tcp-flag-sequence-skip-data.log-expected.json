@@ -6,19 +6,23 @@
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.log_status": "SKIPDATA",
         "aws.vpcflow.subnet_id": "subnet-aaaaaaaa012345678",
-        "aws.vpcflow.version": "3",
+        "aws.vpcflow.version": 3,
         "aws.vpcflow.vpc_id": "vpc-abcdefab012345678",
         "cloud.account.id": "123456789010",
         "cloud.instance.id": "i-01234567890123456",
         "cloud.provider": "aws",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.end": "2019-08-26T19:48:53.000Z",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 - - - - - - - - - - 1566848875 1566848933 - - SKIPDATA",
         "event.start": "2019-08-26T19:47:55.000Z",
-        "event.type": "flow",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 183,
@@ -35,19 +39,23 @@
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.log_status": "NODATA",
         "aws.vpcflow.subnet_id": "subnet-aaaaaaaa012345678",
-        "aws.vpcflow.version": "3",
+        "aws.vpcflow.version": 3,
         "aws.vpcflow.vpc_id": "vpc-abcdefab012345678",
         "cloud.account.id": "123456789010",
         "cloud.instance.id": "i-01234567890123456",
         "cloud.provider": "aws",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.end": "2019-08-26T19:48:53.000Z",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 - - - - - - - - - - 1566848875 1566848933 - - NODATA",
         "event.start": "2019-08-26T19:47:55.000Z",
-        "event.type": "flow",
+        "event.type": [
+            "connection"
+        ],
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 526,

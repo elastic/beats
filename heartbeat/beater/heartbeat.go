@@ -20,13 +20,13 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"syscall"
 	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
@@ -39,25 +39,22 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // Heartbeat represents the root datastructure of this beat.
 type Heartbeat struct {
-	done chan struct{}
+	done     chan struct{}
+	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
-	config          config.Config
-	scheduler       *scheduler.Scheduler
-	monitorReloader *cfgfile.Reloader
-	monitorFactory  *monitors.RunnerFactory
-	autodiscover    *autodiscover.Autodiscover
-}
-
-type EsConfig struct {
-	Hosts    []string `config:"hosts"`
-	Username string   `config:"username"`
-	Password string   `config:"password"`
+	config             config.Config
+	scheduler          *scheduler.Scheduler
+	monitorReloader    *cfgfile.Reloader
+	monitorFactory     *monitors.RunnerFactory
+	autodiscover       *autodiscover.Autodiscover
+	replaceStateLoader func(sl monitorstate.StateLoader)
 }
 
 // New creates a new heartbeat.
@@ -67,17 +64,14 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
-	stateLoader := monitorstate.NilStateLoader
-
-	if b.Config.Output.Name() == "elasticsearch" {
-		// Connect to ES and setup the State loader
-		esc, err := getESClient(b.Config.Output.Config())
-		if err != nil {
-			return nil, err
+	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader)
+	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
+		// Connect to ES and setup the State loader if the output is not managed by agent
+		if err := makeStatesClient(b.Config.Output.Config(), replaceStateLoader, parsedConfig.RunFrom); err != nil {
+			logp.L().Warnf("could not connect to ES for state management during initial load: %s", err)
 		}
-		if esc != nil {
-			stateLoader = monitorstate.MakeESLoader(esc, "synthetics-*,heartbeat-*", parsedConfig.RunFrom)
-		}
+	} else if b.Manager.Enabled() {
+		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
 	}
 
 	limit := parsedConfig.Scheduler.Limit
@@ -107,9 +101,10 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	}
 
 	bt := &Heartbeat{
-		done:      make(chan struct{}),
-		config:    parsedConfig,
-		scheduler: sched,
+		done:               make(chan struct{}),
+		config:             parsedConfig,
+		scheduler:          sched,
+		replaceStateLoader: replaceStateLoader,
 		// monitorFactory is the factory used for creating all monitor instances,
 		// wiring them up to everything needed to actually execute.
 		monitorFactory: monitors.NewFactory(monitors.FactoryParams{
@@ -211,10 +206,26 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
-	mons := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".monitors", mons)
+	// Register output reloader for managed outputs
+	b.OutputConfigReloader = reload.ReloadableFunc(func(r *reload.ConfigWithMeta) error {
+		// Do not return error here, it will prevent libbeat output from processing the same event
+		if r == nil {
+			return nil
+		}
+		outCfg := conf.Namespace{}
+		if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
+			return nil
+		}
+
+		if err := makeStatesClient(outCfg.Config(), bt.replaceStateLoader, bt.config.RunFrom); err != nil {
+			logp.L().Warnf("could not connect to ES for state management during managed reload: %s", err)
+		}
+
+		return nil
+	})
+
 	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
-	reload.Register.MustRegisterList("inputs", inputs)
+	reload.RegisterV2.MustRegisterInput(inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
@@ -248,26 +259,19 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
-	close(bt.done)
+	bt.stopOnce.Do(func() { close(bt.done) })
 }
 
-// getESClient returns an ES client if one is configured. Will return nil, nil, if none is configured.
-func getESClient(outputConfig *conf.C) (esc *elasticsearch.Client, err error) {
-	esConfig := EsConfig{}
-	err = outputConfig.Unpack(&esConfig)
+func makeStatesClient(cfg *conf.C, replace func(monitorstate.StateLoader), runFrom *config.LocationWithID) error {
+	esClient, err := eslegclient.NewConnectedClient(cfg, "Heartbeat")
 	if err != nil {
-		logp.L().Info("output is not elasticsearch, error / state tracking will not be enabled: %w", err)
-		return nil, nil
+		return err
 	}
-	esc, err = elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: esConfig.Hosts,
-		Username:  esConfig.Username,
-		Password:  esConfig.Password,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("could not initialize elasticsearch client: %w", err)
-	}
-	logp.L().Infof("successfully connected to elasticsearch for error / state tracking: %v", esConfig.Hosts)
 
-	return esc, nil
+	if esClient != nil {
+		logp.L().Info("replacing states loader")
+		replace(monitorstate.MakeESLoader(esClient, "synthetics-*,heartbeat-*", runFrom))
+	}
+
+	return nil
 }

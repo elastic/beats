@@ -20,8 +20,9 @@ package api
 import (
 	"fmt"
 	"net/http"
-	_ "net/http/pprof"
 	"net/url"
+
+	"go.uber.org/multierr"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -29,35 +30,29 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type handlerFunc func(http.ResponseWriter, *http.Request)
 type lookupFunc func(string) *monitoring.Namespace
-
-var handlerFuncMap = make(map[string]handlerFunc)
 
 // NewWithDefaultRoutes creates a new server with default API routes.
 func NewWithDefaultRoutes(log *logp.Logger, config *config.C, ns lookupFunc) (*Server, error) {
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", makeRootAPIHandler(makeAPIHandler(ns("info"))))
-	mux.HandleFunc("/state", makeAPIHandler(ns("state")))
-	mux.HandleFunc("/stats", makeAPIHandler(ns("stats")))
-	mux.HandleFunc("/dataset", makeAPIHandler(ns("dataset")))
-
-	for api, h := range handlerFuncMap {
-		mux.HandleFunc(api, h)
+	api, err := New(log, config)
+	if err != nil {
+		return nil, err
 	}
-	return New(log, mux, config)
+
+	err = multierr.Combine(
+		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(ns("info")))),
+		api.AttachHandler("/state", makeAPIHandler(ns("state"))),
+		api.AttachHandler("/stats", makeAPIHandler(ns("stats"))),
+		api.AttachHandler("/dataset", makeAPIHandler(ns("dataset"))),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return api, nil
 }
 
-func (s *Server) AttachPprof() {
-	s.log.Info("Attaching pprof endpoints")
-	s.mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
-		http.DefaultServeMux.ServeHTTP(w, r)
-	})
-
-}
-
-func makeRootAPIHandler(handler handlerFunc) handlerFunc {
+func makeRootAPIHandler(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
@@ -67,7 +62,7 @@ func makeRootAPIHandler(handler handlerFunc) handlerFunc {
 	}
 }
 
-func makeAPIHandler(ns *monitoring.Namespace) handlerFunc {
+func makeAPIHandler(ns *monitoring.Namespace) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -84,17 +79,8 @@ func makeAPIHandler(ns *monitoring.Namespace) handlerFunc {
 func prettyPrint(w http.ResponseWriter, data mapstr.M, u *url.URL) {
 	query := u.Query()
 	if _, ok := query["pretty"]; ok {
-		fmt.Fprintf(w, data.StringToPrint())
+		fmt.Fprint(w, data.StringToPrint())
 	} else {
-		fmt.Fprintf(w, data.String())
+		fmt.Fprint(w, data.String())
 	}
-}
-
-// AddHandlerFunc provides interface to add customized handlerFunc
-func AddHandlerFunc(api string, h handlerFunc) error {
-	if _, exist := handlerFuncMap[api]; exist {
-		return fmt.Errorf("%s already exist", api)
-	}
-	handlerFuncMap[api] = h
-	return nil
 }

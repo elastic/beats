@@ -15,21 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
-// +build !integration
-
-package udp
+package add_formatted_index
 
 import (
-	"testing"
+	"errors"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
 
-func TestNewInputDone(t *testing.T) {
-	config := mapstr.M{
-		"hosts": ":0",
+// configuration for AddFormattedIndex processor.
+type config struct {
+	Index *fmtstr.TimestampFormatString `config:"index"` // Index formatted string value
+}
+
+// Validate ensures that the configuration is valid.
+func (c *config) Validate() error {
+	// Validate type of ID generator
+	if c.Index == nil {
+		return errors.New("index field is required")
 	}
-	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
+
+	return nil
 }

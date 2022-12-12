@@ -145,3 +145,16 @@
         - name: max.ms
           type: long
           description: Maximum response time in milliseconds
+    - name: elasticsearch_client
+      type: group
+      description: Elasticsearch Client's stats
+      fields:
+        - name: total_active_sockets
+          type: integer
+          description: Total number of active sockets
+        - name: total_idle_sockets
+          type: integer
+          description: Total number of idle sockets
+        - name: total_queued_requests
+          type: integer
+          description: Total number of queued requests

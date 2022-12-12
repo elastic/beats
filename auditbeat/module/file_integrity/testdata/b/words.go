@@ -15,31 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package udp
+package b
 
 import (
-	"time"
-
-	"github.com/dustin/go-humanize"
-
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
+	"crypto/md5"
+	"fmt"
 )
 
-var defaultConfig = config{
-	ForwarderConfig: harvester.ForwarderConfig{
-		Type: "udp",
-	},
-	Config: udp.Config{
-		MaxMessageSize: 10 * humanize.KiByte,
-		// TODO: What should be default port?
-		Host: "localhost:8080",
-		// TODO: What should be the default timeout?
-		Timeout: time.Minute * 5,
-	},
+//go:noinline
+func Used(s string) string {
+	if hash(s) == "d41d8cd98f00b204e9800998ecf8427e" {
+		return ""
+	}
+	return s
 }
 
-type config struct {
-	udp.Config                `config:",inline"`
-	harvester.ForwarderConfig `config:",inline"`
+func hash(s interface{}) string {
+	h := md5.New()
+	fmt.Fprint(h, s)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
+
+//go:noinline
+func Unused(s string) string { return s }
