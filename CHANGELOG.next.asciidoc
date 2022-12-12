@@ -125,6 +125,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add `add_formatted_index` processor that allows the resulting index for an event to be changed based on content from the event. {pull}33800[33800]
 - deps: Updated to github.com/elastic/go-sysinfo v1.9.0. {pull}33864[33864]
 - Fix panic due to close of already closed channel during shutdown {pull}33971[33971]
+- Add `lowercase_fields` and `uppercase_fields` processors. {issue}22254[22254]
 
 *Auditbeat*
 

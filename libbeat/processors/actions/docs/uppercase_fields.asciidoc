@@ -1,0 +1,37 @@
+[[uppercase-fields]]
+=== Uppercase fields from events
+
+++++
+<titleabbrev>uppercase_fields</titleabbrev>
+++++
+
+The `uppercase_fields` processor specifies a list of fields to uppercase.
+
+For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+  - uppercase_fields:
+      fields:
+        - "a.b"
+      ignore_missing: false
+      fail_on_error: true
+------------------------------------------------------------------------------
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "a.B": {}
+}
+-------------------------------------------------------------------------------
+
+The `uppercase_fields` processor has the following configuration settings:
+
+`fields`:: The fields to uppercase.
+`ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source field.
+                    The default is `false`, which will fail processing of an event if a field is missing.
+`fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
+                    If set to `false`, processing continues if an error occurs. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
