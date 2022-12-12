@@ -131,7 +131,26 @@ func (r *metricsRequester) buildRegionsFilter(regions []string, label string) st
 	}
 }
 
-func (r *metricsRequester) buildLocationFilter(serviceLabel, filter string) string {
+func (r *metricsRequester) buildLocationFilter(serviceName, filter string) string {
+	var serviceLabel string
+
+	switch serviceName {
+	case gcp.ServiceCompute:
+		serviceLabel = gcp.ComputeResourceLabel
+	case gcp.ServiceGKE:
+		serviceLabel = gcp.GKEResourceLabel
+	case gcp.ServiceDataproc:
+		serviceLabel = gcp.DataprocResourceLabel
+	case gcp.ServiceStorage:
+		serviceLabel = gcp.StorageResourceLabel
+	case gcp.ServiceCloudSQL:
+		serviceLabel = gcp.CloudSQLResourceLabel
+	case gcp.ServiceRedis:
+		serviceLabel = gcp.RedisResourceLabel
+	default:
+		serviceLabel = gcp.DefaultResourceLabel
+	}
+
 	if r.config.Region != "" && r.config.Zone != "" {
 		r.logger.Warnf("when region %s and zone %s config parameter "+
 			"both are provided, only use region", r.config.Regions, r.config.Zone)
@@ -156,38 +175,28 @@ func (r *metricsRequester) buildLocationFilter(serviceLabel, filter string) stri
 	return filter
 }
 
+func isAGlobalService(serviceName string) bool {
+	switch serviceName {
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
+		return true
+	default:
+		return false
+	}
+}
+
 // getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
 // if they have a region specified.
 func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	f := fmt.Sprintf(`metric.type="%s"`, m)
-	if r.config.Zone == "" && r.config.Region == "" && len(r.config.Regions) == 0 {
-		return f
+
+	locationsConfigsAvailable := r.config.Zone == "" && r.config.Region == "" && len(r.config.Regions) == 0
+	// NOTE: some GCP services are global, not regional or zonal. To these services we don't need
+	// to apply any additional filters.
+	if locationsConfigsAvailable && !isAGlobalService(serviceName) {
+		f = r.buildLocationFilter(serviceName, f)
 	}
 
-	var serviceLabel string
-
-	switch serviceName {
-	// Global GCP services that are not regional or zonal.
-	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
-		return f
-	case gcp.ServiceCompute:
-		serviceLabel = gcp.ComputeResourceLabel
-	case gcp.ServiceGKE:
-		serviceLabel = gcp.GKEResourceLabel
-	case gcp.ServiceDataproc:
-		serviceLabel = gcp.DataprocResourceLabel
-	case gcp.ServiceStorage:
-		serviceLabel = gcp.StorageResourceLabel
-	case gcp.ServiceCloudSQL:
-		serviceLabel = gcp.CloudSQLResourceLabel
-	case gcp.ServiceRedis:
-		serviceLabel = gcp.RedisResourceLabel
-	default:
-		serviceLabel = gcp.DefaultResourceLabel
-	}
-
-	f = r.buildLocationFilter(serviceLabel, f)
-
+	// NOTE: make sure to log the applied filter, as it helpful when debugging
 	r.logger.Debugf("ListTimeSeries API filter = %s", f)
 
 	return f
