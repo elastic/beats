@@ -16,6 +16,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
+- Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
 
 *Heartbeat*
 
@@ -61,6 +63,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
 - Fix input cancellation handling when HTTP client does not support contexts. {issue}33962[33962] {pull}33968[33968]
 - Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
+- Fix CEL result deserialisation when evaluation fails. {issue}33992[33992] {pull}33996[33996]
+- Fix handling of non-200/non-429 status codes. {issue}33999[33999] {pull}34002[34002]
 
 *Heartbeat*
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
@@ -98,6 +102,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Packetbeat*
 
 - Fix panic on memcache transaction with no request or response. {issue}33852[33852] {pull}33853[33853]
+- Fix termination logic. {pull}33979[33979]
 
 *Winlogbeat*
 
