@@ -24,7 +24,7 @@ var RootCmd *cmd.BeatsRootCmd
 // configuration generated from a raw Elastic Agent config
 func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	//grab and properly format the input streams
-	inputStreams, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
+	inputStreams, err := management.CreateInputsFromStreams(rawIn, "synthetics", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error generating new stream config: %w", err)
 	}

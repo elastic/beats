@@ -60,6 +60,11 @@ func (s *state) MarkAsError() {
 	s.Error = true
 }
 
+// IsProcessed checks if the state is either Stored or Error
+func (s *state) IsProcessed() bool {
+	return s.Stored || s.Error
+}
+
 // IsEqual checks if the two states point to the same s3 object.
 func (s *state) IsEqual(c *state) bool {
 	return s.Bucket == c.Bucket && s.Key == c.Key && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
