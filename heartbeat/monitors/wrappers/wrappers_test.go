@@ -571,14 +571,10 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 			},
 		})
 		if summary {
-			sumFields := mapstr.M{"up": 0, "down": 0}
-			if projectErr == nil {
-				sumFields["up"] = 1
-			} else {
-				sumFields["down"] = 1
-			}
 			eventext.MergeEventFields(event, mapstr.M{
-				"summary": sumFields,
+				"event": mapstr.M{
+					"type": "heartbeat/summary",
+				},
 			})
 		}
 		return nil, projectErr
@@ -652,6 +648,9 @@ func TestProjectBrowserJob(t *testing.T) {
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{"status": "up"},
 						"summary": map[string]interface{}{"up": 1, "down": 0},
+						"event": map[string]interface{}{
+							"type": "heartbeat/summary",
+						},
 					}),
 				))},
 		nil,
@@ -672,6 +671,9 @@ func TestProjectBrowserJob(t *testing.T) {
 						"error": map[string]interface{}{
 							"type":    isdef.IsString,
 							"message": "testerr",
+						},
+						"event": map[string]interface{}{
+							"type": "heartbeat/summary",
 						},
 					}),
 				))},
