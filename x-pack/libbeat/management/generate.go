@@ -68,7 +68,11 @@ func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *
 // that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
 func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo) ([]map[string]interface{}, error) {
-	inputs := make([]map[string]interface{}, len(raw.Streams))
+	// should this be an error?
+	if raw.GetStreams() == nil {
+		return []map[string]interface{}{}, nil
+	}
+	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
 
 	for iter, stream := range raw.GetStreams() {
 		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
@@ -271,6 +275,9 @@ func groupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, e
 	// I don't think we can get the `Headers()` data reported by the AgentInfo()
 	sourceMap := outCfg.GetSource().AsMap()
 	outputType := outCfg.GetType() //nolint:typecheck // this is used, linter just doesn't seem to see it
+	if outputType == "" {
+		return nil, fmt.Errorf("output config does not have a configured type field")
+	}
 	formattedOut := mapstr.M{
 		outputType: sourceMap,
 	}
