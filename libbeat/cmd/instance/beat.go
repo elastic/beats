@@ -46,6 +46,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -386,15 +387,19 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer svc.NotifyTermination()
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
-	// sharing same data path.
-	bl := locks.New(b.Info)
-	err := bl.Lock()
-	if err != nil {
-		return err
+	// sharing same data path. This is disabled under elastic-agent.
+	if !fleetmode.Enabled() {
+		bl := locks.New(b.Info)
+		err := bl.Lock()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			_ = bl.Unlock()
+		}()
+	} else {
+		logp.Info("running under elastic-agent, per-beat lockfiles disabled")
 	}
-	defer func() {
-		_ = bl.Unlock()
-	}()
 
 	svc.BeforeRun()
 	defer svc.Cleanup()
@@ -406,7 +411,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// that would be set at runtime.
 	var s *api.Server // buffer reporter may need to attach to the server.
 	if b.Config.HTTP.Enabled() {
+<<<<<<< HEAD
 		s, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+=======
+		var err error
+		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+>>>>>>> 493b3a4634 (Disable lockfile under fleet mode (#33988))
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -423,7 +433,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 	}
 
-	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+	if err := seccomp.LoadFilter(b.Config.Seccomp); err != nil {
 		return err
 	}
 
