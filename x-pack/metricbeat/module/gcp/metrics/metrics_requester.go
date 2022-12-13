@@ -189,7 +189,7 @@ func isAGlobalService(serviceName string) bool {
 func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	f := fmt.Sprintf(`metric.type="%s"`, m)
 
-	locationsConfigsAvailable := r.config.Zone == "" && r.config.Region == "" && len(r.config.Regions) == 0
+	locationsConfigsAvailable := r.config.Zone != "" && r.config.Region != "" && len(r.config.Regions) > 0
 	// NOTE: some GCP services are global, not regional or zonal. To these services we don't need
 	// to apply any additional filters.
 	if locationsConfigsAvailable && !isAGlobalService(serviceName) {
