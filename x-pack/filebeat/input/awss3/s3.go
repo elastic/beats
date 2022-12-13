@@ -77,7 +77,7 @@ func newS3Poller(log *logp.Logger,
 	bucketPollInterval time.Duration,
 ) *s3Poller {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", monitoring.NewRegistry())
 	}
 	return &s3Poller{
 		numberOfWorkers:      numberOfWorkers,
@@ -208,7 +208,12 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 				continue
 			}
 
-			p.states.Update(state, "")
+			// we have no previous state or the previous state
+			// is not stored: refresh the state
+			previousState := p.states.FindPrevious(state)
+			if previousState.IsEmpty() || !previousState.IsProcessed() {
+				p.states.Update(state, "")
+			}
 
 			event := s3EventV2{}
 			event.AWSRegion = p.region
@@ -282,8 +287,8 @@ func (p *s3Poller) Purge() {
 
 		for _, state := range p.states.GetStatesByListingID(listingID) {
 			// it is not stored, keep
-			if !state.Stored {
-				p.log.Debugw("state not stored, skip purge", "state", state)
+			if !state.IsProcessed() {
+				p.log.Debugw("state not stored or with error, skip purge", "state", state)
 				continue
 			}
 
@@ -294,7 +299,7 @@ func (p *s3Poller) Purge() {
 				var commitWriteState commitWriteState
 				err := p.store.Get(awsS3WriteCommitPrefix+state.Bucket+state.ListPrefix, &commitWriteState)
 				if err == nil {
-					// we have no entry in the map and we have no entry in the store
+					// we have no entry in the map, and we have no entry in the store
 					// set zero time
 					latestStoredTime = time.Time{}
 					p.log.Debugw("last stored time is zero time", "bucket", state.Bucket, "listPrefix", state.ListPrefix)

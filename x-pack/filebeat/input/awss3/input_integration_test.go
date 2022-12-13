@@ -31,11 +31,8 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -134,28 +131,6 @@ file_selectors:
 `, queueURL))
 }
 
-type testInputStore struct {
-	registry *statestore.Registry
-}
-
-func openTestStatestore() beater.StateStore {
-	return &testInputStore{
-		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
-	}
-}
-
-func (s *testInputStore) Close() {
-	s.registry.Close()
-}
-
-func (s *testInputStore) Access() (*statestore.Store, error) {
-	return s.registry.Get("filebeat")
-}
-
-func (s *testInputStore) CleanupInterval() time.Duration {
-	return 24 * time.Hour
-}
-
 func createInput(t *testing.T, cfg *conf.C) *s3Input {
 	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
@@ -184,7 +159,7 @@ func TestInputRunSQS(t *testing.T) {
 	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURL)
 
 	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
+	monitoring.GetNamespace("inputs").GetRegistry().Remove(inputID)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
 		"testdata/events-array.json",
@@ -225,7 +200,7 @@ func TestInputRunSQS(t *testing.T) {
 	}
 
 	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.GetNamespace("inputs").GetRegistry(),
 		monitoring.Full,
 		false))
 	t.Log(snap.StringToPrint())
@@ -247,7 +222,7 @@ func TestInputRunS3(t *testing.T) {
 	tfConfig := getTerraformOutputs(t)
 
 	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
+	monitoring.GetNamespace("inputs").GetRegistry().Remove(inputID)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
 		"testdata/events-array.json",
@@ -288,7 +263,7 @@ func TestInputRunS3(t *testing.T) {
 	}
 
 	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.GetNamespace("inputs").GetRegistry(),
 		monitoring.Full,
 		false))
 	t.Log(snap.StringToPrint())
@@ -463,7 +438,7 @@ func TestInputRunSNS(t *testing.T) {
 	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURLForSNS)
 
 	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
+	monitoring.GetNamespace("inputs").GetRegistry().Remove(inputID)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForSNS,
 		"testdata/events-array.json",
@@ -503,7 +478,7 @@ func TestInputRunSNS(t *testing.T) {
 	}
 
 	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.GetNamespace("inputs").GetRegistry(),
 		monitoring.Full,
 		false))
 	t.Log(snap.StringToPrint())
