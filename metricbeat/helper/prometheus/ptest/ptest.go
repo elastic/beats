@@ -19,7 +19,7 @@ package ptest
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -54,13 +54,13 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 		file, err := os.Open(test.MetricsFile)
 		assert.NoError(t, err, "cannot open test file "+test.MetricsFile)
 
-		body, err := ioutil.ReadAll(file)
+		body, err := io.ReadAll(file)
 		assert.NoError(t, err, "cannot read test file "+test.MetricsFile)
 
 		server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
-			w.Write([]byte(body))
+			_, _ = w.Write(body)
 		}))
 
 		server.Start()
@@ -83,12 +83,12 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 				return h1 < h2
 			})
 			eventsJSON, _ := json.MarshalIndent(events, "", "\t")
-			err = ioutil.WriteFile(test.ExpectedFile, eventsJSON, 0644)
+			err = os.WriteFile(test.ExpectedFile, eventsJSON, 0644)
 			assert.NoError(t, err)
 		}
 
 		// Read expected events from reference file
-		expected, err := ioutil.ReadFile(test.ExpectedFile)
+		expected, err := os.ReadFile(test.ExpectedFile)
 		if err != nil {
 			t.Fatal(err)
 		}

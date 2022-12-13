@@ -101,11 +101,11 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 		if metric.Exemplar != nil {
 			exemplars = mapstr.M{*mn: metric.Exemplar.Value}
 			if metric.Exemplar.HasTs {
-				exemplars.Put("timestamp", metric.Exemplar.Ts)
+				_, _ = exemplars.Put("timestamp", metric.Exemplar.Ts)
 			}
 			for _, label := range metric.Exemplar.Labels {
 				if label.Name != "" && label.Value != "" {
-					exemplars.Put("labels."+label.Name, label.Value)
+					_, _ = exemplars.Put("labels."+label.Name, label.Value)
 				}
 			}
 		}
@@ -244,11 +244,11 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 				if bucket.Exemplar != nil {
 					exemplars = mapstr.M{name: bucket.Exemplar.Value}
 					if bucket.Exemplar.HasTs {
-						exemplars.Put("timestamp", bucket.Exemplar.Ts)
+						_, _ = exemplars.Put("timestamp", bucket.Exemplar.Ts)
 					}
 					for _, label := range bucket.Exemplar.Labels {
 						if label.Name != "" && label.Value != "" {
-							exemplars.Put("labels."+label.Name, label.Value)
+							_, _ = exemplars.Put("labels."+label.Name, label.Value)
 						}
 					}
 				}

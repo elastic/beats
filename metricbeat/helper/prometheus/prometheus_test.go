@@ -20,7 +20,7 @@ package prometheus
 import (
 	"bytes"
 	"compress/gzip"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"testing"
@@ -188,7 +188,7 @@ var _ = httpfetcher(&mockFetcher{})
 func (m mockFetcher) FetchResponse() (*http.Response, error) {
 	body := bytes.NewBuffer(nil)
 	writer := gzip.NewWriter(body)
-	writer.Write([]byte(m.response))
+	_, _ = writer.Write([]byte(m.response))
 	writer.Close()
 
 	return &http.Response{
@@ -196,7 +196,7 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 		Header: http.Header{
 			"Content-Encoding": []string{"gzip"},
 		},
-		Body: ioutil.NopCloser(body),
+		Body: io.NopCloser(body),
 	}, nil
 }
 
@@ -514,7 +514,7 @@ func TestPrometheus(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.msg, func(t *testing.T) {
 			reporter := &mbtest.CapturingReporterV2{}
-			p.ReportProcessedMetrics(test.mapping, reporter)
+			_ = p.ReportProcessedMetrics(test.mapping, reporter)
 			assert.Nil(t, reporter.GetErrors(), test.msg)
 			// Sort slice to avoid randomness
 			res := reporter.GetEvents()
@@ -971,7 +971,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
 		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logp.NewLogger("test")}
-		p.ReportProcessedMetrics(tc.mapping, r)
+		_ = p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {
 			continue

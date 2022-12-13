@@ -26,10 +26,10 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/golang/protobuf/proto"
 	pl "github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"

@@ -23,10 +23,10 @@ package collector
 import (
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	prometheuslabels "github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"

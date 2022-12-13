@@ -5,13 +5,12 @@
 package remote_write
 
 import (
+	"fmt"
 	"math"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/prometheus/common/model"
 
@@ -56,11 +55,11 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 
 		g.counterPatterns, err = p.CompilePatternList(config.TypesPatterns.CounterPatterns)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile counter patterns")
+			return nil, fmt.Errorf("unable to compile counter patterns: %w", err)
 		}
 		g.histogramPatterns, err = p.CompilePatternList(config.TypesPatterns.HistogramPatterns)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile histogram patterns")
+			return nil, fmt.Errorf("unable to compile histogram patterns: %w", err)
 		}
 
 		return &g, nil
@@ -123,7 +122,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 
 		labelsHash := labels.String() + metric.Timestamp.Time().String()
 		labelsClone := labels.Clone()
-		labelsClone.Delete("le")
+		_ = labelsClone.Delete("le")
 		if promType == histogramType {
 			labelsHash = labelsClone.String() + metric.Timestamp.Time().String()
 		}
@@ -192,17 +191,17 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 }
 
 // rateCounterUint64 fills a counter value and optionally adds the rate if rate_counters is enabled
-func (g *remoteWriteTypedGenerator) rateCounterUint64(name string, labels mapstr.M, value uint64) mapstr.M {
-	d := mapstr.M{
-		"counter": value,
-	}
-
-	if g.rateCounters {
-		d["rate"], _ = g.counterCache.RateUint64(name+labels.String(), value)
-	}
-
-	return d
-}
+//func (g *remoteWriteTypedGenerator) rateCounterUint64(name string, labels mapstr.M, value uint64) mapstr.M {
+//	d := mapstr.M{
+//		"counter": value,
+//	}
+//
+//	if g.rateCounters {
+//		d["rate"], _ = g.counterCache.RateUint64(name+labels.String(), value)
+//	}
+//
+//	return d
+//}
 
 // rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled
 func (g *remoteWriteTypedGenerator) rateCounterFloat64(name string, labels mapstr.M, value float64) mapstr.M {

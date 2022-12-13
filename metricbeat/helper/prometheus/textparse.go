@@ -18,8 +18,6 @@
 package prometheus
 
 import (
-	"fmt"
-	"io"
 	"math"
 	"mime"
 	"net/http"
@@ -33,8 +31,6 @@ import (
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/prometheus/prometheus/pkg/timestamp"
 )
-
-var errNameLabelMandatory = fmt.Errorf("missing metric name (%s label)", labels.MetricName)
 
 type Gauge struct {
 	Value *float64
@@ -312,7 +308,7 @@ func (m *MetricFamily) GetMetric() []*OpenMetric {
 }
 
 const (
-	suffixInfo   = "_info"
+	//suffixInfo   = "_info"
 	suffixTotal  = "_total"
 	suffixGCount = "_gcount"
 	suffixGSum   = "_gsum"
@@ -321,9 +317,9 @@ const (
 	suffixBucket = "_bucket"
 )
 
-func isInfo(name string) bool {
-	return len(name) > 5 && name[len(name)-5:] == suffixInfo
-}
+//func isInfo(name string) bool {
+//	return len(name) > 5 && name[len(name)-5:] == suffixInfo
+//}
 
 // Counters have _total suffix
 func isTotal(name string) bool {
@@ -478,16 +474,15 @@ loop:
 			e  exemplar.Exemplar
 		)
 		if et, err = parser.Next(); err != nil {
-			if err == io.EOF {
-				err = nil
-			}
+			// TODO: log here
+			// if errors.Is(err, io.EOF) {}
 			break
 		}
 		switch et {
 		case textparse.EntryType:
 			buf, t := parser.Type()
 			s := string(buf)
-			fam, ok = metricFamiliesByName[s]
+			_, ok = metricFamiliesByName[s]
 			if !ok {
 				fam = &MetricFamily{Name: &s, Type: t}
 				metricFamiliesByName[s] = fam
@@ -498,7 +493,7 @@ loop:
 			buf, t := parser.Help()
 			s := string(buf)
 			h := string(t)
-			fam, ok = metricFamiliesByName[s]
+			_, ok = metricFamiliesByName[s]
 			if !ok {
 				fam = &MetricFamily{Name: &s, Help: &h, Type: textparse.MetricTypeUnknown}
 				metricFamiliesByName[s] = fam
@@ -509,7 +504,7 @@ loop:
 			buf, t := parser.Unit()
 			s := string(buf)
 			u := string(t)
-			fam, ok = metricFamiliesByName[s]
+			_, ok = metricFamiliesByName[s]
 			if !ok {
 				fam = &MetricFamily{Name: &s, Unit: &u, Type: textparse.MetricTypeUnknown}
 				metricFamiliesByName[string(buf)] = fam
@@ -532,7 +527,8 @@ loop:
 		mets = parser.Metric(&lset)
 
 		if !lset.Has(labels.MetricName) {
-			err = errNameLabelMandatory
+			// TODO: log here an errNameLabelMandatory
+			// var errNameLabelMandatory = fmt.Errorf("missing metric name (%s label)", labels.MetricName)
 			break loop
 		}
 
@@ -575,18 +571,15 @@ loop:
 			} else {
 				lookupMetricName = metricName
 			}
-			break
 		case textparse.MetricTypeGauge:
 			var gauge = &Gauge{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Gauge: gauge, Label: labelPairs}
 			lookupMetricName = metricName
-			break
 		case textparse.MetricTypeInfo:
 			value := int64(v)
 			var info = &Info{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
 			lookupMetricName = metricName
-			break
 		case textparse.MetricTypeSummary:
 			lookupMetricName, metric = summaryMetricName(metricName, v, lset.Get(model.QuantileLabel), lbls.String(), &t, summariesByName)
 			metric.Label = labelPairs
@@ -594,7 +587,6 @@ loop:
 				continue
 			}
 			metricName = lookupMetricName
-			break
 		case textparse.MetricTypeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
@@ -605,7 +597,6 @@ loop:
 				continue
 			}
 			metricName = lookupMetricName
-			break
 		case textparse.MetricTypeGaugeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
@@ -617,18 +608,15 @@ loop:
 				continue
 			}
 			metricName = lookupMetricName
-			break
 		case textparse.MetricTypeStateset:
 			value := int64(v)
 			var stateset = &Stateset{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Stateset: stateset, Label: labelPairs}
 			lookupMetricName = metricName
-			break
 		case textparse.MetricTypeUnknown:
 			var unknown = &Unknown{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Unknown: unknown, Label: labelPairs}
 			lookupMetricName = metricName
-			break
 		default:
 			lookupMetricName = metricName
 		}

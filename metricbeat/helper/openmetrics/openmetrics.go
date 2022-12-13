@@ -21,12 +21,9 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"regexp"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -93,7 +90,7 @@ func (p *openmetrics) GetFamilies() ([]*prometheus.MetricFamily, error) {
 	}
 
 	if resp.StatusCode > 399 {
-		bodyBytes, err := ioutil.ReadAll(reader)
+		bodyBytes, err := io.ReadAll(reader)
 		if err == nil {
 			p.logger.Debug("error received from openmetrics endpoint: ", string(bodyBytes))
 		}
@@ -106,8 +103,14 @@ func (p *openmetrics) GetFamilies() ([]*prometheus.MetricFamily, error) {
 	}
 
 	appendTime := time.Now().Round(0)
-	b, err := ioutil.ReadAll(reader)
+	b, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response: %w", err)
+	}
 	families, err := prometheus.ParseMetricFamilies(b, contentType, appendTime)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse families: %w", err)
+	}
 
 	return families, nil
 }
@@ -169,14 +172,14 @@ func (p *openmetrics) ProcessMetrics(families []*prometheus.MetricFamily, mappin
 			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
-						keyLabels.Put(l.GetField(), v)
+						_, _ = keyLabels.Put(l.GetField(), v)
 					} else {
-						labels.Put(l.GetField(), v)
+						_, _ = labels.Put(l.GetField(), v)
 					}
 				} else if storeAllLabels {
 					// if label for this metric is not found at the label mappings but
 					// it is configured to store any labels found, make it so
-					labels.Put(labelsLocation+"."+k, v)
+					_, _ = labels.Put(labelsLocation+"."+k, v)
 				}
 			}
 
@@ -186,7 +189,7 @@ func (p *openmetrics) ProcessMetrics(families []*prometheus.MetricFamily, mappin
 			// not considering these extra fields to be keylabels as that case
 			// have not appeared yet
 			for k, v := range extraFields {
-				labels.Put(k, v)
+				_, _ = labels.Put(k, v)
 			}
 
 			// Keep a info document if it's an infoMetric
@@ -202,7 +205,7 @@ func (p *openmetrics) ProcessMetrics(families []*prometheus.MetricFamily, mappin
 			if field != "" {
 				event := getEvent(eventsMap, keyLabels)
 				update := mapstr.M{}
-				update.Put(field, value)
+				_, _ = update.Put(field, value)
 				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
 				event.DeepUpdate(update)
 
@@ -260,7 +263,7 @@ type infoMetricData struct {
 func (p *openmetrics) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error {
 	events, err := p.GetProcessedMetrics(mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting processed metrics")
+		return fmt.Errorf("error getting processed metrics: %w", err)
 	}
 	for _, event := range events {
 		r.Event(mb.Event{
@@ -286,7 +289,7 @@ func getLabels(metric *prometheus.OpenMetric) mapstr.M {
 	labels := mapstr.M{}
 	for _, label := range metric.GetLabel() {
 		if label.Name != "" && label.Value != "" {
-			labels.Put(label.Name, label.Value)
+			_, _ = labels.Put(label.Name, label.Value)
 		}
 	}
 	return labels
@@ -300,7 +303,7 @@ func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 		for _, pattern := range *patterns {
 			r, err := regexp.Compile(pattern)
 			if err != nil {
-				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
+				return nil, fmt.Errorf("failed to compile pattern '%s': %w", pattern, err)
 			}
 			compiledPatterns = append(compiledPatterns, r)
 		}

@@ -5,11 +5,11 @@
 package containerd
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -77,7 +77,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
-			return nil, errors.Wrap(err, "error generating cache hash for containerdMetricsCache")
+			return nil, fmt.Errorf("error generating cache hash for containerdMetricsCache: %w", err)
 		}
 		m := module{
 			BaseModule:             base,

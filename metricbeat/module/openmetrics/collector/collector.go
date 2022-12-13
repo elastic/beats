@@ -18,9 +18,9 @@
 package collector
 
 import (
+	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 
@@ -48,7 +48,6 @@ var (
 	upMetricType          = textparse.MetricTypeGauge
 	upMetricInstanceLabel = "instance"
 	upMetricJobLabel      = "job"
-	upMetricJobValue      = "openmetrics"
 )
 
 func init() {
@@ -119,11 +118,11 @@ func MetricSetBuilder(namespace string, genFactory OpenMetricsEventsGeneratorFac
 		ms.host = ms.Host()
 		ms.excludeMetrics, err = p.CompilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
+			return nil, fmt.Errorf("unable to compile exclude patterns: %w", err)
 		}
 		ms.includeMetrics, err = p.CompilePatternList(config.MetricsFilters.IncludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile include patterns")
+			return nil, fmt.Errorf("unable to compile include patterns: %w", err)
 		}
 
 		return ms, nil
@@ -144,7 +143,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		families = append(families, m.upMetricFamily(0.0))
 
 		// set the error to report it after sending the up event
-		err = errors.Wrap(err, "unable to decode response from openmetrics endpoint")
+		err = fmt.Errorf("unable to decode response from openmetrics endpoint: %w", err)
 	} else {
 		// add up event to the list
 		families = append(families, m.upMetricFamily(1.0))
@@ -171,11 +170,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 				// Add default instance label if not already there
 				if exists, _ := openMetricEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
-					openMetricEvent.Labels.Put(upMetricInstanceLabel, m.Host())
+					_, _ = openMetricEvent.Labels.Put(upMetricInstanceLabel, m.Host())
 				}
 				// Add default job label if not already there
 				if exists, _ := openMetricEvent.Labels.HasKey("job"); !exists {
-					openMetricEvent.Labels.Put("job", m.Module().Name())
+					_, _ = openMetricEvent.Labels.Put("job", m.Module().Name())
 				}
 				// Add labels
 				if len(openMetricEvent.Labels) > 0 {
@@ -244,7 +243,7 @@ func (m *MetricSet) upMetricFamily(value float64) *prometheus.MetricFamily {
 	}
 	return &prometheus.MetricFamily{
 		Name:   &upMetricName,
-		Type:   textparse.MetricType(upMetricType),
+		Type:   upMetricType,
 		Metric: []*prometheus.OpenMetric{&metric},
 	}
 }

@@ -17,14 +17,14 @@ import (
 //
 // ES histograms look like this:
 //
-//   "histogram_field" : {
-//      "values" : [0.1, 0.2, 0.3, 0.4, 0.5],
-//      "counts" : [3, 7, 23, 12, 6]
-//   }
+//	"histogram_field" : {
+//		   "values" : [0.1, 0.2, 0.3, 0.4, 0.5],
+//		   "counts" : [3, 7, 23, 12, 6]
+//	}
 //
-// This code takes a Prometheus histogram and tries to accomodate it into an ES histogram by:
-//  - calculating centroids for each bucket (values)
-//  - undoing counters accumulation for each bucket (counts)
+// This code takes a Prometheus histogram and tries to accommodate it into an ES histogram by:
+//   - calculating centroids for each bucket (values)
+//   - undoing counters accumulation for each bucket (counts)
 //
 // https://www.elastic.co/guide/en/elasticsearch/reference/master/histogram.html
 func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram *p.Histogram) mapstr.M {
