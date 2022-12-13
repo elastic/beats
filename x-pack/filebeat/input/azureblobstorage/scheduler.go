@@ -100,7 +100,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		}
 
 		// If previous checkpoint was saved then look up starting point for new jobs
-		if s.state.checkpoint().LatestEntryTime != nil {
+		if !s.state.checkpoint().LatestEntryTime.IsZero() {
 			jobs = s.moveToLastSeenJob(jobs)
 		}
 
@@ -179,8 +179,11 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	ignore := false
 
 	for _, job := range jobs {
-		switch {
-		case job.timestamp().After(*s.state.checkpoint().LatestEntryTime):
+		switch offset, isPartial := s.state.cp.PartiallyProcessed[*job.blob.Name]; {
+		case isPartial:
+			job.offset = offset
+			latestJobs = append(latestJobs, job)
+		case job.timestamp().After(s.state.checkpoint().LatestEntryTime):
 			latestJobs = append(latestJobs, job)
 		case job.name() == s.state.checkpoint().BlobName:
 			flag = true
@@ -201,7 +204,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 
 	// in a senario where there are some jobs which have a later time stamp
 	// but lesser alphanumeric order and some jobs have greater alphanumeric order
-	// than the current checkpoint
+	// than the current checkpoint or partially completed jobs are present
 	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
 		jobsToReturn = append(latestJobs, jobsToReturn...)
 	}
