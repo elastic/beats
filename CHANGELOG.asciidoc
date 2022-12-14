@@ -24,7 +24,7 @@ https://github.com/elastic/beats/compare/v8.5.2\...v8.5.3[View commits]
 
 *Heartbeat*
 
-Airgapped users of the beta Elastic Synthetics Integration package and beta private locations in Uptime Monitor Management may observe that `observer.geo.name` is not indexed with their heartbeat documents, resulting in location data missing from the Uptime app.
+If you are using either the Elastic Synthetics Integration package (beta) or private locations in the Uptime app's Monitor Management (beta) in an airgapped environment, `observer.geo.name` may not be indexed with your Heartbeat documents, resulting in location data missing from the Uptime app.
 
 This issue does not impact clusters with external network access. This issue will be fixed in the next release. 
 
