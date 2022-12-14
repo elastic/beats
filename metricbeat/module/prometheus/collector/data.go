@@ -55,6 +55,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *p.MetricFamily) []PromEvent 
 	var events []PromEvent
 
 	name := *mf.Name
+	_ = name // skip noisy linter
 	metrics := mf.Metric
 	for _, metric := range metrics {
 		labels := mapstr.M{}

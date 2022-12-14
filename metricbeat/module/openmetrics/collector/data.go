@@ -75,6 +75,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 	var events []OpenMetricEvent
 
 	name := *mf.Name
+	_ = name // skip noisy linter
 	metrics := mf.Metric
 	help := ""
 	unit := ""
@@ -88,6 +89,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 	for _, metric := range metrics {
 		labels := mapstr.M{}
 		mn := metric.GetName()
+		_ = mn // skip noisy linter
 
 		if len(metric.Label) != 0 {
 			for _, label := range metric.Label {
@@ -215,6 +217,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 			if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
 				var sum = "_sum"
 				var count = "_count"
+				_, _ = sum, count // skip noisy linter
 				var typ = textparse.MetricTypeHistogram
 				if histogram.IsGaugeHistogram {
 					sum = "_gsum"

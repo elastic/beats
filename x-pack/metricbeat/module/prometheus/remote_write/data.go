@@ -237,6 +237,7 @@ func (g *remoteWriteTypedGenerator) processPromHistograms(eventList map[string]m
 			Bucket: histogram.buckets,
 		}
 		name := strings.TrimSuffix(histogram.metricName, "_bucket")
+		_ = name // skip noisy linter
 		data := mapstr.M{
 			name: mapstr.M{
 				"histogram": collector.PromHistogramToES(g.counterCache, histogram.metricName, histogram.labels, &hist),
