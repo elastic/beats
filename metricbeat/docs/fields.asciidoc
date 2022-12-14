@@ -29999,6 +29999,16 @@ type: keyword
 
 --
 
+*`elasticsearch.node.roles`*::
++
+--
+Node roles.
+
+
+type: keyword
+
+--
+
 *`elasticsearch.node.master`*::
 +
 --
@@ -31671,6 +31681,79 @@ type: long
 --
 
 *`elasticsearch.index.summary.total.bulk.time.avg.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ingest.pipeline.name`*::
++
+--
+type: wildcard
+
+--
+
+
+*`elasticsearch.ingest.pipeline.total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ingest.pipeline.total.failed`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ingest.pipeline.total.total_cpu_time`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ingest.pipeline.total.self_cpu_time`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ingest.pipeline.processor.type`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.ingest.pipeline.processor.order_index`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ingest.pipeline.processor.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ingest.pipeline.processor.failed`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ingest.pipeline.processor.total_cpu_time`*::
 +
 --
 type: long

@@ -22,7 +22,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -58,47 +57,68 @@ type PipelineStat struct {
 	} `json:"processors"`
 }
 
-func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool, sampleProcessors bool) error {
 	var nodeIngestStats Stats
 	if err := json.Unmarshal(content, &nodeIngestStats); err != nil {
 		return errors.Wrap(err, "failure parsing Node Ingest Stats API response")
 	}
 
 	for nodeId, nodeStats := range nodeIngestStats.Nodes {
+		// If there are no ingest stats on this node, don't create any events
 		if nodeStats.Ingest.Total.Count == 0 && nodeStats.Ingest.Total.Failed == 0 && nodeStats.Ingest.Total.TimeInMillis == 0 {
 			continue
 		}
 
 		for pipelineId, pipelineStats := range nodeStats.Ingest.Pipelines {
+			// If there are no metrics on this node for this pipeline, don't create any events
 			if pipelineStats.Count == 0 && pipelineStats.Failed == 0 && pipelineStats.TimeInMillis == 0 {
 				continue
 			}
 
+			// Create the overall pipeline event
 			event := mb.Event{
 				ModuleFields: mapstr.M{},
 			}
-			// Common fields
-			// TODO: make more complete with Node Info API - cluster.id
-			event.ModuleFields.Put("cluster.name", nodeIngestStats.ClusterName)
-			event.ModuleFields.Put("node.id", nodeId)
-			event.ModuleFields.Put("node.name", nodeStats.Name)
-			event.ModuleFields.Put("node.roles", nodeStats.Roles)
 
-			// Pipeline fields
-			event.ModuleFields.Put("ingest.pipeline.name", pipelineId)
+			// Common fields
+			addCommonFields(&event, &info, nodeId, &nodeStats, pipelineId)
+
+			// Pipeline metrics
 			event.ModuleFields.Put("ingest.pipeline.total.count", pipelineStats.Count)
 			event.ModuleFields.Put("ingest.pipeline.total.failed", pipelineStats.Failed)
 			event.ModuleFields.Put("ingest.pipeline.total.total_cpu_time", pipelineStats.TimeInMillis)
 
+			// Self time subtracts any processor pipelines
 			selfCpuTime := pipelineStats.TimeInMillis
-			for _, processorObj := range pipelineStats.Processors {
-				// processorObj has a single key with the processor type
+			for pIdx, processorObj := range pipelineStats.Processors {
 				for pType, processorStats := range processorObj {
 					if pType == "pipeline" {
 						selfCpuTime -= processorStats.Stats.TimeInMillis
-
-						// TODO: add events for processors
 					}
+
+					// Skip when this fetch should not sample processors
+					if !sampleProcessors {
+						continue
+					}
+
+					// Create the processor event
+					processorEvent := mb.Event{
+						ModuleFields: mapstr.M{},
+					}
+
+					// Common fields
+					addCommonFields(&processorEvent, &info, nodeId, &nodeStats, pipelineId)
+
+					// Processor metrics
+					processorEvent.ModuleFields.Put("ingest.pipeline.processor.order_index", pIdx)
+					processorEvent.ModuleFields.Put("ingest.pipeline.processor.type", pType)
+					processorEvent.ModuleFields.Put("ingest.pipeline.processor.count", processorStats.Stats.Count)
+					processorEvent.ModuleFields.Put("ingest.pipeline.processor.failed", processorStats.Stats.Failed)
+					processorEvent.ModuleFields.Put("ingest.pipeline.processor.total_cpu_time", processorStats.Stats.TimeInMillis)
+					r.Event(processorEvent)
+
+					// processorObj has a single key with the processor type, so break early
+					// Any other format would not be expected and would likely break dashboards
 					break
 				}
 			}
@@ -109,4 +129,14 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 	}
 
 	return nil
+}
+
+func addCommonFields(event *mb.Event, info *elasticsearch.Info, nodeId string, nodeStats *NodeStats, pipelineId string) {
+	event.ModuleFields.Put("cluster.id", info.ClusterID)
+	event.ModuleFields.Put("cluster.name", info.ClusterName)
+	event.ModuleFields.Put("node.id", nodeId)
+	event.ModuleFields.Put("node.name", nodeStats.Name)
+	event.ModuleFields.Put("node.roles", nodeStats.Roles)
+
+	event.ModuleFields.Put("ingest.pipeline.name", pipelineId)
 }

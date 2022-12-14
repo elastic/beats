@@ -18,6 +18,7 @@
 package ingest
 
 import (
+	"math"
 	"net/url"
 
 	"github.com/pkg/errors"
@@ -39,30 +40,60 @@ func init() {
 }
 
 const (
-	statsPath = "/_nodes/stats/ingest"
+	statsPathCluster = "/_nodes/stats/ingest"
+	statsPathNode = "/_nodes/_local/stats/ingest"
 )
 
-// MetricSet type defines all fields of the MetricSet
-type MetricSet struct {
+// IngestMetricSet type defines all fields of the IngestMetricSet
+type IngestMetricSet struct {
 	*elasticsearch.MetricSet
+
+	// fetchCounter counts the number of times the Fetch method has been called.
+	// Used for sampling
+	fetchCounter int
+
+	// Rate at which processor level events should be sampled
+	sampleProcessorsEveryN int
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The elasticsearch ingest metricset is beta.")
-	ms, err := elasticsearch.NewMetricSet(base, statsPath)
+	ms, err := elasticsearch.NewMetricSet(base, statsPathCluster)
 	if err != nil {
 		return nil, err
 	}
 
-	return &MetricSet{MetricSet: ms}, nil
+	config := struct {
+		ProcessorSampleRate float64 `config:"ingest.processor_sample_rate"`
+	}{
+		ProcessorSampleRate: 0.25,
+	}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	var sampleProcessorsEveryN int
+	if config.ProcessorSampleRate == 0 {
+		sampleProcessorsEveryN = 0
+	} else {
+		sampleProcessorsEveryN = int(math.Round(1.0 / math.Min(1.0, config.ProcessorSampleRate)))
+	}
+
+	base.Logger().Debugf("Sampling ingest processor stats every %d fetches", sampleProcessorsEveryN)
+
+	return &IngestMetricSet{
+		MetricSet: ms,
+		fetchCounter: 0,
+		sampleProcessorsEveryN: sampleProcessorsEveryN,
+	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+func (m *IngestMetricSet) Fetch(report mb.ReporterV2) error {
 	shouldSkip, err := m.ShouldSkipFetch()
 	if err != nil {
 		return err
@@ -76,7 +107,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	uri.Path = statsPath
+	if m.Scope == elasticsearch.ScopeCluster {
+		uri.Path = statsPathCluster
+	} else {
+		uri.Path = statsPathNode
+	}
 	m.HTTP.SetURI(uri.String())
 
 	content, err := m.HTTP.FetchContent()
@@ -89,5 +124,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
-	return eventsMapping(report, m.HTTP, *info, content, m.XPackEnabled)
+	m.fetchCounter++ // It's fine if this overflows, it's only used for modulo
+	sampleProcessors := m.fetchCounter % m.sampleProcessorsEveryN == 0
+	m.Logger().Debugf("Sampling ingest processor stats: %v", sampleProcessors)
+	return eventsMapping(report, *info, content, m.XPackEnabled, sampleProcessors)
 }
