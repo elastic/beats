@@ -46,6 +46,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -386,15 +387,19 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer svc.NotifyTermination()
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
-	// sharing same data path.
-	bl := locks.New(b.Info)
-	err := bl.Lock()
-	if err != nil {
-		return err
+	// sharing same data path. This is disabled under elastic-agent.
+	if !fleetmode.Enabled() {
+		bl := locks.New(b.Info)
+		err := bl.Lock()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			_ = bl.Unlock()
+		}()
+	} else {
+		logp.Info("running under elastic-agent, per-beat lockfiles disabled")
 	}
-	defer func() {
-		_ = bl.Unlock()
-	}()
 
 	svc.BeforeRun()
 	defer svc.Cleanup()
@@ -404,26 +409,26 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
 	// that would be set at runtime.
-	var s *api.Server // buffer reporter may need to attach to the server.
 	if b.Config.HTTP.Enabled() {
-		s, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		var err error
+		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
-		s.Start()
+		b.API.Start()
 		defer func() {
-			_ = s.Stop()
+			_ = b.API.Stop()
 		}()
 		if b.Config.HTTPPprof.IsEnabled() {
 			pprof.SetRuntimeProfilingParameters(b.Config.HTTPPprof)
 
-			if err := pprof.HttpAttach(b.Config.HTTPPprof, s); err != nil {
+			if err := pprof.HttpAttach(b.Config.HTTPPprof, b.API); err != nil {
 				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
 			}
 		}
 	}
 
-	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+	if err := seccomp.LoadFilter(b.Config.Seccomp); err != nil {
 		return err
 	}
 
@@ -456,7 +461,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 		defer buffReporter.Stop()
 
-		if err := s.AttachHandler("/buffer", buffReporter); err != nil {
+		if err := b.API.AttachHandler("/buffer", buffReporter); err != nil {
 			return err
 		}
 	}
@@ -900,7 +905,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) checkElasticsearchVersion() {
-	if !isElasticsearchOutput(b.Config.Output.Name()) || b.isConnectionToOlderVersionAllowed() {
+	if b.isConnectionToOlderVersionAllowed() {
 		return
 	}
 
@@ -931,7 +936,7 @@ func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
-	if !isElasticsearchOutput(b.Config.Output.Name()) || !b.IdxSupporter.Enabled() {
+	if !b.IdxSupporter.Enabled() {
 		return nil
 	}
 
@@ -978,10 +983,8 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 }
 
 func (b *Beat) registerClusterUUIDFetching() {
-	if isElasticsearchOutput(b.Config.Output.Name()) {
-		callback := b.clusterUUIDFetchingCallback()
-		_, _ = elasticsearch.RegisterConnectCallback(callback)
-	}
+	callback := b.clusterUUIDFetchingCallback()
+	_, _ = elasticsearch.RegisterConnectCallback(callback)
 }
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring

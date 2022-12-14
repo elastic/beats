@@ -197,3 +197,27 @@ curl -XGET 'localhost:5066/stats?pretty'
 ----
 
 The actual output may contain more metrics specific to {beatname_uc}
+
+ifdef::has_inputs_endpoint[]
+[float]
+=== Inputs
+
+`/inputs/` returns metrics related to input instances. It returns a list of
+objects where each object contains metrics for an instance of an input. Each
+object will minimally contain an `input` field that identifies the type of input
+(e.g. `aws-s3`) and an `id` field that is the unique identifier for the input
+instance.
+
+A request may optionally specify a `type` query parameter to request metrics
+for a specific type of input. And `pretty` may be included to have the
+returned JSON be pretty formatted.
+
+[source,js]
+----
+curl 'http://localhost:5066/inputs/'
+curl 'http://localhost:5066/inputs/?pretty'
+curl 'http://localhost:5066/inputs/?type=aws-s3&pretty'
+----
+
+["source","js",subs="attributes"]
+endif::has_inputs_endpoint[]
