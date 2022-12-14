@@ -51,15 +51,20 @@ type BeatV2Manager struct {
 	payload map[string]interface{}
 
 	// stop callback must be registered by libbeat, as with the V1 callback
-	stopFunc func()
-	stopMut  sync.Mutex
-	beatStop sync.Once
+	stopFunc           func()
+	stopOnOutputReload bool
+	stopMut            sync.Mutex
+	beatStop           sync.Once
 
 	// sync channel for shutting down the manager after we get a stop from
 	// either the agent or the beat
 	stopChan chan struct{}
 
 	isRunning bool
+
+	// is set on first instance of a config reload,
+	// allowing us to restart the beat if stopOnOutputReload is set
+	outputIsConfigured bool
 
 	// used for the debug callback to report as-running config
 	lastOutputCfg *reload.ConfigWithMeta
@@ -97,14 +102,18 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (
 // NewV2AgentManagerWithClient actually creates the manager instance used by the rest of the beats.
 func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2) (lbmanagement.Manager, error) {
 	log := logp.NewLogger(lbmanagement.DebugK)
+	if config.OutputRestart {
+		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
+	}
 	m := &BeatV2Manager{
-		config:   config,
-		logger:   log.Named("V2-manager"),
-		registry: registry,
-		units:    make(map[unitKey]*client.Unit),
-		status:   lbmanagement.Running,
-		message:  "Healthy",
-		stopChan: make(chan struct{}, 1),
+		stopOnOutputReload: config.OutputRestart,
+		config:             config,
+		logger:             log.Named("V2-manager"),
+		registry:           registry,
+		units:              make(map[unitKey]*client.Unit),
+		status:             lbmanagement.Running,
+		message:            "Healthy",
+		stopChan:           make(chan struct{}, 1),
 	}
 
 	if config.Enabled {
@@ -464,6 +473,13 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return nil
 	}
 
+	if cm.stopOnOutputReload && cm.outputIsConfigured {
+		cm.logger.Info("beat is restarting because output changed")
+		_ = unit.UpdateState(client.UnitStateStopping, "Restarting", nil)
+		cm.Stop()
+		return nil
+	}
+
 	_, _, rawConfig := unit.Expected()
 	if rawConfig == nil {
 		return fmt.Errorf("output unit has no config")
@@ -480,6 +496,8 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return fmt.Errorf("failed to reload output: %w", err)
 	}
 	cm.lastOutputCfg = reloadConfig
+	// set to true, we'll reload the output if we need to re-configure
+	cm.outputIsConfigured = true
 	return nil
 }
 
