@@ -191,6 +191,7 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 	defer client.Close()
 
 	// Use locations - (wildcard) to fetch all instances.
+	// https://pkg.go.dev/cloud.google.com/go/redis@v1.10.0/apiv1#CloudRedisClient.ListInstances
 	it := client.ListInstances(ctx, &redispb.ListInstancesRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/-", s.projectID),
 	})
