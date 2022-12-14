@@ -41,7 +41,7 @@ func init() {
 
 const (
 	statsPathCluster = "/_nodes/stats/ingest"
-	statsPathNode = "/_nodes/_local/stats/ingest"
+	statsPathNode    = "/_nodes/_local/stats/ingest"
 )
 
 // IngestMetricSet type defines all fields of the IngestMetricSet
@@ -84,8 +84,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	base.Logger().Debugf("Sampling ingest processor stats every %d fetches", sampleProcessorsEveryN)
 
 	return &IngestMetricSet{
-		MetricSet: ms,
-		fetchCounter: 0,
+		MetricSet:              ms,
+		fetchCounter:           0,
 		sampleProcessorsEveryN: sampleProcessorsEveryN,
 	}, nil
 }
@@ -125,7 +125,7 @@ func (m *IngestMetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	m.fetchCounter++ // It's fine if this overflows, it's only used for modulo
-	sampleProcessors := m.fetchCounter % m.sampleProcessorsEveryN == 0
+	sampleProcessors := m.fetchCounter%m.sampleProcessorsEveryN == 0
 	m.Logger().Debugf("Sampling ingest processor stats: %v", sampleProcessors)
 	return eventsMapping(report, *info, content, m.XPackEnabled, sampleProcessors)
 }
