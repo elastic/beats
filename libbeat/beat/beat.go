@@ -18,6 +18,7 @@
 package beat
 
 import (
+	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -79,6 +80,8 @@ type Beat struct {
 	Keystore keystore.Keystore
 
 	Instrumentation instrumentation.Instrumentation // instrumentation holds an APM agent for capturing and reporting traces
+
+	API *api.Server // API server. This is nil unless the http endpoint is enabled.
 }
 
 // BeatConfig struct contains the basic configuration of every beat

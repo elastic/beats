@@ -18,12 +18,13 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/gorilla/mux"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -33,13 +34,13 @@ import (
 // and will answer all the routes defined in the received ServeMux.
 type Server struct {
 	log    *logp.Logger
-	mux    *http.ServeMux
+	mux    *mux.Router
 	l      net.Listener
 	config Config
 }
 
-// New creates a new API Server.
-func New(log *logp.Logger, mux *http.ServeMux, config *config.C) (*Server, error) {
+// New creates a new API Server with no routes attached.
+func New(log *logp.Logger, config *config.C) (*Server, error) {
 	if log == nil {
 		log = logp.NewLogger("")
 	}
@@ -55,7 +56,12 @@ func New(log *logp.Logger, mux *http.ServeMux, config *config.C) (*Server, error
 		return nil, err
 	}
 
-	return &Server{mux: mux, l: l, config: cfg, log: log.Named("api")}, nil
+	return &Server{
+		mux:    mux.NewRouter().StrictSlash(true),
+		l:      l,
+		config: cfg,
+		log:    log.Named("api"),
+	}, nil
 }
 
 // Start starts the HTTP server and accepting new connection.
@@ -73,23 +79,19 @@ func (s *Server) Stop() error {
 	return s.l.Close()
 }
 
-// AttachHandler will attach a handler at the specified route and return an error instead of panicing.
+// AttachHandler will attach a handler at the specified route. Routes are
+// matched in the order in which that are attached.
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			switch r := r.(type) {
-			case error:
-				err = r
-			case string:
-				err = errors.New(r)
-			default:
-				err = fmt.Errorf("failed to register http handler at path %v: %v", route, h)
-			}
-		}
-	}()
-	s.mux.Handle(route, h)
+	if err := s.mux.Handle(route, h).GetError(); err != nil {
+		return err
+	}
 	s.log.Debugf("Attached handler at %q to server.", route)
 	return nil
+}
+
+// Router returns the mux.Router that handles all request to the server.
+func (s *Server) Router() *mux.Router {
+	return s.mux
 }
 
 func parse(host string, port int) (string, string, error) {
