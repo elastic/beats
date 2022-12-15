@@ -197,9 +197,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 			// filter listMetricsOutput by detailed configuration per each namespace
 			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespace, namespaceDetails)
-			for _, filteredMetricDetail := range filteredMetricWithStatsTotal {
-				m.logger.Infof("Filtered namespace for namespace %s: %s", namespace, *filteredMetricDetail.cloudwatchMetric.Namespace)
-			}
+
 			// get resource type filters and tags filters for each namespace
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
 
