@@ -1111,6 +1111,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 	cases := []struct {
 		title                        string
 		listMetricsOutput            []cloudwatchtypes.Metric
+		namespace                    string
 		namespaceDetails             []namespaceDetail
 		filteredMetricWithStatsTotal []metricsWithStatistics
 	}{
@@ -1139,6 +1140,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 			},
+			"AWS/EC2",
 			[]namespaceDetail{
 				{
 					resourceTypeFilter: "ec2:instance",
@@ -1190,6 +1192,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 					Namespace:  awssdk.String("AWS/EC2"),
 				},
 			},
+			"AWS/EC2",
 			[]namespaceDetail{
 				{
 					names:              []string{"CPUUtilization"},
@@ -1214,7 +1217,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			output := filterListMetricsOutput(c.listMetricsOutput, c.namespaceDetails)
+			output := filterListMetricsOutput(c.listMetricsOutput, c.namespace, c.namespaceDetails)
 			assert.Equal(t, c.filteredMetricWithStatsTotal, output)
 		})
 	}

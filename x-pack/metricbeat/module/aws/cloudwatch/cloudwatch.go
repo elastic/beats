@@ -204,9 +204,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			if len(listMetricsOutput) == 0 {
 				continue
 			}
-
 			// filter listMetricsOutput by detailed configuration per each namespace
-			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespaceDetails)
+			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespace, namespaceDetails)
+			for _, filteredMetricDetail := range filteredMetricWithStatsTotal {
+				m.logger.Infof("Filtered namespace for namespace %s: %s", namespace, *filteredMetricDetail.cloudwatchMetric.Namespace)
+			}
 			// get resource type filters and tags filters for each namespace
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
 
@@ -252,52 +254,54 @@ func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionNa
 }
 
 // filterListMetricsOutput compares config details with listMetricsOutput and filter out the ones don't match
-func filterListMetricsOutput(listMetricsOutput []types.Metric, namespaceDetails []namespaceDetail) []metricsWithStatistics {
+func filterListMetricsOutput(listMetricsOutput []types.Metric, namespace string, namespaceDetails []namespaceDetail) []metricsWithStatistics {
 	var filteredMetricWithStatsTotal []metricsWithStatistics
 	for _, listMetric := range listMetricsOutput {
-		for _, configPerNamespace := range namespaceDetails {
-			if configPerNamespace.names != nil && configPerNamespace.dimensions == nil {
-				// if metric names are given in config but no dimensions, filter
-				// out the metrics with other names
-				if exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names); !exists {
-					continue
-				}
-				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
-					metricsWithStatistics{
-						cloudwatchMetric: listMetric,
-						statistic:        configPerNamespace.statistics,
-					})
+		if *listMetric.Namespace == namespace {
+			for _, configPerNamespace := range namespaceDetails {
+				if configPerNamespace.names != nil && configPerNamespace.dimensions == nil {
+					// if metric names are given in config but no dimensions, filter
+					// out the metrics with other names
+					if exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names); !exists {
+						continue
+					}
+					filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
+						metricsWithStatistics{
+							cloudwatchMetric: listMetric,
+							statistic:        configPerNamespace.statistics,
+						})
 
-			} else if configPerNamespace.names == nil && configPerNamespace.dimensions != nil {
-				// if metric names are not given in config but dimensions are
-				// given, only keep the metrics with matching dimensions
-				if !compareAWSDimensions(listMetric.Dimensions, configPerNamespace.dimensions) {
-					continue
+				} else if configPerNamespace.names == nil && configPerNamespace.dimensions != nil {
+					// if metric names are not given in config but dimensions are
+					// given, only keep the metrics with matching dimensions
+					if !compareAWSDimensions(listMetric.Dimensions, configPerNamespace.dimensions) {
+						continue
+					}
+					filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
+						metricsWithStatistics{
+							cloudwatchMetric: listMetric,
+							statistic:        configPerNamespace.statistics,
+						})
+				} else if configPerNamespace.names != nil && configPerNamespace.dimensions != nil {
+					if exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names); !exists {
+						continue
+					}
+					if !compareAWSDimensions(listMetric.Dimensions, configPerNamespace.dimensions) {
+						continue
+					}
+					filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
+						metricsWithStatistics{
+							cloudwatchMetric: listMetric,
+							statistic:        configPerNamespace.statistics,
+						})
+				} else {
+					// if no metric name and no dimensions given, then keep all listMetricsOutput
+					filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
+						metricsWithStatistics{
+							cloudwatchMetric: listMetric,
+							statistic:        configPerNamespace.statistics,
+						})
 				}
-				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
-					metricsWithStatistics{
-						cloudwatchMetric: listMetric,
-						statistic:        configPerNamespace.statistics,
-					})
-			} else if configPerNamespace.names != nil && configPerNamespace.dimensions != nil {
-				if exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names); !exists {
-					continue
-				}
-				if !compareAWSDimensions(listMetric.Dimensions, configPerNamespace.dimensions) {
-					continue
-				}
-				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
-					metricsWithStatistics{
-						cloudwatchMetric: listMetric,
-						statistic:        configPerNamespace.statistics,
-					})
-			} else {
-				// if no metric name and no dimensions given, then keep all listMetricsOutput
-				filteredMetricWithStatsTotal = append(filteredMetricWithStatsTotal,
-					metricsWithStatistics{
-						cloudwatchMetric: listMetric,
-						statistic:        configPerNamespace.statistics,
-					})
 			}
 		}
 	}
