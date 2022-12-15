@@ -597,7 +597,7 @@ func TestOnRenameFileIdentity(t *testing.T) {
 	for k, tc := range testCases {
 		t.Run(k, func(t *testing.T) {
 			p := fileProspector{
-				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
+				filewatcher:       &mockFileWatcher{events: tc.events},
 				identifier:        mustPathIdentifier(true),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: true},
 			}
