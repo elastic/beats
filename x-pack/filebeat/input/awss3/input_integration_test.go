@@ -31,11 +31,8 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -132,28 +129,6 @@ file_selectors:
         negate:  true
         match:   after
 `, queueURL))
-}
-
-type testInputStore struct {
-	registry *statestore.Registry
-}
-
-func openTestStatestore() beater.StateStore {
-	return &testInputStore{
-		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
-	}
-}
-
-func (s *testInputStore) Close() {
-	s.registry.Close()
-}
-
-func (s *testInputStore) Access() (*statestore.Store, error) {
-	return s.registry.Get("filebeat")
-}
-
-func (s *testInputStore) CleanupInterval() time.Duration {
-	return 24 * time.Hour
 }
 
 func createInput(t *testing.T, cfg *conf.C) *s3Input {
