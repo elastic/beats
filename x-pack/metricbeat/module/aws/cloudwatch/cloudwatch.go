@@ -180,10 +180,22 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		if err != nil {
 			m.Logger().Warn("skipping metrics list from region '%s'", regionName)
 		}
+
+		// retrieve all the details for all the metrics available in the current region
+		regionListMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, svcCloudwatch)
+
+		// filter out metrics details for namespaces that are not included in the configuration
+		listMetricsOutput := make([]types.Metric, 0)
+		for _, listMetricDetail := range regionListMetricsOutput {
+			namespace := *listMetricDetail.Namespace
+			if _, ok := namespaceDetailTotal[namespace]; ok {
+				listMetricsOutput = append(listMetricsOutput, listMetricDetail)
+			}
+		}
+
 		for namespace, namespaceDetails := range namespaceDetailTotal {
 			m.logger.Debugf("Collected metrics from namespace %s", namespace)
 
-			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, svcCloudwatch)
 			if err != nil {
 				m.logger.Info(err.Error())
 				continue
@@ -195,6 +207,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// filter listMetricsOutput by detailed configuration per each namespace
 			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespaceDetails)
+			for _, filteredMetricDetail := range filteredMetricWithStatsTotal {
+				m.logger.Infof("Filtered namespace for namespace %s: %s", namespace, *filteredMetricDetail.cloudwatchMetric.Namespace)
+			}
 			// get resource type filters and tags filters for each namespace
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
 
