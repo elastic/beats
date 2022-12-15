@@ -29,38 +29,48 @@ func TestAddFields(t *testing.T) {
 
 	testProcessors(t, map[string]testCase{
 		"add field": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"fields": common.MapStr{"field": "test"},
 			},
 			cfg: single(`{add_fields: {fields: {field: test}}}`),
 		},
 		"custom target": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"my": common.MapStr{"field": "test"},
 			},
 			cfg: single(`{add_fields: {target: my, fields: {field: test}}}`),
 		},
 		"overwrite existing field": {
-			event: common.MapStr{
+			eventFields: common.MapStr{
 				"fields": common.MapStr{"field": "old"},
 			},
-			want: common.MapStr{"fields": common.MapStr{"field": "test"}},
-			cfg:  single(`{add_fields: {fields: {field: test}}}`),
+			wantFields: common.MapStr{"fields": common.MapStr{"field": "test"}},
+			cfg:        single(`{add_fields: {fields: {field: test}}}`),
+		},
+		"merge with existing meta": {
+			eventMeta: common.MapStr{
+				"_id": "unique",
+			},
+			wantMeta: common.MapStr{
+				"_id":     "unique",
+				"op_type": "index",
+			},
+			cfg: single(`{add_fields: {target: "@metadata", fields: {op_type: "index"}}}`),
 		},
 		"merge with existing fields": {
-			event: common.MapStr{
+			eventFields: common.MapStr{
 				"fields": common.MapStr{"existing": "a"},
 			},
-			want: common.MapStr{
+			wantFields: common.MapStr{
 				"fields": common.MapStr{"existing": "a", "field": "test"},
 			},
 			cfg: single(`{add_fields: {fields: {field: test}}}`),
 		},
 		"combine 2 processors": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"fields": common.MapStr{
 					"l1": "a",
 					"l2": "b",
@@ -72,8 +82,8 @@ func TestAddFields(t *testing.T) {
 			),
 		},
 		"different targets": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"a": common.MapStr{"l1": "a"},
 				"b": common.MapStr{"l2": "b"},
 			},
@@ -83,8 +93,8 @@ func TestAddFields(t *testing.T) {
 			),
 		},
 		"under root": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"a": common.MapStr{"b": "test"},
 			},
 			cfg: single(
@@ -92,10 +102,10 @@ func TestAddFields(t *testing.T) {
 			),
 		},
 		"merge under root": {
-			event: common.MapStr{
+			eventFields: common.MapStr{
 				"a": common.MapStr{"old": "value"},
 			},
-			want: common.MapStr{
+			wantFields: common.MapStr{
 				"a": common.MapStr{"old": "value", "new": "test"},
 			},
 			cfg: single(
@@ -103,10 +113,10 @@ func TestAddFields(t *testing.T) {
 			),
 		},
 		"overwrite existing under root": {
-			event: common.MapStr{
+			eventFields: common.MapStr{
 				"a": common.MapStr{"keep": "value", "change": "a"},
 			},
-			want: common.MapStr{
+			wantFields: common.MapStr{
 				"a": common.MapStr{"keep": "value", "change": "b"},
 			},
 			cfg: single(
@@ -114,8 +124,8 @@ func TestAddFields(t *testing.T) {
 			),
 		},
 		"add fields to nil event": {
-			event: nil,
-			want: common.MapStr{
+			eventFields: nil,
+			wantFields: common.MapStr{
 				"fields": common.MapStr{"field": "test"},
 			},
 			cfg: single(`{add_fields: {fields: {field: test}}}`),
