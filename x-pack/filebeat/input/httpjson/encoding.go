@@ -210,7 +210,8 @@ func decodeAsZip(p []byte, dst *response) error {
 	}
 
 	dst.body = results
-	if dst.header == nil {
+	if dst.header == nil { //nolint:errorlint // Bad linter!
+		// https://github.com/golangci/golangci-lint-action/issues/624
 		dst.header = http.Header{}
 	}
 	dst.header["X-Zip-Files"] = names
