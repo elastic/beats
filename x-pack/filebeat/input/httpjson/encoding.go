@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"net/http"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -188,11 +189,13 @@ func decodeAsZip(p []byte, dst *response) error {
 		return err
 	}
 
+	names := make([]string, 0, len(r.File))
 	for _, f := range r.File {
 		rc, err := f.Open()
 		if err != nil {
 			return err
 		}
+		names = append(names, f.Name)
 
 		dec := json.NewDecoder(rc)
 		for dec.More() {
@@ -207,6 +210,10 @@ func decodeAsZip(p []byte, dst *response) error {
 	}
 
 	dst.body = results
+	if dst.header == nil { //linter false positive; golangci-lint-action #624
+		dst.header = http.Header{}
+	}
+	dst.header["X-Zip-Files"] = names
 
 	return nil
 }
