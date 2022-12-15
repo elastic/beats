@@ -92,7 +92,7 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (
 func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2) (lbmanagement.Manager, error) {
 	log := logp.NewLogger(lbmanagement.DebugK)
 	if config.OutputRestart {
-		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
+		log.Info("Output reload is enabled, the beat will restart as needed on change of output config")
 	}
 	m := &BeatV2Manager{
 		stopOnOutputReload: config.OutputRestart,
@@ -348,7 +348,7 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 
 	// if needed, stop the beat, let agent restart
 	if cm.stopOnOutputReload && cm.outputIsConfigured {
-		cm.logger.Infof("beat will now stop for output reload")
+		cm.logger.Info("beat will now stop for output reload")
 		// in the future we'll want some set "reloading" state,
 		// but for now set the state this way.
 		_ = unit.UpdateState(client.UnitStateStopping, "got output unit, beat will restart", nil)
@@ -384,6 +384,7 @@ func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
 
 // handle the updated config for an input unit
 func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
+	cm.addUnit(unit)
 	_, _, rawConfig := unit.Expected()
 	if rawConfig == nil {
 		cm.logger.Warnf("got input update with no config, ignoring")
