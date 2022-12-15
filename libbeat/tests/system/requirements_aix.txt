@@ -2,7 +2,7 @@ attrs==19.3.0
 autopep8==1.5.4
 backports.ssl-match-hostname==3.5.0.1
 cached-property==1.4.2
-certifi==2018.1.18
+certifi==2022.12.7
 chardet==3.0.4
 deepdiff==4.2.0
 docker==4.1.0
