@@ -645,7 +645,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	if !wantClient(cfg) {
 		return nil, nil
 	}
-	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL)...)
+	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
@@ -696,7 +696,7 @@ func wantClient(cfg config) bool {
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(u *url.URL) []httpcommon.TransportOption {
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
 	switch {
@@ -705,7 +705,7 @@ func clientOptions(u *url.URL) []httpcommon.TransportOption {
 	case !ok:
 		return []httpcommon.TransportOption{
 			httpcommon.WithAPMHTTPInstrumentation(),
-			httpcommon.WithKeepaliveSettings{Disable: true},
+			keepalive,
 		}
 
 	// We set the host for the unix socket and Windows named
@@ -723,7 +723,7 @@ func clientOptions(u *url.URL) []httpcommon.TransportOption {
 	u.Scheme = scheme
 	return []httpcommon.TransportOption{
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
+		keepalive,
 		httpcommon.WithBaseDialer(dialer),
 	}
 }
