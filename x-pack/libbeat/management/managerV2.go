@@ -7,6 +7,8 @@ package management
 import (
 	"context"
 	"fmt"
+	"github.com/joeshaw/multierror"
+	"go.uber.org/zap/zapcore"
 	"os"
 	"os/signal"
 	"sync"
@@ -23,6 +25,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+type unitKey struct {
+	Type client.UnitType
+	ID   string
+}
+
 // BeatV2Manager is the main type for tracing V2-related config updates
 type BeatV2Manager struct {
 	config   *Config
@@ -31,14 +38,19 @@ type BeatV2Manager struct {
 
 	logger *logp.Logger
 
-	// Track individual units given to us by the V2 API
-	unitsMut sync.Mutex
-	units    map[string]*client.Unit
-	mainUnit string
+	// track individual units given to us by the V2 API
+	mx      sync.Mutex
+	units   map[unitKey]*client.Unit
+	actions []client.Action
 
-	// This satisfies the SetPayload() function, and will pass along this value to the UpdateStatus()
-	// call whenever a config is re-registered
+	// status is reported as a whole for every unit sent to this component
+	// hopefully this can be improved in the future to be seperated per unit
+	status  lbmanagement.Status
+	message string
 	payload map[string]interface{}
+
+	// reloadCh is kicked when a reload needs to occur
+	reloadCh chan struct{}
 
 	// stop callback must be registered by libbeat, as with the V1 callback
 	stopFunc func()
@@ -91,7 +103,10 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		config:   config,
 		logger:   log.Named("V2-manager"),
 		registry: registry,
-		units:    make(map[string]*client.Unit),
+		units:    make(map[unitKey]*client.Unit),
+		status:   lbmanagement.Running,
+		message:  "Healthy",
+		reloadCh: make(chan struct{}, 1),
 		stopChan: make(chan struct{}, 1),
 	}
 
@@ -107,14 +122,12 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 
 // UpdateStatus updates the manager with the current status for the beat.
 func (cm *BeatV2Manager) UpdateStatus(status lbmanagement.Status, msg string) {
-	updateState := client.UnitState(status)
-	stateUnit, exists := cm.getMainUnit()
-	cm.logger.Debugf("Updating beat status: %s", msg)
-	if exists {
-		_ = stateUnit.UpdateState(updateState, msg, cm.payload)
-	} else {
-		cm.logger.Warnf("Cannot update state to %s, no main unit is set. Msg: %s", status, msg)
-	}
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	cm.status = status
+	cm.message = msg
+	cm.updateStatuses()
 }
 
 // Enabled returns true if config management is enabled.
@@ -158,33 +171,78 @@ func (cm *BeatV2Manager) CheckRawConfig(_ *conf.C) error {
 
 // RegisterAction adds a V2 client action
 func (cm *BeatV2Manager) RegisterAction(action client.Action) {
-	cm.unitsMut.Lock()
-	defer cm.unitsMut.Unlock()
-	stateUnit, exists := cm.units[cm.mainUnit]
-	if exists {
-		_ = stateUnit.UpdateState(client.UnitStateHealthy, fmt.Sprintf("Registering action %s for main unit with ID %s", cm.mainUnit, action.Name()), nil)
-		cm.units[cm.mainUnit].RegisterAction(action)
-	} else {
-		cm.logger.Warnf("Cannot register action %s, no main unit found", action.Name())
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	cm.actions = append(cm.actions, action)
+	for _, unit := range cm.units {
+		// actions are only registered on input units (not a requirement by Agent but
+		// don't see a need in beats to support actions on an output at the moment)
+		if unit.Type() == client.UnitTypeInput {
+			unit.RegisterAction(action)
+		}
 	}
 }
 
 // UnregisterAction removes a V2 client action
 func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
-	cm.unitsMut.Lock()
-	defer cm.unitsMut.Unlock()
-	stateUnit, exists := cm.units[cm.mainUnit]
-	if exists {
-		_ = stateUnit.UpdateState(client.UnitStateHealthy, fmt.Sprintf("Unregistering action %s for main unit with ID %s", cm.mainUnit, action.Name()), nil)
-		cm.units[cm.mainUnit].UnregisterAction(action)
-	} else {
-		cm.logger.Warnf("Cannot Unregister action %s, no main unit found", action.Name())
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	// remove the registered action
+	i := func() int {
+		for i, a := range cm.actions {
+			if a.Name() == action.Name() {
+				return i
+			}
+		}
+		return -1
+	}()
+	if i == -1 {
+		// not registered
+		return
+	}
+	cm.actions = append(cm.actions[:i], cm.actions[i+1:]...)
+
+	for _, unit := range cm.units {
+		// actions are only registered on input units (not a requirement by Agent but
+		// don't see a need in beats to support actions on an output at the moment)
+		if unit.Type() == client.UnitTypeInput {
+			unit.UnregisterAction(action)
+		}
 	}
 }
 
 // SetPayload sets the global payload for the V2 client
 func (cm *BeatV2Manager) SetPayload(payload map[string]interface{}) {
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
 	cm.payload = payload
+	cm.updateStatuses()
+}
+
+// updateStatuses updates the status for all units to match the status of the entire manager.
+//
+// This is done because beats at the moment cannot manage different status per unit, something
+// that is new in the V2 control protocol but not supported in beats itself.
+func (cm *BeatV2Manager) updateStatuses() {
+	status := getUnitState(cm.status)
+	message := cm.message
+	payload := cm.payload
+
+	for _, unit := range cm.units {
+		state, _, _ := unit.Expected()
+		if state == client.UnitStateStopped {
+			// unit is expected to be stopping (don't adjust the state as the state is now managed by the
+			// `reload` method and will be marked stopped in that code path)
+			continue
+		}
+		err := unit.UpdateState(status, message, payload)
+		if err != nil {
+			cm.logger.Errorf("Failed to update unit %s status: %s", unit.ID(), err)
+		}
+	}
 }
 
 // ================================
@@ -192,35 +250,41 @@ func (cm *BeatV2Manager) SetPayload(payload map[string]interface{}) {
 // ================================
 
 func (cm *BeatV2Manager) addUnit(unit *client.Unit) {
-	cm.unitsMut.Lock()
-	cm.units[unit.ID()] = unit
-	cm.unitsMut.Unlock()
-}
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+	cm.units[unitKey{unit.Type(), unit.ID()}] = unit
 
-func (cm *BeatV2Manager) getMainUnit() (*client.Unit, bool) {
-	cm.unitsMut.Lock()
-	defer cm.unitsMut.Unlock()
-	if cm.mainUnit == "" {
-		return nil, false
+	// update specific unit to starting
+	_ = unit.UpdateState(client.UnitStateStarting, "Starting", nil)
+
+	// register the already registered actions (only on input units)
+	for _, action := range cm.actions {
+		unit.RegisterAction(action)
 	}
-	return cm.units[cm.mainUnit], true
 }
 
-// We need a "main" unit that we can send updates to for the StatusReporter interface
-// the purpose of this is to just grab the first input-type unit we get and set it as the "main" unit
-func (cm *BeatV2Manager) setMainUnitValue(unit *client.Unit) {
-	cm.unitsMut.Lock()
-	defer cm.unitsMut.Unlock()
-	if cm.mainUnit == "" {
-		cm.logger.Debugf("Set main input unit to ID %s", unit.ID())
-		cm.mainUnit = unit.ID()
+func (cm *BeatV2Manager) modifyUnit(unit *client.Unit) {
+	// `unit` is already in `cm.units` no need to add it to the map again
+	// but the lock still needs to be help so reload can be triggered
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	state, _, _ := unit.Expected()
+	if state == client.UnitStateStopped {
+		// expected to be stopped; needs to stop this unit
+		_ = unit.UpdateState(client.UnitStateStopping, "Stopping", nil)
+	} else {
+		// update specific unit to configuring
+		_ = unit.UpdateState(client.UnitStateConfiguring, "Configuring", nil)
 	}
 }
 
 func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
-	cm.unitsMut.Lock()
-	delete(cm.units, unit.ID())
-	cm.unitsMut.Unlock()
+	// a unit will only be deleted once it has reported stopped so nothing
+	// more needs to be done other than cleaning up the reference to the unit
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+	delete(cm.units, unitKey{unit.Type(), unit.ID()})
 }
 
 // ================================
@@ -251,38 +315,29 @@ func (cm *BeatV2Manager) unitListen() {
 				cm.logger.Debug("Received sighup, stopping")
 			}
 			cm.isRunning = false
-			unit, mainExists := cm.getMainUnit()
-			if mainExists {
-				_ = unit.UpdateState(client.UnitStateStopping, "stopping beat", nil)
-			}
-			cm.client.Stop()
+			cm.UpdateStatus(lbmanagement.Stopping, "Stopping")
 			return
 		case change := <-cm.client.UnitChanges():
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure there is a difference between
 			// A unit add and a unit change, since either way we can't do much more than call the reloader
 			case client.UnitChangedAdded:
-				// At this point we also get a log level, however I'm not sure the beats core logger provides a
-				// clean way to "just" change the log level, without resetting the whole log config
-				state, _, _ := change.Unit.Expected()
-				cm.logger.Debugf("Got unit added: %s, type: %s expected state: %s", change.Unit.ID(), change.Unit.Type(), state.String())
-				go cm.handleUnitReload(change.Unit)
-
+				cm.addUnit(change.Unit)
+				cm.triggerReload()
 			case client.UnitChangedModified:
-				state, _, _ := change.Unit.Expected()
-				cm.logger.Debugf("Got unit modified: %s, type: %s expected state: %s", change.Unit.ID(), change.Unit.Type(), state.String())
-				// I'm assuming that a state STOPPED just tells us to shut down the entire beat,
-				// as such we don't really care about updating via a particular unit
-				if state == client.UnitStateStopped {
-					cm.stopBeat()
-				} else {
-					go cm.handleUnitReload(change.Unit)
-				}
-
+				cm.modifyUnit(change.Unit)
+				cm.triggerReload()
 			case client.UnitChangedRemoved:
-				cm.logger.Debugf("Got unit removed: %s", change.Unit.ID())
 				cm.deleteUnit(change.Unit)
 			}
+		case <-cm.reloadCh:
+			cm.mx.Lock()
+			units := make(map[unitKey]*client.Unit, len(cm.units))
+			for k, u := range cm.units {
+				units[k] = u
+			}
+			cm.mx.Unlock()
+			cm.reload(units)
 		}
 
 	}
@@ -292,15 +347,8 @@ func (cm *BeatV2Manager) stopBeat() {
 	if !cm.isRunning {
 		return
 	}
-	// will we ever get a Unit removed for anything other than the main beat?
-	// Individual reloaders don't have a "stop" function, so the most we can do
-	// is just shut down a beat, I think.
 	cm.logger.Debugf("Stopping beat")
-	// stop the "main" beat runtime
-	unit, mainExists := cm.getMainUnit()
-	if mainExists {
-		_ = unit.UpdateState(client.UnitStateStopping, "stopping beat", nil)
-	}
+	cm.UpdateStatus(lbmanagement.Stopping, "Stopping")
 
 	cm.isRunning = false
 	cm.stopMut.Lock()
@@ -311,95 +359,162 @@ func (cm *BeatV2Manager) stopBeat() {
 		cm.beatStop.Do(cm.stopFunc)
 	}
 	cm.client.Stop()
-
-	if mainExists {
-		_ = unit.UpdateState(client.UnitStateStopped, "stopped beat", nil)
-	}
-
+	cm.UpdateStatus(lbmanagement.Stopped, "Stopped")
 }
 
-func (cm *BeatV2Manager) handleUnitReload(unit *client.Unit) {
-	cm.addUnit(unit)
-	unitType := unit.Type()
-
-	if unitType == client.UnitTypeOutput {
-		cm.handleOutputReload(unit)
-	} else if unitType == client.UnitTypeInput {
-		cm.handleInputReload(unit)
+func (cm *BeatV2Manager) drainReload() {
+	for {
+		select {
+		case <-cm.reloadCh:
+		default:
+			return
+		}
 	}
 }
 
-// Handle the updated config for an output unit
-func (cm *BeatV2Manager) handleOutputReload(unit *client.Unit) {
-	_, _, rawConfig := unit.Expected()
-	if rawConfig == nil {
-		cm.logger.Infof("got output update with no config, ignoring")
-		return
-	}
-	cm.logger.Debugf("Got Output unit config '%s'", rawConfig.GetId())
+func (cm *BeatV2Manager) triggerReload() {
+	cm.drainReload()
+	cm.reloadCh <- struct{}{}
+}
 
-	reloadConfig, err := groupByOutputs(rawConfig)
-	if err != nil {
-		errString := fmt.Errorf("Failed to generate config for output: %w", err)
-		_ = unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
-		return
+func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
+	lowestLevel := client.UnitLogLevelError
+	var outputUnit *client.Unit
+	var inputUnits []*client.Unit
+	var stoppingUnits []*client.Unit
+	for _, unit := range units {
+		state, ll, _ := unit.Expected()
+		if state == client.UnitStateStopped {
+			// unit is being stopped
+			//
+			// we keep the unit so after reload is performed
+			// these units can be marked as stopped
+			stoppingUnits = append(stoppingUnits, unit)
+			continue
+		} else if state != client.UnitStateHealthy {
+			// only stopped or healthy are known (and expected) state
+			// for a unit
+			cm.logger.Errorf("unit %s has an unknown state %+v", unit.ID(), state)
+		}
+		if ll > lowestLevel {
+			lowestLevel = ll
+		}
+		if unit.Type() == client.UnitTypeOutput {
+			outputUnit = unit
+		} else if unit.Type() == client.UnitTypeInput {
+			inputUnits = append(inputUnits, unit)
+		} else {
+			cm.logger.Errorf("unit %s as an unknown type %+v", unit.ID(), unit.Type())
+		}
 	}
+
+	// set the new log level (if nothing has changed is a noop)
+	logp.SetLevel(getZapcoreLevel(lowestLevel))
+
+	// reload the output configuration
+	var errs multierror.Errors
+	if err := cm.reloadOutput(outputUnit); err != nil {
+		errs = append(errs, err)
+	}
+
+	// compute the input configuration
+	//
+	// in v2 only a single input type will be started per component, so we don't need to
+	// worry about getting multiple re-loaders (we just need the one for the type)
+	if err := cm.reloadInputs(inputUnits); err != nil {
+		errs = append(errs, err)
+	}
+
+	// report the stopping units as stopped
+	for _, unit := range stoppingUnits {
+		_ = unit.UpdateState(client.UnitStateStopped, "Stopped", nil)
+	}
+
+	// any error during reload changes the whole state of the beat to failed
+	if len(errs) > 0 {
+		cm.status = lbmanagement.Failed
+		cm.message = fmt.Sprintf("%s", errs)
+	}
+
+	// now update the statuses of all units
+	cm.mx.Lock()
+	status := getUnitState(cm.status)
+	message := cm.message
+	payload := cm.payload
+	cm.mx.Unlock()
+	for _, unit := range units {
+		state, _, _ := unit.Expected()
+		if state == client.UnitStateStopped {
+			// unit is expected to be stopping (don't adjust the state as the state is now managed by the
+			// `reload` method and will be marked stopped in that code path)
+			continue
+		}
+		err := unit.UpdateState(status, message, payload)
+		if err != nil {
+			cm.logger.Errorf("Failed to update unit %s status: %s", unit.ID(), err)
+		}
+	}
+}
+
+func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 	// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
 	output := cm.registry.GetReloadableOutput()
 	if output == nil {
-		_ = unit.UpdateState(client.UnitStateFailed, "failed to find beat reloadable type 'output'", nil)
-		return
+		return fmt.Errorf("failed to find beat reloadable type 'output'")
 	}
 
-	_ = unit.UpdateState(client.UnitStateConfiguring, "reloading output component", nil)
-	cm.lastOutputCfg = reloadConfig
-	err = output.Reload(reloadConfig)
-	if err != nil {
-		errString := fmt.Errorf("Failed to reload component: %w", err)
-		_ = unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
-		return
+	if unit == nil {
+		// output is being stopped
+		err := output.Reload(nil)
+		if err != nil {
+			return fmt.Errorf("failed to reload output: %w", err)
+		}
+		cm.lastOutputCfg = nil
+		return nil
 	}
-	_ = unit.UpdateState(client.UnitStateHealthy, "reloaded output component", nil)
-}
 
-// handle the updated config for an input unit
-func (cm *BeatV2Manager) handleInputReload(unit *client.Unit) {
 	_, _, rawConfig := unit.Expected()
 	if rawConfig == nil {
-		cm.logger.Warnf("got input update with no config, ignoring")
-		return
+		return fmt.Errorf("output unit has no config")
 	}
-	cm.setMainUnitValue(unit)
-	cm.logger.Infof("Got Input unit config %s", rawConfig.GetId())
+	cm.logger.Debugf("Got output unit config '%s'", rawConfig.GetId())
 
-	// Find the V2 inputs we need to reload
-	// The reloader provides list and non-list types, but all the beats register as lists,
-	// so just go with that for V2
+	reloadConfig, err := groupByOutputs(rawConfig)
+	if err != nil {
+		return fmt.Errorf("failed to generate config for output: %w", err)
+	}
+
+	err = output.Reload(reloadConfig)
+	if err != nil {
+		return fmt.Errorf("failed to reload output: %w", err)
+	}
+	cm.lastOutputCfg = reloadConfig
+	return nil
+}
+
+func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 	obj := cm.registry.GetInputList()
 	if obj == nil {
-		_ = unit.UpdateState(client.UnitStateFailed, "failed to find beat reloadable type 'input'", nil)
-		return
-	}
-	_ = unit.UpdateState(client.UnitStateConfiguring, "found reloader for 'input'", nil)
-
-	beatCfg, err := generateBeatConfig(rawConfig, cm.client.AgentInfo())
-	if err != nil {
-		errString := fmt.Errorf("Failed to create Unit config: %w", err)
-		_ = unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
-		return
+		return fmt.Errorf("failed to find beat reloadable type 'input'")
 	}
 
-	if err != nil {
-		cm.logger.Error("error generating yaml for debug: %s", err)
+	var inputCfgs []*reload.ConfigWithMeta
+	agentInfo := cm.client.AgentInfo()
+	for _, unit := range inputUnits {
+		_, _, rawConfig := unit.Expected()
+		inputCfg, err := generateBeatConfig(rawConfig, agentInfo)
+		if err != nil {
+			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
+		}
+		inputCfgs = append(inputCfgs, inputCfg...)
 	}
-	cm.lastInputCfg = beatCfg
-	err = obj.Reload(beatCfg)
+
+	err := obj.Reload(inputCfgs)
 	if err != nil {
-		errString := fmt.Errorf("Error reloading input: %w", err)
-		_ = unit.UpdateState(client.UnitStateFailed, errString.Error(), nil)
-		return
+		return fmt.Errorf("failed to reloading inputs: %w", err)
 	}
-	_ = unit.UpdateState(client.UnitStateHealthy, "beat reloaded", nil)
+	cm.lastInputCfg = inputCfgs
+	return nil
 }
 
 // this function is registered as a debug hook
@@ -419,10 +534,12 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 
 	// generate output
 	outputCfg := map[string]interface{}{}
-	err := cm.lastOutputCfg.Config.Unpack(&outputCfg)
-	if err != nil {
-		cm.logger.Errorf("error unpacking output config for debug callback: %s", err)
-		return nil
+	if cm.lastOutputCfg != nil {
+		err := cm.lastOutputCfg.Config.Unpack(&outputCfg)
+		if err != nil {
+			cm.logger.Errorf("error unpacking output config for debug callback: %s", err)
+			return nil
+		}
 	}
 	// combine the two in a somewhat coherent way
 	// This isn't perfect, but generating a config that can actually be fed back into the beat
@@ -441,4 +558,46 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 		return nil
 	}
 	return data
+}
+
+func getUnitState(status lbmanagement.Status) client.UnitState {
+	switch status {
+	case lbmanagement.Unknown:
+		// must be started if its unknown
+		return client.UnitStateStarting
+	case lbmanagement.Starting:
+		return client.UnitStateStarting
+	case lbmanagement.Configuring:
+		return client.UnitStateConfiguring
+	case lbmanagement.Running:
+		return client.UnitStateHealthy
+	case lbmanagement.Degraded:
+		return client.UnitStateDegraded
+	case lbmanagement.Failed:
+		return client.UnitStateFailed
+	case lbmanagement.Stopping:
+		return client.UnitStateStopping
+	case lbmanagement.Stopped:
+		return client.UnitStateStopped
+	}
+	// unknown again?
+	return client.UnitStateStarting
+}
+
+func getZapcoreLevel(ll client.UnitLogLevel) zapcore.Level {
+	switch ll {
+	case client.UnitLogLevelError:
+		return zapcore.ErrorLevel
+	case client.UnitLogLevelWarn:
+		return zapcore.WarnLevel
+	case client.UnitLogLevelInfo:
+		return zapcore.InfoLevel
+	case client.UnitLogLevelDebug:
+		return zapcore.DebugLevel
+	case client.UnitLogLevelTrace:
+		// beats doesn't support trace
+		return zapcore.DebugLevel
+	}
+	// info level for fallback
+	return zapcore.InfoLevel
 }
