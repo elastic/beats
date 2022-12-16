@@ -32,7 +32,7 @@ const (
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := requestCfg.Transport.Client(clientOptions(requestCfg.URL.URL)...)
+	netHTTPClient, err := requestCfg.Transport.Client(clientOptions(requestCfg.URL.URL, requestCfg.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
