@@ -308,7 +308,6 @@ func (m *MetricFamily) GetMetric() []*OpenMetric {
 }
 
 const (
-	//suffixInfo   = "_info"
 	suffixTotal  = "_total"
 	suffixGCount = "_gcount"
 	suffixGSum   = "_gsum"
@@ -316,10 +315,6 @@ const (
 	suffixSum    = "_sum"
 	suffixBucket = "_bucket"
 )
-
-//func isInfo(name string) bool {
-//	return len(name) > 5 && name[len(name)-5:] == suffixInfo
-//}
 
 // Counters have _total suffix
 func isTotal(name string) bool {

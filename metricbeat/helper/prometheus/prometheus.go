@@ -94,7 +94,7 @@ func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 		}
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
-	
+
 	contentType := GetContentType(resp.Header)
 	if contentType == "" {
 		return nil, fmt.Errorf("Invalid format for response of response")

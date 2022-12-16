@@ -190,19 +190,6 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 	return eventList
 }
 
-// rateCounterUint64 fills a counter value and optionally adds the rate if rate_counters is enabled
-//func (g *remoteWriteTypedGenerator) rateCounterUint64(name string, labels mapstr.M, value uint64) mapstr.M {
-//	d := mapstr.M{
-//		"counter": value,
-//	}
-//
-//	if g.rateCounters {
-//		d["rate"], _ = g.counterCache.RateUint64(name+labels.String(), value)
-//	}
-//
-//	return d
-//}
-
 // rateCounterFloat64 fills a counter value and optionally adds the rate if rate_counters is enabled
 func (g *remoteWriteTypedGenerator) rateCounterFloat64(name string, labels mapstr.M, value float64) mapstr.M {
 	d := mapstr.M{
