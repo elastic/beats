@@ -153,6 +153,18 @@ var (
 			tags:               nameTestTag,
 		},
 	}
+	ec2instance1Config = Config{
+		Namespace:  namespace,
+		MetricName: []string{metricName1},
+		Dimensions: []Dimension{
+			{
+				Name:  "InstanceId",
+				Value: instanceID1,
+			},
+		},
+		ResourceType: resourceTypeEC2,
+		Statistic:    []string{"Average"},
+	}
 )
 
 func TestConstructLabel(t *testing.T) {
@@ -402,18 +414,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		{
 			"test with a specific metric",
 			[]Config{
-				{
-					Namespace:  "AWS/EC2",
-					MetricName: []string{"CPUUtilization"},
-					Dimensions: []Dimension{
-						{
-							Name:  "InstanceId",
-							Value: "i-1",
-						},
-					},
-					ResourceType: "ec2:instance",
-					Statistic:    []string{"Average"},
-				},
+				ec2instance1Config,
 			},
 			nil,
 			expectedListMetricWithDetailEC2,
@@ -422,18 +423,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		{
 			"test with a specific metric and a namespace",
 			[]Config{
-				{
-					Namespace:  "AWS/EC2",
-					MetricName: []string{"CPUUtilization"},
-					Dimensions: []Dimension{
-						{
-							Name:  "InstanceId",
-							Value: "i-1",
-						},
-					},
-					ResourceType: "ec2:instance",
-					Statistic:    []string{"Average"},
-				},
+				ec2instance1Config,
 				{
 					Namespace: "AWS/S3",
 				},
@@ -445,18 +435,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		{
 			"test with two specific metrics and a namespace",
 			[]Config{
-				{
-					Namespace:  "AWS/EC2",
-					MetricName: []string{"CPUUtilization"},
-					Dimensions: []Dimension{
-						{
-							Name:  "InstanceId",
-							Value: "i-1",
-						},
-					},
-					Statistic:    []string{"Average"},
-					ResourceType: "ec2:instance",
-				},
+				ec2instance1Config,
 				{
 					Namespace: "AWS/Lambda",
 				},
@@ -589,18 +568,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					Namespace: "AWS/Lambda",
 				},
-				{
-					Namespace:  "AWS/EC2",
-					MetricName: []string{"CPUUtilization"},
-					Dimensions: []Dimension{
-						{
-							Name:  "InstanceId",
-							Value: "i-1",
-						},
-					},
-					Statistic:    []string{"Average"},
-					ResourceType: "ec2:instance",
-				},
+				ec2instance1Config,
 				{
 					Namespace:  "AWS/RDS",
 					MetricName: []string{"CommitThroughput"},
