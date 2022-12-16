@@ -121,6 +121,24 @@ var (
 			Key:   "name",
 			Value: []string{"test-ec2"},
 		}}
+	nameELBTag = []aws.Tag{
+		{
+			Key:   "name",
+			Value: []string{"test-elb"},
+		},
+	}
+	nameELB1Tag = []aws.Tag{
+		{
+			Key:   "name",
+			Value: []string{"test-elb1"},
+		},
+	}
+	nameELB2Tag = []aws.Tag{
+		{
+			Key:   "name",
+			Value: []string{"test-elb2"},
+		},
+	}
 	elbNamespaceDetail = []namespaceDetail{
 		{
 			resourceTypeFilter: "elasticloadbalancing",
@@ -888,24 +906,10 @@ func TestConstructTagsFilters(t *testing.T) {
 	expectedResourceTypeTagFiltersEC2["ec2:instance"] = nil
 
 	expectedResourceTypeTagFiltersELB := map[string][]aws.Tag{}
-	expectedResourceTypeTagFiltersELB["elasticloadbalancing"] = []aws.Tag{
-		{
-			Key:   "name",
-			Value: []string{"test-elb1"},
-		},
-		{
-			Key:   "name",
-			Value: []string{"test-elb2"},
-		},
-	}
+	expectedResourceTypeTagFiltersELB["elasticloadbalancing"] = append(nameELB1Tag, nameELB2Tag...)
 
 	expectedResourceTypeTagFiltersELBEC2 := map[string][]aws.Tag{}
-	expectedResourceTypeTagFiltersELBEC2["elasticloadbalancing"] = []aws.Tag{
-		{
-			Key:   "name",
-			Value: []string{"test-elb"},
-		},
-	}
+	expectedResourceTypeTagFiltersELBEC2["elasticloadbalancing"] = nameELBTag
 	expectedResourceTypeTagFiltersELBEC2["ec2:instance"] = nameTestEC2Tag
 
 	cases := []struct {
@@ -936,23 +940,13 @@ func TestConstructTagsFilters(t *testing.T) {
 					resourceTypeFilter: "elasticloadbalancing",
 					names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
 					statistics:         []string{"Sum"},
-					tags: []aws.Tag{
-						{
-							Key:   "name",
-							Value: []string{"test-elb1"},
-						},
-					},
+					tags:               nameELB1Tag,
 				},
 				{
 					resourceTypeFilter: "elasticloadbalancing",
 					names:              []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
 					statistics:         []string{"Maximum"},
-					tags: []aws.Tag{
-						{
-							Key:   "name",
-							Value: []string{"test-elb2"},
-						},
-					},
+					tags:               nameELB2Tag,
 				},
 			},
 			expectedResourceTypeTagFiltersELB,
@@ -964,12 +958,7 @@ func TestConstructTagsFilters(t *testing.T) {
 					resourceTypeFilter: "elasticloadbalancing",
 					names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
 					statistics:         []string{"Sum"},
-					tags: []aws.Tag{
-						{
-							Key:   "name",
-							Value: []string{"test-elb"},
-						},
-					},
+					tags:               nameELBTag,
 				},
 				{
 					resourceTypeFilter: "ec2:instance",
