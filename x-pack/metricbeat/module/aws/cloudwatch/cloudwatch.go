@@ -178,23 +178,23 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		svcCloudwatch, svcResourceAPI, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 		if err != nil {
-			m.Logger().Warn("skipping metrics list from region '%s'", regionName)
+			m.Logger().Warn("skipping metrics list from region '%s'", regionName, err)
+			continue
 		}
 
 		// retrieve all the details for all the metrics available in the current region
-		listMetricsOutput, _ := aws.GetListMetricsOutput("*", regionName, m.Period, svcCloudwatch)
+		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, svcCloudwatch)
+		if err != nil {
+			m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
+		}
+
+		if len(listMetricsOutput) == 0 {
+			continue
+		}
 
 		for namespace, namespaceDetails := range namespaceDetailTotal {
 			m.logger.Debugf("Collected metrics from namespace %s", namespace)
 
-			if err != nil {
-				m.logger.Info(err.Error())
-				continue
-			}
-
-			if len(listMetricsOutput) == 0 {
-				continue
-			}
 			// filter listMetricsOutput by detailed configuration per each namespace
 			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespace, namespaceDetails)
 
