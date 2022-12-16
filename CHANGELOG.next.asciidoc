@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
+- Disable lockfile when running under elastic-agent. {pull}33988[33988]
 
 *Auditbeat*
 
@@ -62,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix Google workspace pagination and document ID generation. {pull}33666[33666]
 - Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
 - Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
+- Fix 'requires pointer' error while getting cursor metadata. {pull}33956[33956]
 - Fix input cancellation handling when HTTP client does not support contexts. {issue}33962[33962] {pull}33968[33968]
 - Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
 - Fix CEL result deserialisation when evaluation fails. {issue}33992[33992] {pull}33996[33996]
@@ -111,6 +113,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Functionbeat*
 
+- Fix Kinesis events timestamp to use timestamp of the event record instead of when the record was processed {pull}33593[33593]
 
 
 *Elastic Logging Plugin*
@@ -178,6 +181,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add `decode_duration`, `move_fields` processors. {pull}31301[31301]
 - Add metrics for UDP packet processing. {pull}33870[33870]
 - Convert UDP input to v2 input. {pull}33930[33930]
+- Improve collection of risk information from Okta debug data. {issue}33677[33677] {pull}34030[34030]
+- Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
+- Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
 
 *Auditbeat*
 
