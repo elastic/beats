@@ -152,7 +152,8 @@ func injectIndexStream(dataStreamType string, expected *proto.UnitExpectedConfig
 }
 
 //injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
-// this adds a variety of processors foe metadata related to the dataset and input config.
+// this adds a variety of processors for metadata related to the dataset and input config.
+// as well as injecting any global-level processors into the individual streams.
 func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}) (map[string]interface{}, error) {
 	//1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
@@ -182,6 +183,17 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType s
 	if streamID := streamExpected.GetId(); streamID != "" {
 		sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
 		processors = append(processors, sourceStream)
+	}
+
+	// look for any processors at the global level
+	// if found, copy to the stream-level processors
+	rootMap := expected.GetSource().AsMap()
+	globalProcFound, ok := rootMap["processors"]
+	if ok {
+		globalList, ok := globalProcFound.([]interface{})
+		if ok {
+			processors = append(processors, globalList...)
+		}
 	}
 
 	// figure out if we have any existing processors
