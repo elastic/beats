@@ -33,8 +33,6 @@ import (
 
 const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
 
-// Content-Type: text/plain; version=0.0.4; charset=utf-8
-
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
 	// GetFamilies requests metric families from prometheus endpoint and returns them
@@ -96,30 +94,7 @@ func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 		}
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
-
-	//format := expfmt.ResponseFormat(resp.Header)
-	//if format == "" {
-	//	return nil, fmt.Errorf("Invalid format for response of response")
-	//}
-	//
-	//decoder := expfmt.NewDecoder(reader, format)
-	//if decoder == nil {
-	//	return nil, fmt.Errorf("Unable to create decoder to decode response")
-	//}
-	//
-	//families := []*dto.MetricFamily{}
-	//for {
-	//	mf := &dto.MetricFamily{}
-	//	err = decoder.Decode(mf)
-	//	if err != nil {
-	//		if err == io.EOF {
-	//			break
-	//		}
-	//		return nil, errors.Wrap(err, "decoding of metric family failed")
-	//	} else {
-	//		families = append(families, mf)
-	//	}
-	//}
+	
 	contentType := GetContentType(resp.Header)
 	if contentType == "" {
 		return nil, fmt.Errorf("Invalid format for response of response")
