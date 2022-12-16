@@ -111,23 +111,28 @@ var (
 		MetricName: &metricName6,
 		Namespace:  &namespaceMSK,
 	}
-	nameTag = []aws.Tag{
+	nameTestTag = []aws.Tag{
 		{
 			Key:   "name",
 			Value: []string{"test"},
+		}}
+	nameTestEC2Tag = []aws.Tag{
+		{
+			Key:   "name",
+			Value: []string{"test-ec2"},
 		}}
 	elbNamespaceDetail = []namespaceDetail{
 		{
 			resourceTypeFilter: "elasticloadbalancing",
 			names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
 			statistics:         []string{"Sum"},
-			tags:               nameTag,
+			tags:               nameTestTag,
 		},
 		{
 			resourceTypeFilter: "elasticloadbalancing",
 			names:              []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
 			statistics:         []string{"Maximum"},
-			tags:               nameTag,
+			tags:               nameTestTag,
 		},
 	}
 )
@@ -230,8 +235,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	}
 
 	resourceTypeFiltersEC2RDSWithTag := map[string][]aws.Tag{}
-	resourceTypeFiltersEC2RDSWithTag["ec2:instance"] = nameTag
-	resourceTypeFiltersEC2RDSWithTag["rds"] = nameTag
+	resourceTypeFiltersEC2RDSWithTag["ec2:instance"] = nameTestTag
+	resourceTypeFiltersEC2RDSWithTag["rds"] = nameTestTag
 	expectedListMetricWithDetailEC2RDSWithTag := listMetricWithDetail{
 		metricsWithStats:    metricsWithStats,
 		resourceTypeFilters: resourceTypeFiltersEC2RDSWithTag,
@@ -290,7 +295,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			resourceTypeFilter: resourceTypeEC2,
 			names:              []string{"CPUUtilization"},
 			statistics:         defaultStatistics,
-			tags:               nameTag,
+			tags:               nameTestTag,
 		},
 	}
 
@@ -300,7 +305,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedNamespaceDetailELBLambda["AWS/Lambda"] = []namespaceDetail{
 		{
 			statistics: defaultStatistics,
-			tags:       nameTag,
+			tags:       nameTestTag,
 		},
 	}
 	expectedNamespaceDetailELBLambda["AWS/ELB"] = elbNamespaceDetail
@@ -542,7 +547,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceType: "elasticloadbalancing",
 				},
 			},
-			nameTag,
+			nameTestTag,
 			listMetricWithDetail{
 				resourceTypeFilters: map[string][]aws.Tag{},
 			},
@@ -595,7 +600,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceType: "rds",
 				},
 			},
-			nameTag,
+			nameTestTag,
 			expectedListMetricWithDetailEC2RDSWithTag,
 			expectedNamespaceDetailELBLambda,
 		},
@@ -684,7 +689,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceType: "rds",
 				},
 			},
-			nameTag,
+			nameTestTag,
 			expectedListMetricWithDetailEC2sRDSWithTag,
 			map[string][]namespaceDetail{},
 		},
@@ -901,12 +906,7 @@ func TestConstructTagsFilters(t *testing.T) {
 			Value: []string{"test-elb"},
 		},
 	}
-	expectedResourceTypeTagFiltersELBEC2["ec2:instance"] = []aws.Tag{
-		{
-			Key:   "name",
-			Value: []string{"test-ec2"},
-		},
-	}
+	expectedResourceTypeTagFiltersELBEC2["ec2:instance"] = nameTestEC2Tag
 
 	cases := []struct {
 		title                  string
@@ -975,12 +975,7 @@ func TestConstructTagsFilters(t *testing.T) {
 					resourceTypeFilter: "ec2:instance",
 					names:              []string{"CPUUtilization"},
 					statistics:         defaultStatistics,
-					tags: []aws.Tag{
-						{
-							Key:   "name",
-							Value: []string{"test-ec2"},
-						},
-					},
+					tags:               nameTestEC2Tag,
 				},
 			},
 			expectedResourceTypeTagFiltersELBEC2,
@@ -1284,12 +1279,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 		[]string{"Average"},
 	}}
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
-		{
-			Key:   "name",
-			Value: []string{"test-ec2"},
-		},
-	}
+	resourceTypeTagFilters["ec2:instance"] = nameTestEC2Tag
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
@@ -1408,12 +1398,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 
 	// Check that the event is created when the tag filter matches
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
-		{
-			Key:   "name",
-			Value: []string{"test-ec2"},
-		},
-	}
+	resourceTypeTagFilters["ec2:instance"] = nameTestEC2Tag
 
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
