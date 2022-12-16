@@ -33,10 +33,14 @@ const (
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {
 	// Make retryable HTTP client
+<<<<<<< HEAD
 	netHTTPClient, err := requestCfg.Transport.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithKeepaliveSettings{Disable: true},
 	)
+=======
+	netHTTPClient, err := requestCfg.Transport.Client(clientOptions(requestCfg.URL.URL, requestCfg.KeepAlive.settings())...)
+>>>>>>> 3cd8d811d6 (x-pack/filebeat/input/{cel,httpjson}: make transport keep-alives configurable (#34014))
 	if err != nil {
 		return nil, err
 	}
