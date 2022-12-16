@@ -474,7 +474,7 @@ The maximum idle connections to keep per-host. If zero, defaults to two. Default
 [float]
 ==== `request.keep_alive.idle_connection_timeout`
 
-The maximum amount of time an idle connection will remain idle before closing itself. Zero means no limit. Default: `0s`.
+The maximum amount of time an idle connection will remain idle before closing itself. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Zero means no limit. Default: `0s`.
 
 [float]
 ==== `request.retry.max_attempts`
