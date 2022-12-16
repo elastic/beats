@@ -53,6 +53,7 @@ var (
 	metricName2     = "StatusCheckFailed"
 	metricName3     = "StatusCheckFailed_System"
 	metricName4     = "StatusCheckFailed_Instance"
+	metricName5     = "DiskReadOps"
 	resourceTypeEC2 = "ec2:instance"
 	listMetric1     = cloudwatchtypes.Metric{
 		Dimensions: []cloudwatchtypes.Dimension{{
@@ -95,11 +96,39 @@ var (
 		Namespace:  &namespace,
 	}
 
+	listMetric6 = cloudwatchtypes.Metric{
+		Dimensions: []cloudwatchtypes.Dimension{{
+			Name:  &dimName,
+			Value: &instanceID1,
+		}},
+		MetricName: &metricName5,
+		Namespace:  &namespace,
+	}
+
 	namespaceMSK = "AWS/Kafka"
 	metricName6  = "MemoryUsed"
 	listMetric8  = cloudwatchtypes.Metric{
 		MetricName: &metricName6,
 		Namespace:  &namespaceMSK,
+	}
+	nameTag = []aws.Tag{
+		{
+			Key:   "name",
+			Value: []string{"test"},
+		}}
+	elbNamespaceDetail = []namespaceDetail{
+		{
+			resourceTypeFilter: "elasticloadbalancing",
+			names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
+			statistics:         []string{"Sum"},
+			tags:               nameTag,
+		},
+		{
+			resourceTypeFilter: "elasticloadbalancing",
+			names:              []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
+			statistics:         []string{"Maximum"},
+			tags:               nameTag,
+		},
 	}
 )
 
@@ -156,14 +185,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedListMetricWithDetailEC2 := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
-				cloudwatchtypes.Metric{
-					Dimensions: []cloudwatchtypes.Dimension{{
-						Name:  awssdk.String("InstanceId"),
-						Value: awssdk.String("i-1"),
-					}},
-					MetricName: awssdk.String("CPUUtilization"),
-					Namespace:  awssdk.String("AWS/EC2"),
-				},
+				listMetric1,
 				[]string{"Average"},
 			},
 		},
@@ -182,14 +204,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	resourceTypeFiltersEC2RDS["rds"] = nil
 	metricsWithStats := []metricsWithStatistics{
 		{
-			cloudwatchtypes.Metric{
-				Dimensions: []cloudwatchtypes.Dimension{{
-					Name:  awssdk.String("InstanceId"),
-					Value: awssdk.String("i-1"),
-				}},
-				MetricName: awssdk.String("CPUUtilization"),
-				Namespace:  awssdk.String("AWS/EC2"),
-			},
+			listMetric1,
 			[]string{"Average"},
 		},
 		{
@@ -215,18 +230,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	}
 
 	resourceTypeFiltersEC2RDSWithTag := map[string][]aws.Tag{}
-	resourceTypeFiltersEC2RDSWithTag["ec2:instance"] = []aws.Tag{
-		{
-			Key:   "name",
-			Value: []string{"test"},
-		},
-	}
-	resourceTypeFiltersEC2RDSWithTag["rds"] = []aws.Tag{
-		{
-			Key:   "name",
-			Value: []string{"test"},
-		},
-	}
+	resourceTypeFiltersEC2RDSWithTag["ec2:instance"] = nameTag
+	resourceTypeFiltersEC2RDSWithTag["rds"] = nameTag
 	expectedListMetricWithDetailEC2RDSWithTag := listMetricWithDetail{
 		metricsWithStats:    metricsWithStats,
 		resourceTypeFilters: resourceTypeFiltersEC2RDSWithTag,
@@ -285,50 +290,17 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			resourceTypeFilter: resourceTypeEC2,
 			names:              []string{"CPUUtilization"},
 			statistics:         defaultStatistics,
-			tags: []aws.Tag{
-				{
-					Key:   "name",
-					Value: []string{"test"},
-				},
-			},
+			tags:               nameTag,
 		},
 	}
-	elbNamespaceDetail := []namespaceDetail{
-		{
-			resourceTypeFilter: "elasticloadbalancing",
-			names:              []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
-			statistics:         []string{"Sum"},
-			tags: []aws.Tag{
-				{
-					Key:   "name",
-					Value: []string{"test"},
-				},
-			},
-		},
-		{
-			resourceTypeFilter: "elasticloadbalancing",
-			names:              []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
-			statistics:         []string{"Maximum"},
-			tags: []aws.Tag{
-				{
-					Key:   "name",
-					Value: []string{"test"},
-				},
-			},
-		},
-	}
+
 	expectedNamespaceDetailTotal["AWS/ELB"] = elbNamespaceDetail
 
 	expectedNamespaceDetailELBLambda := map[string][]namespaceDetail{}
 	expectedNamespaceDetailELBLambda["AWS/Lambda"] = []namespaceDetail{
 		{
 			statistics: defaultStatistics,
-			tags: []aws.Tag{
-				{
-					Key:   "name",
-					Value: []string{"test"},
-				},
-			},
+			tags:       nameTag,
 		},
 	}
 	expectedNamespaceDetailELBLambda["AWS/ELB"] = elbNamespaceDetail
@@ -350,25 +322,11 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedListMetricsEC2WithDim := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
-				cloudwatchtypes.Metric{
-					Dimensions: []cloudwatchtypes.Dimension{{
-						Name:  awssdk.String("InstanceId"),
-						Value: awssdk.String("i-1"),
-					}},
-					MetricName: awssdk.String("CPUUtilization"),
-					Namespace:  awssdk.String("AWS/EC2"),
-				},
+				listMetric1,
 				[]string{"Average"},
 			},
 			{
-				cloudwatchtypes.Metric{
-					Dimensions: []cloudwatchtypes.Dimension{{
-						Name:  awssdk.String("InstanceId"),
-						Value: awssdk.String("i-1"),
-					}},
-					MetricName: awssdk.String("DiskReadOps"),
-					Namespace:  awssdk.String("AWS/EC2"),
-				},
+				listMetric6,
 				[]string{"Average"},
 			},
 		},
@@ -378,14 +336,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	expectedListMetricWithDetailEC2sRDSWithTag := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
 			{
-				cloudwatchtypes.Metric{
-					Dimensions: []cloudwatchtypes.Dimension{{
-						Name:  awssdk.String("InstanceId"),
-						Value: awssdk.String("i-1"),
-					}},
-					MetricName: awssdk.String("CPUUtilization"),
-					Namespace:  awssdk.String("AWS/EC2"),
-				},
+				listMetric1,
 				[]string{"Average"},
 			},
 			{
@@ -591,12 +542,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceType: "elasticloadbalancing",
 				},
 			},
-			[]aws.Tag{
-				{
-					Key:   "name",
-					Value: []string{"test"},
-				},
-			},
+			nameTag,
 			listMetricWithDetail{
 				resourceTypeFilters: map[string][]aws.Tag{},
 			},
@@ -649,12 +595,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceType: "rds",
 				},
 			},
-			[]aws.Tag{
-				{
-					Key:   "name",
-					Value: []string{"test"},
-				},
-			},
+			nameTag,
 			expectedListMetricWithDetailEC2RDSWithTag,
 			expectedNamespaceDetailELBLambda,
 		},
@@ -743,12 +684,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceType: "rds",
 				},
 			},
-			[]aws.Tag{
-				{
-					Key:   "name",
-					Value: []string{"test"},
-				},
-			},
+			nameTag,
 			expectedListMetricWithDetailEC2sRDSWithTag,
 			map[string][]namespaceDetail{},
 		},
@@ -1107,14 +1043,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 			},
 			[]metricsWithStatistics{
 				{
-					cloudwatchtypes.Metric{
-						Dimensions: []cloudwatchtypes.Dimension{{
-							Name:  awssdk.String("InstanceId"),
-							Value: awssdk.String("i-1"),
-						}},
-						MetricName: awssdk.String("CPUUtilization"),
-						Namespace:  awssdk.String("AWS/EC2"),
-					},
+					listMetric1,
 					[]string{"Average"},
 				},
 			},
@@ -1154,14 +1083,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 			},
 			[]metricsWithStatistics{
 				{
-					cloudwatchtypes.Metric{
-						Dimensions: []cloudwatchtypes.Dimension{{
-							Name:  awssdk.String("InstanceId"),
-							Value: awssdk.String("i-1"),
-						}},
-						MetricName: awssdk.String("CPUUtilization"),
-						Namespace:  awssdk.String("AWS/EC2"),
-					},
+					listMetric1,
 					[]string{"Average"},
 				},
 			},
@@ -1358,14 +1280,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClient{}
 	listMetricWithStatsTotal := []metricsWithStatistics{{
-		cloudwatchtypes.Metric{
-			Dimensions: []cloudwatchtypes.Dimension{{
-				Name:  awssdk.String("InstanceId"),
-				Value: awssdk.String("i-1"),
-			}},
-			MetricName: awssdk.String("CPUUtilization"),
-			Namespace:  awssdk.String("AWS/EC2"),
-		},
+		listMetric1,
 		[]string{"Average"},
 	}}
 	resourceTypeTagFilters := map[string][]aws.Tag{}
@@ -1441,17 +1356,11 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 	mockCloudwatchSvc := &MockCloudWatchClientWithDataGranularity{}
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
-			cloudwatchtypes.Metric{
-				MetricName: awssdk.String("CPUUtilization"),
-				Namespace:  awssdk.String("AWS/EC2"),
-			},
+			listMetric1,
 			[]string{"Average"},
 		},
 		{
-			cloudwatchtypes.Metric{
-				MetricName: awssdk.String("DiskReadOps"),
-				Namespace:  awssdk.String("AWS/EC2"),
-			},
+			listMetric6,
 			[]string{"Average"},
 		},
 	}
@@ -1488,25 +1397,11 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	mockCloudwatchSvc := &MockCloudWatchClient{}
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
-			cloudwatchtypes.Metric{
-				Dimensions: []cloudwatchtypes.Dimension{{
-					Name:  awssdk.String("InstanceId"),
-					Value: awssdk.String("i-1"),
-				}},
-				MetricName: awssdk.String("CPUUtilization"),
-				Namespace:  awssdk.String("AWS/EC2"),
-			},
+			listMetric1,
 			[]string{"Average"},
 		},
 		{
-			cloudwatchtypes.Metric{
-				Dimensions: []cloudwatchtypes.Dimension{{
-					Name:  awssdk.String("InstanceId"),
-					Value: awssdk.String("i-1"),
-				}},
-				MetricName: awssdk.String("DiskReadOps"),
-				Namespace:  awssdk.String("AWS/EC2"),
-			},
+			listMetric6,
 			[]string{"Average"},
 		},
 	}
@@ -1666,10 +1561,7 @@ func TestCreateEventsTimestamp(t *testing.T) {
 
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
-			cloudwatchtypes.Metric{
-				MetricName: awssdk.String("CPUUtilization"),
-				Namespace:  awssdk.String("AWS/EC2"),
-			},
+			listMetric1,
 			[]string{"Average"},
 		},
 		{
