@@ -184,6 +184,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Improve collection of risk information from Okta debug data. {issue}33677[33677] {pull}34030[34030]
 - Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
 - Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
+- Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 
 *Auditbeat*
 
