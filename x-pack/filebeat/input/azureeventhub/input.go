@@ -42,7 +42,6 @@ type azureInput struct {
 	workerCtx    context.Context         // worker goroutine context. It's cancelled when the input stops or the worker exits.
 	workerCancel context.CancelFunc      // used to signal that the worker should stop.
 	workerOnce   sync.Once               // guarantees that the worker goroutine is only started once.
-	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
 	hub          *eventhub.Hub           // hub will be assigned
 }
@@ -98,22 +97,25 @@ func NewInput(
 	return in, nil
 }
 
-// Run starts the input worker then returns. Only the first invocation
-// will ever start the worker.
+// Run starts the `azure-eventhub` input worker then returns.
+//
+// Only the first invocation will ever start the worker. All subsequent
+// invocations will be no-ops.
+//
+// After we set up and start the worker, it will continue fetching data
+// from the event hub on its own until the input Runner calls
+// the `Stop()` method.
 func (a *azureInput) Run() {
+	// `Run` is invoked periodically by the input Runner. The `sync.Once`
+	// guarantees that we only start the worker once.
 	a.workerOnce.Do(func() {
-		a.workerWg.Add(1)
-		go func() {
-			a.log.Infof("%s input worker has started.", inputName)
-			defer a.log.Infof("%s input worker has stopped.", inputName)
-			defer a.workerWg.Done()
-			defer a.workerCancel()
-			err := a.runWithEPH()
-			if err != nil {
-				a.log.Error(err)
-				return
-			}
-		}()
+		a.log.Infof("%s input worker is starting.", inputName)
+		err := a.runWithEPH()
+		if err != nil {
+			a.log.Errorw("error starting the input worker", "error", err)
+			return
+		}
+		a.log.Infof("%s input worker has started.", inputName)
 	})
 }
 
@@ -150,22 +152,18 @@ func (a *azureInput) Run() {
 //	return nil
 //}
 
-// Stop stops TCP server
+// Stop stops `azure-eventhub` input.
 func (a *azureInput) Stop() {
-	if a.hub != nil {
-		err := a.hub.Close(a.workerCtx)
-		if err != nil {
-			a.log.Errorw(fmt.Sprintf("error while closing eventhub"), "error", err)
-		}
-	}
 	if a.processor != nil {
-		err := a.processor.Close(a.workerCtx)
+		// Tells the processor to stop processing events and release all resources,
+		// like scheduler, leaser, checkpointer, and client.
+		err := a.processor.Close(context.Background())
 		if err != nil {
 			a.log.Errorw(fmt.Sprintf("error while closing eventhostprocessor"), "error", err)
 		}
 	}
+
 	a.workerCancel()
-	a.workerWg.Wait()
 }
 
 // Wait stop the current server

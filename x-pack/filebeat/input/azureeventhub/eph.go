@@ -85,7 +85,7 @@ func (a *azureInput) runWithEPH() error {
 	// processor.UnregisterHandler(ctx, handleID)
 
 	// start handling messages from all of the partitions balancing across multiple consumers
-	err = a.processor.Start(a.workerCtx)
+	err = a.processor.StartNonBlocking(a.workerCtx)
 	if err != nil {
 		return err
 	}
