@@ -59,7 +59,7 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 
 		server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
+			w.Header().Set("Content-Type", "text/plain; version=0.0.4")
 			_, _ = w.Write(body)
 		}))
 
