@@ -86,6 +86,7 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 		if err != nil {
 			return nil, fmt.Errorf("Error injecting agent processors: %w", err)
 		}
+		streamSource = injectGlobalProcesssors(raw, streamSource)
 		inputs[iter] = streamSource
 	}
 
@@ -127,19 +128,25 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 		mapstr.M{"id": agentInfo.ID},
 		"agent"))
 
-	currentProcs, ok := inputs["processors"]
-	if !ok {
-		inputs["processors"] = processors
-	} else {
-		currentProcsList, ok := currentProcs.([]interface{})
-		if !ok {
-			return nil, fmt.Errorf("error creating list of existing processors, got: %#v", currentProcs)
-		}
-		inputs["processors"] = append(processors, currentProcsList...)
-
-	}
+	inputs["processors"] = appendProcessors(inputs, processors)
 
 	return inputs, nil
+}
+
+// injectGlobalProcesssors re-injects any global processors into the individual streams
+func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[string]interface{}) map[string]interface{} {
+	rootMap := expected.GetSource().AsMap()
+	globalProcFound, ok := rootMap["processors"]
+	if !ok {
+		return stream
+	}
+	globalList, ok := globalProcFound.([]interface{})
+	if !ok {
+		return stream
+	}
+	newProcs := appendProcessors(stream, globalList)
+	stream["processors"] = newProcs
+	return stream
 }
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
@@ -152,7 +159,7 @@ func injectIndexStream(dataStreamType string, expected *proto.UnitExpectedConfig
 }
 
 //injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
-// this adds a variety of processors foe metadata related to the dataset and input config.
+// this adds a variety of processors for metadata related to the dataset and input config.
 func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}) (map[string]interface{}, error) {
 	//1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
@@ -184,18 +191,8 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType s
 		processors = append(processors, sourceStream)
 	}
 
-	// figure out if we have any existing processors
-	currentProcs, ok := stream["processors"]
-	if !ok {
-		stream["processors"] = processors
-	} else {
-		currentProcsList, ok := currentProcs.([]interface{})
-		if !ok {
-			return nil, fmt.Errorf("error creating list of existing processors, got: %#v", currentProcs)
-		}
-		stream["processors"] = append(processors, currentProcsList...)
-
-	}
+	// append with existing processors
+	stream["processors"] = appendProcessors(stream, processors)
 
 	return stream, nil
 }
@@ -228,6 +225,20 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 			"target": target,
 		},
 	}
+}
+
+// appendProcessors takes an existing intput or stream-level config, extracts any existing processors in the config,
+// and appends them to a new list of configs. Mostly a helper to deal with all the typecasting
+func appendProcessors(existingConfig map[string]interface{}, newProcs []interface{}) []interface{} {
+	currentProcs, ok := existingConfig["processors"]
+	if !ok {
+		return newProcs
+	}
+	currentList, ok := currentProcs.([]interface{})
+	if !ok {
+		return newProcs
+	}
+	return append(currentList, newProcs...)
 }
 
 // metadataFromDatastreamValues takes the various data_stream values from across the expected config and returns a set of "good" that can be used to add fields
