@@ -32,6 +32,15 @@ import (
 	"github.com/prometheus/prometheus/pkg/timestamp"
 )
 
+const (
+	// The Content-Type values for the different wire protocols
+	hdrContentType                      = "Content-Type"
+	TextVersion                         = "0.0.4"
+	ContentTypeOpenMetricsFormat        = `application/openmetrics-text`
+	ContentTypeUnknownFormat     string = ``
+	ContentTypeTextFormat        string = `text/plain; version=` + TextVersion + `; charset=utf-8`
+)
+
 type Gauge struct {
 	Value *float64
 }
@@ -318,27 +327,27 @@ const (
 
 // Counters have _total suffix
 func isTotal(name string) bool {
-	return len(name) > 6 && name[len(name)-6:] == suffixTotal
+	return strings.HasSuffix(name, suffixTotal)
 }
 
 func isGCount(name string) bool {
-	return len(name) > 7 && name[len(name)-7:] == suffixGCount
+	return strings.HasSuffix(name, suffixGCount)
 }
 
 func isGSum(name string) bool {
-	return len(name) > 5 && name[len(name)-5:] == suffixGSum
+	return strings.HasSuffix(name, suffixGSum)
 }
 
 func isCount(name string) bool {
-	return len(name) > 6 && name[len(name)-6:] == suffixCount
+	return strings.HasSuffix(name, suffixCount)
 }
 
 func isSum(name string) bool {
-	return len(name) > 4 && name[len(name)-4:] == suffixSum
+	return strings.HasSuffix(name, suffixSum)
 }
 
 func isBucket(name string) bool {
-	return len(name) > 7 && name[len(name)-7:] == suffixBucket
+	return strings.HasSuffix(name, suffixBucket)
 }
 
 func summaryMetricName(name string, s float64, qv string, lbls string, t *int64, summariesByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
@@ -461,7 +470,6 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 	)
 	var err error
 
-loop:
 	for {
 		var (
 			et textparse.Entry
@@ -522,9 +530,8 @@ loop:
 		mets = parser.Metric(&lset)
 
 		if !lset.Has(labels.MetricName) {
-			// TODO: log here an errNameLabelMandatory
-			// var errNameLabelMandatory = fmt.Errorf("missing metric name (%s label)", labels.MetricName)
-			break loop
+			// missing metric name from labels.MetricName, skip.
+			break
 		}
 
 		var lbls strings.Builder
@@ -561,7 +568,7 @@ loop:
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			if isTotal(metricName) && contentType == OpenMetricsType { // Remove suffix _total, get lookup metricname
+			if isTotal(metricName) && contentType == ContentTypeOpenMetricsFormat { // Remove suffix _total, get lookup metricname
 				lookupMetricName = metricName[:len(metricName)-6]
 			} else {
 				lookupMetricName = metricName
@@ -648,42 +655,29 @@ loop:
 	return families, nil
 }
 
-const (
-	TextVersion     = "0.0.4"
-	OpenMetricsType = `application/openmetrics-text`
-
-	// The Content-Type values for the different wire protocols.
-	FmtUnknown string = `<unknown>`
-	FmtText    string = `text/plain; version=` + TextVersion + `; charset=utf-8`
-)
-
-const (
-	hdrContentType = "Content-Type"
-)
-
 func GetContentType(h http.Header) string {
 	ct := h.Get(hdrContentType)
 
 	mediatype, params, err := mime.ParseMediaType(ct)
 	if err != nil {
-		return FmtUnknown
+		return ContentTypeUnknownFormat
 	}
 
 	const textType = "text/plain"
 
 	switch mediatype {
-	case OpenMetricsType:
+	case ContentTypeOpenMetricsFormat:
 		if e, ok := params["encoding"]; ok && e != "delimited" {
-			return FmtUnknown
+			return ContentTypeUnknownFormat
 		}
-		return OpenMetricsType
+		return ContentTypeOpenMetricsFormat
 
 	case textType:
 		if v, ok := params["version"]; ok && v != TextVersion {
-			return FmtUnknown
+			return ContentTypeUnknownFormat
 		}
-		return FmtText
+		return ContentTypeTextFormat
 	}
 
-	return FmtUnknown
+	return ContentTypeUnknownFormat
 }

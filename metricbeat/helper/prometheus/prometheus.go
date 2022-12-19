@@ -96,8 +96,8 @@ func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 	}
 
 	contentType := GetContentType(resp.Header)
-	if contentType == "" {
-		return nil, fmt.Errorf("Invalid format for response of response")
+	if contentType == ContentTypeUnknownFormat {
+		return nil, fmt.Errorf("Invalid format for response: %w", ContentTypeUnknownFormat)
 	}
 
 	appendTime := time.Now().Round(0)
