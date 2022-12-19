@@ -182,7 +182,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add metrics for UDP packet processing. {pull}33870[33870]
 - Convert UDP input to v2 input. {pull}33930[33930]
 - Improve collection of risk information from Okta debug data. {issue}33677[33677] {pull}34030[34030]
-- Add pagination support for Salesforce module. {issue}34057[34057]
+- Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
+- Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
+- Add pagination support for Salesforce module. {issue}34057[34057] {pull}34065[34065]
 
 *Auditbeat*
 
