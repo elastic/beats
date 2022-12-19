@@ -34,11 +34,11 @@ import (
 
 const (
 	// The Content-Type values for the different wire protocols
-	hdrContentType                      = "Content-Type"
-	TextVersion                         = "0.0.4"
-	ContentTypeOpenMetricsFormat        = `application/openmetrics-text`
-	ContentTypeUnknownFormat     string = ``
-	ContentTypeTextFormat        string = `text/plain; version=` + TextVersion + `; charset=utf-8`
+	hdrContentType               = "Content-Type"
+	TextVersion                  = "0.0.4"
+	OpenMetricsType              = `application/openmetrics-text`
+	FmtUnknown            string = `<unknown>`
+	ContentTypeTextFormat string = `text/plain; version=` + TextVersion + `; charset=utf-8`
 )
 
 type Gauge struct {
@@ -568,7 +568,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			if isTotal(metricName) && contentType == ContentTypeOpenMetricsFormat { // Remove suffix _total, get lookup metricname
+			if isTotal(metricName) && contentType == OpenMetricsType { // Remove suffix _total, get lookup metricname
 				lookupMetricName = metricName[:len(metricName)-6]
 			} else {
 				lookupMetricName = metricName
@@ -660,24 +660,24 @@ func GetContentType(h http.Header) string {
 
 	mediatype, params, err := mime.ParseMediaType(ct)
 	if err != nil {
-		return ContentTypeUnknownFormat
+		return FmtUnknown
 	}
 
 	const textType = "text/plain"
 
 	switch mediatype {
-	case ContentTypeOpenMetricsFormat:
+	case OpenMetricsType:
 		if e, ok := params["encoding"]; ok && e != "delimited" {
-			return ContentTypeUnknownFormat
+			return FmtUnknown
 		}
-		return ContentTypeOpenMetricsFormat
+		return OpenMetricsType
 
 	case textType:
 		//if v, ok := params["version"]; ok && v != TextVersion {
-		//	return ContentTypeUnknownFormat
+		//	return FmtUnknown
 		//}
 		return ContentTypeTextFormat
 	}
 
-	return ContentTypeUnknownFormat
+	return FmtUnknown
 }
