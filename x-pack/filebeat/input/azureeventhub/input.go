@@ -15,8 +15,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -52,7 +50,7 @@ const (
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
 	}
 }
 
@@ -64,7 +62,7 @@ func NewInput(
 ) (input.Input, error) {
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "reading %s input config", inputName)
+		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
 	}
 
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
@@ -125,7 +123,7 @@ func (a *azureInput) Stop() {
 		// like scheduler, leaser, checkpointer, and client.
 		err := a.processor.Close(context.Background())
 		if err != nil {
-			a.log.Errorw(fmt.Sprintf("error while closing eventhostprocessor"), "error", err)
+			a.log.Errorw("error while closing eventhostprocessor", "error", err)
 		}
 	}
 
@@ -147,9 +145,9 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 	}
 	messages := a.parseMultipleMessages(event.Data)
 	for _, msg := range messages {
-		azure.Put("offset", event.SystemProperties.Offset)
-		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
-		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
+		_, _ = azure.Put("offset", event.SystemProperties.Offset)
+		_, _ = azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
+		_, _ = azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 		ok := a.outlet.OnEvent(beat.Event{
 			Timestamp: timestamp,
 			Fields: mapstr.M{
