@@ -673,9 +673,9 @@ func GetContentType(h http.Header) string {
 		return OpenMetricsType
 
 	case textType:
-		//if v, ok := params["version"]; ok && v != TextVersion {
-		//	return FmtUnknown
-		//}
+		if v, ok := params["version"]; ok && v != TextVersion {
+			return FmtUnknown
+		}
 		return ContentTypeTextFormat
 	}
 
