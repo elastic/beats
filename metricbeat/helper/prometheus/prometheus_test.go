@@ -195,6 +195,7 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 		StatusCode: 200,
 		Header: http.Header{
 			"Content-Encoding": []string{"gzip"},
+			"Content-Type":     []string{"text/plain; version=0.0.4; charset=utf-8"},
 		},
 		Body: io.NopCloser(body),
 	}, nil
