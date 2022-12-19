@@ -91,7 +91,9 @@ func (a *azureInput) runWithEPH() error {
 	}
 	a.log.Infof("handler id: %q is registered\n", handlerID)
 
-	// start handling messages from all of the partitions balancing across multiple consumers
+	// Start handling messages from all of the partitions balancing across
+	// multiple consumers.
+	// The processor can be stopped by calling `Close()` on the processor.
 	err = a.processor.StartNonBlocking(a.workerCtx)
 	if err != nil {
 		a.log.Errorw("error starting the processor", "error", err)

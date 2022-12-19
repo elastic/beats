@@ -94,17 +94,17 @@ func NewInput(
 	return in, nil
 }
 
-// Run starts the `azure-eventhub` input worker then returns.
+// Run starts the `azure-eventhub` input and then returns.
 //
-// Only the first invocation will ever start the worker. All subsequent
+// The first invocation will start an input worker. All subsequent
 // invocations will be no-ops.
 //
-// After we set up and start the worker, it will continue fetching data
-// from the event hub on its own until the input Runner calls
-// the `Stop()` method.
+// The input worker will continue fetching data from the event hub until
+// the input Runner calls the `Stop()` method.
 func (a *azureInput) Run() {
 	// `Run` is invoked periodically by the input Runner. The `sync.Once`
-	// guarantees that we only start the worker once.
+	// guarantees that we only start the worker once during the first
+	// invocation.
 	a.workerOnce.Do(func() {
 		a.log.Infof("%s input worker is starting.", inputName)
 		err := a.runWithEPH()
@@ -119,8 +119,8 @@ func (a *azureInput) Run() {
 // Stop stops `azure-eventhub` input.
 func (a *azureInput) Stop() {
 	if a.processor != nil {
-		// Tells the processor to stop processing events and release all resources,
-		// like scheduler, leaser, checkpointer, and client.
+		// Tells the processor to stop processing events and release all
+		// resources (like scheduler, leaser, checkpointer, and client).
 		err := a.processor.Close(context.Background())
 		if err != nil {
 			a.log.Errorw("error while closing eventhostprocessor", "error", err)
