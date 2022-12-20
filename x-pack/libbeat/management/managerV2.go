@@ -7,13 +7,14 @@ package management
 import (
 	"context"
 	"fmt"
-	"github.com/joeshaw/multierror"
-	"go.uber.org/zap/zapcore"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/joeshaw/multierror"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/gofrs/uuid"
 	"gopkg.in/yaml.v2"
@@ -26,6 +27,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// unitKey is used to identify a unique unit in a map
+// the `ID` of a unit in itself is not unique without its type, only `Type` + `ID` is unique
 type unitKey struct {
 	Type client.UnitType
 	ID   string
