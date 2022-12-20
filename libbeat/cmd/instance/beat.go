@@ -900,7 +900,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) checkElasticsearchVersion() {
-	if !isElasticsearchOutput(b.Config.Output.Name()) || b.isConnectionToOlderVersionAllowed() {
+	if b.isConnectionToOlderVersionAllowed() {
 		return
 	}
 
@@ -931,7 +931,7 @@ func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
-	if !isElasticsearchOutput(b.Config.Output.Name()) || !b.IdxSupporter.Enabled() {
+	if !b.IdxSupporter.Enabled() {
 		return nil
 	}
 
@@ -978,10 +978,8 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 }
 
 func (b *Beat) registerClusterUUIDFetching() {
-	if isElasticsearchOutput(b.Config.Output.Name()) {
-		callback := b.clusterUUIDFetchingCallback()
-		_, _ = elasticsearch.RegisterConnectCallback(callback)
-	}
+	callback := b.clusterUUIDFetchingCallback()
+	_, _ = elasticsearch.RegisterConnectCallback(callback)
 }
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
