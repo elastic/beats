@@ -297,7 +297,7 @@ GetMetricData max page size: 100, based on https://docs.aws.amazon.com/AmazonClo
 | IAM ListAccountAliases | 1 | Once on startup
 | STS GetCallerIdentity | 1 | Once on startup
 | EC2 DescribeRegions| 1 | Once on startup
-| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per namespace per collection period
+| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per collection period
 | CloudWatch GetMetricData | Total number of results / GetMetricData max page size | Per region per namespace per collection period
 |===
 `billing`, `ebs`, `elb`, `sns`, `usage` and `lambda` are the same as `cloudwatch` metricset.
