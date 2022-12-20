@@ -13,6 +13,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"gopkg.in/yaml.v2"
@@ -48,9 +49,6 @@ type BeatV2Manager struct {
 	status  lbmanagement.Status
 	message string
 	payload map[string]interface{}
-
-	// reloadCh is kicked when a reload needs to occur
-	reloadCh chan struct{}
 
 	// stop callback must be registered by libbeat, as with the V1 callback
 	stopFunc func()
@@ -106,7 +104,6 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		units:    make(map[unitKey]*client.Unit),
 		status:   lbmanagement.Running,
 		message:  "Healthy",
-		reloadCh: make(chan struct{}, 1),
 		stopChan: make(chan struct{}, 1),
 	}
 
@@ -292,10 +289,16 @@ func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
 // ================================
 
 func (cm *BeatV2Manager) unitListen() {
+	const changeDebounce = 100 * time.Millisecond
 
 	// register signal handler
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
+	// timer is used to provide debounce on unit changes
+	// this allows multiple changes to come in and only a single reload be performed
+	t := time.NewTimer(changeDebounce)
+	t.Stop() // starts stopped, until a change occurs
 
 	cm.logger.Debugf("Listening for agent unit changes")
 	for {
@@ -323,14 +326,17 @@ func (cm *BeatV2Manager) unitListen() {
 			// A unit add and a unit change, since either way we can't do much more than call the reloader
 			case client.UnitChangedAdded:
 				cm.addUnit(change.Unit)
-				cm.triggerReload()
+				t.Reset(changeDebounce)
 			case client.UnitChangedModified:
 				cm.modifyUnit(change.Unit)
-				cm.triggerReload()
+				t.Reset(changeDebounce)
 			case client.UnitChangedRemoved:
 				cm.deleteUnit(change.Unit)
 			}
-		case <-cm.reloadCh:
+		case <-t.C:
+			// a copy of the units is used for reload to prevent the holding of the `cm.mx`.
+			// it could be possible that sending the configuration to reload could cause the `UpdateStatus`
+			// to be called on the manager causing it to try and grab the `cm.mx` lock, causing a deadlock.
 			cm.mx.Lock()
 			units := make(map[unitKey]*client.Unit, len(cm.units))
 			for k, u := range cm.units {
@@ -360,21 +366,6 @@ func (cm *BeatV2Manager) stopBeat() {
 	}
 	cm.client.Stop()
 	cm.UpdateStatus(lbmanagement.Stopped, "Stopped")
-}
-
-func (cm *BeatV2Manager) drainReload() {
-	for {
-		select {
-		case <-cm.reloadCh:
-		default:
-			return
-		}
-	}
-}
-
-func (cm *BeatV2Manager) triggerReload() {
-	cm.drainReload()
-	cm.reloadCh <- struct{}{}
 }
 
 func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
