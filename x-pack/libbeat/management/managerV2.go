@@ -274,7 +274,7 @@ func (cm *BeatV2Manager) addUnit(unit *client.Unit) {
 
 func (cm *BeatV2Manager) modifyUnit(unit *client.Unit) {
 	// `unit` is already in `cm.units` no need to add it to the map again
-	// but the lock still needs to be help so reload can be triggered
+	// but the lock still needs to be held so reload can be triggered
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
