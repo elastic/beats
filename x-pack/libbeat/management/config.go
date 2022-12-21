@@ -11,9 +11,9 @@ import (
 
 // Config for central management
 type Config struct {
-	Enabled       bool                    `config:"enabled" yaml:"enabled"`
-	Blacklist     ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
-	OutputRestart bool                    `config:"output_restart" yaml:"output_restart"`
+	Enabled               bool                    `config:"enabled" yaml:"enabled"`
+	Blacklist             ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
+	RestartOnOutputChange bool                    `config:"restart_on_output_change" yaml:"restart_on_output_change"`
 }
 
 // ConfigBlock stores a piece of config from central management

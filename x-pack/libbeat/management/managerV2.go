@@ -48,7 +48,7 @@ type BeatV2Manager struct {
 	actions []client.Action
 
 	// status is reported as a whole for every unit sent to this component
-	// hopefully this can be improved in the future to be seperated per unit
+	// hopefully this can be improved in the future to be separated per unit
 	status  lbmanagement.Status
 	message string
 	payload map[string]interface{}
@@ -105,11 +105,11 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (
 // NewV2AgentManagerWithClient actually creates the manager instance used by the rest of the beats.
 func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2) (lbmanagement.Manager, error) {
 	log := logp.NewLogger(lbmanagement.DebugK)
-	if config.OutputRestart {
+	if config.RestartOnOutputChange {
 		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
 	}
 	m := &BeatV2Manager{
-		stopOnOutputReload: config.OutputRestart,
+		stopOnOutputReload: config.RestartOnOutputChange,
 		config:             config,
 		logger:             log.Named("V2-manager"),
 		registry:           registry,
@@ -338,9 +338,11 @@ func (cm *BeatV2Manager) unitListen() {
 			// A unit add and a unit change, since either way we can't do much more than call the reloader
 			case client.UnitChangedAdded:
 				cm.addUnit(change.Unit)
+				// reset can be called here because `<-t.C` is handled in the same select
 				t.Reset(changeDebounce)
 			case client.UnitChangedModified:
 				cm.modifyUnit(change.Unit)
+				// reset can be called here because `<-t.C` is handled in the same select
 				t.Reset(changeDebounce)
 			case client.UnitChangedRemoved:
 				cm.deleteUnit(change.Unit)
@@ -387,6 +389,11 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	var stoppingUnits []*client.Unit
 	for _, unit := range units {
 		state, ll, _ := unit.Expected()
+		if ll > lowestLevel {
+			// log level is still used from an expected stopped unit until
+			// the unit is completely removed (aka. fully stopped)
+			lowestLevel = ll
+		}
 		if state == client.UnitStateStopped {
 			// unit is being stopped
 			//
@@ -398,9 +405,6 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 			// only stopped or healthy are known (and expected) state
 			// for a unit
 			cm.logger.Errorf("unit %s has an unknown state %+v", unit.ID(), state)
-		}
-		if ll > lowestLevel {
-			lowestLevel = ll
 		}
 		if unit.Type() == client.UnitTypeOutput {
 			outputUnit = unit

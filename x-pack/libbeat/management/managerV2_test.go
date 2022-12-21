@@ -11,81 +11,165 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 )
 
 func TestManagerV2(t *testing.T) {
 
-	srv := mockSrvWithUnits([]*proto.UnitExpected{
+	r := reload.NewRegistry()
+
+	output := &reloadable{}
+	r.MustRegisterOutput(output)
+	inputs := &reloadableList{}
+	r.MustRegisterInput(inputs)
+
+	configsSet := false
+	configsCleared := false
+	logLevelSet := false
+	allStopped := false
+	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
+		if currentIdx < 2 {
+			oCfg := output.Config()
+			iCfgs := inputs.Configs()
+			if oCfg != nil && len(iCfgs) == 3 {
+				configsSet = true
+			}
+		} else {
+			oCfg := output.Config()
+			iCfgs := inputs.Configs()
+			if oCfg == nil && len(iCfgs) == 0 {
+				configsCleared = true
+			}
+			if len(observed.Units) == 0 {
+				allStopped = true
+			}
+		}
+		if logp.GetLevel() == zapcore.DebugLevel {
+			logLevelSet = true
+		}
+	}
+
+	srv := mockSrvWithUnits([][]*proto.UnitExpected{
 		{
-			Id:             "output-unit",
-			Type:           proto.UnitType_OUTPUT,
-			ConfigStateIdx: 1,
-			Config: &proto.UnitExpectedConfig{
-				Id:   "default",
-				Type: "elasticsearch",
-				Name: "elasticsearch",
+			{
+				Id:             "output-unit",
+				Type:           proto.UnitType_OUTPUT,
+				ConfigStateIdx: 1,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "default",
+					Type: "elasticsearch",
+					Name: "elasticsearch",
+				},
+				State:    proto.State_HEALTHY,
+				LogLevel: proto.UnitLogLevel_INFO,
 			},
-			State:    proto.State_HEALTHY,
-			LogLevel: proto.UnitLogLevel_INFO,
-		},
-		{
-			Id:             "input-unit-1",
-			Type:           proto.UnitType_INPUT,
-			ConfigStateIdx: 1,
-			Config: &proto.UnitExpectedConfig{
-				Id:   "system/metrics-system-default-system-1",
-				Type: "system/metrics",
-				Name: "system-1",
-				Streams: []*proto.Stream{
-					{
-						Id: "system/metrics-system.filesystem-default-system-1",
-						Source: requireNewStruct(t, map[string]interface{}{
-							"metricsets": []interface{}{"filesystem"},
-							"period":     "1m",
-						}),
+			{
+				Id:             "input-unit-1",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "system/metrics-system-default-system-1",
+					Type: "system/metrics",
+					Name: "system-1",
+					Streams: []*proto.Stream{
+						{
+							Id: "system/metrics-system.filesystem-default-system-1",
+							Source: requireNewStruct(t, map[string]interface{}{
+								"metricsets": []interface{}{"filesystem"},
+								"period":     "1m",
+							}),
+						},
 					},
 				},
+				State:    proto.State_HEALTHY,
+				LogLevel: proto.UnitLogLevel_INFO,
 			},
-			State:    proto.State_HEALTHY,
-			LogLevel: proto.UnitLogLevel_INFO,
-		},
-		{
-			Id:             "input-unit-2",
-			Type:           proto.UnitType_INPUT,
-			ConfigStateIdx: 1,
-			Config: &proto.UnitExpectedConfig{
-				Id:   "system/metrics-system-default-system-2",
-				Type: "system/metrics",
-				Name: "system-2",
-				Streams: []*proto.Stream{
-					{
-						Id: "system/metrics-system.filesystem-default-system-2",
-						Source: requireNewStruct(t, map[string]interface{}{
-							"metricsets": []interface{}{"filesystem"},
-							"period":     "1m",
-						}),
-					},
-					{
-						Id: "system/metrics-system.filesystem-default-system-3",
-						Source: requireNewStruct(t, map[string]interface{}{
-							"metricsets": []interface{}{"filesystem"},
-							"period":     "1m",
-						}),
+			{
+				Id:             "input-unit-2",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "system/metrics-system-default-system-2",
+					Type: "system/metrics",
+					Name: "system-2",
+					Streams: []*proto.Stream{
+						{
+							Id: "system/metrics-system.filesystem-default-system-2",
+							Source: requireNewStruct(t, map[string]interface{}{
+								"metricsets": []interface{}{"filesystem"},
+								"period":     "1m",
+							}),
+						},
+						{
+							Id: "system/metrics-system.filesystem-default-system-3",
+							Source: requireNewStruct(t, map[string]interface{}{
+								"metricsets": []interface{}{"filesystem"},
+								"period":     "1m",
+							}),
+						},
 					},
 				},
+				State:    proto.State_HEALTHY,
+				LogLevel: proto.UnitLogLevel_INFO,
 			},
-			State:    proto.State_HEALTHY,
-			LogLevel: proto.UnitLogLevel_INFO,
 		},
-	})
+		{
+			{
+				Id:             "output-unit",
+				Type:           proto.UnitType_OUTPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_INFO,
+			},
+			{
+				Id:             "input-unit-1",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_DEBUG,
+			},
+			{
+				Id:             "input-unit-2",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_INFO,
+			},
+		},
+		{
+			{
+				Id:             "output-unit",
+				Type:           proto.UnitType_OUTPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_STOPPED,
+				LogLevel:       proto.UnitLogLevel_INFO,
+			},
+			{
+				Id:             "input-unit-1",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_STOPPED,
+				LogLevel:       proto.UnitLogLevel_DEBUG,
+			},
+			{
+				Id:             "input-unit-2",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_STOPPED,
+				LogLevel:       proto.UnitLogLevel_INFO,
+			},
+		},
+		{},
+	}, onObserved)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 
@@ -97,13 +181,6 @@ func TestManagerV2(t *testing.T) {
 		},
 	}, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	r := reload.NewRegistry()
-
-	output := &reloadable{}
-	r.MustRegisterOutput(output)
-	inputs := &reloadableList{}
-	r.MustRegisterInput(inputs)
-
 	m, err := NewV2AgentManagerWithClient(&Config{
 		Enabled: true,
 	}, r, client)
@@ -114,22 +191,39 @@ func TestManagerV2(t *testing.T) {
 	defer m.Stop()
 
 	require.Eventually(t, func() bool {
-		outputCfg := output.Config()
-		inputCfgs := inputs.Configs()
-		return outputCfg != nil && len(inputCfgs) == 3
-	}, 5*time.Second, 100*time.Millisecond)
+		return configsSet && configsCleared && logLevelSet && allStopped
+	}, 15*time.Second, 100*time.Millisecond)
 }
 
-func mockSrvWithUnits(units []*proto.UnitExpected) *mock.StubServerV2 {
+func mockSrvWithUnits(units [][]*proto.UnitExpected, observedCallback func(*proto.CheckinObserved, int)) *mock.StubServerV2 {
+	i := 0
+	agentInfo := &proto.CheckinAgentInfo{
+		Id:       "elastic-agent-id",
+		Version:  "8.6.0",
+		Snapshot: true,
+	}
 	return &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if observedCallback != nil {
+				observedCallback(observed, i)
+			}
+			matches := doesStateMatch(observed, units[i])
+			if !matches {
+				// send same set of units
+				return &proto.CheckinExpected{
+					AgentInfo: agentInfo,
+					Units:     units[i],
+				}
+			}
+			// send next set of units
+			i += 1
+			if i >= len(units) {
+				// stay on last index
+				i = len(units) - 1
+			}
 			return &proto.CheckinExpected{
-				AgentInfo: &proto.CheckinAgentInfo{
-					Id:       "elastic-agent-id",
-					Version:  "8.6.0",
-					Snapshot: true,
-				},
-				Units: units,
+				AgentInfo: agentInfo,
+				Units:     units[i],
 			}
 		},
 		ActionImpl: func(response *proto.ActionResponse) error {
@@ -138,6 +232,26 @@ func mockSrvWithUnits(units []*proto.UnitExpected) *mock.StubServerV2 {
 		},
 		ActionsChan: make(chan *mock.PerformAction, 100),
 	}
+}
+
+func doesStateMatch(observed *proto.CheckinObserved, expected []*proto.UnitExpected) bool {
+	if len(observed.Units) != len(expected) {
+		return false
+	}
+	expectedMap := make(map[unitKey]*proto.UnitExpected)
+	for _, exp := range expected {
+		expectedMap[unitKey{client.UnitType(exp.Type), exp.Id}] = exp
+	}
+	for _, unit := range observed.Units {
+		exp, ok := expectedMap[unitKey{client.UnitType(unit.Type), unit.Id}]
+		if !ok {
+			return false
+		}
+		if unit.State != exp.State || unit.ConfigStateIdx != exp.ConfigStateIdx {
+			return false
+		}
+	}
+	return true
 }
 
 type reloadable struct {
