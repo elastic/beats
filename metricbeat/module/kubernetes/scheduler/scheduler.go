@@ -28,35 +28,38 @@ import (
 
 var mapping = &prometheus.MetricsMapping{
 	Metrics: map[string]prometheus.MetricMap{
-		"process_cpu_seconds_total":          prometheus.Metric("process.cpu.sec"),
-		"process_resident_memory_bytes":      prometheus.Metric("process.memory.resident.bytes"),
-		"process_virtual_memory_bytes":       prometheus.Metric("process.memory.virtual.bytes"),
-		"process_open_fds":                   prometheus.Metric("process.fds.open.count"),
-		"process_start_time_seconds":         prometheus.Metric("process.started.sec"),
-		"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
-		"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
-		"http_response_size_bytes":           prometheus.Metric("http.response.size.bytes"),
-		"http_requests_total":                prometheus.Metric("http.request.count"),
-		"rest_client_requests_total":         prometheus.Metric("client.request.count"),
-		"leader_election_master_status":      prometheus.BooleanMetric("leader.is_master"),
-		"scheduler_e2e_scheduling_duration_seconds": prometheus.Metric("scheduling.e2e.duration.us",
+		"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
+		"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
+		"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
+		"process_open_fds":              prometheus.Metric("process.fds.open.count"),
+		"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
+		"process_max_fds":               prometheus.Metric("process.fds.max.count"),
+
+		"rest_client_requests_total":           prometheus.Metric("client.request.count"),
+		"rest_client_response_size_bytes":      prometheus.Metric("client.response.size.bytes"),
+		"rest_client_request_size_bytes":       prometheus.Metric("client.request.size.bytes"),
+		"rest_client_request_duration_seconds": prometheus.Metric("client.request.duration.us", prometheus.OpMultiplyBuckets(1000000)),
+
+		"leader_election_master_status": prometheus.BooleanMetric("leader.is_master"),
+
+		"scheduler_pending_pods":              prometheus.Metric("scheduling.pending.pods.count"),
+		"scheduler_preemption_victims":        prometheus.Metric("scheduling.preemption.victims"),
+		"scheduler_preemption_attempts_total": prometheus.Metric("scheduling.preemption.attempts.count"),
+		"scheduler_queue_incoming_pods_total": prometheus.Metric("scheduling.incoming.pods.count"),
+		"scheduler_scheduling_attempt_duration_seconds": prometheus.Metric("scheduling.attempts.duration.us",
 			prometheus.OpMultiplyBuckets(1000000)),
-		"scheduler_pod_preemption_victims": prometheus.Metric("scheduling.pod.preemption.victims",
-			// this is needed in order to solve compatibility issue of different
-			// different k8s versions, issue: https://github.com/elastic/beats/issues/19332
-			prometheus.OpSetNumericMetricSuffix("count")),
-		"scheduler_schedule_attempts_total":     prometheus.Metric("scheduling.pod.attempts.count"),
-		"scheduler_scheduling_duration_seconds": prometheus.Metric("scheduling.duration.seconds"),
+		"scheduler_schedule_attempts_total": prometheus.Metric("scheduling.attempts.count"),
 	},
 
 	Labels: map[string]prometheus.LabelMap{
-		"handler":   prometheus.KeyLabel("handler"),
-		"code":      prometheus.KeyLabel("code"),
-		"method":    prometheus.KeyLabel("method"),
-		"host":      prometheus.KeyLabel("host"),
-		"name":      prometheus.KeyLabel("name"),
-		"result":    prometheus.KeyLabel("result"),
-		"operation": prometheus.KeyLabel("operation"),
+		"verb":    prometheus.KeyLabel("verb"),
+		"host":    prometheus.KeyLabel("host"),
+		"code":    prometheus.KeyLabel("code"),
+		"method":  prometheus.KeyLabel("method"),
+		"queue":   prometheus.KeyLabel("queue"),
+		"event":   prometheus.KeyLabel("event"),
+		"profile": prometheus.KeyLabel("profile"),
+		"result":  prometheus.KeyLabel("result"),
 	},
 }
 

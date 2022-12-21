@@ -4,134 +4,131 @@
     Kubernetes scheduler metrics
   release: ga
   fields:
-  - name: handler
-    type: keyword
-    description: >
-      Request handler
-  - name: code
-    type: keyword
-    description: >
-      HTTP code
-  - name: method
-    type: keyword
-    description: >
-      HTTP method
-  - name: host
-    type: keyword
-    description: >
-      Request host
-  - name: name
-    type: keyword
-    description: >
-      Name for the resource
-  - name: result
-    type: keyword
-    description: >
-      Schedule attempt result
-  - name: operation
-    type: keyword
-    description: >
-      Scheduling operation
-  - name: process
-    type: group
-    fields:
-      - name: cpu.sec
-        type: double
-        description: CPU seconds
-      - name: memory.resident.bytes
-        type: long
-        format: bytes
-        description: Bytes in resident memory
-      - name: memory.virtual.bytes
-        type: long
-        format: bytes
-        description: Bytes in virtual memory
-      - name: fds.open.count
-        type: long
-        description: Number of open file descriptors
-      - name: started.sec
-        type: double
-        description: Seconds since the process started
-  - name: http
-    type: group
-    fields:
-      - name: request.duration.us.percentile.*
-        type: object
-        object_type: double
-        description: Request duration microseconds percentiles
-      - name: request.duration.us.sum
-        type: double
-        description: Request duration microseconds cumulative sum
-      - name: request.duration.us.count
-        type: long
-        description: Request count for duration
-      - name: request.size.bytes.percentile.*
-        type: object
-        object_type: long
-        description: Request size percentiles
-      - name: request.size.bytes.sum
-        type: long
-        format: bytes
-        description: Request size cumulative sum
-      - name: request.size.bytes.count
-        type: long
-        description: Request count for size
-      - name: response.size.bytes.percentile.*
-        type: object
-        object_type: long
-        description: Response size percentiles
-      - name: response.size.bytes.sum
-        type: long
-        format: bytes
-        description: Response size cumulative sum
-      - name: response.size.bytes.count
-        type: long
-        description: Response count
-      - name: request.count
-        type: long
-        description: Request count
-  - name: client.request.count
-    type: long
-    description: >
-      Number of requests as client
-  - name: leader.is_master
-    type: boolean
-    description: >
-      Whether the node is master
-
-  - name: scheduling
-    type: group
-    fields:
-      - name: e2e.duration.us.bucket.*
-        type: object
-        object_type: long
-        description: End to end scheduling duration microseconds
-      - name: e2e.duration.us.sum
-        type: long
-        description: End to end scheduling duration microseconds sum
-      - name: e2e.duration.us.count
-        type: long
-        description: End to end scheduling count
-      - name: pod.preemption.victims.bucket.*
-        type: long
-        description: Pod preemption victims
-      - name: pod.preemption.victims.sum
-        type: long
-        description: Pod preemption victims sum
-      - name: pod.preemption.victims.count
-        type: long
-        description: Pod preemption victims count
-      - name: pod.attempts.count
-        type: long
-        description: Pod attempts count
-      - name: duration.seconds.percentile.*
-        type: object
-        object_type: double
-        description: Scheduling duration percentiles
-      - name: duration.seconds.sum
-        type: double
-        description: Scheduling duration cumulative sum
-      - name: duration.seconds.count
-        type: long
-        description: Scheduling count
-
+    - name: verb
+      type: keyword
+      description: >
+        HTTP verb
+    - name: host
+      type: keyword
+      description: >
+        HTTP host
+    - name: code
+      type: keyword
+      description: >
+        HTTP code
+    - name: method
+      type: keyword
+      description: >
+        HTTP method
+    - name: queue
+      type: keyword
+      description: >
+        Scheduling queue
+    - name: event
+      type: keyword
+      description: >
+        Scheduling event
+    - name: profile
+      type: keyword
+      description: >
+        Scheduling profile
+    - name: result
+      type: keyword
+      description: >
+        Attempt result to schedule pod
+    - name: process
+      type: group
+      fields:
+        - name: cpu.sec
+          type: double
+          description: Total user and system CPU time spent in seconds
+        - name: memory.resident.bytes
+          type: long
+          format: bytes
+          description: Bytes in resident memory
+        - name: memory.virtual.bytes
+          type: long
+          format: bytes
+          description: Bytes in virtual memory
+        - name: fds.open.count
+          type: long
+          description: Number of open file descriptors
+        - name: fds.max.count
+          type: long
+          description: Limit of open file descriptors
+        - name: started.sec
+          type: double
+          description: Seconds since the process started
+    - name: client
+      type: group
+      fields:
+        - name: request.count
+          type: long
+          description: Number of HTTP requests
+        - name: request.duration.us.sum
+          type: long
+          description: Sum of requests latency in microseconds
+        - name: request.duration.us.count
+          type: long
+          description: Number of requests
+        - name: request.duration.us.bucket.*
+          type: object
+          object_type: long
+          description: Requests latency distribution in histogram buckets
+        - name: request.size.bytes.sum
+          type: long
+          format: bytes
+          description: Requests size sum in bytes
+        - name: request.size.bytes.count
+          type: long
+          description: Number of requests
+        - name: request.size.bytes.bucket.*
+          type: object
+          object_type: long
+          description: Requests size distribution in histogram buckets
+        - name: response.size.bytes.count
+          type: long
+          description: Number of responses
+        - name: response.size.bytes.sum
+          type: long
+          format: bytes
+          description: Responses size sum in bytes
+        - name: response.size.bytes.bucket.*
+          type: object
+          object_type: long
+          description: Responses size distribution in histogram buckets
+    - name: scheduling
+      type: group
+      fields:
+        - name: pending.pods.count
+          type:
+          description: Number of pending pods
+        - name: preemption.victims.bucket.*
+          type: object
+          object_type: long
+          description: Number of preemption victims distribution in histogram buckets
+        - name: preemption.victims.sum
+          type: long
+          description: Preemption victims sum
+        - name: preemption.victims.count
+          type: long
+          description: Number of preemptions
+        - name: preemption.attempts.count
+          type: long
+          description: Total preemption attempts in the cluster so far
+        - name: incoming.pods.count
+          type: long
+          description: Number of pods added to scheduling queues
+        - name: attempts.count
+          type: long
+          description: Number of attempts to schedule pod
+        - name: attempts.duration.us.bucket.*
+          type: object
+          object_type: long
+          description: Scheduling attempt latency distribution in histogram buckets
+        - name: attempts.duration.us.sum
+          type: long
+          description: Sum of scheduling attempt latency in microseconds
+        - name: attempts.duration.us.count
+          type: long
+          description: Number of attempts
