@@ -101,6 +101,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add support for multiple regions in GCP {pull}32964[32964]
 
 *Packetbeat*
 
