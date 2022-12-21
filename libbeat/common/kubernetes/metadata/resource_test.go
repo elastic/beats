@@ -29,7 +29,6 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -144,7 +143,7 @@ func TestNamespaceAwareResource_GenerateWithNamespace(t *testing.T) {
 		resourceName string
 		input        kubernetes.Resource
 		namespace    kubernetes.Resource
-		output       mapstr.M
+		output       common.MapStr
 		name         string
 	}{
 		{
@@ -180,13 +179,13 @@ func TestNamespaceAwareResource_GenerateWithNamespace(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: mapstr.M{
-				"kubernetes": mapstr.M{
-					"persistentvolume": mapstr.M{
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"persistentvolume": common.MapStr{
 						"name": "pvc-18705cfb-9fb8-441f-9b32-0d67a21af839",
 						"uid":  "020fd954-3674-496a-9e77-c25f0f2257ea",
 					},
-					"labels": mapstr.M{
+					"labels": common.MapStr{
 						"foo": "bar",
 					},
 				},
@@ -226,21 +225,21 @@ func TestNamespaceAwareResource_GenerateWithNamespace(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: mapstr.M{
-				"kubernetes": mapstr.M{
-					"deployment": mapstr.M{
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"deployment": common.MapStr{
 						"name": name,
 						"uid":  "f33ca314-8cc5-48ea-90b7-3102c7430f75",
 					},
-					"labels": mapstr.M{
+					"labels": common.MapStr{
 						"foo": "bar",
 					},
 					"namespace":     "default",
 					"namespace_uid": uid,
-					"namespace_labels": mapstr.M{
+					"namespace_labels": common.MapStr{
 						"nskey": "nsvalue",
 					},
-					"namespace_annotations": mapstr.M{
+					"namespace_annotations": common.MapStr{
 						"ns_annotation": "value",
 					},
 				},
