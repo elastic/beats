@@ -41,6 +41,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -104,7 +105,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
-	metrics := newInputMetrics(monitoring.GetNamespace("dataset").GetRegistry(), env.ID)
+	metrics := newInputMetrics(env.ID)
 	defer metrics.Close()
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
@@ -121,7 +122,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 		return err
 	}
 
-	prg, err := newProgram(cfg.Program, root, client, limiter, patterns)
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, patterns)
 	if err != nil {
 		return err
 	}
@@ -176,27 +177,28 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 		log.Info("process repeated request")
 		var waitUntil time.Time
 		for {
-			// We have a special-case wait for when we have a zero limit.
-			// x/time/rate allow a burst through even when the limit is zero
-			// so in order to ensure that we don't try until we are out of
-			// purgatory we calculate how long we should wait according to
-			// the retry after for a 429 and rate limit headers if we have
-			// a zero rate quota. See handleResponse below.
 			if wait := time.Until(waitUntil); wait > 0 {
+				// We have a special-case wait for when we have a zero limit.
+				// x/time/rate allow a burst through even when the limit is zero
+				// so in order to ensure that we don't try until we are out of
+				// purgatory we calculate how long we should wait according to
+				// the retry after for a 429 and rate limit headers if we have
+				// a zero rate quota. See handleResponse below.
 				select {
 				case <-ctx.Done():
 					return ctx.Err()
 				case <-time.After(wait):
 				}
+			} else if err = ctx.Err(); err != nil {
+				// Otherwise exit if we have been cancelled.
+				return err
 			}
 
 			// Process a set of event requests.
 			log.Debugw("request state", logp.Namespace("cel"), "state", state)
 			metrics.executions.Add(1)
 			start := time.Now()
-			state, err = evalWith(ctx, prg, map[string]interface{}{
-				root: state,
-			})
+			state, err = evalWith(ctx, prg, state)
 			log.Debugw("response state", logp.Namespace("cel"), "state", state)
 			if err != nil {
 				switch {
@@ -423,9 +425,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			// Replace the last known good cursor.
 			state["cursor"] = goodCursor
 
-			// Avoid explicit type assertion. This is safe as long as the value is
-			// Go-comparable.
-			if state["want_more"] == false {
+			if more, _ := state["want_more"].(bool); !more {
 				return nil
 			}
 		}
@@ -529,10 +529,14 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 					waitUntil = t
 				}
 			}
-			fallthrough
-		default:
-			delete(state, "events")
 			return false, waitUntil, nil
+		default:
+			status := http.StatusText(statusCode)
+			if status == "" {
+				status = "unknown status code"
+			}
+			state["events"] = errorMessage(fmt.Sprintf("failed http request with %s: %d", status, statusCode))
+			return true, time.Time{}, nil
 		}
 	}
 	return true, waitUntil, nil
@@ -641,7 +645,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	if !wantClient(cfg) {
 		return nil, nil
 	}
-	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL)...)
+	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
@@ -692,7 +696,7 @@ func wantClient(cfg config) bool {
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(u *url.URL) []httpcommon.TransportOption {
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
 	switch {
@@ -701,7 +705,7 @@ func clientOptions(u *url.URL) []httpcommon.TransportOption {
 	case !ok:
 		return []httpcommon.TransportOption{
 			httpcommon.WithAPMHTTPInstrumentation(),
-			httpcommon.WithKeepaliveSettings{Disable: true},
+			keepalive,
 		}
 
 	// We set the host for the unix socket and Windows named
@@ -719,7 +723,7 @@ func clientOptions(u *url.URL) []httpcommon.TransportOption {
 	u.Scheme = scheme
 	return []httpcommon.TransportOption{
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
+		keepalive,
 		httpcommon.WithBaseDialer(dialer),
 	}
 }
@@ -804,7 +808,7 @@ var (
 	}
 )
 
-func newProgram(src, root string, client *http.Client, limiter *rate.Limiter, patterns map[string]*regexp.Regexp) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, patterns map[string]*regexp.Regexp) (cel.Program, error) {
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
 		lib.Collections(),
@@ -821,7 +825,7 @@ func newProgram(src, root string, client *http.Client, limiter *rate.Limiter, pa
 		}),
 	}
 	if client != nil {
-		opts = append(opts, lib.HTTP(client, limiter))
+		opts = append(opts, lib.HTTPWithContext(ctx, client, limiter))
 	}
 	if len(patterns) != 0 {
 		opts = append(opts, lib.Regexp(patterns))
@@ -843,35 +847,37 @@ func newProgram(src, root string, client *http.Client, limiter *rate.Limiter, pa
 	return prg, nil
 }
 
-func evalWith(ctx context.Context, prg cel.Program, input map[string]interface{}) (map[string]interface{}, error) {
-	out, _, err := prg.ContextEval(ctx, input)
-	if err != nil {
-		input["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed eval: %v", err)}
-		return input, fmt.Errorf("failed eval: %w", err)
+func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}) (map[string]interface{}, error) {
+	out, _, err := prg.ContextEval(ctx, map[string]interface{}{root: state})
+	if e := ctx.Err(); e != nil {
+		err = e
 	}
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	default:
+	if err != nil {
+		state["events"] = errorMessage(fmt.Sprintf("failed eval: %v", err))
+		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
 	v, err := out.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
 	if err != nil {
-		input["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed proto conversion: %v", err)}
-		return input, fmt.Errorf("failed proto conversion: %w", err)
+		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
+		return state, fmt.Errorf("failed proto conversion: %w", err)
 	}
 	b, err := protojson.MarshalOptions{Indent: ""}.Marshal(v.(proto.Message))
 	if err != nil {
-		input["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed native conversion: %v", err)}
-		return input, fmt.Errorf("failed native conversion: %w", err)
+		state["events"] = errorMessage(fmt.Sprintf("failed native conversion: %v", err))
+		return state, fmt.Errorf("failed native conversion: %w", err)
 	}
 	var res map[string]interface{}
 	err = json.Unmarshal(b, &res)
 	if err != nil {
-		input["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed json conversion: %v", err)}
-		return input, fmt.Errorf("failed json conversion: %w", err)
+		state["events"] = errorMessage(fmt.Sprintf("failed json conversion: %v", err))
+		return state, fmt.Errorf("failed json conversion: %w", err)
 	}
 	return res, nil
+}
+
+func errorMessage(msg string) map[string]interface{} {
+	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.
@@ -908,8 +914,7 @@ func test(url *url.URL) error {
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	id     string
-	parent *monitoring.Registry
+	unregister func()
 
 	resource            *monitoring.String // URL-ish of input resource
 	executions          *monitoring.Uint   // times the CEL program has been executed
@@ -921,13 +926,10 @@ type inputMetrics struct {
 	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
-	reg := parent.NewRegistry(id)
-	monitoring.NewString(reg, "input").Set(inputName)
-	monitoring.NewString(reg, "id").Set(id)
+func newInputMetrics(id string) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &inputMetrics{
-		id:                  id,
-		parent:              reg,
+		unregister:          unreg,
 		resource:            monitoring.NewString(reg, "resource"),
 		executions:          monitoring.NewUint(reg, "cel_executions"),
 		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
@@ -946,5 +948,5 @@ func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
 }
 
 func (m *inputMetrics) Close() {
-	m.parent.Remove(m.id)
+	m.unregister()
 }
