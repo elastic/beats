@@ -182,6 +182,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add metrics for UDP packet processing. {pull}33870[33870]
 - Convert UDP input to v2 input. {pull}33930[33930]
 - Improve collection of risk information from Okta debug data. {issue}33677[33677] {pull}34030[34030]
+- Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
+- Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
+- Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 
 *Auditbeat*
 
@@ -204,6 +207,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add GCP Redis regions support {pull}33728[33728]
 - Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
+- Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
 
 *Packetbeat*
 
