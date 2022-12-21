@@ -28,9 +28,11 @@ import (
 )
 
 type testCase struct {
-	event common.MapStr
-	want  common.MapStr
-	cfg   []string
+	eventFields common.MapStr
+	eventMeta   common.MapStr
+	wantFields  common.MapStr
+	wantMeta    common.MapStr
+	cfg         []string
 }
 
 func testProcessors(t *testing.T, cases map[string]testCase) {
@@ -51,8 +53,11 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 			}
 
 			current := &beat.Event{}
-			if test.event != nil {
-				current.Fields = test.event.Clone()
+			if test.eventFields != nil {
+				current.Fields = test.eventFields.Clone()
+			}
+			if test.eventMeta != nil {
+				current.Meta = test.eventMeta.Clone()
 			}
 			for i, processor := range ps {
 				var err error
@@ -65,7 +70,8 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 				}
 			}
 
-			assert.Equal(t, test.want, current.Fields)
+			assert.Equal(t, test.wantFields, current.Fields)
+			assert.Equal(t, test.wantMeta, current.Meta)
 		})
 	}
 }
