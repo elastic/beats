@@ -32,6 +32,7 @@ import (
 type Resource struct {
 	config      *Config
 	clusterInfo ClusterInfo
+	namespace   MetaGen
 }
 
 // NewResourceMetadataGenerator creates a metadata generator for a generic resource
@@ -49,12 +50,21 @@ func NewResourceMetadataGenerator(cfg *common.Config, client k8s.Interface) *Res
 	return r
 }
 
+// NewNamespaceAwareResourceMetadataGenerator creates a metadata generator with informatuon about namespace
+func NewNamespaceAwareResourceMetadataGenerator(cfg *common.Config, client k8s.Interface, namespace MetaGen) *Resource {
+	r := NewResourceMetadataGenerator(cfg, client)
+	r.namespace = namespace
+	return r
+}
+
 // Generate generates metadata from a resource object
 // Generate method returns metadata in the following form:
-// {
-// 	  "kubernetes": {},
-//    "ecs.a.field": 42,
-// }
+//
+//	{
+//		  "kubernetes": {},
+//	   "ecs.a.field": 42,
+//	}
+//
 // This method should be called in top level and not as part of other metadata generators.
 // For retrieving metadata without kubernetes. prefix one should call GenerateK8s instead.
 func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldOptions) common.MapStr {
@@ -104,6 +114,18 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 			"name": accessor.GetName(),
 			"uid":  string(accessor.GetUID()),
 		},
+	}
+
+	namespaceName := accessor.GetNamespace()
+	if namespaceName != "" {
+		_ = safemapstr.Put(meta, "namespace", namespaceName)
+
+		if r.namespace != nil {
+			nsMeta := r.namespace.GenerateFromName(namespaceName)
+			if nsMeta != nil {
+				meta.DeepUpdate(nsMeta)
+			}
+		}
 	}
 
 	if accessor.GetNamespace() != "" {

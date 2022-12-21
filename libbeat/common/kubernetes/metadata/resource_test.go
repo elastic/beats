@@ -21,14 +21,24 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+)
+
+const (
+	uid       = "005f3b90-4b9d-12f8-acf0-31020a840133"
+	defaultNs = "default"
+	name      = "obj"
 )
 
 func TestResource_Generate(t *testing.T) {
@@ -123,6 +133,134 @@ func TestResource_Generate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate("pod", test.input))
+		})
+	}
+}
+
+func TestNamespaceAwareResource_GenerateWithNamespace(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	tests := []struct {
+		resourceName string
+		input        kubernetes.Resource
+		namespace    kubernetes.Resource
+		output       common.MapStr
+		name         string
+	}{
+		{
+			name:         "test not namespaced kubernetes resource - PersistentVolume",
+			resourceName: "persistentvolume",
+			input: &v1.PersistentVolume{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "pvc-18705cfb-9fb8-441f-9b32-0d67a21af839",
+					UID:  "020fd954-3674-496a-9e77-c25f0f2257ea",
+					Labels: map[string]string{
+						"foo": "bar",
+					},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "PersistentVolume",
+					APIVersion: "v1",
+				},
+			},
+			namespace: &v1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: defaultNs,
+					UID:  types.UID(uid),
+					Labels: map[string]string{
+						"nskey": "nsvalue",
+					},
+					Annotations: map[string]string{
+						"ns.annotation": "value",
+					},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Namespace",
+					APIVersion: "v1",
+				},
+			},
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"persistentvolume": common.MapStr{
+						"name": "pvc-18705cfb-9fb8-441f-9b32-0d67a21af839",
+						"uid":  "020fd954-3674-496a-9e77-c25f0f2257ea",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+				},
+			},
+		},
+		{
+			name:         "test namespaced kubernetes resource",
+			resourceName: "deployment",
+			input: &appsv1.Deployment{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					Namespace: "default",
+					UID:       "f33ca314-8cc5-48ea-90b7-3102c7430f75",
+					Labels: map[string]string{
+						"foo": "bar",
+					},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Deployment",
+					APIVersion: "apps/v1",
+				},
+			},
+			namespace: &v1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: defaultNs,
+					UID:  types.UID(uid),
+					Labels: map[string]string{
+						"nskey": "nsvalue",
+					},
+					Annotations: map[string]string{
+						"ns.annotation": "value",
+					},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Namespace",
+					APIVersion: "v1",
+				},
+			},
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"deployment": common.MapStr{
+						"name": name,
+						"uid":  "f33ca314-8cc5-48ea-90b7-3102c7430f75",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"namespace":     "default",
+					"namespace_uid": uid,
+					"namespace_labels": common.MapStr{
+						"nskey": "nsvalue",
+					},
+					"namespace_annotations": common.MapStr{
+						"ns_annotation": "value",
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		nsConfig, err := common.NewConfigFrom(map[string]interface{}{
+			"include_annotations": []string{"ns.annotation"},
+		})
+		require.NoError(t, err)
+
+		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
+		err = namespaces.Add(test.namespace)
+		require.NoError(t, err)
+		nsMeta := NewNamespaceMetadataGenerator(nsConfig, namespaces, client)
+
+		metagen := NewNamespaceAwareResourceMetadataGenerator(nsConfig, client, nsMeta)
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.output, metagen.Generate(test.resourceName, test.input))
 		})
 	}
 }
