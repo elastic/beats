@@ -41,7 +41,7 @@
         },
         "optionsJSON": {
             "hidePanelTitles": false,
-            "syncColors": true,
+            "syncColors": false,
             "useMargins": true
         },
         "panelsJSON": [
@@ -343,7 +343,7 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of sum(kubernetes.scheduler.scheduling.attempts.duration.us.bucket.4000)",
+                                                    "label": "Part of Under 4ms",
                                                     "operationType": "sum",
                                                     "params": {
                                                         "emptyAsNull": false
@@ -435,7 +435,29 @@
                                         "position": "top",
                                         "seriesType": "area",
                                         "showGridlines": false,
-                                        "xAccessor": "f43b17b1-346d-48d3-ab2b-8adee975db03"
+                                        "xAccessor": "f43b17b1-346d-48d3-ab2b-8adee975db03",
+                                        "yConfig": [
+                                            {
+                                                "color": "#66b5ae",
+                                                "forAccessor": "467e529c-bfdd-4af5-bc76-3abd415545b4"
+                                            },
+                                            {
+                                                "color": "#6ac7ac",
+                                                "forAccessor": "39f7ce0a-5814-4351-b749-b74033c205f6"
+                                            },
+                                            {
+                                                "color": "#9fe593",
+                                                "forAccessor": "36c948e5-088b-4e3b-aa9a-2202947df4ee"
+                                            },
+                                            {
+                                                "color": "#c8f081",
+                                                "forAccessor": "9b853252-7b50-4be9-9820-8b4f88cef28c"
+                                            },
+                                            {
+                                                "color": "#f9f871",
+                                                "forAccessor": "7e1fcc95-c255-433c-a4cd-dd03a8b0993e"
+                                            }
+                                        ]
                                     }
                                 ],
                                 "legend": {
@@ -711,7 +733,13 @@
                                         "position": "top",
                                         "seriesType": "area",
                                         "showGridlines": false,
-                                        "xAccessor": "1ede51be-b22d-42ce-a5ca-43b2e0e0a6f0"
+                                        "xAccessor": "1ede51be-b22d-42ce-a5ca-43b2e0e0a6f0",
+                                        "yConfig": [
+                                            {
+                                                "color": "#d6bf57",
+                                                "forAccessor": "52dda843-2651-4ddb-a5e6-4d8894a021a1"
+                                            }
+                                        ]
                                     }
                                 ],
                                 "legend": {
@@ -849,7 +877,17 @@
                                         "position": "top",
                                         "seriesType": "area",
                                         "showGridlines": false,
-                                        "xAccessor": "27201b0b-32e0-42f3-a3b0-7ac6f7f2ff89"
+                                        "xAccessor": "27201b0b-32e0-42f3-a3b0-7ac6f7f2ff89",
+                                        "yConfig": [
+                                            {
+                                                "color": "#c0a73a",
+                                                "forAccessor": "66200b8d-de51-4f82-adb9-19362895f476"
+                                            },
+                                            {
+                                                "color": "#e1cc6c",
+                                                "forAccessor": "1b673afe-dcd3-4ed8-b196-4b8b68b2158e"
+                                            }
+                                        ]
                                     }
                                 ],
                                 "legend": {
@@ -1099,7 +1137,7 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Average request latency in ms",
+                                                    "label": "Request latency in ms",
                                                     "operationType": "formula",
                                                     "params": {
                                                         "formula": "(sum(kubernetes.scheduler.client.request.duration.us.sum)/1000)/sum(kubernetes.scheduler.client.request.duration.us.count)",
@@ -1219,6 +1257,10 @@
                                         ],
                                         "layerId": "098e2493-f84e-45cd-bae4-436fd46cbb98",
                                         "layerType": "data",
+                                        "palette": {
+                                            "name": "cool",
+                                            "type": "palette"
+                                        },
                                         "position": "top",
                                         "seriesType": "area",
                                         "showGridlines": false,
@@ -1685,6 +1727,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-12-22T09:06:52.779Z",
-    "version": "WzM2OTcsMV0="
+    "updated_at": "2022-12-22T10:36:04.231Z",
+    "version": "WzQ2OTMsMV0="
 }
