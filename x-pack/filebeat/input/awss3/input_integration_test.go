@@ -32,8 +32,6 @@ import (
 	"gopkg.in/yaml.v2"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -132,7 +130,9 @@ file_selectors:
 }
 
 func createInput(t *testing.T, cfg *conf.C) *s3Input {
-	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
+	s3InputManager := Plugin(openTestStatestore()).Manager.(*s3InputManager)
+	inputV2, err := s3InputManager.CreateWithoutClosingMetrics(cfg)
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -180,18 +180,9 @@ func TestInputRunSQS(t *testing.T) {
 		cancel()
 	})
 
-	client := pubtest.NewChanClient(0)
-	defer close(client.Channel)
-	go func() {
-		for event := range client.Channel {
-			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		}
-	}()
-
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := pubtest.PublisherWithClient(client)
+		pipeline := &fakePipeline{}
 		return s3Input.Run(inputCtx, pipeline)
 	})
 
@@ -243,18 +234,9 @@ func TestInputRunS3(t *testing.T) {
 		cancel()
 	})
 
-	client := pubtest.NewChanClient(0)
-	defer close(client.Channel)
-	go func() {
-		for event := range client.Channel {
-			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		}
-	}()
-
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := pubtest.PublisherWithClient(client)
+		pipeline := &fakePipeline{}
 		return s3Input.Run(inputCtx, pipeline)
 	})
 
@@ -459,17 +441,9 @@ func TestInputRunSNS(t *testing.T) {
 		cancel()
 	})
 
-	client := pubtest.NewChanClient(0)
-	defer close(client.Channel)
-	go func() {
-		for event := range client.Channel {
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		}
-	}()
-
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := pubtest.PublisherWithClient(client)
+		pipeline := &fakePipeline{}
 		return s3Input.Run(inputCtx, pipeline)
 	})
 

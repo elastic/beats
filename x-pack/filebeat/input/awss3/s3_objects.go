@@ -41,11 +41,12 @@ const (
 type s3ObjectProcessorFactory struct {
 	log           *logp.Logger
 	metrics       *inputMetrics
-	s3            s3Getter
+	s3            s3API
 	fileSelectors []fileSelectorConfig
+	backupConfig  backupConfig
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3Getter, sel []fileSelectorConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -59,6 +60,7 @@ func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3G
 		metrics:       metrics,
 		s3:            s3,
 		fileSelectors: sel,
+		backupConfig:  backupConfig,
 	}
 }
 
@@ -158,6 +160,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	default:
 		err = p.readFile(reader)
 	}
+
 	if err != nil {
 		return fmt.Errorf("failed reading s3 object (elapsed_time_ns=%d): %w",
 			time.Since(start).Nanoseconds(), err)
@@ -362,6 +365,29 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 	}
 
 	return event
+}
+
+func (p *s3ObjectProcessor) FinalizeS3Object() error {
+	bucketName := p.backupConfig.GetBucketName()
+	if bucketName == "" {
+		return nil
+	}
+	backupKey := p.s3Obj.S3.Object.Key
+	if p.backupConfig.BackupToBucketPrefix != "" {
+		backupKey = fmt.Sprintf("%s%s", p.backupConfig.BackupToBucketPrefix, backupKey)
+	}
+	_, err := p.s3.CopyObject(p.ctx, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
+	if err != nil {
+		return fmt.Errorf("failed to copy object to backup bucket: %w", err)
+	}
+	if !p.backupConfig.Delete {
+		return nil
+	}
+	_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+	if err != nil {
+		return fmt.Errorf("failed to delete object from bucket: %w", err)
+	}
+	return nil
 }
 
 func objectID(objectHash string, offset int64) string {
