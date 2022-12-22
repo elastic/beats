@@ -52,6 +52,53 @@ func TestBareConfig(t *testing.T) {
 	findFieldsInProcessors(t, processorFields, cfgMap)
 }
 
+func TestGlobalProcessInject(t *testing.T) {
+	// config with datastreams, metadata, etc, removed
+	rawExpected := proto.UnitExpectedConfig{
+		Id:   "system/metrics-system-default-system",
+		Type: "system/metrics",
+		Name: "system-1",
+		Streams: []*proto.Stream{
+			{
+				Id: "system/metrics-system.filesystem-default-system",
+				Source: requireNewStruct(t, map[string]interface{}{
+					"metricsets": []interface{}{"filesystem"},
+					"period":     "1m",
+				}),
+			},
+		},
+		Source: requireNewStruct(t, map[string]interface{}{
+			"processors": []interface{}{
+				map[string]interface{}{
+					"add_fields": map[string]interface{}{
+						"fields": map[string]interface{}{
+							"cluster": map[string]interface{}{
+								"name": "kind",
+								"url":  "kind-control-plane:6443",
+							},
+						},
+						"target": "orchestrator",
+					},
+				},
+			},
+		}),
+	}
+
+	reloadCfg, err := generateBeatConfig(&rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+	require.NoError(t, err, "error in generateBeatConfig")
+	cfgMap := mapstr.M{}
+	err = reloadCfg[0].Config.Unpack(&cfgMap)
+	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+
+	processorFields := map[string]interface{}{
+		"add_fields.fields.stream_id":    "system/metrics-system.filesystem-default-system", // make sure we're not overwiting anything
+		"add_fields.fields.dataset":      "generic",
+		"add_fields.fields.cluster.name": "kind", // actual test for the global processors
+		"add_fields.target":              "orchestrator",
+	}
+	findFieldsInProcessors(t, processorFields, cfgMap)
+}
+
 func TestMBGenerate(t *testing.T) {
 	sourceStream := requireNewStruct(t, map[string]interface{}{
 		"metricsets": []interface{}{"filesystem"},
@@ -127,6 +174,32 @@ func TestOutputGen(t *testing.T) {
 	assert.True(t, exists, "elasticsearch key does not exist")
 	_, pwExists := innerCfg.(map[string]interface{})["password"]
 	assert.True(t, pwExists, "password config not found")
+
+}
+
+func TestOutputIndex(t *testing.T) {
+	dataStreamType := "unused"
+	stream := &proto.Stream{
+		DataStream: &proto.DataStream{
+			Type:      "synthetics",
+			Dataset:   "icmp",
+			Namespace: "example", // This should *not* get applied.
+		},
+	}
+	unit := &proto.UnitExpectedConfig{
+		DataStream: &proto.DataStream{
+			Namespace: "default",
+		},
+	}
+	inStream := map[string]interface{}{}
+	outStream := injectIndexStream(dataStreamType, unit, stream, inStream)
+	require.Equal(t, "synthetics-icmp-default", outStream["index"])
+
+	//test Defaults
+	emptyStream := &proto.Stream{DataStream: &proto.DataStream{}}
+	emptyUnit := &proto.UnitExpectedConfig{DataStream: &proto.DataStream{}}
+	outDefaultIndex := injectIndexStream(dataStreamType, emptyUnit, emptyStream, inStream)
+	require.Equal(t, "unused-generic-default", outDefaultIndex["index"])
 
 }
 

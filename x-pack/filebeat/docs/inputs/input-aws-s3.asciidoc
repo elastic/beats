@@ -711,7 +711,7 @@ Will produce the following output:
 === Metrics
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
-These metrics are exposed under the `/dataset` path. They can be used to
+These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.
 
 [options="header"]
