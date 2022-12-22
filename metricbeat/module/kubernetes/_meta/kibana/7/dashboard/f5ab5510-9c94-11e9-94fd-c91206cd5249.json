@@ -735,7 +735,7 @@
                 "gridData": {
                     "h": 14,
                     "i": "e3072db1-6e8a-4724-898f-e9f6d09c1513",
-                    "w": 23,
+                    "w": 19,
                     "x": 3,
                     "y": 22
                 },
@@ -874,12 +874,102 @@
                 "gridData": {
                     "h": 14,
                     "i": "6f06bc75-cf56-4dcd-94ce-fc8b9b390648",
-                    "w": 22,
-                    "x": 26,
+                    "w": 20,
+                    "x": 22,
                     "y": 22
                 },
                 "panelIndex": "6f06bc75-cf56-4dcd-94ce-fc8b9b390648",
                 "title": "Scheduler memory in bytes [Metrics Kubernetes]",
+                "type": "lens",
+                "version": "8.5.1"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-f2a18418-440a-4948-98ae-5eead4250a79",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "f2a18418-440a-4948-98ae-5eead4250a79": {
+                                            "columnOrder": [
+                                                "53db3772-5ce9-4ba1-b67d-09ffad290720",
+                                                "18b9d773-d91c-4675-bf5b-4146dbcf079f"
+                                            ],
+                                            "columns": {
+                                                "18b9d773-d91c-4675-bf5b-4146dbcf079f": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.scheduler.process.fds.max.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Limit",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.scheduler.process.fds.max.count"
+                                                },
+                                                "53db3772-5ce9-4ba1-b67d-09ffad290720": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.scheduler.process.fds.open.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Open file descriptors",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.scheduler.process.fds.open.count"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layerId": "f2a18418-440a-4948-98ae-5eead4250a79",
+                                "layerType": "data",
+                                "metricAccessor": "53db3772-5ce9-4ba1-b67d-09ffad290720",
+                                "secondaryMetricAccessor": "18b9d773-d91c-4675-bf5b-4146dbcf079f"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": true
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "9c957843-21e0-4ff9-b345-f27590d6530f",
+                    "w": 6,
+                    "x": 42,
+                    "y": 22
+                },
+                "panelIndex": "9c957843-21e0-4ff9-b345-f27590d6530f",
                 "type": "lens",
                 "version": "8.5.1"
             },
@@ -1564,6 +1654,11 @@
             "type": "index-pattern"
         },
         {
+            "id": "metricbeat-*",
+            "name": "9c957843-21e0-4ff9-b345-f27590d6530f:indexpattern-datasource-layer-f2a18418-440a-4948-98ae-5eead4250a79",
+            "type": "index-pattern"
+        },
+        {
             "id": "logs-*",
             "name": "4ef17ecf-8c10-462c-a94b-11021a7d922f:metrics_4ef17ecf-8c10-462c-a94b-11021a7d922f_0_index_pattern",
             "type": "index-pattern"
@@ -1590,6 +1685,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2022-12-22T08:51:51.961Z",
-    "version": "WzM0NzIsMV0="
+    "updated_at": "2022-12-22T09:06:52.779Z",
+    "version": "WzM2OTcsMV0="
 }
