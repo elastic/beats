@@ -56,6 +56,7 @@ type BeatV2Manager struct {
 	// stop callback must be registered by libbeat, as with the V1 callback
 	stopFunc           func()
 	stopOnOutputReload bool
+	stopOnEmptyUnits   bool
 	stopMut            sync.Mutex
 	beatStop           sync.Once
 
@@ -72,6 +73,15 @@ type BeatV2Manager struct {
 	// used for the debug callback to report as-running config
 	lastOutputCfg *reload.ConfigWithMeta
 	lastInputCfg  []*reload.ConfigWithMeta
+}
+
+// ================================
+// Optionals
+// ================================
+
+// WithStopOnEmptyUnits enables stopping the beat when agent sends no units.
+func WithStopOnEmptyUnits(m *BeatV2Manager) {
+	m.stopOnEmptyUnits = true
 }
 
 // ================================
@@ -103,7 +113,7 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (
 }
 
 // NewV2AgentManagerWithClient actually creates the manager instance used by the rest of the beats.
-func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2) (lbmanagement.Manager, error) {
+func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agentClient client.V2, opts ...func(*BeatV2Manager)) (lbmanagement.Manager, error) {
 	log := logp.NewLogger(lbmanagement.DebugK)
 	if config.RestartOnOutputChange {
 		log.Infof("Output reload is enabled, the beat will restart as needed on change of output config")
@@ -121,6 +131,9 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 
 	if config.Enabled {
 		m.client = agentClient
+	}
+	for _, o := range opts {
+		o(m)
 	}
 	return m, nil
 }
@@ -292,8 +305,14 @@ func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
 	// a unit will only be deleted once it has reported stopped so nothing
 	// more needs to be done other than cleaning up the reference to the unit
 	cm.mx.Lock()
-	defer cm.mx.Unlock()
 	delete(cm.units, unitKey{unit.Type(), unit.ID()})
+	empty := len(cm.units) == 0
+	cm.mx.Unlock()
+
+	// stop the entire beat when all units removed
+	if empty && cm.stopOnEmptyUnits {
+		cm.stopBeat()
+	}
 }
 
 // ================================
