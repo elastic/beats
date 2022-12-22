@@ -162,7 +162,10 @@ func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[stri
 	if !ok {
 		return stream
 	}
-	newProcs := prependProcessors(stream, globalList)
+	// copy global processors to ensure that each stream gets its own copy
+	// if the stream doesn't have any processors it will take the slice as the new value
+	// without copying its possible that the processors appended to the streams will be shared
+	newProcs := prependProcessors(stream, append([]interface{}{}, globalList...))
 	stream["processors"] = newProcs
 	return stream
 }
