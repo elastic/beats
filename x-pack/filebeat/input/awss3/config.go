@@ -135,7 +135,7 @@ type backupConfig struct {
 	BackupToBucketArn        string `config:"backup_to_bucket_arn"`
 	NonAWSBackupToBucketName string `config:"non_aws_backup_to_bucket_name"`
 	BackupToBucketPrefix     string `config:"backup_to_bucket_prefix"`
-	Delete                   bool   `config:"delete"`
+	Delete                   bool   `config:"delete_after_backup"`
 }
 
 func (c *backupConfig) GetBucketName() string {

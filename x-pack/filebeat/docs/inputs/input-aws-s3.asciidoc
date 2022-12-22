@@ -459,7 +459,7 @@ When using the `bucket_arn`, please use `backup_to_bucket_arn` accordingly.
 Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
 
 [float]
-==== `delete`
+==== `delete_after_backup`
 
 Controls whether fully processed files will be deleted from the bucket.
 
@@ -485,6 +485,16 @@ when using the polling list of S3 bucket objects:
 s3:GetObject
 s3:ListBucket
 s3:GetBucketLocation
+----
+
+In case `backup_to_bucket_arn` or `non_aws_backup_to_bucket_name` are set the following permission is required as well:
+----
+s3:PutObject
+----
+
+In case `delete_after_backup` is set the following permission is required as well:
+----
+s3:DeleteObject
 ----
 
 [float]

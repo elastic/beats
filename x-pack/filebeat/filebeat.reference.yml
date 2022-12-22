@@ -3465,7 +3465,7 @@ filebeat.inputs:
   #backup_to_bucket_prefix: 'backup/'
 
   # Controls deletion of objects after backing them up
-  #delete: false
+  #delete_after_backup: false
 
 #------------------------------ AWS CloudWatch input --------------------------------
 # Beta: Config options for AWS CloudWatch input
