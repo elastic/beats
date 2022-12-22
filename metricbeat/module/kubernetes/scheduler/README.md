@@ -10,6 +10,48 @@ https://github.com/kubernetes/kubernetes/blob/master/pkg/scheduler/metrics/metri
 
 ## Metrics insight
 
+- process_cpu_seconds_total
+- process_resident_memory_bytes
+- process_virtual_memory_bytes
+- process_open_fds
+- process_start_time_seconds
+- process_max_fds
+
+
+- rest_client_requests_total (alpha)
+  - code
+  - host
+  - method
+- rest_client_response_size_bytes (alpha)
+  - host
+  - verb
+- rest_client_request_size_bytes (alpha)
+  - host
+  - verb
+- rest_client_request_duration_seconds (alpha)
+  - host
+  - verb
+
+
+- leader_election_master_status (alpha)
+  - name
+
+
+- scheduler_pending_pods (stable)
+  - queue
+- scheduler_preemption_victims (stable)
+- scheduler_preemption_attempts_total (stable)
+- scheduler_scheduling_attempt_duration_seconds (stable)
+  - profile
+  - result
+- scheduler_schedule_attempts_total (stable)
+  - profile
+  - result
+
+
+----- old
+
+
 - leader_election_master_status
     - name
 - scheduler_binding_duration_seconds_bucket

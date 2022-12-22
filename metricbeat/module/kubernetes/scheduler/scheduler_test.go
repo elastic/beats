@@ -33,12 +33,8 @@ func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "scheduler",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.scheduler.1.14",
-				ExpectedFile: "./_meta/test/metrics.scheduler.1.14.expected",
-			},
-			{
-				MetricsFile:  "./_meta/test/metrics.scheduler.1.17",
-				ExpectedFile: "./_meta/test/metrics.scheduler.1.17.expected",
+				MetricsFile:  "./_meta/test/metrics.scheduler.1.20",
+				ExpectedFile: "./_meta/test/metrics.scheduler.1.20.expected",
 			},
 		},
 	)

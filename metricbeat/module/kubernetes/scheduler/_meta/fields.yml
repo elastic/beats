@@ -116,9 +116,6 @@
         - name: preemption.attempts.count
           type: long
           description: Total preemption attempts in the cluster so far
-        - name: incoming.pods.count
-          type: long
-          description: Number of pods added to scheduling queues
         - name: attempts.count
           type: long
           description: Number of attempts to schedule pod

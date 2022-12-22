@@ -45,7 +45,6 @@ var mapping = &prometheus.MetricsMapping{
 		"scheduler_pending_pods":              prometheus.Metric("scheduling.pending.pods.count"),
 		"scheduler_preemption_victims":        prometheus.Metric("scheduling.preemption.victims"),
 		"scheduler_preemption_attempts_total": prometheus.Metric("scheduling.preemption.attempts.count"),
-		"scheduler_queue_incoming_pods_total": prometheus.Metric("scheduling.incoming.pods.count"),
 		"scheduler_scheduling_attempt_duration_seconds": prometheus.Metric("scheduling.attempts.duration.us",
 			prometheus.OpMultiplyBuckets(1000000)),
 		"scheduler_schedule_attempts_total": prometheus.Metric("scheduling.attempts.count"),
