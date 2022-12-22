@@ -1,5 +1,11 @@
 {
     "attributes": {
+        "controlGroupInput": {
+            "chainingSystem": "NONE",
+            "controlStyle": "twoLine",
+            "ignoreParentSettingsJSON": "{\"ignoreFilters\":false,\"ignoreQuery\":false,\"ignoreTimerange\":false,\"ignoreValidations\":false}",
+            "panelsJSON": "{}"
+        },
         "description": "Kubernetes Proxy metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
@@ -18,15 +24,11 @@
                             "params": {
                                 "query": "kubernetes.proxy"
                             },
-                            "type": "phrase",
-                            "value": "kubernetes.proxy"
+                            "type": "phrase"
                         },
                         "query": {
-                            "match": {
-                                "event.dataset": {
-                                    "query": "kubernetes.proxy",
-                                    "type": "phrase"
-                                }
+                            "match_phrase": {
+                                "event.dataset": "kubernetes.proxy"
                             }
                         }
                     }
@@ -39,130 +41,1680 @@
         },
         "optionsJSON": {
             "hidePanelTitles": false,
+            "syncColors": false,
+            "syncTooltips": false,
             "useMargins": true
         },
         "panelsJSON": [
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "fontSize": 12,
+                            "markdown": "### Proxy\n\nThis dashboard uses data collected from the metrics endpoint of [kube proxy](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy). Its purpose is to give an overview of what is happening inside it and detect problems that might be happening.",
+                            "openLinksInNewTab": false
+                        },
+                        "title": "",
+                        "type": "markdown",
+                        "uiState": {}
+                    }
                 },
                 "gridData": {
-                    "h": 12,
-                    "i": "1",
+                    "h": 5,
+                    "i": "d67e9827-7fd9-49e8-a419-12670f5f1974",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "d67e9827-7fd9-49e8-a419-12670f5f1974",
+                "type": "visualization",
+                "version": "8.5.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "axis_formatter": "number",
+                            "axis_position": "left",
+                            "axis_scale": "normal",
+                            "background_color": "rgba(102,181,174,1)",
+                            "drop_last_bucket": 0,
+                            "id": "dd8c0e46-6fc3-4315-9366-775363b84b15",
+                            "index_pattern_ref_name": "metrics_3cb1e278-30b4-43a9-950e-e12e36155172_0_index_pattern",
+                            "interval": "",
+                            "isModelInvalid": false,
+                            "markdown": "Proxy",
+                            "markdown_css": "font-family:system-ui,\"Segoe UI\",Helvetica,Arial,sans-serif,\"Segoe UI Emoji\",\"Segoe UI Symbol\";font-weight:500;font-kerning:normal;font-size:36px;font-stretch:100%;font-style:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;\np {\nposition:absolute;top:50%;left:50%;transform:translateX(-50%) translateY(-50%) rotate(-90deg);\n } a{text-decoration:none !important;}",
+                            "max_lines_legend": 1,
+                            "series": [
+                                {
+                                    "axis_position": "right",
+                                    "chart_type": "line",
+                                    "color": "#68BC00",
+                                    "fill": 0.5,
+                                    "formatter": "default",
+                                    "id": "64bdf521-26ce-4876-82e0-89c6f7917b10",
+                                    "line_width": 1,
+                                    "metrics": [
+                                        {
+                                            "id": "72954083-86ff-481f-9237-a2917d25cff4",
+                                            "type": "count"
+                                        }
+                                    ],
+                                    "override_index_pattern": 0,
+                                    "palette": {
+                                        "name": "default",
+                                        "type": "palette"
+                                    },
+                                    "point_size": 1,
+                                    "separate_axis": 0,
+                                    "series_drop_last_bucket": 0,
+                                    "split_mode": "everything",
+                                    "stacked": "none",
+                                    "time_range_mode": "entire_time_range"
+                                }
+                            ],
+                            "show_grid": 1,
+                            "show_legend": 1,
+                            "time_field": "",
+                            "time_range_mode": "entire_time_range",
+                            "tooltip_mode": "show_all",
+                            "truncate_legend": 1,
+                            "type": "markdown",
+                            "use_kibana_indexes": true
+                        },
+                        "title": "",
+                        "type": "metrics",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "3cb1e278-30b4-43a9-950e-e12e36155172",
+                    "w": 3,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "3cb1e278-30b4-43a9-950e-e12e36155172",
+                "type": "visualization",
+                "version": "8.5.1"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-57ff16b0-269e-46fe-aafc-764352a73fb9",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "57ff16b0-269e-46fe-aafc-764352a73fb9": {
+                                            "columnOrder": [
+                                                "7e6033a1-88e3-4f5d-b13d-df6f7688f1a8",
+                                                "aa5edc07-6a5e-4fd4-9091-5be797e1fd3c",
+                                                "78114103-8671-4584-9869-640cce97214a",
+                                                "8b008e78-f100-4034-9c13-becd71e4a95e",
+                                                "92b7ff84-7977-43d7-8484-62df1aaf9e8b",
+                                                "0d102f00-ced2-4b5d-8ba9-c2e4c5e14754"
+                                            ],
+                                            "columns": {
+                                                "0d102f00-ced2-4b5d-8ba9-c2e4c5e14754": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.sync.rules.duration.us.bucket.+Inf: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "All",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.rules.duration.us.bucket.+Inf"
+                                                },
+                                                "78114103-8671-4584-9869-640cce97214a": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.sync.rules.duration.us.bucket.64000: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Under 64ms",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.rules.duration.us.bucket.64000"
+                                                },
+                                                "7e6033a1-88e3-4f5d-b13d-df6f7688f1a8": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "8b008e78-f100-4034-9c13-becd71e4a95e": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.sync.rules.duration.us.bucket.256000: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Under 256ms",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.rules.duration.us.bucket.256000"
+                                                },
+                                                "92b7ff84-7977-43d7-8484-62df1aaf9e8b": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.sync.rules.duration.us.bucket.512000: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Under 512ms",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.rules.duration.us.bucket.512000"
+                                                },
+                                                "aa5edc07-6a5e-4fd4-9091-5be797e1fd3c": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.sync.rules.duration.us.bucket.8000: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Under 8ms",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.rules.duration.us.bucket.8000"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": false,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "aa5edc07-6a5e-4fd4-9091-5be797e1fd3c",
+                                            "78114103-8671-4584-9869-640cce97214a",
+                                            "8b008e78-f100-4034-9c13-becd71e4a95e",
+                                            "92b7ff84-7977-43d7-8484-62df1aaf9e8b",
+                                            "0d102f00-ced2-4b5d-8ba9-c2e4c5e14754"
+                                        ],
+                                        "layerId": "57ff16b0-269e-46fe-aafc-764352a73fb9",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "xAccessor": "7e6033a1-88e3-4f5d-b13d-df6f7688f1a8",
+                                        "yConfig": [
+                                            {
+                                                "color": "#66b5ae",
+                                                "forAccessor": "aa5edc07-6a5e-4fd4-9091-5be797e1fd3c"
+                                            },
+                                            {
+                                                "color": "#6ac7ac",
+                                                "forAccessor": "78114103-8671-4584-9869-640cce97214a"
+                                            },
+                                            {
+                                                "color": "#9fe593",
+                                                "forAccessor": "8b008e78-f100-4034-9c13-becd71e4a95e"
+                                            },
+                                            {
+                                                "color": "#c8f081",
+                                                "forAccessor": "92b7ff84-7977-43d7-8484-62df1aaf9e8b"
+                                            },
+                                            {
+                                                "color": "#f9f871",
+                                                "forAccessor": "0d102f00-ced2-4b5d-8ba9-c2e4c5e14754"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "xTitle": "",
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "f413754d-c2d9-4cad-862a-f637c657eaf7",
                     "w": 23,
-                    "x": 0,
-                    "y": 12
+                    "x": 3,
+                    "y": 5
                 },
-                "panelIndex": "1",
-                "panelRefName": "panel_1",
-                "type": "visualization",
-                "version": "7.3.0"
+                "panelIndex": "f413754d-c2d9-4cad-862a-f637c657eaf7",
+                "title": "ProxySyncRules latency in ms [Metrics Kubernetes]",
+                "type": "lens",
+                "version": "8.5.1"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-91200e36-c39a-4cd2-929a-657a4fa3a679",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "91200e36-c39a-4cd2-929a-657a4fa3a679": {
+                                            "columnOrder": [
+                                                "b27e4e6b-335e-4f1b-84e8-251bd5944f42",
+                                                "b1326281-b893-46b4-8e9c-a885159eecb0",
+                                                "9dcc646c-5b4a-455d-8b05-3a31b290cec8",
+                                                "9fe86bdd-ffc1-498f-85d6-e15fb1bf4623",
+                                                "d5ad5036-957a-4ac5-b773-4d021780fe02",
+                                                "9dcc646c-5b4a-455d-8b05-3a31b290cec8X0",
+                                                "b1326281-b893-46b4-8e9c-a885159eecb0X0",
+                                                "9fe86bdd-ffc1-498f-85d6-e15fb1bf4623X0",
+                                                "d5ad5036-957a-4ac5-b773-4d021780fe02X0"
+                                            ],
+                                            "columns": {
+                                                "9dcc646c-5b4a-455d-8b05-3a31b290cec8": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Under 10s",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "sum(kubernetes.proxy.sync.networkprogramming.duration.us.bucket.10000000)",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "9dcc646c-5b4a-455d-8b05-3a31b290cec8X0"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "9dcc646c-5b4a-455d-8b05-3a31b290cec8X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Under 10s",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.10000000"
+                                                },
+                                                "9fe86bdd-ffc1-498f-85d6-e15fb1bf4623": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Under 100s",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "sum(kubernetes.proxy.sync.networkprogramming.duration.us.bucket.5000000, kql='kubernetes.proxy.sync.networkprogramming.duration.us.bucket.100000000: *')",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "9fe86bdd-ffc1-498f-85d6-e15fb1bf4623X0"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "9fe86bdd-ffc1-498f-85d6-e15fb1bf4623X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.100000000: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Part of Under 100s",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.5000000"
+                                                },
+                                                "b1326281-b893-46b4-8e9c-a885159eecb0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": " Under 1s",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "sum(kubernetes.proxy.sync.networkprogramming.duration.us.bucket.1000000, kql='kubernetes.proxy.sync.networkprogramming.duration.us.bucket.1000000: *')",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "b1326281-b893-46b4-8e9c-a885159eecb0X0"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "b1326281-b893-46b4-8e9c-a885159eecb0X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.1000000: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Part of  Under 1s",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.1000000"
+                                                },
+                                                "b27e4e6b-335e-4f1b-84e8-251bd5944f42": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "d5ad5036-957a-4ac5-b773-4d021780fe02": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "All",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "sum('kubernetes.proxy.sync.networkprogramming.duration.us.bucket.+Inf', kql='kubernetes.proxy.sync.networkprogramming.duration.us.bucket.+Inf: *')",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "d5ad5036-957a-4ac5-b773-4d021780fe02X0"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "d5ad5036-957a-4ac5-b773-4d021780fe02X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.+Inf: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Part of All",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.+Inf"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "9dcc646c-5b4a-455d-8b05-3a31b290cec8",
+                                            "9fe86bdd-ffc1-498f-85d6-e15fb1bf4623",
+                                            "b1326281-b893-46b4-8e9c-a885159eecb0",
+                                            "d5ad5036-957a-4ac5-b773-4d021780fe02"
+                                        ],
+                                        "layerId": "91200e36-c39a-4cd2-929a-657a4fa3a679",
+                                        "layerType": "data",
+                                        "seriesType": "area",
+                                        "xAccessor": "b27e4e6b-335e-4f1b-84e8-251bd5944f42",
+                                        "yConfig": [
+                                            {
+                                                "color": "#66b5ae",
+                                                "forAccessor": "b1326281-b893-46b4-8e9c-a885159eecb0"
+                                            },
+                                            {
+                                                "color": "#7ed7a2",
+                                                "forAccessor": "9dcc646c-5b4a-455d-8b05-3a31b290cec8"
+                                            },
+                                            {
+                                                "color": "#c8f081",
+                                                "forAccessor": "9fe86bdd-ffc1-498f-85d6-e15fb1bf4623"
+                                            },
+                                            {
+                                                "color": "#f9f871",
+                                                "forAccessor": "d5ad5036-957a-4ac5-b773-4d021780fe02"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": false,
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
-                    "h": 12,
-                    "i": "2",
-                    "w": 25,
+                    "h": 14,
+                    "i": "cc2b991a-fcd3-4a93-b8e9-3d50d1d1d761",
+                    "w": 22,
+                    "x": 26,
+                    "y": 5
+                },
+                "panelIndex": "cc2b991a-fcd3-4a93-b8e9-3d50d1d1d761",
+                "title": "Network programming latency in seconds [Metrics Kubernetes]",
+                "type": "lens",
+                "version": "8.5.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "axis_formatter": "number",
+                            "axis_position": "left",
+                            "axis_scale": "normal",
+                            "background_color": "rgba(243,211,55,1)",
+                            "drop_last_bucket": 0,
+                            "id": "6967ed21-4621-4348-86a2-5e7e2e8a51df",
+                            "index_pattern_ref_name": "metrics_093eb5bf-24c8-47d9-81ae-9bd8c95f3137_0_index_pattern",
+                            "interval": "",
+                            "isModelInvalid": false,
+                            "markdown": "Process",
+                            "markdown_css": "font-family:system-ui,\"Segoe UI\",Helvetica,Arial,sans-serif,\"Segoe UI Emoji\",\"Segoe UI Symbol\";font-weight:500;font-kerning:normal;font-size:36px;font-stretch:100%;font-style:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;\np {\nposition:absolute;top:50%;left:50%;transform:translateX(-50%) translateY(-50%) rotate(-90deg);\n } a{text-decoration:none !important;}",
+                            "max_lines_legend": 1,
+                            "series": [
+                                {
+                                    "axis_position": "right",
+                                    "chart_type": "line",
+                                    "color": "#68BC00",
+                                    "fill": 0.5,
+                                    "formatter": "default",
+                                    "id": "89974a5e-2667-4d14-bc95-a0913c525f9f",
+                                    "line_width": 1,
+                                    "metrics": [
+                                        {
+                                            "id": "493cfb54-1080-4380-9a54-3e4551d297a4",
+                                            "type": "count"
+                                        }
+                                    ],
+                                    "override_index_pattern": 0,
+                                    "palette": {
+                                        "name": "default",
+                                        "type": "palette"
+                                    },
+                                    "point_size": 1,
+                                    "separate_axis": 0,
+                                    "series_drop_last_bucket": 0,
+                                    "split_mode": "everything",
+                                    "stacked": "none",
+                                    "time_range_mode": "entire_time_range"
+                                }
+                            ],
+                            "show_grid": 1,
+                            "show_legend": 1,
+                            "time_field": "",
+                            "time_range_mode": "entire_time_range",
+                            "tooltip_mode": "show_all",
+                            "truncate_legend": 1,
+                            "type": "markdown",
+                            "use_kibana_indexes": true
+                        },
+                        "title": "",
+                        "type": "metrics",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "093eb5bf-24c8-47d9-81ae-9bd8c95f3137",
+                    "w": 3,
+                    "x": 0,
+                    "y": 19
+                },
+                "panelIndex": "093eb5bf-24c8-47d9-81ae-9bd8c95f3137",
+                "type": "visualization",
+                "version": "8.5.1"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-58c3838b-6f54-44e5-ba36-e4b535b28f7c",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "58c3838b-6f54-44e5-ba36-e4b535b28f7c": {
+                                            "columnOrder": [
+                                                "26be6ad5-b83e-43ec-b5c8-aeba9f5f0b7a",
+                                                "0d821b19-bc83-4ee4-98f6-be1619029791",
+                                                "7dfe8306-dee5-4115-ab99-cef731604884"
+                                            ],
+                                            "columns": {
+                                                "0d821b19-bc83-4ee4-98f6-be1619029791": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Differences in Proxy CPU time",
+                                                    "operationType": "differences",
+                                                    "references": [
+                                                        "7dfe8306-dee5-4115-ab99-cef731604884"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "26be6ad5-b83e-43ec-b5c8-aeba9f5f0b7a": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "7dfe8306-dee5-4115-ab99-cef731604884": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Average of kubernetes.proxy.process.cpu.sec",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.process.cpu.sec"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": false,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "0d821b19-bc83-4ee4-98f6-be1619029791"
+                                        ],
+                                        "layerId": "58c3838b-6f54-44e5-ba36-e4b535b28f7c",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "xAccessor": "26be6ad5-b83e-43ec-b5c8-aeba9f5f0b7a",
+                                        "yConfig": [
+                                            {
+                                                "color": "#d6bf57",
+                                                "forAccessor": "0d821b19-bc83-4ee4-98f6-be1619029791"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "xTitle": "",
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "7fe5c8e1-5fe0-46ef-a40f-89776d502b7d",
+                    "w": 20,
+                    "x": 3,
+                    "y": 19
+                },
+                "panelIndex": "7fe5c8e1-5fe0-46ef-a40f-89776d502b7d",
+                "title": "Differences in Proxy CPU time spent in seconds [Metrics Kubernetes]",
+                "type": "lens",
+                "version": "8.5.1"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-ab0b91a3-72dc-4fb1-a421-1f68925f4f84",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "ab0b91a3-72dc-4fb1-a421-1f68925f4f84": {
+                                            "columnOrder": [
+                                                "da64efc5-2021-4bb6-adc4-1c0a4750e6ad",
+                                                "091f6df6-22c4-4dc5-8c7c-dc4beef774cc",
+                                                "e04740d2-76a8-4468-9811-effe9f87b652"
+                                            ],
+                                            "columns": {
+                                                "091f6df6-22c4-4dc5-8c7c-dc4beef774cc": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Resident Memory",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true,
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.process.memory.resident.bytes"
+                                                },
+                                                "da64efc5-2021-4bb6-adc4-1c0a4750e6ad": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "e04740d2-76a8-4468-9811-effe9f87b652": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Virtual Memory",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": true,
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.process.memory.virtual.bytes"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": false,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "091f6df6-22c4-4dc5-8c7c-dc4beef774cc",
+                                            "e04740d2-76a8-4468-9811-effe9f87b652"
+                                        ],
+                                        "layerId": "ab0b91a3-72dc-4fb1-a421-1f68925f4f84",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "xAccessor": "da64efc5-2021-4bb6-adc4-1c0a4750e6ad",
+                                        "yConfig": [
+                                            {
+                                                "axisMode": "auto",
+                                                "color": "#c0a73a",
+                                                "forAccessor": "091f6df6-22c4-4dc5-8c7c-dc4beef774cc"
+                                            },
+                                            {
+                                                "color": "#e8d373",
+                                                "forAccessor": "e04740d2-76a8-4468-9811-effe9f87b652"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right",
+                                    "showSingleSeries": false
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "valuesInLegend": false,
+                                "xTitle": "",
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "58eee069-1699-408f-9602-ecb454af0c17",
+                    "w": 18,
                     "x": 23,
-                    "y": 12
+                    "y": 19
                 },
-                "panelIndex": "2",
-                "panelRefName": "panel_2",
-                "type": "visualization",
-                "version": "7.3.0"
+                "panelIndex": "58eee069-1699-408f-9602-ecb454af0c17",
+                "title": "Proxy memory in bytes [Metrics Kubernetes]",
+                "type": "lens",
+                "version": "8.5.1"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-8fd34ecf-d1ed-4830-b667-0565d84fdc4e",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "8fd34ecf-d1ed-4830-b667-0565d84fdc4e": {
+                                            "columnOrder": [
+                                                "37ba3d7d-fbdd-4c22-af77-812697abfc1c",
+                                                "1fabeb28-2a42-452b-9425-412f66312efe"
+                                            ],
+                                            "columns": {
+                                                "1fabeb28-2a42-452b-9425-412f66312efe": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.process.fds.open.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Open file descriptors",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.process.fds.open.count"
+                                                },
+                                                "37ba3d7d-fbdd-4c22-af77-812697abfc1c": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.proxy.process.fds.max.count: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Limit",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.process.fds.max.count"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layerId": "8fd34ecf-d1ed-4830-b667-0565d84fdc4e",
+                                "layerType": "data",
+                                "metricAccessor": "1fabeb28-2a42-452b-9425-412f66312efe",
+                                "secondaryMetricAccessor": "37ba3d7d-fbdd-4c22-af77-812697abfc1c"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": true
                 },
                 "gridData": {
-                    "h": 12,
-                    "i": "3",
-                    "w": 9,
-                    "x": 12,
-                    "y": 0
+                    "h": 7,
+                    "i": "2032e4a9-8a8d-4e6a-b499-b8adc8dc22d4",
+                    "w": 7,
+                    "x": 41,
+                    "y": 19
                 },
-                "panelIndex": "3",
-                "panelRefName": "panel_3",
-                "type": "visualization",
-                "version": "7.3.0"
+                "panelIndex": "2032e4a9-8a8d-4e6a-b499-b8adc8dc22d4",
+                "type": "lens",
+                "version": "8.5.1"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "axis_formatter": "number",
+                            "axis_position": "left",
+                            "axis_scale": "normal",
+                            "background_color": "rgba(93,164,220,1)",
+                            "drop_last_bucket": 0,
+                            "id": "8634c711-94bd-45bd-9c63-07beff88e7da",
+                            "index_pattern_ref_name": "metrics_d8b0bd41-19dc-49c9-9d15-9caf922e0758_0_index_pattern",
+                            "interval": "",
+                            "isModelInvalid": false,
+                            "markdown": "REST Client",
+                            "markdown_css": "font-family:system-ui,\"Segoe UI\",Helvetica,Arial,sans-serif,\"Segoe UI Emoji\",\"Segoe UI Symbol\";font-weight:500;font-kerning:normal;font-size:36px;font-stretch:100%;font-style:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;\np {\nposition:absolute;top:50%;left:50%;transform:translateX(-50%) translateY(-50%) rotate(-90deg); overflow: hidden; white-space: nowrap;\n } a{text-decoration:none !important;}",
+                            "max_lines_legend": 1,
+                            "series": [
+                                {
+                                    "axis_position": "right",
+                                    "chart_type": "line",
+                                    "color": "#68BC00",
+                                    "fill": 0.5,
+                                    "formatter": "default",
+                                    "id": "14b0cd48-711d-4e22-841d-f7048bbdcbf6",
+                                    "line_width": 1,
+                                    "metrics": [
+                                        {
+                                            "id": "4489b496-0f32-48b9-a528-e3016c141a87",
+                                            "type": "count"
+                                        }
+                                    ],
+                                    "override_index_pattern": 0,
+                                    "palette": {
+                                        "name": "default",
+                                        "type": "palette"
+                                    },
+                                    "point_size": 1,
+                                    "separate_axis": 0,
+                                    "series_drop_last_bucket": 0,
+                                    "split_mode": "everything",
+                                    "stacked": "none",
+                                    "time_range_mode": "entire_time_range"
+                                }
+                            ],
+                            "show_grid": 1,
+                            "show_legend": 1,
+                            "time_field": "",
+                            "time_range_mode": "entire_time_range",
+                            "tooltip_mode": "show_all",
+                            "truncate_legend": 1,
+                            "type": "markdown",
+                            "use_kibana_indexes": true
+                        },
+                        "title": "",
+                        "type": "metrics",
+                        "uiState": {}
+                    }
                 },
                 "gridData": {
-                    "h": 12,
-                    "i": "4",
-                    "w": 27,
-                    "x": 21,
-                    "y": 0
-                },
-                "panelIndex": "4",
-                "panelRefName": "panel_4",
-                "type": "visualization",
-                "version": "7.3.0"
-            },
-            {
-                "embeddableConfig": {
-                    "enhancements": {}
-                },
-                "gridData": {
-                    "h": 13,
-                    "i": "5",
-                    "w": 48,
+                    "h": 14,
+                    "i": "d8b0bd41-19dc-49c9-9d15-9caf922e0758",
+                    "w": 3,
                     "x": 0,
-                    "y": 24
+                    "y": 33
                 },
-                "panelIndex": "5",
-                "panelRefName": "panel_5",
+                "panelIndex": "d8b0bd41-19dc-49c9-9d15-9caf922e0758",
                 "type": "visualization",
-                "version": "7.3.0"
+                "version": "8.5.1"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-dc6bcc79-27f4-42d5-9311-3daa9c740b55",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "dc6bcc79-27f4-42d5-9311-3daa9c740b55": {
+                                            "columnOrder": [
+                                                "7b7890b7-de14-4c6e-b4b3-0bda52907d1b",
+                                                "4a6ca1e1-ea43-42b6-95f9-d53fb753981c",
+                                                "dfea118b-5004-461a-b0f5-a6c60df92d97",
+                                                "dfea118b-5004-461a-b0f5-a6c60df92d97X0",
+                                                "dfea118b-5004-461a-b0f5-a6c60df92d97X2",
+                                                "dfea118b-5004-461a-b0f5-a6c60df92d97X1"
+                                            ],
+                                            "columns": {
+                                                "4a6ca1e1-ea43-42b6-95f9-d53fb753981c": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "7b7890b7-de14-4c6e-b4b3-0bda52907d1b": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 3 values of kubernetes.proxy.host",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 3
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "kubernetes.proxy.host"
+                                                },
+                                                "dfea118b-5004-461a-b0f5-a6c60df92d97": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Average request latency in ms",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "(sum(kubernetes.proxy.client.request.duration.us.sum)/1000)/sum(kubernetes.proxy.client.request.duration.us.count)",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "dfea118b-5004-461a-b0f5-a6c60df92d97X2"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "dfea118b-5004-461a-b0f5-a6c60df92d97X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Average request latency in ms",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.client.request.duration.us.sum"
+                                                },
+                                                "dfea118b-5004-461a-b0f5-a6c60df92d97X1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Average request latency in ms",
+                                                    "operationType": "sum",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.client.request.duration.us.count"
+                                                },
+                                                "dfea118b-5004-461a-b0f5-a6c60df92d97X2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Average request latency in ms",
+                                                    "operationType": "math",
+                                                    "params": {
+                                                        "tinymathAst": {
+                                                            "args": [
+                                                                {
+                                                                    "args": [
+                                                                        "dfea118b-5004-461a-b0f5-a6c60df92d97X0",
+                                                                        1000
+                                                                    ],
+                                                                    "location": {
+                                                                        "max": 58,
+                                                                        "min": 1
+                                                                    },
+                                                                    "name": "divide",
+                                                                    "text": "sum(kubernetes.proxy.client.request.duration.us.sum)/1000",
+                                                                    "type": "function"
+                                                                },
+                                                                "dfea118b-5004-461a-b0f5-a6c60df92d97X1"
+                                                            ],
+                                                            "location": {
+                                                                "max": 114,
+                                                                "min": 0
+                                                            },
+                                                            "name": "divide",
+                                                            "text": "(sum(kubernetes.proxy.client.request.duration.us.sum)/1000)/sum(kubernetes.proxy.client.request.duration.us.count)",
+                                                            "type": "function"
+                                                        }
+                                                    },
+                                                    "references": [
+                                                        "dfea118b-5004-461a-b0f5-a6c60df92d97X0",
+                                                        "dfea118b-5004-461a-b0f5-a6c60df92d97X1"
+                                                    ],
+                                                    "scale": "ratio"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": false,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "dfea118b-5004-461a-b0f5-a6c60df92d97"
+                                        ],
+                                        "layerId": "dc6bcc79-27f4-42d5-9311-3daa9c740b55",
+                                        "layerType": "data",
+                                        "palette": {
+                                            "name": "cool",
+                                            "type": "palette"
+                                        },
+                                        "position": "top",
+                                        "seriesType": "area",
+                                        "showGridlines": false,
+                                        "splitAccessor": "7b7890b7-de14-4c6e-b4b3-0bda52907d1b",
+                                        "xAccessor": "4a6ca1e1-ea43-42b6-95f9-d53fb753981c"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "xTitle": "",
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
-                    "h": 10,
-                    "i": "6",
-                    "w": 48,
-                    "x": 0,
-                    "y": 37
+                    "h": 14,
+                    "i": "7fb48af3-06e9-411b-943e-ff26b002df7a",
+                    "w": 31,
+                    "x": 3,
+                    "y": 33
                 },
-                "panelIndex": "6",
-                "panelRefName": "panel_6",
-                "type": "visualization",
-                "version": "7.3.0"
+                "panelIndex": "7fb48af3-06e9-411b-943e-ff26b002df7a",
+                "title": "Proxy average request latency in ms [Metrics Kubernetes]",
+                "type": "lens",
+                "version": "8.5.1"
             },
             {
                 "embeddableConfig": {
-                    "enhancements": {}
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-49feb50d-ef90-4d5f-8484-4f634aefdf79",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "49feb50d-ef90-4d5f-8484-4f634aefdf79": {
+                                            "columnOrder": [
+                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62e",
+                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX2",
+                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX1",
+                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX0"
+                                            ],
+                                            "columns": {
+                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62e": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Hosts with error responses",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "percent",
+                                                            "params": {
+                                                                "decimals": 0
+                                                            }
+                                                        },
+                                                        "formula": "unique_count(kubernetes.proxy.host, kql='kubernetes.scheduler.code \u003e= 400')/unique_count(kubernetes.proxy.host)",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX2"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "kubernetes.scheduler.code \u003e= 400"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Part of unique_count(kubernetes.proxy.host, kql='kubernetes.scheduler.code \u003e= 400')/unique_count(kubernetes.proxy.host)",
+                                                    "operationType": "unique_count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.host"
+                                                },
+                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of unique_count(kubernetes.proxy.host, kql='kubernetes.scheduler.code \u003e= 400')/unique_count(kubernetes.proxy.host)",
+                                                    "operationType": "unique_count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.host"
+                                                },
+                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of unique_count(kubernetes.proxy.host, kql='kubernetes.scheduler.code \u003e= 400')/unique_count(kubernetes.proxy.host)",
+                                                    "operationType": "math",
+                                                    "params": {
+                                                        "tinymathAst": {
+                                                            "args": [
+                                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX0",
+                                                                "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX1"
+                                                            ],
+                                                            "location": {
+                                                                "max": 111,
+                                                                "min": 0
+                                                            },
+                                                            "name": "divide",
+                                                            "text": "unique_count(kubernetes.proxy.host, kql='kubernetes.scheduler.code \u003e= 400')/unique_count(kubernetes.proxy.host)",
+                                                            "type": "function"
+                                                        }
+                                                    },
+                                                    "references": [
+                                                        "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX0",
+                                                        "0d8ff4c9-6a6e-4412-a52a-46474c22e62eX1"
+                                                    ],
+                                                    "scale": "ratio"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "accessor": "0d8ff4c9-6a6e-4412-a52a-46474c22e62e",
+                                "layerId": "49feb50d-ef90-4d5f-8484-4f634aefdf79",
+                                "layerType": "data",
+                                "size": "xl",
+                                "textAlign": "center"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsLegacyMetric"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": true
                 },
                 "gridData": {
-                    "h": 12,
-                    "i": "7",
-                    "w": 12,
-                    "x": 0,
-                    "y": 0
+                    "h": 7,
+                    "i": "8d72dd8f-6145-45a4-a0fb-6ade328e5bb7",
+                    "w": 14,
+                    "x": 34,
+                    "y": 33
                 },
-                "panelIndex": "7",
-                "panelRefName": "panel_7",
+                "panelIndex": "8d72dd8f-6145-45a4-a0fb-6ade328e5bb7",
+                "type": "lens",
+                "version": "8.5.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "axis_formatter": "number",
+                            "axis_position": "left",
+                            "axis_scale": "normal",
+                            "background_color_rules": [
+                                {
+                                    "id": "40979740-81df-11ed-8860-4f7e4a55c6f9"
+                                }
+                            ],
+                            "drop_last_bucket": 1,
+                            "filter": {
+                                "language": "kuery",
+                                "query": "kubernetes.proxy.client.request.count : * "
+                            },
+                            "id": "74f3f776-05a3-42b1-aeb2-128795fa141d",
+                            "index_pattern_ref_name": "metrics_b42231c7-5d73-4df8-9139-d077d099cf29_0_index_pattern",
+                            "interval": "",
+                            "isModelInvalid": false,
+                            "max_lines_legend": 1,
+                            "series": [
+                                {
+                                    "axis_position": "right",
+                                    "chart_type": "line",
+                                    "color": "#68BC00",
+                                    "fill": 0.5,
+                                    "formatter": "0.00a",
+                                    "id": "e2d8de8b-cacb-4d2c-8ddd-7e3453daa2d8",
+                                    "label": "Requests",
+                                    "line_width": 1,
+                                    "metrics": [
+                                        {
+                                            "field": "kubernetes.proxy.client.request.count",
+                                            "id": "3228c1bf-ed64-4498-a544-684acc0d461b",
+                                            "type": "sum"
+                                        }
+                                    ],
+                                    "override_index_pattern": 0,
+                                    "palette": {
+                                        "name": "default",
+                                        "type": "palette"
+                                    },
+                                    "point_size": 1,
+                                    "separate_axis": 0,
+                                    "series_drop_last_bucket": 0,
+                                    "split_mode": "everything",
+                                    "stacked": "none",
+                                    "time_range_mode": "entire_time_range"
+                                }
+                            ],
+                            "show_grid": 1,
+                            "show_legend": 1,
+                            "time_field": "",
+                            "time_range_mode": "last_value",
+                            "tooltip_mode": "show_all",
+                            "truncate_legend": 1,
+                            "type": "metric",
+                            "use_kibana_indexes": true
+                        },
+                        "title": "",
+                        "type": "metrics",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "b42231c7-5d73-4df8-9139-d077d099cf29",
+                    "w": 7,
+                    "x": 34,
+                    "y": 40
+                },
+                "panelIndex": "b42231c7-5d73-4df8-9139-d077d099cf29",
                 "type": "visualization",
-                "version": "7.3.0"
+                "version": "8.5.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "axis_formatter": "number",
+                            "axis_position": "left",
+                            "axis_scale": "normal",
+                            "background_color_rules": [
+                                {
+                                    "id": "6ed92c90-81df-11ed-8860-4f7e4a55c6f9"
+                                }
+                            ],
+                            "drop_last_bucket": 1,
+                            "filter": {
+                                "language": "kuery",
+                                "query": "kubernetes.proxy.client.request.count : * and kubernetes.proxy.code \u003e= 400"
+                            },
+                            "id": "dc508305-7026-4364-b237-1f37a1c5bafc",
+                            "index_pattern_ref_name": "metrics_2e21971e-0715-4084-9eb8-d2b88c514d17_0_index_pattern",
+                            "interval": "",
+                            "isModelInvalid": false,
+                            "max_lines_legend": 1,
+                            "series": [
+                                {
+                                    "axis_position": "right",
+                                    "chart_type": "line",
+                                    "color": "#68BC00",
+                                    "fill": 0.5,
+                                    "formatter": "0.00a",
+                                    "id": "249852ba-f5f7-41dd-af8e-84cd39340a89",
+                                    "label": "Error responses",
+                                    "line_width": 1,
+                                    "metrics": [
+                                        {
+                                            "field": "kubernetes.proxy.client.request.count",
+                                            "id": "ca411600-e15f-413a-92f3-f6a818abb2e6",
+                                            "type": "sum"
+                                        }
+                                    ],
+                                    "override_index_pattern": 0,
+                                    "palette": {
+                                        "name": "default",
+                                        "type": "palette"
+                                    },
+                                    "point_size": 1,
+                                    "separate_axis": 0,
+                                    "series_drop_last_bucket": 0,
+                                    "split_mode": "everything",
+                                    "stacked": "none",
+                                    "time_range_mode": "entire_time_range"
+                                }
+                            ],
+                            "show_grid": 1,
+                            "show_legend": 1,
+                            "time_field": "",
+                            "time_range_mode": "last_value",
+                            "tooltip_mode": "show_all",
+                            "truncate_legend": 1,
+                            "type": "metric",
+                            "use_kibana_indexes": true
+                        },
+                        "title": "",
+                        "type": "metrics",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "2e21971e-0715-4084-9eb8-d2b88c514d17",
+                    "w": 7,
+                    "x": 41,
+                    "y": 40
+                },
+                "panelIndex": "2e21971e-0715-4084-9eb8-d2b88c514d17",
+                "type": "visualization",
+                "version": "8.5.1"
             }
         ],
         "timeRestore": false,
         "title": "[Metricbeat Kubernetes] Proxy",
         "version": 1
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.5.1",
     "id": "5e649d60-9901-11e9-ba57-b7ab4e2d4b58",
     "migrationVersion": {
-        "dashboard": "7.14.0"
+        "dashboard": "8.5.0"
     },
     "references": [
         {
@@ -171,42 +1723,67 @@
             "type": "index-pattern"
         },
         {
-            "id": "e0ddd3e0-98fe-11e9-ba57-b7ab4e2d4b58",
-            "name": "1:panel_1",
-            "type": "visualization"
+            "id": "logs-*",
+            "name": "3cb1e278-30b4-43a9-950e-e12e36155172:metrics_3cb1e278-30b4-43a9-950e-e12e36155172_0_index_pattern",
+            "type": "index-pattern"
         },
         {
-            "id": "cac89fb0-9906-11e9-ba57-b7ab4e2d4b58",
-            "name": "2:panel_2",
-            "type": "visualization"
+            "id": "metricbeat-*",
+            "name": "f413754d-c2d9-4cad-862a-f637c657eaf7:indexpattern-datasource-layer-57ff16b0-269e-46fe-aafc-764352a73fb9",
+            "type": "index-pattern"
         },
         {
-            "id": "09b404f0-99af-11e9-ba57-b7ab4e2d4b58",
-            "name": "3:panel_3",
-            "type": "visualization"
+            "id": "metricbeat-*",
+            "name": "cc2b991a-fcd3-4a93-b8e9-3d50d1d1d761:indexpattern-datasource-layer-91200e36-c39a-4cd2-929a-657a4fa3a679",
+            "type": "index-pattern"
         },
         {
-            "id": "8c6c2690-9bd8-11e9-9dc8-fd27291d427f",
-            "name": "4:panel_4",
-            "type": "visualization"
+            "id": "logs-*",
+            "name": "093eb5bf-24c8-47d9-81ae-9bd8c95f3137:metrics_093eb5bf-24c8-47d9-81ae-9bd8c95f3137_0_index_pattern",
+            "type": "index-pattern"
         },
         {
-            "id": "b8a24790-9bf0-11e9-9dc8-fd27291d427f",
-            "name": "5:panel_5",
-            "type": "visualization"
+            "id": "metricbeat-*",
+            "name": "7fe5c8e1-5fe0-46ef-a40f-89776d502b7d:indexpattern-datasource-layer-58c3838b-6f54-44e5-ba36-e4b535b28f7c",
+            "type": "index-pattern"
         },
         {
-            "id": "ba7bf750-9bf5-11e9-9dc8-fd27291d427f",
-            "name": "6:panel_6",
-            "type": "visualization"
+            "id": "metricbeat-*",
+            "name": "58eee069-1699-408f-9602-ecb454af0c17:indexpattern-datasource-layer-ab0b91a3-72dc-4fb1-a421-1f68925f4f84",
+            "type": "index-pattern"
         },
         {
-            "id": "bcb194a0-9bf8-11e9-9dc8-fd27291d427f",
-            "name": "7:panel_7",
-            "type": "visualization"
+            "id": "metricbeat-*",
+            "name": "2032e4a9-8a8d-4e6a-b499-b8adc8dc22d4:indexpattern-datasource-layer-8fd34ecf-d1ed-4830-b667-0565d84fdc4e",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "d8b0bd41-19dc-49c9-9d15-9caf922e0758:metrics_d8b0bd41-19dc-49c9-9d15-9caf922e0758_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "7fb48af3-06e9-411b-943e-ff26b002df7a:indexpattern-datasource-layer-dc6bcc79-27f4-42d5-9311-3daa9c740b55",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "8d72dd8f-6145-45a4-a0fb-6ade328e5bb7:indexpattern-datasource-layer-49feb50d-ef90-4d5f-8484-4f634aefdf79",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "b42231c7-5d73-4df8-9139-d077d099cf29:metrics_b42231c7-5d73-4df8-9139-d077d099cf29_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "2e21971e-0715-4084-9eb8-d2b88c514d17:metrics_2e21971e-0715-4084-9eb8-d2b88c514d17_0_index_pattern",
+            "type": "index-pattern"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-04T16:31:38.365Z",
-    "version": "WzQwMjcsMV0="
+    "updated_at": "2022-12-22T10:37:17.242Z",
+    "version": "WzQ3NzMsMV0="
 }
