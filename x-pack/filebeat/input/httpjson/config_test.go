@@ -7,6 +7,7 @@ package httpjson
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"testing"
 
@@ -15,6 +16,7 @@ import (
 	"golang.org/x/oauth2/google"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 func TestProviderCanonical(t *testing.T) {
@@ -484,4 +486,60 @@ func TestCursorEntryConfig(t *testing.T) {
 	assert.False(t, conf["entry2"].mustIgnoreEmptyValue())
 	assert.True(t, conf["entry3"].mustIgnoreEmptyValue())
 	assert.True(t, conf["entry4"].mustIgnoreEmptyValue())
+}
+
+var keepAliveTests = []struct {
+	name    string
+	input   map[string]interface{}
+	want    httpcommon.WithKeepaliveSettings
+	wantErr error
+}{
+	{
+		name:  "keep_alive_none", // Default to the old behaviour of true.
+		input: map[string]interface{}{},
+		want:  httpcommon.WithKeepaliveSettings{Disable: true},
+	},
+	{
+		name: "keep_alive_true",
+		input: map[string]interface{}{
+			"request.keep_alive.disable": true,
+		},
+		want: httpcommon.WithKeepaliveSettings{Disable: true},
+	},
+	{
+		name: "keep_alive_false",
+		input: map[string]interface{}{
+			"request.keep_alive.disable": false,
+		},
+		want: httpcommon.WithKeepaliveSettings{Disable: false},
+	},
+	{
+		name: "keep_alive_invalid_max",
+		input: map[string]interface{}{
+			"request.keep_alive.disable":              false,
+			"request.keep_alive.max_idle_connections": -1,
+		},
+		wantErr: errors.New("max_idle_connections must not be negative accessing 'request.keep_alive'"),
+	},
+}
+
+func TestKeepAliveSetting(t *testing.T) {
+	for _, test := range keepAliveTests {
+		t.Run(test.name, func(t *testing.T) {
+			test.input["request.url"] = "localhost"
+			cfg := conf.MustNewConfigFrom(test.input)
+			conf := defaultConfig()
+			err := cfg.Unpack(&conf)
+			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+				t.Errorf("unexpected error return from Unpack: got: %q want: %q", err, test.wantErr)
+			}
+			if err != nil {
+				return
+			}
+			got := conf.Request.KeepAlive.settings()
+			if got != test.want {
+				t.Errorf("unexpected setting for %s: got: %#v\nwant:%#v", test.name, got, test.want)
+			}
+		})
+	}
 }

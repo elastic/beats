@@ -36,6 +36,7 @@ type inputMetrics struct {
 
 // Close removes the metrics from the registry.
 func (m *inputMetrics) Close() {
+	// Thanks to this integration tests fail
 	m.unregister()
 }
 
