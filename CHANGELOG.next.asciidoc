@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
 - Fix handling of error in states in direct aws-s3 listing input {issue}33513[33513] {pull}33722[33722]
 - Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
+- [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
 
 *Heartbeat*
 
