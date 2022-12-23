@@ -91,11 +91,13 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
-	rsName, _ := out.GetValue("replicaset.name")
-	if rsName, ok := rsName.(string); ok {
-		dep := p.getRSDeployment(rsName, po.GetNamespace())
-		if dep != "" {
-			_, _ = out.Put("deployment.name", dep)
+	if p.addResourceMetadata.Deployment {
+		rsName, _ := out.GetValue("replicaset.name")
+		if rsName, ok := rsName.(string); ok {
+			dep := p.getRSDeployment(rsName, po.GetNamespace())
+			if dep != "" {
+				_, _ = out.Put("deployment.name", dep)
+			}
 		}
 	}
 
