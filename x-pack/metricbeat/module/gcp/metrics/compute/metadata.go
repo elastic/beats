@@ -6,6 +6,7 @@ package compute
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -36,8 +37,6 @@ type computeMetadata struct {
 	zone        string
 	instanceID  string
 	machineType string
-
-	ts *monitoringpb.TimeSeries
 
 	User     map[string]string
 	Metadata map[string]string
@@ -73,16 +72,25 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	}
 
 	if resp.Resource != nil && resp.Resource.Labels != nil {
-		metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
+		_, err = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
+		if err != nil {
+			return gcp.MetadataCollectorData{}, err
+		}
 	}
 
 	if resp.Metric.Labels != nil {
-		metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
+		_, err = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
+		if err != nil {
+			return gcp.MetadataCollectorData{}, err
+		}
 	}
 
 	if s.computeMetadata.machineType != "" {
 		lastIndex := strings.LastIndex(s.computeMetadata.machineType, "/")
-		metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, s.computeMetadata.machineType[lastIndex+1:])
+		_, err = metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, s.computeMetadata.machineType[lastIndex+1:])
+		if err != nil {
+			return gcp.MetadataCollectorData{}, err
+		}
 	}
 
 	s.computeMetadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
@@ -108,7 +116,7 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 	// FIXME: remove side effect on metadataCollector instance and use return value instead
 	i, err := s.instance(ctx, instanceID)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to get data from instance '%s' in zone '%s'", instanceID, zone)
+		return nil, fmt.Errorf("error trying to get data from instance '%s' in zone '%s': %w", instanceID, zone, err)
 	}
 
 	s.computeMetadata = &computeMetadata{
