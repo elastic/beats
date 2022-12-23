@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/gofrs/uuid"
-	protobuf "github.com/golang/protobuf/proto"
+	protobuf "github.com/golang/protobuf/proto" //nolint:staticcheck // won't update the package for now
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
@@ -104,6 +104,7 @@ type Server struct {
 
 	listener     net.Listener
 	server       *grpc.Server
+	serverLock   *sync.Mutex
 	watchdogDone chan bool
 	watchdogWG   sync.WaitGroup
 
@@ -125,6 +126,7 @@ func New(logger *logger.Logger, listenAddr string, handler Handler) (*Server, er
 		ca:                    ca,
 		listenAddr:            listenAddr,
 		handler:               handler,
+		serverLock:            &sync.Mutex{},
 		watchdogCheckInterval: WatchdogCheckLoop,
 		checkInMinTimeout:     client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
 	}, nil
@@ -151,14 +153,25 @@ func (s *Server) Start() error {
 		ClientCAs:      certPool,
 		GetCertificate: s.getCertificate,
 	})
+	s.serverLock.Lock()
 	s.server = grpc.NewServer(grpc.Creds(creds))
+	s.serverLock.Unlock()
 	proto.RegisterElasticAgentServer(s.server, s)
 
 	// start serving GRPC connections
 	go func() {
-		err := s.server.Serve(lis)
+		s.serverLock.Lock()
+		server := s.server
+		s.serverLock.Unlock()
+
+		if server == nil { // Server.Stop was called before this goroutine run
+			s.logger.Error("cannot start gRPC server, server is nil. Did you call Stop before the initialization has completed?")
+			return
+		}
+
+		err := server.Serve(lis)
 		if err != nil {
-			s.logger.Errorf("error listening for GRPC: %s", err)
+			s.logger.Errorf("error listening for GRPC: %v", err)
 		}
 	}()
 
@@ -172,6 +185,9 @@ func (s *Server) Start() error {
 
 // Stop stops the GRPC endpoint.
 func (s *Server) Stop() {
+	s.serverLock.Lock()
+	defer s.serverLock.Unlock()
+
 	if s.server != nil {
 		close(s.watchdogDone)
 		s.server.Stop()

@@ -3220,6 +3220,16 @@ type: keyword
 
 --
 
+*`azure.platformlogs.identity_name`*::
++
+--
+Identity name
+
+
+type: keyword
+
+--
+
 *`azure.platformlogs.properties`*::
 +
 --

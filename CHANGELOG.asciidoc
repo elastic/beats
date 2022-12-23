@@ -3,6 +3,75 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.8]]
+=== Beats version 7.17.8
+https://github.com/elastic/beats/compare/v7.17.7\...v7.17.8[View commits]
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Re-enable build optimizations to reduce binary size and improve performance. {pull}33620[33620]
+
+*Filebeat*
+
+- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+
+*Metricbeat*
+
+- Add tags to events based on parsed identifier. {pull}33472[33472]
+
+*Packetbeat*
+
+- Fix panic on memcache transaction with no request or response. {issue}33852[33852] {pull}33853[33853]
+
+==== Added
+
+*Affecting all Beats*
+
+- Beats will now attempt to recover if a lockfile has not been removed {pull}[33169]
+
+*Auditbeat*
+
+- Improve documentation for symlink handling behaviour in file integrity module. {pull}33430[33430]
+- Ensure file integrity module watch paths are absolute. {pull}33430[33430]
+
+*Filebeat*
+
+- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
+- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
+- Add support for parsers on journald input {pull}29070[29070]
+- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
+- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
+- Support SASL/SCRAM authentication in the Kafka input. {pull}31167[31167]
+- checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
+- Add URL Encode template function for httpjson input. {pull}30962[30962]
+- Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
+- Default value of `filebeat.registry.flush` increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk for each ingested log line. {issue}30279[30279]
+- Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
+- Change threatintel module from beta to GA. {pull}31693[31693]
+- Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
+- Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
+- Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
+- Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
+- Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
+- Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
+- Allow iptables module to parse ulogd v2 TOS field in logs. {pull}32126[32126]
+- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
+- Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
+- add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
+- httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
+- Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
+- Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
+- Cloud Foundry input uses server-side filtering when retrieving logs. {pull}33456[33456]
+
+*Metricbeat*
+
+- Azure Billing: upgrade Usage Details API to version 2019-10-01 {pull}31970[31970]
+- Azure Billing: switch to Cost Management API for forecast data {pull}32589[32589]
+
+
 [[release-notes-7.17.7]]
 === Beats version 7.17.7
 https://github.com/elastic/beats/compare/v7.17.6\...v7.17.7[View commits]
