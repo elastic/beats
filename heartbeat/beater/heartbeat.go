@@ -20,6 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"syscall"
 	"time"
@@ -45,7 +46,8 @@ import (
 
 // Heartbeat represents the root datastructure of this beat.
 type Heartbeat struct {
-	done chan struct{}
+	done     chan struct{}
+	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
 	config             config.Config
 	scheduler          *scheduler.Scheduler
@@ -222,10 +224,8 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		return nil
 	})
 
-	mons := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".monitors", mons)
 	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
-	reload.Register.MustRegisterList("inputs", inputs)
+	reload.RegisterV2.MustRegisterInput(inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
@@ -259,7 +259,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
-	close(bt.done)
+	bt.stopOnce.Do(func() { close(bt.done) })
 }
 
 func makeStatesClient(cfg *conf.C, replace func(monitorstate.StateLoader), runFrom *config.LocationWithID) error {

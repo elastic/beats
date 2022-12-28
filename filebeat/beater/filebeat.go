@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -38,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -67,6 +69,7 @@ type Filebeat struct {
 	moduleRegistry *fileset.ModuleRegistry
 	pluginFactory  PluginFactory
 	done           chan struct{}
+	stopOnce       sync.Once // wraps the Stop() method
 	pipeline       beat.PipelineConnector
 }
 
@@ -113,6 +116,12 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	if err := config.FetchConfigs(); err != nil {
 		return nil, err
+	}
+
+	if b.API != nil {
+		if err = inputmon.AttachHandler(b.API.Router()); err != nil {
+			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+		}
 	}
 
 	// Add inputs created by the modules
@@ -362,10 +371,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Register reloadable list of inputs and modules
 	inputs := cfgfile.NewRunnerList(management.DebugK, inputLoader, fb.pipeline)
-	reload.Register.MustRegisterList("filebeat.inputs", inputs)
+	reload.RegisterV2.MustRegisterInput(inputs)
 
 	modules := cfgfile.NewRunnerList(management.DebugK, moduleLoader, fb.pipeline)
-	reload.Register.MustRegisterList("filebeat.modules", modules)
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
@@ -432,7 +440,7 @@ func (fb *Filebeat) Stop() {
 	logp.Info("Stopping filebeat")
 
 	// Stop Filebeat
-	close(fb.done)
+	fb.stopOnce.Do(func() { close(fb.done) })
 }
 
 // Create a new pipeline loader (es client) factory

@@ -15,6 +15,7 @@ import (
 
 	"github.com/aws/smithy-go/middleware"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -28,7 +29,7 @@ import (
 // Run 'go generate' to create mocks that are used in tests.
 //go:generate go install github.com/golang/mock/mockgen@v1.6.0
 //go:generate mockgen -source=interfaces.go -destination=mock_interfaces_test.go -package awss3 -mock_names=sqsAPI=MockSQSAPI,sqsProcessor=MockSQSProcessor,s3API=MockS3API,s3Pager=MockS3Pager,s3ObjectHandlerFactory=MockS3ObjectHandlerFactory,s3ObjectHandler=MockS3ObjectHandler
-//go:generate mockgen -destination=mock_publisher_test.go -package=awss3 -mock_names=Client=MockBeatClient github.com/elastic/beats/v7/libbeat/beat Client
+//go:generate mockgen -destination=mock_publisher_test.go -package=awss3 -mock_names=Client=MockBeatClient,Pipeline=MockBeatPipeline github.com/elastic/beats/v7/libbeat/beat Client,Pipeline
 
 // ------
 // SQS interfaces
@@ -68,11 +69,17 @@ type sqsProcessor interface {
 
 type s3API interface {
 	s3Getter
+	s3Mover
 	s3Lister
 }
 
 type s3Getter interface {
 	GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error)
+}
+
+type s3Mover interface {
+	CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error)
+	DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error)
 }
 
 type s3Lister interface {
@@ -88,7 +95,7 @@ type s3ObjectHandlerFactory interface {
 	// Create returns a new s3ObjectHandler that can be used to process the
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
-	Create(ctx context.Context, log *logp.Logger, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
+	Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {
@@ -98,6 +105,10 @@ type s3ObjectHandler interface {
 	// the publisher before returning (use eventACKTracker's Wait() method to
 	// determine this).
 	ProcessS3Object() error
+
+	// FinalizeS3Object finalizes processing of an S3 object after the current
+	// batch is finished.
+	FinalizeS3Object() error
 
 	// Wait waits for every event published by ProcessS3Object() to be ACKed
 	// by the publisher before returning. Internally it uses the
@@ -225,6 +236,29 @@ func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetOb
 	}
 
 	return getObjectOutput, nil
+}
+
+func (a *awsS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+	copyObjectOutput, err := a.client.CopyObject(ctx, &s3.CopyObjectInput{
+		Bucket:     awssdk.String(to_bucket),
+		CopySource: awssdk.String(fmt.Sprintf("%s/%s", from_bucket, from_key)),
+		Key:        awssdk.String(to_key),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("s3 CopyObject failed: %w", err)
+	}
+	return copyObjectOutput, nil
+}
+
+func (a *awsS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+	deleteObjectOutput, err := a.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: awssdk.String(bucket),
+		Key:    awssdk.String(key),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("s3 DeleteObject failed: %w", err)
+	}
+	return deleteObjectOutput, nil
 }
 
 func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {

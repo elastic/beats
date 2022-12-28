@@ -1,0 +1,303 @@
+[
+    {
+        "@timestamp": "2014-12-14T04:07:50Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "version": 2
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "destination": {
+            "address": "172.31.16.21",
+            "ip": "172.31.16.21",
+            "port": 22
+        },
+        "event": {
+            "action": "accept",
+            "end": "2014-12-14T04:07:50Z",
+            "outcome": "success",
+            "start": "2014-12-14T04:06:50Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "2 123456789010 eni-1235b8ca123456789 172.31.16.139 172.31.16.21 20641 22 6 20 4249 1418530010 1418530070 ACCEPT OK",
+        "network": {
+            "bytes": 4249,
+            "iana_number": "6",
+            "packets": 20,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "172.31.16.139",
+                "172.31.16.21"
+            ]
+        },
+        "source": {
+            "address": "172.31.16.139",
+            "bytes": 4249,
+            "ip": "172.31.16.139",
+            "packets": 20,
+            "port": 20641
+        }
+    },
+    {
+        "@timestamp": "2014-12-14T04:07:50Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "version": 2
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "destination": {
+            "address": "172.31.9.12",
+            "ip": "172.31.9.12",
+            "port": 3389
+        },
+        "event": {
+            "action": "reject",
+            "end": "2014-12-14T04:07:50Z",
+            "outcome": "failure",
+            "start": "2014-12-14T04:06:50Z",
+            "type": [
+                "connection",
+                "denied"
+            ]
+        },
+        "message": "2 123456789010 eni-1235b8ca123456789 172.31.9.69 172.31.9.12 49761 3389 6 20 4249 1418530010 1418530070 REJECT OK",
+        "network": {
+            "bytes": 4249,
+            "iana_number": "6",
+            "packets": 20,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "172.31.9.69",
+                "172.31.9.12"
+            ]
+        },
+        "source": {
+            "address": "172.31.9.69",
+            "bytes": 4249,
+            "ip": "172.31.9.69",
+            "packets": 20,
+            "port": 49761
+        }
+    },
+    {
+        "@timestamp": "2015-05-10T18:02:14Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "NODATA",
+                "version": 2
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "event": {
+            "end": "2015-05-10T18:02:14Z",
+            "start": "2015-05-10T18:01:16Z",
+            "type": [
+                "connection"
+            ]
+        },
+        "message": "2 123456789010 eni-1235b8ca123456789 - - - - - - - 1431280876 1431280934 - NODATA"
+    },
+    {
+        "@timestamp": "2015-05-10T18:02:14Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-11111111aaaaaaaaa",
+                "log_status": "SKIPDATA",
+                "version": 2
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "event": {
+            "end": "2015-05-10T18:02:14Z",
+            "start": "2015-05-10T18:01:16Z",
+            "type": [
+                "connection"
+            ]
+        },
+        "message": "2 123456789010 eni-11111111aaaaaaaaa - - - - - - - 1431280876 1431280934 - SKIPDATA"
+    },
+    {
+        "@timestamp": "2015-05-29T16:32:22Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "version": 2
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "destination": {
+            "address": "172.31.16.139",
+            "ip": "172.31.16.139",
+            "port": 0
+        },
+        "event": {
+            "action": "accept",
+            "end": "2015-05-29T16:32:22Z",
+            "outcome": "success",
+            "start": "2015-05-29T16:30:27Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "2 123456789010 eni-1235b8ca123456789 203.0.113.12 172.31.16.139 0 0 1 4 336 1432917027 1432917142 ACCEPT OK",
+        "network": {
+            "bytes": 336,
+            "iana_number": "1",
+            "packets": 4,
+            "transport": "icmp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "203.0.113.12",
+                "172.31.16.139"
+            ]
+        },
+        "source": {
+            "address": "203.0.113.12",
+            "bytes": 336,
+            "ip": "203.0.113.12",
+            "packets": 4,
+            "port": 0
+        }
+    },
+    {
+        "@timestamp": "2015-05-29T16:32:22Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "version": 2
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "destination": {
+            "address": "203.0.113.12",
+            "ip": "203.0.113.12",
+            "port": 0
+        },
+        "event": {
+            "action": "reject",
+            "end": "2015-05-29T16:32:22Z",
+            "outcome": "failure",
+            "start": "2015-05-29T16:31:34Z",
+            "type": [
+                "connection",
+                "denied"
+            ]
+        },
+        "message": "2 123456789010 eni-1235b8ca123456789 172.31.16.139 203.0.113.12 0 0 1 4 336 1432917094 1432917142 REJECT OK",
+        "network": {
+            "bytes": 336,
+            "iana_number": "1",
+            "packets": 4,
+            "transport": "icmp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "172.31.16.139",
+                "203.0.113.12"
+            ]
+        },
+        "source": {
+            "address": "172.31.16.139",
+            "bytes": 336,
+            "ip": "172.31.16.139",
+            "packets": 4,
+            "port": 0
+        }
+    },
+    {
+        "@timestamp": "2016-10-31T11:37:00Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "version": 2
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "destination": {
+            "address": "2001:db8:1234:a102:3304:8879:34cf:4071",
+            "ip": "2001:db8:1234:a102:3304:8879:34cf:4071",
+            "port": 22
+        },
+        "event": {
+            "action": "accept",
+            "end": "2016-10-31T11:37:00Z",
+            "outcome": "success",
+            "start": "2016-10-31T11:35:08Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "2 123456789010 eni-1235b8ca123456789 2001:db8:1234:a100:8d6e:3477:df66:f105 2001:db8:1234:a102:3304:8879:34cf:4071 34892 22 6 54 8855 1477913708 1477913820 ACCEPT OK",
+        "network": {
+            "bytes": 8855,
+            "iana_number": "6",
+            "packets": 54,
+            "transport": "tcp",
+            "type": "ipv6"
+        },
+        "related": {
+            "ip": [
+                "2001:db8:1234:a100:8d6e:3477:df66:f105",
+                "2001:db8:1234:a102:3304:8879:34cf:4071"
+            ]
+        },
+        "source": {
+            "address": "2001:db8:1234:a100:8d6e:3477:df66:f105",
+            "bytes": 8855,
+            "ip": "2001:db8:1234:a100:8d6e:3477:df66:f105",
+            "packets": 54,
+            "port": 34892
+        }
+    }
+]

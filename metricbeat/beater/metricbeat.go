@@ -45,6 +45,7 @@ import (
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
 	done         chan struct{}   // Channel used to initiate shutdown.
+	stopOnce     sync.Once       // wraps the Stop() method
 	runners      []module.Runner // Active list of module runners.
 	config       Config
 	autodiscover *autodiscover.Autodiscover
@@ -218,7 +219,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	// Centrally managed modules
 	factory := module.NewFactory(b.Info, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".modules", modules)
+	reload.RegisterV2.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -272,7 +273,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 // Stop should only be called a single time. Calling it more than once may
 // result in undefined behavior.
 func (bt *Metricbeat) Stop() {
-	close(bt.done)
+	bt.stopOnce.Do(func() { close(bt.done) })
+
 }
 
 // Modules return a list of all configured modules.

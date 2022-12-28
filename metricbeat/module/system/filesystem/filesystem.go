@@ -79,7 +79,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // an event for each mount point.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-
 	fsList, err := fs.GetFilesystems(m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes))
 	if err != nil {
 		return fmt.Errorf("error fetching filesystem list: %w", err)
@@ -88,12 +87,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	for _, fs := range fsList {
 		err := fs.GetUsage()
 		if err != nil {
-			return fmt.Errorf("error getting filesystem usage for %s: %w", fs.Directory, err)
+			m.Logger().Errorf("error getting filesystem usage for %s: %s", fs.Directory, err)
+			continue
 		}
 		out := mapstr.M{}
 		err = typeconv.Convert(&out, fs)
 		if err != nil {
-			return fmt.Errorf("error converting event %s: %w", fs.Device, err)
+			m.Logger().Errorf("error converting filesystem event for %s: %s", fs.Device, err)
+			continue
 		}
 
 		event := mb.Event{

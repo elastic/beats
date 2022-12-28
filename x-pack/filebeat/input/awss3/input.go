@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -51,26 +50,38 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newInput(config, im.store)
+	return newInput(config, im.store, true)
+}
+
+func (im *s3InputManager) CreateWithoutClosingMetrics(cfg *conf.C) (v2.Input, error) {
+	// This smells, but since we call metrics.Close() on metrics that are not injectable in integration test we need this
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	return newInput(config, im.store, false)
 }
 
 // s3Input is a input for reading logs from S3 when triggered by an SQS message.
 type s3Input struct {
-	config    config
-	awsConfig awssdk.Config
-	store     beater.StateStore
+	closeMetrics bool
+	config       config
+	awsConfig    awssdk.Config
+	store        beater.StateStore
 }
 
-func newInput(config config, store beater.StateStore) (*s3Input, error) {
+func newInput(config config, store beater.StateStore, closeMetrics bool) (*s3Input, error) {
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
 	return &s3Input{
-		config:    config,
-		awsConfig: awsConfig,
-		store:     store,
+		closeMetrics: closeMetrics,
+		config:       config,
+		awsConfig:    awsConfig,
+		store:        store,
 	}, nil
 }
 
@@ -108,16 +119,6 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	}()
 	defer cancelInputCtx()
 
-	// Create client for publishing events and receive notification of their ACKs.
-	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:   inputContext.Cancelation,
-		ACKHandler: awscommon.NewEventACKHandler(),
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create pipeline client: %w", err)
-	}
-	defer client.Close()
-
 	if in.config.QueueURL != "" {
 		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
 		if err != nil {
@@ -127,11 +128,13 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		in.awsConfig.Region = regionName
 
 		// Create SQS receiver and S3 notification processor.
-		receiver, err := in.createSQSReceiver(inputContext, client)
+		receiver, err := in.createSQSReceiver(inputContext, pipeline)
 		if err != nil {
 			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
 		}
-		defer receiver.metrics.Close()
+		if in.closeMetrics {
+			defer receiver.metrics.Close()
+		}
 
 		if err := receiver.Receive(ctx); err != nil {
 			return err
@@ -139,12 +142,29 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	}
 
 	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
+		// Create client for publishing events and receive notification of their ACKs.
+		client, err := pipeline.ConnectWith(beat.ClientConfig{
+			CloseRef:   inputContext.Cancelation,
+			ACKHandler: awscommon.NewEventACKHandler(),
+			Processing: beat.ProcessingConfig{
+				// This input only produces events with basic types so normalization
+				// is not required.
+				EventNormalization: boolPtr(false),
+			},
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create pipeline client: %w", err)
+		}
+		defer client.Close()
+
 		// Create S3 receiver and S3 notification processor.
 		poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
 		if err != nil {
 			return fmt.Errorf("failed to initialize s3 poller: %w", err)
 		}
-		defer poller.metrics.Close()
+		if in.closeMetrics {
+			defer poller.metrics.Close()
+		}
 
 		if err := poller.Poll(ctx); err != nil {
 			return err
@@ -154,7 +174,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	return nil
 }
 
-func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsReader, error) {
+func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
 	sqsAPI := &awsSQSAPI{
 		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
 			if in.config.AWSConfig.FIPSEnabled {
@@ -181,8 +201,10 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
 	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
 
-	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
-	metrics := newInputMetrics(metricRegistry, ctx.ID)
+	if in.config.BackupConfig.GetBucketName() != "" {
+		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets" +
+			"or prefixes to avoid an infinite loop.")
+	}
 
 	fileSelectors := in.config.FileSelectors
 	if len(in.config.FileSelectors) == 0 {
@@ -192,8 +214,9 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	if err != nil {
 		return nil, err
 	}
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, fileSelectors)
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, s3EventHandlerFactory)
+	metrics := newInputMetrics(ctx.ID, nil)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
 	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
@@ -260,17 +283,16 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	log.Infof("bucket_list_prefix is set to %v.", in.config.BucketListPrefix)
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
 
-	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
-	metrics := newInputMetrics(metricRegistry, ctx.ID)
-
 	fileSelectors := in.config.FileSelectors
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, fileSelectors)
+	metrics := newInputMetrics(ctx.ID, nil)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
 	s3Poller := newS3Poller(log.Named("s3_poller"),
 		metrics,
 		s3API,
+		client,
 		s3EventHandlerFactory,
 		states,
 		persistentStore,
@@ -368,3 +390,6 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 	}
 	return "unknown"
 }
+
+// boolPtr returns a pointer to b.
+func boolPtr(b bool) *bool { return &b }

@@ -574,11 +574,11 @@ func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
 }
 
 func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
-	_, ok := mu.table[s.Name()]
+	meta, ok := mu.table[s.Name()]
 	if !ok {
-		return fmt.Errorf("no such id")
+		return fmt.Errorf("no such id [%q]", s.Name())
 	}
-	return nil
+	return typeconv.Convert(v, meta)
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
@@ -653,4 +653,71 @@ func mustPathIdentifier(renamed bool) fileIdentifier {
 		return &renamedPathIdentifier{pathIdentifier}
 	}
 	return pathIdentifier
+}
+
+func TestOnRenameFileIdentity(t *testing.T) {
+	testCases := map[string]struct {
+		identifier    string
+		events        []loginp.FSEvent
+		populateStore bool
+		errMsg        string
+	}{
+		"identifier name from meta is kept": {
+			identifier:    "foo",
+			errMsg:        "must be the same as in the registry",
+			populateStore: true,
+			events: []loginp.FSEvent{
+				{
+					Op:      loginp.OpRename,
+					OldPath: "/old/path/to/file",
+					NewPath: "/new/path/to/file",
+					Info:    testFileInfo{},
+				},
+			},
+		},
+		"identifier from prospector is used": {
+			identifier:    "path",
+			errMsg:        "must come from prospector configuration",
+			populateStore: false,
+			events: []loginp.FSEvent{
+				{
+					Op:      loginp.OpRename,
+					OldPath: "/old/path/to/file",
+					NewPath: "/new/path/to/file",
+					Info:    testFileInfo{},
+				},
+			},
+		},
+	}
+
+	for k, tc := range testCases {
+		t.Run(k, func(t *testing.T) {
+			p := fileProspector{
+				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
+				identifier:        mustPathIdentifier(true),
+				stateChangeCloser: stateChangeCloserConfig{Renamed: true},
+			}
+			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
+			path := "/new/path/to/file"
+			expectedIdentifier := tc.identifier
+			id := "path" + "::" + path
+
+			testStore := newMockMetadataUpdater()
+			if tc.populateStore {
+				testStore.table[id] = fileMeta{Source: path, IdentifierName: expectedIdentifier}
+			}
+
+			hg := newTestHarvesterGroup()
+			p.Run(ctx, testStore, hg)
+
+			got := testStore.table[id]
+			meta := fileMeta{}
+			typeconv.Convert(&meta, got)
+
+			if meta.IdentifierName != expectedIdentifier {
+				t.Errorf("fileMeta.IdentifierName %s, expecting: %q, got: %q", tc.errMsg, expectedIdentifier, meta.IdentifierName)
+			}
+		})
+	}
 }

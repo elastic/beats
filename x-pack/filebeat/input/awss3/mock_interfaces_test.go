@@ -17,6 +17,7 @@ import (
 	types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	gomock "github.com/golang/mock/gomock"
 
+	beat "github.com/elastic/beats/v7/libbeat/beat"
 	aws "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	logp "github.com/elastic/elastic-agent-libs/logp"
 )
@@ -274,6 +275,32 @@ func (mr *MockS3APIMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, bucket, key)
 }
 
+func (m *MockS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CopyObject", ctx, from_bucket, to_bucket, from_key, to_key)
+	ret0, _ := ret[0].(*s3.CopyObjectOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockS3APIMockRecorder) CopyObject(ctx, from_bucket, to_bucket, from_key, to_key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, from_bucket, to_bucket, from_key, to_key)
+}
+
+func (m *MockS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteObject", ctx, bucket, key)
+	ret0, _ := ret[0].(*s3.DeleteObjectOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockS3APIMockRecorder) DeleteObject(ctx, bucket, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, bucket, key)
+}
+
 // ListObjectsPaginator mocks base method.
 func (m *MockS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
 	m.ctrl.T.Helper()
@@ -444,17 +471,17 @@ func (m *MockS3ObjectHandlerFactory) EXPECT() *MockS3ObjectHandlerFactoryMockRec
 }
 
 // Create mocks base method.
-func (m *MockS3ObjectHandlerFactory) Create(ctx context.Context, log *logp.Logger, acker *aws.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (m *MockS3ObjectHandlerFactory) Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *aws.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, log, acker, obj)
+	ret := m.ctrl.Call(m, "Create", ctx, log, client, acker, obj)
 	ret0, _ := ret[0].(s3ObjectHandler)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockS3ObjectHandlerFactoryMockRecorder) Create(ctx, log, acker, obj interface{}) *gomock.Call {
+func (mr *MockS3ObjectHandlerFactoryMockRecorder) Create(ctx, log, client, acker, obj interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockS3ObjectHandlerFactory)(nil).Create), ctx, log, acker, obj)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockS3ObjectHandlerFactory)(nil).Create), ctx, log, client, acker, obj)
 }
 
 // MockS3ObjectHandler is a mock of s3ObjectHandler interface.
@@ -492,6 +519,20 @@ func (m *MockS3ObjectHandler) ProcessS3Object() error {
 func (mr *MockS3ObjectHandlerMockRecorder) ProcessS3Object() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessS3Object", reflect.TypeOf((*MockS3ObjectHandler)(nil).ProcessS3Object))
+}
+
+// ProcessS3Object mocks base method.
+func (m *MockS3ObjectHandler) FinalizeS3Object() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FinalizeS3Object")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ProcessS3Object indicates an expected call of ProcessS3Object.
+func (mr *MockS3ObjectHandlerMockRecorder) FinalizeS3Object() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FinalizeS3Object", reflect.TypeOf((*MockS3ObjectHandler)(nil).FinalizeS3Object))
 }
 
 // Wait mocks base method.

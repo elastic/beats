@@ -15,31 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package udp
+package add_formatted_index
 
 import (
-	"time"
+	"errors"
 
-	"github.com/dustin/go-humanize"
-
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
 
-var defaultConfig = config{
-	ForwarderConfig: harvester.ForwarderConfig{
-		Type: "udp",
-	},
-	Config: udp.Config{
-		MaxMessageSize: 10 * humanize.KiByte,
-		// TODO: What should be default port?
-		Host: "localhost:8080",
-		// TODO: What should be the default timeout?
-		Timeout: time.Minute * 5,
-	},
+// configuration for AddFormattedIndex processor.
+type config struct {
+	Index *fmtstr.TimestampFormatString `config:"index"` // Index formatted string value
 }
 
-type config struct {
-	udp.Config                `config:",inline"`
-	harvester.ForwarderConfig `config:",inline"`
+// Validate ensures that the configuration is valid.
+func (c *config) Validate() error {
+	// Validate type of ID generator
+	if c.Index == nil {
+		return errors.New("index field is required")
+	}
+
+	return nil
 }
