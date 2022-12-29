@@ -36,6 +36,8 @@ import (
 )
 
 func init() {
+	logp.L().Named(processorName).Infof("add_host_metadata %s init", processorName)
+	logp.L().Infof("add_host_metadata %s init", processorName)
 	processors.RegisterPlugin("add_host_metadata", New)
 	jsprocessor.RegisterPlugin("AddHostMetadata", New)
 }
@@ -57,20 +59,23 @@ const (
 
 // New constructs a new add_host_metadata processor.
 func New(cfg *config.C) (processors.Processor, error) {
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
+	defautcfg := defaultConfig()
+	if err := cfg.Unpack(&defautcfg); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
 	p := &addHostMetadata{
-		config: config,
+		config: defautcfg,
 		data:   mapstr.NewPointer(nil),
 		logger: logp.NewLogger("add_host_metadata"),
 	}
-	p.loadData()
+	err := p.loadData()
+	if err != nil {
+		return nil, fmt.Errorf("coul not load metadata: %w", err)
+	}
 
-	if config.Geo != nil {
-		geoFields, err := util.GeoConfigToMap(*config.Geo)
+	if defautcfg.Geo != nil {
+		geoFields, err := util.GeoConfigToMap(*defautcfg.Geo)
 		if err != nil {
 			return nil, err
 		}
@@ -83,13 +88,16 @@ func New(cfg *config.C) (processors.Processor, error) {
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// check replace_host_fields field
+	p.logger.Info("add_host_metadata Run")
+	logp.L().Info("add_host_metadata Run")
 	if !p.config.ReplaceFields && skipAddingHostMetadata(event) {
+		p.logger.Infof("skipping addHostMetadata: config.ReplaceFields: %v, skipAddingHostMetadata: %v", p.config.ReplaceFields, skipAddingHostMetadata(event))
 		return event, nil
 	}
 
 	err := p.loadData()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not load data to enrich event: %w", err)
 	}
 
 	event.Fields.DeepUpdate(p.data.Get().Clone())
@@ -116,7 +124,12 @@ func (p *addHostMetadata) expired() bool {
 }
 
 func (p *addHostMetadata) loadData() error {
+	fmt.Println("loadData invoked")
+	p.logger.Infof("loadData invoked")
+
 	if !p.expired() {
+		fmt.Printf("addHostMetadata is not expired, exiting: p.expired: %v\n", p.expired)
+		p.logger.Infof("addHostMetadata is not expired, exiting: p.expired: %v", p.expired)
 		return nil
 	}
 
@@ -134,15 +147,24 @@ func (p *addHostMetadata) loadData() error {
 		}
 
 		if len(ipList) > 0 {
-			data.Put("host.ip", ipList)
+			if _, err := data.Put("host.ip", ipList); err != nil {
+				p.logger.Warnf("failed to add 'host.ip':%v", err)
+			}
 		}
 		if len(hwList) > 0 {
-			data.Put("host.mac", hwList)
+			if _, err := data.Put("host.mac", hwList); err != nil {
+				p.logger.Warnf("failed to add 'host.mac':%v", err)
+			}
 		}
 	}
 
 	if p.config.Name != "" {
-		data.Put("host.name", p.config.Name)
+		if _, err := data.Put("host.name", p.config.Name); err != nil {
+			p.logger.Warnf("failed to add 'host.name':%v", err)
+		}
+		if _, err := data.Put("host.hostname", p.config.Name); err != nil {
+			p.logger.Warnf("failed to add 'host.hostname':%v", err)
+		}
 	}
 	p.data.Set(data)
 	return nil

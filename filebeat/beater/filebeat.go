@@ -55,10 +55,9 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
-const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
-	" modules because the Elasticsearch output is not configured/enabled." +
-	" The configured/enabled output is %q. If you have already loaded the ingest" +
-	" pipelines or are using Logstash pipelines, you can ignore this warning."
+const pipelinesWarning = "ingest pipelines disabled as configured/enabled output is %q. " +
+	"Only Elasticsearch output supports them. If you have already loaded the " +
+	"ingest pipelines or are using Logstash pipelines, you can ignore this warning."
 
 var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 
@@ -162,6 +161,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
 		logp.Info(fmt.Sprintf(pipelinesWarning, b.Config.Output.Name()))
+		logp.Info("b.Config.Output keys: %v", b.Config.Output.Config().FlattenedKeys())
 		return nil
 	}
 
@@ -199,7 +199,8 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		logp.Warn(pipelinesWarning)
+		logp.Info(fmt.Sprintf(pipelinesWarning, b.Config.Output.Name()))
+		logp.Info("b.Config.Output keys: %v", b.Config.Output.Config().FlattenedKeys())
 		return nil
 	}
 
@@ -284,10 +285,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Create a ES connection factory for dynamic modules pipeline loading
 	var pipelineLoaderFactory fileset.PipelineLoaderFactory
-	if b.Config.Output.Name() == "elasticsearch" {
+	if b.Config.Output.Name() == "elasticsearch" || b.Config.Output.Name() == "" {
 		pipelineLoaderFactory = newPipelineLoaderFactory(b.Config.Output.Config())
 	} else {
 		logp.Info(fmt.Sprintf(pipelinesWarning, b.Config.Output.Name()))
+		logp.Info("b.Config.Output keys: %v", b.Config.Output.Config().FlattenedKeys())
 	}
 
 	inputsLogger := logp.NewLogger("input")

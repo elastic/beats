@@ -36,7 +36,7 @@ import (
 // builder orders and merges global and local (per client) event annotation
 // settings, with the configured event processors into one common event
 // processor for use with the publisher pipeline.
-// Also See: (*builder).Create
+// Also See: *builder.Create
 type builder struct {
 	info beat.Info
 	log  *logp.Logger

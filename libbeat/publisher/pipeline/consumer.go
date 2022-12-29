@@ -155,7 +155,7 @@ outerLoop:
 			// Successfully sent a batch to the output workers
 			if len(retryBatches) > 0 {
 				// This was a retry, report it to the observer
-				c.observer.eventsRetry(len(active.Events()))
+				c.observer.eventsRetry(len(active.Events())) // the logs are here
 				retryBatches = retryBatches[1:]
 			} else {
 				// This was directly from the queue, clear the value so we can

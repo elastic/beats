@@ -84,7 +84,7 @@ type Beat struct {
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
 	// output/publishing related configurations
-	Output config.Namespace `config:"output"`
+	Output config.Namespace `config:"outputs"` // this seems to be the issue. But right now it seems that somehow it works when loading the config, but later on Output is empty again
 }
 
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader

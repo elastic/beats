@@ -190,6 +190,7 @@ func (procs *Processors) Close() error {
 func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
 	var err error
 	for _, p := range procs.List {
+		procs.log.Infof("running processor: %s", p.String())
 		event, err = p.Run(event)
 		if err != nil {
 			return event, errors.Wrapf(err, "failed applying processor %v", p)
@@ -202,7 +203,7 @@ func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (procs Processors) String() string {
+func (procs *Processors) String() string {
 	var s []string
 	for _, p := range procs.List {
 		s = append(s, p.String())

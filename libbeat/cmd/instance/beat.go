@@ -78,9 +78,9 @@ import (
 	libversion "github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
-	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -479,7 +479,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	logp.Info("%s start running.", b.Info.Beat)
+	logp.Info("%s start running. 12", b.Info.Beat)
 
 	// Allow the manager to stop a currently running beats out of bound.
 	b.Manager.SetStopCallback(beater.Stop)
@@ -664,7 +664,6 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
-
 	if err := initPaths(cfg); err != nil {
 		return err
 	}
@@ -701,8 +700,31 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
-
 	b.Beat.Config = &b.Config.BeatConfig
+
+	// if b.Beat.Config.Output.Name() == "" {
+	// 	return errors.New("b.Beat.Config.Output cannot be emoty")
+	// }
+	// if b.Config.BeatConfig.Output.Name() == "" {
+	// 	return errors.New("b.Config.BeatConfig.Output cannot be emoty")
+	// }
+
+	// c, err := cfg.Child("outputs", -1)
+	// if err != nil {
+	// 	logp.Err("cfg keys: %v", cfg.FlattenedKeys())
+	// 	return fmt.Errorf("error getting 'outputs' from config: %w", err)
+	// }
+	//
+	// logp.Info("cfg keys: %v", cfg.FlattenedKeys())
+	// outs := config.Namespace{}
+	// err = c.Unpack(&outs)
+	// if err != nil {
+	// 	return fmt.Errorf("error unpacking 'outputs' config data. Available keys: %v: %w",
+	// 		c.FlattenedKeys(), err)
+	// }
+	//
+	// b.Beat.Config = &beat.BeatConfig{Output: outs}
+	// b.Config.Output = outs
 
 	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
@@ -716,6 +738,8 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
+	// WARNING: it seems the agent isn't collecting logs before this line
+
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
@@ -725,7 +749,26 @@ func (b *Beat) configure(settings Settings) error {
 		return err
 	}
 
-	logp.Info("Beat ID: %v", b.Info.ID)
+	// is it possible the agent is losing this logs
+	logp.Info("Beat ID 11: %v", b.Info.ID)
+
+	logp.Info("===============================================")
+
+	logp.Info("b.Beat.Config.Output.Name(): %s",
+		b.Beat.Config.Output.Name())
+	logp.Info("b.Config.Output: %s",
+		b.Config.Output.Name())
+
+	logp.Info("cfg keys: %v", cfg.FlattenedKeys())
+
+	c, err := cfg.Child("outputs", -1)
+	if err != nil {
+		logp.Err("cfg keys: %v", cfg.FlattenedKeys())
+		return fmt.Errorf("error getting 'outputs' from config: %w", err)
+	}
+	logp.Info("truing to extract 'outputs` from cfg: %v", c.FlattenedKeys())
+
+	logp.Info("===============================================")
 
 	// initialize config manager
 	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
@@ -1101,10 +1144,14 @@ func logSystemInfo(info beat.Info) {
 	log.Infow("Build info", "build", build)
 
 	// Go Runtime
-	log.Infow("Go runtime info", "go", sysinfo.Go())
+	log.Infow("Go runtime info", "go", sysinfo.Go()) // TODO: fix it, it is NOT being logged
 
 	// Host
-	if host, err := sysinfo.Host(); err == nil {
+	host, err := sysinfo.Host()
+	if err != nil {
+		log.Errorf("failed to get host info: %v", err)
+	}
+	if err == nil {
 		log.Infow("Host info", "host", host.Info())
 	}
 

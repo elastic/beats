@@ -33,7 +33,7 @@ var registry = processors.NewNamespace()
 
 // RegisterPlugin registeres processor plugins for the javascript processor.
 func RegisterPlugin(name string, c processors.Constructor) {
-	logp.L().Named("javascript").Debugf("Register script processor %s", name)
+	logp.L().Named("javascript").Infof("Register script processor %s", name)
 
 	err := registry.Register(name, c)
 	if err != nil {
@@ -95,21 +95,20 @@ func newConstructor(
 // Require registers the processor module that exposes constructors for beat
 // processors from javascript.
 //
-//    // javascript
-//    var processor = require('processor');
+//	// javascript
+//	var processor = require('processor');
 //
-//    // Construct a single processor.
-//    var chopLog = new processor.Dissect({tokenizer: "%{key}: %{value}"});
+//	// Construct a single processor.
+//	var chopLog = new processor.Dissect({tokenizer: "%{key}: %{value}"});
 //
-//    // Construct/compose a processor chain.
-//    var mutateLog = new processor.Chain()
-//        .Add(chopLog)
-//        .AddProcessMetadata({match_pids: [process.pid]})
-//        .Add(function(evt) {
-//            evt.Put("hello", "world");
-//        })
-//        .Build();
-//
+//	// Construct/compose a processor chain.
+//	var mutateLog = new processor.Chain()
+//	    .Add(chopLog)
+//	    .AddProcessMetadata({match_pids: [process.pid]})
+//	    .Add(function(evt) {
+//	        evt.Put("hello", "world");
+//	    })
+//	    .Build();
 func Require(runtime *goja.Runtime, module *goja.Object) {
 	o := module.Get("exports").(*goja.Object)
 
