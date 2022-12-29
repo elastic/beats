@@ -56,9 +56,9 @@ import (
 )
 
 const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
-	" modules because the Elasticsearch output is not configured/enabled. If you have" +
-	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
-	" can ignore this warning."
+	" modules because the Elasticsearch output is not configured/enabled." +
+	" The configured/enabled output is %q. If you have already loaded the ingest" +
+	" pipelines or are using Logstash pipelines, you can ignore this warning."
 
 var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 
@@ -161,7 +161,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		logp.Warn(pipelinesWarning)
+		logp.Info(fmt.Sprintf(pipelinesWarning, b.Config.Output.Name()))
 		return nil
 	}
 
@@ -287,7 +287,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if b.Config.Output.Name() == "elasticsearch" {
 		pipelineLoaderFactory = newPipelineLoaderFactory(b.Config.Output.Config())
 	} else {
-		logp.Warn(pipelinesWarning)
+		logp.Info(fmt.Sprintf(pipelinesWarning, b.Config.Output.Name()))
 	}
 
 	inputsLogger := logp.NewLogger("input")
