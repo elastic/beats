@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
 - Fix handling of empty array in httpjson input. {pull}32001[32001]
 - Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
+- [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
 
 *Heartbeat*
 
