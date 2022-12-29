@@ -93,7 +93,7 @@ func LoadWithSettings(
 		log.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	name := beatInfo.Name
+	name := beatInfo.Beat
 
 	queueBuilder, err := createQueueBuilder(config.Queue, monitors, settings.InputQueueSize)
 	if err != nil {
