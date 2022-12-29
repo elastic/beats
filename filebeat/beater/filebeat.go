@@ -285,7 +285,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Create a ES connection factory for dynamic modules pipeline loading
 	var pipelineLoaderFactory fileset.PipelineLoaderFactory
-	if b.Config.Output.Name() == "elasticsearch" || b.Config.Output.Name() == "" {
+	if b.Config.Output.Name() == "elasticsearch" {
 		pipelineLoaderFactory = newPipelineLoaderFactory(b.Config.Output.Config())
 	} else {
 		logp.Info(fmt.Sprintf(pipelinesWarning, b.Config.Output.Name()))

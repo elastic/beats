@@ -479,7 +479,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	logp.Info("%s start running. 12", b.Info.Beat)
+	logp.Info("%s start running. 15", b.Info.Beat)
 
 	// Allow the manager to stop a currently running beats out of bound.
 	b.Manager.SetStopCallback(beater.Stop)
