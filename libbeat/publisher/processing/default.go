@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// builder is used to create the event processing pipeline in Beats.  The
+// builder is used to create the event processing pipeline in Beats. The
 // builder orders and merges global and local (per client) event annotation
 // settings, with the configured event processors into one common event
 // processor for use with the publisher pipeline.

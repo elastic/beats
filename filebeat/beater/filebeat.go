@@ -173,15 +173,15 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 		}
 
 		// When running the subcommand setup, configuration from modules.d directories
-		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
+		// have to be loaded using cfg.Reloader. Otherwise, those configurations are skipped.
 		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
 		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
 		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, enableAllFilesets)
 		if fb.config.ConfigModules.Enabled() {
 			if enableAllFilesets {
-				//All module configs need to be loaded to enable all the filesets
-				//contained in the modules.  The default glob just loads the enabled
-				//ones.  Switching the glob pattern from *.yml to * achieves this.
+				// All module configs need to be loaded to enable all the filesets
+				// contained in the modules.  The default glob just loads the enabled
+				// ones.  Switching the glob pattern from *.yml to * achieves this.
 				origPath, _ := fb.config.ConfigModules.String("path", -1)
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)

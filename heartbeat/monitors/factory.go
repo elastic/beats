@@ -246,7 +246,8 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 
 var geoErrOnce = &sync.Once{}
 
-// preProcessors sets up the required geo, event.dataset, data_stream.*, and write index processors for future event publishes.
+// preProcessors sets up the required geo, event.dataset, data_stream.*
+// and write index processors for future event publishes.
 func preProcessors(info beat.Info, location *config.LocationWithID, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
 	procs = processors.NewList(nil)
 

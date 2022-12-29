@@ -553,19 +553,20 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 	}())
 }
 
-//SetupSettings holds settings necessary for beat setup
+// SetupSettings holds settings necessary for beat setup
 type SetupSettings struct {
 	Dashboard       bool
 	Pipeline        bool
 	IndexManagement bool
-	//Deprecated: use IndexManagementKey instead
+	// Deprecated: use IndexManagementKey instead
 	Template bool
-	//Deprecated: use IndexManagementKey instead
+	// Deprecated: use IndexManagementKey instead
 	ILMPolicy         bool
 	EnableAllFilesets bool
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
+//
 //nolint:forbidigo // required to give feedback to user
 func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) error {
 	return handleError(func() error {
@@ -1055,7 +1056,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 }
 
 // handleError handles the given error by logging it and then returning the
-// error. If the err is nil or is a GracefulExit error then the method will
+// error. If err is nil or is a GracefulExit error then the method will
 // return nil without logging anything.
 func handleError(err error) error {
 	if err == nil || err == beat.GracefulExit { //nolint:errorlint // keep old behaviour

@@ -39,9 +39,9 @@ type Creator func(*Beat, *config.C) (Beater, error)
 //
 // The Stop() method is invoked the first time (and only the first time) a
 // shutdown signal is received. The Stop()-method normally will stop the Run()-loop,
-// such that the beat can gracefully shutdown.
+// such that the beat can gracefully shut down.
 type Beater interface {
-	// The main event loop. This method should block until signalled to stop by an
+	// Run runs the main event loop. This method should block until signalled to stop by an
 	// invocation of the Stop() method.
 	Run(b *Beat) error
 
