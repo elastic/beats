@@ -85,10 +85,13 @@ func New(config PluginConfig) (*Processors, error) {
 		}
 
 		if len(procConfig.GetFields()) != 1 {
+			c := make(map[string]interface{})
+			procConfig.Unpack(&c)
 			return nil, errors.Errorf("each processor must have exactly one "+
-				"action, but found %d actions (%v)",
+				"action, but found %d actions (%v)(%v)",
 				len(procConfig.GetFields()),
-				strings.Join(procConfig.GetFields(), ","))
+				strings.Join(procConfig.GetFields(), ","),
+				c)
 		}
 
 		actionName := procConfig.GetFields()[0]

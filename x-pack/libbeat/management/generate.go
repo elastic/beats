@@ -67,7 +67,7 @@ func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
 // that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
-func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo) ([]map[string]interface{}, error) {
+func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
 	// should this be an error?
 	if raw.GetStreams() == nil {
 		return []map[string]interface{}{}, nil
@@ -94,7 +94,7 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 		}
 
 		// 3. stream processors
-		streamSource, err = injectStreamProcessors(raw, inputType, stream, streamSource)
+		streamSource, err = injectStreamProcessors(raw, inputType, stream, streamSource, defaultProcessors)
 		if err != nil {
 			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
 		}
@@ -181,7 +181,7 @@ func injectIndexStream(dataStreamType string, expected *proto.UnitExpectedConfig
 
 //injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
 // this adds a variety of processors for metadata related to the dataset and input config.
-func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}) (map[string]interface{}, error) {
+func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}, defaultProcessors []mapstr.M) (map[string]interface{}, error) {
 	//1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
 	procInputType, procInputDataset, procInputNamespace := metadataFromDatastreamValues(dataStreamType, expected, streamExpected)
@@ -210,6 +210,13 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType s
 	if streamID := streamExpected.GetId(); streamID != "" {
 		sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
 		processors = append(processors, sourceStream)
+	}
+
+	for _, p := range defaultProcessors {
+		if len(p) == 0 {
+			continue
+		}
+		processors = append(processors, p)
 	}
 
 	// prepend with existing processors
