@@ -188,6 +188,13 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType s
 
 	var processors = []interface{}{}
 
+	for _, p := range defaultProcessors {
+		if len(p) == 0 {
+			continue
+		}
+		processors = append(processors, p)
+	}
+
 	// In V1, AST injects input_id at the input level and not the stream level,
 	// for reasons I can't understand, as it just ends up shuffling it around
 	// to individual metricsets anyway, at least on metricbeat
@@ -210,13 +217,6 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType s
 	if streamID := streamExpected.GetId(); streamID != "" {
 		sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
 		processors = append(processors, sourceStream)
-	}
-
-	for _, p := range defaultProcessors {
-		if len(p) == 0 {
-			continue
-		}
-		processors = append(processors, p)
 	}
 
 	// prepend with existing processors
