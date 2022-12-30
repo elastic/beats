@@ -104,7 +104,7 @@ func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
 		jobs := s.createJobs(objects, s.log)
 
 		// If previous checkpoint was saved then look up starting point for new jobs
-		if s.state.checkpoint().LatestEntryTime != nil {
+		if !s.state.checkpoint().LatestEntryTime.IsZero() {
 			jobs = s.moveToLastSeenJob(jobs)
 			if len(s.state.checkpoint().FailedJobs) > 0 {
 				jobs = s.addFailedJobs(ctxWithTimeout, jobs)
@@ -177,7 +177,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 
 	for _, job := range jobs {
 		switch {
-		case job.Timestamp().After(*s.state.checkpoint().LatestEntryTime):
+		case job.Timestamp().After(s.state.checkpoint().LatestEntryTime):
 			latestJobs = append(latestJobs, job)
 		case job.Name() == s.state.checkpoint().ObjectName:
 			flag = true

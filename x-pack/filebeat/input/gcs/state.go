@@ -27,22 +27,31 @@ type Checkpoint struct {
 	// name of the latest blob in alphabetical order
 	ObjectName string
 	// timestamp to denote which is the latest blob
-	LatestEntryTime *time.Time
+	LatestEntryTime time.Time
 	// list of failed jobs due to unexpected errors/download errors
 	FailedJobs map[string]int
+	// map to contain root type information for json objects
+	IsRootArray map[string]bool
+	// map to contain offset data
+	// if isRootArray == true for object, then PartiallyProcessed will treat offset as an array index
+	PartiallyProcessed map[string]int64
 }
 
 func newState() *state {
 	return &state{
 		cp: &Checkpoint{
-			FailedJobs: make(map[string]int),
+			FailedJobs:         make(map[string]int),
+			PartiallyProcessed: make(map[string]int64),
+			IsRootArray:        make(map[string]bool),
 		},
 	}
 }
 
 // save, saves/updates the current state for cursor checkpoint
-func (s *state) save(name string, lastModifiedOn *time.Time) {
+func (s *state) save(name string, lastModifiedOn time.Time) {
 	s.mu.Lock()
+	delete(s.cp.PartiallyProcessed, name)
+	delete(s.cp.IsRootArray, name)
 	if _, ok := s.cp.FailedJobs[name]; !ok {
 		if len(s.cp.ObjectName) == 0 {
 			s.cp.ObjectName = name
@@ -50,15 +59,27 @@ func (s *state) save(name string, lastModifiedOn *time.Time) {
 			s.cp.ObjectName = name
 		}
 
-		if s.cp.LatestEntryTime == nil {
+		if s.cp.LatestEntryTime.IsZero() {
 			s.cp.LatestEntryTime = lastModifiedOn
-		} else if lastModifiedOn.After(*s.cp.LatestEntryTime) {
+		} else if lastModifiedOn.After(s.cp.LatestEntryTime) {
 			s.cp.LatestEntryTime = lastModifiedOn
 		}
 	} else {
 		// clear entry if this is a failed job
 		delete(s.cp.FailedJobs, name)
 	}
+	s.mu.Unlock()
+}
+
+// setRootArray, sets boolean true for objects that have their roots defined as an array type
+func (s *state) setRootArray(name string) {
+	s.cp.IsRootArray[name] = true
+}
+
+// savePartial, partially saves/updates the current state for cursor checkpoint
+func (s *state) savePartial(name string, offset int64) {
+	s.mu.Lock()
+	s.cp.PartiallyProcessed[name] = offset
 	s.mu.Unlock()
 }
 
