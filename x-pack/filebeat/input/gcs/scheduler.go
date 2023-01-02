@@ -176,7 +176,10 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	ignore := false
 
 	for _, job := range jobs {
-		switch {
+		switch offset, isPartial := s.state.cp.PartiallyProcessed[job.object.Name]; {
+		case isPartial:
+			job.offset = offset
+			latestJobs = append(latestJobs, job)
 		case job.Timestamp().After(s.state.checkpoint().LatestEntryTime):
 			latestJobs = append(latestJobs, job)
 		case job.Name() == s.state.checkpoint().ObjectName:
@@ -198,7 +201,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 
 	// in a senario where there are some jobs which have a later time stamp
 	// but lesser lexicographic order and some jobs have greater lexicographic order
-	// than the current checkpoint
+	// than the current checkpoint or if partially completed jobs are present
 	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
 		jobsToReturn = append(latestJobs, jobsToReturn...)
 	}

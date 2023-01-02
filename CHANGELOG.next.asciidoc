@@ -51,6 +51,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for 
+   automatic splitting at root level, if root level element is an array. {pull}33981[33981]
 - [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
 - Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
 - Fix handling of error in states in direct aws-s3 listing input {issue}33513[33513] {pull}33722[33722]

@@ -89,6 +89,10 @@ func (s *state) savePartial(name string, offset int64) {
 // A failed job will be re-tried a maximum of 3 times after which the
 // entry is removed from the map
 func (s *state) updateFailedJobs(jobName string) {
+	// we do not store partially processed jobs as failed jobs
+	if _, ok := s.cp.PartiallyProcessed[jobName]; ok {
+		return
+	}
 	s.mu.Lock()
 	s.cp.FailedJobs[jobName]++
 	if s.cp.FailedJobs[jobName] > maxFailedJobRetries {

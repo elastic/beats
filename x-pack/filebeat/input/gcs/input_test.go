@@ -27,8 +27,13 @@ import (
 )
 
 const (
-	bucketGcsTestNew    = "gcs-test-new"
-	bucketGcsTestLatest = "gcs-test-latest"
+	bucketGcsTestNew         = "gcs-test-new"
+	bucketGcsTestLatest      = "gcs-test-latest"
+	beatsMultilineJSONBucket = "beatsmultilinejsonbucket"
+	beatsJSONBucket          = "beatsjsonbucket"
+	beatsNdJSONBucket        = "beatsndjsonbucket"
+	beatsGzJSONBucket        = "beatsgzjsonbucket"
+	beatsJSONWithArrayBucket = "beatsjsonwitharraybucket"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -42,14 +47,13 @@ func Test_StorageClient(t *testing.T) {
 		unexpectedError error
 	}{
 		{
-			name: "Test1_SingleBucketWithPoll_NoErr",
+			name: "SingleBucketWithPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": "gcs-test-new",
@@ -65,14 +69,13 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: context.Canceled,
 		},
 		{
-			name: "Test2_SingleBucketWithoutPoll_NoErr",
+			name: "SingleBucketWithoutPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       false,
 				"poll_interval":              "10s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": bucketGcsTestNew,
@@ -88,14 +91,13 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test3_TwoBucketsWithPoll_NoErr",
+			name: "TwoBucketsWithPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": bucketGcsTestNew,
@@ -116,14 +118,13 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: context.Canceled,
 		},
 		{
-			name: "Test4_TwoBucketsWithoutPoll_NoErr",
+			name: "TwoBucketsWithoutPoll_NoErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       false,
 				"poll_interval":              "10s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": bucketGcsTestNew,
@@ -144,14 +145,13 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test5_SingleBucketWithPoll_InvalidBucketErr",
+			name: "SingleBucketWithPoll_InvalidBucketErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": "gcs-test",
@@ -164,14 +164,13 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test6_SingleBucketWithoutPoll_InvalidBucketErr",
+			name: "SingleBucketWithoutPoll_InvalidBucketErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       false,
 				"poll_interval":              "5s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": "gcs-test",
@@ -184,14 +183,13 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test7_TwoBucketsWithPoll_InvalidBucketErr",
+			name: "TwoBucketsWithPoll_InvalidBucketErr",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                2,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": "gcs-test",
@@ -207,14 +205,13 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test8_SingleBucketWithPoll_InvalidConfigValue",
+			name: "SingleBucketWithPoll_InvalidConfigValue",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                5100,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": "gcs-test",
@@ -227,14 +224,13 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test9_TwoBucketWithPoll_InvalidConfigValue",
+			name: "TwoBucketWithPoll_InvalidConfigValue",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
 				"max_workers":                5100,
 				"poll":                       true,
 				"poll_interval":              "5s",
-				"parse_json":                 false,
 				"buckets": []map[string]interface{}{
 					{
 						"name": "gcs-test",
@@ -250,7 +246,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: nil,
 		},
 		{
-			name: "Test10_SingleBucketWithPoll_parseJSON",
+			name: "SingleBucketWithPoll_parseJSON",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
@@ -269,6 +265,114 @@ func Test_StorageClient(t *testing.T) {
 			expected: map[string]bool{
 				mock.Gcs_test_latest_object_ata_json_parsed:   true,
 				mock.Gcs_test_latest_object_data3_json_parsed: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadJSON",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name": beatsJSONBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_log_json[0]: true,
+				mock.BeatsFilesBucket_log_json[1]: true,
+				mock.BeatsFilesBucket_log_json[2]: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadOctetStreamJSON",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name": beatsMultilineJSONBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_multiline_json[0]: true,
+				mock.BeatsFilesBucket_multiline_json[1]: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadNdJSON",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name": beatsNdJSONBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_log_ndjson[0]: true,
+				mock.BeatsFilesBucket_log_ndjson[1]: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadMultilineGzJSON",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name": beatsGzJSONBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_multiline_json_gz[0]: true,
+				mock.BeatsFilesBucket_multiline_json_gz[1]: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadJSONWithRootAsArray",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"buckets": []map[string]interface{}{
+					{
+						"name": beatsJSONWithArrayBucket,
+					},
+				},
+			},
+			mockHandler: mock.GCSFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesBucket_json_array[0]: true,
+				mock.BeatsFilesBucket_json_array[1]: true,
+				mock.BeatsFilesBucket_json_array[2]: true,
+				mock.BeatsFilesBucket_json_array[3]: true,
 			},
 			unexpectedError: context.Canceled,
 		},
@@ -311,9 +415,9 @@ func Test_StorageClient(t *testing.T) {
 
 			var timeout *time.Timer
 			if conf.PollInterval != nil {
-				timeout = time.NewTimer(1*time.Second + *conf.PollInterval)
+				timeout = time.NewTimer(1000*time.Second + *conf.PollInterval)
 			} else {
-				timeout = time.NewTimer(5 * time.Second)
+				timeout = time.NewTimer(5000 * time.Second)
 			}
 			t.Cleanup(func() { _ = timeout.Stop() })
 

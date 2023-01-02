@@ -80,6 +80,7 @@ func (j *job) do(ctx context.Context, id string) {
 		}
 		err := j.processAndPublishData(ctx, id)
 		if err != nil {
+			j.state.updateFailedJobs(j.object.Name)
 			j.log.Errorf(jobErrString, id, err)
 			return
 		}
