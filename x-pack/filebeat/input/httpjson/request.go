@@ -667,7 +667,12 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 		n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
 	}
 
-	defer httpResp.Body.Close()
+	defer func() {
+		if httpResp != nil && httpResp.Body != nil {
+			httpResp.Body.Close()
+		}
+	}()
+
 	return n, nil
 }
 
