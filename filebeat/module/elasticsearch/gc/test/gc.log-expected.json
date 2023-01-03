@@ -4,6 +4,7 @@
         "elasticsearch.gc.tags": [
             "gc"
         ],
+        "elasticsearch.gc.level": "info",
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
         "event.kind": "metric",
