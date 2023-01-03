@@ -32,6 +32,8 @@ import (
 	"gopkg.in/yaml.v2"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -130,9 +132,7 @@ file_selectors:
 }
 
 func createInput(t *testing.T, cfg *conf.C) *s3Input {
-	s3InputManager := Plugin(openTestStatestore()).Manager.(*s3InputManager)
-	inputV2, err := s3InputManager.CreateWithoutClosingMetrics(cfg)
-
+	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -159,7 +159,7 @@ func TestInputRunSQS(t *testing.T) {
 	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURL)
 
 	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
+	monitoring.GetNamespace("inputs").GetRegistry().Remove(inputID)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
 		"testdata/events-array.json",
@@ -180,9 +180,18 @@ func TestInputRunSQS(t *testing.T) {
 		cancel()
 	})
 
+	client := pubtest.NewChanClient(0)
+	defer close(client.Channel)
+	go func() {
+		for event := range client.Channel {
+			// Fake the ACK handling that's not implemented in pubtest.
+			event.Private.(*awscommon.EventACKTracker).ACK()
+		}
+	}()
+
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := &fakePipeline{}
+		pipeline := pubtest.PublisherWithClient(client)
 		return s3Input.Run(inputCtx, pipeline)
 	})
 
@@ -191,7 +200,7 @@ func TestInputRunSQS(t *testing.T) {
 	}
 
 	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.GetNamespace("inputs").GetRegistry(),
 		monitoring.Full,
 		false))
 	t.Log(snap.StringToPrint())
@@ -213,7 +222,7 @@ func TestInputRunS3(t *testing.T) {
 	tfConfig := getTerraformOutputs(t)
 
 	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
+	monitoring.GetNamespace("inputs").GetRegistry().Remove(inputID)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
 		"testdata/events-array.json",
@@ -234,9 +243,18 @@ func TestInputRunS3(t *testing.T) {
 		cancel()
 	})
 
+	client := pubtest.NewChanClient(0)
+	defer close(client.Channel)
+	go func() {
+		for event := range client.Channel {
+			// Fake the ACK handling that's not implemented in pubtest.
+			event.Private.(*awscommon.EventACKTracker).ACK()
+		}
+	}()
+
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := &fakePipeline{}
+		pipeline := pubtest.PublisherWithClient(client)
 		return s3Input.Run(inputCtx, pipeline)
 	})
 
@@ -245,7 +263,7 @@ func TestInputRunS3(t *testing.T) {
 	}
 
 	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.GetNamespace("inputs").GetRegistry(),
 		monitoring.Full,
 		false))
 	t.Log(snap.StringToPrint())
@@ -420,7 +438,7 @@ func TestInputRunSNS(t *testing.T) {
 	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURLForSNS)
 
 	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
+	monitoring.GetNamespace("inputs").GetRegistry().Remove(inputID)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForSNS,
 		"testdata/events-array.json",
@@ -441,9 +459,17 @@ func TestInputRunSNS(t *testing.T) {
 		cancel()
 	})
 
+	client := pubtest.NewChanClient(0)
+	defer close(client.Channel)
+	go func() {
+		for event := range client.Channel {
+			event.Private.(*awscommon.EventACKTracker).ACK()
+		}
+	}()
+
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := &fakePipeline{}
+		pipeline := pubtest.PublisherWithClient(client)
 		return s3Input.Run(inputCtx, pipeline)
 	})
 
@@ -452,7 +478,7 @@ func TestInputRunSNS(t *testing.T) {
 	}
 
 	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.GetNamespace("inputs").GetRegistry(),
 		monitoring.Full,
 		false))
 	t.Log(snap.StringToPrint())
