@@ -9,6 +9,7 @@
 - [Process metrics](https://github.com/kubernetes/kubernetes/blob/master/vendor/github.com/prometheus/client_golang/prometheus/process_collector.go)
 - [Scheduler metrics](https://github.com/kubernetes/kubernetes/blob/master/pkg/scheduler/metrics/metrics.go)
 - [Rest client metrics](https://github.com/kubernetes/component-base/blob/master/metrics/prometheus/restclient/metrics.go)
+- [Workqueue metrics](https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/component-base/metrics/prometheus/workqueue/metrics.go)
 - [Metrics general information](https://kubernetes.io/docs/reference/instrumentation/metrics/)
 
 

@@ -8,9 +8,9 @@
 
 - [Process metrics](https://github.com/kubernetes/kubernetes/blob/master/vendor/github.com/prometheus/client_golang/prometheus/process_collector.go)
 - [Rest client metrics](https://github.com/kubernetes/component-base/blob/master/metrics/prometheus/restclient/metrics.go)
-- Other metrics gathered by each controller do not have a source file to reference but a set of source files that are gathered into a single metrics resource
+- [Node collector metrics](https://github.com/kubernetes/kubernetes/blob/master/pkg/controller/nodelifecycle/metrics.go)
+- [Workqueue metrics](https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/component-base/metrics/prometheus/workqueue/metrics.go)
 - [Metrics general information](https://kubernetes.io/docs/reference/instrumentation/metrics/)
-
 
 
 ## Metrics insight
