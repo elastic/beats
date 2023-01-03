@@ -102,6 +102,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 - Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
+- Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 
 *Packetbeat*
 

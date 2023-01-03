@@ -2390,7 +2390,7 @@
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "metricbeat-*",
             "name": "ff6afcdf-0de2-47fb-aa9e-72b48f11e0cd:metrics_ff6afcdf-0de2-47fb-aa9e-72b48f11e0cd_0_index_pattern",
             "type": "index-pattern"
         },
@@ -2405,7 +2405,7 @@
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "metricbeat-*",
             "name": "c3fee68f-01c6-49da-a759-2900b1cd15bf:metrics_c3fee68f-01c6-49da-a759-2900b1cd15bf_0_index_pattern",
             "type": "index-pattern"
         },
@@ -2430,7 +2430,7 @@
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "metricbeat-*",
             "name": "f8313a9d-ab58-448e-b183-75f914caf53f:metrics_f8313a9d-ab58-448e-b183-75f914caf53f_0_index_pattern",
             "type": "index-pattern"
         },
