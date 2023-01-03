@@ -50,7 +50,7 @@ func (c *cursor) update(trCtx *transformContext) {
 	}
 
 	for k, cfg := range c.cfg {
-		v, _ := cfg.Value.Execute(trCtx, transformable{}, cfg.Default, c.log)
+		v, _ := cfg.Value.Execute(trCtx, transformable{}, "", cfg.Default, c.log)
 		if v != "" || !cfg.mustIgnoreEmptyValue() {
 			_, _ = c.state.Put(k, v)
 			c.log.Debugf("cursor.%s stored with %s", k, v)

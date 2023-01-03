@@ -24,28 +24,40 @@ type Checkpoint struct {
 	// name of the latest blob in alphabetical order
 	BlobName string
 	// timestamp to denote which is the latest blob
-	LatestEntryTime *time.Time
+	LatestEntryTime time.Time
+	// map to contain offset data
+	PartiallyProcessed map[string]int64
 }
 
 func newState() *state {
 	return &state{
-		cp: &Checkpoint{},
+		cp: &Checkpoint{
+			PartiallyProcessed: make(map[string]int64),
+		},
 	}
 }
 
 // Save, saves/updates the current state for cursor checkpoint
-func (s *state) save(name string, lastModifiedOn *time.Time) {
+func (s *state) save(name string, lastModifiedOn time.Time) {
 	s.mu.Lock()
+	delete(s.cp.PartiallyProcessed, name)
 	if len(s.cp.BlobName) == 0 {
 		s.cp.BlobName = name
 	} else if strings.ToLower(name) > strings.ToLower(s.cp.BlobName) {
 		s.cp.BlobName = name
 	}
-	if s.cp.LatestEntryTime == nil {
+	if s.cp.LatestEntryTime.IsZero() {
 		s.cp.LatestEntryTime = lastModifiedOn
-	} else if lastModifiedOn.After(*s.cp.LatestEntryTime) {
+	} else if lastModifiedOn.After(s.cp.LatestEntryTime) {
 		s.cp.LatestEntryTime = lastModifiedOn
 	}
+	s.mu.Unlock()
+}
+
+// savePartial, partially saves/updates the current state for cursor checkpoint
+func (s *state) savePartial(name string, offset int64, lastModifiedOn *time.Time) {
+	s.mu.Lock()
+	s.cp.PartiallyProcessed[name] = offset
 	s.mu.Unlock()
 }
 

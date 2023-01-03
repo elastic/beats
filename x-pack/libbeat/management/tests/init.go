@@ -62,7 +62,7 @@ func fleetClientFactory(srv MockV2Handler) lbmanagement.PluginFunc {
 				return nil
 			}
 			return func(_ *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
-				return management.NewV2AgentManagerWithClient(c, registry, srv.Client)
+				return management.NewV2AgentManagerWithClient(c, registry, srv.Client, management.WithStopOnEmptyUnits)
 			}
 		}
 		return nil

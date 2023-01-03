@@ -529,10 +529,14 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 					waitUntil = t
 				}
 			}
-			fallthrough
-		default:
-			delete(state, "events")
 			return false, waitUntil, nil
+		default:
+			status := http.StatusText(statusCode)
+			if status == "" {
+				status = "unknown status code"
+			}
+			state["events"] = errorMessage(fmt.Sprintf("failed http request with %s: %d", status, statusCode))
+			return true, time.Time{}, nil
 		}
 	}
 	return true, waitUntil, nil
@@ -641,7 +645,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	if !wantClient(cfg) {
 		return nil, nil
 	}
-	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL)...)
+	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
@@ -692,7 +696,7 @@ func wantClient(cfg config) bool {
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(u *url.URL) []httpcommon.TransportOption {
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
 	switch {
@@ -701,7 +705,7 @@ func clientOptions(u *url.URL) []httpcommon.TransportOption {
 	case !ok:
 		return []httpcommon.TransportOption{
 			httpcommon.WithAPMHTTPInstrumentation(),
-			httpcommon.WithKeepaliveSettings{Disable: true},
+			keepalive,
 		}
 
 	// We set the host for the unix socket and Windows named
@@ -719,7 +723,7 @@ func clientOptions(u *url.URL) []httpcommon.TransportOption {
 	u.Scheme = scheme
 	return []httpcommon.TransportOption{
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
+		keepalive,
 		httpcommon.WithBaseDialer(dialer),
 	}
 }
@@ -849,27 +853,31 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 		err = e
 	}
 	if err != nil {
-		state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed eval: %v", err)}
+		state["events"] = errorMessage(fmt.Sprintf("failed eval: %v", err))
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
 	v, err := out.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
 	if err != nil {
-		state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed proto conversion: %v", err)}
+		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
 		return state, fmt.Errorf("failed proto conversion: %w", err)
 	}
 	b, err := protojson.MarshalOptions{Indent: ""}.Marshal(v.(proto.Message))
 	if err != nil {
-		state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed native conversion: %v", err)}
+		state["events"] = errorMessage(fmt.Sprintf("failed native conversion: %v", err))
 		return state, fmt.Errorf("failed native conversion: %w", err)
 	}
 	var res map[string]interface{}
 	err = json.Unmarshal(b, &res)
 	if err != nil {
-		state["events"] = map[string]interface{}{"error.message": fmt.Sprintf("failed json conversion: %v", err)}
+		state["events"] = errorMessage(fmt.Sprintf("failed json conversion: %v", err))
 		return state, fmt.Errorf("failed json conversion: %w", err)
 	}
 	return res, nil
+}
+
+func errorMessage(msg string) map[string]interface{} {
+	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.
