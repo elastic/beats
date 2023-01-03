@@ -438,6 +438,34 @@ In order to make AWS API calls, `aws-s3` input requires AWS credentials. Please
 see <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
+==== `backup_to_bucket_arn`
+
+The bucket ARN to backup processed files to. This will copy the processed file after it was fully read.
+When using the `non_aws_bucket_name`, please use `non_aws_backup_to_bucket_name` accordingly.
+
+Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
+
+[float]
+==== `backup_to_bucket_prefix`
+
+This prefix will be prepended to the object key when backing it up to another (or the same) bucket.
+
+[float]
+==== `non_aws_backup_to_bucket_name`
+
+The bucket name to backup processed files to. Use this parameter when not using AWS buckets. This will copy the processed file after it was fully read.
+When using the `bucket_arn`, please use `backup_to_bucket_arn` accordingly.
+
+Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
+
+[float]
+==== `delete_after_backup`
+
+Controls whether fully processed files will be deleted from the bucket.
+
+Can only be used together with the backup functionality.
+
+[float]
 === AWS Permissions
 
 Specific AWS permissions are required for IAM user to access SQS and S3
@@ -457,6 +485,16 @@ when using the polling list of S3 bucket objects:
 s3:GetObject
 s3:ListBucket
 s3:GetBucketLocation
+----
+
+In case `backup_to_bucket_arn` or `non_aws_backup_to_bucket_name` are set the following permission is required as well:
+----
+s3:PutObject
+----
+
+In case `delete_after_backup` is set the following permission is required as well:
+----
+s3:DeleteObject
 ----
 
 [float]
@@ -683,7 +721,7 @@ Will produce the following output:
 === Metrics
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
-These metrics are exposed under the `/dataset` path. They can be used to
+These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.
 
 [options="header"]

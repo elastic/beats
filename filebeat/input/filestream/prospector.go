@@ -267,11 +267,12 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 	} else {
 		// update file metadata as the path has changed
 		var meta fileMeta
-		err := s.FindCursorMeta(src, meta)
+		err := s.FindCursorMeta(src, &meta)
 		if err != nil {
-			log.Errorf("Error while getting cursor meta data of entry %s: %v", src.Name(), err)
-
 			meta.IdentifierName = p.identifier.Name()
+			log.Warnf("Error while getting cursor meta data of entry '%s': '%w'"+
+				", using prospector's identifier: '%s'",
+				src.Name(), err, meta.IdentifierName)
 		}
 		err = s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: meta.IdentifierName})
 		if err != nil {
