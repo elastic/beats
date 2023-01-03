@@ -43666,7 +43666,7 @@ type: long
 *`kubernetes.controllermanager.client.request.duration.us.count`*::
 +
 --
-Number of requests to API server, broken down by verb and host
+Number of request duration operations to API server, broken down by verb and host
 
 type: long
 
@@ -43808,6 +43808,15 @@ type: long
 +
 --
 Number of nodes, broken down by zone
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.node.collector.health.pct`*::
++
+--
+Percentage of healthy nodes, broken down by zone
 
 type: long
 
@@ -44674,7 +44683,7 @@ type: long
 *`kubernetes.proxy.client.request.duration.us.count`*::
 +
 --
-Number of requests to API server, broken down by verb and host
+Number of request duration operations to API server, broken down by verb and host
 
 type: long
 
@@ -44766,7 +44775,7 @@ type: long
 *`kubernetes.proxy.sync.rules.duration.us.count`*::
 +
 --
-Number of SyncProxyRules
+Number of SyncProxyRules latency operations
 
 type: long
 
@@ -44793,7 +44802,7 @@ type: long
 *`kubernetes.proxy.sync.networkprogramming.duration.us.count`*::
 +
 --
-Count of network programming latency
+Number of network programming latency operations
 
 type: long
 
@@ -44996,7 +45005,7 @@ type: long
 *`kubernetes.scheduler.client.request.duration.us.count`*::
 +
 --
-Number of requests to API server, broken down by verb and host
+Number of request duration operations to API server, broken down by verb and host
 
 type: long
 
@@ -45146,7 +45155,7 @@ type: long
 *`kubernetes.scheduler.scheduling.preemption.victims.count`*::
 +
 --
-Number of preemptions
+Number of preemption victims
 
 type: long
 
@@ -45182,7 +45191,7 @@ type: long
 *`kubernetes.scheduler.scheduling.attempts.duration.us.count`*::
 +
 --
-Number of attempts, broken down by profile and result
+Number of scheduling attempts, broken down by profile and result
 
 type: long
 

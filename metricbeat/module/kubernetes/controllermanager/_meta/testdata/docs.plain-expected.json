@@ -755,60 +755,6 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "node": {
-                    "collector": {
-                        "count": 1,
-                        "eviction": {
-                            "count": 0
-                        },
-                        "unhealthy": {
-                            "count": 0
-                        }
-                    }
-                },
-                "process": {
-                    "cpu": {
-                        "sec": 127
-                    },
-                    "fds": {
-                        "max": {
-                            "count": 1048576
-                        },
-                        "open": {
-                            "count": 42
-                        }
-                    },
-                    "memory": {
-                        "resident": {
-                            "bytes": 103018496
-                        },
-                        "virtual": {
-                            "bytes": 792305664
-                        }
-                    },
-                    "started": {
-                        "sec": 1671725506.1
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
                 "name": "statefulset",
                 "workqueue": {
                     "adds": {
@@ -1299,6 +1245,63 @@
                 "code": "200",
                 "host": "172.18.0.2:6443",
                 "method": "PUT"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "node": {
+                    "collector": {
+                        "count": 1,
+                        "eviction": {
+                            "count": 0
+                        },
+                        "health": {
+                            "pct": 100
+                        },
+                        "unhealthy": {
+                            "count": 0
+                        }
+                    }
+                },
+                "process": {
+                    "cpu": {
+                        "sec": 127
+                    },
+                    "fds": {
+                        "max": {
+                            "count": 1048576
+                        },
+                        "open": {
+                            "count": 42
+                        }
+                    },
+                    "memory": {
+                        "resident": {
+                            "bytes": 103018496
+                        },
+                        "virtual": {
+                            "bytes": 792305664
+                        }
+                    },
+                    "started": {
+                        "sec": 1671725506.1
+                    }
+                }
             }
         },
         "metricset": {

@@ -255,6 +255,60 @@
 		"RootFields": {},
 		"ModuleFields": null,
 		"MetricSetFields": {
+			"node": {
+				"collector": {
+					"count": 1,
+					"eviction": {
+						"count": 0
+					},
+					"health": {
+						"pct": 100
+					},
+					"unhealthy": {
+						"count": 0
+					}
+				}
+			},
+			"process": {
+				"cpu": {
+					"sec": 127
+				},
+				"fds": {
+					"max": {
+						"count": 1048576
+					},
+					"open": {
+						"count": 42
+					}
+				},
+				"memory": {
+					"resident": {
+						"bytes": 103018496
+					},
+					"virtual": {
+						"bytes": 792305664
+					}
+				},
+				"started": {
+					"sec": 1671725506.1
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": null,
+		"MetricSetFields": {
 			"name": "garbage_collector_graph_changes",
 			"workqueue": {
 				"adds": {
@@ -724,57 +778,6 @@
 				},
 				"unfinished": {
 					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"node": {
-				"collector": {
-					"count": 1,
-					"eviction": {
-						"count": 0
-					},
-					"unhealthy": {
-						"count": 0
-					}
-				}
-			},
-			"process": {
-				"cpu": {
-					"sec": 127
-				},
-				"fds": {
-					"max": {
-						"count": 1048576
-					},
-					"open": {
-						"count": 42
-					}
-				},
-				"memory": {
-					"resident": {
-						"bytes": 103018496
-					},
-					"virtual": {
-						"bytes": 792305664
-					}
-				},
-				"started": {
-					"sec": 1671725506.1
 				}
 			}
 		},

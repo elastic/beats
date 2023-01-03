@@ -78,7 +78,7 @@
           description: Sum of requests latency in microseconds, broken down by verb and host
         - name: request.duration.us.count
           type: long
-          description: Number of requests to API server, broken down by verb and host
+          description: Number of request duration operations to API server, broken down by verb and host
         - name: request.duration.us.bucket.*
           type: object
           object_type: long
@@ -138,7 +138,7 @@
           description: Preemption victims sum
         - name: preemption.victims.count
           type: long
-          description: Number of preemptions
+          description: Number of preemption victims
         - name: preemption.attempts.count
           type: long
           description: Total preemption attempts in the cluster so far
@@ -151,4 +151,4 @@
           description: Sum of scheduling attempt latency in microseconds, broken down by profile and result
         - name: attempts.duration.us.count
           type: long
-          description: Number of attempts, broken down by profile and result
+          description: Number of scheduling attempts, broken down by profile and result

@@ -62,7 +62,7 @@
           description: Sum of requests latency in microseconds, broken down by verb and host
         - name: request.duration.us.count
           type: long
-          description: Number of requests to API server, broken down by verb and host
+          description: Number of request duration operations to API server, broken down by verb and host
         - name: request.duration.us.bucket.*
           type: object
           object_type: long
@@ -119,6 +119,9 @@
         - name: count
           type: long
           description: Number of nodes, broken down by zone
+        - name: health.pct
+          type: long
+          description: Percentage of healthy nodes, broken down by zone
     - name: leader.is_master
       type: boolean
       description: >

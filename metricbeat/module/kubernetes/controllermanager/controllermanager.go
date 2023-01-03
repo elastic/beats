@@ -48,6 +48,7 @@ var mapping = &prometheus.MetricsMapping{
 
 		"node_collector_evictions_total":         prometheus.Metric("node.collector.eviction.count"),
 		"node_collector_unhealthy_nodes_in_zone": prometheus.Metric("node.collector.unhealthy.count"),
+		"node_collector_zone_health":             prometheus.Metric("node.collector.health.pct"),
 		"node_collector_zone_size":               prometheus.Metric("node.collector.count"),
 
 		"leader_election_master_status": prometheus.BooleanMetric("leader.is_master"),

@@ -54,7 +54,7 @@
           description: Sum of requests latency in microseconds, broken down by verb and host
         - name: request.duration.us.count
           type: long
-          description: Number of requests to API server, broken down by verb and host
+          description: Number of request duration operations to API server, broken down by verb and host
         - name: request.duration.us.bucket.*
           type: object
           object_type: long
@@ -91,7 +91,7 @@
           description: SyncProxyRules latency sum in microseconds
         - name: rules.duration.us.count
           type: long
-          description: Number of SyncProxyRules
+          description: Number of SyncProxyRules latency operations
         - name: rules.duration.us.bucket.*
           type: object
           object_type: long
@@ -101,7 +101,7 @@
           description: Sum of network programming latency in microseconds
         - name: networkprogramming.duration.us.count
           type: long
-          description: Count of network programming latency
+          description: Number of network programming latency operations
         - name: networkprogramming.duration.us.bucket.*
           type: object
           object_type: long
