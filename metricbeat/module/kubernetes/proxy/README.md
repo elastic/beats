@@ -2,13 +2,15 @@
 
 ## Version history
 
-- December 2022, `v1.19`
+- December 2022, `v1.25.x`
 
 ## Resources
 
-- https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/metrics/metrics.go
-- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/
-- https://kubernetes.io/docs/reference/instrumentation/metrics/
+- [Process metrics](https://github.com/kubernetes/kubernetes/blob/master/vendor/github.com/prometheus/client_golang/prometheus/process_collector.go)
+- [Proxy metrics](https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/metrics/metrics.go)
+- [Rest client metrics](https://github.com/kubernetes/component-base/blob/master/metrics/prometheus/restclient/metrics.go)
+- [Metrics general information](https://kubernetes.io/docs/reference/instrumentation/metrics/)
+
 
 ## Metrics insight
 

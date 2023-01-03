@@ -2,13 +2,19 @@
 
 ## Version history
 
-- June 2019, `v1.14.0`
+- December 2022, `v1.25.x`
 
 ## Resources
 
-https://github.com/kubernetes/kubernetes/blob/master/pkg/scheduler/metrics/metrics.go
+- [Process metrics](https://github.com/kubernetes/kubernetes/blob/master/vendor/github.com/prometheus/client_golang/prometheus/process_collector.go)
+- [Scheduler metrics](https://github.com/kubernetes/kubernetes/blob/master/pkg/scheduler/metrics/metrics.go)
+- [Rest client metrics](https://github.com/kubernetes/component-base/blob/master/metrics/prometheus/restclient/metrics.go)
+- [Metrics general information](https://kubernetes.io/docs/reference/instrumentation/metrics/)
+
 
 ## Metrics insight
+
+Metrics used are either stable (not explicit) or alpha (explicit).
 
 - process_cpu_seconds_total
 - process_resident_memory_bytes
@@ -33,20 +39,31 @@ https://github.com/kubernetes/kubernetes/blob/master/pkg/scheduler/metrics/metri
   - verb
 
 
-- leader_election_master_status (alpha)
+- workqueue_longest_running_processor_seconds (alpha)
+  - name
+- workqueue_unfinished_work_seconds (alpha)
+  - name
+- workqueue_adds_total (alpha)
+  - name
+- workqueue_depth (alpha)
+  - name
+- workqueue_retries_total (alpha)
+  - name
+- workqueue_work_duration_seconds (alpha)
   - name
 
 
-- scheduler_pending_pods (stable)
+- scheduler_pending_pods
   - queue
-- scheduler_preemption_victims (stable)
-- scheduler_preemption_attempts_total (stable)
-- scheduler_scheduling_attempt_duration_seconds (stable)
+- scheduler_preemption_victims
+- scheduler_preemption_attempts_total
+- scheduler_scheduling_attempt_duration_seconds
   - profile
   - result
-- scheduler_schedule_attempts_total (stable)
-  - profile
-  - result
+
+
+- leader_election_master_status (alpha)
+  - name
 
 ## Setup environment for manual tests
 

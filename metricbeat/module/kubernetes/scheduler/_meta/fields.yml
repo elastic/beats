@@ -36,6 +36,14 @@
       type: keyword
       description: >
         Attempt result to schedule pod
+    - name: name
+      type: keyword
+      description: >
+        Name for the resource
+    - name: leader.is_master
+      type: boolean
+      description: >
+        Whether the scheduler instance is leader
     - name: process
       type: group
       fields:
@@ -55,54 +63,72 @@
           description: Number of open file descriptors
         - name: fds.max.count
           type: long
-          description: Limit of open file descriptors
+          description: Limit for open file descriptors
         - name: started.sec
           type: double
-          description: Seconds since the process started
+          description: Start time of the process since unix epoch in seconds
     - name: client
       type: group
       fields:
         - name: request.count
           type: long
-          description: Number of HTTP requests
+          description: Number of HTTP requests to API server, broken down by status code, method and host
         - name: request.duration.us.sum
           type: long
-          description: Sum of requests latency in microseconds
+          description: Sum of requests latency in microseconds, broken down by verb and host
         - name: request.duration.us.count
           type: long
-          description: Number of requests
+          description: Number of requests to API server, broken down by verb and host
         - name: request.duration.us.bucket.*
           type: object
           object_type: long
-          description: Requests latency distribution in histogram buckets
+          description: Requests latency distribution in histogram buckets, broken down by verb and host
         - name: request.size.bytes.sum
           type: long
           format: bytes
-          description: Requests size sum in bytes
+          description: Requests size sum in bytes, broken down by verb and host
         - name: request.size.bytes.count
           type: long
-          description: Number of requests
+          description: Number of requests, broken down by verb and host
         - name: request.size.bytes.bucket.*
           type: object
           object_type: long
-          description: Requests size distribution in histogram buckets
+          description: Requests size distribution in histogram buckets, broken down by verb and host
         - name: response.size.bytes.count
           type: long
-          description: Number of responses
+          description: Number of responses, broken down by verb and host
         - name: response.size.bytes.sum
           type: long
           format: bytes
-          description: Responses size sum in bytes
+          description: Responses size sum in bytes, broken down by verb and host
         - name: response.size.bytes.bucket.*
           type: object
           object_type: long
-          description: Responses size distribution in histogram buckets
+          description: Responses size distribution in histogram buckets, broken down by verb and host
+    - name: workqueue
+      type: group
+      fields:
+        - name: longestrunning.sec
+          type: double
+          description: How many seconds has the longest running processor been running, broken down by workqueue name
+        - name: unfinished.sec
+          type: double
+          description: How many seconds of work has done that is in progress and hasn't been considered in the longest running processor, broken down by workqueue name
+        - name: adds.count
+          type: long
+          description: Workqueue add count, broken down by workqueue name
+        - name: depth.count
+          type: long
+          description: Workqueue current depth, broken down by workqueue name
+        - name: retries.count
+          type: long
+          description: Workqueue number of retries, broken down by workqueue name
     - name: scheduling
       type: group
       fields:
         - name: pending.pods.count
-          type:
-          description: Number of pending pods
+          type: long
+          description: Number of current pending pods, broken down by the queue type
         - name: preemption.victims.bucket.*
           type: object
           object_type: long
@@ -116,16 +142,13 @@
         - name: preemption.attempts.count
           type: long
           description: Total preemption attempts in the cluster so far
-        - name: attempts.count
-          type: long
-          description: Number of attempts to schedule pod
         - name: attempts.duration.us.bucket.*
           type: object
           object_type: long
-          description: Scheduling attempt latency distribution in histogram buckets
+          description: Scheduling attempt latency distribution in histogram buckets, broken down by profile and result
         - name: attempts.duration.us.sum
           type: long
-          description: Sum of scheduling attempt latency in microseconds
+          description: Sum of scheduling attempt latency in microseconds, broken down by profile and result
         - name: attempts.duration.us.count
           type: long
-          description: Number of attempts
+          description: Number of attempts, broken down by profile and result

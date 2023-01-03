@@ -40,14 +40,19 @@ var mapping = &prometheus.MetricsMapping{
 		"rest_client_request_size_bytes":       prometheus.Metric("client.request.size.bytes"),
 		"rest_client_request_duration_seconds": prometheus.Metric("client.request.duration.us", prometheus.OpMultiplyBuckets(1000000)),
 
-		"leader_election_master_status": prometheus.BooleanMetric("leader.is_master"),
+		"workqueue_longest_running_processor_seconds": prometheus.Metric("workqueue.longestrunning.sec"),
+		"workqueue_unfinished_work_seconds":           prometheus.Metric("workqueue.unfinished.sec"),
+		"workqueue_adds_total":                        prometheus.Metric("workqueue.adds.count"),
+		"workqueue_depth":                             prometheus.Metric("workqueue.depth.count"),
+		"workqueue_retries_total":                     prometheus.Metric("workqueue.retries.count"),
 
 		"scheduler_pending_pods":              prometheus.Metric("scheduling.pending.pods.count"),
 		"scheduler_preemption_victims":        prometheus.Metric("scheduling.preemption.victims"),
 		"scheduler_preemption_attempts_total": prometheus.Metric("scheduling.preemption.attempts.count"),
 		"scheduler_scheduling_attempt_duration_seconds": prometheus.Metric("scheduling.attempts.duration.us",
 			prometheus.OpMultiplyBuckets(1000000)),
-		"scheduler_schedule_attempts_total": prometheus.Metric("scheduling.attempts.count"),
+
+		"leader_election_master_status": prometheus.BooleanMetric("leader.is_master"),
 	},
 
 	Labels: map[string]prometheus.LabelMap{
@@ -59,6 +64,7 @@ var mapping = &prometheus.MetricsMapping{
 		"event":   prometheus.KeyLabel("event"),
 		"profile": prometheus.KeyLabel("profile"),
 		"result":  prometheus.KeyLabel("result"),
+		"name":    prometheus.KeyLabel("name"),
 	},
 }
 

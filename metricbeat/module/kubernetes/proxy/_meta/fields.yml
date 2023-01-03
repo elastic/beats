@@ -39,48 +39,48 @@
           description: Number of open file descriptors
         - name: fds.max.count
           type: long
-          description: Limit of open file descriptors
+          description: Limit for open file descriptors
         - name: started.sec
           type: double
-          description: Seconds since the process started
+          description: Start time of the process since unix epoch in seconds
     - name: client
       type: group
       fields:
         - name: request.count
           type: long
-          description: Number of HTTP requests
+          description: Number of HTTP requests to API server, broken down by status code, method and host
         - name: request.duration.us.sum
           type: long
-          description: Sum of requests latency in microseconds
+          description: Sum of requests latency in microseconds, broken down by verb and host
         - name: request.duration.us.count
           type: long
-          description: Number of requests
+          description: Number of requests to API server, broken down by verb and host
         - name: request.duration.us.bucket.*
           type: object
           object_type: long
-          description: Requests latency distribution in histogram buckets
+          description: Requests latency distribution in histogram buckets, broken down by verb and host
         - name: request.size.bytes.sum
           type: long
           format: bytes
-          description: Requests size sum in bytes
+          description: Requests size sum in bytes, broken down by verb and host
         - name: request.size.bytes.count
           type: long
-          description: Number of requests
+          description: Number of requests, broken down by verb and host
         - name: request.size.bytes.bucket.*
           type: object
           object_type: long
-          description: Requests size distribution in histogram buckets
+          description: Requests size distribution in histogram buckets, broken down by verb and host
         - name: response.size.bytes.count
           type: long
-          description: Number of responses
+          description: Number of responses, broken down by verb and host
         - name: response.size.bytes.sum
           type: long
           format: bytes
-          description: Responses size sum in bytes
+          description: Responses size sum in bytes, broken down by verb and host
         - name: response.size.bytes.bucket.*
           type: object
           object_type: long
-          description: Responses size distribution in histogram buckets
+          description: Responses size distribution in histogram buckets, broken down by verb and host
     - name: sync
       type: group
       description: >
@@ -98,11 +98,11 @@
           description: SyncProxyRules latency distribution in histogram buckets
         - name: networkprogramming.duration.us.sum
           type: long
-          description: Sum of networks programming latency in microseconds
+          description: Sum of network programming latency in microseconds
         - name: networkprogramming.duration.us.count
           type: long
-          description: Number of networks programming
+          description: Count of network programming latency
         - name: networkprogramming.duration.us.bucket.*
           type: object
           object_type: long
-          description: Networks programming latency distribution in histogram buckets
+          description: Network programming latency distribution in histogram buckets
