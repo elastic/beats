@@ -1,0 +1,23 @@
+- name: inputs
+  type: group
+  description: >
+    Beat input metrics
+  release: ga
+  fields:
+    - name: beat
+      type: group
+      fields:
+        - name: input
+          type: group
+          fields:
+            - name: id
+              type: keyword
+            - name: type
+              type: keyword
+            - name: metrics
+              type: group
+              fields:
+                - name: metric1_int
+                  type: int
+                - name: metric2_float
+                  type: float

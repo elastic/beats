@@ -1,0 +1,142 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "id": "c4c9bc08-e990-4529-8bf5-715c00fa6615",
+        "elasticsearch": {
+            "cluster": {
+                "id": "foobar"
+            }
+        },
+        "stats": {
+            "beat": {
+                "host": "2963d991095f",
+                "name": "2963d991095f",
+                "type": "metricbeat",
+                "uuid": "c4c9bc08-e990-4529-8bf5-715c00fa6615",
+                "version": "7.12.0"
+            },
+            "cpu": {
+                "system": {
+                    "ticks": 60,
+                    "time": {
+                        "ms": 65
+                    }
+                },
+                "total": {
+                    "ticks": 170,
+                    "time": {
+                        "ms": 178
+                    },
+                    "value": 170
+                },
+                "user": {
+                    "ticks": 110,
+                    "time": {
+                        "ms": 113
+                    }
+                }
+            },
+            "handles": {
+                "limit": {
+                    "hard": 1024,
+                    "soft": 1024
+                },
+                "open": 17
+            },
+            "info": {
+                "ephemeral_id": "16f5a19a-8ed6-4bfa-ae0a-85530262b63e",
+                "uptime": {
+                    "ms": 3260
+                }
+            },
+            "libbeat": {
+                "config": {
+                    "running": 3,
+                    "starts": 3,
+                    "stops": 0,
+                    "reloads": 1
+                },
+                "output": {
+                    "events": {
+                        "acked": 0,
+                        "active": 0,
+                        "batches": 0,
+                        "dropped": 0,
+                        "duplicates": 0,
+                        "failed": 0,
+                        "toomany": 0,
+                        "total": 0
+                    },
+                    "read": {
+                        "bytes": 0,
+                        "errors": 0
+                    },
+                    "type": "elasticsearch",
+                    "write": {
+                        "bytes": 0,
+                        "errors": 0
+                    }
+                },
+                "pipeline": {
+                    "clients": 10,
+                    "events": {
+                        "active": 11,
+                        "dropped": 0,
+                        "failed": 0,
+                        "filtered": 0,
+                        "published": 11,
+                        "retry": 0,
+                        "total": 11
+                    },
+                    "queue": {
+                        "acked": 0
+                    }
+                }
+            },
+            "memstats": {
+                "gc_next": 16263952,
+                "memory": {
+                    "alloc": 12278440,
+                    "total": 31749920
+                },
+                "rss": 83816448
+            },
+            "runtime": {
+                "goroutines": 63
+            },
+            "system": {
+                "cpu": {
+                    "cores": 12
+                },
+                "load": {
+                    "1": 2.14,
+                    "15": 1.5,
+                    "5": 1.44,
+                    "norm": {
+                        "1": 0.1783,
+                        "15": 0.125,
+                        "5": 0.12
+                    }
+                }
+            },
+            "uptime": {
+                "ms": 3260
+            }
+        },
+        "type": "metricbeat"
+    },
+    "event": {
+        "dataset": "beat.stats",
+        "duration": 115000,
+        "module": "beat"
+    },
+    "metricset": {
+        "name": "stats",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.19.0.2:5066",
+        "name": "beat",
+        "type": "beat"
+    }
+}

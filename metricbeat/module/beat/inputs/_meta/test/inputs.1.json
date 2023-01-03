@@ -1,0 +1,26 @@
+[
+  {
+    "beat": {
+      "input": {
+        "id": "123abc",
+        "type": "input1",
+        "metrics": {
+          "metric100_int": 1234,
+          "metric200_float": 1.234
+        }
+      }
+    }
+  },
+  {
+    "beat": {
+      "input": {
+        "id": "234bcd",
+        "type": "input2",
+        "metrics": {
+          "metric111_int": 2345,
+          "metric211_float": 2.456
+        }
+      }
+    }
+  }
+]

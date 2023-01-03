@@ -1,0 +1,1 @@
+This is the inputs metricset of the beat module.
