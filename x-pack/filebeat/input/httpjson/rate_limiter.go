@@ -101,15 +101,7 @@ func (r *rateLimiter) getRateLimit(header http.Header) (int64, error) {
 		return 0, nil
 	}
 
-<<<<<<< HEAD
 	remaining := header.Get(r.remaining)
-=======
-	tr := transformable{}
-	ctx := emptyTransformContext()
-	ctx.updateLastResponse(response{header: resp.Header.Clone()})
-
-	remaining, _ := r.remaining.Execute(ctx, tr, "", nil, r.log)
->>>>>>> 32ab1168c2 ([filebeat] Change how we debug tpl values in httpjson (#33254))
 	if remaining == "" {
 		return 0, fmt.Errorf("field %s does not exist in the HTTP Header, or is empty", r.remaining)
 	}
@@ -118,43 +110,11 @@ func (r *rateLimiter) getRateLimit(header http.Header) (int64, error) {
 		return 0, fmt.Errorf("failed to parse rate-limit remaining value: %w", err)
 	}
 
-<<<<<<< HEAD
 	if m != 0 {
 		return 0, nil
 	}
 
 	reset := header.Get(r.reset)
-=======
-	// by default, httpjson will continue requests until Limit is 0
-	// can optionally stop requests "early"
-	var activeLimit int64 = 0
-	if r.earlyLimit != nil {
-		earlyLimit := *r.earlyLimit
-		if earlyLimit > 0 && earlyLimit < 1 {
-			limit, _ := r.limit.Execute(ctx, tr, "", nil, r.log)
-			if limit != "" {
-				l, err := strconv.ParseInt(limit, 10, 64)
-				if err == nil {
-					activeLimit = l - int64(earlyLimit*float64(l))
-				}
-			}
-		} else if earlyLimit >= 1 {
-			activeLimit = int64(earlyLimit)
-		}
-	}
-
-	r.log.Debugf("Rate Limit: Using active Early Limit: %f", activeLimit)
-	if m > activeLimit {
-		return 0, nil
-	}
-
-	if r.reset == nil {
-		r.log.Warn("reset rate limit is not set")
-		return 0, nil
-	}
-
-	reset, _ := r.reset.Execute(ctx, tr, "", nil, r.log)
->>>>>>> 32ab1168c2 ([filebeat] Change how we debug tpl values in httpjson (#33254))
 	if reset == "" {
 		return 0, fmt.Errorf("field %s does not exist in the HTTP Header, or is empty", r.reset)
 	}
