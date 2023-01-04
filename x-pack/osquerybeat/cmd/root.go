@@ -81,7 +81,8 @@ func osquerybeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo
 	}
 	rawIn.Streams = streams
 
-	modules, err := management.CreateInputsFromStreams(rawIn, "osquery", agentInfo)
+	procs := defaultProcessors()
+	modules, err := management.CreateInputsFromStreams(rawIn, "osquery", agentInfo, procs...)
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
@@ -95,4 +96,14 @@ func osquerybeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo
 		return nil, fmt.Errorf("error creating config for reloader: %w", err)
 	}
 	return configList, nil
+}
+
+func defaultProcessors() []mapstr.M {
+	// 	processors:
+	//   - add_host_metadata: ~
+	//   - add_cloud_metadata: ~
+	return []mapstr.M{
+		{"add_host_metadata": nil},
+		{"add_cloud_metadata": nil},
+	}
 }
