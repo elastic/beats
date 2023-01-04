@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register Auditbeat x-pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
@@ -29,7 +30,8 @@ var RootCmd *cmd.BeatsRootCmd
 // auditbeatCfg is a callback registered with central management to perform any needed config transformations
 // before agent configs are sent to a beat
 func auditbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	modules, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
+	procs := defaultProcessors()
+	modules, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo, procs...)
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
@@ -56,4 +58,16 @@ func init() {
 	settings := auditbeatcmd.AuditbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = auditbeatcmd.Initialize(settings)
+}
+
+func defaultProcessors() []mapstr.M {
+	// 	processors:
+	//   - add_host_metadata: ~
+	//   - add_cloud_metadata: ~
+	//   - add_docker_metadata: ~
+	return []mapstr.M{
+		{"add_host_metadata": nil},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+	}
 }
