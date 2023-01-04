@@ -4,7 +4,6 @@
         "elasticsearch.gc.tags": [
             "gc"
         ],
-        "elasticsearch.gc.level": "info",
         "event.category": "database",
         "event.dataset": "elasticsearch.gc",
         "event.kind": "metric",
@@ -12,6 +11,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
+	"log.level": "info",
         "log.offset": 0,
         "message": "Using Concurrent Mark Sweep",
         "process.pid": "32376",

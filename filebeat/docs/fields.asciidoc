@@ -50411,16 +50411,6 @@ type: float
 
 --
 
-*`elasticsearch.gc.level`*::
-+
---
-GC log level.
-
-
-type: keyword
-
---
-
 *`elasticsearch.gc.tags`*::
 +
 --
