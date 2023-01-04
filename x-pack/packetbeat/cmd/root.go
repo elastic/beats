@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 
@@ -31,7 +32,8 @@ var RootCmd *cmd.BeatsRootCmd
 // configuration generated from a raw Elastic Agent config
 func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	//grab and properly format the input streams
-	inputStreams, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
+	procs := defaultProcessors()
+	inputStreams, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo, procs...)
 	if err != nil {
 		return nil, fmt.Errorf("error generating new stream config: %w", err)
 	}
@@ -56,4 +58,54 @@ func init() {
 	settings := packetbeatCmd.PacketbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = packetbeatCmd.Initialize(settings)
+}
+
+func defaultProcessors() []mapstr.M {
+	// 	processors:
+	//   - # Add forwarded to tags when processing data from a network tap or mirror.
+	//     if.contains.tags: forwarded
+	//     then:
+	//       - drop_fields:
+	//           fields: [host]
+	//     else:
+	//       - add_host_metadata: ~
+	//   - add_cloud_metadata: ~
+	//   - add_docker_metadata: ~
+	//   - detect_mime_type:
+	//       field: http.request.body.content
+	//       target: http.request.mime_type
+	//   - detect_mime_type:
+	//       field: http.response.body.content
+	//       target: http.response.mime_type
+	return []mapstr.M{
+		{
+			"if.contains.tags": "forwarded",
+			"then": []interface{}{
+				mapstr.M{
+					"drop_fields": mapstr.M{
+						"fields": []interface{}{"host"},
+					},
+				},
+			},
+			"else": []interface{}{
+				mapstr.M{
+					"add_host_metadata": nil,
+				},
+			},
+		},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{
+			"detect_mime_type": mapstr.M{
+				"field":  "http.request.body.content",
+				"target": "http.request.mime_type",
+			},
+		},
+		{
+			"detect_mime_type": mapstr.M{
+				"field":  "http.response.body.content",
+				"target": "http.response.mime_type",
+			},
+		},
+	}
 }
