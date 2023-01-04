@@ -18,7 +18,7 @@ import (
 func TestDecodeZip(t *testing.T) {
 	buf := new(bytes.Buffer)
 	w := zip.NewWriter(buf)
-	var files = []struct {
+	files := []struct {
 		Name, Body string
 	}{
 		{
@@ -57,6 +57,8 @@ func TestDecodeZip(t *testing.T) {
 	}
 
 	assert.Equal(t, expected, string(j))
+
+	assert.Equal(t, []string{"a.json", "b.ndjson", "c.ndjson"}, resp.header["X-Zip-Files"])
 }
 
 func TestDecodeNdjson(t *testing.T) {

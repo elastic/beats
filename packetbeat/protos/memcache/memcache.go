@@ -198,6 +198,9 @@ func (mc *memcache) GetPorts() []int {
 }
 
 func (mc *memcache) finishTransaction(t *transaction) error {
+	if t == nil {
+		return nil
+	}
 	mc.handler.onTransaction(t)
 	return nil
 }
