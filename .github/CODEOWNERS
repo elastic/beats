@@ -65,6 +65,7 @@ CHANGELOG*
 /metricbeat/module/kibana/ @elastic/infra-monitoring-ui
 /metricbeat/module/kubernetes/ @elastic/obs-cloudnative-monitoring
 /metricbeat/module/logstash/ @elastic/infra-monitoring-ui
+/metricbeat/module/nats/ @elastic/obs-cloudnative-monitoring
 /metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
 /metricbeat/module/system/ @elastic/elastic-agent-data-plane
 /packetbeat/ @elastic/security-external-integrations
