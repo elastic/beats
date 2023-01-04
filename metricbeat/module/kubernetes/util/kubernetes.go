@@ -589,13 +589,13 @@ func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		logp.Err("fail to get kubernetes client: %s", err)
-		return nil
+		return mapstr.M{}
 	}
 	cfg, _ := conf.NewConfigFrom(&config)
 	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
 	if err != nil {
 		logp.Info("could not retrieve cluster metadata: %s", err)
-		return nil
+		return mapstr.M{}
 	}
 	return ecsClusterMeta
 }
