@@ -33,12 +33,7 @@ func TestBareConfig(t *testing.T) {
 		},
 	}
 
-	// First test: this doesn't panic on nil pointer dereference
-	reloadCfg, err := generateBeatConfig(&rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
-	require.NoError(t, err, "error in generateBeatConfig")
-	cfgMap := mapstr.M{}
-	err = reloadCfg[0].Config.Unpack(&cfgMap)
-	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
 
 	// Actual checks
 	processorFields := map[string]interface{}{
@@ -84,12 +79,7 @@ func TestGlobalProcessInject(t *testing.T) {
 		}),
 	}
 
-	reloadCfg, err := generateBeatConfig(&rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
-	require.NoError(t, err, "error in generateBeatConfig")
-	cfgMap := mapstr.M{}
-	err = reloadCfg[0].Config.Unpack(&cfgMap)
-	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
-
+	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
 	processorFields := map[string]interface{}{
 		"add_fields.fields.stream_id":    "system/metrics-system.filesystem-default-system", // make sure we're not overwiting anything
 		"add_fields.fields.dataset":      "generic",
@@ -138,12 +128,7 @@ func TestMBGenerate(t *testing.T) {
 		},
 	}
 
-	reloadCfg, err := generateBeatConfig(&rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
-	require.NoError(t, err, "error in generateBeatConfig")
-	cfgMap := mapstr.M{}
-	err = reloadCfg[0].Config.Unpack(&cfgMap)
-	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
-
+	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
 	configFields := map[string]interface{}{
 		"drop_event":                  nil,
 		"add_fields.fields.stream_id": "system/metrics-system.filesystem-default-system",
@@ -235,4 +220,13 @@ func findFieldsInProcessors(t *testing.T, configFields map[string]interface{}, c
 		assert.True(t, gotKey, "did not find key for %s", key)
 		assert.True(t, gotVal, "got incorrect key for %s, expected %s, got %s", key, val, errStr)
 	}
+}
+
+func buildConfigMap(t *testing.T, unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) mapstr.M {
+	reloadCfg, err := generateBeatConfig(unitRaw, agentInfo)
+	require.NoError(t, err, "error in generateBeatConfig")
+	cfgMap := mapstr.M{}
+	err = reloadCfg[0].Config.Unpack(&cfgMap)
+	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+	return cfgMap
 }
