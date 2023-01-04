@@ -4,6 +4,11 @@ type: syslog
 protocol.udp:
   host: "{{.syslog_host}}:{{.syslog_port}}"
 
+{{ else if eq .input "tcp" }}
+
+type: tcp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
 {{ else if eq .input "file" }}
 
 type: log
