@@ -104,7 +104,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 	for _, e := range events {
 		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
-		if m.clusterMeta != nil {
+		if len(m.clusterMeta) != 0 {
 			event.RootFields.DeepUpdate(m.clusterMeta)
 		}
 		isOpen := reporter.Event(event)
