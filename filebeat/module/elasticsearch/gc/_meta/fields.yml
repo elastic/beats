@@ -65,10 +65,6 @@
       type: float
       description: >
         Time took to stop threads seconds.
-    - name: level
-      type: keyword
-      description: >
-        GC log level.
     - name: tags
       type: keyword
       description: >
