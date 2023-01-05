@@ -1,60 +1,47 @@
 {
-    "@timestamp": "2019-03-01T08:05:34.853Z",
-    "event": {
-        "dataset": "kubernetes.scheduler",
-        "duration": 115000,
-        "module": "kubernetes"
+    "@timestamp": "2022-12-30T17:23:42.218Z",
+    "ecs": {
+        "version": "8.0.0"
     },
-    "kubernetes": {
-        "scheduler": {
-            "handler": "prometheus",
-            "http": {
-                "request": {
-                    "duration": {
-                        "us": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 7644.523,
-                                "90": 7644.523,
-                                "99": 7644.523
-                            },
-                            "sum": 16210.005000000001
-                        }
-                    },
-                    "size": {
-                        "bytes": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 64,
-                                "90": 64,
-                                "99": 64
-                            },
-                            "sum": 256
-                        }
-                    }
-                },
-                "response": {
-                    "size": {
-                        "bytes": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 48741,
-                                "90": 48741,
-                                "99": 48741
-                            },
-                            "sum": 184429
-                        }
-                    }
-                }
-            }
-        }
+    "host": {
+        "name": "fournodecluster-control-plane"
     },
     "metricset": {
         "name": "scheduler",
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:55555",
+        "address": "https://0.0.0.0:10259/metrics",
         "type": "kubernetes"
+    },
+    "kubernetes": {
+        "scheduler": {
+            "queue": "active",
+            "scheduling": {
+                "pending": {
+                    "pods": {
+                        "count": 0
+                    }
+                }
+            }
+        }
+    },
+    "orchestrator": {
+        "cluster": {
+            "url": "fournodecluster-external-load-balancer:6443",
+            "name": "fournodecluster"
+        }
+    },
+    "event": {
+        "dataset": "kubernetes.scheduler",
+        "module": "kubernetes",
+        "duration": 17161170
+    },
+    "agent": {
+        "version": "8.7.0",
+        "ephemeral_id": "04246647-4474-4dbc-aeaa-2ad7ec591e93",
+        "id": "90f9684c-750c-4e1c-a036-2370196a9d93",
+        "name": "fournodecluster-control-plane",
+        "type": "metricbeat"
     }
 }
