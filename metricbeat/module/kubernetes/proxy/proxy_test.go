@@ -25,17 +25,22 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
-)
 
-const testFile = "_meta/test/metrics"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+)
 
 func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "proxy",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.proxy.1.14",
-				ExpectedFile: "./_meta/test/metrics.proxy.1.14.expected",
+				MetricsFile:  "./_meta/test/metrics.1.25",
+				ExpectedFile: "./_meta/test/metrics.1.25.expected",
 			},
 		},
 	)
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "proxy")
 }

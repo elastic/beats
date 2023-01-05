@@ -33,12 +33,7 @@ func TestBareConfig(t *testing.T) {
 		},
 	}
 
-	// First test: this doesn't panic on nil pointer dereference
-	reloadCfg, err := generateBeatConfig(&rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
-	require.NoError(t, err, "error in generateBeatConfig")
-	cfgMap := mapstr.M{}
-	err = reloadCfg[0].Config.Unpack(&cfgMap)
-	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
 
 	// Actual checks
 	processorFields := map[string]interface{}{
@@ -48,6 +43,48 @@ func TestBareConfig(t *testing.T) {
 		"add_fields.fields.type":      "log",
 		"add_fields.fields.input_id":  "system/metrics-system-default-system",
 		"add_fields.fields.id":        "beat-ID",
+	}
+	findFieldsInProcessors(t, processorFields, cfgMap)
+}
+
+func TestGlobalProcessInject(t *testing.T) {
+	// config with datastreams, metadata, etc, removed
+	rawExpected := proto.UnitExpectedConfig{
+		Id:   "system/metrics-system-default-system",
+		Type: "system/metrics",
+		Name: "system-1",
+		Streams: []*proto.Stream{
+			{
+				Id: "system/metrics-system.filesystem-default-system",
+				Source: requireNewStruct(t, map[string]interface{}{
+					"metricsets": []interface{}{"filesystem"},
+					"period":     "1m",
+				}),
+			},
+		},
+		Source: requireNewStruct(t, map[string]interface{}{
+			"processors": []interface{}{
+				map[string]interface{}{
+					"add_fields": map[string]interface{}{
+						"fields": map[string]interface{}{
+							"cluster": map[string]interface{}{
+								"name": "kind",
+								"url":  "kind-control-plane:6443",
+							},
+						},
+						"target": "orchestrator",
+					},
+				},
+			},
+		}),
+	}
+
+	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
+	processorFields := map[string]interface{}{
+		"add_fields.fields.stream_id":    "system/metrics-system.filesystem-default-system", // make sure we're not overwiting anything
+		"add_fields.fields.dataset":      "generic",
+		"add_fields.fields.cluster.name": "kind", // actual test for the global processors
+		"add_fields.target":              "orchestrator",
 	}
 	findFieldsInProcessors(t, processorFields, cfgMap)
 }
@@ -91,12 +128,7 @@ func TestMBGenerate(t *testing.T) {
 		},
 	}
 
-	reloadCfg, err := generateBeatConfig(&rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
-	require.NoError(t, err, "error in generateBeatConfig")
-	cfgMap := mapstr.M{}
-	err = reloadCfg[0].Config.Unpack(&cfgMap)
-	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
-
+	cfgMap := buildConfigMap(t, &rawExpected, &client.AgentInfo{ID: "beat-ID", Version: "8.0.0", Snapshot: true})
 	configFields := map[string]interface{}{
 		"drop_event":                  nil,
 		"add_fields.fields.stream_id": "system/metrics-system.filesystem-default-system",
@@ -188,4 +220,13 @@ func findFieldsInProcessors(t *testing.T, configFields map[string]interface{}, c
 		assert.True(t, gotKey, "did not find key for %s", key)
 		assert.True(t, gotVal, "got incorrect key for %s, expected %s, got %s", key, val, errStr)
 	}
+}
+
+func buildConfigMap(t *testing.T, unitRaw *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) mapstr.M {
+	reloadCfg, err := generateBeatConfig(unitRaw, agentInfo)
+	require.NoError(t, err, "error in generateBeatConfig")
+	cfgMap := mapstr.M{}
+	err = reloadCfg[0].Config.Unpack(&cfgMap)
+	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
+	return cfgMap
 }

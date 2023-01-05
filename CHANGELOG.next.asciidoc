@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
+- [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
 - [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
 - Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
 - Fix handling of error in states in direct aws-s3 listing input {issue}33513[33513] {pull}33722[33722]
@@ -68,6 +69,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
 - Fix CEL result deserialisation when evaluation fails. {issue}33992[33992] {pull}33996[33996]
 - Fix handling of non-200/non-429 status codes. {issue}33999[33999] {pull}34002[34002]
+- [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
 
 *Heartbeat*
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
@@ -101,7 +103,10 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add GCP CloudSQL region filter {pull}32943[32943]
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
+- Fix kafka dashboard field names {pull}33555[33555]
+- Add tags to events based on parsed identifier. {pull}33472[33472]
 - Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
+- Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 
 *Packetbeat*
 
@@ -179,10 +184,13 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for http+unix and http+npipe schemes in httpjson input. {issue}33571[33571] {pull}33610[33610]
 - Add support for http+unix and http+npipe schemes in cel input. {issue}33571[33571] {pull}33712[33712]
 - Add `decode_duration`, `move_fields` processors. {pull}31301[31301]
+- Add backup to bucket and delete functionality for the `aws-s3` input. {issue}30696[30696] {pull}33559[33559]
 - Add metrics for UDP packet processing. {pull}33870[33870]
 - Convert UDP input to v2 input. {pull}33930[33930]
 - Improve collection of risk information from Okta debug data. {issue}33677[33677] {pull}34030[34030]
 - Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
+- Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
+- Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 
 *Auditbeat*
 
@@ -205,6 +213,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add GCP Redis regions support {pull}33728[33728]
 - Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
+- Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
 
 *Packetbeat*
 
