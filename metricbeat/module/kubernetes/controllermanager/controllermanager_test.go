@@ -32,8 +32,8 @@ func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "controllermanager",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.1.20",
-				ExpectedFile: "./_meta/test/metrics.1.20.expected",
+				MetricsFile:  "./_meta/test/metrics.1.25",
+				ExpectedFile: "./_meta/test/metrics.1.25.expected",
 			},
 		},
 	)
