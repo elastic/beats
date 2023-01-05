@@ -42,13 +42,7 @@ var (
 	// unsuccessful because another Beat instance already has the lock on the same
 	// data path.
 	ErrAlreadyLocked = fmt.Errorf("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data)")
-
-	// ErrLockfileEmpty is returned by readExistingPidfile() when an existing pidfile is found, but the file is empty.
-	ErrLockfileEmpty = fmt.Errorf("lockfile is empty")
 )
-
-// a little wrapper for the gitpid function to make testing easier.
-var pidFetch = os.Getpid
 
 // New returns a new pid-aware file locker
 func New(beatInfo beat.Info) *Locker {
