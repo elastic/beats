@@ -249,6 +249,10 @@ processors:
       target_field: okta.debug_context.debug_data.flattened.behaviors
       ignore_missing: true
       ignore_failure: true
+  - set:
+      field: okta.debug_context.debug_data.flattened.risk_object
+      copy_from: okta.debug_context.debug_data.flattened.risk
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
   - dissect:
       field: okta.debug_context.debug_data.flattened.risk
       pattern: "{%{okta.debug_context.debug_data.flattened.risk}}"
@@ -260,6 +264,30 @@ processors:
       value_split: "="
       target_field: _risk_object
       if: ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      on_failure:
+        - remove:
+            field: _risk_object
+  - remove:
+      field: okta.debug_context.debug_data.flattened.risk_object
+      if: ctx._risk_object != null
+
+  # Make heroic efforts to capture risk level and reason if kv could not get them.
+  - grok:
+      field: okta.debug_context.debug_data.flattened.risk
+      patterns:
+        - level=%{NOTSPACE:_risk_object.level}
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk_object != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      ignore_failure: true
+  - grok:
+      field: okta.debug_context.debug_data.flattened.risk
+      patterns:
+        - reasons=%{DATA:_risk_object.reasons}, %{KEY}
+        - reasons=%{DATA:_risk_object.reasons}$
+      pattern_definitions:
+        KEY: '%{NOTSPACE}='
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk_object != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      ignore_failure: true
+
   - remove:
       field: okta.debug_context.debug_data.flattened.risk
       if: ctx._risk_object != null
