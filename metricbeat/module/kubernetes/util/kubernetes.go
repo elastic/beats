@@ -105,11 +105,13 @@ func NewResourceMetadataEnricher(
 	}
 	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
-	metaGen := metadata.NewResourceMetadataGenerator(cfg, watcher.Client())
 	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, config.AddResourceMetadata)
 
 	namespaceMeta := metadata.NewNamespaceMetadataGenerator(config.AddResourceMetadata.Namespace, namespaceWatcher.Store(), watcher.Client())
 	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, watcher.Client())
+
+	metaGen := metadata.NewNamespaceAwareResourceMetadataGenerator(cfg, watcher.Client(), namespaceMeta)
+
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
 		func(m map[string]mapstr.M, r kubernetes.Resource) {
@@ -582,18 +584,18 @@ func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 	config, err := GetValidatedConfig(base)
 	if err != nil {
 		logp.Info("could not retrieve validated config")
-		return nil
+		return mapstr.M{}
 	}
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		logp.Err("fail to get kubernetes client: %s", err)
-		return nil
+		return mapstr.M{}
 	}
 	cfg, _ := conf.NewConfigFrom(&config)
 	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
 	if err != nil {
 		logp.Info("could not retrieve cluster metadata: %s", err)
-		return nil
+		return mapstr.M{}
 	}
 	return ecsClusterMeta
 }

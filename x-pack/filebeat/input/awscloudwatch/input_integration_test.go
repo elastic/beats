@@ -190,7 +190,7 @@ func TestInputWithLogGroupNamePrefix(t *testing.T) {
 	}
 
 	snap := mapstr.M(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.GetNamespace("inputs").GetRegistry(),
 		monitoring.Full,
 		false))
 	t.Log(snap.StringToPrint())

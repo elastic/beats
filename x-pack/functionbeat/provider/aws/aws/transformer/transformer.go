@@ -103,7 +103,7 @@ func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
 
 		for _, deaggRecord := range deaggRecords {
 			beatEvents = append(beatEvents, beat.Event{
-				Timestamp: time.Now(),
+				Timestamp: *deaggRecord.ApproximateArrivalTimestamp,
 				Fields: mapstr.M{
 					"event": mapstr.M{
 						"kind": "event",
