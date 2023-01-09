@@ -7,32 +7,6 @@
 === Beats version 8.6.0
 https://github.com/elastic/beats/compare/v8.5.3\...v8.6.0[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -41,9 +15,6 @@ https://github.com/elastic/beats/compare/v8.5.3\...v8.6.0[View commits]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -62,39 +33,10 @@ https://github.com/elastic/beats/compare/v8.5.3\...v8.6.0[View commits]
 *Heartbeat*
 - Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-
 *Packetbeat*
 
 - Fix panic on memcache transaction with no request or response. {issue}33852[33852] {pull}33853[33853]
 - Fix termination logic. {pull}33979[33979]
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -140,12 +82,6 @@ https://github.com/elastic/beats/compare/v8.5.3\...v8.6.0[View commits]
 - Improve collection of risk information from Okta debug data. {issue}33677[33677] {pull}34030[34030]
 - Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
 *Heartbeat*
 
 - Upgrade node to 18.12.0
@@ -162,40 +98,6 @@ https://github.com/elastic/beats/compare/v8.5.3\...v8.6.0[View commits]
 *Packetbeat*
 
 - Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-==== Known Issue
-
-
 
 [[release-notes-8.5.0]]
 === Beats version 8.5.0
