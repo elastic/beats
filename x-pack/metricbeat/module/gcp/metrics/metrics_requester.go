@@ -116,7 +116,7 @@ func (r *metricsRequester) buildRegionsFilter(regions []string, label string) st
 			filter.WriteString(" ")
 		}
 
-		filter.WriteString(fmt.Sprintf("%s = starts_with(\"%s\")", label, strings.TrimSuffix(region, "*")))
+		filter.WriteString(fmt.Sprintf("%s = starts_with(\"%s\")", label, trimWildcard(region)))
 		filter.WriteString(" ")
 
 		regionsCount++
@@ -131,26 +131,27 @@ func (r *metricsRequester) buildRegionsFilter(regions []string, label string) st
 	}
 }
 
-func (r *metricsRequester) buildLocationFilter(serviceName, filter string) string {
-	var serviceLabel string
-
+// getServiceLabelFor return the appropriate label to use for filtering metrics of a given service.
+func getServiceLabelFor(serviceName string) string {
 	switch serviceName {
 	case gcp.ServiceCompute:
-		serviceLabel = gcp.ComputeResourceLabel
+		return gcp.ComputeResourceLabel
 	case gcp.ServiceGKE:
-		serviceLabel = gcp.GKEResourceLabel
+		return gcp.GKEResourceLabel
 	case gcp.ServiceDataproc:
-		serviceLabel = gcp.DataprocResourceLabel
+		return gcp.DataprocResourceLabel
 	case gcp.ServiceStorage:
-		serviceLabel = gcp.StorageResourceLabel
+		return gcp.StorageResourceLabel
 	case gcp.ServiceCloudSQL:
-		serviceLabel = gcp.CloudSQLResourceLabel
+		return gcp.CloudSQLResourceLabel
 	case gcp.ServiceRedis:
-		serviceLabel = gcp.RedisResourceLabel
+		return gcp.RedisResourceLabel
 	default:
-		serviceLabel = gcp.DefaultResourceLabel
+		return gcp.DefaultResourceLabel
 	}
+}
 
+func (r *metricsRequester) buildLocationFilter(serviceLabel, filter string) string {
 	if r.config.Region != "" && r.config.Zone != "" {
 		r.logger.Warnf("when region %s and zone %s config parameter "+
 			"both are provided, only use region", r.config.Regions, r.config.Zone)
@@ -162,11 +163,9 @@ func (r *metricsRequester) buildLocationFilter(serviceName, filter string) strin
 
 	switch {
 	case r.config.Region != "":
-		region := strings.TrimSuffix(r.config.Region, "*")
-		filter = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", filter, serviceLabel, region)
+		filter = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", filter, serviceLabel, trimWildcard(r.config.Region))
 	case r.config.Zone != "":
-		zone := strings.TrimSuffix(r.config.Zone, "*")
-		filter = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", filter, serviceLabel, zone)
+		filter = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", filter, serviceLabel, trimWildcard(r.config.Zone))
 	case len(r.config.Regions) != 0:
 		regionsFilter := r.buildRegionsFilter(r.config.Regions, serviceLabel)
 		filter = fmt.Sprintf("%s AND %s", filter, regionsFilter)
@@ -175,6 +174,13 @@ func (r *metricsRequester) buildLocationFilter(serviceName, filter string) strin
 	return filter
 }
 
+// trimWildcard remove wildcard value `*` from the end of the string.
+func trimWildcard(value string) string {
+	return strings.TrimSuffix(value, "*")
+}
+
+// isAGlobalService return true if the given service is considered global from GCP and does not
+// uses the regional or zonal metrics filtering.
 func isAGlobalService(serviceName string) bool {
 	switch serviceName {
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
@@ -193,7 +199,8 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	// NOTE: some GCP services are global, not regional or zonal. To these services we don't need
 	// to apply any additional filters.
 	if locationsConfigsAvailable && !isAGlobalService(serviceName) {
-		f = r.buildLocationFilter(serviceName, f)
+		serviceLabel := getServiceLabelFor(serviceName)
+		f = r.buildLocationFilter(serviceLabel, f)
 	}
 
 	// NOTE: make sure to log the applied filter, as it helpful when debugging
