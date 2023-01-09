@@ -1117,13 +1117,13 @@
                                                         "orderAgg": {
                                                             "dataType": "number",
                                                             "isBucketed": false,
-                                                            "label": "Sum of kubernetes.controllermanager.workqueue.adds.count",
+                                                            "label": "Sum of kubernetes.scheduler.workqueue.adds.count",
                                                             "operationType": "sum",
                                                             "params": {
                                                                 "emptyAsNull": true
                                                             },
                                                             "scale": "ratio",
-                                                            "sourceField": "kubernetes.controllermanager.workqueue.adds.count"
+                                                            "sourceField": "kubernetes.scheduler.workqueue.adds.count"
                                                         },
                                                         "orderBy": {
                                                             "type": "custom"
@@ -1283,13 +1283,13 @@
                                                         "orderAgg": {
                                                             "dataType": "number",
                                                             "isBucketed": false,
-                                                            "label": "Maximum of kubernetes.controllermanager.workqueue.retries.count",
+                                                            "label": "Maximum of kubernetes.scheduler.workqueue.retries.count",
                                                             "operationType": "max",
                                                             "params": {
                                                                 "emptyAsNull": true
                                                             },
                                                             "scale": "ratio",
-                                                            "sourceField": "kubernetes.controllermanager.workqueue.retries.count"
+                                                            "sourceField": "kubernetes.scheduler.workqueue.retries.count"
                                                         },
                                                         "orderBy": {
                                                             "type": "custom"
@@ -1535,13 +1535,13 @@
                                                         "orderAgg": {
                                                             "dataType": "number",
                                                             "isBucketed": false,
-                                                            "label": "Sum of kubernetes.controllermanager.workqueue.depth.count",
+                                                            "label": "Sum of kubernetes.scheduler.workqueue.depth.count",
                                                             "operationType": "sum",
                                                             "params": {
                                                                 "emptyAsNull": true
                                                             },
                                                             "scale": "ratio",
-                                                            "sourceField": "kubernetes.controllermanager.workqueue.depth.count"
+                                                            "sourceField": "kubernetes.scheduler.workqueue.depth.count"
                                                         },
                                                         "orderBy": {
                                                             "type": "custom"
@@ -1704,13 +1704,13 @@
                                                         "orderAgg": {
                                                             "dataType": "number",
                                                             "isBucketed": false,
-                                                            "label": "Maximum of kubernetes.controllermanager.workqueue.unfinished.sec",
+                                                            "label": "Maximum of kubernetes.scheduler.workqueue.unfinished.sec",
                                                             "operationType": "max",
                                                             "params": {
                                                                 "emptyAsNull": true
                                                             },
                                                             "scale": "ratio",
-                                                            "sourceField": "kubernetes.controllermanager.workqueue.unfinished.sec"
+                                                            "sourceField": "kubernetes.scheduler.workqueue.unfinished.sec"
                                                         },
                                                         "orderBy": {
                                                             "type": "custom"
@@ -3543,7 +3543,7 @@
             "type": "index-pattern"
         },
         {
-            "id": "metricbeat-*",
+            "id": "logs-*",
             "name": "ff6afcdf-0de2-47fb-aa9e-72b48f11e0cd:metrics_ff6afcdf-0de2-47fb-aa9e-72b48f11e0cd_0_index_pattern",
             "type": "index-pattern"
         },
@@ -3578,7 +3578,7 @@
             "type": "index-pattern"
         },
         {
-            "id": "metricbeat-*",
+            "id": "logs-*",
             "name": "0599e0ae-2375-4ceb-b12d-2ebec4310cc6:metrics_0599e0ae-2375-4ceb-b12d-2ebec4310cc6_0_index_pattern",
             "type": "index-pattern"
         },
@@ -3623,7 +3623,7 @@
             "type": "index-pattern"
         },
         {
-            "id": "metricbeat-*",
+            "id": "logs-*",
             "name": "c3fee68f-01c6-49da-a759-2900b1cd15bf:metrics_c3fee68f-01c6-49da-a759-2900b1cd15bf_0_index_pattern",
             "type": "index-pattern"
         },
@@ -3653,7 +3653,7 @@
             "type": "index-pattern"
         },
         {
-            "id": "metricbeat-*",
+            "id": "logs-*",
             "name": "f8313a9d-ab58-448e-b183-75f914caf53f:metrics_f8313a9d-ab58-448e-b183-75f914caf53f_0_index_pattern",
             "type": "index-pattern"
         },
