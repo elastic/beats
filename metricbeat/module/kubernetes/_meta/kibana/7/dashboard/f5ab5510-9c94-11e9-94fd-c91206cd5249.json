@@ -1401,7 +1401,7 @@
                                             "type": "palette"
                                         },
                                         "position": "top",
-                                        "seriesType": "area",
+                                        "seriesType": "line",
                                         "showGridlines": false,
                                         "splitAccessor": "68f1dece-b63b-4a27-9c1f-8068f2f9bedb",
                                         "xAccessor": "34f7328b-5fef-43e7-9350-98256b031a79"
@@ -1611,7 +1611,7 @@
                                             "type": "palette"
                                         },
                                         "position": "top",
-                                        "seriesType": "area",
+                                        "seriesType": "line",
                                         "showGridlines": false,
                                         "splitAccessor": "e7259e4c-0700-48a5-aeff-993fc075bcab",
                                         "xAccessor": "7b8d9b03-439b-4171-8b64-91b8664b4b94"
@@ -1826,7 +1826,7 @@
                                             "type": "palette"
                                         },
                                         "position": "top",
-                                        "seriesType": "area",
+                                        "seriesType": "line",
                                         "showGridlines": false,
                                         "splitAccessor": "73933c6b-b6da-45c6-a190-c501453f658f",
                                         "xAccessor": "3ed7787d-1fbe-487f-a377-9a5e5e6f2571"
