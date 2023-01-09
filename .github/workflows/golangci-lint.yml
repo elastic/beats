@@ -19,7 +19,6 @@ jobs:
           - GOOS: windows
           - GOOS: linux
           - GOOS: darwin
-            GOARCH: amd64
     name: lint
     runs-on: ubuntu-latest
     steps:
