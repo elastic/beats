@@ -3,6 +3,200 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.6.0]]
+=== Beats version 8.6.0
+https://github.com/elastic/beats/compare/v8.5.3\...v8.6.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
+- Support for multiline zookeeper logs {issue}2496[2496]
+- Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
+- Disable lockfile when running under elastic-agent. {pull}33988[33988]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
+- [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
+- Fix handling of error in states in direct aws-s3 listing input {issue}33513[33513] {pull}33722[33722]
+- Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
+- Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
+- Fix 'requires pointer' error while getting cursor metadata. {pull}33956[33956]
+- Fix input cancellation handling when HTTP client does not support contexts. {issue}33962[33962] {pull}33968[33968]
+- Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
+- Fix CEL result deserialisation when evaluation fails. {issue}33992[33992] {pull}33996[33996]
+- Fix handling of non-200/non-429 status codes. {issue}33999[33999] {pull}34002[34002]
+- [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
+
+*Heartbeat*
+- Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+
+*Packetbeat*
+
+- Fix panic on memcache transaction with no request or response. {issue}33852[33852] {pull}33853[33853]
+- Fix termination logic. {pull}33979[33979]
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Add `http.pprof` config options for enabling block and mutex profiling. {issue}33572[33572] {pull}33576[33576]
+- Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
+- Add `add_formatted_index` processor that allows the resulting index for an event to be changed based on content from the event. {pull}33800[33800]
+- deps: Updated to github.com/elastic/go-sysinfo v1.9.0. {pull}33864[33864]
+- Fix panic due to close of already closed channel during shutdown {pull}33971[33971]
+
+*Auditbeat*
+
+- Add file parser processor to file_integrity module. {pull}28802[28802]
+- Improve documentation for symlink handling behaviour in file integrity module. {pull}33430[33430]
+- Ensure file integrity module watch paths are absolute. {pull}33430[33430]
+
+*Filebeat*
+
+- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
+- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
+- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
+- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
+- Add support for parsers on journald input {pull}29070[29070]
+- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
+- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
+- Allow iptables module to parse ulogd v2 TOS field in logs. {pull}32126[32126]
+- Fix handling of invalid UserIP and LocalIP values. {pull}32896[32896]
+- Allow http_endpoint instances to share ports. {issue}32578[32578] {pull}33377[33377]
+- Improve httpjson documentation for split processor. {pull}33473[33473]
+- Added separation of transform context object inside httpjson. Introduced new clause `.parent_last_response.*` {pull}33499[33499]
+- Cloud Foundry input uses server-side filtering when retrieving logs. {pull}33456[33456]
+- Add `parse_aws_vpc_flow_log` processor. {pull}33656[33656]
+- Update `aws.vpcflow` dataset in AWS module have a configurable log `format` and to produce ECS 8.x fields. {pull}33699[33699]
+- Modified `aws-s3` input to reduce mutex contention when multiple SQS message are being processed concurrently. {pull}33658[33658]
+- Disable "event normalization" processing for the aws-s3 input to reduce allocations. {pull}33673[33673]
+- Add Common Expression Language input. {pull}31233[31233]
+- Add support for http+unix and http+npipe schemes in httpjson input. {issue}33571[33571] {pull}33610[33610]
+- Add support for http+unix and http+npipe schemes in cel input. {issue}33571[33571] {pull}33712[33712]
+- Add `decode_duration`, `move_fields` processors. {pull}31301[31301]
+- Add metrics for UDP packet processing. {pull}33870[33870]
+- Convert UDP input to v2 input. {pull}33930[33930]
+- Improve collection of risk information from Okta debug data. {issue}33677[33677] {pull}34030[34030]
+- Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+- Upgrade node to 18.12.0
+
+*Metricbeat*
+
+- Add Data Granularity option to AWS module to allow for for fewer API calls of longer periods and keep small intervals. {issue}33133[33133] {pull}33166[33166]
+- Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
+- Add per-thread metrics to system_summary {pull}33614[33614]
+- Add GCP CloudSQL metadata {pull}33066[33066]
+- Add support for multiple regions in GCP {pull}32964[32964]
+- Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
+
+*Packetbeat*
+
+- Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
 [[release-notes-8.5.0]]
 === Beats version 8.5.0
 https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
