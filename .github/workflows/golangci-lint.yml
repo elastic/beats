@@ -13,11 +13,13 @@ permissions:
 jobs:
   golangci:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - GOOS: windows
           - GOOS: linux
           - GOOS: darwin
+            GOARCH: arm64
     name: lint
     runs-on: ubuntu-latest
     steps:
