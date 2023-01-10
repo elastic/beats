@@ -44,7 +44,7 @@ var (
 	ErrAlreadyLocked = fmt.Errorf("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data)")
 )
 
-// New returns a new pid-aware file locker
+// New returns a new file locker
 func New(beatInfo beat.Info) *Locker {
 	return NewWithRetry(beatInfo, 4, time.Millisecond*400)
 }
@@ -80,14 +80,16 @@ func (lock *Locker) Lock() error {
 
 // Unlock attempts to release the lock on a data path previously acquired via Lock().
 func (lock *Locker) Unlock() error {
-	err := lock.fileLock.Unlock()
+	// remove first while we still have the lock, so we reduce the odds of another beat swooping in to start between the Unlock() and Remove() operation.
+	err := os.Remove(lock.fileLock.Path())
+	if err != nil {
+		return fmt.Errorf("unable to remove data path file %s: %w", lock.fileLock.Path(), err)
+	}
+
+	err = lock.fileLock.Unlock()
 	if err != nil {
 		return fmt.Errorf("unable to unlock data path: %w", err)
 	}
 
-	err = os.Remove(lock.fileLock.Path())
-	if err != nil {
-		return fmt.Errorf("unable to unlock data path file %s: %w", lock.fileLock.Path(), err)
-	}
 	return nil
 }
