@@ -19,7 +19,7 @@ package hints
 
 import (
 	"fmt"
-	"strings"
+	// "strings"
 
 	"github.com/elastic/go-ucfg"
 
