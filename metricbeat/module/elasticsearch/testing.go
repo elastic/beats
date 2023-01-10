@@ -27,10 +27,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // TestMapper tests mapping methods
@@ -117,7 +117,7 @@ func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP
 	info := Info{
 		ClusterID:   "1234",
 		ClusterName: "helloworld",
-		Version: Version{Number: &common.Version{
+		Version: Version{Number: &version.V{
 			Major:  7,
 			Minor:  6,
 			Bugfix: 0,

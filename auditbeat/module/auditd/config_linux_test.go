@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -91,6 +91,46 @@ func TestConfigValidateConnectionType(t *testing.T) {
 	err := config.Validate()
 	assert.Error(t, err)
 	t.Log(err)
+}
+
+func TestConfigValidateImmutable(t *testing.T) {
+	tcs := []struct {
+		name       string
+		socketType string
+		mustFail   bool
+	}{
+		{
+			name:       "Must pass for default",
+			socketType: "",
+			mustFail:   false,
+		},
+		{
+			name:       "Must pass for unicast",
+			socketType: "unicast",
+			mustFail:   false,
+		},
+		{
+			name:       "Must fail for multicast",
+			socketType: "multicast",
+			mustFail:   true,
+		},
+	}
+
+	for _, tc := range tcs {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			config := defaultConfig
+			config.SocketType = tc.socketType
+			config.Immutable = true
+			err := config.Validate()
+			if tc.mustFail {
+				assert.Error(t, err)
+				t.Log(err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
 
 func TestConfigRuleOrdering(t *testing.T) {
@@ -195,7 +235,7 @@ func makeRuleFlags(fileID, ruleID int) string {
 }
 
 func parseConfig(t testing.TB, yaml string) (Config, error) {
-	c, err := common.NewConfigWithYAML([]byte(yaml), "")
+	c, err := conf.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
 		t.Fatal(err)
 	}

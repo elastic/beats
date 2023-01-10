@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: graphite
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/graphite/_meta/docs.asciidoc
+
 
 [[metricbeat-module-graphite]]
 == Graphite module
@@ -11,6 +13,8 @@ This is the Graphite module.
 
 The default metricset is `server`.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -54,3 +58,4 @@ The following metricsets are available:
 
 include::graphite/server.asciidoc[]
 
+:edit_url!:

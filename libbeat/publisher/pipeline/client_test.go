@@ -27,15 +27,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestClient(t *testing.T) {
@@ -83,16 +83,15 @@ func TestClient(t *testing.T) {
 			},
 		}
 
-		if testing.Verbose() {
-			logp.TestingSetup()
-		}
+		err := logp.TestingSetup()
+		assert.Nil(t, err)
 
 		for name, test := range cases {
 			t.Run(name, func(t *testing.T) {
 				routinesChecker := resources.NewGoroutinesChecker()
 				defer routinesChecker.Check(t)
 
-				pipeline := makePipeline(Settings{}, makeBlockingQueue())
+				pipeline := makePipeline(Settings{}, makeTestQueue())
 				defer pipeline.Close()
 
 				var ctx context.Context
@@ -140,9 +139,8 @@ func TestClientWaitClose(t *testing.T) {
 
 		return p
 	}
-	if testing.Verbose() {
-		logp.TestingSetup()
-	}
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
 
 	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
 	pipeline := makePipeline(Settings{}, q)
@@ -189,7 +187,6 @@ func TestClientWaitClose(t *testing.T) {
 		defer client.Close()
 
 		// Send an event which gets acknowledged immediately.
-		client.Publish(beat.Event{})
 		output := newMockClient(func(batch publisher.Batch) error {
 			batch.ACK()
 			return nil
@@ -197,6 +194,8 @@ func TestClientWaitClose(t *testing.T) {
 		defer output.Close()
 		pipeline.output.Set(outputs.Group{Clients: []outputs.Client{output}})
 		defer pipeline.output.Set(outputs.Group{})
+
+		client.Publish(beat.Event{})
 
 		closed := make(chan struct{})
 		go func() {
@@ -219,7 +218,7 @@ func TestMonitoring(t *testing.T) {
 		numClients = 42
 	)
 	var config Config
-	err := common.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]interface{}{
 		"queue.mem.events":           maxEvents,
 		"queue.mem.flush.min_events": 1,
 	}).Unpack(&config)

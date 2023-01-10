@@ -10,11 +10,11 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -84,8 +84,8 @@ func eventMapping(report mb.ReporterV2, input []byte, isXpack bool) error {
 
 	// All events need to have a cluster_uuid to work with Stack Monitoring
 	event := mb.Event{
-		ModuleFields:    common.MapStr{},
-		MetricSetFields: common.MapStr{},
+		ModuleFields:    mapstr.M{},
+		MetricSetFields: mapstr.M{},
 	}
 	event.ModuleFields.Put("cluster_uuid", data["cluster_uuid"])
 

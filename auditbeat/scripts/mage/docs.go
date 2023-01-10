@@ -46,7 +46,7 @@ func ModuleDocs() error {
 		configFiles = append(configFiles, files...)
 	}
 
-	var configs []string
+	configs := make([]string, 0, len(configFiles))
 	params := map[string]interface{}{
 		"GOOS":      "linux",
 		"GOARCH":    "amd64",
@@ -58,7 +58,7 @@ func ModuleDocs() error {
 		configs = append(configs, dst)
 		devtools.MustExpandFile(src, dst, params)
 	}
-	defer devtools.Clean(configs)
+	defer devtools.Clean(configs) //nolint:errcheck // Errors can safely be ignored here.
 
 	// Remove old.
 	for _, path := range dirsWithModules {
@@ -71,7 +71,7 @@ func ModuleDocs() error {
 	}
 
 	// Run the docs_collector.py script.
-	ve, err := devtools.PythonVirtualenv()
+	ve, err := devtools.PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}

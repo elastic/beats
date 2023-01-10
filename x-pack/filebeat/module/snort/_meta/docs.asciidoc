@@ -7,6 +7,10 @@
 
 experimental[]
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 This is a module for receiving Snort/Sourcefire logs over Syslog or a file.
 
 include::../include/gs-link.asciidoc[]

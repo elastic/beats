@@ -44,10 +44,10 @@ type unpaddedNumber struct {
 }
 
 type paddedNumber struct {
-	ft                   fieldType
-	div                  int
-	minDigits, maxDigits int
-	signed               bool
+	ft                                fieldType
+	divExp                            int
+	minDigits, maxDigits, fractDigits int
+	signed                            bool
 }
 
 type textField struct {
@@ -123,12 +123,8 @@ func numRequires(c *ctxConfig, ft fieldType) error {
 		ftSecondOfMinute:
 		c.enableClock()
 
-	case ftMillisOfDay:
-		c.enableClock()
-		c.enableMillis()
-
-	case ftMillisOfSecond:
-		c.enableMillis()
+	case ftNanoOfSecond:
+		c.enableNano()
 	}
 
 	return nil
@@ -183,7 +179,7 @@ func (r runeLiteral) compile() (prog, error) {
 }
 
 func (s stringLiteral) compile() (prog, error) {
-	return makeCopy([]byte(s.s))
+	return makeCopy(s.s)
 }
 
 func (n unpaddedNumber) compile() (prog, error) {
@@ -191,10 +187,14 @@ func (n unpaddedNumber) compile() (prog, error) {
 }
 
 func (n paddedNumber) compile() (prog, error) {
-	if n.div == 0 {
+	switch {
+	case n.fractDigits != 0:
+		return makeProg(opExtNumFractPadded, byte(n.ft), byte(n.divExp), byte(n.maxDigits), byte(n.fractDigits))
+	case n.divExp == 0:
 		return makeProg(opNumPadded, byte(n.ft), byte(n.maxDigits))
+	default:
+		return makeProg(opExtNumPadded, byte(n.ft), byte(n.divExp), byte(n.maxDigits))
 	}
-	return makeProg(opExtNumPadded, byte(n.ft), byte(n.div), byte(n.maxDigits))
 }
 
 func (n twoDigitYear) compile() (prog, error) {

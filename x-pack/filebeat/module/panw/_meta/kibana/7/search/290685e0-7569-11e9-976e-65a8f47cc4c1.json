@@ -12,7 +12,7 @@
                 "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
                 "query": {
                     "language": "kuery",
-                    "query": "event.dataset: \"panw.panos\" and event.category: \"network_traffic\""
+                    "query": "event.dataset: \"panw.panos\" and event.category: \"network\""
                 },
                 "version": true
             }

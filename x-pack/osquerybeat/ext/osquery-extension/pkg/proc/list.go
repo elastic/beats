@@ -5,17 +5,21 @@
 package proc
 
 import (
+	"io/fs"
 	"os"
-	"path/filepath"
 	"strconv"
 )
 
+// List returns all the processes in the proc folder
 func List(root string) ([]string, error) {
+	return ListFS(os.DirFS(root))
+}
+
+func ListFS(sysfs fs.FS) ([]string, error) {
+	//nolint:prealloc // saving on alloc and not breaking the existing expected behavior
 	var pids []string
 
-	root = filepath.Join(root, "/proc")
-
-	dirs, err := os.ReadDir(root)
+	dirs, err := fs.ReadDir(sysfs, "proc")
 
 	if err != nil {
 		return nil, err
@@ -28,9 +32,8 @@ func List(root string) ([]string, error) {
 
 		name := dir.Name()
 		// Check if directory is number
-		_, err := strconv.Atoi(name)
+		_, err = strconv.Atoi(name)
 		if err != nil {
-			err = nil
 			continue
 		}
 		pids = append(pids, name)

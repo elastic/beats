@@ -34,14 +34,7 @@ func MakeTimestampEncoder() func(*time.Time, structform.ExtVisitor) error {
 // MakeUTCOrLocalTimestampEncoder creates encoder function that formats time into RFC3339 representation
 // with UTC or local timezone in the output (based on localTime boolean parameter).
 func MakeUTCOrLocalTimestampEncoder(localTime bool) func(*time.Time, structform.ExtVisitor) error {
-	var dtPattern string
-	if localTime {
-		dtPattern = "yyyy-MM-dd'T'HH:mm:ss.SSSz"
-	} else {
-		dtPattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-	}
-
-	formatter, err := dtfmt.NewFormatter(dtPattern)
+	formatter, err := dtfmt.NewFormatter(common.TimestampFormat(localTime))
 	if err != nil {
 		panic(err)
 	}

@@ -33,6 +33,9 @@ heartbeat.monitors:
     {% endfor %}
   {% endif -%}
 
+  {%- if monitor.check_request_method is defined %}
+  check.request.method: {{monitor.check_request_method}}
+  {% endif -%}
 
   {%- if monitor.check_response_json is defined %}
   check.response.json:

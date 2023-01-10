@@ -1,23 +1,17 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "container": {
-        "id": "ca30d1e2be38876c2a2e9ebb6007bbb295651b7468116e367212311fecf8ce8c",
+        "id": "3f2af516565acd770488bc82f55d8ed17b335988f13bb7c5cd3e2dc9abdac6f4",
         "image": {
-            "name": "kindest/node:v1.21.1@sha256:69860bda5563ac81e3c0057d654b5253219618a22ec3a346306239bba8cfa1a6"
+            "name": "docker.elastic.co/elasticsearch/elasticsearch:8.2.0-SNAPSHOT"
         },
-        "name": "kind-control-plane",
+        "name": "elastic-package-stack_elasticsearch_1",
         "runtime": "docker"
     },
     "docker": {
-        "container": {
-            "labels": {
-                "io_x-k8s_kind_cluster": "kind",
-                "io_x-k8s_kind_role": "control-plane"
-            }
-        },
         "diskio": {
             "read": {
-                "bytes": 0,
+                "bytes": 65941504,
                 "ops": 0,
                 "queued": 0,
                 "rate": 0,
@@ -33,7 +27,7 @@
                 "wait_time": 0
             },
             "write": {
-                "bytes": 0,
+                "bytes": 182902059008,
                 "ops": 0,
                 "queued": 0,
                 "rate": 0,

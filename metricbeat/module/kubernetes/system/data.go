@@ -21,46 +21,48 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte) ([]common.MapStr, error) {
-	events := []common.MapStr{}
+func eventMapping(content []byte, logger *logp.Logger) ([]mapstr.M, error) {
+	events := []mapstr.M{}
 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
 
 	for _, syscontainer := range node.SystemContainers {
-		containerEvent := common.MapStr{
-			mb.ModuleDataKey: common.MapStr{
-				"node": common.MapStr{
+		containerEvent := mapstr.M{
+			mb.ModuleDataKey: mapstr.M{
+				"node": mapstr.M{
 					"name": node.NodeName,
 				},
 			},
 			"container": syscontainer.Name,
-			"cpu": common.MapStr{
-				"usage": common.MapStr{
+			"cpu": mapstr.M{
+				"usage": mapstr.M{
 					"nanocores": syscontainer.CPU.UsageNanoCores,
-					"core": common.MapStr{
+					"core": mapstr.M{
 						"ns": syscontainer.CPU.UsageCoreNanoSeconds,
 					},
 				},
 			},
-			"memory": common.MapStr{
-				"usage": common.MapStr{
+			"memory": mapstr.M{
+				"usage": mapstr.M{
 					"bytes": syscontainer.Memory.UsageBytes,
 				},
-				"workingset": common.MapStr{
+				"workingset": mapstr.M{
 					"bytes": syscontainer.Memory.WorkingSetBytes,
 				},
-				"rss": common.MapStr{
+				"rss": mapstr.M{
 					"bytes": syscontainer.Memory.RssBytes,
 				},
 				"pagefaults":      syscontainer.Memory.PageFaults,
@@ -69,7 +71,7 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 		}
 
 		if syscontainer.StartTime != "" {
-			containerEvent.Put("start_time", syscontainer.StartTime)
+			kubernetes2.ShouldPut(containerEvent, "start_time", syscontainer.StartTime, logger)
 		}
 
 		events = append(events, containerEvent)

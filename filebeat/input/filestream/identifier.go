@@ -22,8 +22,8 @@ import (
 	"os"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type identifierFeature uint8
@@ -47,7 +47,7 @@ var identifierFactories = map[string]identifierFactory{
 	inodeMarkerName: newINodeMarkerIdentifier,
 }
 
-type identifierFactory func(*common.Config) (fileIdentifier, error)
+type identifierFactory func(*conf.C) (fileIdentifier, error)
 
 type fileIdentifier interface {
 	GetSource(loginp.FSEvent) fileSource
@@ -74,7 +74,7 @@ func (f fileSource) Name() string {
 }
 
 // newFileIdentifier creates a new state identifier for a log input.
-func newFileIdentifier(ns *common.ConfigNamespace, suffix string) (fileIdentifier, error) {
+func newFileIdentifier(ns *conf.Namespace, suffix string) (fileIdentifier, error) {
 	if ns == nil {
 		i, err := newINodeDeviceIdentifier(nil)
 		if err != nil {
@@ -100,7 +100,7 @@ type inodeDeviceIdentifier struct {
 	name string
 }
 
-func newINodeDeviceIdentifier(_ *common.Config) (fileIdentifier, error) {
+func newINodeDeviceIdentifier(_ *conf.C) (fileIdentifier, error) {
 	return &inodeDeviceIdentifier{
 		name: nativeName,
 	}, nil
@@ -135,7 +135,7 @@ type pathIdentifier struct {
 	name string
 }
 
-func newPathIdentifier(_ *common.Config) (fileIdentifier, error) {
+func newPathIdentifier(_ *conf.C) (fileIdentifier, error) {
 	return &pathIdentifier{
 		name: pathName,
 	}, nil

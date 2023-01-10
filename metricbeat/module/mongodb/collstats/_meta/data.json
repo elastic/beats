@@ -1,20 +1,17 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "mongodb.collstats",
         "duration": 115000,
         "module": "mongodb"
     },
     "metricset": {
-        "name": "collstats"
+        "name": "collstats",
+        "period": 10000
     },
     "mongodb": {
         "collstats": {
-            "collection": "startup_log",
+            "collection": "oplog.rs",
             "commands": {
                 "count": 0,
                 "time": {
@@ -36,19 +33,19 @@
             },
             "lock": {
                 "read": {
-                    "count": 74,
+                    "count": 1,
                     "time": {
-                        "us": 443
+                        "us": 7
                     }
                 },
                 "write": {
                     "count": 1,
                     "time": {
-                        "us": 8
+                        "us": 6600
                     }
                 }
             },
-            "name": "local.startup_log",
+            "name": "local.oplog.rs",
             "queries": {
                 "count": 0,
                 "time": {
@@ -62,9 +59,9 @@
                 }
             },
             "total": {
-                "count": 75,
+                "count": 2,
                 "time": {
-                    "us": 451
+                    "us": 6607
                 }
             },
             "update": {
@@ -76,7 +73,7 @@
         }
     },
     "service": {
-        "address": "172.26.0.2:27017",
+        "address": "172.28.0.5:27017",
         "type": "mongodb"
     }
 }

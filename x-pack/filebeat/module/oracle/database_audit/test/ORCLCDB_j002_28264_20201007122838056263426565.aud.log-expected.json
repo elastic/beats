@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-10-07T16:28:38.000Z",
+        "@timestamp": "2020-10-21T16:28:38.000Z",
         "event.action": "database_audit",
         "event.category": "database",
         "event.dataset": "oracle.database_audit",

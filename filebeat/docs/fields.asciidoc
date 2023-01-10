@@ -3,6 +3,8 @@
 This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
+:edit_url:
+
 [[exported-fields]]
 = Exported fields
 
@@ -54,6 +56,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-lumberjack>>
 * <<exported-fields-microsoft>>
 * <<exported-fields-misp>>
 * <<exported-fields-mongodb>>
@@ -77,6 +80,7 @@ grouped in the following categories:
 * <<exported-fields-radware>>
 * <<exported-fields-redis>>
 * <<exported-fields-s3>>
+* <<exported-fields-salesforce>>
 * <<exported-fields-santa>>
 * <<exported-fields-snort>>
 * <<exported-fields-snyk>>
@@ -2024,20 +2028,57 @@ type: keyword
 --
 
 [[exported-fields-aws-cloudwatch]]
-== aws-cloudwatch fields
+== AWS CloudWatch fields
 
 Fields from AWS CloudWatch logs.
 
 
 
 [float]
-=== aws-cloudwatch
+=== awscloudwatch
+
+Fields from AWS CloudWatch logs. Deprecated: Use aws.cloudwatch.* instead
+
+
+
+*`awscloudwatch.log_group`*::
++
+--
+The name of the log group to which this event belongs. Deprecated: Use aws.cloudwatch.log_group instead
+
+
+type: keyword
+
+--
+
+*`awscloudwatch.log_stream`*::
++
+--
+The name of the log stream to which this event belongs. Deprecated: Use aws.cloudwatch.log_stream instead
+
+
+type: keyword
+
+--
+
+*`awscloudwatch.ingestion_time`*::
++
+--
+The time the event was ingested in AWS CloudWatch. Deprecated: Use aws.cloudwatch.ingestion_time instead
+
+
+type: keyword
+
+--
+
+[float]
+=== aws.cloudwatch
 
 Fields from AWS CloudWatch logs.
 
 
 
-*`aws-cloudwatch.log_group`*::
+*`aws.cloudwatch.log_group`*::
 +
 --
 The name of the log group to which this event belongs.
@@ -2046,7 +2087,7 @@ type: keyword
 
 --
 
-*`aws-cloudwatch.log_stream`*::
+*`aws.cloudwatch.log_stream`*::
 +
 --
 The name of the log stream to which this event belongs.
@@ -2055,7 +2096,7 @@ type: keyword
 
 --
 
-*`aws-cloudwatch.ingestion_time`*::
+*`aws.cloudwatch.ingestion_time`*::
 +
 --
 The time the event was ingested in AWS CloudWatch.
@@ -2200,6 +2241,15 @@ type: keyword
 Fields for Azure activity logs.
 
 
+
+*`azure.activitylogs.identity_name`*::
++
+--
+identity name
+
+type: keyword
+
+--
 
 [float]
 === identity
@@ -2363,6 +2413,36 @@ type: keyword
 +
 --
 Principal type
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.tenant_id`*::
++
+--
+Tenant ID
+
+
+type: keyword
+
+--
+
+*`azure.activitylogs.level`*::
++
+--
+Level
+
+
+type: long
+
+--
+
+*`azure.activitylogs.operation_version`*::
++
+--
+Operation version
 
 
 type: keyword
@@ -2925,6 +3005,16 @@ type: keyword
 
 --
 
+*`azure.platformlogs.identity_name`*::
++
+--
+Identity name
+
+
+type: keyword
+
+--
+
 *`azure.platformlogs.properties`*::
 +
 --
@@ -3294,6 +3384,26 @@ type: keyword
 
 --
 
+*`azure.signinlogs.properties.device_detail.is_compliant`*::
++
+--
+If the device is compliant
+
+
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.device_detail.is_managed`*::
++
+--
+If the device is managed
+
+
+type: boolean
+
+--
+
 *`azure.signinlogs.properties.applied_conditional_access_policies`*::
 +
 --
@@ -3324,6 +3434,35 @@ type: flattened
 
 --
 
+*`azure.signinlogs.properties.authentication_protocol`*::
++
+--
+Authentication protocol type.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.incoming_token_type`*::
++
+--
+Incoming token type.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.unique_token_identifier`*::
++
+--
+Unique token identifier for the request.
+
+type: keyword
+
+--
+
 *`azure.signinlogs.properties.authentication_requirement`*::
 +
 --
@@ -3340,7 +3479,7 @@ type: keyword
 Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user
 
 
-type: keyword
+type: flattened
 
 --
 
@@ -16734,6 +16873,16 @@ type: integer
 
 --
 
+*`checkpoint.identity_src`*::
++
+--
+The source for authentication identity information.
+
+
+type: keyword
+
+--
+
 *`checkpoint.information`*::
 +
 --
@@ -17308,6 +17457,16 @@ type: keyword
 +
 --
 Risk level we got from the engine.
+
+
+type: keyword
+
+--
+
+*`checkpoint.roles`*::
++
+--
+The role of identity.
 
 
 type: keyword
@@ -19754,6 +19913,16 @@ type: keyword
 
 --
 
+*`checkpoint.snid`*::
++
+--
+The Check Point session ID.
+
+
+type: keyword
+
+--
+
 *`checkpoint.source_object`*::
 +
 --
@@ -20284,6 +20453,16 @@ type: keyword
 
 --
 
+*`checkpoint.auth_status`*::
++
+--
+The authentication status for an event.
+
+
+type: keyword
+
+--
+
 *`checkpoint.machine`*::
 +
 --
@@ -20639,6 +20818,40 @@ type: keyword
 --
 In case of phishing event, the domain, which the attacker was impersonating.
 
+
+type: keyword
+
+--
+
+*`checkpoint.comment`*::
++
+--
+type: keyword
+
+--
+
+*`checkpoint.conn_direction`*::
++
+--
+Connection direction
+
+type: keyword
+
+--
+
+*`checkpoint.db_ver`*::
++
+--
+Database version
+
+type: keyword
+
+--
+
+*`checkpoint.update_status`*::
++
+--
+Status of database update
 
 type: keyword
 
@@ -21297,6 +21510,16 @@ type: keyword
 
 --
 
+*`cisco.asa.source_user_security_group_tag`*::
++
+--
+The Security Group Tag for the source user. Security Group Tag are 16-bit identifiers used to represent logical group privilege.
+
+
+type: long
+
+--
+
 *`cisco.asa.destination_username`*::
 +
 --
@@ -21304,6 +21527,16 @@ Name of the user that is the destination for this event.
 
 
 type: keyword
+
+--
+
+*`cisco.asa.destination_user_security_group_tag`*::
++
+--
+The Security Group Tag for the destination user. Security Group Tag are 16-bit identifiers used to represent logical group privilege.
+
+
+type: long
 
 --
 
@@ -35626,9 +35859,35 @@ example: true
 [float]
 === container
 
-Container fields are used for meta information about the specific container that is the source of information.
-These fields help correlate data based containers from any runtime.
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
 
+
+*`container.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
+*`container.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`container.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
 
 *`container.id`*::
 +
@@ -35666,12 +35925,39 @@ type: object
 
 --
 
+*`container.memory.usage`*::
++
+--
+Memory usage percentage and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
 *`container.name`*::
 +
 --
 Container name.
 
 type: keyword
+
+--
+
+*`container.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the container since the last metric collection.
+
+type: long
+
+--
+
+*`container.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the container since the last metric collection.
+
+type: long
 
 --
 
@@ -86599,66 +86885,17 @@ type: object
 
 --
 
-*`kibana.log.kibana.log.meta.req.headers.referer`*::
+*`kibana.log.meta.req.headers`*::
 +
 --
-type: alias
-
-alias to: http.request.referrer
+type: flattened
 
 --
 
-*`kibana.log.kibana.log.meta.req.referer`*::
+*`kibana.log.meta.res.headers`*::
 +
 --
-type: alias
-
-alias to: http.request.referrer
-
---
-
-*`kibana.log.kibana.log.meta.req.headers.user-agent`*::
-+
---
-type: alias
-
-alias to: user_agent.original
-
---
-
-*`kibana.log.kibana.log.meta.req.remoteAddress`*::
-+
---
-type: alias
-
-alias to: source.address
-
---
-
-*`kibana.log.kibana.log.meta.req.url`*::
-+
---
-type: alias
-
-alias to: url.original
-
---
-
-*`kibana.log.kibana.log.meta.statusCode`*::
-+
---
-type: alias
-
-alias to: http.response.status_code
-
---
-
-*`kibana.log.kibana.log.meta.method`*::
-+
---
-type: alias
-
-alias to: http.request.method
+type: flattened
 
 --
 
@@ -87346,6 +87583,23 @@ alias to: log.level
 type: alias
 
 alias to: event.duration
+
+--
+
+[[exported-fields-lumberjack]]
+== Lumberjack fields
+
+Fields from Lumberjack input.
+
+
+
+*`lumberjack`*::
++
+--
+Structured data received in an event sent over the Lumberjack protocol.
+
+
+type: flattened
 
 --
 
@@ -111849,6 +112103,16 @@ type: keyword
 
 --
 
+*`okta.debug_context.debug_data.risk_level`*::
++
+--
+The risk level assigned to the sign in attempt.
+
+
+type: keyword
+
+--
+
 *`okta.debug_context.debug_data.url`*::
 +
 --
@@ -111856,6 +112120,16 @@ The URL.
 
 
 type: keyword
+
+--
+
+*`okta.debug_context.debug_data.flattened`*::
++
+--
+The complete debug_data object.
+
+
+type: flattened
 
 --
 
@@ -124655,6 +124929,769 @@ type: keyword
 AWS S3 object metadata values.
 
 type: flattened
+
+--
+
+[[exported-fields-salesforce]]
+== Salesforce fields
+
+Salesforce Module
+
+
+
+[float]
+=== salesforce
+
+Fileset for ingesting Salesforce Apex logs.
+
+
+
+*`salesforce.access_mode`*::
++
+--
+The mode of collecting logs from Salesforce - "rest" or "stream".
+
+
+type: keyword
+
+--
+
+[float]
+=== apex
+
+Fileset for ingesting Salesforce Apex logs.
+
+
+
+*`salesforce.apex.action`*::
++
+--
+Action performed by the callout.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.callout_time`*::
++
+--
+Time spent waiting on webservice callouts, in milliseconds.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.class_name`*::
++
+--
+The Apex class name. If the class is part of a managed package, this string includes the package namespace.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.client_name`*::
++
+--
+The name of the client that's using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didnt specify a client in the CallOptions header.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.cpu_time`*::
++
+--
+The CPU time in milliseconds used to complete the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.db_blocks`*::
++
+--
+Indicates how much activity is occurring in the database. A high value for this field suggests that adding indexes or filters on your queries would benefit performance.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.db_cpu_time`*::
++
+--
+The CPU time in milliseconds to complete the request. Indicates the amount of activity taking place in the database layer during the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.db_total_time`*::
++
+--
+Time (in milliseconds) spent waiting for database processing in aggregate for all operations in the request. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.entity`*::
++
+--
+Name of the external object being accessed.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.entity_name`*::
++
+--
+The name of the object affected by the trigger.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.entry_point`*::
++
+--
+The entry point for this Apex execution.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.event_type`*::
++
+--
+The type of event. The value is always ApexCallout.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.execute_ms`*::
++
+--
+How long it took (in milliseconds) for Salesforce to prepare and execute the query. Available in API version 42.0 and later.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.fetch_ms`*::
++
+--
+How long it took (in milliseconds) to retrieve the query results from the external system. Available in API version 42.0 and later.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.filter`*::
++
+--
+Field expressions to filter which rows to return. Corresponds to WHERE in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.is_long_running_request`*::
++
+--
+Indicates whether the request is counted against your org's concurrent long-running Apex request limit (true) or not (false).
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.limit`*::
++
+--
+Maximum number of rows to return for a query. Corresponds to LIMIT in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.limit_usage_percent`*::
++
+--
+The percentage of Apex SOAP calls that were made against the organization's limit.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.login_key`*::
++
+--
+The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.media_type`*::
++
+--
+The media type of the response.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.message`*::
++
+--
+Error or warning message associated with the failed call.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.method_name`*::
++
+--
+The name of the calling Apex method.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.number_fields`*::
++
+--
+The number of fields or columns, where applicable.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.number_soql_queries`*::
++
+--
+The number of SOQL queries that were executed during the event.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.offset`*::
++
+--
+Number of rows to skip when paging through a result set. Corresponds to OFFSET in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.orderby`*::
++
+--
+Field or column to use for sorting query results, and whether to sort the results in ascending (default) or descending order. Corresponds to ORDER BY in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.organization_id`*::
++
+--
+The 15-character ID of the organization.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.query`*::
++
+--
+The SOQL query, if one was performed.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.quiddity`*::
++
+--
+The type of outer execution associated with this event.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.request.id`*::
++
+--
+The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same REQUEST_ID.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.request.status`*::
++
+--
+The status of the request for a page view or user interface action.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.rows.total`*::
++
+--
+Total number of records in the result set. The value is always -1 if the custom adapter's DataSource.Provider class doesn't declare the QUERY_TOTAL_SIZE capability.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.rows.fetched`*::
++
+--
+Number of rows fetched by the callout. Available in API version 42.0 and later.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.rows.processed`*::
++
+--
+The number of rows that were processed in the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.run_time`*::
++
+--
+Not used for this event type. Use the TIME field instead.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.select`*::
++
+--
+Comma-separated list of fields being queried. Corresponds to SELECT in SOQL queries.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.subqueries`*::
++
+--
+Reserved for future use.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.throughput`*::
++
+--
+Number of records retrieved in one second.
+
+
+type: keyword
+
+--
+
+
+*`salesforce.apex.trigger.id`*::
++
+--
+The 15-character ID of the trigger that was fired.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.trigger.name`*::
++
+--
+For triggers coming from managed packages, TRIGGER_NAME includes a namespace prefix separated with a . character. If no namespace prefix is present, the trigger is from an unmanaged trigger.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.trigger.type`*::
++
+--
+The type of this trigger.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.type`*::
++
+--
+The type of Apex callout.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.uri`*::
++
+--
+The URI of the page that's receiving the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.uri_id_derived`*::
++
+--
+The 18-character case-safe ID of the URI of the page that's receiving the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.user_agent`*::
++
+--
+The numeric code for the type of client used to make the request (for example, the browser, application, or API).
+
+
+type: keyword
+
+--
+
+*`salesforce.apex.user_id_derived`*::
++
+--
+The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
+
+
+type: keyword
+
+--
+
+[float]
+=== salesforce.login
+
+Fileset for ingesting Salesforce Login (Streaming) logs.
+
+
+
+*`salesforce.login.application`*::
++
+--
+The application used to access the org. Possible values include: AppExchange, Browser, Salesforce for iOS, Salesforce Developers API Explorer, N/A
+
+
+type: keyword
+
+--
+
+*`salesforce.login.auth_method_reference`*::
++
+--
+The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.auth_service_id`*::
++
+--
+The 18-character ID for an authentication service for a login event.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.client_version`*::
++
+--
+The version number of the login client. If no version number is available, “Unknown” is returned.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.created_by_id`*::
++
+--
+Unavailable
+
+
+type: keyword
+
+--
+
+*`salesforce.login.evaluation_time`*::
++
+--
+The amount of time it took to evaluate the transaction security policy, in milliseconds.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.login_geo_id`*::
++
+--
+The Salesforce ID of the LoginGeo object associated with the login user’s IP address.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.login_history_id`*::
++
+--
+Tracks a user session so you can correlate user activity with a particular login instance. This field is also available on the LoginHistory, AuthSession, and LoginHistory objects, making it easier to trace events back to a user’s original authentication.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.login_type`*::
++
+--
+The type of login used to access the session.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.policy_id`*::
++
+--
+The ID of the transaction security policy associated with this event.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.policy_outcome`*::
++
+--
+The result of the transaction policy.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.related_event_identifier`*::
++
+--
+This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.session_level`*::
++
+--
+Session-level security controls user access to features that support it, such as connected apps and reporting. Possible values are: HIGH_ASSURANCE, LOW, STANDARD
+
+
+type: keyword
+
+--
+
+[float]
+=== salesforce.logout
+
+Fileset for parsing Salesforce Logout (Streaming) logs.
+
+
+
+*`salesforce.logout.created_by_id`*::
++
+--
+Unavailable
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.related_event_identifier`*::
++
+--
+This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.replay_id`*::
++
+--
+Represents an ID value that is populated by the system and refers to the position of the event in the event stream. Replay ID values aren’t guaranteed to be contiguous for consecutive events. A subscriber can store a replay ID value and use it on resubscription to retrieve missed events that are within the retention window.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.schema`*::
++
+--
+Unavailable
+
+
+type: keyword
+
+--
+
+[float]
+=== salesforce.setup_audit_trail
+
+Fileset for ingesting Salesforce SetupAuditTrail logs.
+
+
+
+*`salesforce.setup_audit_trail.event_type`*::
++
+--
+Event type
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.created_by_context`*::
++
+--
+The context under which the Setup change was made. For example, if Einstein uses cloud-to-cloud services to make a change in Setup, the value of this field is Einstein.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.created_by_id`*::
++
+--
+Unknown
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.created_by_issuer`*::
++
+--
+Reserved for future use.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.delegate_user`*::
++
+--
+The Login-As user who executed the action in Setup. If a Login-As user didn’t perform the action, this field is blank. This field is available in API version 35.0 and later.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.display`*::
++
+--
+The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like “Created permission set MAD: with user license Salesforce.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.responsible_namespace_prefix`*::
++
+--
+Unknown
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.section`*::
++
+--
+The section in the Setup menu where the action occurred. For example, Manage Users or Company Profile.
+
+
+type: keyword
 
 --
 
@@ -141461,190 +142498,100 @@ Module for parsing sophosxg syslog.
 
 
 
-*`sophos.xg.device`*::
+*`sophos.xg.action`*::
 +
 --
-device
+Event Action
 
 
 type: keyword
 
 --
 
-*`sophos.xg.date`*::
+*`sophos.xg.activityname`*::
 +
 --
-Date (yyyy-mm-dd) when the event occurred
-
-
-type: date
-
---
-
-*`sophos.xg.timezone`*::
-+
---
-Time (hh:mm:ss) when the event occurred
+Web policy activity that matched and caused the policy result.
 
 
 type: keyword
 
 --
 
-*`sophos.xg.device_name`*::
+*`sophos.xg.ap`*::
 +
 --
-Model number of the device
+Access Point Serial ID or LocalWifi0 or LocalWifi1.
 
 
 type: keyword
 
 --
 
-*`sophos.xg.device_id`*::
+*`sophos.xg.app_category`*::
 +
 --
-Serial number of the device
+Name of the category under which application falls
 
 
 type: keyword
 
 --
 
-*`sophos.xg.log_id`*::
+*`sophos.xg.app_filter_policy_id`*::
 +
 --
-Unique 12 characters code (0101011)
+Application filter policy ID applied on the traffic
 
 
 type: keyword
 
 --
 
-*`sophos.xg.log_type`*::
+*`sophos.xg.app_is_cloud`*::
 +
 --
-Type of event e.g. firewall event
+Application is Cloud
 
 
 type: keyword
 
 --
 
-*`sophos.xg.log_component`*::
+*`sophos.xg.app_name`*::
 +
 --
-Component responsible for logging e.g. Firewall rule
+Application name
 
 
 type: keyword
 
 --
 
-*`sophos.xg.log_subtype`*::
+*`sophos.xg.app_resolved_by`*::
 +
 --
-Sub type of event
+Application is resolved by signature or synchronized application
 
 
 type: keyword
 
 --
 
-*`sophos.xg.hb_health`*::
+*`sophos.xg.app_risk`*::
 +
 --
-Heartbeat status
+Risk level assigned to the application
 
 
 type: keyword
 
 --
 
-*`sophos.xg.priority`*::
+*`sophos.xg.app_technology`*::
 +
 --
-Severity level of traffic
-
-
-type: keyword
-
---
-
-*`sophos.xg.status`*::
-+
---
-Ultimate status of traffic – Allowed or Denied
-
-
-type: keyword
-
---
-
-*`sophos.xg.duration`*::
-+
---
-Durability of traffic (seconds)
-
-
-type: long
-
---
-
-*`sophos.xg.fw_rule_id`*::
-+
---
-Firewall Rule ID which is applied on the traffic
-
-
-type: integer
-
---
-
-*`sophos.xg.user_name`*::
-+
---
-user_name
-
-
-type: keyword
-
---
-
-*`sophos.xg.user_group`*::
-+
---
-Group name to which the user belongs
-
-
-type: keyword
-
---
-
-*`sophos.xg.iap`*::
-+
---
-Internet Access policy ID applied on the traffic
-
-
-type: keyword
-
---
-
-*`sophos.xg.ips_policy_id`*::
-+
---
-IPS policy ID applied on the traffic
-
-
-type: integer
-
---
-
-*`sophos.xg.policy_type`*::
-+
---
-Policy type applied to the traffic
+Technology of the application
 
 
 type: keyword
@@ -141661,16 +142608,6 @@ type: integer
 
 --
 
-*`sophos.xg.application_filter_policy`*::
-+
---
-Application Filter policy applied on the traffic
-
-
-type: integer
-
---
-
 *`sophos.xg.application`*::
 +
 --
@@ -141678,6 +142615,26 @@ Application name
 
 
 type: keyword
+
+--
+
+*`sophos.xg.application_category`*::
++
+--
+Application is resolved by signature or synchronized application
+
+
+type: keyword
+
+--
+
+*`sophos.xg.application_filter_policy`*::
++
+--
+Application Filter policy applied on the traffic
+
+
+type: integer
 
 --
 
@@ -141711,1050 +142668,10 @@ type: keyword
 
 --
 
-*`sophos.xg.application_category`*::
-+
---
-Application is resolved by signature or synchronized application
-
-
-type: keyword
-
---
-
 *`sophos.xg.appresolvedby`*::
 +
 --
 Technology of the application
-
-
-type: keyword
-
---
-
-*`sophos.xg.app_is_cloud`*::
-+
---
-Application is Cloud
-
-
-type: keyword
-
---
-
-*`sophos.xg.in_interface`*::
-+
---
-Interface for incoming traffic, e.g., Port A
-
-
-type: keyword
-
---
-
-*`sophos.xg.out_interface`*::
-+
---
-Interface for outgoing traffic, e.g., Port B
-
-
-type: keyword
-
---
-
-*`sophos.xg.src_ip`*::
-+
---
-Original source IP address of traffic
-
-
-type: ip
-
---
-
-*`sophos.xg.src_mac`*::
-+
---
-Original source MAC address of traffic
-
-
-type: keyword
-
---
-
-*`sophos.xg.src_country_code`*::
-+
---
-Code of the country to which the source IP belongs
-
-
-type: keyword
-
---
-
-*`sophos.xg.dst_ip`*::
-+
---
-Original destination IP address of traffic
-
-
-type: ip
-
---
-
-*`sophos.xg.dst_country_code`*::
-+
---
-Code of the country to which the destination IP belongs
-
-
-type: keyword
-
---
-
-*`sophos.xg.protocol`*::
-+
---
-Protocol number of traffic
-
-
-type: keyword
-
---
-
-*`sophos.xg.src_port`*::
-+
---
-Original source port of TCP and UDP traffic
-
-
-type: integer
-
---
-
-*`sophos.xg.dst_port`*::
-+
---
-Original destination port of TCP and UDP traffic
-
-
-type: integer
-
---
-
-*`sophos.xg.icmp_type`*::
-+
---
-ICMP type of ICMP traffic
-
-
-type: keyword
-
---
-
-*`sophos.xg.icmp_code`*::
-+
---
-ICMP code of ICMP traffic
-
-
-type: keyword
-
---
-
-*`sophos.xg.sent_pkts`*::
-+
---
-Total number of packets sent
-
-
-type: long
-
---
-
-*`sophos.xg.received_pkts`*::
-+
---
-Total number of packets received
-
-
-type: long
-
---
-
-*`sophos.xg.sent_bytes`*::
-+
---
-Total number of bytes sent
-
-
-type: long
-
---
-
-*`sophos.xg.recv_bytes`*::
-+
---
-Total number of bytes received
-
-
-type: long
-
---
-
-*`sophos.xg.trans_src_ip`*::
-+
---
-Translated source IP address for outgoing traffic
-
-
-type: ip
-
---
-
-*`sophos.xg.trans_src_port`*::
-+
---
-Translated source port for outgoing traffic
-
-
-type: integer
-
---
-
-*`sophos.xg.trans_dst_ip`*::
-+
---
-Translated destination IP address for outgoing traffic
-
-
-type: ip
-
---
-
-*`sophos.xg.trans_dst_port`*::
-+
---
-Translated destination port for outgoing traffic
-
-
-type: integer
-
---
-
-*`sophos.xg.srczonetype`*::
-+
---
-Type of source zone, e.g., LAN
-
-
-type: keyword
-
---
-
-*`sophos.xg.srczone`*::
-+
---
-Name of source zone
-
-
-type: keyword
-
---
-
-*`sophos.xg.dstzonetype`*::
-+
---
-Type of destination zone, e.g., WAN
-
-
-type: keyword
-
---
-
-*`sophos.xg.dstzone`*::
-+
---
-Name of destination zone
-
-
-type: keyword
-
---
-
-*`sophos.xg.dir_disp`*::
-+
---
-TPacket direction. Possible values:“org”, “reply”, “”
-
-
-type: keyword
-
---
-
-*`sophos.xg.connevent`*::
-+
---
-Event on which this log is generated
-
-
-type: keyword
-
---
-
-*`sophos.xg.conn_id`*::
-+
---
-Unique identifier of connection
-
-
-type: integer
-
---
-
-*`sophos.xg.vconn_id`*::
-+
---
-Connection ID of the master connection
-
-
-type: integer
-
---
-
-*`sophos.xg.idp_policy_id`*::
-+
---
-IPS policy ID which is applied on the traffic
-
-
-type: integer
-
---
-
-*`sophos.xg.idp_policy_name`*::
-+
---
-IPS policy name i.e. IPS policy name which is applied on the traffic
-
-
-type: keyword
-
---
-
-*`sophos.xg.signature_id`*::
-+
---
-Signature ID
-
-
-type: keyword
-
---
-
-*`sophos.xg.signature_msg`*::
-+
---
-Signature messsage
-
-
-type: keyword
-
---
-
-*`sophos.xg.classification`*::
-+
---
-Signature classification
-
-
-type: keyword
-
---
-
-*`sophos.xg.rule_priority`*::
-+
---
-Priority of IPS policy
-
-
-type: keyword
-
---
-
-*`sophos.xg.platform`*::
-+
---
-Platform of the traffic.
-
-
-type: keyword
-
---
-
-*`sophos.xg.category`*::
-+
---
-IPS signature category.
-
-
-type: keyword
-
---
-
-*`sophos.xg.target`*::
-+
---
-Platform of the traffic.
-
-
-type: keyword
-
---
-
-*`sophos.xg.eventid`*::
-+
---
-ATP Evenet ID
-
-
-type: keyword
-
---
-
-*`sophos.xg.ep_uuid`*::
-+
---
-Endpoint UUID
-
-
-type: keyword
-
---
-
-*`sophos.xg.threatname`*::
-+
---
-ATP threatname
-
-
-type: keyword
-
---
-
-*`sophos.xg.sourceip`*::
-+
---
-Original source IP address of traffic
-
-
-type: ip
-
---
-
-*`sophos.xg.destinationip`*::
-+
---
-Original destination IP address of traffic
-
-
-type: ip
-
---
-
-*`sophos.xg.login_user`*::
-+
---
-ATP login user
-
-
-type: keyword
-
---
-
-*`sophos.xg.eventtype`*::
-+
---
-ATP event type
-
-
-type: keyword
-
---
-
-*`sophos.xg.execution_path`*::
-+
---
-ATP execution path
-
-
-type: keyword
-
---
-
-*`sophos.xg.av_policy_name`*::
-+
---
-Malware scanning policy name which is applied on the traffic
-
-
-type: keyword
-
---
-
-*`sophos.xg.from_email_address`*::
-+
---
-Sender email address
-
-
-type: keyword
-
---
-
-*`sophos.xg.to_email_address`*::
-+
---
-Receipeint email address
-
-
-type: keyword
-
---
-
-*`sophos.xg.subject`*::
-+
---
-Email subject
-
-
-type: keyword
-
---
-
-*`sophos.xg.mailsize`*::
-+
---
-mailsize
-
-
-type: integer
-
---
-
-*`sophos.xg.virus`*::
-+
---
-virus name
-
-
-type: keyword
-
---
-
-*`sophos.xg.ftp_url`*::
-+
---
-FTP URL from which virus was downloaded
-
-
-type: keyword
-
---
-
-*`sophos.xg.ftp_direction`*::
-+
---
-Direction of FTP transfer: Upload or Download
-
-
-type: keyword
-
---
-
-*`sophos.xg.filesize`*::
-+
---
-Size of the file that contained virus
-
-
-type: integer
-
---
-
-*`sophos.xg.filepath`*::
-+
---
-Path of the file containing virus
-
-
-type: keyword
-
---
-
-*`sophos.xg.filename`*::
-+
---
-File name associated with the event
-
-
-type: keyword
-
---
-
-*`sophos.xg.ftpcommand`*::
-+
---
-FTP command used when virus was found
-
-
-type: keyword
-
---
-
-*`sophos.xg.url`*::
-+
---
-URL from which virus was downloaded
-
-
-type: keyword
-
---
-
-*`sophos.xg.domainname`*::
-+
---
-Domain from which virus was downloaded
-
-
-type: keyword
-
---
-
-*`sophos.xg.quarantine`*::
-+
---
-Path and filename of the file quarantined
-
-
-type: keyword
-
---
-
-*`sophos.xg.src_domainname`*::
-+
---
-Sender domain name
-
-
-type: keyword
-
---
-
-*`sophos.xg.dst_domainname`*::
-+
---
-Receiver domain name
-
-
-type: keyword
-
---
-
-*`sophos.xg.reason`*::
-+
---
-Reason why the record was detected as spam/malicious
-
-
-type: keyword
-
---
-
-*`sophos.xg.referer`*::
-+
---
-Referer
-
-
-type: keyword
-
---
-
-*`sophos.xg.spamaction`*::
-+
---
-Spam Action
-
-
-type: keyword
-
---
-
-*`sophos.xg.mailid`*::
-+
---
-mailid
-
-
-type: keyword
-
---
-
-*`sophos.xg.quarantine_reason`*::
-+
---
-Quarantine reason
-
-
-type: keyword
-
---
-
-*`sophos.xg.status_code`*::
-+
---
-Status code
-
-
-type: keyword
-
---
-
-*`sophos.xg.override_token`*::
-+
---
-Override token
-
-
-type: keyword
-
---
-
-*`sophos.xg.con_id`*::
-+
---
-Unique identifier of connection
-
-
-type: integer
-
---
-
-*`sophos.xg.override_authorizer`*::
-+
---
-Override authorizer
-
-
-type: keyword
-
---
-
-*`sophos.xg.transactionid`*::
-+
---
-Transaction ID of the AV scan.
-
-
-type: keyword
-
---
-
-*`sophos.xg.upload_file_type`*::
-+
---
-Upload file type
-
-
-type: keyword
-
---
-
-*`sophos.xg.upload_file_name`*::
-+
---
-Upload file name
-
-
-type: keyword
-
---
-
-*`sophos.xg.httpresponsecode`*::
-+
---
-code of HTTP response
-
-
-type: long
-
---
-
-*`sophos.xg.user_gp`*::
-+
---
-Group name to which the user belongs.
-
-
-type: keyword
-
---
-
-*`sophos.xg.category_type`*::
-+
---
-Type of category under which website falls
-
-
-type: keyword
-
---
-
-*`sophos.xg.download_file_type`*::
-+
---
-Download file type
-
-
-type: keyword
-
---
-
-*`sophos.xg.exceptions`*::
-+
---
-List of the checks excluded by web exceptions.
-
-
-type: keyword
-
---
-
-*`sophos.xg.contenttype`*::
-+
---
-Type of the content
-
-
-type: keyword
-
---
-
-*`sophos.xg.override_name`*::
-+
---
-Override name
-
-
-type: keyword
-
---
-
-*`sophos.xg.activityname`*::
-+
---
-Web policy activity that matched and caused the policy result.
-
-
-type: keyword
-
---
-
-*`sophos.xg.download_file_name`*::
-+
---
-Download file name
-
-
-type: keyword
-
---
-
-*`sophos.xg.sha1sum`*::
-+
---
-SHA1 checksum of the item being analyzed
-
-
-type: keyword
-
---
-
-*`sophos.xg.message_id`*::
-+
---
-Message ID
-
-
-type: keyword
-
---
-
-*`sophos.xg.connid`*::
-+
---
-Connection ID
-
-
-type: keyword
-
---
-
-*`sophos.xg.message`*::
-+
---
-Message
-
-
-type: keyword
-
---
-
-*`sophos.xg.email_subject`*::
-+
---
-Email Subject
-
-
-type: keyword
-
---
-
-*`sophos.xg.file_path`*::
-+
---
-File path
-
-
-type: keyword
-
---
-
-*`sophos.xg.dstdomain`*::
-+
---
-Destination Domain
-
-
-type: keyword
-
---
-
-*`sophos.xg.file_size`*::
-+
---
-File Size
-
-
-type: integer
-
---
-
-*`sophos.xg.transaction_id`*::
-+
---
-Transaction ID
-
-
-type: keyword
-
---
-
-*`sophos.xg.website`*::
-+
---
-Website
-
-
-type: keyword
-
---
-
-*`sophos.xg.file_name`*::
-+
---
-Filename
-
-
-type: keyword
-
---
-
-*`sophos.xg.context_prefix`*::
-+
---
-Content Prefix
-
-
-type: keyword
-
---
-
-*`sophos.xg.site_category`*::
-+
---
-Site Category
-
-
-type: keyword
-
---
-
-*`sophos.xg.context_suffix`*::
-+
---
-Context Suffix
-
-
-type: keyword
-
---
-
-*`sophos.xg.dictionary_name`*::
-+
---
-Dictionary Name
-
-
-type: keyword
-
---
-
-*`sophos.xg.action`*::
-+
---
-Event Action
-
-
-type: keyword
-
---
-
-*`sophos.xg.user`*::
-+
---
-User
-
-
-type: keyword
-
---
-
-*`sophos.xg.context_match`*::
-+
---
-Context Match
-
-
-type: keyword
-
---
-
-*`sophos.xg.direction`*::
-+
---
-Direction
 
 
 type: keyword
@@ -142781,6 +142698,146 @@ type: keyword
 
 --
 
+*`sophos.xg.av_policy_name`*::
++
+--
+Malware scanning policy name which is applied on the traffic
+
+
+type: keyword
+
+--
+
+*`sophos.xg.backup_mode`*::
++
+--
+Backup mode
+
+
+type: keyword
+
+--
+
+*`sophos.xg.branch_name`*::
++
+--
+Branch Name
+
+
+type: keyword
+
+--
+
+*`sophos.xg.category`*::
++
+--
+IPS signature category.
+
+
+type: keyword
+
+--
+
+*`sophos.xg.category_type`*::
++
+--
+Type of category under which website falls
+
+
+type: keyword
+
+--
+
+*`sophos.xg.classification`*::
++
+--
+Signature classification
+
+
+type: keyword
+
+--
+
+*`sophos.xg.client_host_name`*::
++
+--
+Client host name
+
+
+type: keyword
+
+--
+
+*`sophos.xg.client_physical_address`*::
++
+--
+Client physical address
+
+
+type: keyword
+
+--
+
+*`sophos.xg.clients_conn_ssid`*::
++
+--
+Number of client connected to the SSID.
+
+
+type: long
+
+--
+
+*`sophos.xg.collisions`*::
++
+--
+collisions
+
+
+type: long
+
+--
+
+*`sophos.xg.con_event`*::
++
+--
+Event Start/Stop
+
+
+type: keyword
+
+--
+
+*`sophos.xg.con_id`*::
++
+--
+Unique identifier of connection
+
+
+type: integer
+
+--
+
+*`sophos.xg.configuration`*::
++
+--
+Configuration
+
+
+type: float
+
+--
+
+*`sophos.xg.conn_id`*::
++
+--
+Unique identifier of connection
+
+
+type: integer
+
+--
+
 *`sophos.xg.connectionname`*::
 +
 --
@@ -142791,10 +142848,670 @@ type: keyword
 
 --
 
-*`sophos.xg.remotenetwork`*::
+*`sophos.xg.connectiontype`*::
 +
 --
-remotenetwork
+Connectiontype
+
+
+type: keyword
+
+--
+
+*`sophos.xg.connevent`*::
++
+--
+Event on which this log is generated
+
+
+type: keyword
+
+--
+
+*`sophos.xg.connid`*::
++
+--
+Connection ID
+
+
+type: keyword
+
+--
+
+*`sophos.xg.content_type`*::
++
+--
+Type of the content
+
+
+type: keyword
+
+--
+
+*`sophos.xg.contenttype`*::
++
+--
+Type of the content
+
+
+type: keyword
+
+--
+
+*`sophos.xg.context_match`*::
++
+--
+Context Match
+
+
+type: keyword
+
+--
+
+*`sophos.xg.context_prefix`*::
++
+--
+Content Prefix
+
+
+type: keyword
+
+--
+
+*`sophos.xg.context_suffix`*::
++
+--
+Context Suffix
+
+
+type: keyword
+
+--
+
+*`sophos.xg.cookie`*::
++
+--
+cookie
+
+
+type: keyword
+
+--
+
+*`sophos.xg.date`*::
++
+--
+Date (yyyy-mm-dd) when the event occurred
+
+
+type: date
+
+--
+
+*`sophos.xg.destinationip`*::
++
+--
+Original destination IP address of traffic
+
+
+type: ip
+
+--
+
+*`sophos.xg.device`*::
++
+--
+device
+
+
+type: keyword
+
+--
+
+*`sophos.xg.device_id`*::
++
+--
+Serial number of the device
+
+
+type: keyword
+
+--
+
+*`sophos.xg.device_model`*::
++
+--
+Model number of the device
+
+
+type: keyword
+
+--
+
+*`sophos.xg.device_name`*::
++
+--
+Model number of the device
+
+
+type: keyword
+
+--
+
+*`sophos.xg.dictionary_name`*::
++
+--
+Dictionary Name
+
+
+type: keyword
+
+--
+
+*`sophos.xg.dir_disp`*::
++
+--
+TPacket direction. Possible values:“org”, “reply”, “”
+
+
+type: keyword
+
+--
+
+*`sophos.xg.direction`*::
++
+--
+Direction
+
+
+type: keyword
+
+--
+
+*`sophos.xg.domainname`*::
++
+--
+Domain from which virus was downloaded
+
+
+type: keyword
+
+--
+
+*`sophos.xg.download_file_name`*::
++
+--
+Download file name
+
+
+type: keyword
+
+--
+
+*`sophos.xg.download_file_type`*::
++
+--
+Download file type
+
+
+type: keyword
+
+--
+
+*`sophos.xg.dst_country_code`*::
++
+--
+Code of the country to which the destination IP belongs
+
+
+type: keyword
+
+--
+
+*`sophos.xg.dst_domainname`*::
++
+--
+Receiver domain name
+
+
+type: keyword
+
+--
+
+*`sophos.xg.dst_ip`*::
++
+--
+Original destination IP address of traffic
+
+
+type: ip
+
+--
+
+*`sophos.xg.dst_port`*::
++
+--
+Original destination port of TCP and UDP traffic
+
+
+type: integer
+
+--
+
+*`sophos.xg.dst_zone_type`*::
++
+--
+Type of destination zone
+
+
+type: keyword
+
+--
+
+*`sophos.xg.dstdomain`*::
++
+--
+Destination Domain
+
+
+type: keyword
+
+--
+
+*`sophos.xg.duration`*::
++
+--
+Durability of traffic (seconds)
+
+
+type: long
+
+--
+
+*`sophos.xg.email_subject`*::
++
+--
+Email Subject
+
+
+type: keyword
+
+--
+
+*`sophos.xg.ep_uuid`*::
++
+--
+Endpoint UUID
+
+
+type: keyword
+
+--
+
+*`sophos.xg.ether_type`*::
++
+--
+ethernet frame type
+
+
+type: keyword
+
+--
+
+*`sophos.xg.eventid`*::
++
+--
+ATP Evenet ID
+
+
+type: keyword
+
+--
+
+*`sophos.xg.eventtime`*::
++
+--
+Event time
+
+
+type: date
+
+--
+
+*`sophos.xg.eventtype`*::
++
+--
+ATP event type
+
+
+type: keyword
+
+--
+
+*`sophos.xg.exceptions`*::
++
+--
+List of the checks excluded by web exceptions.
+
+
+type: keyword
+
+--
+
+*`sophos.xg.execution_path`*::
++
+--
+ATP execution path
+
+
+type: keyword
+
+--
+
+*`sophos.xg.extra`*::
++
+--
+extra
+
+
+type: keyword
+
+--
+
+*`sophos.xg.file_name`*::
++
+--
+Filename
+
+
+type: keyword
+
+--
+
+*`sophos.xg.file_path`*::
++
+--
+File path
+
+
+type: keyword
+
+--
+
+*`sophos.xg.file_size`*::
++
+--
+File Size
+
+
+type: integer
+
+--
+
+*`sophos.xg.filename`*::
++
+--
+File name associated with the event
+
+
+type: keyword
+
+--
+
+*`sophos.xg.filepath`*::
++
+--
+Path of the file containing virus
+
+
+type: keyword
+
+--
+
+*`sophos.xg.filesize`*::
++
+--
+Size of the file that contained virus
+
+
+type: integer
+
+--
+
+*`sophos.xg.free`*::
++
+--
+free
+
+
+type: integer
+
+--
+
+*`sophos.xg.from_email_address`*::
++
+--
+Sender email address
+
+
+type: keyword
+
+--
+
+*`sophos.xg.ftp_direction`*::
++
+--
+Direction of FTP transfer: Upload or Download
+
+
+type: keyword
+
+--
+
+*`sophos.xg.ftp_url`*::
++
+--
+FTP URL from which virus was downloaded
+
+
+type: keyword
+
+--
+
+*`sophos.xg.ftpcommand`*::
++
+--
+FTP command used when virus was found
+
+
+type: keyword
+
+--
+
+*`sophos.xg.fw_rule_id`*::
++
+--
+Firewall Rule ID which is applied on the traffic
+
+
+type: integer
+
+--
+
+*`sophos.xg.fw_rule_type`*::
++
+--
+Firewall rule type which is applied on the traffic
+
+
+type: keyword
+
+--
+
+*`sophos.xg.hb_health`*::
++
+--
+Heartbeat status
+
+
+type: keyword
+
+--
+
+*`sophos.xg.hb_status`*::
++
+--
+Heartbeat status
+
+
+type: keyword
+
+--
+
+*`sophos.xg.host`*::
++
+--
+Host
+
+
+type: keyword
+
+--
+
+*`sophos.xg.http_category`*::
++
+--
+HTTP Category
+
+
+type: keyword
+
+--
+
+*`sophos.xg.http_category_type`*::
++
+--
+HTTP Category Type
+
+
+type: keyword
+
+--
+
+*`sophos.xg.httpresponsecode`*::
++
+--
+code of HTTP response
+
+
+type: long
+
+--
+
+*`sophos.xg.iap`*::
++
+--
+Internet Access policy ID applied on the traffic
+
+
+type: keyword
+
+--
+
+*`sophos.xg.icmp_code`*::
++
+--
+ICMP code of ICMP traffic
+
+
+type: keyword
+
+--
+
+*`sophos.xg.icmp_type`*::
++
+--
+ICMP type of ICMP traffic
+
+
+type: keyword
+
+--
+
+*`sophos.xg.idle_cpu`*::
++
+--
+idle ##
+
+
+type: float
+
+--
+
+*`sophos.xg.idp_policy_id`*::
++
+--
+IPS policy ID which is applied on the traffic
+
+
+type: integer
+
+--
+
+*`sophos.xg.idp_policy_name`*::
++
+--
+IPS policy name i.e. IPS policy name which is applied on the traffic
+
+
+type: keyword
+
+--
+
+*`sophos.xg.in_interface`*::
++
+--
+Interface for incoming traffic, e.g., Port A
+
+
+type: keyword
+
+--
+
+*`sophos.xg.interface`*::
++
+--
+interface
+
+
+type: keyword
+
+--
+
+*`sophos.xg.ipaddress`*::
++
+--
+Ipaddress
+
+
+type: keyword
+
+--
+
+*`sophos.xg.ips_policy_id`*::
++
+--
+IPS policy ID applied on the traffic
+
+
+type: integer
+
+--
+
+*`sophos.xg.lease_time`*::
++
+--
+Lease Time
 
 
 type: keyword
@@ -142821,20 +143538,110 @@ type: keyword
 
 --
 
-*`sophos.xg.connectiontype`*::
+*`sophos.xg.log_component`*::
 +
 --
-Connectiontype
+Component responsible for logging e.g. Firewall rule
 
 
 type: keyword
 
 --
 
-*`sophos.xg.oldversion`*::
+*`sophos.xg.log_id`*::
 +
 --
-Oldversion
+Unique 12 characters code (0101011)
+
+
+type: keyword
+
+--
+
+*`sophos.xg.log_subtype`*::
++
+--
+Sub type of event
+
+
+type: keyword
+
+--
+
+*`sophos.xg.log_type`*::
++
+--
+Type of event e.g. firewall event
+
+
+type: keyword
+
+--
+
+*`sophos.xg.log_version`*::
++
+--
+Log Version
+
+
+type: keyword
+
+--
+
+*`sophos.xg.login_user`*::
++
+--
+ATP login user
+
+
+type: keyword
+
+--
+
+*`sophos.xg.mailid`*::
++
+--
+mailid
+
+
+type: keyword
+
+--
+
+*`sophos.xg.mailsize`*::
++
+--
+mailsize
+
+
+type: integer
+
+--
+
+*`sophos.xg.message`*::
++
+--
+Message
+
+
+type: keyword
+
+--
+
+*`sophos.xg.mode`*::
++
+--
+Mode
+
+
+type: keyword
+
+--
+
+*`sophos.xg.nat_rule_id`*::
++
+--
+NAT Rule ID
 
 
 type: keyword
@@ -142851,160 +143658,130 @@ type: keyword
 
 --
 
-*`sophos.xg.ipaddress`*::
+*`sophos.xg.oldversion`*::
 +
 --
-Ipaddress
+Oldversion
 
 
 type: keyword
 
 --
 
-*`sophos.xg.client_physical_address`*::
+*`sophos.xg.out_interface`*::
 +
 --
-Client physical address
+Interface for outgoing traffic, e.g., Port B
 
 
 type: keyword
 
 --
 
-*`sophos.xg.client_host_name`*::
+*`sophos.xg.override_authorizer`*::
 +
 --
-Client host name
+Override authorizer
 
 
 type: keyword
 
 --
 
-*`sophos.xg.raw_data`*::
+*`sophos.xg.override_name`*::
 +
 --
-Raw data
+Override name
 
 
 type: keyword
 
 --
 
-*`sophos.xg.Mode`*::
+*`sophos.xg.override_token`*::
 +
 --
-Mode
+Override token
 
 
 type: keyword
 
 --
 
-*`sophos.xg.sessionid`*::
+*`sophos.xg.phpsessid`*::
 +
 --
-Sessionid
+PHP session ID
 
 
 type: keyword
 
 --
 
-*`sophos.xg.starttime`*::
+*`sophos.xg.platform`*::
 +
 --
-Starttime
-
-
-type: date
-
---
-
-*`sophos.xg.remote_ip`*::
-+
---
-Remote IP
-
-
-type: ip
-
---
-
-*`sophos.xg.timestamp`*::
-+
---
-timestamp
-
-
-type: date
-
---
-
-*`sophos.xg.SysLog_SERVER_NAME`*::
-+
---
-SysLog SERVER NAME
+Platform of the traffic.
 
 
 type: keyword
 
 --
 
-*`sophos.xg.backup_mode`*::
+*`sophos.xg.policy_type`*::
 +
 --
-Backup mode
+Policy type applied to the traffic
 
 
 type: keyword
 
 --
 
-*`sophos.xg.source`*::
+*`sophos.xg.priority`*::
 +
 --
-Source
+Severity level of traffic
 
 
 type: keyword
 
 --
 
-*`sophos.xg.server`*::
+*`sophos.xg.protocol`*::
 +
 --
-Server
+Protocol number of traffic
 
 
 type: keyword
 
 --
 
-*`sophos.xg.host`*::
+*`sophos.xg.qualifier`*::
 +
 --
-Host
+Qualifier
 
 
 type: keyword
 
 --
 
-*`sophos.xg.responsetime`*::
+*`sophos.xg.quarantine`*::
 +
 --
-Responsetime
+Path and filename of the file quarantined
 
 
-type: long
+type: keyword
 
 --
 
-*`sophos.xg.cookie`*::
+*`sophos.xg.quarantine_reason`*::
 +
 --
-cookie
+Quarantine reason
 
 
 type: keyword
@@ -143021,153 +143798,33 @@ type: keyword
 
 --
 
-*`sophos.xg.extra`*::
+*`sophos.xg.raw_data`*::
 +
 --
-extra
+Raw data
 
 
 type: keyword
 
 --
 
-*`sophos.xg.PHPSESSID`*::
+*`sophos.xg.received_pkts`*::
 +
 --
-PHPSESSID
+Total number of packets received
 
 
-type: keyword
+type: long
 
 --
 
-*`sophos.xg.start_time`*::
+*`sophos.xg.receiveddrops`*::
 +
 --
-Start time
+received drops
 
 
-type: date
-
---
-
-*`sophos.xg.eventtime`*::
-+
---
-Event time
-
-
-type: date
-
---
-
-*`sophos.xg.red_id`*::
-+
---
-RED ID
-
-
-type: keyword
-
---
-
-*`sophos.xg.branch_name`*::
-+
---
-Branch Name
-
-
-type: keyword
-
---
-
-*`sophos.xg.updatedip`*::
-+
---
-updatedip
-
-
-type: ip
-
---
-
-*`sophos.xg.idle_cpu`*::
-+
---
-idle ##
-
-
-type: float
-
---
-
-*`sophos.xg.system_cpu`*::
-+
---
-system
-
-
-type: float
-
---
-
-*`sophos.xg.user_cpu`*::
-+
---
-system
-
-
-type: float
-
---
-
-*`sophos.xg.used`*::
-+
---
-used
-
-
-type: integer
-
---
-
-*`sophos.xg.unit`*::
-+
---
-unit
-
-
-type: keyword
-
---
-
-*`sophos.xg.total_memory`*::
-+
---
-Total Memory
-
-
-type: integer
-
---
-
-*`sophos.xg.free`*::
-+
---
-free
-
-
-type: integer
-
---
-
-*`sophos.xg.transmittederrors`*::
-+
---
-transmitted errors
-
-
-type: keyword
+type: long
 
 --
 
@@ -143191,13 +143848,492 @@ type: long
 
 --
 
-*`sophos.xg.transmittedkbits`*::
+*`sophos.xg.recv_bytes`*::
 +
 --
-transmitted kbits
+Total number of bytes received
 
 
 type: long
+
+--
+
+*`sophos.xg.red_id`*::
++
+--
+RED ID
+
+
+type: keyword
+
+--
+
+*`sophos.xg.referer`*::
++
+--
+Referer
+
+
+type: keyword
+
+--
+
+*`sophos.xg.remote_ip`*::
++
+--
+Remote IP
+
+
+type: ip
+
+--
+
+*`sophos.xg.remotenetwork`*::
++
+--
+remotenetwork
+
+
+type: keyword
+
+--
+
+*`sophos.xg.reported_host`*::
++
+--
+Reported Host
+
+
+type: keyword
+
+--
+
+*`sophos.xg.reported_ip`*::
++
+--
+Reported IP
+
+
+type: keyword
+
+--
+
+*`sophos.xg.reports`*::
++
+--
+Reports
+
+
+type: float
+
+--
+
+*`sophos.xg.rule_priority`*::
++
+--
+Priority of IPS policy
+
+
+type: keyword
+
+--
+
+*`sophos.xg.sent_bytes`*::
++
+--
+Total number of bytes sent
+
+
+type: long
+
+--
+
+*`sophos.xg.sent_pkts`*::
++
+--
+Total number of packets sent
+
+
+type: long
+
+--
+
+*`sophos.xg.server`*::
++
+--
+Server
+
+
+type: keyword
+
+--
+
+*`sophos.xg.sessionid`*::
++
+--
+Sessionid
+
+
+type: keyword
+
+--
+
+*`sophos.xg.sha1sum`*::
++
+--
+SHA1 checksum of the item being analyzed
+
+
+type: keyword
+
+--
+
+*`sophos.xg.signature`*::
++
+--
+Signature
+
+
+type: float
+
+--
+
+*`sophos.xg.signature_id`*::
++
+--
+Signature ID
+
+
+type: keyword
+
+--
+
+*`sophos.xg.signature_msg`*::
++
+--
+Signature messsage
+
+
+type: keyword
+
+--
+
+*`sophos.xg.site_category`*::
++
+--
+Site Category
+
+
+type: keyword
+
+--
+
+*`sophos.xg.source`*::
++
+--
+Source
+
+
+type: keyword
+
+--
+
+*`sophos.xg.sourceip`*::
++
+--
+Original source IP address of traffic
+
+
+type: ip
+
+--
+
+*`sophos.xg.spamaction`*::
++
+--
+Spam Action
+
+
+type: keyword
+
+--
+
+*`sophos.xg.sqli`*::
++
+--
+related SQLI caught by the WAF
+
+
+type: keyword
+
+--
+
+*`sophos.xg.src_country_code`*::
++
+--
+Code of the country to which the source IP belongs
+
+
+type: keyword
+
+--
+
+*`sophos.xg.src_domainname`*::
++
+--
+Sender domain name
+
+
+type: keyword
+
+--
+
+*`sophos.xg.src_ip`*::
++
+--
+Original source IP address of traffic
+
+
+type: ip
+
+--
+
+*`sophos.xg.src_mac`*::
++
+--
+Original source MAC address of traffic
+
+
+type: keyword
+
+--
+
+*`sophos.xg.src_port`*::
++
+--
+Original source port of TCP and UDP traffic
+
+
+type: integer
+
+--
+
+*`sophos.xg.src_zone_type`*::
++
+--
+Type of source zone
+
+type: keyword
+
+--
+
+*`sophos.xg.ssid`*::
++
+--
+Configured SSID name.
+
+
+type: keyword
+
+--
+
+*`sophos.xg.start_time`*::
++
+--
+Start time
+
+
+type: date
+
+--
+
+*`sophos.xg.starttime`*::
++
+--
+Starttime
+
+
+type: date
+
+--
+
+*`sophos.xg.status`*::
++
+--
+Ultimate status of traffic – Allowed or Denied
+
+
+type: keyword
+
+--
+
+*`sophos.xg.status_code`*::
++
+--
+Status code
+
+
+type: keyword
+
+--
+
+*`sophos.xg.subject`*::
++
+--
+Email subject
+
+
+type: keyword
+
+--
+
+*`sophos.xg.syslog_server_name`*::
++
+--
+Syslog server name.
+
+
+type: keyword
+
+--
+
+*`sophos.xg.system_cpu`*::
++
+--
+system
+
+
+type: float
+
+--
+
+*`sophos.xg.target`*::
++
+--
+Platform of the traffic.
+
+
+type: keyword
+
+--
+
+*`sophos.xg.temp`*::
++
+--
+Temp
+
+
+type: float
+
+--
+
+*`sophos.xg.threatname`*::
++
+--
+ATP threatname
+
+
+type: keyword
+
+--
+
+*`sophos.xg.timestamp`*::
++
+--
+timestamp
+
+
+type: date
+
+--
+
+*`sophos.xg.timezone`*::
++
+--
+Time (hh:mm:ss) when the event occurred
+
+
+type: keyword
+
+--
+
+*`sophos.xg.to_email_address`*::
++
+--
+Receipeint email address
+
+
+type: keyword
+
+--
+
+*`sophos.xg.total_memory`*::
++
+--
+Total Memory
+
+
+type: integer
+
+--
+
+*`sophos.xg.trans_dst_ip`*::
++
+--
+Translated destination IP address for outgoing traffic
+
+
+type: ip
+
+--
+
+*`sophos.xg.trans_dst_port`*::
++
+--
+Translated destination port for outgoing traffic
+
+
+type: integer
+
+--
+
+*`sophos.xg.trans_src_ip`*::
++
+--
+Translated source IP address for outgoing traffic
+
+
+type: ip
+
+--
+
+*`sophos.xg.trans_src_port`*::
++
+--
+Translated source port for outgoing traffic
+
+
+type: integer
+
+--
+
+*`sophos.xg.transaction_id`*::
++
+--
+Transaction ID
+
+
+type: keyword
+
+--
+
+*`sophos.xg.transactionid`*::
++
+--
+Transaction ID of the AV scan.
+
+
+type: keyword
 
 --
 
@@ -143211,120 +144347,190 @@ type: long
 
 --
 
-*`sophos.xg.receiveddrops`*::
+*`sophos.xg.transmittederrors`*::
 +
 --
-received drops
-
-
-type: long
-
---
-
-*`sophos.xg.collisions`*::
-+
---
-collisions
-
-
-type: long
-
---
-
-*`sophos.xg.interface`*::
-+
---
-interface
+transmitted errors
 
 
 type: keyword
 
 --
 
-*`sophos.xg.Configuration`*::
+*`sophos.xg.transmittedkbits`*::
 +
 --
-Configuration
+transmitted kbits
+
+
+type: long
+
+--
+
+*`sophos.xg.unit`*::
++
+--
+unit
+
+
+type: keyword
+
+--
+
+*`sophos.xg.updatedip`*::
++
+--
+updatedip
+
+
+type: ip
+
+--
+
+*`sophos.xg.upload_file_name`*::
++
+--
+Upload file name
+
+
+type: keyword
+
+--
+
+*`sophos.xg.upload_file_type`*::
++
+--
+Upload file type
+
+
+type: keyword
+
+--
+
+*`sophos.xg.url`*::
++
+--
+URL from which virus was downloaded
+
+
+type: keyword
+
+--
+
+*`sophos.xg.used`*::
++
+--
+used
+
+
+type: integer
+
+--
+
+*`sophos.xg.used_quota`*::
++
+--
+Used Quota
+
+
+type: keyword
+
+--
+
+*`sophos.xg.user`*::
++
+--
+User
+
+
+type: keyword
+
+--
+
+*`sophos.xg.user_cpu`*::
++
+--
+system
 
 
 type: float
 
 --
 
-*`sophos.xg.Reports`*::
+*`sophos.xg.user_gp`*::
 +
 --
-Reports
+Group name to which the user belongs.
 
 
-type: float
+type: keyword
 
 --
 
-*`sophos.xg.Signature`*::
+*`sophos.xg.user_group`*::
 +
 --
-Signature
+Group name to which the user belongs
 
 
-type: float
+type: keyword
 
 --
 
-*`sophos.xg.Temp`*::
+*`sophos.xg.user_name`*::
 +
 --
-Temp
+user_name
 
 
-type: float
+type: keyword
 
 --
 
 *`sophos.xg.users`*::
 +
 --
-users
+Number of users from System Health / Live User events.
+
+
+type: long
+
+--
+
+*`sophos.xg.vconn_id`*::
++
+--
+Connection ID of the master connection
+
+
+type: integer
+
+--
+
+*`sophos.xg.virus`*::
++
+--
+virus name
 
 
 type: keyword
 
 --
 
-*`sophos.xg.ssid`*::
+*`sophos.xg.web_policy_id`*::
 +
 --
-ssid
+Web policy ID
 
 
 type: keyword
 
 --
 
-*`sophos.xg.ap`*::
+*`sophos.xg.website`*::
 +
 --
-ap
-
-
-type: keyword
-
---
-
-*`sophos.xg.clients_conn_ssid`*::
-+
---
-clients connection ssid
-
-
-type: keyword
-
---
-
-*`sophos.xg.sqli`*::
-+
---
-The related SQLI caught by the WAF
+Website
 
 
 type: keyword
@@ -143334,17 +144540,7 @@ type: keyword
 *`sophos.xg.xss`*::
 +
 --
-The related XSS caught by the WAF
-
-
-type: keyword
-
---
-
-*`sophos.xg.ether_type`*::
-+
---
-The ethernet frame type
+related XSS caught by the WAF
 
 
 type: keyword
@@ -151285,7 +152481,7 @@ type: long
 Code signing information for the sample.
 
 
-type: keyword
+type: nested
 
 --
 
@@ -170292,3 +171488,4 @@ type: keyword
 
 --
 
+:edit_url!:

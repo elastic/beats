@@ -23,10 +23,10 @@ import (
 	"os"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // diskQueue is the internal type representing a disk-based implementation
@@ -99,7 +99,7 @@ func init() {
 // queueFactory matches the queue.Factory interface, and is used to add the
 // disk queue to the registry.
 func queueFactory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, _ int, // input queue size param is unused.
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *config.C, _ int, // input queue size param is unused.
 ) (queue.Queue, error) {
 	settings, err := SettingsForUserConfig(cfg)
 	if err != nil {
@@ -155,7 +155,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		// and could also prevent us from creating new ones, so we treat this as a
 		// fatal error on startup rather than quietly providing degraded
 		// performance.
-		return nil, fmt.Errorf("couldn't write to state file: %v", err)
+		return nil, fmt.Errorf("couldn't write to state file: %w", err)
 	}
 
 	// Index any existing data segments to be placed in segments.reading.
@@ -193,6 +193,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 	// events that are still present on disk but were already sent and
 	// acknowledged on a previous run (we probably want to track these as well
 	// in the future.)
+	//nolint:godox // Ignore This
 	// TODO: pass in a context that queues can use to report these events.
 	activeFrameCount := 0
 	for _, segment := range initialSegments {
@@ -266,14 +267,20 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
+	var serializationFormat SerializationFormat
+	if dq.settings.UseProtobuf {
+		serializationFormat = SerializationProtobuf
+	} else {
+		serializationFormat = SerializationCBOR
+	}
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newEventEncoder(),
+		encoder: newEventEncoder(serializationFormat),
 		done:    make(chan struct{}),
 	}
 }
 
-func (dq *diskQueue) Consumer() queue.Consumer {
-	return &diskQueueConsumer{queue: dq, done: make(chan struct{})}
+func (dq *diskQueue) Metrics() (queue.Metrics, error) {
+	return queue.Metrics{}, queue.ErrMetricsNotImplemented
 }

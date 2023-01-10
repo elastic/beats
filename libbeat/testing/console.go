@@ -26,6 +26,8 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
+
+	libtesting "github.com/elastic/elastic-agent-libs/testing"
 )
 
 // ConsoleDriver outputs test result to the given stdout/stderr descriptors
@@ -58,7 +60,7 @@ func NewConsoleDriverWithKiller(stdout io.Writer, killer func()) *ConsoleDriver 
 	}
 }
 
-func (d *ConsoleDriver) Run(name string, f func(Driver)) {
+func (d *ConsoleDriver) Run(name string, f func(libtesting.Driver)) {
 	if !d.reported {
 		fmt.Fprintln(d.Stdout, "")
 	}

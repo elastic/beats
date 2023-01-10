@@ -21,8 +21,8 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFormatStringWriter(t *testing.T) {
@@ -32,7 +32,7 @@ func TestFormatStringWriter(t *testing.T) {
 	expectedValue := "test message"
 
 	codec := New(format)
-	output, err := codec.Encode("test", &beat.Event{Fields: common.MapStr{"msg": "message"}})
+	output, err := codec.Encode("test", &beat.Event{Fields: mapstr.M{"msg": "message"}})
 
 	if err != nil {
 		t.Errorf("Error during event write %v", err)

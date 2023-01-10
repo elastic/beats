@@ -15,13 +15,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
@@ -41,9 +40,7 @@ type azureInput struct {
 	workerCtx    context.Context         // worker goroutine context. It's cancelled when the input stops or the worker exits.
 	workerCancel context.CancelFunc      // used to signal that the worker should stop.
 	workerOnce   sync.Once               // guarantees that the worker goroutine is only started once.
-	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
-	hub          *eventhub.Hub           // hub will be assigned
 }
 
 const (
@@ -53,19 +50,19 @@ const (
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
 	}
 }
 
 // NewInput creates a new azure-eventhub input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "reading %s input config", inputName)
+		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
 	}
 
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
@@ -97,74 +94,40 @@ func NewInput(
 	return in, nil
 }
 
-// Run starts the input worker then returns. Only the first invocation
-// will ever start the worker.
+// Run starts the `azure-eventhub` input and then returns.
+//
+// The first invocation will start an input worker. All subsequent
+// invocations will be no-ops.
+//
+// The input worker will continue fetching data from the event hub until
+// the input Runner calls the `Stop()` method.
 func (a *azureInput) Run() {
+	// `Run` is invoked periodically by the input Runner. The `sync.Once`
+	// guarantees that we only start the worker once during the first
+	// invocation.
 	a.workerOnce.Do(func() {
-		a.workerWg.Add(1)
-		go func() {
-			a.log.Infof("%s input worker has started.", inputName)
-			defer a.log.Infof("%s input worker has stopped.", inputName)
-			defer a.workerWg.Done()
-			defer a.workerCancel()
-			err := a.runWithEPH()
-			if err != nil {
-				a.log.Error(err)
-				return
-			}
-		}()
+		a.log.Infof("%s input worker is starting.", inputName)
+		err := a.runWithEPH()
+		if err != nil {
+			a.log.Errorw("error starting the input worker", "error", err)
+			return
+		}
+		a.log.Infof("%s input worker has started.", inputName)
 	})
 }
 
-// run will run the input with the non-eph version, this option will be available once a more reliable storage is in place, it is curently using an in-memory storage
-//func (a *azureInput) run() error {
-//	var err error
-//	a.hub, err = eventhub.NewHubFromConnectionString(fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName))
-//	if err != nil {
-//		return err
-//	}
-//	// listen to each partition of the Event Hub
-//	runtimeInfo, err := a.hub.GetRuntimeInformation(a.workerCtx)
-//	if err != nil {
-//		return err
-//	}
-//
-//	for _, partitionID := range runtimeInfo.PartitionIDs {
-//		// Start receiving messages
-//		handler := func(c context.Context, event *eventhub.Event) error {
-//			a.log.Info(string(event.Data))
-//			return a.processEvents(event, partitionID)
-//		}
-//		var err error
-//		// sending a nill ReceiveOption will throw an exception
-//		if a.config.ConsumerGroup != "" {
-//			_, err = a.hub.Receive(a.workerCtx, partitionID, handler, eventhub.ReceiveWithConsumerGroup(a.config.ConsumerGroup))
-//		} else {
-//			_, err = a.hub.Receive(a.workerCtx, partitionID, handler)
-//		}
-//		if err != nil {
-//			return err
-//		}
-//	}
-//	return nil
-//}
-
-// Stop stops TCP server
+// Stop stops `azure-eventhub` input.
 func (a *azureInput) Stop() {
-	if a.hub != nil {
-		err := a.hub.Close(a.workerCtx)
-		if err != nil {
-			a.log.Errorw(fmt.Sprintf("error while closing eventhub"), "error", err)
-		}
-	}
 	if a.processor != nil {
-		err := a.processor.Close(a.workerCtx)
+		// Tells the processor to stop processing events and release all
+		// resources (like scheduler, leaser, checkpointer, and client).
+		err := a.processor.Close(context.Background())
 		if err != nil {
-			a.log.Errorw(fmt.Sprintf("error while closing eventhostprocessor"), "error", err)
+			a.log.Errorw("error while closing eventhostprocessor", "error", err)
 		}
 	}
+
 	a.workerCancel()
-	a.workerWg.Wait()
 }
 
 // Wait stop the current server
@@ -174,7 +137,7 @@ func (a *azureInput) Wait() {
 
 func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bool {
 	timestamp := time.Now()
-	azure := common.MapStr{
+	azure := mapstr.M{
 		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
 		//"partition_id":   partitionID,
 		"eventhub":       a.config.EventHubName,
@@ -182,12 +145,12 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 	}
 	messages := a.parseMultipleMessages(event.Data)
 	for _, msg := range messages {
-		azure.Put("offset", event.SystemProperties.Offset)
-		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
-		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
+		_, _ = azure.Put("offset", event.SystemProperties.Offset)
+		_, _ = azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
+		_, _ = azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 		ok := a.outlet.OnEvent(beat.Event{
 			Timestamp: timestamp,
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"message": msg,
 				"azure":   azure,
 			},

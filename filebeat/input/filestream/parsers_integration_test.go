@@ -30,6 +30,7 @@ func TestParsersAgentLogs(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -49,7 +50,7 @@ func TestParsersAgentLogs(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
-	env.requireOffsetInRegistry(testlogName, len(testline))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
 
 	env.requireEventContents(0, "message", "Harvester started for file: /var/log/auth.log")
 	env.requireEventContents(0, "log.level", "info")
@@ -65,6 +66,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -88,7 +90,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(2)
-	env.requireOffsetInRegistry(testlogName, len(testline))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
 
 	env.requireEventContents(0, "time", "2016-03-02T22:59:04.609292428Z")
 	env.requireEventContents(0, "stream", "stdout")
@@ -103,6 +105,7 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -123,7 +126,7 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
-	env.requireOffsetInRegistry(testlogName, len(testline))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
 
 	env.requireEventContents(0, "source", "hello")
 	env.requireEventContents(0, "message", "test source")
@@ -138,6 +141,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -162,7 +166,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, len(testline))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
 
 	env.requireEventTimestamp(0, "2016-04-05T18:47:18.444")
 	env.requireEventContents(1, "error.message", "@timestamp not overwritten (parse error on invalid)")
@@ -178,6 +182,7 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -200,7 +205,7 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(20)
-	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -212,6 +217,7 @@ func TestParsersCStyleLog(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -240,7 +246,7 @@ The total should be 4 lines covered
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(4)
-	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -252,6 +258,7 @@ func TestParsersRabbitMQMultilineLog(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -284,7 +291,7 @@ connection <0.23893.109>, channel 3 - soft error:
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(2)
-	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -296,6 +303,7 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -319,7 +327,7 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	env.requireEventsReceived([]string{
 		"[2015-12-06 01:44:16,735][INFO ][node                     ] [Zach] version[2.0.0], pid[48553], build[de54438/2015-10-22T08:09:48Z]",
@@ -339,6 +347,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
@@ -365,7 +374,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
-	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	moreLines := []byte(`  This should not be third
   This should not be fourth
@@ -382,7 +391,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 	})
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreLines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines)+len(moreLines))
 	env.requireEventsReceived([]string{
 		`[2015] hello world
   First Line
@@ -403,6 +412,7 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"message_max_bytes":                 50,
@@ -426,7 +436,7 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	env.requireEventsReceived([]string{
 		"[2015-12-06 01:44:16,735][INFO ][node             ",
@@ -444,6 +454,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"close.reader.after_interval":       "1s",
@@ -469,7 +480,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
-	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 	env.waitUntilHarvesterIsDone()
 
 	moreLines := []byte(`  This should not be third
@@ -487,7 +498,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 	})
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreLines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines)+len(moreLines))
 	env.requireEventsReceived([]string{
 		`[2015] hello world
   First Line
@@ -508,6 +519,7 @@ func TestParsersConsecutiveNewline(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"close.reader.after_interval":       "1s",
@@ -544,7 +556,7 @@ SetAdCodeMiddleware.default_ad_code route
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(2)
-	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	env.requireEventsReceived([]string{
 		line1[:len(line1)-1],

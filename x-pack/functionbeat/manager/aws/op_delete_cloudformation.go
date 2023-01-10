@@ -9,16 +9,15 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type opDeleteCloudFormation struct {
 	log       *logp.Logger
-	svc       cloudformationiface.ClientAPI
+	svc       deleteStackClient
 	stackName string
 }
 
@@ -46,8 +45,7 @@ func (o *opDeleteCloudFormation) Execute(ctx executor.Context) error {
 		StackName:          aws.String(o.stackName),
 	}
 
-	req := o.svc.DeleteStackRequest(input)
-	resp, err := req.Send(context.TODO())
+	resp, err := o.svc.DeleteStack(context.TODO(), input)
 	if err != nil {
 		o.log.Debugf("Could not delete the stack, response: %v", resp)
 		return err
@@ -58,7 +56,7 @@ func (o *opDeleteCloudFormation) Execute(ctx executor.Context) error {
 
 func newOpDeleteCloudFormation(
 	log *logp.Logger,
-	svc cloudformationiface.ClientAPI,
+	svc deleteStackClient,
 	stackName string,
 ) *opDeleteCloudFormation {
 	return &opDeleteCloudFormation{log: log, svc: svc, stackName: stackName}

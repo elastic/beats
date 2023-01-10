@@ -1,0 +1,306 @@
+[role="xpack"]
+
+:modulename: salesforce
+:has-dashboards: true
+
+== Salesforce module
+
+This is a module for Salesforce logs. 
+It collects the logs using the following two different types of inputs:
+
+- `httpjson` input: collects historical data from Salesforce REST API.
+- `cometd` input: collects real-time data from Salesforce Streaming API.
+
+It includes the following filesets for receiving logs:
+
+- `login-rest` fileset: supports Salesforce Login logs received from the REST API.
+- `login-stream` fileset: supports Salesforce Login logs received from the Streaming API.
+- `logout-rest` fileset: supports Salesforce Logout logs received from the REST API.
+- `logout-stream` fileset: supports Salesforce Logout logs received from the Streaming API.
+- `apex-rest` fileset: supports Salesforce Apex logs received from the REST API.
+- `setupaudittrail-rest` fileset: supports logs generated when admins make in your org’s Setup area.
+
+Note: We can leverage the inputs provided above to collect the rest of the events from the Salesforce REST or Streaming API.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+==== `login-rest` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  login-rest:
+    enabled: true
+    var.client_id: "my-client-id"
+    var.client_secret: "my-client-secret"
+    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.user: "my.email@here.com"
+    var.password: "password"
+    var.url: "https://instance-url.salesforce.com"
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.client_id`*::
+
+Oauth client ID.
+
+*`var.client_secret`*::
+
+Oauth client secret.
+
+*`var.token_url`*::
+
+Oauth token URL.
+
+*`var.user`*::
+
+The user used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.password`*::
+
+The password used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.url`*::
+
+The URL of the Saleforce instance.
+
+[float]
+==== `login-stream` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  login-stream:
+    enabled: true
+    var.client_id: "my-client-id"
+    var.client_secret: "my-client-secret"
+    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.user: "my.email@here.com"
+    var.password: "password"
+    var.url: "https://instance-url.salesforce.com"
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.client_id`*::
+
+Oauth client ID.
+
+*`var.client_secret`*::
+
+Oauth client secret.
+
+*`var.token_url`*::
+
+Oauth token URL.
+
+*`var.user`*::
+
+The user used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.password`*::
+
+The password used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.url`*::
+
+The URL of the Saleforce instance.
+
+[float]
+==== `logout-rest` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  logout-rest:
+    enabled: true
+    var.client_id: "my-client-id"
+    var.client_secret: "my-client-secret"
+    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.user: "my.email@here.com"
+    var.password: "password"
+    var.url: "https://instance-url.salesforce.com"
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.client_id`*::
+
+Oauth client ID.
+
+*`var.client_secret`*::
+
+Oauth client secret.
+
+*`var.token_url`*::
+
+Oauth token URL.
+
+*`var.user`*::
+
+The user used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.password`*::
+
+The password used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.url`*::
+
+The URL of the Saleforce instance.
+
+[float]
+==== `logout-stream` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  logout-stream:
+    enabled: true
+    var.client_id: "my-client-id"
+    var.client_secret: "my-client-secret"
+    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.user: "my.email@here.com"
+    var.password: "password"
+    var.url: "https://instance-url.salesforce.com"
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.client_id`*::
+
+Oauth client ID.
+
+*`var.client_secret`*::
+
+Oauth client secret.
+
+*`var.token_url`*::
+
+Oauth token URL.
+
+*`var.user`*::
+
+The user used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.password`*::
+
+The password used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.url`*::
+
+The URL of the Saleforce instance.
+
+[float]
+==== `setupaudittrail-rest` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  setupaudittrail-rest:
+    enabled: true
+    var.client_id: "my-client-id"
+    var.client_secret: "my-client-secret"
+    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.user: "my.email@here.com"
+    var.password: "password"
+    var.url: "https://instance-url.salesforce.com"
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.client_id`*::
+
+Oauth client ID.
+
+*`var.client_secret`*::
+
+Oauth client secret.
+
+*`var.token_url`*::
+
+Oauth token URL.
+
+*`var.user`*::
+
+The user used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.password`*::
+
+The password used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.url`*::
+
+The URL of the Saleforce instance.
+
+[float]
+==== `apex-rest` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  apex-rest:
+    enabled: true
+    var.client_id: "my-client-id"
+    var.client_secret: "my-client-secret"
+    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.user: "my.email@here.com"
+    var.password: "password"
+    var.url: "https://instance-url.salesforce.com"
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.client_id`*::
+
+Oauth client ID.
+
+*`var.client_secret`*::
+
+Oauth client secret.
+
+*`var.token_url`*::
+
+Oauth token URL.
+
+*`var.user`*::
+
+The user used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.password`*::
+
+The password used as part of the authentication flow. It is required for authentication - grant type password.
+
+*`var.url`*::
+
+The URL of the Saleforce instance.
+
+[float]
+=== Example dashboard
+
+This Salesforce module comes with several predefined dashboards, including Login, Logout, Apex, and Setup Audit Trails Dashboards. For example:
+
+image::./images/filebeat-salesforce-login-dashboard.png[]
+
+image::./images/filebeat-salesforce-logout-dashboard.png[]
+
+:has-dashboards!: 
+
+:fileset_ex!:
+
+:modulename!:

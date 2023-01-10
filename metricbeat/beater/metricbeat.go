@@ -18,20 +18,19 @@
 package beater
 
 import (
+	"fmt"
 	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	// include all metricbeat specific builders
 	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
@@ -77,7 +76,7 @@ func WithLightModules() Option {
 // Creator returns a beat.Creator for instantiating a new instance of the
 // Metricbeat framework with the given options.
 func Creator(options ...Option) beat.Creator {
-	return func(b *beat.Beat, c *common.Config) (beat.Beater, error) {
+	return func(b *beat.Beat, c *conf.C) (beat.Beater, error) {
 		return newMetricbeat(b, c, options...)
 	}
 }
@@ -128,10 +127,10 @@ func DefaultTestModulesCreator() beat.Creator {
 }
 
 // newMetricbeat creates and returns a new Metricbeat instance.
-func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbeat, error) {
+func newMetricbeat(b *beat.Beat, c *conf.C, options ...Option) (*Metricbeat, error) {
 	config := defaultConfig
 	if err := c.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "error reading configuration file")
+		return nil, fmt.Errorf("error reading configuration file: %w", err)
 	}
 
 	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.Manager.Enabled()

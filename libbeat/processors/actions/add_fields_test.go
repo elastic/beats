@@ -20,7 +20,7 @@ package actions
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestAddFields(t *testing.T) {
@@ -29,49 +29,49 @@ func TestAddFields(t *testing.T) {
 
 	testProcessors(t, map[string]testCase{
 		"add field": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"fields": common.MapStr{"field": "test"},
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"fields": mapstr.M{"field": "test"},
 			},
 			cfg: single(`{add_fields: {fields: {field: test}}}`),
 		},
 		"custom target": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"my": common.MapStr{"field": "test"},
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"my": mapstr.M{"field": "test"},
 			},
 			cfg: single(`{add_fields: {target: my, fields: {field: test}}}`),
 		},
 		"overwrite existing field": {
-			eventFields: common.MapStr{
-				"fields": common.MapStr{"field": "old"},
+			eventFields: mapstr.M{
+				"fields": mapstr.M{"field": "old"},
 			},
-			wantFields: common.MapStr{"fields": common.MapStr{"field": "test"}},
+			wantFields: mapstr.M{"fields": mapstr.M{"field": "test"}},
 			cfg:        single(`{add_fields: {fields: {field: test}}}`),
 		},
 		"merge with existing meta": {
-			eventMeta: common.MapStr{
+			eventMeta: mapstr.M{
 				"_id": "unique",
 			},
-			wantMeta: common.MapStr{
+			wantMeta: mapstr.M{
 				"_id":     "unique",
 				"op_type": "index",
 			},
 			cfg: single(`{add_fields: {target: "@metadata", fields: {op_type: "index"}}}`),
 		},
 		"merge with existing fields": {
-			eventFields: common.MapStr{
-				"fields": common.MapStr{"existing": "a"},
+			eventFields: mapstr.M{
+				"fields": mapstr.M{"existing": "a"},
 			},
-			wantFields: common.MapStr{
-				"fields": common.MapStr{"existing": "a", "field": "test"},
+			wantFields: mapstr.M{
+				"fields": mapstr.M{"existing": "a", "field": "test"},
 			},
 			cfg: single(`{add_fields: {fields: {field: test}}}`),
 		},
 		"combine 2 processors": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"fields": common.MapStr{
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"fields": mapstr.M{
 					"l1": "a",
 					"l2": "b",
 				},
@@ -82,10 +82,10 @@ func TestAddFields(t *testing.T) {
 			),
 		},
 		"different targets": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"a": common.MapStr{"l1": "a"},
-				"b": common.MapStr{"l2": "b"},
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"a": mapstr.M{"l1": "a"},
+				"b": mapstr.M{"l2": "b"},
 			},
 			cfg: multi(
 				`{add_fields: {target: a, fields: {l1: a}}}`,
@@ -93,31 +93,31 @@ func TestAddFields(t *testing.T) {
 			),
 		},
 		"under root": {
-			eventFields: common.MapStr{},
-			wantFields: common.MapStr{
-				"a": common.MapStr{"b": "test"},
+			eventFields: mapstr.M{},
+			wantFields: mapstr.M{
+				"a": mapstr.M{"b": "test"},
 			},
 			cfg: single(
 				`{add_fields: {target: "", fields: {a.b: test}}}`,
 			),
 		},
 		"merge under root": {
-			eventFields: common.MapStr{
-				"a": common.MapStr{"old": "value"},
+			eventFields: mapstr.M{
+				"a": mapstr.M{"old": "value"},
 			},
-			wantFields: common.MapStr{
-				"a": common.MapStr{"old": "value", "new": "test"},
+			wantFields: mapstr.M{
+				"a": mapstr.M{"old": "value", "new": "test"},
 			},
 			cfg: single(
 				`{add_fields: {target: "", fields: {a.new: test}}}`,
 			),
 		},
 		"overwrite existing under root": {
-			eventFields: common.MapStr{
-				"a": common.MapStr{"keep": "value", "change": "a"},
+			eventFields: mapstr.M{
+				"a": mapstr.M{"keep": "value", "change": "a"},
 			},
-			wantFields: common.MapStr{
-				"a": common.MapStr{"keep": "value", "change": "b"},
+			wantFields: mapstr.M{
+				"a": mapstr.M{"keep": "value", "change": "b"},
 			},
 			cfg: single(
 				`{add_fields: {target: "", fields: {a.change: b}}}`,
@@ -125,8 +125,8 @@ func TestAddFields(t *testing.T) {
 		},
 		"add fields to nil event": {
 			eventFields: nil,
-			wantFields: common.MapStr{
-				"fields": common.MapStr{"field": "test"},
+			wantFields: mapstr.M{
+				"fields": mapstr.M{"field": "test"},
 			},
 			cfg: single(`{add_fields: {fields: {field: test}}}`),
 		},

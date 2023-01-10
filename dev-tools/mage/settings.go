@@ -63,8 +63,8 @@ var (
 	PLATFORMS    = EnvOr("PLATFORMS", "")
 	PACKAGES     = EnvOr("PACKAGES", "")
 
-	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
-	// the crossbuild images at /go/pkg/mod, read-only.
+	// CrossBuildMountModcache mounts $GOPATH/pkg/mod into
+	// the crossbuild images at /go/pkg/mod, read-only,  when set to true.
 	CrossBuildMountModcache = true
 
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))
@@ -358,6 +358,14 @@ func BeatQualifiedVersion() (string, error) {
 		return version, nil
 	}
 	return version + "-" + versionQualifier, nil
+}
+
+func BeatMajorMinorVersion() string {
+	if v, _ := BeatQualifiedVersion(); v != "" {
+		parts := strings.SplitN(v, ".", 3)
+		return parts[0] + "." + parts[1]
+	}
+	return ""
 }
 
 // BeatVersion returns the Beat's version. The value can be overridden by

@@ -94,6 +94,46 @@
     },
     {
         "container": {
+            "cpu": {
+                "usage": 0
+            },
+            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+        },
+        "containerd": {
+            "cpu": {
+                "usage": {
+                    "kernel": {
+                        "ns": 532180000000,
+                        "pct": 0
+                    },
+                    "total": {
+                        "ns": 1236339003984,
+                        "pct": 0
+                    },
+                    "user": {
+                        "ns": 525470000000,
+                        "pct": 0
+                    }
+                }
+            },
+            "namespace": "k8s.io"
+        },
+        "event": {
+            "dataset": "containerd.cpu",
+            "duration": 115000,
+            "module": "containerd"
+        },
+        "metricset": {
+            "name": "cpu",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "containerd"
+        }
+    },
+    {
+        "container": {
             "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
         },
         "containerd": {
@@ -291,43 +331,6 @@
                         }
                     },
                     "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "kernel": {
-                        "ns": 532180000000,
-                        "pct": 0
-                    },
-                    "total": {
-                        "ns": 1236339003984,
-                        "pct": 0
-                    },
-                    "user": {
-                        "ns": 525470000000,
-                        "pct": 0
-                    }
                 }
             },
             "namespace": "k8s.io"

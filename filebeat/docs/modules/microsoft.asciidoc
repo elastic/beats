@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/microsoft/_meta/docs.asciidoc
+
 [[filebeat-module-microsoft]]
 [role="xpack"]
 
@@ -10,7 +12,13 @@ This file is generated! See scripts/docs_collector.py
 
 == Microsoft module
 
+//temporarily override modulename to create working link
+:modulename: m365_defender
+
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: microsoft
 
 This is a module for ingesting data from the different Microsoft Products. Currently supports these filesets:
 
@@ -270,3 +278,4 @@ will be found under `rsa.raw`. The default is false.
 For a description of each field in the module, see the
 <<exported-fields-microsoft,exported fields>> section.
 
+:edit_url!:

@@ -17,6 +17,6 @@
 
 package kafka
 
-import "github.com/elastic/beats/v7/libbeat/logp"
+import "github.com/elastic/elastic-agent-libs/logp"
 
 var debugf = logp.MakeDebug("kafka")

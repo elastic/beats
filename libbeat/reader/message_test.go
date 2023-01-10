@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestToEvent(t *testing.T) {
@@ -37,36 +37,36 @@ func TestToEvent(t *testing.T) {
 			beat.Event{},
 		},
 		"empty content, one field": {
-			Message{Fields: common.MapStr{"my_field": "my_value"}},
-			beat.Event{Fields: common.MapStr{"my_field": "my_value"}},
+			Message{Fields: mapstr.M{"my_field": "my_value"}},
+			beat.Event{Fields: mapstr.M{"my_field": "my_value"}},
 		},
 		"content, no field": {
 			Message{Content: []byte("my message")},
-			beat.Event{Fields: common.MapStr{"message": "my message"}},
+			beat.Event{Fields: mapstr.M{"message": "my message"}},
 		},
 		"content, one field": {
-			Message{Content: []byte("my message"), Fields: common.MapStr{"my_field": "my_value"}},
-			beat.Event{Fields: common.MapStr{"message": "my message", "my_field": "my_value"}},
+			Message{Content: []byte("my message"), Fields: mapstr.M{"my_field": "my_value"}},
+			beat.Event{Fields: mapstr.M{"message": "my message", "my_field": "my_value"}},
 		},
 		"content, message field": {
-			Message{Content: []byte("my message"), Fields: common.MapStr{"message": "my_message_value"}},
-			beat.Event{Fields: common.MapStr{"message": "my message"}},
+			Message{Content: []byte("my message"), Fields: mapstr.M{"message": "my_message_value"}},
+			beat.Event{Fields: mapstr.M{"message": "my message"}},
 		},
 		"content, meta, message field": {
-			Message{Content: []byte("my message"), Fields: common.MapStr{"my_field": "my_value"}, Meta: common.MapStr{"meta": "id"}},
-			beat.Event{Fields: common.MapStr{"message": "my message", "my_field": "my_value"}, Meta: common.MapStr{"meta": "id"}},
+			Message{Content: []byte("my message"), Fields: mapstr.M{"my_field": "my_value"}, Meta: mapstr.M{"meta": "id"}},
+			beat.Event{Fields: mapstr.M{"message": "my message", "my_field": "my_value"}, Meta: mapstr.M{"meta": "id"}},
 		},
 		"content, meta, message and private fields": {
 			Message{
 				Ts:      time.Date(2022, 1, 9, 10, 42, 0, 0, time.UTC),
 				Content: []byte("my message"),
-				Meta:    common.MapStr{"foo": "bar"},
+				Meta:    mapstr.M{"foo": "bar"},
 				Private: 42,
 			},
 			beat.Event{
 				Timestamp: time.Date(2022, 1, 9, 10, 42, 0, 0, time.UTC),
-				Fields:    common.MapStr{"message": "my message"},
-				Meta:      common.MapStr{"foo": "bar"},
+				Fields:    mapstr.M{"message": "my message"},
+				Meta:      mapstr.M{"foo": "bar"},
 				Private:   42,
 			},
 		},

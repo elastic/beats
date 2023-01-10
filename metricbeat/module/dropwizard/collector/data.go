@@ -21,26 +21,26 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type DropWizardEvent struct {
 	key     string
-	value   common.MapStr
-	tags    common.MapStr
+	value   mapstr.M
+	tags    mapstr.M
 	tagHash string
 }
 
 // NewPromEvent creates a prometheus event based on the given string
-func eventMapping(metrics map[string]interface{}) map[string]common.MapStr {
-	eventList := map[string]common.MapStr{}
+func eventMapping(metrics map[string]interface{}) map[string]mapstr.M {
+	eventList := map[string]mapstr.M{}
 
 	for _, metricSet := range metrics {
 		switch t := metricSet.(type) {
 		case map[string]interface{}:
 			for key, value := range t {
 				name, tags := splitTagsFromMetricName(key)
-				valueMap := common.MapStr{}
+				valueMap := mapstr.M{}
 
 				metric, _ := value.(map[string]interface{})
 				for k, v := range metric {
@@ -67,7 +67,7 @@ func eventMapping(metrics map[string]interface{}) map[string]common.MapStr {
 				}
 
 				if _, ok := eventList[dropEvent.tagHash]; !ok {
-					eventList[dropEvent.tagHash] = common.MapStr{}
+					eventList[dropEvent.tagHash] = mapstr.M{}
 
 					// Add labels
 					if len(dropEvent.tags) > 0 {
@@ -88,7 +88,7 @@ func eventMapping(metrics map[string]interface{}) map[string]common.MapStr {
 	return eventList
 }
 
-func splitTagsFromMetricName(metricName string) (string, common.MapStr) {
+func splitTagsFromMetricName(metricName string) (string, mapstr.M) {
 	if metricName == "" {
 		return "", nil
 	}
@@ -103,7 +103,7 @@ func splitTagsFromMetricName(metricName string) (string, common.MapStr) {
 	}
 
 	key := metricName[:index]
-	tags := common.MapStr{}
+	tags := mapstr.M{}
 
 	tagStr := metricName[index+1 : len(metricName)-1]
 

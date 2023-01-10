@@ -795,7 +795,9 @@ class Test(BaseTest):
 
         # Wait until registry file is created
         self.wait_until(lambda: self.registry.exists(), max_timeout=15)
-        assert self.registry.count() == 2
+
+        # registry_flush is now set to 1s, so we need to wait more than 60s
+        self.wait_until(lambda: self.registry.count() == 2, max_timeout=2)
 
         # Wait until states are removed from inputs
         self.wait_until(self.logs.nextCheck("State removed for", count=2), max_timeout=15)

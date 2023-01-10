@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type arrayBackedClient struct {
@@ -46,7 +47,7 @@ func (a *arrayBackedClient) Wait()        { return }
 func (a *arrayBackedClient) Close() error { return nil }
 
 func TestCloudwatchLogs(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"name":        "foobar",
 		"description": "my long description",
 		"role":        "arn:aws:iam::000000000000:role/functionbeat",

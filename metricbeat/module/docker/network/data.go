@@ -18,8 +18,8 @@
 package network
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {
@@ -29,17 +29,21 @@ func eventsMapping(r mb.ReporterV2, netsStatsList []NetStats) {
 }
 
 func eventMapping(r mb.ReporterV2, stats *NetStats) {
+	rootFields := stats.Container.ToMapStr()
+	// Add container ECS fields
+	_, _ = rootFields.Put("container.network.ingress.bytes", stats.Total.RxBytes)
+	_, _ = rootFields.Put("container.network.egress.bytes", stats.Total.TxBytes)
 	r.Event(mb.Event{
-		RootFields: stats.Container.ToMapStr(),
-		MetricSetFields: common.MapStr{
+		RootFields: rootFields,
+		MetricSetFields: mapstr.M{
 			"interface": stats.NameInterface,
-			"inbound": common.MapStr{
+			"inbound": mapstr.M{
 				"bytes":   stats.Total.RxBytes,
 				"dropped": stats.Total.RxDropped,
 				"errors":  stats.Total.RxErrors,
 				"packets": stats.Total.RxPackets,
 			},
-			"outbound": common.MapStr{
+			"outbound": mapstr.M{
 				"bytes":   stats.Total.TxBytes,
 				"dropped": stats.Total.TxDropped,
 				"errors":  stats.Total.TxErrors,

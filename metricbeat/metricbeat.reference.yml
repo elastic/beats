@@ -506,8 +506,7 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
-  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
-  # `add_resource_metadata` can be defined.
+  # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
   #   namespace:
@@ -553,8 +552,7 @@ metricbeat.modules:
   #kube_config: ~/.kube/config
   # Set the namespace to watch for resources
   #namespace: staging
-  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
-  # `add_resource_metadata` can be defined.
+  # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
   #   namespace:
@@ -563,6 +561,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
@@ -888,7 +887,7 @@ metricbeat.modules:
 
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
-  metricsets: ["node", "queue", "connection"]
+  metricsets: ["node", "queue", "connection", "exchange", "shovel"]
   enabled: true
   period: 10s
   hosts: ["localhost:15672"]
@@ -1012,6 +1011,10 @@ metricbeat.modules:
 # fields in the output document instead of being grouped under a fields
 # sub-dictionary. Default is false.
 #fields_under_root: false
+
+# Configure the precision of all timestamps in Metricbeat.
+# Available options: millisecond, microsecond, nanosecond
+#timestamp.precision: millisecond
 
 # Internal queue configuration for buffering events to be published.
 #queue:
@@ -1615,9 +1618,6 @@ output.elasticsearch:
     # Strategy for fetching the topics metadata from the broker. Default is false.
     #full: false
 
-  # The number of concurrent load-balanced Kafka output workers.
-  #worker: 1
-
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, events are typically dropped.
   # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
@@ -2074,6 +2074,9 @@ output.elasticsearch:
 
 # Name under which the template is stored in Elasticsearch
 #setup.template.json.name: ""
+
+# Set this option if the JSON template is a data stream.
+#setup.template.json.data_stream: false
 
 # Overwrite existing template
 # Do not enable this option for more than one instance of metricbeat as it might

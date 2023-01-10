@@ -18,7 +18,6 @@
 package diskqueue
 
 import (
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -50,21 +49,21 @@ type producerWriteRequest struct {
 // diskQueueProducer implementation of the queue.Producer interface
 //
 
-func (producer *diskQueueProducer) Publish(event publisher.Event) bool {
-	return producer.publish(event, true)
+func (producer *diskQueueProducer) Publish(event interface{}) (queue.EntryID, bool) {
+	return 0, producer.publish(event, true)
 }
 
-func (producer *diskQueueProducer) TryPublish(event publisher.Event) bool {
-	return producer.publish(event, false)
+func (producer *diskQueueProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+	return 0, producer.publish(event, false)
 }
 
 func (producer *diskQueueProducer) publish(
-	event publisher.Event, shouldBlock bool,
+	event interface{}, shouldBlock bool,
 ) bool {
 	if producer.cancelled {
 		return false
 	}
-	serialized, err := producer.encoder.encode(&event)
+	serialized, err := producer.encoder.encode(event)
 	if err != nil {
 		producer.queue.logger.Errorf(
 			"Couldn't serialize incoming event: %v", err)

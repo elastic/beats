@@ -7,11 +7,11 @@ package cmd
 import (
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/spf13/cobra"
 
@@ -26,8 +26,8 @@ const (
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
-var withECSVersion = processing.WithFields(common.MapStr{
-	"ecs": common.MapStr{
+var withECSVersion = processing.WithFields(mapstr.M{
+	"ecs": mapstr.M{
 		"version": ecs.Version,
 	},
 })
@@ -37,7 +37,7 @@ var RootCmd = Osquerybeat()
 func Osquerybeat() *cmd.BeatsRootCmd {
 	settings := instance.Settings{
 		Name:            Name,
-		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 		ElasticLicensed: true,
 	}
 	command := cmd.GenRootCmdWithSettings(beater.New, settings)
@@ -48,7 +48,7 @@ func Osquerybeat() *cmd.BeatsRootCmd {
 	return command
 }
 
-func genVerifyCmd(settings instance.Settings) *cobra.Command {
+func genVerifyCmd(_ instance.Settings) *cobra.Command {
 	return &cobra.Command{
 		Use:   "verify",
 		Short: "Verify installation",

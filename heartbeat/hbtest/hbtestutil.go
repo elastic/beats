@@ -35,18 +35,21 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
-	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/common/x509util"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/common/x509util"
 )
 
 // HelloWorldBody is the body of the HelloWorldHandler.
@@ -61,7 +64,7 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 				w.Header().Set("Location", "/somewhere")
 			}
 			w.WriteHeader(status)
-			io.WriteString(w, HelloWorldBody)
+			_, _ = io.WriteString(w, HelloWorldBody)
 		},
 	)
 }
@@ -78,7 +81,7 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
-			io.WriteString(w, body.String())
+			_, _ = io.WriteString(w, body.String())
 		},
 	)
 }
@@ -90,7 +93,7 @@ func CustomResponseHandler(body []byte, status int, extraHeaders map[string]stri
 				w.Header().Add(key, val)
 			}
 			w.WriteHeader(status)
-			w.Write(body)
+			_, _ = w.Write(body)
 		},
 	)
 }
@@ -107,6 +110,8 @@ func RedirectHandler(redirectingPaths map[string]string, body string) http.Handl
 				w.WriteHeader(302)
 			} else {
 				w.WriteHeader(200)
+				//nolint:errcheck // There are no new changes to this line but
+				// linter has been activated in the meantime. We'll cleanup separately.
 				io.WriteString(w, body)
 			}
 		})
@@ -127,7 +132,7 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validator.Validator {
-	expected := common.MapStr{}
+	expected := mapstr.M{}
 	// This function is well tested independently, so we just test that things match up here.
 	tlsmeta.AddTLSMetadata(expected, tls.ConnectionState{
 		Version:           tls.VersionTLS13,
@@ -137,12 +142,16 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 		PeerCertificates:  []*x509.Certificate{certificate},
 	}, time.Duration(1))
 
-	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+	//nolint:errcheck // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
+	expected.Put("tls.rtt.handshake.us", hbtestllext.IsInt64)
 
 	// Generally, the exact cipher will match, but on windows 7 32bit this is not true!
 	// We don't actually care about the exact cipher matching, since we're not testing the TLS
 	// implementation, we trust go there, just that most of the metadata is present
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		//nolint:errcheck // There are no new changes to this line but
+		// linter has been activated in the meantime. We'll cleanup separately.
 		expected.Put("tls.cipher", isdef.IsString)
 	}
 
@@ -150,9 +159,8 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 }
 
 func TLSCertChecks(certificate *x509.Certificate) validator.Validator {
-	expected := common.MapStr{}
-	tlsmeta.AddCertMetadata(expected, []*x509.Certificate{certificate})
-	return lookslike.MustCompile(expected)
+	tlsFields := tlsmeta.CertFields(certificate, nil)
+	return lookslike.MustCompile(mapstr.M{"tls": tlsFields})
 }
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
@@ -171,7 +179,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 			"monitor": map[string]interface{}{
 				"ip":          ipCheck,
 				"status":      status,
-				"duration.us": isdef.IsDuration,
+				"duration.us": hbtestllext.IsInt64,
 				"id":          isdef.IsNonEmptyString,
 				"name":        isdef.IsString,
 				"type":        typ,
@@ -182,13 +190,14 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	)
 }
 
-// SummaryChecks validates the "summary" field and its subfields.
+// SummaryChecks validates the "summary" + "state" fields
 func SummaryChecks(up int, down int) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"summary": map[string]interface{}{
 			"up":   uint16(up),
 			"down": uint16(down),
 		},
+		"state": hbtestllext.IsMonitorState,
 	})
 }
 
@@ -197,7 +206,7 @@ func ResolveChecks(ip string) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"resolve": map[string]interface{}{
 			"ip":     ip,
-			"rtt.us": isdef.IsDuration,
+			"rtt.us": hbtestllext.IsInt64,
 		},
 	})
 }
@@ -220,6 +229,18 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) vali
 func URLChecks(t *testing.T, u *url.URL) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"url": wrappers.URLFields(u),
+	})
+}
+
+func ECSErrCodeChecks(ecode ecserr.ECode, messageContains string) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"error": hbtestllext.IsECSErrMatchingCode(ecode, messageContains),
+	})
+}
+
+func ECSErrChecks(eErr *ecserr.ECSErr) validator.Validator {
+	return lookslike.MustCompile(map[string]interface{}{
+		"error": hbtestllext.IsECSErr(eErr),
 	})
 }
 
@@ -246,7 +267,7 @@ func ExpiredCertChecks(cert *x509.Certificate) validator.Validator {
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
 func RespondingTCPChecks() validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": isdef.IsDuration})
+	return lookslike.MustCompile(map[string]interface{}{"tcp.rtt.connect.us": hbtestllext.IsInt64})
 }
 
 // CertToTempFile takes a certificate and returns an *os.File with a PEM encoded
@@ -259,7 +280,7 @@ func CertToTempFile(t *testing.T, cert *x509.Certificate) *os.File {
 	// disk, not memory, so this little bit of extra work is worthwhile
 	certFile, err := ioutil.TempFile("", "sslcert")
 	require.NoError(t, err)
-	certFile.WriteString(x509util.CertToPEMString(cert))
+	_, _ = certFile.WriteString(x509util.CertToPEMString(cert))
 	return certFile
 }
 
@@ -268,14 +289,17 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 	require.NoError(t, err)
 
 	// No need to start a real server, since this is invalid, we just
+	//nolint:gosec // There are no new changes to this line but
+	// linter has been activated in the meantime. We'll cleanup separately.
 	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
 		Certificates: []tls.Certificate{tlsCert},
 	})
 	require.NoError(t, err)
 
-	srv := &http.Server{Handler: HelloWorldHandler(200)}
+	// We set ReadHeaderTimeout to make the gosec lint happy
+	srv := &http.Server{Handler: HelloWorldHandler(200), ReadHeaderTimeout: time.Second}
 	go func() {
-		srv.Serve(l)
+		_ = srv.Serve(l)
 	}()
 
 	host, port, err = net.SplitHostPort(l.Addr().String())

@@ -29,7 +29,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
@@ -48,7 +47,7 @@ func TestFileIdentifierInodeMarker(t *testing.T) {
 		}
 		markerFile.Sync()
 
-		c := common.MustNewConfigFrom(map[string]interface{}{
+		c := conf.MustNewConfigFrom(map[string]interface{}{
 			"identifier": map[string]interface{}{
 				"inode_marker": map[string]interface{}{
 					"path": markerFile.Name(),

@@ -48,7 +48,7 @@ func XPackConfigFileParams() devtools.ConfigFileParams {
 }
 
 func configFileParams(dirs ...string) (devtools.ConfigFileParams, error) {
-	var globs []string
+	globs := make([]string, 0, len(dirs))
 	for _, dir := range dirs {
 		globs = append(globs, filepath.Join(dir, configTemplateGlob))
 	}

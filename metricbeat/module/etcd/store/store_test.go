@@ -25,8 +25,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"testing"
 )
@@ -37,7 +37,7 @@ func TestEventMapping(t *testing.T) {
 
 	event := eventMapping(content)
 
-	assert.Equal(t, event["gets"].(common.MapStr)["fail"], int64(3))
+	assert.Equal(t, event["gets"].(mapstr.M)["fail"], int64(3))
 }
 
 func TestFetchEventContent(t *testing.T) {

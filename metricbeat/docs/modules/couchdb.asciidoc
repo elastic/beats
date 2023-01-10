@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: couchdb
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/couchdb/_meta/docs.asciidoc
+
 
 [[metricbeat-module-couchdb]]
 == CouchDB module
@@ -27,6 +29,8 @@ The CouchDB module comes with a predefined dashboard for CouchDB database specif
 
 image::./images/metricbeat-couchdb-overview.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -55,3 +59,4 @@ The following metricsets are available:
 
 include::couchdb/server.asciidoc[]
 
+:edit_url!:

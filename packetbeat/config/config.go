@@ -19,35 +19,74 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"runtime"
+	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type Config struct {
-	Interfaces      InterfacesConfig          `config:"interfaces"`
-	Flows           *Flows                    `config:"flows"`
-	Protocols       map[string]*common.Config `config:"protocols"`
-	ProtocolsList   []*common.Config          `config:"protocols"`
-	Procs           procs.ProcsConfig         `config:"procs"`
-	IgnoreOutgoing  bool                      `config:"ignore_outgoing"`
-	ShutdownTimeout time.Duration             `config:"shutdown_timeout"`
+	Interface       *InterfaceConfig   `config:"interfaces"`
+	Interfaces      []InterfaceConfig  `config:"interfaces"`
+	Flows           *Flows             `config:"flows"`
+	Protocols       map[string]*conf.C `config:"protocols"`
+	ProtocolsList   []*conf.C          `config:"protocols"`
+	Procs           procs.ProcsConfig  `config:"procs"`
+	IgnoreOutgoing  bool               `config:"ignore_outgoing"`
+	ShutdownTimeout time.Duration      `config:"shutdown_timeout"`
 }
 
-// FromStatic initializes a configuration given a common.Config
-func (c Config) FromStatic(cfg *common.Config) (Config, error) {
+// FromStatic initializes a configuration given a config.C
+func (c Config) FromStatic(cfg *conf.C) (Config, error) {
 	err := cfg.Unpack(&c)
 	if err != nil {
 		return c, err
+	}
+	iface, err := cfg.Child("interfaces", -1)
+	if err == nil {
+		if !iface.IsArray() {
+			c.Interfaces = []InterfaceConfig{*c.Interface}
+		}
+	}
+	c.Interface = nil
+	counts := make(map[string]int)
+	for i, iface := range c.Interfaces {
+		name := iface.Device
+		if name == "" {
+			if runtime.GOOS == "linux" {
+				name = "any"
+			} else {
+				name = "default_route"
+			}
+		}
+		counts[name]++
+		if 0 < c.Interfaces[i].PollDefaultRoute && c.Interfaces[i].PollDefaultRoute < time.Second {
+			c.Interfaces[i].PollDefaultRoute = time.Second
+		}
+	}
+	for n, c := range counts {
+		if c == 1 {
+			delete(counts, n)
+		}
+	}
+	if len(counts) != 0 {
+		dups := make([]string, 0, len(counts))
+		for n := range counts {
+			dups = append(dups, n)
+		}
+		return c, fmt.Errorf("duplicated device configurations: %s", strings.Join(dups, ", "))
 	}
 	return c, nil
 }
 
 // ICMP returns the ICMP configuration
-func (c Config) ICMP() (*common.Config, error) {
-	var icmp *common.Config
+func (c Config) ICMP() (*conf.C, error) {
+	var icmp *conf.C
 	if c.Protocols["icmp"].Enabled() {
 		icmp = c.Protocols["icmp"]
 	}
@@ -74,18 +113,19 @@ func (c Config) ICMP() (*common.Config, error) {
 	return icmp, nil
 }
 
-type InterfacesConfig struct {
-	Device                string   `config:"device"`
-	Type                  string   `config:"type"`
-	File                  string   `config:"file"`
-	WithVlans             bool     `config:"with_vlans"`
-	BpfFilter             string   `config:"bpf_filter"`
-	Snaplen               int      `config:"snaplen"`
-	BufferSizeMb          int      `config:"buffer_size_mb"`
-	EnableAutoPromiscMode bool     `config:"auto_promisc_mode"`
-	InternalNetworks      []string `config:"internal_networks"`
+type InterfaceConfig struct {
+	Device                string        `config:"device"`
+	PollDefaultRoute      time.Duration `config:"poll_default_route"`
+	Type                  string        `config:"type"`
+	File                  string        `config:"file"`
+	WithVlans             bool          `config:"with_vlans"`
+	BpfFilter             string        `config:"bpf_filter"`
+	Snaplen               int           `config:"snaplen"`
+	BufferSizeMb          int           `config:"buffer_size_mb"`
+	EnableAutoPromiscMode bool          `config:"auto_promisc_mode"`
+	InternalNetworks      []string      `config:"internal_networks"`
 	TopSpeed              bool
-	Dumpfile              string
+	Dumpfile              string // Dumpfile is the basename of pcap dumpfiles. The file names will have a creation time stamp and .pcap extension appended.
 	OneAtATime            bool
 	Loop                  int
 }
@@ -94,7 +134,7 @@ type Flows struct {
 	Enabled       *bool                   `config:"enabled"`
 	Timeout       string                  `config:"timeout"`
 	Period        string                  `config:"period"`
-	EventMetadata common.EventMetadata    `config:",inline"`
+	EventMetadata mapstr.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
 	KeepNull      bool                    `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published

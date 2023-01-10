@@ -21,9 +21,10 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -36,23 +37,18 @@ type datastream struct {
 type agentInput struct {
 	Type       string                   `config:"type"`
 	Datastream datastream               `config:"data_stream"`
-	Processors []common.MapStr          `config:"processors"`
+	Processors []mapstr.M               `config:"processors"`
 	Streams    []map[string]interface{} `config:"streams"`
 }
 
-var osDefaultDevices = map[string]string{
-	"darwin": "en0",
-	"linux":  "any",
-}
-
 func defaultDevice() string {
-	if device, found := osDefaultDevices[runtime.GOOS]; found {
-		return device
+	if runtime.GOOS == "linux" {
+		return "any"
 	}
-	return "0"
+	return "default_route"
 }
 
-func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, error) {
+func (i agentInput) addProcessorsAndIndex(cfg *conf.C) (*conf.C, error) {
 	namespace := i.Datastream.Namespace
 	if namespace == "" {
 		namespace = "default"
@@ -63,13 +59,13 @@ func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, e
 	if err := cfg.Unpack(&datastreamConfig); err != nil {
 		return nil, err
 	}
-	mergeConfig, err := common.NewConfigFrom(common.MapStr{
+	mergeConfig, err := conf.NewConfigFrom(mapstr.M{
 		"index": datastreamConfig.Datastream.Type + "-" + datastreamConfig.Datastream.Dataset + "-" + namespace,
-		"processors": append([]common.MapStr{
+		"processors": append([]mapstr.M{
 			{
-				"add_fields": common.MapStr{
+				"add_fields": mapstr.M{
 					"target": "data_stream",
-					"fields": common.MapStr{
+					"fields": mapstr.M{
 						"type":      datastreamConfig.Datastream.Type,
 						"dataset":   datastreamConfig.Datastream.Dataset,
 						"namespace": namespace,
@@ -77,9 +73,9 @@ func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, e
 				},
 			},
 			{
-				"add_fields": common.MapStr{
+				"add_fields": mapstr.M{
 					"target": "event",
-					"fields": common.MapStr{
+					"fields": mapstr.M{
 						"dataset": datastreamConfig.Datastream.Dataset,
 					},
 				},
@@ -116,15 +112,12 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 
 // NewAgentConfig allows the packetbeat configuration to understand
 // agent semantics
-func NewAgentConfig(cfg *common.Config) (Config, error) {
+func NewAgentConfig(cfg *conf.C) (Config, error) {
 	logp.Debug("agent", "Normalizing agent configuration")
-	var input agentInput
-	config := Config{
-		Interfaces: InterfacesConfig{
-			// TODO: make this configurable rather than just using the default device
-			Device: defaultDevice(),
-		},
-	}
+	var (
+		input  agentInput
+		config Config
+	)
 	if err := cfg.Unpack(&input); err != nil {
 		return config, err
 	}
@@ -132,17 +125,19 @@ func NewAgentConfig(cfg *common.Config) (Config, error) {
 	logp.Debug("agent", fmt.Sprintf("Found %d inputs", len(input.Streams)))
 	for _, stream := range input.Streams {
 		if interfaceOverride, ok := stream["interface"]; ok {
-			cfg, err := common.NewConfigFrom(interfaceOverride)
+			cfg, err := conf.NewConfigFrom(interfaceOverride)
 			if err != nil {
 				return config, err
 			}
-			if err := cfg.Unpack(&config.Interfaces); err != nil {
+			var iface InterfaceConfig
+			if err := cfg.Unpack(&iface); err != nil {
 				return config, err
 			}
+			config.Interfaces = append(config.Interfaces, iface)
 		}
 
 		if procsOverride, ok := stream["procs"]; ok {
-			cfg, err := common.NewConfigFrom(procsOverride)
+			cfg, err := conf.NewConfigFrom(procsOverride)
 			if err != nil {
 				return config, err
 			}
@@ -159,7 +154,7 @@ func NewAgentConfig(cfg *common.Config) (Config, error) {
 				return config, fmt.Errorf("invalid input type of: '%T'", rawStreamType)
 			}
 			logp.Debug("agent", fmt.Sprintf("Found agent configuration for %v", streamType))
-			cfg, err := common.NewConfigFrom(stream)
+			cfg, err := conf.NewConfigFrom(stream)
 			if err != nil {
 				return config, err
 			}
@@ -175,6 +170,12 @@ func NewAgentConfig(cfg *common.Config) (Config, error) {
 			default:
 				config.ProtocolsList = append(config.ProtocolsList, cfg)
 			}
+		}
+	}
+	if len(config.Interfaces) == 0 {
+		config.Interfaces = []InterfaceConfig{
+			// TODO: Make this configurable rather than just using the default device.
+			{Device: defaultDevice()},
 		}
 	}
 	return config, nil

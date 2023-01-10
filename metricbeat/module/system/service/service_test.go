@@ -27,8 +27,8 @@ import (
 	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var exampleUnits = []dbus.UnitStatus{
@@ -66,18 +66,18 @@ func TestFormProps(t *testing.T) {
 	event, err := formProperties(testUnit, testprops)
 	assert.NoError(t, err)
 
-	testEvent := common.MapStr{
+	testEvent := mapstr.M{
 		"state":       "active",
 		"exec_code":   "exited",
 		"load_state":  "loaded",
 		"name":        "test.service",
 		"state_since": time.Unix(0, 1571850129000000*1000),
 		"sub_state":   "running",
-		"resources": common.MapStr{"network": common.MapStr{
-			"in": common.MapStr{
+		"resources": mapstr.M{"network": mapstr.M{
+			"in": mapstr.M{
 				"bytes":   50,
 				"packets": 50},
-			"out": common.MapStr{
+			"out": mapstr.M{
 				"bytes":   100,
 				"packets": 100},
 		},

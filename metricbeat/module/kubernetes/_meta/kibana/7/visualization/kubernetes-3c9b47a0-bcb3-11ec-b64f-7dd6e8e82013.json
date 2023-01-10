@@ -1,0 +1,106 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Active CronJobs [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "e6b7ebe0-ba3c-11ec-b1ac-bdfe932d311a"
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "filter": {
+                    "language": "kuery",
+                    "query": "metricset.name :\"state_cronjob\" "
+                },
+                "id": "d9403a9e-99ec-469a-8373-8c33af18e310",
+                "index_pattern_ref_name": "metrics_0_index_pattern",
+                "interval": "",
+                "isModelInvalid": false,
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "default",
+                        "id": "2d23bf1e-1abf-427b-99a1-153919fa6769",
+                        "label": "Active CronJobs",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "kubernetes.cronjob.active.count",
+                                "id": "47e96e26-a822-4c31-b53c-1e41bf281c35",
+                                "order": "desc",
+                                "order_by": "@timestamp",
+                                "size": 1,
+                                "type": "top_hit"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "79dc39d0-ba3d-11ec-b1ac-bdfe932d311a",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kubernetes.cronjob.name",
+                        "terms_size": "10000",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "metric",
+                "use_kibana_indexes": true
+            },
+            "title": "Active CronJobs [Metricbeat Kubernetes]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-3c9b47a0-bcb3-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "metrics_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-05-23T08:46:42.762Z",
+    "version": "WzY2NCwxXQ=="
+}

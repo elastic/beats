@@ -100,10 +100,10 @@ processors:
       field: "json.eventCategory"
       target_field: "aws.cloudtrail.event_category"
       ignore_failure: true
-  - rename:
-      field: "json.awsRegion"
-      target_field: "cloud.region"
-      ignore_failure: true
+  - set:
+      field: "cloud.region"
+      copy_from: "json.awsRegion"
+      ignore_empty_value: true
   - rename:
       field: "json.sourceIPAddress"
       target_field: "source.address"
@@ -183,7 +183,7 @@ processors:
         }
       ignore_failure: true
   - rename:
-      field: "json.requestId"
+      field: "json.requestID"
       target_field: "aws.cloudtrail.request_id"
       ignore_failure: true
   - rename:
@@ -608,7 +608,7 @@ processors:
       target_field: "cloud.account.id"
       ignore_failure: true
   - rename:
-      field: "json.previousDigestS3Object"
+      field: "json.digestS3Object"
       target_field: "file.path"
       ignore_failure: true
   - rename:

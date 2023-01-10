@@ -19,6 +19,7 @@ package tcp
 
 import (
 	"crypto/x509"
+	"errors"
 	"net"
 	"net/url"
 	"time"
@@ -33,10 +34,11 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func init() {
@@ -47,7 +49,7 @@ var debugf = logp.MakeDebug("tcp")
 
 func create(
 	name string,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (p plugin.Plugin, err error) {
 	return createWithResolver(cfg, monitors.NewStdResolver())
 }
@@ -55,7 +57,7 @@ func create(
 // Custom resolver is useful for tests against hostnames locally where we don't want to depend on any
 // hostnames existing in test environments
 func createWithResolver(
-	cfg *common.Config,
+	cfg *conf.C,
 	resolver monitors.Resolver,
 ) (p plugin.Plugin, err error) {
 	jc, err := newJobFactory(cfg, resolver)
@@ -82,7 +84,7 @@ type jobFactory struct {
 	resolver      monitors.Resolver
 }
 
-func newJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (*jobFactory, error) {
+func newJobFactory(commonCfg *conf.C, resolver monitors.Resolver) (*jobFactory, error) {
 	jf := &jobFactory{config: defaultConfig(), resolver: resolver}
 	err := jf.loadConfig(commonCfg)
 	if err != nil {
@@ -93,7 +95,7 @@ func newJobFactory(commonCfg *common.Config, resolver monitors.Resolver) (*jobFa
 }
 
 // loadConfig parses the YAML config and populates the jobFactory fields.
-func (jf *jobFactory) loadConfig(commonCfg *common.Config) error {
+func (jf *jobFactory) loadConfig(commonCfg *conf.C) error {
 	var err error
 	if err = commonCfg.Unpack(&jf.config); err != nil {
 		return err
@@ -171,12 +173,12 @@ func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, err
 }
 
 // makeSocksLookupEndpointJob makes jobs that use a Socks5 proxy to perform DNS lookups
-func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
+func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) jobs.Job {
 	return wrappers.WithURLField(endpointURL,
 		jobs.MakeSimpleJob(func(event *beat.Event) error {
 			hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
 			return jf.dial(event, hostPort, endpointURL)
-		})), nil
+		}))
 }
 
 // dial builds a dialer and executes the network request.
@@ -228,8 +230,10 @@ func (jf *jobFactory) execDialer(
 	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
 		debugf("dial failed with: %v", err)
-		if certErr, ok := err.(x509.CertificateInvalidError); ok {
-			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+		var certErr x509.CertificateInvalidError
+		if errors.As(err, &certErr) {
+			tlsFields := tlsmeta.CertFields(certErr.Cert, nil)
+			event.Fields.DeepUpdate(mapstr.M{"tls": tlsFields})
 		}
 		return reason.IOFailed(err)
 	}
@@ -246,15 +250,15 @@ func (jf *jobFactory) execDialer(
 
 	validateStart := time.Now()
 	err = jf.dataCheck.Check(conn)
-	if err != nil && err != errRecvMismatch {
+	if err != nil && !errors.Is(err, errRecvMismatch) {
 		debugf("check failed with: %v", err)
 		return reason.IOFailed(err)
 	}
 
 	end := time.Now()
-	eventext.MergeEventFields(event, common.MapStr{
-		"tcp": common.MapStr{
-			"rtt": common.MapStr{
+	eventext.MergeEventFields(event, mapstr.M{
+		"tcp": mapstr.M{
+			"rtt": mapstr.M{
 				"validate": look.RTT(end.Sub(validateStart)),
 			},
 		},

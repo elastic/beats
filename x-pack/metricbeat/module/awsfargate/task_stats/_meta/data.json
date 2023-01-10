@@ -128,7 +128,9 @@
                     }
                 }
             },
-            "task_name": "query-metadata"
+            "task_desired_status": "RUNNING",
+            "task_known_status": "ACTIVATING",
+            "task_name": "query-metadata-1"
         }
     },
     "cloud": {

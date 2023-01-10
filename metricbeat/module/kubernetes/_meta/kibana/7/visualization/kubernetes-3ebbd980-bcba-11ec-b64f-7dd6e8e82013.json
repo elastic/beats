@@ -1,0 +1,99 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Select Namespace and Volume [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "orchestrator.cluster.name",
+                        "id": "1653382434503",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Cluster Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "kubernetes.namespace",
+                        "id": "1649843284872",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Namespace name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1653382434503",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "kubernetes.volume.name",
+                        "id": "1649843408089",
+                        "indexPatternRefName": "control_2_index_pattern",
+                        "label": "Volume Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "1649843284872",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": true,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": true
+            },
+            "title": "Select Namespace and Volume [Metricbeat Kubernetes]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-3ebbd980-bcba-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-06-28T06:47:01.240Z",
+    "version": "WzU3MTcsM10="
+}

@@ -41,8 +41,8 @@ processors:
       if: ctx?.winlog?.time_created != null
 
   - set:
-      field: event.ingested
-      value: '{{_ingest.timestamp}}'
+      field: event.module
+      value: powershell
   - set:
       field: event.kind
       value: event

@@ -20,11 +20,11 @@ package server
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/helper/server/tcp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server/udp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // init registers the MetricSet with the central registry.

@@ -18,15 +18,15 @@
 package core
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // AddDatasetToEvent adds dataset information to the event. In particular this
 // adds the module name under dataset.module.
 func AddDatasetToEvent(module, metricSet string, event *mb.Event) {
 	if event.RootFields == nil {
-		event.RootFields = common.MapStr{}
+		event.RootFields = mapstr.M{}
 	}
 
 	event.RootFields.Put("event.module", module)

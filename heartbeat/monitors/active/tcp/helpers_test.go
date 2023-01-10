@@ -18,31 +18,34 @@
 package tcp
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port uint16) *beat.Event {
-	config, err := common.NewConfigFrom(configMap)
+func testTCPConfigCheck(t *testing.T, configMap mapstr.M) *beat.Event {
+	config, err := conf.NewConfigFrom(configMap)
 	require.NoError(t, err)
 
 	p, err := create("tcp", config)
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -53,7 +56,7 @@ func testTCPConfigCheck(t *testing.T, configMap common.MapStr, host string, port
 	return event
 }
 
-func setupServer(t *testing.T, serverCreator func(http.Handler) (*httptest.Server, error)) (*httptest.Server, uint16, error) {
+func setupServer(_ *testing.T, serverCreator func(http.Handler) (*httptest.Server, error)) (*httptest.Server, uint16, error) {
 	server, err := serverCreator(hbtest.HelloWorldHandler(200))
 	if err != nil {
 		return nil, 0, err
@@ -73,12 +76,12 @@ func setupServer(t *testing.T, serverCreator func(http.Handler) (*httptest.Serve
 func newHostTestServer(handler http.Handler, host string) (*httptest.Server, error) {
 	listener, err := net.Listen("tcp", net.JoinHostPort(host, "0"))
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to listen on host '%s'", host)
+		return nil, fmt.Errorf("failed to listen on host '%s': %w", host, err)
 	}
 
 	server := &httptest.Server{
 		Listener: listener,
-		Config:   &http.Server{Handler: handler},
+		Config:   &http.Server{Handler: handler, ReadHeaderTimeout: time.Second},
 	}
 	server.Start()
 

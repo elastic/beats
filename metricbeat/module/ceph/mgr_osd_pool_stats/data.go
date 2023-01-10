@@ -20,8 +20,8 @@ package mgr_osd_pool_stats
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type OsdPoolStat struct {
@@ -35,19 +35,19 @@ type OsdPoolStat struct {
 	} `json:"client_io_rate"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var response []OsdPoolStat
 	err := mgr.UnmarshalResponse(content, &response)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get response data")
 	}
 
-	var events []common.MapStr
+	var events []mapstr.M
 	for _, stat := range response {
-		event := common.MapStr{
+		event := mapstr.M{
 			"pool_id":   stat.PoolID,
 			"pool_name": stat.PoolName,
-			"client_io_rate": common.MapStr{
+			"client_io_rate": mapstr.M{
 				"read_bytes_sec":   stat.ClientIORate.ReadBytesSec,
 				"write_bytes_sec":  stat.ClientIORate.WriteBytesSec,
 				"read_op_per_sec":  stat.ClientIORate.ReadOpPerSec,

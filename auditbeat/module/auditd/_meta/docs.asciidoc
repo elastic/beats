@@ -128,6 +128,7 @@ following example shows all configuration options with their default values.
   include_raw_message: false
   include_warnings: false
   backpressure_strategy: auto
+  immutable: false
 ----
 
 This module also supports the
@@ -151,6 +152,14 @@ than 3.16 {beatname_uc} will automatically revert to `unicast`.
 +
 By default {beatname_uc} will use `multicast` if the kernel version is 3.16 or
 newer and no rules have been defined. Otherwise `unicast` will be used.
+
+*`immutable`*:: This boolean setting sets the audit config as immutable (`-e 2`).
+This option can only be used with the `socket_type: unicast` since {beatname_uc}
+needs to manage the rules to be able to set it.
++
+It is important to note that with this setting enabled, if {beatname_uc} is
+stopped and resumed events will continue to be processed but the
+configuration won't be updated until the system is restarted entirely.
 
 *`resolve_ids`*:: This boolean setting enables the resolution of UIDs and
 GIDs to their associated names. The default value is true.

@@ -13,14 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
-        make: |
-          make -C metricbeat check;
-          make -C metricbeat update;
-          make -C x-pack/metricbeat check;
-          make -C x-pack/metricbeat update;
-          make check-no-changes;
-        stage: lint
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
@@ -39,7 +31,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "orka && darwin && poc"
+          - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test metricbeat for macos"
@@ -49,36 +41,55 @@ stages:
                 - "macosTest"
             tags: true         ## for all the tags
         stage: extended
-    windows:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
-        stage: mandatory
+      # Ignore as long as there are test failures, see https://github.com/elastic/beats/issues/33035
+#     macosM1:
+#         mage: "mage build unitTest"
+#         platforms:             ## override default label in this specific stage.
+#           - "orka && darwin && aarch64"
+#         when:                  ## Override the top-level when.
+#             comments:
+#                 - "/test metricbeat for macos-m1"
+#             labels:
+#                 - "macos-m1"
+#             parameters:
+#                 - "macosM1Test"
+#             tags: false         ## for all the tags
+#         stage: extended
     windows-2022:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2022"
-        stage: extended
+        stage: mandatory
+    windows-2019:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2019"
+        stage: extended_win
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        stage: extended
+        stage: mandatory
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        stage: extended
+        stage: extended_win
+    windows-11:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-11"
+        stage: extended_win
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        stage: extended
+        stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
+        stage: extended_win
     packaging-linux:
         packaging-linux: "mage package"
         e2e:

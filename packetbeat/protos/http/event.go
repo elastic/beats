@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ProtocolFields contains HTTP fields. This contains all the HTTP fields from
@@ -70,10 +71,10 @@ type ProtocolFields struct {
 	ResponseBodyBytes int64 `ecs:"response.body.bytes"`
 
 	// HTTP request headers.
-	RequestHeaders common.MapStr `packetbeat:"request.headers"`
+	RequestHeaders mapstr.M `packetbeat:"request.headers"`
 
 	// HTTP response headers.
-	ResponseHeaders common.MapStr `packetbeat:"response.headers"`
+	ResponseHeaders mapstr.M `packetbeat:"response.headers"`
 
 	// HTTP response mime-type.
 	ResponseMIMEType string `ecs:"response.mime_type"`

@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package source
 
 import (
@@ -14,7 +17,7 @@ import (
 	"github.com/Masterminds/semver"
 )
 
-// ensure compatability of synthetics by enforcing the installed
+// ensure compatibility of synthetics by enforcing the installed
 // version never goes beyond this range
 const ExpectedSynthVersion = "<2.0.0"
 
@@ -27,7 +30,7 @@ type packageJson struct {
 	} `json:"devDependencies"`
 }
 
-var nonNumberRegex = regexp.MustCompile("\\D")
+var nonNumberRegex = regexp.MustCompile(`\D`)
 
 // parsed a given dep version by ignoring all range tags (^, = , >, <)
 func parseVersion(version string) string {

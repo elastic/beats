@@ -1,31 +1,6 @@
 version: '2.3'
 services:
-  beat:
-    build: ${PWD}/.
-    depends_on:
-      - proxy_dep
-    env_file:
-      - ${PWD}/input/redis/_meta/env
-    environment:
-      - BEAT_STRICT_PERMS=false
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
-      - ES_USER=beats
-      - ES_PASS=testing
-      - KAFKA_HOST=kafka
-      - KAFKA_PORT=9092
-      - KIBANA_HOST=kibana
-      - KIBANA_PORT=5601
-      - MOSQUITTO_HOST=mosquitto
-      - MOSQUITTO_PORT=1883
-    working_dir: /go/src/github.com/elastic/beats/filebeat
-    volumes:
-      - ${PWD}/..:/go/src/github.com/elastic/beats/
-      # We launch docker containers to test docker autodiscover:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: make
-
-  # This is a proxy used to block beats until all services are healthy.
+  # This is a proxy used to block "docker-compose up" until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
     image: busybox
@@ -44,12 +19,16 @@ services:
       test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
       interval: 1s
+    ports:
+      - 9200:9200
 
   kafka:
     build: ${ES_BEATS}/testing/environments/docker/kafka
-    expose:
-      - 9092
-      - 2181
+    ports:
+      - 9092:9092
+      - 9093:9093
+      - 9094:9094
+      - 2181:2181
     environment:
       - ADVERTISED_HOST=kafka
 
@@ -63,8 +42,10 @@ services:
 
   mosquitto:
     build: ${ES_BEATS}/testing/environments/docker/mosquitto
-    expose:
-      - 1883
+    ports:
+      - 1883:1883
 
   redis:
     build: ${PWD}/input/redis/_meta
+    ports:
+      - 6379:6379

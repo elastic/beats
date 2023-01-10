@@ -26,13 +26,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -42,6 +42,7 @@ var (
 			"versions": c.Ifc("versions"),
 			"count":    c.Int("count.total"),
 			"master":   c.Int("count.master"),
+			"data":     c.Int("count.data"),
 			"fs": c.Dict("fs", s.Schema{
 				"total": s.Object{
 					"bytes": c.Int("total_in_bytes"),
@@ -94,10 +95,13 @@ var (
 				"available": c.Bool("available"),
 			}),
 		}),
+		"apm": c.Dict("apm", s.Schema{
+			"found": c.Bool("found"),
+		}),
 	}
 )
 
-func clusterNeedsTLSEnabled(license *elasticsearch.License, stackStats common.MapStr) (bool, error) {
+func clusterNeedsTLSEnabled(license *elasticsearch.License, stackStats mapstr.M) (bool, error) {
 	// TLS does not need to be enabled if license type is something other than trial
 	if !license.IsOneOf("trial") {
 		return false, nil
@@ -133,7 +137,7 @@ func clusterNeedsTLSEnabled(license *elasticsearch.License, stackStats common.Ma
 }
 
 // computeNodesHash computes a simple hash value that can be used to determine if the nodes listing has changed since the last report.
-func computeNodesHash(clusterState common.MapStr) (int32, error) {
+func computeNodesHash(clusterState mapstr.M) (int32, error) {
 	value, err := clusterState.GetValue("nodes")
 	if err != nil {
 		return 0, elastic.MakeErrorForMissingField("nodes", elastic.Elasticsearch)
@@ -176,7 +180,7 @@ func hash(s string) int32 {
 	return int32(h.Sum32()) // This cast is needed because the ES mapping is for a 32-bit *signed* integer
 }
 
-func apmIndicesExist(clusterState common.MapStr) (bool, error) {
+func apmIndicesExist(clusterState mapstr.M) (bool, error) {
 	value, err := clusterState.GetValue("routing_table.indices")
 	if err != nil {
 		return false, elastic.MakeErrorForMissingField("routing_table.indices", elastic.Elasticsearch)
@@ -196,7 +200,7 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 	return false, nil
 }
 
-func getClusterMetadataSettings(httpClient *helper.HTTP) (common.MapStr, error) {
+func getClusterMetadataSettings(httpClient *helper.HTTP) (mapstr.M, error) {
 	// For security reasons we only get the display_name setting
 	filterPaths := []string{"*.cluster.metadata.display_name"}
 	clusterSettings, err := elasticsearch.GetClusterSettingsWithDefaults(httpClient, httpClient.GetURI(), filterPaths)
@@ -219,7 +223,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 		return errors.Wrap(err, "failure parsing Elasticsearch Cluster Stats API response")
 	}
 
-	clusterStats := common.MapStr(data)
+	clusterStats := mapstr.M(data)
 	clusterStats.Delete("_nodes")
 
 	license, err := elasticsearch.GetLicense(httpClient, httpClient.GetURI())
@@ -234,7 +238,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	}
 	clusterState.Delete("cluster_name")
 
-	clusterStateReduced := common.MapStr{}
+	clusterStateReduced := mapstr.M{}
 	if err = elasticsearch.PassThruField("status", clusterStats, clusterStateReduced); err != nil {
 		return errors.Wrap(err, "failed to pass through status field")
 	}
@@ -286,8 +290,8 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	stackData, _ := stackSchema.Apply(stackStats)
 
 	event := mb.Event{
-		ModuleFields: common.MapStr{},
-		RootFields:   common.MapStr{},
+		ModuleFields: mapstr.M{},
+		RootFields:   mapstr.M{},
 	}
 	event.ModuleFields.Put("cluster.name", info.ClusterName)
 	event.ModuleFields.Put("cluster.id", info.ClusterID)

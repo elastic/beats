@@ -1,19 +1,5 @@
 Storage metricset fetches metrics from https://cloud.google.com/storage/[Storage] in Google Cloud Platform.
 
-The `storage` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-storage[GCP Storage Monitoring API]. The field names have been left untouched for people already familiar with them.
+The `storage` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-storage[GCP Storage Monitoring API]. The field names are aligned to {beats-devguide}/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
 
-You can specify a single region to fetch metrics like `us-central1`. Be aware that GCP Storage does not use zones so `us-central1-a` will return nothing. If no region is specified, it will return metrics from all buckets.
-
-[float]
-=== Metrics
-Here is a list of metrics collected by `storage` metricset:
-
-- `storage.api.request_count`: Delta count of API calls, grouped by the API method name and response code.
-- `storage.authz.acl_based_object_access_count`: Delta count of requests that result in an object being granted access solely due to object ACLs.
-- `storage.authz.acl_operations_count`: Usage of ACL operations broken down by type.
-- `storage.authz.object_specific_acl_mutation_count`: Delta count of changes made to object specific ACLs.
-- `storage.network.received_bytes_count`: Delta count of bytes received over the network, grouped by the API method name and response code.
-- `storage.network.sent_bytes_count`: Delta count of bytes sent over the network, grouped by the API method name and response code.
-- `storage.storage.object_count`: Total number of objects per bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
-- `storage.storage.total_byte_seconds`: Delta count of bytes received over the network, grouped by the API method name and response code.
-- `storage.storage.total_bytes`: Total size of all objects in the bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
+You can specify a single region to fetch metrics like `us-central1`. Be aware that GCP Storage does not use zones so `us-central1-a` will return nothing. If no region is specified, metrics are returned from all buckets.

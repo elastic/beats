@@ -23,9 +23,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const flagParsingError = "dissect_parsing_error"
@@ -40,7 +41,7 @@ func init() {
 }
 
 // NewProcessor constructs a new dissect processor.
-func NewProcessor(c *common.Config) (processors.Processor, error) {
+func NewProcessor(c *cfg.C) (processors.Processor, error) {
 	config := defaultConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -91,7 +92,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		m, err = p.config.Tokenizer.Dissect(s)
 	}
 	if err != nil {
-		if err := common.AddTagsWithKey(
+		if err := mapstr.AddTagsWithKey(
 			event.Fields,
 			beat.FlagField,
 			[]string{flagParsingError},
@@ -118,7 +119,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *processor) mapper(event *beat.Event, m common.MapStr) (*beat.Event, error) {
+func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
 	prefix := ""
 	if p.config.TargetPrefix != "" {
 		prefix = p.config.TargetPrefix + "."
@@ -126,7 +127,7 @@ func (p *processor) mapper(event *beat.Event, m common.MapStr) (*beat.Event, err
 	var prefixKey string
 	for k, v := range m {
 		prefixKey = prefix + k
-		if _, err := event.GetValue(prefixKey); err == common.ErrKeyNotFound || p.config.OverwriteKeys {
+		if _, err := event.GetValue(prefixKey); err == mapstr.ErrKeyNotFound || p.config.OverwriteKeys {
 			event.PutValue(prefixKey, v)
 		} else {
 			// When the target key exists but is a string instead of a map.
@@ -146,16 +147,16 @@ func (p *processor) String() string {
 		",target_prefix=" + p.config.TargetPrefix
 }
 
-func mapToMapStr(m Map) common.MapStr {
-	newMap := make(common.MapStr, len(m))
+func mapToMapStr(m Map) mapstr.M {
+	newMap := make(mapstr.M, len(m))
 	for k, v := range m {
 		newMap[k] = v
 	}
 	return newMap
 }
 
-func mapInterfaceToMapStr(m MapConverted) common.MapStr {
-	newMap := make(common.MapStr, len(m))
+func mapInterfaceToMapStr(m MapConverted) mapstr.M {
+	newMap := make(mapstr.M, len(m))
 	for k, v := range m {
 		newMap[k] = v
 	}

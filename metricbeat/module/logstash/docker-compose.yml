@@ -19,7 +19,6 @@ services:
       args:
         ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-8.1.0-aa69d697-SNAPSHOT}
     environment:
-      - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
     ports:

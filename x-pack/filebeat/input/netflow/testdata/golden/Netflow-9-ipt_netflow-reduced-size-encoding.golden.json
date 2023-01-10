@@ -8,13 +8,12 @@
         "destination": {
           "ip": "193.151.198.166",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dd",
+          "mac": "00-1B-21-BC-24-DD",
           "port": 36025
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 8996000000,
@@ -31,7 +30,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "193.151.198.166",
-          "destination_mac_address": "00:1b:21:bc:24:dd",
+          "destination_mac_address": "00-1B-21-BC-24-DD",
           "destination_transport_port": 36025,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -53,7 +52,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "37.122.1.226",
-          "source_mac_address": "90:e2:ba:23:09:fc",
+          "source_mac_address": "90-E2-BA-23-09-FC",
           "source_transport_port": 27622,
           "tcp_control_bits": 2,
           "tcp_options": 4026531840,
@@ -80,7 +79,7 @@
           "bytes": 156,
           "ip": "37.122.1.226",
           "locality": "external",
-          "mac": "90:e2:ba:23:09:fc",
+          "mac": "90-E2-BA-23-09-FC",
           "packets": 3,
           "port": 27622
         }
@@ -95,13 +94,12 @@
         "destination": {
           "ip": "193.151.199.69",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dd",
+          "mac": "00-1B-21-BC-24-DD",
           "port": 29598
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -118,7 +116,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "193.151.199.69",
-          "destination_mac_address": "00:1b:21:bc:24:dd",
+          "destination_mac_address": "00-1B-21-BC-24-DD",
           "destination_transport_port": 29598,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -140,7 +138,7 @@
           "packet_delta_count": 1,
           "protocol_identifier": 6,
           "source_ipv4_address": "5.141.231.166",
-          "source_mac_address": "90:e2:ba:23:09:fc",
+          "source_mac_address": "90-E2-BA-23-09-FC",
           "source_transport_port": 31178,
           "tcp_control_bits": 2,
           "tcp_options": 3489660928,
@@ -167,7 +165,7 @@
           "bytes": 48,
           "ip": "5.141.231.166",
           "locality": "external",
-          "mac": "90:e2:ba:23:09:fc",
+          "mac": "90-E2-BA-23-09-FC",
           "packets": 1,
           "port": 31178
         }
@@ -182,13 +180,12 @@
         "destination": {
           "ip": "212.224.113.74",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dc",
+          "mac": "00-1B-21-BC-24-DC",
           "port": 443
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 7652000000,
@@ -205,7 +202,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "212.224.113.74",
-          "destination_mac_address": "00:1b:21:bc:24:dc",
+          "destination_mac_address": "00-1B-21-BC-24-DC",
           "destination_transport_port": 443,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -227,7 +224,7 @@
           "packet_delta_count": 11,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.233.128.4",
-          "source_mac_address": "00:04:96:97:b8:cd",
+          "source_mac_address": "00-04-96-97-B8-CD",
           "source_transport_port": 53688,
           "tcp_control_bits": 211,
           "tcp_options": 4043309057,
@@ -254,7 +251,7 @@
           "bytes": 584,
           "ip": "10.233.128.4",
           "locality": "internal",
-          "mac": "00:04:96:97:b8:cd",
+          "mac": "00-04-96-97-B8-CD",
           "packets": 11,
           "port": 53688
         }
@@ -269,13 +266,12 @@
         "destination": {
           "ip": "10.236.8.4",
           "locality": "internal",
-          "mac": "00:1b:21:bc:24:dc",
+          "mac": "00-1B-21-BC-24-DC",
           "port": 51549
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 16000000,
@@ -292,7 +288,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "10.236.8.4",
-          "destination_mac_address": "00:1b:21:bc:24:dc",
+          "destination_mac_address": "00-1B-21-BC-24-DC",
           "destination_transport_port": 51549,
           "egress_interface": 8,
           "egress_physical_interface": 8,
@@ -314,7 +310,7 @@
           "packet_delta_count": 4,
           "protocol_identifier": 6,
           "source_ipv4_address": "193.151.192.46",
-          "source_mac_address": "00:1a:4a:16:01:81",
+          "source_mac_address": "00-1A-4A-16-01-81",
           "source_transport_port": 80,
           "tcp_control_bits": 27,
           "tcp_options": 4043309056,
@@ -341,7 +337,7 @@
           "bytes": 577,
           "ip": "193.151.192.46",
           "locality": "external",
-          "mac": "00:1a:4a:16:01:81",
+          "mac": "00-1A-4A-16-01-81",
           "packets": 4,
           "port": 80
         }
@@ -356,13 +352,12 @@
         "destination": {
           "ip": "62.221.115.205",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dc",
+          "mac": "00-1B-21-BC-24-DC",
           "port": 1024
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 1168000000,
@@ -379,7 +374,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "62.221.115.205",
-          "destination_mac_address": "00:1b:21:bc:24:dc",
+          "destination_mac_address": "00-1B-21-BC-24-DC",
           "destination_transport_port": 1024,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -401,7 +396,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.235.197.6",
-          "source_mac_address": "00:04:96:97:b8:cd",
+          "source_mac_address": "00-04-96-97-B8-CD",
           "source_transport_port": 57505,
           "tcp_control_bits": 2,
           "tcp_options": 4026531840,
@@ -428,7 +423,7 @@
           "bytes": 152,
           "ip": "10.235.197.6",
           "locality": "internal",
-          "mac": "00:04:96:97:b8:cd",
+          "mac": "00-04-96-97-B8-CD",
           "packets": 3,
           "port": 57505
         }
@@ -443,13 +438,12 @@
         "destination": {
           "ip": "37.146.125.64",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dc",
+          "mac": "00-1B-21-BC-24-DC",
           "port": 3237
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 8992000000,
@@ -466,7 +460,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "37.146.125.64",
-          "destination_mac_address": "00:1b:21:bc:24:dc",
+          "destination_mac_address": "00-1B-21-BC-24-DC",
           "destination_transport_port": 3237,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -488,7 +482,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.236.31.7",
-          "source_mac_address": "00:04:96:97:b8:cd",
+          "source_mac_address": "00-04-96-97-B8-CD",
           "source_transport_port": 61471,
           "tcp_control_bits": 2,
           "tcp_options": 4026531840,
@@ -515,7 +509,7 @@
           "bytes": 152,
           "ip": "10.236.31.7",
           "locality": "internal",
-          "mac": "00:04:96:97:b8:cd",
+          "mac": "00-04-96-97-B8-CD",
           "packets": 3,
           "port": 61471
         }
@@ -530,13 +524,12 @@
         "destination": {
           "ip": "52.198.214.72",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dc",
+          "mac": "00-1B-21-BC-24-DC",
           "port": 443
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 4432000000,
@@ -553,7 +546,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "52.198.214.72",
-          "destination_mac_address": "00:1b:21:bc:24:dc",
+          "destination_mac_address": "00-1B-21-BC-24-DC",
           "destination_transport_port": 443,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -575,7 +568,7 @@
           "packet_delta_count": 15,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.233.151.8",
-          "source_mac_address": "00:04:96:97:b8:cd",
+          "source_mac_address": "00-04-96-97-B8-CD",
           "source_transport_port": 58044,
           "tcp_control_bits": 31,
           "tcp_options": 4177526784,
@@ -602,7 +595,7 @@
           "bytes": 1809,
           "ip": "10.233.151.8",
           "locality": "internal",
-          "mac": "00:04:96:97:b8:cd",
+          "mac": "00-04-96-97-B8-CD",
           "packets": 15,
           "port": 58044
         }
@@ -617,13 +610,12 @@
         "destination": {
           "ip": "64.233.161.188",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dc",
+          "mac": "00-1B-21-BC-24-DC",
           "port": 5228
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 80000000,
@@ -640,7 +632,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "64.233.161.188",
-          "destination_mac_address": "00:1b:21:bc:24:dc",
+          "destination_mac_address": "00-1B-21-BC-24-DC",
           "destination_transport_port": 5228,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -662,7 +654,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.234.22.4",
-          "source_mac_address": "00:04:96:97:b8:cd",
+          "source_mac_address": "00-04-96-97-B8-CD",
           "source_transport_port": 60583,
           "tcp_control_bits": 24,
           "tcp_options": 2164260864,
@@ -689,7 +681,7 @@
           "bytes": 234,
           "ip": "10.234.22.4",
           "locality": "internal",
-          "mac": "00:04:96:97:b8:cd",
+          "mac": "00-04-96-97-B8-CD",
           "packets": 3,
           "port": 60583
         }
@@ -704,13 +696,12 @@
         "destination": {
           "ip": "185.209.20.240",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dc",
+          "mac": "00-1B-21-BC-24-DC",
           "port": 80
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 400000000,
@@ -727,7 +718,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "185.209.20.240",
-          "destination_mac_address": "00:1b:21:bc:24:dc",
+          "destination_mac_address": "00-1B-21-BC-24-DC",
           "destination_transport_port": 80,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -749,7 +740,7 @@
           "packet_delta_count": 22,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.233.36.7",
-          "source_mac_address": "00:04:96:97:b8:cd",
+          "source_mac_address": "00-04-96-97-B8-CD",
           "source_transport_port": 51399,
           "tcp_control_bits": 27,
           "tcp_options": 4043309056,
@@ -776,7 +767,7 @@
           "bytes": 1681,
           "ip": "10.233.36.7",
           "locality": "internal",
-          "mac": "00:04:96:97:b8:cd",
+          "mac": "00-04-96-97-B8-CD",
           "packets": 22,
           "port": 51399
         }
@@ -791,13 +782,12 @@
         "destination": {
           "ip": "84.39.245.175",
           "locality": "external",
-          "mac": "00:1b:21:bc:24:dc",
+          "mac": "00-1B-21-BC-24-DC",
           "port": 18580
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 9024000000,
@@ -814,7 +804,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "84.39.245.175",
-          "destination_mac_address": "00:1b:21:bc:24:dc",
+          "destination_mac_address": "00-1B-21-BC-24-DC",
           "destination_transport_port": 18580,
           "egress_interface": 7,
           "egress_physical_interface": 7,
@@ -836,7 +826,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.233.200.7",
-          "source_mac_address": "00:04:96:97:b8:cd",
+          "source_mac_address": "00-04-96-97-B8-CD",
           "source_transport_port": 61820,
           "tcp_control_bits": 2,
           "tcp_options": 4026531840,
@@ -863,7 +853,7 @@
           "bytes": 152,
           "ip": "10.233.200.7",
           "locality": "internal",
-          "mac": "00:04:96:97:b8:cd",
+          "mac": "00-04-96-97-B8-CD",
           "packets": 3,
           "port": 61820
         }
@@ -878,13 +868,12 @@
         "destination": {
           "ip": "10.232.8.45",
           "locality": "internal",
-          "mac": "00:1b:21:bc:24:dd",
+          "mac": "00-1B-21-BC-24-DD",
           "port": 56257
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 60000000,
@@ -901,7 +890,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "10.232.8.45",
-          "destination_mac_address": "00:1b:21:bc:24:dd",
+          "destination_mac_address": "00-1B-21-BC-24-DD",
           "destination_transport_port": 56257,
           "egress_interface": 8,
           "egress_physical_interface": 8,
@@ -923,7 +912,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "23.43.139.27",
-          "source_mac_address": "90:e2:ba:23:09:fc",
+          "source_mac_address": "90-E2-BA-23-09-FC",
           "source_transport_port": 80,
           "tcp_control_bits": 26,
           "tcp_options": 4026531840,
@@ -950,7 +939,7 @@
           "bytes": 1866,
           "ip": "23.43.139.27",
           "locality": "external",
-          "mac": "90:e2:ba:23:09:fc",
+          "mac": "90-E2-BA-23-09-FC",
           "packets": 3,
           "port": 80
         }
@@ -965,13 +954,12 @@
         "destination": {
           "ip": "10.233.150.21",
           "locality": "internal",
-          "mac": "00:1b:21:bc:24:dd",
+          "mac": "00-1B-21-BC-24-DD",
           "port": 38164
         },
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 192000000,
@@ -988,7 +976,7 @@
         },
         "netflow": {
           "destination_ipv4_address": "10.233.150.21",
-          "destination_mac_address": "00:1b:21:bc:24:dd",
+          "destination_mac_address": "00-1B-21-BC-24-DD",
           "destination_transport_port": 38164,
           "egress_interface": 8,
           "egress_physical_interface": 8,
@@ -1010,7 +998,7 @@
           "packet_delta_count": 3,
           "protocol_identifier": 6,
           "source_ipv4_address": "2.17.140.47",
-          "source_mac_address": "90:e2:ba:23:09:fc",
+          "source_mac_address": "90-E2-BA-23-09-FC",
           "source_transport_port": 443,
           "tcp_control_bits": 25,
           "tcp_options": 2164260864,
@@ -1037,7 +1025,7 @@
           "bytes": 187,
           "ip": "2.17.140.47",
           "locality": "external",
-          "mac": "90:e2:ba:23:09:fc",
+          "mac": "90-E2-BA-23-09-FC",
           "packets": 3,
           "port": 443
         }

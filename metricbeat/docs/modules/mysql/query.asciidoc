@@ -1,6 +1,8 @@
 ////
 This file is generated! See scripts/mage/docs_collector.go
 ////
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/mysql/query/_meta/docs.asciidoc
+
 
 [[metricbeat-metricset-mysql-query]]
 === MySQL query metricset
@@ -10,8 +12,11 @@ beta[]
 include::../../../module/mysql/query/_meta/docs.asciidoc[]
 
 
+:edit_url:
+
 ==== Fields
 
 For a description of each field in the metricset, see the
 <<exported-fields-mysql,exported fields>> section.
 
+:edit_url!:

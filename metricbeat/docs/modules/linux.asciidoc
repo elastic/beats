@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: linux
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/linux/_meta/docs.asciidoc
+
 
 [[metricbeat-module-linux]]
 == Linux module
@@ -14,6 +16,8 @@ include::{libbeat-dir}/shared/integration-link.asciidoc[]
 :modulename!:
 
 The Linux module reports on metrics exclusive to the Linux kernel and GNU/Linux OS.
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -73,3 +77,4 @@ include::linux/pressure.asciidoc[]
 
 include::linux/rapl.asciidoc[]
 
+:edit_url!:

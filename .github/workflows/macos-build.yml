@@ -42,12 +42,12 @@ jobs:
         echo Changed GOPATH to ${{ env.MACOS_GOPATH }}
         echo "GOPATH="${{ env.MACOS_GOPATH }} >> $GITHUB_ENV
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
         go-version: ${{ github.event.inputs.go_version }}
     - name: Install dependencies
-      run:  go get -u github.com/magefile/mage
-    - uses: actions/checkout@v2
+      run:  go install github.com/magefile/mage
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.GITHUB_REF }}

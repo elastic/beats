@@ -1,0 +1,146 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "36fb858f-bcf8-4256-9880-37297f1189ce": {
+                            "columnOrder": [
+                                "2566280d-0419-4eaa-97e7-f8a6c76da734",
+                                "70dcbe16-f977-46bb-a8ae-9e0067232d5e",
+                                "6822f9cc-97ef-41b2-bebb-5444626e2a4f"
+                            ],
+                            "columns": {
+                                "2566280d-0419-4eaa-97e7-f8a6c76da734": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Job Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.job.name"
+                                },
+                                "6822f9cc-97ef-41b2-bebb-5444626e2a4f": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Owner Kind",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.job.owner.kind"
+                                },
+                                "70dcbe16-f977-46bb-a8ae-9e0067232d5e": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Owner Name",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.job.owner.name"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "696f07db-6a63-439f-a139-f51b6887387a",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_job"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_job"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "2566280d-0419-4eaa-97e7-f8a6c76da734",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "70dcbe16-f977-46bb-a8ae-9e0067232d5e",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "6822f9cc-97ef-41b2-bebb-5444626e2a4f",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "36fb858f-bcf8-4256-9880-37297f1189ce",
+                "layerType": "data",
+                "rowHeight": "single",
+                "rowHeightLines": 1
+            }
+        },
+        "title": "Job Owner Informations [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-3c34f9d0-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-36fb858f-bcf8-4256-9880-37297f1189ce",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "696f07db-6a63-439f-a139-f51b6887387a",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-23T08:46:48.838Z",
+    "version": "WzcxMCwxXQ=="
+}

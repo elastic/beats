@@ -117,7 +117,7 @@ func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {
 		// the zeroth element of the heap is the same as a peek
 		peeked := tq.th[0]
 		if peeked.runAt.Before(now) {
-			popped := heap.Pop(&tq.th).(*timerTask)
+			popped, _ := heap.Pop(&tq.th).(*timerTask)
 			res = append(res, popped)
 		} else {
 			break

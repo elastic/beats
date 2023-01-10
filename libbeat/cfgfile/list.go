@@ -27,8 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // RunnerList implements a reloadable.List of Runners
@@ -80,13 +81,22 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 	r.logger.Debugf("Start list: %d, Stop list: %d", len(startList), len(stopList))
 
+	wg := sync.WaitGroup{}
 	// Stop removed runners
 	for hash, runner := range stopList {
+		wg.Add(1)
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
-		go runner.Stop()
+		go func(runner Runner) {
+			defer wg.Done()
+			runner.Stop()
+			r.logger.Debugf("Runner: '%s' has stopped", runner)
+		}(runner)
 		moduleStops.Add(1)
 	}
+
+	// Wait for all runners to stop before starting new ones
+	wg.Wait()
 
 	// Start new runners
 	for hash, config := range startList {
@@ -154,8 +164,8 @@ func (r *RunnerList) Has(hash uint64) bool {
 	return ok
 }
 
-// HashConfig hashes a given common.Config
-func HashConfig(c *common.Config) (uint64, error) {
+// HashConfig hashes a given config.C
+func HashConfig(c *config.C) (uint64, error) {
 	var config map[string]interface{}
 	if err := c.Unpack(&config); err != nil {
 		return 0, err
@@ -171,9 +181,9 @@ func (r *RunnerList) copyRunnerList() map[uint64]Runner {
 	return list
 }
 
-func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, config *reload.ConfigWithMeta) (Runner, error) {
+func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, cfg *reload.ConfigWithMeta) (Runner, error) {
 	// Pass a copy of the config to the factory, this way if the factory modifies it,
 	// that doesn't affect the hash of the original one.
-	c, _ := common.NewConfigFrom(config.Config)
-	return factory.Create(pipetool.WithDynamicFields(pipeline, config.Meta), c)
+	c, _ := config.NewConfigFrom(cfg.Config)
+	return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
 }

@@ -61,14 +61,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type TestModule struct {
 	ModName   string
 	ModConfig mb.ModuleConfig
-	RawConfig *common.Config
+	RawConfig *conf.C
 }
 
 func (m *TestModule) Name() string                      { return m.ModName }
@@ -76,7 +77,7 @@ func (m *TestModule) Config() mb.ModuleConfig           { return m.ModConfig }
 func (m *TestModule) UnpackConfig(to interface{}) error { return m.RawConfig.Unpack(to) }
 
 func NewTestModule(t testing.TB, config interface{}) *TestModule {
-	c, err := common.NewConfigFrom(config)
+	c, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +105,7 @@ func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 // NewMetricSets instantiates a list of new MetricSets using the given
 // module configuration.
 func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
-	c, err := common.NewConfigFrom(config)
+	c, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +133,7 @@ func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricS
 
 // ReportingFetch runs the given reporting metricset and returns all of the
 // events and errors that occur during that period.
-func ReportingFetch(metricSet mb.ReportingMetricSet) ([]common.MapStr, []error) {
+func ReportingFetch(metricSet mb.ReportingMetricSet) ([]mapstr.M, []error) {
 	r := &capturingReporter{}
 	metricSet.Fetch(r)
 	return r.events, r.errs
@@ -266,17 +267,17 @@ func NewPushMetricSet(t testing.TB, config interface{}) mb.PushMetricSet {
 }
 
 type capturingReporter struct {
-	events []common.MapStr
+	events []mapstr.M
 	errs   []error
 	done   chan struct{}
 }
 
-func (r *capturingReporter) Event(event common.MapStr) bool {
+func (r *capturingReporter) Event(event mapstr.M) bool {
 	r.events = append(r.events, event)
 	return true
 }
 
-func (r *capturingReporter) ErrorWith(err error, meta common.MapStr) bool {
+func (r *capturingReporter) ErrorWith(err error, meta mapstr.M) bool {
 	r.events = append(r.events, meta)
 	r.errs = append(r.errs, err)
 	return true
@@ -293,7 +294,7 @@ func (r *capturingReporter) Done() <-chan struct{} {
 
 // RunPushMetricSet run the given push metricset for the specific amount of time
 // and returns all of the events and errors that occur during that period.
-func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]common.MapStr, []error) {
+func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]mapstr.M, []error) {
 	r := &capturingReporter{done: make(chan struct{})}
 
 	// Run the metricset.

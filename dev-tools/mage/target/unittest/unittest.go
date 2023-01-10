@@ -19,6 +19,7 @@ package unittest
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/magefile/mage/mg"
 
@@ -62,4 +63,14 @@ func PythonUnitTest() error {
 	mg.SerialDeps(pythonTestDeps...)
 	mg.Deps(devtools.BuildSystemTestBinary)
 	return devtools.PythonTest(devtools.DefaultPythonTestUnitArgs())
+}
+
+// PythonVirtualEnv creates the testing virtual environment and prints its location.
+func PythonVirtualEnv() error {
+	venv, err := devtools.PythonVirtualenv(true)
+	if err != nil {
+		return err
+	}
+	fmt.Println(venv)
+	return nil
 }

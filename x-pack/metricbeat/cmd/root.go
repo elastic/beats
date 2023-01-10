@@ -11,12 +11,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
@@ -36,8 +36,8 @@ const (
 var RootCmd *cmd.BeatsRootCmd
 
 // withECSVersion is a modifier that adds ecs.version to events.
-var withECSVersion = processing.WithFields(common.MapStr{
-	"ecs": common.MapStr{
+var withECSVersion = processing.WithFields(mapstr.M{
+	"ecs": mapstr.M{
 		"version": ecs.Version,
 	},
 })

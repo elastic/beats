@@ -28,23 +28,25 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	btesting "github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	btesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
-	config := common.MapStr{
+	config := mapstr.M{
 		"hosts":   host,
 		"ports":   port,
 		"timeout": "1s",
 	}
-	return testTCPConfigCheck(t, config, host, port)
+	return testTCPConfigCheck(t, config)
 }
 
 // TestUpEndpointJob tests an up endpoint configured using either direct lookups or IPs
@@ -130,7 +132,7 @@ func TestConnectionRefusedEndpointJob(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
-			hbtest.ErrorChecks(dialErr, "io"),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, dialErr),
 		)),
 		event.Fields,
 	)
@@ -148,7 +150,7 @@ func TestUnreachableEndpointJob(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
-			hbtest.ErrorChecks(dialErr, "io"),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, dialErr),
 		)),
 		event.Fields,
 	)
@@ -157,9 +159,9 @@ func TestUnreachableEndpointJob(t *testing.T) {
 func TestCheckUp(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
-	defer closeEcho()
+	defer closeEcho() //nolint:errcheck // not needed in test
 
-	configMap := common.MapStr{
+	configMap := mapstr.M{
 		"hosts":         host,
 		"ports":         port,
 		"timeout":       "1s",
@@ -167,7 +169,7 @@ func TestCheckUp(t *testing.T) {
 		"check.send":    "echo123",
 	}
 
-	event := testTCPConfigCheck(t, configMap, host, port)
+	event := testTCPConfigCheck(t, configMap)
 
 	testslike.Test(
 		t,
@@ -179,7 +181,7 @@ func TestCheckUp(t *testing.T) {
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
 				"tcp": map[string]interface{}{
-					"rtt.validate.us": isdef.IsDuration,
+					"rtt.validate.us": hbtestllext.IsInt64,
 				},
 			}),
 		)),
@@ -190,17 +192,16 @@ func TestCheckUp(t *testing.T) {
 func TestCheckDown(t *testing.T) {
 	host, port, ip, closeEcho, err := startEchoServer(t)
 	require.NoError(t, err)
-	defer closeEcho()
+	defer closeEcho() //nolint:errcheck // not needed in test
 
-	configMap := common.MapStr{
+	configMap := mapstr.M{
 		"hosts":         host,
 		"ports":         port,
 		"timeout":       "1s",
 		"check.receive": "BOOM", // should fail
 		"check.send":    "echo123",
 	}
-
-	event := testTCPConfigCheck(t, configMap, host, port)
+	event := testTCPConfigCheck(t, configMap)
 
 	testslike.Test(
 		t,
@@ -212,7 +213,7 @@ func TestCheckDown(t *testing.T) {
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
 				"tcp": map[string]interface{}{
-					"rtt.validate.us": isdef.IsDuration,
+					"rtt.validate.us": hbtestllext.IsInt64,
 				},
 				"error": map[string]interface{}{
 					"type":    "validate",
@@ -249,6 +250,7 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	if err != nil {
 		return "", 0, "", nil, err
 	}
+
 	go func() {
 		conn, err := listener.Accept()
 		require.NoError(t, err)
@@ -259,9 +261,14 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 		require.NoError(t, err)
 		// Normally we'd retry partial writes, but for tests this is OK
 		require.Equal(t, wlen, rlen)
+		conn.Close()
 	}()
 
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+	if err != nil {
+		listener.Close()
+		return "", 0, "", nil, err
+	}
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	if err != nil {
 		listener.Close()

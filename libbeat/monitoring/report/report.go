@@ -24,12 +24,12 @@ import (
 	errw "github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
 	// allow for maximum one reporter being configured
-	Reporter common.ConfigNamespace `config:",inline"`
+	Reporter conf.Namespace `config:",inline"`
 }
 
 type Settings struct {
@@ -41,7 +41,7 @@ type Reporter interface {
 	Stop()
 }
 
-type ReporterFactory func(beat.Info, Settings, *common.Config) (Reporter, error)
+type ReporterFactory func(beat.Info, Settings, *conf.C) (Reporter, error)
 
 type hostsCfg struct {
 	Hosts []string `config:"hosts"`
@@ -63,8 +63,8 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 func New(
 	beat beat.Info,
 	settings Settings,
-	cfg *common.Config,
-	outputs common.ConfigNamespace,
+	cfg *conf.C,
+	outputs conf.Namespace,
 ) (Reporter, error) {
 	name, cfg, err := getReporterConfig(cfg, settings, outputs)
 	if err != nil {
@@ -80,10 +80,10 @@ func New(
 }
 
 func getReporterConfig(
-	monitoringConfig *common.Config,
+	monitoringConfig *conf.C,
 	settings Settings,
-	outputs common.ConfigNamespace,
-) (string, *common.Config, error) {
+	outputs conf.Namespace,
+) (string, *conf.C, error) {
 	cfg := collectSubObject(monitoringConfig)
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
@@ -102,7 +102,7 @@ func getReporterConfig(
 			hosts := hostsCfg{}
 			rc.Unpack(&hosts)
 
-			merged, err := common.MergeConfigs(outCfg, rc)
+			merged, err := conf.MergeConfigs(outCfg, rc)
 			if err != nil {
 				return "", nil, err
 			}
@@ -130,8 +130,8 @@ func getReporterConfig(
 	return "", nil, errors.New("No monitoring reporter configured")
 }
 
-func collectSubObject(cfg *common.Config) *common.Config {
-	out := common.NewConfig()
+func collectSubObject(cfg *conf.C) *conf.C {
+	out := conf.NewConfig()
 	for _, field := range cfg.GetFields() {
 		if obj, err := cfg.Child(field, -1); err == nil {
 			// on error field is no object, but primitive value -> ignore
@@ -142,9 +142,9 @@ func collectSubObject(cfg *common.Config) *common.Config {
 	return out
 }
 
-func mergeHosts(merged, outCfg, reporterCfg *common.Config) error {
+func mergeHosts(merged, outCfg, reporterCfg *conf.C) error {
 	if merged == nil {
-		merged = common.NewConfig()
+		merged = conf.NewConfig()
 	}
 
 	outputHosts := hostsCfg{}
@@ -166,12 +166,12 @@ func mergeHosts(merged, outCfg, reporterCfg *common.Config) error {
 	}
 
 	// Give precedence to reporter hosts over output hosts
-	var newHostsCfg *common.Config
+	var newHostsCfg *conf.C
 	var err error
 	if len(reporterHosts.Hosts) > 0 {
-		newHostsCfg, err = common.NewConfigFrom(reporterHosts.Hosts)
+		newHostsCfg, err = conf.NewConfigFrom(reporterHosts.Hosts)
 	} else {
-		newHostsCfg, err = common.NewConfigFrom(outputHosts.Hosts)
+		newHostsCfg, err = conf.NewConfigFrom(outputHosts.Hosts)
 	}
 	if err != nil {
 		return errw.Wrap(err, "unable to make config from new hosts")

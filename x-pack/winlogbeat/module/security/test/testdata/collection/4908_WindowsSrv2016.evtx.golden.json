@@ -1,0 +1,42 @@
+[
+  {
+    "@timestamp": "2020-08-19T06:07:25.0461779Z",
+    "event": {
+      "action": "Audit Policy Change",
+      "code": "4908",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-BVM4LI1L1Q6.TEST.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Special Groups Logon table modified.\n\nSpecial Groups:\t\n\t\t%{S-1-5-32-544}\n\t\t%{S-1-5-32-123-54-65}\n\nThis event is generated when the list of special groups is updated in the registry or through security policy. The updated list of special groups is indicated in the event.",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
+      "event_data": {
+        "SidList": "\n\t\t%{S-1-5-32-544}\n\t\t%{S-1-5-32-123-54-65}"
+      },
+      "event_id": "4908",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 784,
+        "thread": {
+          "id": 808
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 140274,
+      "task": "Audit Policy Change"
+    }
+  }
+]

@@ -7,12 +7,15 @@ package httpjson
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"gopkg.in/natefinch/lumberjack.v2"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type retryConfig struct {
@@ -48,8 +51,10 @@ func (c retryConfig) getWaitMin() time.Duration {
 }
 
 func (c retryConfig) getWaitMax() time.Duration {
-	if c.WaitMax == nil {
+	if c.WaitMax == nil && c.WaitMin == nil {
 		return 0
+	} else if c.WaitMax == nil && c.WaitMin != nil {
+		return *c.WaitMin
 	}
 	return *c.WaitMax
 }
@@ -87,7 +92,7 @@ func (u *urlConfig) Unpack(in string) error {
 type requestConfig struct {
 	URL                    *urlConfig       `config:"url" validate:"required"`
 	Method                 string           `config:"method" validate:"required"`
-	Body                   *common.MapStr   `config:"body"`
+	Body                   *mapstr.M        `config:"body"`
 	EncodeAs               string           `config:"encode_as"`
 	Retry                  retryConfig      `config:"retry"`
 	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
@@ -97,13 +102,15 @@ type requestConfig struct {
 	Transforms             transformsConfig `config:"transforms"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+
+	Tracer *lumberjack.Logger `config:"tracer"`
 }
 
 func (c *requestConfig) Validate() error {
 	c.Method = strings.ToUpper(c.Method)
 	switch c.Method {
-	case "POST":
-	case "GET":
+	case http.MethodPost:
+	case http.MethodGet:
 		if c.Body != nil {
 			return errors.New("body can't be used with method: \"GET\"")
 		}
@@ -118,6 +125,18 @@ func (c *requestConfig) Validate() error {
 	if c.EncodeAs != "" {
 		if _, found := registeredEncoders[c.EncodeAs]; !found {
 			return fmt.Errorf("encoder not found for contentType: %v", c.EncodeAs)
+		}
+	}
+
+	if c.Tracer != nil {
+		if c.Tracer.Filename == "" {
+			return errors.New("request tracer must have a filename if used")
+		}
+		if c.Tracer.MaxSize == 0 {
+			// By default Lumberjack caps file sizes at 100MB which
+			// is excessive for a debugging logger, so default to 1MB
+			// which is the minimum.
+			c.Tracer.MaxSize = 1
 		}
 	}
 

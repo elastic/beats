@@ -21,11 +21,10 @@
 package wineventlog
 
 import (
+	"io/fs"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/sys/windows"
 )
 
 func TestPublisherMetadata(t *testing.T) {
@@ -227,5 +226,5 @@ func testPublisherMetadata(t *testing.T, provider string) {
 
 func TestNewPublisherMetadataUnknown(t *testing.T) {
 	_, err := NewPublisherMetadata(NilHandle, "Fake-Publisher")
-	assert.Equal(t, windows.ERROR_FILE_NOT_FOUND, errors.Cause(err))
+	assert.ErrorIs(t, err, fs.ErrNotExist)
 }

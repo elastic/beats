@@ -21,8 +21,13 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -30,13 +35,10 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
-var ErrMonitorDisabled = errors.New("monitor not loaded, plugin is disabled")
+var ErrMonitorDisabled = fmt.Errorf("monitor not loaded, plugin is disabled")
 
 const (
 	MON_INIT = iota
@@ -44,18 +46,12 @@ const (
 	MON_STOPPED
 )
 
-type WrappedClient struct {
-	Publish func(event beat.Event)
-	Close   func() error
-	wait    func()
-}
-
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
 	stdFields      stdfields.StdMonitorFields
 	pluginName     string
-	config         *common.Config
+	config         *conf.C
 	addTask        scheduler.AddTask
 	configuredJobs []*configuredJob
 	enabled        bool
@@ -67,13 +63,13 @@ type Monitor struct {
 	internalsMtx sync.Mutex
 	close        func() error
 
-	pipelineConnector beat.PipelineConnector
+	// pubClient accepts an ISyncClient as the lowest common denominator of client
+	// since async clients are a subset of sync clients
+	pubClient pipeline.ISyncClient
 
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
 	stats plugin.RegistryRecorder
-
-	runOnce bool
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -82,8 +78,8 @@ func (m *Monitor) String() string {
 	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.stdFields.Name, m.enabled)
 }
 
-func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, nil, false)
+func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
+	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
 
 	return err
 }
@@ -91,14 +87,14 @@ func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) err
 // newMonitor creates a new monitor, without leaking resources in the event of an error.
 // you do not need to call Stop(), it will be safely garbage collected unless Start is called.
 func newMonitor(
-	config *common.Config,
+	config *conf.C,
 	registrar *plugin.PluginsReg,
-	pipelineConnector beat.PipelineConnector,
+	pubClient pipeline.ISyncClient,
 	taskAdder scheduler.AddTask,
+	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
-	runOnce bool,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, taskAdder, onStop, runOnce)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -108,12 +104,12 @@ func newMonitor(
 // newMonitorUnsafe is the unsafe way of creating a new monitor because it may return a monitor instance along with an
 // error without freeing monitor resources. m.Stop() must always be called on a non-nil monitor to free resources.
 func newMonitorUnsafe(
-	config *common.Config,
+	config *conf.C,
 	registrar *plugin.PluginsReg,
-	pipelineConnector beat.PipelineConnector,
+	pubClient pipeline.ISyncClient,
 	addTask scheduler.AddTask,
+	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
-	runOnce bool,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -123,26 +119,21 @@ func newMonitorUnsafe(
 		return nil, err
 	}
 
-	if !config.Enabled() {
-		return nil, fmt.Errorf("monitor '%s' with id '%s' skipped: %w", standardFields.Name, standardFields.ID, ErrMonitorDisabled)
-	}
-
 	pluginFactory, found := registrar.Get(standardFields.Type)
 	if !found {
 		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", standardFields.Type, registrar.MonitorNames())
 	}
 
 	m := &Monitor{
-		stdFields:         standardFields,
-		pluginName:        pluginFactory.Name,
-		addTask:           addTask,
-		configuredJobs:    []*configuredJob{},
-		pipelineConnector: pipelineConnector,
-		internalsMtx:      sync.Mutex{},
-		config:            config,
-		stats:             pluginFactory.Stats,
-		state:             MON_INIT,
-		runOnce:           runOnce,
+		stdFields:      standardFields,
+		pluginName:     pluginFactory.Name,
+		addTask:        addTask,
+		configuredJobs: []*configuredJob{},
+		pubClient:      pubClient,
+		internalsMtx:   sync.Mutex{},
+		config:         config,
+		stats:          pluginFactory.Stats,
+		state:          MON_INIT,
 	}
 
 	if m.stdFields.ID == "" {
@@ -163,24 +154,34 @@ func newMonitorUnsafe(
 		return p.Close()
 	}
 
-	// If we've hit an error at this point, still run on schedule, but always return an error.
-	// This way the error is clearly communicated through to kibana.
-	// Since the error is not recoverable in these instances, the user will need to reconfigure
-	// the monitor, which will destroy and recreate it in heartbeat, thus clearing this error.
-	//
-	// Note: we do this at this point, and no earlier, because at a minimum we need the
-	// standard monitor fields (id, name and schedule) to deliver an error to kibana in a way
-	// that it can render.
-	if err != nil {
+	var wrappedJobs []jobs.Job
+	if err == nil {
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
+	} else {
+		// If we've hit an error at this point, still run on schedule, but always return an error.
+		// This way the error is clearly communicated through to kibana.
+		// Since the error is not recoverable in these instances, the user will need to reconfigure
+		// the monitor, which will destroy and recreate it in heartbeat, thus clearing this error.
+		//
+		// Note: we do this at this point, and no earlier, because at a minimum we need the
+		// standard monitor fields (id, name and schedule) to deliver an error to kibana in a way
+		// that it can render.
+
 		// Note, needed to hoist err to this scope, not just to add a prefix
-		fullErr := fmt.Errorf("job could not be initialized: %s", err)
+		fullErr := fmt.Errorf("job could not be initialized: %w", err)
 		// A placeholder job that always returns an error
+
+		logp.L().Error(fullErr)
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
 			return nil, fullErr
 		}}
+
+		// We need to use the lightweight wrapping for error jobs
+		// since browser wrapping won't write summaries, but the fake job here is
+		// effectively a lightweight job
+		wrappedJobs = wrappers.WrapLightweight(p.Jobs, m.stdFields, monitorstate.NewTracker(stateLoader, false))
 	}
 
-	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
 	m.endpoints = p.Endpoints
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
@@ -205,25 +206,15 @@ func (m *Monitor) configHash() (uint64, error) {
 	return hash, nil
 }
 
-func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configuredJob, error) {
+func (m *Monitor) makeTasks(config *conf.C, jobs []jobs.Job) ([]*configuredJob, error) {
 	mtConf := jobConfig{}
 	if err := config.Unpack(&mtConf); err != nil {
-		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
+		return nil, fmt.Errorf("invalid config, could not unpack monitor config: %w", err)
 	}
 
-	var mTasks []*configuredJob
+	var mTasks = make([]*configuredJob, 0, len(jobs))
 	for _, job := range jobs {
-		t, err := newConfiguredJob(job, mtConf, m)
-		if err != nil {
-			// Failure to compile monitor processors should not crash hb or prevent progress
-			if _, ok := err.(ProcessorsError); ok {
-				logp.Critical("Failed to load monitor processors: %v", err)
-				continue
-			}
-
-			return nil, err
-		}
-
+		t := newConfiguredJob(job, mtConf, m)
 		mTasks = append(mTasks, t)
 	}
 
@@ -236,31 +227,7 @@ func (m *Monitor) Start() {
 	defer m.internalsMtx.Unlock()
 
 	for _, t := range m.configuredJobs {
-		if m.runOnce {
-			client, err := pipeline.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
-			if err != nil {
-				logp.Err("could not start monitor: %v", err)
-				continue
-			}
-			t.Start(&WrappedClient{
-				Publish: func(event beat.Event) {
-					client.Publish(event)
-				},
-				Close: client.Close,
-				wait:  client.Wait,
-			})
-		} else {
-			client, err := m.pipelineConnector.Connect()
-			if err != nil {
-				logp.Err("could not start monitor: %v", err)
-				continue
-			}
-			t.Start(&WrappedClient{
-				Publish: client.Publish,
-				Close:   client.Close,
-				wait:    func() {},
-			})
-		}
+		t.Start(m.pubClient)
 	}
 
 	m.stats.StartMonitor(int64(m.endpoints))
@@ -284,7 +251,7 @@ func (m *Monitor) Stop() {
 	if m.close != nil {
 		err := m.close()
 		if err != nil {
-			logp.Error(fmt.Errorf("error closing monitor %s: %w", m.String(), err))
+			logp.L().Error("error closing monitor %s: %w", m.String(), err)
 		}
 	}
 

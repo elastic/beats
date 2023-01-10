@@ -13,14 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
-        make: |
-          make -C x-pack/filebeat check;
-          make -C x-pack/filebeat update;
-          make -C filebeat check;
-          make -C filebeat update;
-          make check-no-changes;
-        stage: lint
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -44,19 +36,10 @@ stages:
     pythonIntegTest:
         mage: "mage pythonIntegTest"       ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
-    module-compat-prev-minor:
-      mage: >-                 ## Run module integration tests under previous minor of ES to ensure ingest pipeline compatibility.
-        STACK_ENVIRONMENT=prev-minor
-        TESTING_FILEBEAT_SKIP_DIFF=1
-        TESTING_FILEBEAT_ALLOW_OLDER=1
-        PYTEST_ADDOPTS='-k test_xpack_modules'
-        mage pythonIntegTest
-      withModule: true
-      stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "orka && darwin && poc"
+          - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/filebeat for macos"
@@ -66,36 +49,54 @@ stages:
                 - "macosTest"
             tags: true         ## for all the tags
         stage: extended
-    windows:
+    macosM1:
         mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
-        stage: mandatory
+        platforms:             ## override default label in this specific stage.
+          - "orka && darwin && aarch64"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test filebeat for macos-m1"
+            labels:
+                - "macos-m1"
+            parameters:
+                - "macosM1Test"
+            tags: false         ## for all the tags
+        stage: extended
     windows-2022:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2022"
-        stage: extended
+        stage: mandatory
+    windows-2019:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2019"
+        stage: extended_win
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        stage: extended
+        stage: mandatory
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        stage: extended
+        stage: extended_win
+    windows-11:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-11"
+        stage: extended_win
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        stage: extended
+        stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
+        stage: extended_win
     cloud:
       cloud: "mage build test"
       withModule: true       ## run the ITs only if the changeset affects a specific module.
@@ -110,7 +111,7 @@ stages:
           - "aws"
       stage: extended
     cloudAWS:
-        cloud: "mage build test"
+        cloud: "mage build test goIntegTest"
         withAWS: true          ## Enable the tests to run in AWS
         withModule: true       ## run the ITs only if the changeset affects a specific module.
         dirs:                  ## run the cloud tests for the given modules.

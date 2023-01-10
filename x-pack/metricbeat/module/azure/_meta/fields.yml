@@ -6,7 +6,6 @@
   fields:
     - name: azure
       type: group
-      description: >
       fields:
         - name: timegrain
           type: keyword
@@ -43,6 +42,10 @@
           type: keyword
           description: >
             The subscription ID
+        - name: subscription_name
+          type: keyword
+          description: >
+            The subscription name
         - name: application_id
           type: keyword
           description: >

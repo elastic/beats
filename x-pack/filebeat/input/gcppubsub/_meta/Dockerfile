@@ -28,6 +28,6 @@ RUN \
 RUN \
     mkdir /data
 
-HEALTHCHECK --interval=1s --retries=90 CMD curl -s -f http://localhost:8432/
+HEALTHCHECK --interval=1s --retries=90 CMD curl -s -f --http2 http://localhost:8432/
 
 CMD gcloud beta emulators pubsub start --data-dir /data --host-port "0.0.0.0:8432"

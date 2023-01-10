@@ -20,10 +20,10 @@ package info
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -265,7 +265,7 @@ func eventMapping(r mb.ReporterV2, info map[string]string) {
 	commandstatsData, _ := commandstatsSchema.Apply(source)
 	data["commandstats"] = commandstatsData
 
-	rootFields := common.MapStr{}
+	rootFields := mapstr.M{}
 	if v, err := data.GetValue("server.version"); err == nil {
 		rootFields.Put("service.version", v)
 		data.Delete("server.version")

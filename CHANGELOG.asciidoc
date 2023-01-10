@@ -3,9 +3,959 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.5.3]]
+=== Beats version 8.5.3
+https://github.com/elastic/beats/compare/v8.5.2\...v8.5.3[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
+
+==== Bugfixes
+
+*Heartbeat*
+
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+
+==== Known issues
+
+*Heartbeat*
+
+If you are using either the Elastic Synthetics Integration package (beta) or private locations in the Uptime app's Monitor Management (beta) in an airgapped environment, `observer.geo.name` may not be indexed with your Heartbeat documents, resulting in location data missing from the Uptime app.
+
+This issue does not impact clusters with external network access. This issue will be fixed in the next release. 
+
+Suggested resolution: Manually add custom ingest pipelines to the synthetics-* data streams. 
+
+NOTE: The instructions provided below assume `manage_pipeline` cluster privilege.
+
+Execute the following request in Kibana `Dev Tools`
+
+[source,json]
+--
+PUT _ingest/pipeline/synthetics-browser.screenshot@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/synthetics-browser.network@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/synthetics-browser@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/synthetics-http@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+
+PUT _ingest/pipeline/synthetics-tcp@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+
+PUT _ingest/pipeline/synthetics-icmp@custom
+{
+  "description": "Applies location name (observe.geo.name) to Synthetics documents",
+  "processors": [
+    {
+      "set": {
+        "field": "observer.geo.name",
+        "override": false,
+        "ignore_failure": true,
+        "copy_from": "observer.name"
+      }
+    }
+  ]
+}
+--
+
+Check that each request is acknowledged
+
+[source,json]
+----
+{
+  "acknowledged": true
+}
+----
+
+After navigating back to Uptime, you should now see the appropriate location name for your monitor.
+
+[[release-notes-8.5.2]]
+=== Beats version 8.5.2
+https://github.com/elastic/beats/compare/v8.5.1\...v8.5.2[View commits]
+
+[[release-notes-8.5.1]]
+=== Beats version 8.5.1
+https://github.com/elastic/beats/compare/v8.5.0\...v8.5.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Re-enable build optimizations to reduce binary size and improve performance. {pull}33620[33620]
+- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
+- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+- Keep `orchestrator.cluster.name` if `kubeconfig` is not returned in GKE metadata. {pull}33418[33418]
+
+*Filebeat*
+
+- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled. {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+- Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
+- Fix splitting array of strings/arrays in httpjson input. {issue}30345[30345] {pull}33609[33609]
+- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+
+*Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix states client support for output options. {pull}33405[33405]
+- Fix states client reloader under managed mode. {pull}33405[33405]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+
+==== Bugfixes
+
+*Heartbeat*
+- Fix bug affecting let's encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for kibana configured monitors. {pull}33293[33293]
+- Fix states client support for output options. {pull}33405[33405]
+- Fix states client reloader under managed mode. {pull}33405[33405]
+
+*Metricbeat*
+
+- Add tags to events based on parsed identifier. {pull}33472[33472]
+- Skip over unsupported filesystems in the system.filesystem metricset instead of failing immediately. Fix debug statement in system.fsstat metricset. {pull}33646[33646]
+
+==== Added
+
+*Affecting all Beats*
+
+- Beats will now attempt to recover if a lockfile has not been removed. {pull}[33169]
+
+[[release-notes-8.5.0]]
+=== Beats version 8.5.0
+https://github.com/elastic/beats/compare/v8.4.3\...v8.5.0[View commits]
+
+==== Known issues
+
+*Affecting most Beats*
+
+Due to a recent change in the Red Hat scan verification process,
+this version of {heartbeat}, {filebeat}, {metricbeat}, and {auditbeat} are not available in the Red Hat Ecosystem Catalog.
+This bug will be fixed in the next release.
+Please use the https://www.docker.elastic.co/search?q=beats[Elastic docker registry] to download 8.5.0 images.
+
+*Heartbeat*
+
+Heartbeat mappings have introduced a new section to improve state tracking, `state`. Due to inconsistent serialization of the underlying data type,
+documents will be rejected upon index after a few minutes, producing the following error message:
+
+[source,json]
+----
+{..., "reason":"failed to parse date field [4.0614878e+07] with format [strict_date_optional_time||epoch_millis]","caused_by":{"type":"date_time_parse_exception","reason":"date_time_parse_exception: Failed to parse with all enclosed parsers"}
+----
+
+IMPORTANT: ** It is strongly recommended to update directly to v8.5.1 when it is available. ** If not possible to update, please continue to the suggested solution.
+
+Suggested resolution: Manually update Heartbeat index template mappings. The instructions provided below assume access to `heartbeat` executable
+and familiarity with ES APIs. For a detailed GUI walkthrough, please check https://discuss.elastic.co/t/heartbeat-8-5-0-mapper-error-workaround/318133[this thread].
+
+Start by exporting the actual mappings:
+
+[source,shell]
+----
+$ ./heartbeat export template > /tmp/idx-pattern.json
+----
+
+Inside the exported file, locate the field `duration_ms` and change the type to `long`:
+
+[source,json]
+----
+"state": {
+  "properties": {
+    ...,
+
+    "duration_ms": {
+      "type": "long"
+    },
+----
+
+Copy the contents of this file and log into Kibana.
+Once in Kibana, go to `Dev Tools`, write the request URL to update the index template and paste file contents underneath:
+
+[source,json]
+----
+PUT /_index_template/heartbeat-8.5.0
+{
+  "data_stream": {},
+  "index_patterns": [
+    "heartbeat-8.5.0"
+  ],
+  ...
+----
+
+Execute the request and check that the operation has been acknowledged:
+
+[source,json]
+----
+{
+  "acknowledged": true
+}
+----
+
+Finally, execute the following request, also in Kibana `Dev Tools`, to perform an index rollover:
+
+[source,json]
+----
+POST heartbeat-8.5.0/_rollover
+----
+
+This should create a new backing index with the correct mappings.
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
+- Fix formatting of MAC hardware addresses populated by the add_host_metadata processor. {issue}32264[32264] {pull}32265[32265]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix metric namespacing for self-monitoring to correct some process incorrectly reading as zero. {pull}32336[32336]
+
+*Auditbeat*
+
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+
+*Filebeat*
+
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+- Import dashboards from CEF integration. {pull}32766[32766]
+- Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
+- Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
+- Fix input metrics not being unregistered when an input closes. This led to panics when configuration was reloaded for the aws-s3, aws-cloudwatch, and lumberjack inputs. {pull}33259[33259]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
+
+*Heartbeat*
+- Fix bug affecting Let's Encrypt and other users of cross-signed certs, where cert expiration was incorrectly calculated. {issue}33215[33215]
+- Fix broken disable feature for Kibana-configured monitors. {pull}33293[33293]
+
+*Metricbeat*
+
+- Fix GCP storage field naming {pull}32806[32806]
+- In `module/windows/perfmon`, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
+- Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call. {pull}33105[33105]
+- Add GCP CloudSQL region filter. {pull}32943[32943]
+- Fix Logstash cgroup mappings. {pull}33131[33131]
+- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping. {pull}33263[33263]
+
+*Packetbeat*
+
+- Fix formatting of debug logs. {pull}32698[32698]
+- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+
+*Winlogbeat*
+
+- Reduce severity of message salvage failure logging. {pull}32697[32697]
+
+==== Added
+
+*Filebeat*
+- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
+
+*Heartbeat*
+- Add new states field for internal use by new synthetics app. {pull}30632[30632]
+
+*Packetbeat*
+- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
+- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
+- Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
+
+==== Deprecated
+
+*Heartbeat*
+- Deprecate `zip_url` and local monitor options. {pull}33123[33123]
+
+[[release-notes-8.4.2]]
+=== Beats version 8.4.2
+https://github.com/elastic/beats/compare/v8.4.1\...v8.4.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+
+*Filebeat*
+
+- Fix for pagination at root level not working when used with chaining. {pull}32722[32722]
+
+*Metricbeat*
+
+- Fix and improve AWS metric period calculation to avoid zero-length intervals. {pull}32724[32724]
+- Add missing cluster metadata to k8s module metricsets. {pull}32979[32979] {pull}33032[33032]
+
+==== Added
+
+*Metricbeat*
+
+- Allow filtering on AWS tags by more than 1 value per key. {pull}32775[32775]
+- Azure Billing: switch to Cost Management API for forecast data. {pull}32589[32589]
+
+[[release-notes-8.4.1]]
+=== Beats version 8.4.1
+https://github.com/elastic/beats/compare/v8.4.0\...v8.4.1[View commits]
+
+==== Known Issue
+
+// tag::credentials-error[]
+
+*Filebeat*
+
+Filebeat agents configured to read from AWS inputs may return an error similar to the following:
+
+[source,shell]
+----
+sqs ReceiveMessage failed: operation error SQS: ReceiveMessage, https response
+error StatusCode: 403, RequestID: cb57783a-505f-5099-9160-23b8eea8ddbb,
+api error SignatureDoesNotMatch: Credential should be scoped to a valid region.
+----
+
+This error was introduced by a breaking change in the AWS library.
+
+IMPORTANT: This issue also affects FIPS-enabled endpoints. **If you rely on FIPS,
+do not upgrade until version 8.4.2 of the {stack} is available.** The workaround
+documented here will not resolve this problem.
+
+Suggested resolution: In the Filebeat configuration, if an AWS input or module
+configuration sets `endpoint` to a non empty string, set it to an empty string
+instead. Also make sure the default AWS region is set in an environment
+variable, credentials or instance profile, or in the `default_region` setting in
+the configuration. For example:
+
+[source,yaml]
+----
+filebeat.inputs:
+- type: aws-s3
+...
+  endpoint: "" <1>
+  default_region: us-east-1
+----
+<1> You can set this value to an empty string or remove the configuration setting.
+
+Or for modules:
+
+[source,yaml]
+----
+s3access:
+    enabled: false
+...
+    var.endpoint: "" <1>
+    var.default_region: us-east-1
+----
+<1> You can set this value to an empty string or remove the configuration setting
+
+// end::credentials-error[]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Fixes a bug with the auditd module where data is corrupted because it was not copied before the byte slice was reused. {issue}32818[32818] {pull}32823[32823]
+
+*Filebeat*
+
+- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
+- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
+- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
+
+==== Added
+
+*Filebeat*
+
+- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
+
+[[release-notes-8.4.0]]
+=== Beats version 8.4.0
+https://github.com/elastic/beats/compare/v8.3.3\...v8.4.0[View commits]
+
+==== Breaking changes
+
+*Heartbeat*
+- Browser monitors (beta) now write to the `synthetics-*` index prefix. {pull}32064[32064]
+- Setting a custom index for a given monitor is now deprecated. Streams are preferred. {pull}32064[32064]
+- Browser monitors now default to a max concurrency of two. {pull}32564[32564]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
+- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
+
+*Auditbeat*
+
+- auditd module: Fix parsing of audit rules where arguments are quoted (like file paths containing spaces). {pull}32421[32421]
+- auditd module: Fix minimum AuditStatus length so that library can support kernels from 2.6.32. {pull}32421[32421]
+- system/socket: Reduce memory usage of the dataset. {issue}32191[32191] {pull}32192[32192]
+
+*Filebeat*
+
+- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
+- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
+- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
+
+*Heartbeat*
+
+- Send targetted error message for unexpected synthetics exits. {pull}31936[31936]
+- Reduced memory usage slightly for browser monitors. {pull}32317[32317]
+- Automatically kill zombie-ish node processes. {pull}32393[32393]
+- Added timeout for browser monitors. {pull}32434[32434]
+- Fix bug with browser jobs that had missing check groups or sent empty events. {pull}32542[32542]
+
+*Metricbeat*
+
+- Update Kubernetes apiserver metricset to not collect deprecated metrics and fix dashboard. {pull}31973[31973]
+- Check for nil metadata in GCP. {pull}32281[32281]
+- Update Kubernetes controllermanager metricset to not collect deprecated metrics and fix dashboard. {pull}32037[32037]
+- Fix ARN parsing for Cloudwatch resource names with leading slashes. {pull}32358[32358]
+- Fix an infinite loop in AWS billing metricset. {pull}32626[32626]
+- Add missing metrics in AWS Transit Gateway module {pull}32617[32617]
+- Replace internal expiring cache used by the Kubernetes module with in-memory dictionary. {pull}32539[32539]
+- Oracle Module: Refactor module to use existing host parsers instead of doing its own parsing of hosts. {issue}31611[31611] {pull}31692[#31692]
+- Oracle Module: Correctly handle special characters in the connection string. {issue}24609[24609] {pull}31368[#31368]
+
+*Winlogbeat*
+
+- Powershell: Fix processing of parameter details. {pull}31833[31833]
+- Security: Fix processing of sidlist, access list and access mask. {pull}31833[31833]
+- Fix fatal invalid memory write on Windows 11. {issue}32469[32469] {pull}32519[32519]
+- Fix handling of event formatting when no metadata is available on Windows 11. {issue}32468[32468] {pull}32519[32519]
+
+==== Added
+
+*Affecting all Beats*
+
+- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
+
+*Auditbeat*
+
+- Add `immutable` option to the auditd module. {issue}8352[8352] {pull}32381[32381]
+
+*Filebeat*
+
+- Add `auth.oauth2.google.jwt_json` option to `httpjson` input. {pull}31750[31750]
+- Add authentication fields to RabbitMQ module documents. {issue}31159[31159] {pull}31680[31680]
+- Add template helper function for decoding hexadecimal strings. {pull}31886[31886]
+- Add new `parser` called `include_message` to filter based on message contents. {issue}31794[31794] {pull}32094[32094]
+- Extend list of mapped record types in o365 Audit module. {pull}32217[32217]
+- Add references for CRI-O configuration in input-container and in our Kubernetes manifests. {issue}32149[32149] {pull}32151[32151]
+- httpjson input: Add `replaceAll` helper function to template context. {pull}32365[32365]
+- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
+- Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
+- Add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
+
+*Metricbeat*
+
+- Oracle Module: New sysmetric metricset. {issue}30946[30946] {pull}31462[#31462]
+- AWS Fargate: Added support for DesiredStatus and KnownStatus. {issue}32077[32077] {pull}32342[#32342]
+- Enable Generic SQL merge metrics to a single event for sql_queries using new flag. {pull}32394[32394]
+- Add distribution type metrics for GCP. {pull}32170[32170]
+
+*Packetbeat*
+
+- Add support for specifying default route interface sniffing. {issue}31905[31905] {pull}31950[31950]
+- Add support for TCP transport to the SIP protocol. {issue}28166[28166] {pull}32346[32346]
+
+[[release-notes-8.3.3]]
+=== Beats version 8.3.3
+https://github.com/elastic/beats/compare/v8.3.2\...v8.3.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix OS name reported by add_host_metadata on Windows 11. {issue}30833[30833] {pull}32259[32259]
+- Fix race condition when reloading running inputs. {pull}32309[32309]
+
+*Filebeat*
+
+- Fix Cisco AMP rate limit and pagination. {pull}32030[32030]
+- Fix wrong state ID in states registry for awss3 s3 direct input. {pull}32164[32164]
+- cisco/asa: fix handling of user names when there are Security Group Tags present. {issue}32009[32009] {pull}32196[32196]
+
+*Metricbeat*
+
+- Update elasticsearch node_stats metricset to use keyword for cgroup memory instead of long. {pull}32197[32197]
+
+==== Added
+
+*Metricbeat*
+
+- Azure Billing: upgrade Usage Details API to version 2019-10-01. {pull}31970[31970]
+
+[[release-notes-8.3.2]]
+=== Beats version 8.3.2
+https://github.com/elastic/beats/compare/v8.3.1\...v8.3.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+- Fix handling of stale log message handling in the winlog input {issue}32168[32168] {pull}32176[32176]
+
+*Heartbeat*
+
+- Fix regression where we write a dotted (non-nested) key `event.type`. {pull}32097[32097]
+
+*Metricbeat*
+
+- Fix for unintentionally reporting the libbeat "handles" metrics under "system" instead of "beat" as they were in previous releases. https://github.com/elastic/elastic-agent-system-metrics/pull/37[system-metrics#37]
+
+*Winlogbeat*
+
+- Fix handling of stale log message handling {issue}32168[32168] {pull}32176[32176]
+
+==== Added
+
+*Metricbeat*
+
+- Differentiate between actual idle CPU states and an uninterruptible disk sleep. https://github.com/elastic/elastic-agent-system-metrics/pull/32[system-metrics#32]
+
+[[release-notes-8.3.1]]
+=== Beats version 8.3.1
+https://github.com/elastic/beats/compare/v8.3.0\...v8.3.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Improve syslog parser/processor error handling. {issue}31246[31246] {pull}31798[31798]
+
+*Auditbeat*
+
+- Fix handling of audit status messages for modern kernels with reduced audit message feature support. {issue}31616[31616] {pull}32141[32141]
+
+*Filebeat*
+
+- Fix handling and mapping of syslog priority, facility and severity values in Cisco module. {pull}32025[32025]
+- Fix deduplication in Google workspace module by changing fingerprint processor target field from `@metadata.id` to `@metadata._id`. {pull}31898[31898]
+- Adding a fix for threatintel module where MISP was paginating forever. {pull}31784[31784]
+- Fix http_endpoint input TLS handshake failures. {pull}32105[32105]
+- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
+
+[[release-notes-8.3.0]]
+=== Beats version 8.3.0
+https://github.com/elastic/beats/compare/v8.2.3\...v8.3.0[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Allow loading secrets that contain commas from the keystore {pull}31694[31694].
+
+*Auditbeat*
+
+- Fix audit status collection on kernels prior to version 5.9. {issue}31616[31616] {pull}31710[31710]
+
+*Filebeat*
+
+- Do not emit error log when filestream reader reaches EOF and `close.reader.on_eof` is enabled. {pull}31109[31109]
+- sophos.xg: Update module to handle new log fields. {issue}31038[31038] {pull}31388[31388]
+- Fix MISP documentation for `var.filters` config option. {pull}31434[31434]
+- Fix type mapping of client.as.number in okta module. {pull}31676[31676]
+- If a file is ignored by `filestream` because of ignore_older settings, when it is updated, only the new lines are shipped to the output. {issue}31924[31924] {pull}31972[31972]
+
+*Heartbeat*
+
+- Fix unintentional use of no-op logger. {pull}31543[31543]
+
+*Metricbeat*
+
+- make `system/filesystem` code sensitive to `hostfs` and migrate libraries to `elastic-agent-opts` {pull}31001[31001]
+- Fix kubernetes module's internal cache expiration issue. This avoid metrics like `kubernetes.container.cpu.usage.limit.pct` from not being populated. {pull}31785[31785]
+- add missing HealthyHostCount and UnHealthyHostCount for application ELB. {pull}31853[31853]
+
+*Winlogbeat*
+
+- Sysmon: Drop fields with "-" value (unset) {pull}31556[31556]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add new config option `timestamp.precision` to configure timestamps. {pull}31682[31682]
+
+*Auditbeat*
+
+- Add `backlog_wait_time_actual` to the output of the `auditbeat auditd show-status` command. {pull}31535[31535]
+
+*Filebeat*
+
+- Support SASL/SCRAM authentication in the Kafka input. {pull}31167[31167]
+- checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
+- Add URL Encode template function for httpjson input. {pull}30962[30962]
+- Add `application/zip` decoder to the `httpsjon` input. {issue}31282[31282] {pull}31304[31304]
+- Default value of `filebeat.registry.flush` increased from 0s to 1s. CPU and disk I/O usage are reduced because the registry is not written to disk for each ingested log line. {issue}30279[30279]
+- Cisco ASA/FTD: Add support for messages 434001 and 434003. {pull}31533[31533]
+- Change threatintel module from beta to GA. {pull}31693[31693]
+- Add template helper function for hashing strings. {issue}31613[31613] {pull}31630[31630]
+- Add extended okta.debug_context.debug_data handling. {pull}31676[31676]
+- Add a new `salesforce` module to collect data from salesforce. {pull}31486[31486]
+
+*Auditbeat*
+
+- auditd: Updated the go-libaudit library version to v2.3.0. This refreshes the syscall names for Linux and adds ECS categorizations for more audit anomaly events. {pull}31519[31519]
+
+*Filebeat*
+
+- http_endpoint input: Add support for requests with `Content-Encoding: gzip`. {issue}31005[31005]
+
+*Heartbeat*
+
+- Add support for `pushed` browser monitor source from the synthetics agent. {pull}31428[31428]
+- Add ARM64 seccomp profile. {issue}31285[31285] {pull}31422[31422]
+- Add new `playwright_options` config for browser monitors. {issue}28197[28196] {pull}31737[31737]
+
+*Metricbeat*
+
+- Add new Kubernetes module dashboards {pull}31591[31591]
+- system/core: add cpuinfo information for Linux hosts {pull}31643[31643]
+
+*Winlogbeat*
+
+- Add parent process ID to new process creation events. {issue}29237[29237] {pull}31102[31102]
+- Sysmon: Support for Sysmon Registry non-QWORD/DWORD events. {pull}31556[31556]
+
+==== Deprecated
+
+*Heartbeat*
+- Bump node.js version for synthetics to 16.15.0. {pull}31675[31675]
+
+[[release-notes-8.2.3]]
+=== Beats version 8.2.3
+https://github.com/elastic/beats/compare/v8.2.2\...v8.2.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix Windows service timeouts when the "TCP/IP NetBIOS Helper" service is disabled. {issue}31810[31810] {pull}31835[31835]
+
+*Filebeat*
+
+- Fix last write pagination commit checkpoint on `aws-s3` input for s3 direct polling when using the same bucket and different list prefixes. {pull}31776[31776]
+
+[[release-notes-8.2.2]]
+=== Beats version 8.2.2
+https://github.com/elastic/beats/compare/v8.2.1\...v8.2.2[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
+
+*Filebeat*
+
+- Remove invalid "network_traffic" term from event.category. {pull}31674[31674]
+
+[[release-notes-8.2.1]]
+=== Beats version 8.2.1
+https://github.com/elastic/beats/compare/v8.2.0\...v8.2.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix group write permissions on runtime directories. {pull}30869[30869]
+- Store syslog version as string. {pull}31446[31446]
+- Accept XML that declares non-UTF-8 encoding to allow decode_xml and decode_xml_wineventlog decoding of incorrectly annotated documents. {issue}31395[31395] {pull}31546[31546]
+
+*Filebeat*
+
+- Netflow: replace invalid field value. {pull}31295[31295]
+- google_workspace: Fix pagination to prevent skipped events when more than one page is present. {pull}31372[31372]
+- cisco: Fix umbrella dns logs populating destination.ip instead of source.nat.ip. {pull}31454[31454]
+- Duplicate awscloudwatch.* fields to aws.cloudwatch.* in aws-cloudwatch input. {pull}31488[31488]
+- aws-s3 input: Stop SQS keep-alive routine on InvalidParameterValue error. {issue}30675[30675] {pull}31499[31499]
+- Supporting the double digit date parsing in ingest pipeline for oracle logs. {pull}31514[31514]
+- Fix handling of code_sign data in ThreatIntel Malwarebazaar. {issue}29972[29972] {pull}31552[31552]
+- Remove invalid term from event.outcome in the cisco asa and ftd modules. {pull}31628[31628]
+
+*Heartbeat*
+
+- Restrict setuid to containerized environments. {pull}30869[30869]
+
+*Metricbeat*
+
+- Improve handling of disabled commands in Zookeeper Metricbeat module. {pull}31013[#31013]
+
+*Packetbeat*
+
+- Use /proc/<pid>/comm for linux process names where possible. {pull}31527[31527]
+- Move "protocol" term from event.category to event.type in SIP events. {pull}31599[31599]
+
+*Winlogbeat*
+
+- Fix resource handle leak during event log enrichment. {pull}31504[31504]
+- Fix winlogbeat.registry_flush being ignored. {issue}31666[31666] {pull}31669[31669]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go 1.17.10 {issue}31636[31636]
+- Add support for nanosecond precision timestamps. {issue}15871[15871] {pull}31553[31553]
+
+*Filebeat*
+
+- Add `storage_account_container` configuration option to Azure logs. {pull}31279[31279]
+- Sanitize the Azure storage account container names with underscores (_). {pull}31384[31384]
+- Add missing docs for the `delegated_account` option in the `httpjson` input. {pull}31498[31498]
+
+*Metricbeat*
+
+- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
+- Generic SQL code reorganization, with support for raw metrics and query lists {pull}31568[31568]
+- Add metadata for missing k8s resources/metricsets {pull}31590[31590]
+- Fix `include_top_n` fields in system/process {pull}31595[31595]
+
+[[release-notes-8.2.0]]
+=== Beats version 8.2.0
+https://github.com/elastic/beats/compare/v8.1.3\...v8.2.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
+
+==== Bugfixes
+
+*Filebeat*
+
+- m365_defender: Fix processing when alerts.entities is an empty list. {issue}31223[31223] {pull}31227[31227]
+- Prevent filestream from rereading whole files if they are rotated using rename. {pull}31268[31268]
+
+*Heartbeat*
+
+- Heartbeat now successfully runs synthetic monitors on ARM processors. {pull}31114[31114]
+
+*Metricbeat*
+
+- Add back missing metrics to system/linux. {pull}30774[30774]
+- GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
+- Fix Jolokia module to print URI for one of the debug logs. {pull}30943[#30943]
+- Handle docker reporting different capitalization for disk usage metrics. {pull}30978[#30978]
+
+*Winlogbeat*
+
+- Fix routing for PowerShell events. {issue}31287[31287] {pull}31291[31291]
+- Fix missing annotation of event.module. {issue}31330[31330] {pull}31331[31331]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add support for port mapping in docker hints. {pull}31243[31243]
+- Relax timestamp syntax for RFC3164 syslog to allow leading zero on day. {issue}16824[16824] {pull}31254[31254]
+
+*Filebeat*
+
+- Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
+- Improve recovery from corrupted registries. {issue}25135[25135] {pull}30994[30994]
+- Add support in httpjson input for chain calls. {pull}29816[29816]
+
+*Auditbeat*
+
+- Include config file (`auditbeat.elastic-agent.yml`) in tar.gz and zip packages for use with Elastic Agent.
+
+*Metricbeat*
+
+- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
+- Fix overflow in `iostat` metrics {pull}30679[30679]
+- Add `commandstats` field to Redis module {pull}29662[29662]
+- Add `kubernetes.volume.fs.inodes.pct` field. {pull}30785[30785]
+- Improve Kubernetes dashboard. {pull}30913[30913]
+- Populate new container ECS fields in Docker module. {pull}30399[30399]
+- Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
+- Populate ecs container fields in Containerd module. {pull}31025[31025]
+- Add new metricset shovel to RabbitMQ module {pull}31534[31534]
+
+*Winlogbeat*
+
+- Improve the error message when the registry file content is invalid. {pull}30543[30543]
+
+[[release-notes-8.1.3]]
+=== Beats version 8.1.3
+https://github.com/elastic/beats/compare/v8.1.2\...v8.1.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Load data stream during setup, so users do not need extra permissions during publishing. {issue}30647[30647] {pull}31048[31048]
+- Add ecs container fields {pull}31020[31020]
+- Fix docs reference for syslog processor {pull}31087[31087]
+- Fix AWS config initialization issue when using a role {issue}30999[30999] {pull}31014[31014]
+
+*Filebeat*
+
+- Prevent logic race on clearing data during request in httpjson. {pull}30730[30730]
+- Prevents filestream inputs from being stuck while being created. {pull}31240[31240]
+
+*Filebeat*
+
+- Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
+- Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
+- Fix Azure signinlogs authentication_requirement_policies field type and several missing fields. {pull}31062[31062]
+- Cyberark PAS: Fix error ingesting events with a single entry in the CAProperties field. {pull}31094[31094]
+- Fix Azure activitylogs identity field type and several missing fields. {pull}31170[31170]
+- checkpoint: Fix ingest error when a message contains trailing spaces {pull}31197[31197]
+
+*Metricbeat*
+
+- Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
+
+*Packetbeat*
+
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821] {pull}30837[30837]
+
+*Winlogbeat*
+
+- Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
+- Add support for kafka message headers. {pull}29940[29940]
+- Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
+- Add syslog parser and processor. {issue}30139[30139] {pull}30541[30541]
+- Add action_input_type for the .fleet-actions-results {pull}30562[30562]
+- Add cronjob metadata by default {pull}30637[30637]
+- New option `setup.template.json.data_stream` is added to indicate if the JSON index template is a data stream. {pull}31048[31048]
+
+*Winlogbeat*
+
+- Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
+
+
+[[release-notes-8.1.2]]
+=== Beats version 8.1.2
+https://github.com/elastic/beats/compare/v8.1.1\...v8.1.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
+
+*Filebeat*
+
+- Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
+
+*Packetbeat*
+
+- packetbeat: Fix timeout error in af_packet capture mode. {issue}30731[30731] {issue}30822[30822] {pull}30882[30882]
+
+==== Added
+
+*Heartbeat*
+
+- Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
+
+[[release-notes-8.1.1]]
+=== Beats version 8.1.1
+https://github.com/elastic/beats/compare/v8.1.0\...v8.1.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
+- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
+- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
+- Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
+- Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
+
+*Filebeat*
+
+- Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
+- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
+
+*Packetbeat*
+
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
+
 [[release-notes-8.1.0]]
 === Beats version 8.1.0
-https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
+https://github.com/elastic/beats/compare/v8.0.1\...v8.1.0[View commits]
 
 ==== Breaking changes
 
@@ -74,7 +1024,7 @@ https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
 
 [[release-notes-8.0.1]]
 === Beats version 8.0.1
-https://github.com/elastic/beats/compare/v8.0.0...v8.0.1[View commits]
+https://github.com/elastic/beats/compare/v8.0.0\...v8.0.1[View commits]
 
 ==== Bugfixes
 
@@ -100,7 +1050,7 @@ https://github.com/elastic/beats/compare/v8.0.0...v8.0.1[View commits]
 
 [[release-notes-8.0.0]]
 === Beats version 8.0.0
-https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
+https://github.com/elastic/beats/compare/v7.17.0\...v8.0.0[View commits]
 
 ==== Breaking changes
 
@@ -207,7 +1157,7 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 
 [[release-notes-7.17.0]]
 === Beats version 7.17.0
-https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
+https://github.com/elastic/beats/compare/v7.16.3\...v7.17.0[View commits]
 
 ==== Breaking changes
 
@@ -281,7 +1231,7 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 
 [[release-notes-7.16.3]]
 === Beats version 7.16.3
-https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
+https://github.com/elastic/beats/compare/v7.16.2\...v7.16.3[View commits]
 
 ==== Bugfixes
 
@@ -291,7 +1241,7 @@ https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
 
 [[release-notes-7.16.2]]
 === Beats version 7.16.2
-https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
+https://github.com/elastic/beats/compare/v7.16.1\...v7.16.2[View commits]
 
 ==== Bugfixes
 
@@ -312,7 +1262,7 @@ https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
 
 [[release-notes-7.16.1]]
 === Beats version 7.16.1
-https://github.com/elastic/beats/compare/v7.16.0...v7.16.1[View commits]
+https://github.com/elastic/beats/compare/v7.16.0\...v7.16.1[View commits]
 
 ==== Bugfixes
 
@@ -493,7 +1443,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 
 [[release-notes-7.15.2]]
 === Beats version 7.15.2
-https://github.com/elastic/beats/compare/v7.15.1...v7.15.2[View commits]
+https://github.com/elastic/beats/compare/v7.15.1\...v7.15.2[View commits]
 
 ==== Bugfixes
 
@@ -524,7 +1474,7 @@ https://github.com/elastic/beats/compare/v7.15.1...v7.15.2[View commits]
 
 [[release-notes-7.15.1]]
 === Beats version 7.15.1
-https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
+https://github.com/elastic/beats/compare/v7.15.0\...v7.15.1[View commits]
 
 ==== Bugfixes
 
@@ -539,7 +1489,7 @@ https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
 
 [[release-notes-7.15.0]]
 === Beats version 7.15.0
-https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
+https://github.com/elastic/beats/compare/v7.14.2\...v7.15.0[View commits]
 
 ==== Breaking changes
 
@@ -632,7 +1582,7 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 
 [[release-notes-7.14.2]]
 === Beats version 7.14.2
-https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
+https://github.com/elastic/beats/compare/v7.14.1\...v7.14.2[View commits]
 
 ==== Bugfixes
 
@@ -644,7 +1594,7 @@ https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
 
 [[release-notes-7.14.1]]
 === Beats version 7.14.1
-https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
+https://github.com/elastic/beats/compare/v7.14.0\...v7.14.1[View commits]
 
 ==== Bugfixes
 
@@ -674,7 +1624,7 @@ https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
 
 [[release-notes-7.14.0]]
 === Beats version 7.14.0
-https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
+https://github.com/elastic/beats/compare/v7.13.4\...v7.14.0[View commits]
 
 ==== Breaking changes
 
@@ -843,7 +1793,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 
 [[release-notes-7.13.4]]
 === Beats version 7.13.4
-https://github.com/elastic/beats/compare/v7.13.3...v7.13.4[View commits]
+https://github.com/elastic/beats/compare/v7.13.3\...v7.13.4[View commits]
 
 ==== Bugfixes
 
@@ -864,7 +1814,7 @@ https://github.com/elastic/beats/compare/v7.13.3...v7.13.4[View commits]
 
 [[release-notes-7.13.3]]
 === Beats version 7.13.3
-https://github.com/elastic/beats/compare/v7.13.2...v7.13.3[View commits]
+https://github.com/elastic/beats/compare/v7.13.2\...v7.13.3[View commits]
 
 ==== Bugfixes
 
@@ -877,7 +1827,7 @@ https://github.com/elastic/beats/compare/v7.13.2...v7.13.3[View commits]
 
 [[release-notes-7.13.2]]
 === Beats version 7.13.2
-https://github.com/elastic/beats/compare/v7.13.1...v7.13.2[View commits]
+https://github.com/elastic/beats/compare/v7.13.1\...v7.13.2[View commits]
 
 ==== Bugfixes
 
@@ -902,7 +1852,7 @@ https://github.com/elastic/beats/compare/v7.13.1...v7.13.2[View commits]
 
 [[release-notes-7.13.1]]
 === Beats version 7.13.1
-https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]
+https://github.com/elastic/beats/compare/v7.13.0\...v7.13.1[View commits]
 
 ==== Bugfixes
 
@@ -917,7 +1867,7 @@ https://github.com/elastic/beats/compare/v7.13.0...v7.13.1[View commits]
 
 [[release-notes-7.13.0]]
 === Beats version 7.13.0
-https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
+https://github.com/elastic/beats/compare/v7.12.1\...v7.13.0[View commits]
 
 ==== Breaking changes
 
@@ -1038,7 +1988,7 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 
 [[release-notes-7.12.1]]
 === Beats version 7.12.1
-https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
+https://github.com/elastic/beats/compare/v7.12.0\...v7.12.1[View commits]
 
 ==== Breaking changes
 
@@ -1093,7 +2043,7 @@ https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
 
 [[release-notes-7.12.0]]
 === Beats version 7.12.0
-https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
+https://github.com/elastic/beats/compare/v7.11.2\...v7.12.0[View commits]
 
 ==== Breaking changes
 
@@ -1254,7 +2204,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 [[release-notes-7.11.2]]
 === Beats version 7.11.2
-https://github.com/elastic/beats/compare/v7.11.1...v7.11.2[View commits]
+https://github.com/elastic/beats/compare/v7.11.1\...v7.11.2[View commits]
 
 ==== Bugfixes
 
@@ -1274,7 +2224,7 @@ https://github.com/elastic/beats/compare/v7.11.1...v7.11.2[View commits]
 
 [[release-notes-7.11.1]]
 === Beats version 7.11.1
-https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
+https://github.com/elastic/beats/compare/v7.11.0\...v7.11.1[View commits]
 
 ==== Bugfixes
 
@@ -1289,7 +2239,7 @@ https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
 
 [[release-notes-7.11.0]]
 === Beats version 7.11.0
-https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
+https://github.com/elastic/beats/compare/v7.10.2\...v7.11.0[View commits]
 
 ==== Breaking changes
 
@@ -2529,6 +3479,7 @@ present. {pull}16116[16116]
 - Add test for documented fields check for metricsets without a http input. {issue}17315[17315] {pull}17334[17334]
 - Release the azure module as GA. {pull}17319[17319]
 - In the kubernetes manifests, mount the data directory from the host, so data persist between executions in the same node. {pull}17429[17429]
+- Release the CockroachDB module as GA. {pull}32527[32527]
 
 *Packetbeat*
 
@@ -5736,6 +6687,7 @@ https://github.com/elastic/beats/compare/v6.2.3\...v6.3.0[View commits]
 - Add support human friendly size for the UDP input. {pull}6886[6886]
 - Add Syslog input to ingest RFC3164 Events via TCP and UDP {pull}6842[6842]
 - Remove the undefined `username` option from the Redis input and clarify the documentation. {pull}6662[6662]
+- Add CometD input {pull}30089[30089]
 
 *Heartbeat*
 
