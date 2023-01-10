@@ -77,6 +77,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Allow to use metricbeat for named mssql instances. {issue}24076[24076] {pull}30859[30859]
 - Setting DEV=true when running `mage build` now correctly generates binaries without optimisations and with debug symbols {pull}31955[31955]
 - The beat.cgroup.memory.mem.usage.bytes metric is now a gauge {issue}31582[31582] {pull}32652[32652]
+- Fixed the integration testcases for sql and oracle modules {issue}34213[34213] {pull}34213[34213]
 
 ==== Added
 
