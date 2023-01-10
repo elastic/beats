@@ -140,16 +140,17 @@ func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int) []string {
 	// Only pick hosts that have ${data.port} or the port on current event. This will make
 	// sure that incorrect meta mapping doesn't happen
 	for _, h := range thosts {
-		if strings.Contains(h, "data.port") || strings.Contains(h, fmt.Sprintf(":%d", port)) ||
-			// Use the event that has no port config if there is a ${data.host}:9090 like input
-			(port == 0 && strings.Contains(h, "data.host")) {
-			result = append(result, h)
-		} else if port == 0 && !strings.Contains(h, ":") {
-			// For ICMP like use cases allow only host to be passed if there is no port
-			result = append(result, h)
-		} else {
-			hb.logger.Warn("unable to frame a host from input host: %s", h)
-		}
+		// if strings.Contains(h, "data.port") || strings.Contains(h, fmt.Sprintf(":%d", port)) ||
+		// 	// Use the event that has no port config if there is a ${data.host}:9090 like input
+		// 	(port == 0 && strings.Contains(h, "data.host")) {
+		// 	result = append(result, h)
+		// } else if port == 0 && !strings.Contains(h, ":") {
+		// 	// For ICMP like use cases allow only host to be passed if there is no port
+		// 	result = append(result, h)
+		// } else {
+		// 	hb.logger.Warn("unable to frame a host from input host: %s", h)
+		// }
+		result = append(result, h)
 	}
 
 	if len(thosts) > 0 && len(result) == 0 {
