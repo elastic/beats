@@ -53,6 +53,24 @@ include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 include::{libbeat-dir}/http-endpoint.asciidoc[]
 
+[float]
+=== Metrics
+
+{beatname_uc} exposes the following additional metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/dataset` path.
+
+[options="header"]
+|=======
+| Metric                   | Description
+| `provider`               | The name of the provider being read.
+| `received_events_total`  | Total number of events read by the input.
+| `discarded_events_total` | Total number of events dropped by the input.
+| `errors_total`           | Total number of errors encountered by the input.
+| `batch_read_period`      | A histogram of intervals between non-empty event batch reads.
+| `received_events_count`  | A histogram of the number of events read in each batch.
+| `source_lag_time`        | The difference between the timestamp recorded in each event and the time when it was read.
+|=======
+
 include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]
