@@ -203,7 +203,7 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 
 		if err != nil {
 			s.logger.Errorf("redis ListInstances error: %v", err)
-			continue
+			break
 		}
 
 		s.instances[instance.Name] = instance
