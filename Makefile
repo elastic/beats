@@ -86,7 +86,6 @@ update: notice
 clean: mage
 	@rm -rf build
 	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) clean || exit 1;)
-	@$(MAKE) -C generator clean
 	@-mage -clean
 
 ## check : TBD.

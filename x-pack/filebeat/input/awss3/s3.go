@@ -15,6 +15,7 @@ import (
 	"github.com/gofrs/uuid"
 	"go.uber.org/multierr"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -53,6 +54,7 @@ type s3Poller struct {
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
+	client               beat.Client
 	s3ObjectHandler      s3ObjectHandlerFactory
 	states               *states
 	store                *statestore.Store
@@ -63,6 +65,7 @@ type s3Poller struct {
 func newS3Poller(log *logp.Logger,
 	metrics *inputMetrics,
 	s3 s3API,
+	client beat.Client,
 	s3ObjectHandler s3ObjectHandlerFactory,
 	states *states,
 	store *statestore.Store,
@@ -71,9 +74,10 @@ func newS3Poller(log *logp.Logger,
 	awsRegion string,
 	provider string,
 	numberOfWorkers int,
-	bucketPollInterval time.Duration) *s3Poller {
+	bucketPollInterval time.Duration,
+) *s3Poller {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", monitoring.NewRegistry())
 	}
 	return &s3Poller{
 		numberOfWorkers:      numberOfWorkers,
@@ -86,6 +90,7 @@ func newS3Poller(log *logp.Logger,
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,
+		client:               client,
 		s3ObjectHandler:      s3ObjectHandler,
 		states:               states,
 		store:                store,
@@ -113,6 +118,19 @@ func (p *s3Poller) handlePurgingLock(info s3ObjectInfo, isStored bool) {
 		lock, _ := p.workersListingMap.Load(info.listingID)
 		lock.(*sync.Mutex).Unlock()
 	}
+}
+
+func (p *s3Poller) createS3ObjectProcessor(ctx context.Context, state state) (s3ObjectHandler, s3EventV2) {
+	event := s3EventV2{}
+	event.AWSRegion = p.region
+	event.Provider = p.provider
+	event.S3.Bucket.Name = state.Bucket
+	event.S3.Bucket.ARN = p.bucket
+	event.S3.Object.Key = state.Key
+
+	acker := awscommon.NewEventACKTracker(ctx)
+
+	return p.s3ObjectHandler.Create(ctx, p.log, p.client, acker, event), event
 }
 
 func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {
@@ -203,18 +221,14 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 				continue
 			}
 
-			p.states.Update(state, "")
+			// we have no previous state or the previous state
+			// is not stored: refresh the state
+			previousState := p.states.FindPrevious(state)
+			if previousState.IsEmpty() || !previousState.IsProcessed() {
+				p.states.Update(state, "")
+			}
 
-			event := s3EventV2{}
-			event.AWSRegion = p.region
-			event.Provider = p.provider
-			event.S3.Bucket.Name = bucketName
-			event.S3.Bucket.ARN = p.bucket
-			event.S3.Object.Key = filename
-
-			acker := awscommon.NewEventACKTracker(ctx)
-
-			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
+			s3Processor, event := p.createS3ObjectProcessor(ctx, state)
 			if s3Processor == nil {
 				p.log.Debugw("empty s3 processor.", "state", state)
 				continue
@@ -255,7 +269,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 	}
 }
 
-func (p *s3Poller) Purge() {
+func (p *s3Poller) Purge(ctx context.Context) {
 	listingIDs := p.states.GetListingIDs()
 	p.log.Debugw("purging listing.", "listingIDs", listingIDs)
 	for _, listingID := range listingIDs {
@@ -272,24 +286,25 @@ func (p *s3Poller) Purge() {
 
 		lock.(*sync.Mutex).Lock()
 
-		keys := map[string]struct{}{}
+		states := map[string]*state{}
 		latestStoredTimeByBucketAndListPrefix := make(map[string]time.Time, 0)
 
-		for _, state := range p.states.GetStatesByListingID(listingID) {
+		listingStates := p.states.GetStatesByListingID(listingID)
+		for i, state := range listingStates {
 			// it is not stored, keep
-			if !state.Stored {
-				p.log.Debugw("state not stored, skip purge", "state", state)
+			if !state.IsProcessed() {
+				p.log.Debugw("state not stored or with error, skip purge", "state", state)
 				continue
 			}
 
 			var latestStoredTime time.Time
-			keys[state.ID] = struct{}{}
+			states[state.ID] = &listingStates[i]
 			latestStoredTime, ok := latestStoredTimeByBucketAndListPrefix[state.Bucket+state.ListPrefix]
 			if !ok {
 				var commitWriteState commitWriteState
 				err := p.store.Get(awsS3WriteCommitPrefix+state.Bucket+state.ListPrefix, &commitWriteState)
 				if err == nil {
-					// we have no entry in the map and we have no entry in the store
+					// we have no entry in the map, and we have no entry in the store
 					// set zero time
 					latestStoredTime = time.Time{}
 					p.log.Debugw("last stored time is zero time", "bucket", state.Bucket, "listPrefix", state.ListPrefix)
@@ -307,7 +322,7 @@ func (p *s3Poller) Purge() {
 			}
 		}
 
-		for key := range keys {
+		for key := range states {
 			p.states.Delete(key)
 		}
 
@@ -325,6 +340,14 @@ func (p *s3Poller) Purge() {
 		lock.(*sync.Mutex).Unlock()
 		p.workersListingMap.Delete(listingID)
 		p.states.DeleteListing(listingID)
+
+		// Listing is removed from all states, we can finalize now
+		for _, state := range states {
+			processor, _ := p.createS3ObjectProcessor(ctx, *state)
+			if err := processor.FinalizeS3Object(); err != nil {
+				p.log.Errorw("Failed to finalize S3 object", "key", state.Key, "error", err)
+			}
+		}
 	}
 }
 
@@ -353,7 +376,7 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 			}()
 
 			p.GetS3Objects(ctx, s3ObjectPayloadChan)
-			p.Purge()
+			p.Purge(ctx)
 		}()
 
 		workerWg.Add(workers)

@@ -20,16 +20,15 @@ import (
 	"strings"
 	"time"
 
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -41,14 +40,14 @@ const (
 type s3ObjectProcessorFactory struct {
 	log           *logp.Logger
 	metrics       *inputMetrics
-	s3            s3Getter
-	publisher     beat.Client
+	s3            s3API
 	fileSelectors []fileSelectorConfig
+	backupConfig  backupConfig
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3Getter, publisher beat.Client, sel []fileSelectorConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", monitoring.NewRegistry())
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{
@@ -59,8 +58,8 @@ func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3G
 		log:           log,
 		metrics:       metrics,
 		s3:            s3,
-		publisher:     publisher,
 		fileSelectors: sel,
+		backupConfig:  backupConfig,
 	}
 }
 
@@ -75,7 +74,7 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 
 // Create returns a new s3ObjectProcessor. It returns nil when no file selectors
 // match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, client beat.Client, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	log = log.With(
 		"bucket_arn", obj.S3.Bucket.Name,
 		"object_key", obj.S3.Object.Key)
@@ -90,6 +89,7 @@ func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger,
 		s3ObjectProcessorFactory: f,
 		log:                      log,
 		ctx:                      ctx,
+		publisher:                client,
 		acker:                    ack,
 		readerConfig:             readerConfig,
 		s3Obj:                    obj,
@@ -102,6 +102,7 @@ type s3ObjectProcessor struct {
 
 	log          *logp.Logger
 	ctx          context.Context
+	publisher    beat.Client
 	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
 	readerConfig *readerConfig              // Config about how to process the object.
 	s3Obj        s3EventV2                  // S3 object information.
@@ -158,6 +159,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	default:
 		err = p.readFile(reader)
 	}
+
 	if err != nil {
 		return fmt.Errorf("failed reading s3 object (elapsed_time_ns=%d): %w",
 			time.Since(start).Nanoseconds(), err)
@@ -284,10 +286,11 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 
 	var reader reader.Reader
 	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
-		Codec:      enc,
-		BufferSize: int(p.readerConfig.BufferSize),
-		Terminator: p.readerConfig.LineTerminator,
-		MaxBytes:   int(p.readerConfig.MaxBytes) * 4,
+		Codec:        enc,
+		BufferSize:   int(p.readerConfig.BufferSize),
+		Terminator:   p.readerConfig.LineTerminator,
+		CollectOnEOF: true,
+		MaxBytes:     int(p.readerConfig.MaxBytes) * 4,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create encode reader: %w", err)
@@ -300,6 +303,13 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
+		if len(message.Content) > 0 {
+			event := p.createEvent(string(message.Content), offset)
+			event.Fields.DeepUpdate(message.Fields)
+			offset += int64(message.Bytes)
+			p.publish(p.acker, &event)
+		}
+
 		if errors.Is(err, io.EOF) {
 			// No more lines
 			break
@@ -307,11 +317,6 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 		if err != nil {
 			return fmt.Errorf("error reading message: %w", err)
 		}
-
-		event := p.createEvent(string(message.Content), offset)
-		event.Fields.DeepUpdate(message.Fields)
-		offset += int64(message.Bytes)
-		p.publish(p.acker, &event)
 	}
 
 	return nil
@@ -359,6 +364,29 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 	}
 
 	return event
+}
+
+func (p *s3ObjectProcessor) FinalizeS3Object() error {
+	bucketName := p.backupConfig.GetBucketName()
+	if bucketName == "" {
+		return nil
+	}
+	backupKey := p.s3Obj.S3.Object.Key
+	if p.backupConfig.BackupToBucketPrefix != "" {
+		backupKey = fmt.Sprintf("%s%s", p.backupConfig.BackupToBucketPrefix, backupKey)
+	}
+	_, err := p.s3.CopyObject(p.ctx, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
+	if err != nil {
+		return fmt.Errorf("failed to copy object to backup bucket: %w", err)
+	}
+	if !p.backupConfig.Delete {
+		return nil
+	}
+	_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+	if err != nil {
+		return fmt.Errorf("failed to delete object from bucket: %w", err)
+	}
+	return nil
 }
 
 func objectID(objectHash string, offset int64) string {

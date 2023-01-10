@@ -44,13 +44,13 @@ import (
 // to a Worker.
 type Sniffer struct {
 	sniffers []sniffer
+	cancel   func()
 }
 
 type sniffer struct {
 	config config.InterfaceConfig
 
-	state atomic.Int32  // store snifferState
-	done  chan struct{} // done is required to wire state into a select.
+	state atomic.Int32 // store snifferState
 
 	// device is the first active device after calling New.
 	// It is not updated by default route polling.
@@ -184,16 +184,17 @@ func validateAfPacketConfig(cfg *config.InterfaceConfig) error {
 // Run opens the sniffing device and processes packets being read from that device.
 // Worker instances are instantiated as needed.
 func (s *Sniffer) Run() error {
-	g, ctx := errgroup.WithContext(context.Background())
-	for _, c := range s.sniffers {
-		c := c
+	ctx, cancel := context.WithCancel(context.Background())
+	s.cancel = cancel
+	g, ctx := errgroup.WithContext(ctx)
+	for i := range s.sniffers {
+		c := &s.sniffers[i]
 		g.Go(func() error {
 			var (
 				defaultRoute chan string
 				refresh      chan struct{}
 			)
 			if c.followDefault {
-				c.done = make(chan struct{})
 				defaultRoute = make(chan string)
 				refresh = make(chan struct{}, 1)
 				go c.pollDefaultRoute(ctx, defaultRoute, refresh)
@@ -208,8 +209,8 @@ func (s *Sniffer) Run() error {
 }
 
 // pollDefaultRoute repeatedly polls the default route's device at intervals
-// specified in config.PollDefaultRoute. The poller is terminated by closing
-// done and the device chan can be read for changes in the default route.
+// specified in config.PollDefaultRoute. The poller is terminated by cancelling
+// the context and the device chan can be read for changes in the default route.
 // Changes in default route will put the Sniffer into the inactive state to
 // trigger a new sniffer connection. Termination of the sniffer is not under
 // the control of the poller.
@@ -232,11 +233,6 @@ func (s *sniffer) pollDefaultRoute(ctx context.Context, device chan<- string, re
 				logp.Debug("sniffer", "requested new default route")
 				current = s.poll(current, device)
 			case <-ctx.Done():
-				logp.Info("polling cancelled")
-				close(device)
-				tick.Stop()
-				return
-			case <-s.done:
 				logp.Info("closing default route poller")
 				close(device)
 				tick.Stop()
@@ -279,11 +275,13 @@ func (s *sniffer) sniffStatic(ctx context.Context, device string) error {
 	}
 	defer handle.Close()
 
-	dec, err := s.decoders(handle.LinkType())
+	dec, cleanup, err := s.decoders(handle.LinkType(), device)
 	if err != nil {
 		return err
 	}
-
+	if cleanup != nil {
+		defer cleanup()
+	}
 	return s.sniffHandle(ctx, handle, dec, nil)
 }
 
@@ -319,9 +317,13 @@ func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layer
 	linkType := handle.LinkType()
 	if dec == nil || linkType != last {
 		logp.Info("changing link type: %d -> %d", last, linkType)
-		dec, err = s.decoders(linkType)
+		var cleanup func()
+		dec, cleanup, err = s.decoders(linkType, device)
 		if err != nil {
 			return linkType, dec, err
+		}
+		if cleanup != nil {
+			defer cleanup()
 		}
 	}
 
@@ -459,11 +461,14 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 // Stop marks a sniffer as stopped. The Run method will return once the stop
 // signal has been given.
 func (s *Sniffer) Stop() {
+	logp.Debug("sniffer", "sending stop to all sniffers")
 	for _, c := range s.sniffers {
+		logp.Debug("sniffer", "sending closing to %s", c.config.Device)
 		c.state.Store(snifferClosing)
-		if c.done != nil {
-			close(c.done)
-		}
+	}
+	if s.cancel != nil {
+		logp.Debug("sniffer", "cancelling sniffers")
+		s.cancel()
 	}
 }
 

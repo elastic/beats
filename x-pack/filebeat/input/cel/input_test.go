@@ -985,7 +985,9 @@ bytes(get(state.url).Body).decode_json().records.map(r,
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
 			{
-				"error.message": "failed eval: no such overload", // This is the best we get for some errors from CEL.
+				"error": map[string]interface{}{
+					"message": "failed eval: no such overload", // This is the best we get for some errors from CEL.
+				},
 			},
 		},
 	},

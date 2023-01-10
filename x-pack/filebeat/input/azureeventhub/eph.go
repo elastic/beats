@@ -27,7 +27,12 @@ var environments = map[string]azure.Environment{
 	azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
 }
 
-// runWithEPH will consume ingested events using the Event Processor Host (EPH) https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host
+// runWithEPH will consume ingested events using the Event Processor Host (EPH).
+//
+// To learn more, check the following resources:
+// - https://github.com/Azure/azure-event-hubs-go#event-processor-host
+// - https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host
+//
 func (a *azureInput) runWithEPH() error {
 	// create a new Azure Storage Leaser / Checkpointer
 	cred, err := azblob.NewSharedKeyCredential(a.config.SAName, a.config.SAKey)
@@ -40,9 +45,12 @@ func (a *azureInput) runWithEPH() error {
 	}
 	leaserCheckpointer, err := storage.NewStorageLeaserCheckpointer(cred, a.config.SAName, a.config.SAContainer, env)
 	if err != nil {
+		a.log.Errorw("error creating storage leaser checkpointer", "error", err)
 		return err
 	}
-	// adding a nil EventProcessorHostOption will break the code, this is why a condition is added and a.processor is assigned
+
+	// adding a nil EventProcessorHostOption will break the code,
+	// this is why a condition is added and a.processor is assigned.
 	if a.config.ConsumerGroup != "" {
 		a.processor, err = eph.NewFromConnectionString(
 			a.workerCtx,
@@ -60,6 +68,7 @@ func (a *azureInput) runWithEPH() error {
 			eph.WithNoBanner())
 	}
 	if err != nil {
+		a.log.Errorw("error creating processor", "error", err)
 		return err
 	}
 
@@ -77,23 +86,25 @@ func (a *azureInput) runWithEPH() error {
 			return onEventErr
 		})
 	if err != nil {
+		a.log.Errorw("error registering handler", "error", err)
 		return err
 	}
-	a.log.Infof("handler id: %q is running\n", handlerID)
+	a.log.Infof("handler id: %q is registered\n", handlerID)
 
-	// unregister a handler to stop that handler from receiving events
-	// processor.UnregisterHandler(ctx, handleID)
-
-	// start handling messages from all of the partitions balancing across multiple consumers
-	err = a.processor.Start(a.workerCtx)
+	// Start handling messages from all of the partitions balancing across
+	// multiple consumers.
+	// The processor can be stopped by calling `Close()` on the processor.
+	err = a.processor.StartNonBlocking(a.workerCtx)
 	if err != nil {
+		a.log.Errorw("error starting the processor", "error", err)
 		return err
 	}
+
 	return nil
 }
 
 func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
-	// if no overrride is set then the azure public cloud is used
+	// if no override is set then the azure public cloud is used
 	if overrideResManager == "" || overrideResManager == "<no value>" {
 		return azure.PublicCloud, nil
 	}

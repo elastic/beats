@@ -63,7 +63,10 @@ CHANGELOG*
 /metricbeat/module/beat/ @elastic/infra-monitoring-ui
 /metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
 /metricbeat/module/kibana/ @elastic/infra-monitoring-ui
+/metricbeat/module/kubernetes/ @elastic/obs-cloudnative-monitoring
 /metricbeat/module/logstash/ @elastic/infra-monitoring-ui
+/metricbeat/module/nats/ @elastic/obs-cloudnative-monitoring
+/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
 /metricbeat/module/system/ @elastic/elastic-agent-data-plane
 /packetbeat/ @elastic/security-external-integrations
 /script/ @elastic/elastic-agent-data-plane
@@ -76,6 +79,7 @@ CHANGELOG*
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
+/x-pack/filebeat/input/cel/ @elastic/security-external-integrations
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
 /x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
@@ -136,7 +140,11 @@ CHANGELOG*
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/ @elastic/integrations
+/x-pack/metricbeat/module/containerd/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application-backend
+/x-pack/metricbeat/module/istio/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/stan/ @elastic/obs-cloudnative-monitoring
 /x-pack/osquerybeat/ @elastic/security-asset-management
 /x-pack/packetbeat/ @elastic/security-external-integrations
 /x-pack/winlogbeat/ @elastic/security-external-integrations
