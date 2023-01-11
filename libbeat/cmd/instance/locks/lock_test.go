@@ -60,7 +60,7 @@ func TestMain(m *testing.M) {
 
 func TestLocker(t *testing.T) {
 	// Setup two beats with same name and data path
-	const beatName = "testbeat"
+	const beatName = "testbeat-testlocker"
 
 	b1 := beat.Info{}
 	b1.Beat = beatName
@@ -82,7 +82,7 @@ func TestLocker(t *testing.T) {
 }
 
 func TestUnlock(t *testing.T) {
-	const beatName = "testbeat"
+	const beatName = "testbeat-testunlock"
 
 	b1 := beat.Info{}
 	b1.Beat = beatName
@@ -107,7 +107,7 @@ func TestUnlock(t *testing.T) {
 }
 
 func TestUnlockWithRemainingFile(t *testing.T) {
-	const beatName = "testbeat"
+	const beatName = "testbeat-testunlockwithfile"
 
 	b1 := beat.Info{}
 	b1.Beat = beatName
