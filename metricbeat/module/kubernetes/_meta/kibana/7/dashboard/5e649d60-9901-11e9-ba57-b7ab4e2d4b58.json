@@ -1952,7 +1952,7 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of differences(sum(kubernetes.controllermanager.client.request.count))",
+                                                    "label": "Part of differences(sum(kubernetes.proxy.client.request.count))",
                                                     "operationType": "differences",
                                                     "references": [
                                                         "eb7e83d0-db8e-4b46-963c-3f2e8f343546"
@@ -1976,13 +1976,13 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of differences(sum(kubernetes.controllermanager.client.request.count))",
+                                                    "label": "Part of differences(sum(kubernetes.proxy.client.request.count))",
                                                     "operationType": "sum",
                                                     "params": {
                                                         "emptyAsNull": false
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "kubernetes.controllermanager.client.request.count"
+                                                    "sourceField": "kubernetes.proxy.client.request.count"
                                                 },
                                                 "eb84dd5b-79c5-4928-8636-fcc56d70b7fc": {
                                                     "dataType": "string",
@@ -2010,7 +2010,7 @@
                                                     "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.code \u003e= 400 and kubernetes.controllermanager.code \u003c 500"
+                                                        "query": "kubernetes.proxy.code \u003e= 400 and kubernetes.proxy.code \u003c 500"
                                                     },
                                                     "isBucketed": false,
                                                     "label": "Client errors",
@@ -2036,7 +2036,7 @@
                                                     "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.code \u003e= 400 and kubernetes.controllermanager.code \u003c 500"
+                                                        "query": "kubernetes.proxy.code \u003e= 400 and kubernetes.proxy.code \u003c 500"
                                                     },
                                                     "isBucketed": false,
                                                     "label": "Part of Client errors",
@@ -2052,7 +2052,7 @@
                                                     "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.code \u003e= 400 and kubernetes.controllermanager.code \u003c 500"
+                                                        "query": "kubernetes.proxy.code \u003e= 400 and kubernetes.proxy.code \u003c 500"
                                                     },
                                                     "isBucketed": false,
                                                     "label": "Part of Client errors",
@@ -2176,7 +2176,7 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of differences(sum(kubernetes.controllermanager.client.request.count))",
+                                                    "label": "Part of differences(sum(kubernetes.proxy.client.request.count))",
                                                     "operationType": "differences",
                                                     "references": [
                                                         "e137ff3f-86e1-4be8-9bee-a9f50d5cbec8"
@@ -2188,16 +2188,16 @@
                                                     "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.code \u003e= 400 and kubernetes.controllermanager.code \u003c 500"
+                                                        "query": "kubernetes.proxy.code \u003e= 400 and kubernetes.proxy.code \u003c 500"
                                                     },
                                                     "isBucketed": false,
-                                                    "label": "Part of differences(sum(kubernetes.controllermanager.client.request.count))",
+                                                    "label": "Part of differences(sum(kubernetes.proxy.client.request.count))",
                                                     "operationType": "sum",
                                                     "params": {
                                                         "emptyAsNull": false
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "kubernetes.controllermanager.client.request.count"
+                                                    "sourceField": "kubernetes.proxy.client.request.count"
                                                 },
                                                 "e05814a2-da30-432b-8fbf-bad34214cc4c": {
                                                     "dataType": "string",
@@ -2224,23 +2224,23 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of differences(sum(kubernetes.controllermanager.client.request.count))",
+                                                    "label": "Part of differences(sum(kubernetes.proxy.client.request.count))",
                                                     "operationType": "sum",
                                                     "params": {
                                                         "emptyAsNull": false
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "kubernetes.controllermanager.client.request.count"
+                                                    "sourceField": "kubernetes.proxy.client.request.count"
                                                 },
                                                 "f19c32fc-8086-4c14-a124-747572608ae5": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.code \u003e= 400 and kubernetes.controllermanager.code \u003c 500"
+                                                        "query": "kubernetes.proxy.code \u003e= 400 and kubernetes.proxy.code \u003c 500"
                                                     },
                                                     "isBucketed": false,
-                                                    "label": "Part of differences(sum(kubernetes.controllermanager.client.request.count))",
+                                                    "label": "Part of differences(sum(kubernetes.proxy.client.request.count))",
                                                     "operationType": "differences",
                                                     "references": [
                                                         "b842fba2-3cc2-4d13-8cf9-37b66f21b796"
@@ -2252,7 +2252,7 @@
                                                     "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.code \u003e= 500"
+                                                        "query": "kubernetes.proxy.code \u003e= 500"
                                                     },
                                                     "isBucketed": false,
                                                     "label": "Server errors",
@@ -2278,7 +2278,7 @@
                                                     "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.code \u003e= 500"
+                                                        "query": "kubernetes.proxy.code \u003e= 500"
                                                     },
                                                     "isBucketed": false,
                                                     "label": "Part of Server errors",
@@ -2294,7 +2294,7 @@
                                                     "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.code \u003e= 500"
+                                                        "query": "kubernetes.proxy.code \u003e= 500"
                                                     },
                                                     "isBucketed": false,
                                                     "label": "Part of Server errors",

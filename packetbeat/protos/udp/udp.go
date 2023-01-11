@@ -19,38 +19,69 @@ package udp
 
 import (
 	"fmt"
+	"time"
+
+	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
-type UDP struct {
-	protocols protos.Protocols
-	portMap   map[uint16]protos.Protocol
-}
-
 type Processor interface {
 	Process(id *flows.FlowID, pkt *protos.Packet)
 }
 
-// decideProtocol determines the protocol based on the source and destination
-// ports. If the protocol cannot be determined then protos.UnknownProtocol
-// is returned.
-func (udp *UDP) decideProtocol(tuple *common.IPPortTuple) protos.Protocol {
-	protocol, exists := udp.portMap[tuple.SrcPort]
-	if exists {
-		return protocol
+type UDP struct {
+	protocols protos.Protocols
+	portMap   map[uint16]protos.Protocol
+
+	metrics *inputMetrics
+}
+
+// NewUDP creates and returns a new UDP.
+func NewUDP(p protos.Protocols, id, device string) (*UDP, error) {
+	portMap, err := buildPortsMap(p.GetAllUDP())
+	if err != nil {
+		return nil, err
 	}
 
-	protocol, exists = udp.portMap[tuple.DstPort]
-	if exists {
-		return protocol
+	udp := &UDP{
+		protocols: p,
+		portMap:   portMap,
+		metrics:   newInputMetrics(id, device),
+	}
+	logp.Debug("udp", "Port map: %v", portMap)
+
+	return udp, nil
+}
+
+// buildPortsMap creates a mapping of port numbers to protocol identifiers. If
+// any two UdpProtocolPlugins operate on the same port number then an error
+// will be returned.
+func buildPortsMap(plugins map[protos.Protocol]protos.UDPPlugin) (map[uint16]protos.Protocol, error) {
+	res := map[uint16]protos.Protocol{}
+
+	for proto, protoPlugin := range plugins {
+		for _, port := range protoPlugin.GetPorts() {
+			oldProto, exists := res[uint16(port)]
+			if exists {
+				if oldProto == proto {
+					continue
+				}
+				return nil, fmt.Errorf("duplicate port (%d) exists in %s and %s protocols",
+					port, oldProto, proto)
+			}
+			res[uint16(port)] = proto
+		}
 	}
 
-	return protos.UnknownProtocol
+	return res, nil
 }
 
 // Process handles UDP packets that have been received. It attempts to
@@ -74,41 +105,92 @@ func (udp *UDP) Process(id *flows.FlowID, pkt *protos.Packet) {
 		logp.Debug("udp", "Parsing packet from %v of length %d.",
 			pkt.Tuple.String(), len(pkt.Payload))
 		plugin.ParseUDP(pkt)
+		udp.metrics.log(pkt)
 	}
 }
 
-// buildPortsMap creates a mapping of port numbers to protocol identifiers. If
-// any two UdpProtocolPlugins operate on the same port number then an error
-// will be returned.
-func buildPortsMap(plugins map[protos.Protocol]protos.UDPPlugin) (map[uint16]protos.Protocol, error) {
-	res := map[uint16]protos.Protocol{}
-
-	for proto, protoPlugin := range plugins {
-		for _, port := range protoPlugin.GetPorts() {
-			oldProto, exists := res[uint16(port)]
-			if exists {
-				if oldProto == proto {
-					continue
-				}
-				return nil, fmt.Errorf("Duplicate port (%d) exists in %s and %s protocols",
-					port, oldProto, proto)
-			}
-			res[uint16(port)] = proto
-		}
+// decideProtocol determines the protocol based on the source and destination
+// ports. If the protocol cannot be determined then protos.UnknownProtocol
+// is returned.
+func (udp *UDP) decideProtocol(tuple *common.IPPortTuple) protos.Protocol {
+	protocol, exists := udp.portMap[tuple.SrcPort]
+	if exists {
+		return protocol
 	}
 
-	return res, nil
+	protocol, exists = udp.portMap[tuple.DstPort]
+	if exists {
+		return protocol
+	}
+
+	return protos.UnknownProtocol
 }
 
-// NewUDP creates and returns a new UDP.
-func NewUDP(p protos.Protocols) (*UDP, error) {
-	portMap, err := buildPortsMap(p.GetAllUDP())
-	if err != nil {
-		return nil, err
+func (udp *UDP) Close() {
+	if udp.metrics == nil {
+		return
 	}
+	udp.metrics.close()
+}
 
-	udp := &UDP{protocols: p, portMap: portMap}
-	logp.Debug("udp", "Port map: %v", portMap)
+// inputMetrics handles the input's metric reporting.
+type inputMetrics struct {
+	unregister func()
 
-	return udp, nil
+	lastPacket time.Time
+
+	device         *monitoring.String // name of the device being monitored
+	packets        *monitoring.Uint   // number of packets processed
+	bytes          *monitoring.Uint   // number of bytes processed
+	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between packet arrivals
+	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
+}
+
+// newInputMetrics returns an input metric for the UDP processor. If id or
+// device is empty a nil inputMetric is returned.
+func newInputMetrics(id, device string) *inputMetrics {
+	if id == "" || device == "" {
+		// An empty id signals to not record metrics,
+		// while an empty device means we are reading
+		// from a pcap file and no metrics are needed.
+		return nil
+	}
+	reg, unreg := inputmon.NewInputRegistry("udp", id+"::"+device, nil)
+	out := &inputMetrics{
+		unregister:     unreg,
+		device:         monitoring.NewString(reg, "device"),
+		packets:        monitoring.NewUint(reg, "received_events_total"),
+		bytes:          monitoring.NewUint(reg, "received_bytes_total"),
+		arrivalPeriod:  metrics.NewUniformSample(1024),
+		processingTime: metrics.NewUniformSample(1024),
+	}
+	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
+	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.processingTime))
+
+	out.device.Set(device)
+
+	return out
+}
+
+// log logs metric for the given packet.
+func (m *inputMetrics) log(pkt *protos.Packet) {
+	if m == nil {
+		return
+	}
+	m.processingTime.Update(time.Since(pkt.Ts).Nanoseconds())
+	m.packets.Add(1)
+	m.bytes.Add(uint64(len(pkt.Payload)))
+	if !m.lastPacket.IsZero() {
+		m.arrivalPeriod.Update(pkt.Ts.Sub(m.lastPacket).Nanoseconds())
+	}
+	m.lastPacket = pkt.Ts
+}
+
+func (m *inputMetrics) close() {
+	if m == nil {
+		return
+	}
+	m.unregister()
 }
