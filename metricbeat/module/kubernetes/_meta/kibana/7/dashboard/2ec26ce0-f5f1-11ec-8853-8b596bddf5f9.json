@@ -7,7 +7,6 @@
             "panelsJSON": "{\"f53d0d21-4502-4dce-8004-017a92104040\":{\"order\":1,\"width\":\"medium\",\"grow\":true,\"type\":\"optionsListControl\",\"explicitInput\":{\"fieldName\":\"host.name\",\"title\":\"Host\",\"id\":\"f53d0d21-4502-4dce-8004-017a92104040\",\"selectedOptions\":[],\"enhancements\":{},\"singleSelect\":false}},\"df56c430-83b1-436e-8b9c-fb027aaa29ca\":{\"order\":0,\"width\":\"medium\",\"grow\":true,\"type\":\"optionsListControl\",\"explicitInput\":{\"fieldName\":\"orchestrator.cluster.name\",\"title\":\"Cluster\",\"singleSelect\":true,\"id\":\"df56c430-83b1-436e-8b9c-fb027aaa29ca\",\"selectedOptions\":[],\"enhancements\":{}}}}"
         },
         "description": "Kubernetes Controller Manager metrics",
-        "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
                 "filter": [
@@ -44,6 +43,8 @@
         "optionsJSON": {
             "hidePanelTitles": false,
             "syncColors": true,
+            "syncCursor": true,
+            "syncTooltips": false,
             "useMargins": true
         },
         "panelsJSON": [
@@ -66,7 +67,7 @@
                         "id": "",
                         "params": {
                             "fontSize": 12,
-                            "markdown": "### Controller Manager\n\nThis dashboard uses data collected from the metrics endpoint of [kube controller manager](https://kubernetes.io/docs/concepts/overview/components/#kube-controller-manager). Its purpose is to give an overview of what is happening inside it through the controller processes metrics and detect problems that might be happening. \n\n**WARNING**: This dataset **requires access** to the kube controller manager endpoint. Refer [here](https://docs.elastic.co/en/integrations/kubernetes#scheduler-and-controllermanager) to learn how to enable it. In some \"As a Service\" Kubernetes implementations, like GKE or AKS, it is **not possible** to access its metrics.",
+                            "markdown": "### Controller Manager\n\nThis dashboard collects metrics from [kube controller manager](https://kubernetes.io/docs/concepts/overview/components/#kube-controller-manager) endpoint. Its purpose is to give an overview of what is happening inside it through the controller processes metrics and detect problems that might be happening. \n\n**WARNING**: This dataset **requires access** to the kube controller manager endpoint. Refer [here](https://docs.elastic.co/en/integrations/kubernetes#scheduler-and-controllermanager) to learn how to enable it. In some \"As a Service\" Kubernetes implementations, like GKE or AKS, it is **not possible** to access its metrics.",
                             "openLinksInNewTab": false
                         },
                         "title": "",
@@ -83,7 +84,7 @@
                 },
                 "panelIndex": "c13eb504-6afb-4fa5-8a7d-a75c5fee15b7",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -167,7 +168,7 @@
                 "panelIndex": "ff6afcdf-0de2-47fb-aa9e-72b48f11e0cd",
                 "title": "",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -182,7 +183,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "239b73ac-0fc9-44fd-a7c5-2d0281e6b765": {
                                             "columnOrder": [
@@ -449,9 +450,9 @@
                     "y": 3
                 },
                 "panelIndex": "aef813b5-85d5-46c9-a86a-2e273806d488",
-                "title": "Node collector [Metricbeat Kubernetes]",
+                "title": "Node collector ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -535,7 +536,7 @@
                 "panelIndex": "0599e0ae-2375-4ceb-b12d-2ebec4310cc6",
                 "title": "",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -555,7 +556,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "76c85206-02c1-4f35-bb0d-c1d4d3ee59d7": {
                                             "columnOrder": [
@@ -743,9 +744,9 @@
                     "y": 13
                 },
                 "panelIndex": "2ba53067-d43d-42eb-ac50-2d941977ce95",
-                "title": "Workqueue additions increase rate [Metricbeat Kubernetes]",
+                "title": "Workqueue additions increase rate ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -765,7 +766,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "77b347b2-91fa-470f-861d-ada0e175cbc4": {
                                             "columnOrder": [
@@ -951,9 +952,9 @@
                     "y": 13
                 },
                 "panelIndex": "1cd3ebab-9630-4253-b9a6-5f921e5cb617",
-                "title": "Workqueue retries increase rate [Metricbeat Kubernetes]",
+                "title": "Workqueue retries increase rate ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -973,7 +974,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "2b80230c-9cc8-444f-b092-1fbc4d764992": {
                                             "columnOrder": [
@@ -1166,9 +1167,9 @@
                     "y": 27
                 },
                 "panelIndex": "3a26dffa-0696-485d-b991-1dbc5092082e",
-                "title": "Workqueue depth variation [Metricbeat Kubernetes]",
+                "title": "Workqueue depth rate",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1188,7 +1189,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "a2facaed-7c02-4fb6-9126-5512b8ffd26f": {
                                             "columnOrder": [
@@ -1360,9 +1361,9 @@
                     "y": 27
                 },
                 "panelIndex": "6a8b9a40-11ec-4790-a38d-2d88c5468f12",
-                "title": "Current unfinished work [Metricbeat Kubernetes]",
+                "title": "Current unfinished work ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1446,7 +1447,7 @@
                 "panelIndex": "c3fee68f-01c6-49da-a759-2900b1cd15bf",
                 "title": "",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1466,7 +1467,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "380c5d66-2e69-4e96-b5fb-ac4e5ab1c807": {
                                             "columnOrder": [
@@ -1777,9 +1778,9 @@
                     "y": 44
                 },
                 "panelIndex": "75255ce8-2d49-4b4f-ac0e-a20fe8f4daec",
-                "title": "Scheduler process data [Metricbeat Kubernetes]",
+                "title": "Controller manager process data ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1792,22 +1793,21 @@
                             },
                             {
                                 "id": "metricbeat-*",
-                                "name": "d9aac793-88e8-4ae5-89e0-2b46dc998789",
+                                "name": "236aa40a-181f-4c61-af17-8df4ecba80d3",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "77da5988-3f03-4e8f-b1e4-39a94d8bec07": {
                                             "columnOrder": [
                                                 "7e1756d9-af1b-4204-a8d4-8c57987216f0",
                                                 "d523e6d2-50f3-4b45-8815-8259df43850c",
                                                 "cf481e4f-b568-4306-8da9-5e3d516ccbea",
-                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0",
-                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX1"
+                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0"
                                             ],
                                             "columns": {
                                                 "7e1756d9-af1b-4204-a8d4-8c57987216f0": {
@@ -1834,7 +1834,7 @@
                                                 "cf481e4f-b568-4306-8da9-5e3d516ccbea": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "differences(last_value(kubernetes.controllermanager.process.memory.resident.bytes))",
+                                                    "label": "average(kubernetes.controllermanager.process.memory.resident.bytes)",
                                                     "operationType": "formula",
                                                     "params": {
                                                         "format": {
@@ -1843,41 +1843,25 @@
                                                                 "decimals": 1
                                                             }
                                                         },
-                                                        "formula": "differences(last_value(kubernetes.controllermanager.process.memory.resident.bytes))",
+                                                        "formula": "average(kubernetes.controllermanager.process.memory.resident.bytes)",
                                                         "isFormulaBroken": false
                                                     },
-                                                    "references": [
-                                                        "cf481e4f-b568-4306-8da9-5e3d516ccbeaX1"
-                                                    ],
-                                                    "scale": "ratio",
-                                                    "timeScale": "s"
-                                                },
-                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "filter": {
-                                                        "language": "kuery",
-                                                        "query": "kubernetes.controllermanager.process.memory.resident.bytes: *"
-                                                    },
-                                                    "isBucketed": false,
-                                                    "label": "Part of differences(last_value(kubernetes.controllermanager.process.memory.resident.bytes))",
-                                                    "operationType": "last_value",
-                                                    "params": {
-                                                        "sortField": "@timestamp"
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "kubernetes.controllermanager.process.memory.resident.bytes"
-                                                },
-                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX1": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Part of differences(last_value(kubernetes.controllermanager.process.memory.resident.bytes))",
-                                                    "operationType": "differences",
                                                     "references": [
                                                         "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0"
                                                     ],
                                                     "scale": "ratio"
+                                                },
+                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of average(kubernetes.controllermanager.process.memory.resident.bytes)",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.controllermanager.process.memory.resident.bytes"
                                                 },
                                                 "d523e6d2-50f3-4b45-8815-8259df43850c": {
                                                     "dataType": "date",
@@ -1906,7 +1890,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "d9aac793-88e8-4ae5-89e0-2b46dc998789",
+                                        "index": "236aa40a-181f-4c61-af17-8df4ecba80d3",
                                         "key": "kubernetes.controllermanager.process.cpu.sec",
                                         "negate": false,
                                         "type": "exists",
@@ -1979,9 +1963,9 @@
                     "y": 44
                 },
                 "panelIndex": "303702e1-ba33-49f2-b337-4cc7d7305606",
-                "title": "Resident memory variation  [Metricbeat Kubernetes]",
+                "title": "Average resident memory  ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -2001,7 +1985,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "d3be0fa3-c7a4-49ba-b8cf-ab79f477f332": {
                                             "columnOrder": [
@@ -2205,9 +2189,9 @@
                     "y": 50
                 },
                 "panelIndex": "1604f0de-edd6-456e-8670-ab9b33988abb",
-                "title": "CPU usage increase over time [Metricbeat Kubernetes]",
+                "title": "CPU usage increase over time ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -2291,7 +2275,7 @@
                 "panelIndex": "f8313a9d-ab58-448e-b183-75f914caf53f",
                 "title": "",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -2311,7 +2295,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "1048fff9-f5a4-446b-8173-e9e22d4b1cff": {
                                             "columnOrder": [
@@ -2483,9 +2467,9 @@
                     "y": 65
                 },
                 "panelIndex": "fd90adaf-517f-4b92-a5b5-c29f7a16663b",
-                "title": "Leader controller manager [Metricbeat Kubernetes]",
+                "title": "Leader controller manager ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -2506,7 +2490,7 @@
                         "id": "",
                         "params": {
                             "fontSize": 12,
-                            "markdown": "**NOTE**: The default period to fetch the metrics used in **Requests and responses [Metricbeat Kubernetes]** visualization is **10s**. The timestamps from the visualizations were chosen according to that. Otherwise, they might be inaccurate. Adjust them by clicking on the **settings wheel** on the top right of the visualization and go to the **right side menu**. After that, write the custom period value on **Horizontal axis \u003e @timestamp \u003e Minimum interval**.",
+                            "markdown": "**NOTE**: The default period to fetch the metrics used in **Requests and responses counter rate** visualization is **10s**. The timestamps from the visualizations were chosen according to that. Otherwise, they might be inaccurate. Adjust them by clicking on the **settings wheel** on the top right of the visualization and go to the **right side menu**. After that, write the custom period value on **Horizontal axis \u003e @timestamp \u003e Minimum interval**.",
                             "openLinksInNewTab": false
                         },
                         "title": "",
@@ -2523,7 +2507,7 @@
                 },
                 "panelIndex": "83449269-d517-4fe6-9266-9d875070d90d",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -2543,7 +2527,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "7c7c4b67-a2df-427f-abbd-635e5fa73a9c": {
                                             "columnOrder": [
@@ -2844,9 +2828,9 @@
                     "y": 70
                 },
                 "panelIndex": "91a7ce56-6a49-4b7e-837f-31c184b48c09",
-                "title": "Requests and responses [Metricbeat Kubernetes]",
+                "title": "Requests and responses counter rate",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -2861,7 +2845,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9": {
                                             "columnOrder": [
@@ -3061,19 +3045,20 @@
                     "y": 71
                 },
                 "panelIndex": "1bd24fa1-319e-4cae-9d45-d821b06a8034",
-                "title": "Average request latency [Metricbeat Kubernetes]",
+                "title": "Average request latency ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Kubernetes] Controller Manager",
+        "title": "Controller Manager",
         "version": 1
     },
-    "coreMigrationVersion": "8.5.1",
+    "coreMigrationVersion": "8.6.0",
+    "created_at": "2023-01-11T16:15:05.999Z",
     "id": "2ec26ce0-f5f1-11ec-8853-8b596bddf5f9",
     "migrationVersion": {
-        "dashboard": "8.5.0"
+        "dashboard": "8.6.0"
     },
     "references": [
         {
@@ -3158,7 +3143,7 @@
         },
         {
             "id": "metricbeat-*",
-            "name": "303702e1-ba33-49f2-b337-4cc7d7305606:d9aac793-88e8-4ae5-89e0-2b46dc998789",
+            "name": "303702e1-ba33-49f2-b337-4cc7d7305606:236aa40a-181f-4c61-af17-8df4ecba80d3",
             "type": "index-pattern"
         },
         {
@@ -3213,6 +3198,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2023-01-03T10:21:34.800Z",
-    "version": "WzI2ODYsMV0="
+    "updated_at": "2023-01-11T16:15:05.999Z",
+    "version": "WzM0NTEsMV0="
 }

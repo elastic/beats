@@ -7,7 +7,6 @@
             "panelsJSON": "{\"f53d0d21-4502-4dce-8004-017a92104040\":{\"order\":1,\"width\":\"medium\",\"grow\":true,\"type\":\"optionsListControl\",\"explicitInput\":{\"fieldName\":\"host.name\",\"title\":\"Host\",\"id\":\"f53d0d21-4502-4dce-8004-017a92104040\",\"selectedOptions\":[],\"enhancements\":{},\"singleSelect\":false}},\"df56c430-83b1-436e-8b9c-fb027aaa29ca\":{\"order\":0,\"width\":\"medium\",\"grow\":true,\"type\":\"optionsListControl\",\"explicitInput\":{\"fieldName\":\"orchestrator.cluster.name\",\"title\":\"Cluster\",\"singleSelect\":true,\"id\":\"df56c430-83b1-436e-8b9c-fb027aaa29ca\",\"selectedOptions\":[],\"enhancements\":{}}}}"
         },
         "description": "Kubernetes Proxy metrics",
-        "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
                 "filter": [
@@ -42,6 +41,8 @@
         "optionsJSON": {
             "hidePanelTitles": false,
             "syncColors": true,
+            "syncCursor": true,
+            "syncTooltips": false,
             "useMargins": true
         },
         "panelsJSON": [
@@ -64,7 +65,7 @@
                         "id": "",
                         "params": {
                             "fontSize": 12,
-                            "markdown": "### Proxy\n\nThis dashboard uses data collected from the metrics endpoint of [kube proxy](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy). Its purpose is to give an overview of what is happening inside it and detect problems that might be happening.",
+                            "markdown": "### Proxy\n\nThis dashboard collects data from [kube proxy](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy) endpoint. Its purpose is to give an overview of what is happening inside it and detect problems that might be happening.",
                             "openLinksInNewTab": false
                         },
                         "title": "",
@@ -81,7 +82,7 @@
                 },
                 "panelIndex": "c13eb504-6afb-4fa5-8a7d-a75c5fee15b7",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -165,7 +166,7 @@
                 "panelIndex": "ff6afcdf-0de2-47fb-aa9e-72b48f11e0cd",
                 "title": "Proxy ",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -180,7 +181,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "5de1942f-e0a5-4ed8-86c0-972d57d62085": {
                                             "columnOrder": [
@@ -390,9 +391,9 @@
                     "y": 7
                 },
                 "panelIndex": "f74e1a86-4370-4f65-a3b8-d92c9f25ff42",
-                "title": "Average network programming latency [Metricbeat Kubernetes]",
+                "title": "Average network programming latency ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -407,7 +408,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "0b5eadf5-2a9c-49a2-b862-d317822adfd8": {
                                             "columnOrder": [
@@ -601,9 +602,9 @@
                     "y": 7
                 },
                 "panelIndex": "34de2f11-faf2-49e8-aada-98c2cd5eb266",
-                "title": "Average SyncProxyRules latency [Metricbeat Kubernetes]",
+                "title": "Average SyncProxyRules latency ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -687,7 +688,7 @@
                 "panelIndex": "c3fee68f-01c6-49da-a759-2900b1cd15bf",
                 "title": "",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -707,7 +708,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "380c5d66-2e69-4e96-b5fb-ac4e5ab1c807": {
                                             "columnOrder": [
@@ -1018,9 +1019,9 @@
                     "y": 24
                 },
                 "panelIndex": "af47c34c-961a-463c-9d66-ffedcc2eef12",
-                "title": "Proxy process data [Metricbeat Kubernetes]",
+                "title": "Proxy process data ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1035,15 +1036,14 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "77da5988-3f03-4e8f-b1e4-39a94d8bec07": {
                                             "columnOrder": [
                                                 "7e1756d9-af1b-4204-a8d4-8c57987216f0",
                                                 "d523e6d2-50f3-4b45-8815-8259df43850c",
                                                 "cf481e4f-b568-4306-8da9-5e3d516ccbea",
-                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0",
-                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX1"
+                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0"
                                             ],
                                             "columns": {
                                                 "7e1756d9-af1b-4204-a8d4-8c57987216f0": {
@@ -1070,7 +1070,7 @@
                                                 "cf481e4f-b568-4306-8da9-5e3d516ccbea": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "differences(last_value(kubernetes.proxy.process.memory.resident.bytes))",
+                                                    "label": "average(kubernetes.proxy.process.memory.resident.bytes)",
                                                     "operationType": "formula",
                                                     "params": {
                                                         "format": {
@@ -1079,41 +1079,25 @@
                                                                 "decimals": 1
                                                             }
                                                         },
-                                                        "formula": "differences(last_value(kubernetes.proxy.process.memory.resident.bytes))",
+                                                        "formula": "average(kubernetes.proxy.process.memory.resident.bytes)",
                                                         "isFormulaBroken": false
                                                     },
-                                                    "references": [
-                                                        "cf481e4f-b568-4306-8da9-5e3d516ccbeaX1"
-                                                    ],
-                                                    "scale": "ratio",
-                                                    "timeScale": "s"
-                                                },
-                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "filter": {
-                                                        "language": "kuery",
-                                                        "query": "kubernetes.proxy.process.memory.resident.bytes: *"
-                                                    },
-                                                    "isBucketed": false,
-                                                    "label": "Part of differences(last_value(kubernetes.proxy.process.memory.resident.bytes))",
-                                                    "operationType": "last_value",
-                                                    "params": {
-                                                        "sortField": "@timestamp"
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "kubernetes.proxy.process.memory.resident.bytes"
-                                                },
-                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX1": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Part of differences(last_value(kubernetes.proxy.process.memory.resident.bytes))",
-                                                    "operationType": "differences",
                                                     "references": [
                                                         "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0"
                                                     ],
                                                     "scale": "ratio"
+                                                },
+                                                "cf481e4f-b568-4306-8da9-5e3d516ccbeaX0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of average(kubernetes.proxy.process.memory.resident.bytes)",
+                                                    "operationType": "average",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "kubernetes.proxy.process.memory.resident.bytes"
                                                 },
                                                 "d523e6d2-50f3-4b45-8815-8259df43850c": {
                                                     "dataType": "date",
@@ -1195,9 +1179,9 @@
                     "y": 24
                 },
                 "panelIndex": "303702e1-ba33-49f2-b337-4cc7d7305606",
-                "title": "Resident memory variation  [Metricbeat Kubernetes]",
+                "title": "Average resident memory  ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1212,7 +1196,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "d3be0fa3-c7a4-49ba-b8cf-ab79f477f332": {
                                             "columnOrder": [
@@ -1396,9 +1380,9 @@
                     "y": 33
                 },
                 "panelIndex": "1604f0de-edd6-456e-8670-ab9b33988abb",
-                "title": "CPU usage increase over time [Metricbeat Kubernetes]",
+                "title": "CPU usage increase over time ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1482,7 +1466,7 @@
                 "panelIndex": "f8313a9d-ab58-448e-b183-75f914caf53f",
                 "title": "",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1503,7 +1487,7 @@
                         "id": "",
                         "params": {
                             "fontSize": 12,
-                            "markdown": "**NOTE**: The default period to fetch the metrics used in **Requests counter rate [Metricbeat Kubernetes], Client error responses counter rate [Metricbeat Kubernetes]** and **Server error responses counter rate [Metricbeat Kubernetes]** visualization is **10s**. The timestamps from the visualizations were chosen according to that. Otherwise, they might be inaccurate. Adjust them by clicking on the **settings wheel** on the top right of the visualization and go to the **right side menu**. After that, write the custom period value on **Horizontal axis \u003e @timestamp \u003e Minimum interval**.",
+                            "markdown": "**NOTE**: The default period to fetch the metrics used in **Requests counter rate , Client error responses counter rate** and **Server error responses counter rate** visualization is **10s**. The timestamps from the visualizations were chosen according to that. Otherwise, they might be inaccurate. Adjust them by clicking on the **settings wheel** on the top right of the visualization and go to the **right side menu**. After that, write the custom period value on **Horizontal axis \u003e @timestamp \u003e Minimum interval**.",
                             "openLinksInNewTab": false
                         },
                         "title": "",
@@ -1520,7 +1504,7 @@
                 },
                 "panelIndex": "6a11dafa-5cd1-49e7-9806-15110738093d",
                 "type": "visualization",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1535,7 +1519,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "f7b7d15b-f8d9-4c06-abf0-7503ae32b8e9": {
                                             "columnOrder": [
@@ -1735,9 +1719,9 @@
                     "y": 52
                 },
                 "panelIndex": "1bd24fa1-319e-4cae-9d45-d821b06a8034",
-                "title": "Average request latency [Metricbeat Kubernetes]",
+                "title": "Average request latency ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1752,7 +1736,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "7c7c4b67-a2df-427f-abbd-635e5fa73a9c": {
                                             "columnOrder": [
@@ -1918,9 +1902,9 @@
                     "y": 52
                 },
                 "panelIndex": "91a7ce56-6a49-4b7e-837f-31c184b48c09",
-                "title": "Requests counter rate [Metricbeat Kubernetes]",
+                "title": "Requests counter rate ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -1935,7 +1919,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "acbb7181-0ff2-4164-9761-8b2c430d6a68": {
                                             "columnOrder": [
@@ -2127,9 +2111,9 @@
                     "y": 66
                 },
                 "panelIndex": "24a2f3ce-a762-4e5f-8794-ff67fc70a41d",
-                "title": "Client error responses counter rate [Metricbeat Kubernetes]",
+                "title": "Client error responses counter rate ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             },
             {
                 "embeddableConfig": {
@@ -2144,7 +2128,7 @@
                         "state": {
                             "adHocDataViews": {},
                             "datasourceStates": {
-                                "indexpattern": {
+                                "formBased": {
                                     "layers": {
                                         "54af7a75-9eab-4746-b959-378d6bbb7cf6": {
                                             "columnOrder": [
@@ -2369,19 +2353,20 @@
                     "y": 66
                 },
                 "panelIndex": "e3c408a3-6515-4104-b764-888f39fa6185",
-                "title": "Server error responses counter rate [Metricbeat Kubernetes]",
+                "title": "Server error responses counter rate ",
                 "type": "lens",
-                "version": "8.5.1"
+                "version": "8.6.0"
             }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Kubernetes] Proxy",
+        "title": " Proxy",
         "version": 1
     },
-    "coreMigrationVersion": "8.5.1",
+    "coreMigrationVersion": "8.6.0",
+    "created_at": "2023-01-11T16:15:13.706Z",
     "id": "5e649d60-9901-11e9-ba57-b7ab4e2d4b58",
     "migrationVersion": {
-        "dashboard": "8.5.0"
+        "dashboard": "8.6.0"
     },
     "references": [
         {
@@ -2466,6 +2451,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2023-01-03T10:24:03.129Z",
-    "version": "WzI5MTUsMV0="
+    "updated_at": "2023-01-11T16:15:13.706Z",
+    "version": "WzM1MDAsMV0="
 }
