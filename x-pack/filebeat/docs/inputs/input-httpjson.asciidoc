@@ -109,12 +109,12 @@ The state has the following elements:
 - `last_response.url.params`: A https://pkg.go.dev/net/url#Values[`url.Values`] of the params from the URL in `last_response.url.value`.  Can be queried with the https://pkg.go.dev/net/url#Values.Get[`Get`] function.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
-- `last_response.page`: A number indicating the page number of the last response.
+- `last_response.page`: A number indicating the page number of the last response. It starts with the value `0` at every interval.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
-- `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
+- `last_event`: A map representing the last event of the current request in the requests chain (result from applying transforms to `last_response.body`).
 - `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
-- `header`: A map containing the headers. References the next request headers when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>>, or <<request-rate-limit>> configuration sections.
-- `body`: A map containing the body. References the next request body when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
+- `header`: A map containing the headers. References the next request headers when used in <<request-transforms-headers>> or <<response-pagination>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>>, or <<request-rate-limit>> configuration sections.
+- `body`: A map containing the body. References the next request body when used in <<request-transforms-headers>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
 - `cursor`: A map containing any data the user configured to be stored between restarts (See <<cursor>>).
 
 All of the mentioned objects are only stored at runtime, except `cursor`, which has values that are persisted between restarts.
@@ -199,29 +199,35 @@ The content inside the brackets `[[` `]]` is evaluated. For more information on 
 
 Some built-in helper functions are provided to work with the input state inside value templates:
 
-- `parseDuration`: parses duration strings and returns `time.Duration`. Example: `[[parseDuration "1h"]]`.
-- `now`: returns the current `time.Time` object in UTC. Optionally, it can receive a `time.Duration` as a parameter. Example: `[[now (parseDuration "-1h")]]` returns the time at 1 hour before now.
-- `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
-- `parseTimestampMilli`: parses a timestamp in milliseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
-- `parseTimestampNano`: parses a timestamp in nanoseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000000000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
-- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.
+- `add`: adds a list of integers and returns their sum.
+- `base64DecodeNoPad`: Decodes the base64 string without padding. Any binary output will be converted to a UTF8 string.
+- `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
+- `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
+- `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
+- `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{version}`.
+- `div`: does the integer division of two integer values.
 - `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 - `getRFC5988Link`: extracts a specific relation from a list of https://tools.ietf.org/html/rfc5988[RFC5988] links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
-- `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
-- `add`: adds a list of integers and returns their sum.
-- `mul`: multiplies two integers.
-- `div`: does the integer division of two integer values.
-- `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
-- `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
-- `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
-- `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
-- `base64DecodeNoPad`: Decodes the base64 string without padding. Any binary output will be converted to a UTF8 string.
-- `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
-- `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
+- `hashBase64`: calculates the hash of a list of strings concatenated together. Returns a base64 encoded hash. Supports sha1 or sha256. Example `[[hash "sha256" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `hash`: calculates the hash of a list of strings concatenated together. Returns a hex encoded hash. Supports sha1 or sha256. Example `[[hash "sha256" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `hexDecode`: Decodes the hexadecimal string. Any hexadecimal string will be converted to its bytes representation. Example `[[hexDecode "b0a92a08a9b4883aa3aa2d0957be12a678cbdbb32dc5db09fe68239a09872f96"]]`; Expected Output: `"\xb0\xa9*\b\xa9\xb4\x88:\xa3\xaa-\tW\xbe\x12\xa6x\xcb۳-\xc5\xdb\t\xfeh#\x9a\t\x87/\x96"`
 - `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
-- `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019`. Example: `[[ uuid ]]`
+- `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
+- `mul`: multiplies two integers.
+- `now`: returns the current `time.Time` object in UTC. Optionally, it can receive a `time.Duration` as a parameter. Example: `[[now (parseDuration "-1h")]]` returns the time at 1 hour before now.
+- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.
+- `parseDuration`: parses duration strings and returns `time.Duration`. Example: `[[parseDuration "1h"]]`.
+- `parseTimestampMilli`: parses a timestamp in milliseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
+- `parseTimestampNano`: parses a timestamp in nanoseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000000000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
+- `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
+- `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some" "my" "some value" ]]` returns `my value`.
+- `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
+- `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
+- `toJSON`: converts a value to a JSON string. This can be used with `value_type: json` to create an object from a template. Example: `[[ toJSON .last_response.body.pagingIdentifiers ]]`.
+- `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
 - `userAgent`: generates the User Agent with optional additional values. If no arguments are provided, it will generate the default User Agent that is added to all requests by default. It is recommended to delete the existing User-Agent header before setting a new one. Example: `[[ userAgent "integration/1.2.3" ]]` would generate `Elastic-Filebeat/8.1.0 (darwin; amd64; 9b893e88cfe109e64638d65c58fd75c2ff695402; 2021-12-15 13:20:00 +0000 UTC; integration_name/1.2.3)`
-- `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{version}`.
+- `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019`. Example: `[[ uuid ]]`
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
@@ -371,6 +377,22 @@ default credentials from the environment will be attempted via ADC. For more inf
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
 [float]
+==== `auth.oauth2.google.jwt_json`
+
+The JWT Account Key file as raw JSON.
+
+NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
+default credentials from the environment will be attempted via ADC. For more information about
+how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `auth.oauth2.google.delegated_account`
+
+Email of the delegated account used to create the credentials (usually an admin). Used in combination
+with `auth.oauth2.google.jwt_file` or `auth.oauth2.google.jwt_json`.
+
+[[request-parameters]]
+[float]
 ==== `request.url`
 
 The URL of the HTTP API. Required.
@@ -481,7 +503,7 @@ If the `remaining` header is missing from the Response, no rate-limiting will oc
 The value of the response that specifies the epoch time when the rate limit will reset.
 It is defined with a Go template value. Can read state from: [`.last_response.header`]
 
-[[request-transforms]]
+[[request-transforms-headers]]
 [float]
 ==== `request.rate_limit.early_limit`
 
@@ -501,6 +523,7 @@ e.g. instead of rate-limiting when `remaining` hits `0`, rate-limiting will occu
 
 It is not set by default (by default the rate-limiting as specified in the Response is followed).
 
+[[request-transforms]]
 [float]
 ==== `request.transforms`
 
@@ -525,11 +548,50 @@ filebeat.inputs:
 ----
 
 [float]
+==== `request.tracer.filename`
+
+It is possible to log httpjson requests and responses to a local file-system for debugging configurations.
+This option is enabled by setting the `request.tracer.filename` value. Additional options are available to
+tune log rotation behavior.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `request.tracer.maxsize`
+
+This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
+logs are allowed to reach 1MB before rotation.
+
+[float]
+==== `request.tracer.maxage`
+
+This specifies the number days to retain rotated log files. If it is not set, log files are retained
+indefinitely.
+
+[float]
+==== `request.tracer.maxbackups`
+
+The number of old logs to retain. If it is not set all old logs are retained subject to the `request.tracer.maxage`
+setting.
+
+[float]
+==== `request.tracer.localtime`
+
+Whether to use the host's local time rather that UTC for timestamping rotated log file names.
+
+[float]
+==== `request.tracer.compress`
+
+This determines whether rotated logs should be gzip compressed.
+
+[float]
 ==== `response.decode_as`
 
-ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`. It is not set by default.
+ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`, `application/zip`. It is not set by default.
 
 NOTE: For `text/csv`, one event for each line will be created, using the header values as the object keys. For this reason is always assumed that a header exists.
+
+NOTE: For `application/zip`, the `zip` file is expected to contain one or more `.json` or `.ndjson` files. The contents of all of them will be merged into a single list of `JSON` objects.
 
 [[response-transforms]]
 [float]
@@ -585,7 +647,7 @@ Defines the field type of the target. Allowed values: `array`, `map`, `string`. 
 [float]
 ==== `response.split[].transforms`
 
-A set of transforms can be defined. This list will be applied after `response.transforms` and after the object has been modified based on `response.split[].keep_parent` and `response.split[].key_field`.
+A set of transforms can be defined. This list will be applied after <<response-transforms, response.transforms>> and after the object has been modified based on `response.split[].keep_parent` and `response.split[].key_field`.
 
 Available transforms for response: [`append`, `delete`, `set`].
 
@@ -629,7 +691,7 @@ If set to true, the values in `request.body` are sent for pagination requests. D
 [float]
 ==== `response.pagination`
 
-List of transforms that will be applied to the response to every new page request. All the transforms from `request.transform` will be executed and then `response.pagination` will be added to modify the next request as needed. For subsequent responses, the usual `response.transforms` and `response.split` will be executed normally.
+List of transforms that will be applied to the response to every new page request. All the transforms from `request.transform` will be executed and then `response.pagination` will be added to modify the next request as needed. For subsequent responses, the usual <<response-transforms, response.transforms>> and <<response-split, response.split>> will be executed normally.
 
 Available transforms for pagination: [`append`, `delete`, `set`].
 
@@ -931,6 +993,303 @@ This will output:
 ]
 ----
 
+[[chain]]
+[float]
+=== `chain`
+
+A chain is a list of requests to be made after the first one.
+
+[float]
+==== `chain[].step`
+
+Contains basic request and response configuration for chained calls.
+
+[float]
+==== `chain[].step.request`
+
+See <<request-parameters,request parameters>>. Required.
+
+Example:
+
+First call: \https://example.com/services/data/v1.0/
+
+Second call: \https://example.com/services/data/v1.0/1/export_ids
+
+Third call: \https://example.com/services/data/v1.0/export_ids/file_1/info
+
+[float]
+==== `chain[].step.response.split`
+
+See <<response-split,response split parameter>>.
+
++
+[[chain-step-replace]]
+[float]
+==== `chain[].step.replace`
+
+A link:https://goessner.net/articles/JsonPath/index.html#e2[JSONPath] string to parse values from responses JSON, collected from previous chain steps. Place same replace string in url where collected values from previous call should be placed. Required.
+
+Example:
+
+- First call: \https://example.com/services/data/v1.0/
++
+<<response-json1,response>>
+
+- Second call: \https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
++
+<<response-json2,response>>
+
+- Third call: \https://example.com/services/data/v1.0/export_ids/`$.file_name`/info
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/records
+  interval: 1h
+  chain:
+    # second call
+    - step:
+      request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
+      request.method: GET
+      replace: $.records[:].id
+    # third call
+    - step:
+      request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
+      request.method: GET
+      replace: $.file_name
+----
+
+Example:
+
+- First call to collect record ids
+
++
+request_url: \https://example.com/services/data/v1.0/records
+
++
+response_json:
+
++
+[[response-json1]]
+["source","json",subs="attributes"]
+----
+{
+    "records": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+
+- Second call to collect `file_name` using collected ids from first call.
+
++
+request_url using id as '1': \https://example.com/services/data/v1.0/1/export_ids
+
++
+response_json using id as '1':
+
++
+[[response-json2]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_1"
+}
+----
+
++
+request_url using id as '2': \https://example.com/services/data/v1.0/2/export_ids
+
++
+response_json using id as '2':
+
++
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_2"
+}
+----
+
+- Third call to collect `files` using collected `file_name` from second call.
+
++
+request_url using file_name as 'file_1': \https://example.com/services/data/v1.0/export_ids/file_1/info
+
++
+request_url using file_name as 'file_2': \https://example.com/services/data/v1.0/export_ids/file_2/info
+
++
+Collect and make events from response in any format supported by httpjson for all calls.
+
+[float]
+==== `chain[].while`
+
+Contains basic request and response configuration for chained while calls. Chained while calls will keep making the requests for a given number of times until a condition is met
+or the maximum number of attempts gets exhausted. While chain has an attribute `until` which holds the expression to be evaluated. Ideally the `until` field should always be used
+together with the attributes `request.retry.max_attempts` and `request.retry.wait_min` which specifies the maximum number of attempts to evaluate `until` before giving up and the
+maximum wait time in between such requests. If `request.retry.max_attempts` is not specified, it will only try to evaluate the expression once and give up if it fails. If
+`request.retry.wait_min` is not specified the default wait time will always be `0` as in successive calls will be made immediately.
+
+[float]
+==== `chain[].while.request`
+
+See  <<request-parameters,request parameters>> .
+
+Example:
+
+First call: \http://example.com/services/data/v1.0/exports
+
+Second call: \http://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+
+Third call: \http://example.com/services/data/v1.0/export_ids/1/info
+
+[float]
+==== `chain[].while.response.split`
+
+See  <<response-split,response split parameter>> .
+
+[float]
+==== `chain[].while.replace`
+
+See  <<chain-step-replace, chain[].step.replace>> .
+
+Example:
+
+- First call: \http://example.com/services/data/v1.0/exports
++
+<<response-json1-while,response>>
+
+- Second call: \http://example.com/services/data/v1.0/`$.exportId`/export_ids/status
++
+<<response-json2-while,response>>
+
+- Third call: \http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
++
+<<response-json3-while,response 1>> , <<response-json4-while,response 2>>
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  id: my-httpjson-id
+  request.url: http://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - while:
+        request.url: http://example.com/services/data/v1.0/$.exportId/export_ids/status
+        request.method: GET
+        replace: $.exportId
+        until: '[[ eq .last_response.body.status "completed" ]]'
+        request.retry.max_attempts: 5
+        request.retry.wait_min: 5s
+    # third call
+    - step:
+        request.url: http://example.com/services/data/v1.0/export_ids/$.files[:].id/info
+        request.method: GET
+        replace: $.files[:].id
+----
+
+Example:
+
+- First call to collect export ids
+
++
+request_url: \https://example.com/services/data/v1.0/exports
+
++
+response_json:
+
++
+[[response-json1-while]]
+["source","json",subs="attributes"]
+----
+{
+    "exportId": "9ef0e6a5"
+}
+----
+
+- Second call to collect `file_ids` using collected id from first call when `response.body.sataus == "completed"`. This call continues until the condition is satisfied or the maximum number of attempts gets exhausted.
+
++
+request_url using id as '9ef0e6a5': \https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+
++
+response_json using id as '9ef0e6a5':
+
++
+[[response-json2-while]]
+["source","json",subs="attributes"]
+----
+{
+    "status": "completed",
+    "files": [
+      {
+        "id": 1
+      },
+      {
+        "id": 2
+      },
+      {
+        "id": 3
+      }
+    ]
+}
+----
+
+- Third call to collect `files` using collected `file_id` from second call.
+
++
+request_url using file_id as '1': \https://example.com/services/data/v1.0/export_ids/1/info
+
++
+request_url using file_id as '2': \https://example.com/services/data/v1.0/export_ids/2/info
+
++
+response_json using id as '1':
+
++
+[[response-json3-while]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_1",
+    "file_data": "some data"
+}
+----
+
++
+response_json using id as '2':
+
++
+[[response-json4-while]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_2",
+    "file_data": "some data"
+}
+----
+
++
+Collect and make events from response in any format supported by httpjson for all calls.
+
+NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
+
 [[cursor]]
 [float]
 ==== `cursor`
@@ -972,12 +1331,21 @@ filebeat.inputs:
 image:images/input-httpjson-lifecycle.png[Request lifecycle]
 
 . At every defined interval a new request is created.
-. The request is transformed using the configured `request.transforms`.
+. The request is transformed using the configured <<request-transforms, request.transforms>>.
 . The resulting transformed request is executed.
 . The server responds (here is where any retry or rate limit policy takes place when configured).
-. The response is transformed using the configured `response.transforms` and `response.split`.
+. The response is transformed using the configured <<response-transforms, response.transforms>> and <<response-split, response.split>>.
+. If a chain step is configured. Each step will generate new requests based on collected IDs from responses. The requests will be transformed using configured <<request-transforms, request.transforms>> and the resulting generated transformed requests will be executed. This process will happen for all the steps mentioned in the chain.
 . Each resulting event is published to the output.
 . If a `response.pagination` is configured and there are more pages, a new request is created using it, otherwise the process ends until the next interval.
+
+image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
+
+. Response from regular call will be processed.
+. Extract data from response and generate new requests from responses.
+. Process generated requests and collect responses from server.
+. Go back to step-2 for the next step.
+. Publish collected responses from the last chain step.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

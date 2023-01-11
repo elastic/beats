@@ -23,10 +23,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-var fakeFactory = func(_ *common.Config, _ channel.Connector, _ Context) (Input, error) {
+var fakeFactory = func(_ *conf.C, _ channel.Connector, _ Context) (Input, error) {
 	return nil, nil
 }
 

@@ -1,0 +1,50 @@
+[
+  {
+    "@timestamp": "2020-08-19T07:56:51.5792901Z",
+    "event": {
+      "action": "Audit Policy Change",
+      "code": "4905",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-BVM4LI1L1Q6.TEST.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "An attempt was made to unregister a security event source.\n\nSubject\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nProcess:\n\tProcess ID:\t0x1364\n\tProcess Name:\t-\n\nEvent Source:\n\tSource Name:\tIIS-METABASE\n\tEvent Source ID:\t0x457B22",
+    "winlog": {
+      "activity_id": "{dab46f85-75ee-0000-c36f-b4daee75d601}",
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
+      "event_data": {
+        "AuditSourceName": "IIS-METABASE",
+        "EventSourceId": "0x457b22",
+        "ProcessId": "0x1364",
+        "ProcessName": "-",
+        "SubjectDomainName": "TEST",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "WIN-BVM4LI1L1Q6$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "4905",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 784,
+        "thread": {
+          "id": 824
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 146938,
+      "task": "Audit Policy Change"
+    }
+  }
+]

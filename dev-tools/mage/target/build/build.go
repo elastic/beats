@@ -18,6 +18,12 @@
 package build
 
 import (
+	"fmt"
+	"os"
+	"os/exec"
+
+	"github.com/magefile/mage/sh"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
@@ -45,4 +51,52 @@ func CrossBuild() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
+}
+
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It's automatically invoked by CrossBuild whenever
+// the darwin/amd64 and darwin/arm64 are present.
+func AssembleDarwinUniversal() error {
+	cmd := "lipo"
+
+	if _, err := exec.LookPath(cmd); err != nil {
+		return fmt.Errorf("'%s' is required to assemble the universal binary: %w",
+			cmd, err)
+	}
+
+	var lipoArgs []string
+	args := []string{
+		"build/golang-crossbuild/%s-darwin-universal",
+		"build/golang-crossbuild/%s-darwin-arm64",
+		"build/golang-crossbuild/%s-darwin-amd64"}
+
+	for _, arg := range args {
+		lipoArgs = append(lipoArgs, fmt.Sprintf(arg, devtools.BeatName))
+	}
+
+	lipo := sh.RunCmd(cmd, "-create", "-output")
+	if err := lipo(lipoArgs...); err != nil {
+		out, _ := sh.Output("which", "ls")
+		fmt.Fprintln(os.Stderr, "which", "ls"+":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		out, _ = sh.Output("pwd")
+		fmt.Fprintln(os.Stderr, "pwd", ":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		out, _ = sh.Output("ls")
+		fmt.Fprintln(os.Stderr, "ls", ":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		out, _ = sh.Output("ls", "build")
+		fmt.Fprintln(os.Stderr, "ls", "build", ":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		out, _ = sh.Output("ls", "build/golang-crossbuild/")
+		fmt.Fprintln(os.Stderr, "ls", "build/golang-crossbuild/"+":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		return err
+	}
+	return nil
 }

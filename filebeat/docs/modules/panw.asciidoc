@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/panw/_meta/docs.asciidoc
+
 [[filebeat-module-panw]]
 [role="xpack"]
 
@@ -108,8 +110,8 @@ in ECS that are added under the `panw.panos` prefix:
 | Protocol | network.transport |
 | Action | event.outcome |
 | Bytes | network.bytes |
-| Bytes Sent | client.bytes destination.bytes |
-| Bytes Received | server.bytes source.bytes |
+| Bytes Sent | client.bytes source.bytes |
+| Bytes Received | server.bytes destination.bytes |
 | Packets | network.packets |
 | Start Time | event.start |
 | Elapsed Time | event.duration |
@@ -192,3 +194,4 @@ image::./images/filebeat-panw-threat.png[]
 For a description of each field in the module, see the
 <<exported-fields-panw,exported fields>> section.
 
+:edit_url!:

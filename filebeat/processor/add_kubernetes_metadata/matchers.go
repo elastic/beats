@@ -23,14 +23,15 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
 	add_kubernetes_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
-	cfg := common.NewConfig()
+	cfg := conf.NewConfig()
 
 	// Add a container indexer config by default.
 	add_kubernetes_metadata.Indexing.AddDefaultIndexerConfig(add_kubernetes_metadata.ContainerIndexerName, *cfg)
@@ -50,7 +51,7 @@ type LogPathMatcher struct {
 	logger       *logp.Logger
 }
 
-func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, error) {
+func newLogsPathMatcher(cfg conf.C) (add_kubernetes_metadata.Matcher, error) {
 	config := struct {
 		LogsPath     string `config:"logs_path"`
 		ResourceType string `config:"resource_type"`
@@ -61,7 +62,7 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 
 	err := cfg.Unpack(&config)
 	if err != nil || config.LogsPath == "" {
-		return nil, fmt.Errorf("fail to unpack the `logs_path` configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the `logs_path` configuration: %w", err)
 	}
 
 	logPath := config.LogsPath
@@ -80,7 +81,7 @@ func newLogsPathMatcher(cfg common.Config) (add_kubernetes_metadata.Matcher, err
 // Docker container ID is a 64-character-long hexadecimal string
 const containerIdLen = 64
 
-func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
+func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 	value, err := event.GetValue("log.file.path")
 	if err != nil {
 		f.logger.Debugf("Error extracting log.file.path from the event: %s.", event)
@@ -91,7 +92,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	f.logger.Debugf("Incoming log.file.path value: %s", source)
 
 	if !strings.Contains(source, f.LogsPath) {
-		f.logger.Errorf("Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)
+		f.logger.Debugf("log.file.path value does not contain matcher's logs_path '%s', skipping...", f.LogsPath)
 		return ""
 	}
 
@@ -101,7 +102,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	if f.ResourceType == "pod" {
 		// Pod resource type will extract only the pod UID, which offers less granularity of metadata when compared to the container ID
 		if strings.Contains(source, ".log") && !strings.HasSuffix(source, ".gz") {
-			// Specify a pod resource type when writting logs into manually mounted log volume,
+			// Specify a pod resource type when writing logs into manually mounted log volume,
 			// those logs apper under under "/var/lib/kubelet/pods/<pod_id>/volumes/..."
 			if strings.HasPrefix(f.LogsPath, podKubeletLogsPath()) {
 				pathDirs := strings.Split(source, pathSeparator)

@@ -24,8 +24,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type testParser struct {
@@ -278,8 +278,8 @@ func prepareBinMessage(
 	return buf, err
 }
 
-func makeMessageEvent(t *testing.T, msg *message) common.MapStr {
-	event := common.MapStr{}
+func makeMessageEvent(t *testing.T, msg *message) mapstr.M {
+	event := mapstr.M{}
 	err := msg.Event(event)
 	if err != nil {
 		t.Fatalf("generating message event structure failed with: %v", err)

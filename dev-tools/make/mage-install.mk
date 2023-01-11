@@ -1,4 +1,4 @@
-MAGE_VERSION     ?= v1.11.0
+MAGE_VERSION     ?= v1.13.0
 MAGE_PRESENT     := $(shell mage --version 2> /dev/null | grep $(MAGE_VERSION))
 MAGE_IMPORT_PATH ?= github.com/magefile/mage
 export MAGE_IMPORT_PATH
@@ -7,7 +7,7 @@ export MAGE_IMPORT_PATH
 mage:
 ifndef MAGE_PRESENT
 	@echo Installing mage $(MAGE_VERSION).
-	@go get -ldflags="-X $(MAGE_IMPORT_PATH)/mage.gitTag=$(MAGE_VERSION)" ${MAGE_IMPORT_PATH}@$(MAGE_VERSION)
+	@go install -ldflags="-X $(MAGE_IMPORT_PATH)/mage.gitTag=$(MAGE_VERSION)" ${MAGE_IMPORT_PATH}@$(MAGE_VERSION)
 	@-mage -clean
 endif
 	@true

@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type testFilterRule struct {
@@ -48,7 +48,7 @@ func TestNamespace(t *testing.T) {
 		err := ns.Register(test.name, newTestFilterRule)
 		fatalError(t, err)
 
-		cfg, _ := common.NewConfigFrom(map[string]interface{}{
+		cfg, _ := config.NewConfigFrom(map[string]interface{}{
 			test.name: nil,
 		})
 
@@ -97,7 +97,7 @@ func TestNamespaceError(t *testing.T) {
 		},
 		{
 			"filter init fail",
-			func(_ *common.Config) (Processor, error) {
+			func(_ *config.C) (Processor, error) {
 				return nil, errors.New("test")
 			},
 			map[string]interface{}{
@@ -113,7 +113,7 @@ func TestNamespaceError(t *testing.T) {
 		err := ns.Register("test", test.factory)
 		fatalError(t, err)
 
-		config, err := common.NewConfigFrom(test.config)
+		config, err := config.NewConfigFrom(test.config)
 		fatalError(t, err)
 
 		_, err = ns.Plugin()(config)
@@ -121,7 +121,7 @@ func TestNamespaceError(t *testing.T) {
 	}
 }
 
-func newTestFilterRule(_ *common.Config) (Processor, error) {
+func newTestFilterRule(_ *config.C) (Processor, error) {
 	return &testFilterRule{}, nil
 }
 

@@ -26,7 +26,7 @@ import (
 
 	rd "github.com/gomodule/redigo/redis"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Redis types

@@ -197,7 +197,7 @@
         "user_agent.version": "71.0."
     },
     {
-        "@timestamp": "2020-08-05T21:07:30.974Z",
+        "@timestamp": "2020-08-05T21:07:30.974750Z",
         "cloud.project.id": "elastic-siem",
         "event.action": "io.k8s.authorization.v1beta1.subjectaccessreviews.create",
         "event.dataset": "gcp.audit",
@@ -347,7 +347,7 @@
         "user_agent.version": "79.0."
     },
     {
-        "@timestamp": "2021-04-23T14:47:07.535Z",
+        "@timestamp": "2021-04-23T14:47:07.535383Z",
         "cloud.project.id": "elastic-siem",
         "event.action": "io.k8s.core.v1.nodes.list",
         "event.dataset": "gcp.audit",
@@ -389,7 +389,7 @@
         "user_agent.original": "GoogleCloudConsole"
     },
     {
-        "@timestamp": "2021-04-23T14:16:07.574Z",
+        "@timestamp": "2021-04-23T14:16:07.574776Z",
         "cloud.project.id": "elastic-siem",
         "event.action": "io.k8s.extensions.v1beta1.ingresses.list",
         "event.dataset": "gcp.audit",
@@ -432,7 +432,7 @@
         "user_agent.original": "GoogleCloudConsole"
     },
     {
-        "@timestamp": "2021-04-29T08:19:20.805Z",
+        "@timestamp": "2021-04-29T08:19:20.805810Z",
         "cloud.project.id": "elastic-siem",
         "event.action": "io.k8s.get",
         "event.dataset": "gcp.audit",
@@ -473,7 +473,7 @@
         "user_agent.original": "kube-probe/1.19+"
     },
     {
-        "@timestamp": "2021-04-29T08:23:18.899Z",
+        "@timestamp": "2021-04-29T08:23:18.899153Z",
         "cloud.project.id": "elastic-siem",
         "event.action": "io.k8s.get",
         "event.dataset": "gcp.audit",

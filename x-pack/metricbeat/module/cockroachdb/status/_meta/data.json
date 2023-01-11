@@ -1,0 +1,41 @@
+{
+    "@timestamp" : "2022-04-08T15:45:24.609Z",
+    "agent" : {
+      "type" : "metricbeat",
+      "version" : "8.2.0",
+      "ephemeral_id" : "f5d8484e-b5dd-4045-ab8d-dca751582fae",
+      "id" : "ab4d7e17-f770-4672-8e51-acd1386317fb",
+      "name" : "example"
+    },
+    "ecs" : {
+      "version" : "8.0.0"
+    },
+    "prometheus" : {
+      "labels" : {
+        "instance" : "localhost:8080",
+        "job" : "cockroachdb",
+        "le" : "8126463"
+      },
+      "metrics" : {
+        "round_trip_latency_bucket" : 22344,
+        "exec_latency_bucket" : 279099,
+        "sql_txn_latency_internal_bucket" : 19400,
+        "sql_exec_latency_internal_bucket" : 62609,
+        "sql_service_latency_internal_bucket" : 59879,
+        "txn_durations_bucket" : 51573
+      }
+    },
+    "event" : {
+      "dataset" : "cockroachdb.status",
+      "module" : "cockroachdb",
+      "duration" : 48386125
+    },
+    "metricset" : {
+      "name" : "status",
+      "period" : 10000
+    },
+    "service" : {
+      "address" : "http://localhost:8080/_status/vars",
+      "type" : "cockroachdb"
+    }
+}

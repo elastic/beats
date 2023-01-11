@@ -102,6 +102,8 @@
                 - name: cpu
                   type: group
                   fields:
+                    - name: cfs_quota_micros
+                      type: long
                     - name: stat
                       type: group
                       fields:

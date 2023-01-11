@@ -18,6 +18,7 @@
 package http
 
 import (
+	"context"
 	"net"
 	"net/http"
 	"net/url"
@@ -128,7 +129,7 @@ func TestSplitHostnamePort(t *testing.T) {
 }
 
 func makeTestHTTPRequest(t *testing.T) *http.Request {
-	req, err := http.NewRequest("GET", "http://example.net", nil)
+	req, err := http.NewRequestWithContext(context.Background(), "GET", "http://example.net", nil)
 	assert.NoError(t, err)
 	return req
 }

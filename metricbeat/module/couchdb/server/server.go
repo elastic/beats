@@ -22,11 +22,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/pkg/errors"
 )
@@ -117,7 +116,7 @@ func (m *MetricSet) retrieveFetcher() (err error) {
 		return errors.Wrap(err, "cannot start CouchDB metricbeat module")
 	}
 
-	version, err := common.NewVersion(m.info.Version)
+	version, err := version.New(m.info.Version)
 	if err != nil {
 		return errors.Wrap(err, "could not capture couchdb version")
 	}

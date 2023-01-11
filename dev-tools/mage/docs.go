@@ -32,7 +32,6 @@ import (
 	"syscall"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -70,7 +69,7 @@ var Docs = docsBuilder{}
 // FieldDocs generates docs/fields.asciidoc from the specified fields.yml file.
 func (docsBuilder) FieldDocs(fieldsYML string) error {
 	// Run the docs_collector.py script.
-	ve, err := PythonVirtualenv()
+	ve, err := PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}
@@ -140,14 +139,18 @@ func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {
 		srv := b.servePreview(htmlDir)
 		url := "http://" + srv.Addr
 		fmt.Println("Serving docs preview at", url)
-		b.openBrowser(url)
+		if err := b.openBrowser(url); err != nil {
+			return err
+		}
 
 		// Wait
 		fmt.Println("Ctrl+C to stop")
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 		<-sigs
-		srv.Shutdown(context.Background())
+		if err := srv.Shutdown(context.Background()); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -178,7 +181,7 @@ func (docsBuilder) servePreview(dir string) *http.Server {
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			panic(errors.Wrap(err, "failed to start docs preview"))
+			panic(fmt.Errorf("failed to start docs preview: %w", err))
 		}
 	}()
 

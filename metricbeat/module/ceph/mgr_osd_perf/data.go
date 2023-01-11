@@ -20,8 +20,8 @@ package mgr_osd_perf
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type OsdPerfResponse struct {
@@ -38,18 +38,18 @@ type OsdPerfResponse struct {
 	} `json:"osdstats"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var response OsdPerfResponse
 	err := mgr.UnmarshalResponse(content, &response)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get response data")
 	}
 
-	var events []common.MapStr
+	var events []mapstr.M
 	for _, OsdPerfInfo := range response.OsdStats.OsdPerfInfos {
-		event := common.MapStr{
+		event := mapstr.M{
 			"id": OsdPerfInfo.ID,
-			"stats": common.MapStr{
+			"stats": mapstr.M{
 				"commit_latency_ms": OsdPerfInfo.PerfStats.CommitLatencyMs,
 				"apply_latency_ms":  OsdPerfInfo.PerfStats.ApplyLatencyMs,
 				"commit_latency_ns": OsdPerfInfo.PerfStats.CommitLatencyNs,

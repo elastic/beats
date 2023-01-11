@@ -21,15 +21,15 @@ import (
 	"flag"
 	"fmt"
 
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Global pipeline module for loading the main pipeline from a configuration object
@@ -118,11 +118,6 @@ func loadOutput(
 	monitors Monitors,
 	makeOutput OutputFactory,
 ) (outputs.Group, error) {
-	log := monitors.Logger
-	if log == nil {
-		log = logp.L()
-	}
-
 	if publishDisabled {
 		return outputs.Group{}, nil
 	}
@@ -138,7 +133,11 @@ func loadOutput(
 	if monitors.Metrics != nil {
 		metrics = monitors.Metrics.GetRegistry("output")
 		if metrics != nil {
-			metrics.Clear()
+			err := metrics.Clear()
+			if err != nil {
+				return outputs.Group{}, err
+			}
+
 		} else {
 			metrics = monitors.Metrics.NewRegistry("output")
 		}
@@ -156,7 +155,10 @@ func loadOutput(
 	if monitors.Telemetry != nil {
 		telemetry := monitors.Telemetry.GetRegistry("output")
 		if telemetry != nil {
-			telemetry.Clear()
+			err := telemetry.Clear()
+			if err != nil {
+				return outputs.Group{}, err
+			}
 		} else {
 			telemetry = monitors.Telemetry.NewRegistry("output")
 		}
@@ -169,7 +171,7 @@ func loadOutput(
 }
 
 func createQueueBuilder(
-	config common.ConfigNamespace,
+	config conf.Namespace,
 	monitors Monitors,
 	inQueueSize int,
 ) (func(queue.ACKListener) (queue.Queue, error), error) {
@@ -185,7 +187,7 @@ func createQueueBuilder(
 
 	queueConfig := config.Config()
 	if queueConfig == nil {
-		queueConfig = common.NewConfig()
+		queueConfig = conf.NewConfig()
 	}
 
 	if monitors.Telemetry != nil {

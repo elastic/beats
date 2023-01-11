@@ -1,16 +1,13 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "mongodb.status",
         "duration": 115000,
         "module": "mongodb"
     },
     "metricset": {
-        "name": "status"
+        "name": "status",
+        "period": 10000
     },
     "mongodb": {
         "status": {
@@ -18,22 +15,22 @@
                 "msg": 0,
                 "regular": 0,
                 "rollovers": 0,
-                "user": 0,
+                "user": 5,
                 "warning": 0
             },
             "connections": {
-                "available": 838859,
-                "current": 1,
-                "total_created": 69
+                "available": 815,
+                "current": 4,
+                "total_created": 783
             },
             "extra_info": {
                 "heap_usage": {},
-                "page_faults": 0
+                "page_faults": 14
             },
             "global_lock": {
                 "active_clients": {
                     "readers": 0,
-                    "total": 7,
+                    "total": 18,
                     "writers": 0
                 },
                 "current_queue": {
@@ -42,16 +39,16 @@
                     "writers": 0
                 },
                 "total_time": {
-                    "us": 68634000
+                    "us": 793189000
                 }
             },
-            "local_time": "2019-01-29T13:47:39.864Z",
+            "local_time": "2022-05-07T12:34:04.274Z",
             "locks": {
                 "collection": {
                     "acquire": {
                         "count": {
-                            "r": 42,
-                            "w": 2
+                            "W": 1,
+                            "r": 2741
                         }
                     },
                     "deadlock": {},
@@ -60,9 +57,10 @@
                 "database": {
                     "acquire": {
                         "count": {
-                            "R": 1,
-                            "W": 7,
-                            "r": 42
+                            "R": 2,
+                            "W": 16,
+                            "r": 3707,
+                            "w": 1
                         }
                     },
                     "deadlock": {},
@@ -71,9 +69,9 @@
                 "global": {
                     "acquire": {
                         "count": {
-                            "W": 3,
-                            "r": 176,
-                            "w": 7
+                            "W": 2,
+                            "r": 7453,
+                            "w": 17
                         }
                     },
                     "deadlock": {},
@@ -82,6 +80,16 @@
                 "meta_data": {
                     "acquire": {
                         "count": {
+                            "w": 1
+                        }
+                    },
+                    "deadlock": {},
+                    "wait": {}
+                },
+                "oplog": {
+                    "acquire": {
+                        "count": {
+                            "r": 966,
                             "w": 1
                         }
                     },
@@ -98,24 +106,24 @@
                     "mb": 0
                 },
                 "resident": {
-                    "mb": 59
+                    "mb": 66
                 },
                 "virtual": {
-                    "mb": 928
+                    "mb": 1183
                 }
             },
             "network": {
                 "in": {
-                    "bytes": 1624
+                    "bytes": 7845
                 },
                 "out": {
-                    "bytes": 143648
+                    "bytes": 204883
                 },
-                "requests": 55
+                "requests": 93
             },
             "ops": {
                 "counters": {
-                    "command": 28,
+                    "command": 48,
                     "delete": 0,
                     "getmore": 0,
                     "insert": 0,
@@ -124,8 +132,8 @@
                 },
                 "latencies": {
                     "commands": {
-                        "count": 27,
-                        "latency": 2834
+                        "count": 48,
+                        "latency": 43041525
                     },
                     "reads": {
                         "count": 0,
@@ -149,23 +157,23 @@
                 "name": "wiredTiger"
             },
             "uptime": {
-                "ms": 68626
+                "ms": 793190
             },
             "wired_tiger": {
                 "cache": {
                     "dirty": {
-                        "bytes": 19336
+                        "bytes": 0
                     },
                     "maximum": {
-                        "bytes": 2585788416
+                        "bytes": 16113467392
                     },
                     "pages": {
                         "evicted": 0,
-                        "read": 0,
-                        "write": 14
+                        "read": 26,
+                        "write": 22
                     },
                     "used": {
-                        "bytes": 29316
+                        "bytes": 99789
                     }
                 },
                 "concurrent_transactions": {
@@ -181,19 +189,19 @@
                     }
                 },
                 "log": {
-                    "flushes": 683,
+                    "flushes": 7918,
                     "max_file_size": {
                         "bytes": 104857600
                     },
-                    "scans": 0,
+                    "scans": 3,
                     "size": {
                         "bytes": 33554432
                     },
-                    "syncs": 13,
+                    "syncs": 7,
                     "write": {
-                        "bytes": 16640
+                        "bytes": 5120
                     },
-                    "writes": 42
+                    "writes": 13
                 }
             }
         }
@@ -202,8 +210,8 @@
         "name": "mongod"
     },
     "service": {
-        "address": "127.0.0.1:27017",
+        "address": "172.28.0.2:27017",
         "type": "mongodb",
-        "version": "3.4.19"
+        "version": "3.4.24"
     }
 }

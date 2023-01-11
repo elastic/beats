@@ -25,9 +25,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
-	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 var (
@@ -62,12 +63,12 @@ func main() {
 	}
 
 	var user, pass string
+	user = "beats"
+	pass = "testing"
 	if u.User != nil {
 		user = u.User.Username()
 		pass, _ = u.User.Password()
 	}
-	user = "beats"
-	pass = "testing"
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
 
@@ -79,7 +80,7 @@ func main() {
 		Path:      u.Path,
 		SpaceID:   *spaceID,
 		Transport: transport,
-	}, "Beat Development Tools")
+	}, "Beat Development Tools", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %v", err)
 	}
@@ -134,6 +135,6 @@ func exportSingleDashboard(client *kibana.Client, dashboard, folder string) erro
 	if err != nil {
 		return fmt.Errorf("failed to export the dashboard: %+v", err)
 	}
-
+	result = dashboards.DecodeExported(result)
 	return dashboards.SaveToFolder(result, folder, client.GetVersion())
 }

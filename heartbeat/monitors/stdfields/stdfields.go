@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"time"
 
+	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type ServiceFields struct {
@@ -37,24 +38,40 @@ type StdMonitorFields struct {
 	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
 	Timeout           time.Duration      `config:"timeout"`
 	Service           ServiceFields      `config:"service"`
+	Origin            string             `config:"origin"`
 	LegacyServiceName string             `config:"service_name"`
-	Enabled           bool               `config:"enabled"`
+	// Used by zip_url and local monitors
+	// kibana originating monitors only run one journey at a time
+	// and just use the `fields` syntax / manually set monitor IDs
+	IsLegacyBrowserSource bool
+	Enabled               bool `config:"enabled"`
+	// TODO: Delete this once browser / local monitors are removed
+	Source struct {
+		ZipUrl *config.C `config:"zip_url"`
+		Local  *config.C `config:"local"`
+	} `config:"source"`
+	RunFrom *hbconfig.LocationWithID `config:"run_from"`
 }
 
-func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
-	mpi := StdMonitorFields{Enabled: true}
+func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
+	sFields := StdMonitorFields{Enabled: true}
 
-	if err := config.Unpack(&mpi); err != nil {
-		return mpi, fmt.Errorf("error unpacking monitor plugin config: %w", err)
+	if err := conf.Unpack(&sFields); err != nil {
+		return sFields, fmt.Errorf("error unpacking monitor plugin config: %w", err)
 	}
 
 	// Use `service_name` if `service.name` is unspecified
 	// `service_name` was only document in the 7.10.0 release.
-	if mpi.LegacyServiceName != "" {
-		if mpi.Service.Name == "" {
-			mpi.Service.Name = mpi.LegacyServiceName
+	if sFields.LegacyServiceName != "" {
+		if sFields.Service.Name == "" {
+			sFields.Service.Name = sFields.LegacyServiceName
 		}
 	}
 
-	return mpi, nil
+	// TODO: Delete this once browser / local monitors are removed
+	if sFields.Source.Local != nil || sFields.Source.ZipUrl != nil {
+		sFields.IsLegacyBrowserSource = true
+	}
+
+	return sFields, nil
 }

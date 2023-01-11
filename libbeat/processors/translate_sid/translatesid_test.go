@@ -30,8 +30,8 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestTranslateSID(t *testing.T) {
@@ -94,12 +94,12 @@ func TestTranslateSID(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		evt := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"sid": "S-1-5-7",
 			},
 		}
 
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"sid":     "S-1-5-32-544",
 			"domain":  "BUILTIN",
 			"account": "Administrators",

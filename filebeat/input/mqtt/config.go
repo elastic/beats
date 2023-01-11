@@ -20,7 +20,7 @@ package mqtt
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type mqttInputConfig struct {

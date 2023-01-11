@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: syncgateway
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/syncgateway/_meta/docs.asciidoc
+
 
 [[metricbeat-module-syncgateway]]
 [role="xpack"]
@@ -14,6 +16,8 @@ Sync Gateway is the synchronization server in a Couchbase for Mobile and Edge de
 
 Sync Gateway access `[host]:[port]/_expvar` on Sync Gateway nodes to fetch metrics data, ensure that the URL is accessible from the host where Metricbeat is running.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -57,3 +61,4 @@ include::syncgateway/replication.asciidoc[]
 
 include::syncgateway/resources.asciidoc[]
 
+:edit_url!:

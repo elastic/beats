@@ -3,7 +3,7 @@ beat defines the basic testing infrastructure used by individual python unit/int
 """
 
 import subprocess
-
+import random
 import unittest
 import os
 import shutil
@@ -137,8 +137,11 @@ class Proc():
         """
         kill_and_wait will kill the process and wait for it to return
         """
-        self.kill()
-        os.close(self.stdin_write)
+        # If the process is running, kill it and close self.stdin_write
+        # this is done so this method can safely be called multiple times
+        if self.proc.poll() is None:
+            self.kill()
+            os.close(self.stdin_write)
         return self.wait()
 
     def check_kill_and_wait(self, exit_code=0):
@@ -151,6 +154,8 @@ class Proc():
 
     def __del__(self):
         # Ensure the process is stopped.
+        # For some reason when some tests error/timeout this
+        # method is not called in a timely manner.
         try:
             self.proc.terminate()
             self.proc.kill()
@@ -391,7 +396,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # create working dir
         self.working_dir = os.path.abspath(os.path.join(
-            self.build_path + "run", self.id()))
+            self.build_path, "run", self.id() + str(random.randrange(1000))))
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
@@ -406,14 +411,26 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # update the last_run link
             if os.path.islink(self.build_path + "last_run"):
                 os.unlink(self.build_path + "last_run")
-            os.symlink(self.build_path + f"run/{self.id()}",
+            os.symlink(self.working_dir,
                        self.build_path + "last_run")
         except BaseException:
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
 
-    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond", err_msg=""):
+        # Keep last 5 runs
+        candidates = []
+        to_keep = 5
+        for dir_entry in os.listdir(os.path.join(self.build_path, "run")):
+            if re.search(self.id() + r"[0-9]+$", dir_entry):
+                candidates.append(dir_entry)
+        if len(candidates) > to_keep:
+            candidates.sort(reverse=True, key=lambda dirname: os.path.getmtime(
+                os.path.join(self.build_path, "run", dirname)))
+            for d in candidates[to_keep:]:
+                shutil.rmtree(os.path.join(self.build_path, "run", d))
+
+    def wait_until(self, cond, max_timeout=20, poll_interval=0.1, name="cond", err_msg=""):
         """
         TODO: this can probably be a "wait_until_output_count", among other things, since that could actually use `self`, and this can become an internal function
         Waits until the cond function returns true,
@@ -861,7 +878,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         return "https://{host}:{port}".format(
             host=os.getenv("ES_HOST_SSL", "localhost"),
-            port=os.getenv("ES_PORT_SSL", "9205"),
+            port=os.getenv("ES_PORT_SSL", "9201"),
         )
 
     def get_kibana_url(self):

@@ -4,10 +4,24 @@
     `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
   release: beta
   fields:
+    - name: cluster_name
+      type: keyword
+      description: Cluster name (Pippero)
+    - name: task_name
+      type: keyword
+      description: ECS task name
     - name: identifier
       type: keyword
       description: >
         Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
+    - name: task_desired_status
+      type: keyword
+      description: >
+        The desired status for the task from Amazon ECS.
+    - name: task_known_status
+      type: keyword
+      description: >
+        The known status for the task from Amazon ECS.
     - name: cpu
       type: group
       description: Runtime CPU metrics.
@@ -98,205 +112,192 @@
               type: long
               description: >
                 Total number of queued requests
-            - name: reads
-              type: scaled_float
-              deprecated: 6.4
+        - name: reads
+          type: scaled_float
+          deprecated: 6.4
+          description: >
+            Number of current reads per second
+        - name: write
+          type: group
+          description: >
+            Accumulated writes during the life of the container
+          fields:
+            - name: ops
+              type: long
               description: >
-                Number of current reads per second
-            - name: write
-              type: group
+                Number of writes during the life of the container
+            - name: bytes
+              type: long
+              format: bytes
               description: >
-                Accumulated writes during the life of the container
-              fields:
-                - name: ops
-                  type: long
-                  description: >
-                    Number of writes during the life of the container
-                - name: bytes
-                  type: long
-                  format: bytes
-                  description: >
-                    Bytes written during the life of the container
-                - name: rate
-                  type: long
-                  description: >
-                    Number of current writes per second
-                - name: service_time
-                  type: long
-                  description: >
-                    Total time to service IO requests, in nanoseconds
-                - name: wait_time
-                  type: long
-                  description: >
-                    Total time requests spent waiting in queues for service, in nanoseconds
-                - name: queued
-                  type: long
-                  description: >
-                    Total number of queued requests
-            - name: writes
-              type: scaled_float
-              deprecated: 6.4
+                Bytes written during the life of the container
+            - name: rate
+              type: long
               description: >
                 Number of current writes per second
-            - name: summary
-              type: group
+            - name: service_time
+              type: long
               description: >
-                Accumulated reads and writes during the life of the container
-              fields:
-                - name: ops
-                  type: long
-                  description: >
-                    Number of I/O operations during the life of the container
-                - name: bytes
-                  type: long
-                  format: bytes
-                  description: >
-                    Bytes read and written during the life of the container
-                - name: rate
-                  type: long
-                  description: >
-                    Number of current operations per second
-                - name: service_time
-                  type: long
-                  description: >
-                    Total time to service IO requests, in nanoseconds
-                - name: wait_time
-                  type: long
-                  description: >
-                    Total time requests spent waiting in queues for service, in nanoseconds
-                - name: queued
-                  type: long
-                  description: >
-                    Total number of queued requests
-            - name: total
-              type: scaled_float
-              deprecated: 6.4
+                Total time to service IO requests, in nanoseconds
+            - name: wait_time
+              type: long
               description: >
-                Number of reads and writes per second
+                Total time requests spent waiting in queues for service, in nanoseconds
+            - name: queued
+              type: long
+              description: >
+                Total number of queued requests
+        - name: writes
+          type: scaled_float
+          deprecated: 6.4
+          description: >
+            Number of current writes per second
+        - name: summary
+          type: group
+          description: >
+            Accumulated reads and writes during the life of the container
+          fields:
+            - name: ops
+              type: long
+              description: >
+                Number of I/O operations during the life of the container
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Bytes read and written during the life of the container
+            - name: rate
+              type: long
+              description: >
+                Number of current operations per second
+            - name: service_time
+              type: long
+              description: >
+                Total time to service IO requests, in nanoseconds
+            - name: wait_time
+              type: long
+              description: >
+                Total time requests spent waiting in queues for service, in nanoseconds
+            - name: queued
+              type: long
+              description: >
+                Total number of queued requests
+        - name: total
+          type: scaled_float
+          deprecated: 6.4
+          description: >
+            Number of reads and writes per second
     - name: memory
       type: group
       description: Memory metrics.
       fields:
-        - name: stats.*
+        - name: stats
           type: object
           object_type: long
           object_type_mapping_type: "*"
           description: >
             Raw memory stats from the cgroups memory.stat interface
+        - name: commit
+          type: group
+          description: >
+            Committed bytes on Windows
           fields:
-            - name: commit
-              type: group
-              description: >
-                Committed bytes on Windows
-              fields:
-                - name: total
-                  type: long
-                  format: bytes
-                  description: >
-                    Total bytes
-                - name: peak
-                  type: long
-                  format: bytes
-                  description: >
-                    Peak committed bytes on Windows
-            - name: private_working_set.total
+            - name: total
               type: long
               format: bytes
               description: >
-                private working sets on Windows
-            - name: fail.count
+                Total bytes
+            - name: peak
+              type: long
+              format: bytes
+              description: >
+                Peak committed bytes on Windows
+        - name: private_working_set.total
+          type: long
+          format: bytes
+          description: >
+            private working sets on Windows
+        - name: fail.count
+          type: scaled_float
+          description: >
+            Fail counter.
+        - name: limit
+          type: long
+          format: bytes
+          description: >
+            Memory limit.
+        - name: rss
+          type: group
+          description: >
+            RSS memory stats.
+          fields:
+            - name: total
+              type: long
+              format: bytes
+              description: >
+                Total memory resident set size.
+            - name: pct
               type: scaled_float
+              format: percent
               description: >
-                Fail counter.
-            - name: limit
+                Memory resident set size percentage.
+        - name: usage
+          type: group
+          description: >
+            Usage memory stats.
+          fields:
+            - name: max
               type: long
               format: bytes
               description: >
-                Memory limit.
-            - name: rss
-              type: group
+                Max memory usage.
+            - name: pct
+              type: scaled_float
+              format: percent
               description: >
-                RSS memory stats.
-              fields:
-                - name: total
-                  type: long
-                  format: bytes
-                  description: >
-                    Total memory resident set size.
-                - name: pct
-                  type: scaled_float
-                  format: percent
-                  description: >
-                    Memory resident set size percentage.
-                - name: usage
-                  type: group
-                  description: >
-                    Usage memory stats.
-                  fields:
-                    - name: max
-                      type: long
-                      format: bytes
-                      description: >
-                        Max memory usage.
-                    - name: pct
-                      type: scaled_float
-                      format: percent
-                      description: >
-                        Memory usage percentage.
-                    - name: total
-                      type: long
-                      format: bytes
-                      description: >
-                        Total memory usage.
-    - name: network
+                Memory usage percentage.
+            - name: total
+              type: long
+              format: bytes
+              description: >
+                Total memory usage.
+    - name: network.*.inbound
       type: group
-      description: Network metrics.
       fields:
-        - name: interface
-          type: keyword
-          description: >
-            Network interface name.
-        - name: inbound
-          type: group
-          description: >
-            Incoming network stats since the container started.
-          fields:
-            - name: bytes
-              type: long
-              format: bytes
-              description: >
-                Total number of incoming bytes.
-            - name: dropped
-              type: long
-              description: >
-                Total number of dropped incoming packets.
-            - name: errors
-              type: long
-              description: >
-                Total errors on incoming packets.
-            - name: packets
-              type: long
-              description: >
-                Total number of incoming packets.
-        - name: outbound
-          type: group
-          description: >
-            Outgoing network stats since the container started.
-          fields:
-            - name: bytes
-              type: long
-              format: bytes
-              description: >
-                Total number of outgoing bytes.
-            - name: dropped
-              type: long
-              description: >
-                Total number of dropped outgoing packets.
-            - name: errors
-              type: long
-              description: >
-                Total errors on outgoing packets.
-            - name: packets
-              type: long
-              description: >
-                Total number of outgoing packets.
+        - name: bytes
+          type: long
+          format: bytes
+          description: |
+            Total number of incoming bytes.
+        - name: dropped
+          type: long
+          description: |
+            Total number of dropped incoming packets.
+        - name: errors
+          type: long
+          description: |
+            Total errors on incoming packets.
+        - name: packets
+          type: long
+          description: |
+            Total number of incoming packets.
+    - name: network.*.outbound
+      type: group
+      fields:
+        - name: bytes
+          type: long
+          format: bytes
+          description: |
+            Total number of incoming bytes.
+        - name: dropped
+          type: long
+          description: |
+            Total number of dropped incoming packets.
+        - name: errors
+          type: long
+          description: |
+            Total errors on incoming packets.
+        - name: packets
+          type: long
+          description: |
+            Total number of incoming packets.

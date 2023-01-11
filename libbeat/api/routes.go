@@ -23,9 +23,10 @@ import (
 	_ "net/http/pprof"
 	"net/url"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type handlerFunc func(http.ResponseWriter, *http.Request)
@@ -34,7 +35,7 @@ type lookupFunc func(string) *monitoring.Namespace
 var handlerFuncMap = make(map[string]handlerFunc)
 
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *common.Config, ns lookupFunc) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C, ns lookupFunc) (*Server, error) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", makeRootAPIHandler(makeAPIHandler(ns("info"))))
@@ -80,7 +81,7 @@ func makeAPIHandler(ns *monitoring.Namespace) handlerFunc {
 	}
 }
 
-func prettyPrint(w http.ResponseWriter, data common.MapStr, u *url.URL) {
+func prettyPrint(w http.ResponseWriter, data mapstr.M, u *url.URL) {
 	query := u.Query()
 	if _, ok := query["pretty"]; ok {
 		fmt.Fprintf(w, data.StringToPrint())

@@ -3,6 +3,8 @@
 This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
+:edit_url:
+
 [[exported-fields]]
 = Exported fields
 
@@ -27,6 +29,7 @@ grouped in the following categories:
 * <<exported-fields-resolve>>
 * <<exported-fields-service>>
 * <<exported-fields-socks5>>
+* <<exported-fields-state>>
 * <<exported-fields-summary>>
 * <<exported-fields-synthetics>>
 * <<exported-fields-tcp>>
@@ -453,6 +456,41 @@ Time range this ping reported starting at the instant the check was started, end
 
 
 type: date_range
+
+--
+
+*`monitor.origin`*::
++
+--
+The origin of this monitor configuration, usually either "ui", or "project"
+
+
+type: keyword
+
+--
+
+[float]
+=== project
+
+Project info for this monitor
+
+
+
+*`monitor.project.id`*::
++
+--
+Project ID
+
+type: keyword
+
+--
+
+*`monitor.project.name`*::
++
+--
+Project name
+
+type: keyword
 
 --
 
@@ -1586,9 +1624,35 @@ example: true
 [float]
 === container
 
-Container fields are used for meta information about the specific container that is the source of information.
-These fields help correlate data based containers from any runtime.
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
 
+
+*`container.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
+*`container.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`container.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
 
 *`container.id`*::
 +
@@ -1626,12 +1690,39 @@ type: object
 
 --
 
+*`container.memory.usage`*::
++
+--
+Memory usage percentage and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
 *`container.name`*::
 +
 --
 Container name.
 
 type: keyword
+
+--
+
+*`container.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the container since the last metric collection.
+
+type: long
+
+--
+
+*`container.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the container since the last metric collection.
+
+type: long
 
 --
 
@@ -16209,6 +16300,101 @@ type: long
 
 --
 
+[[exported-fields-state]]
+== Monitor state fields
+
+state related fields
+
+
+[float]
+=== state
+
+Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`.
+
+
+*`state.id`*::
++
+--
+ID of this state
+
+
+type: keyword
+
+--
+
+*`state.started_at`*::
++
+--
+First time state with this ID was seen
+
+
+type: date
+
+--
+
+*`state.duration_ms`*::
++
+--
+Length of time this state has existed in millis
+
+
+type: long
+
+--
+
+*`state.status`*::
++
+--
+The current status, "up", "down", or "flapping" any state can change into flapping.
+
+
+type: keyword
+
+--
+
+*`state.checks`*::
++
+--
+total checks run
+
+type: integer
+
+--
+
+*`state.up`*::
++
+--
+total up checks run
+
+type: integer
+
+--
+
+*`state.down`*::
++
+--
+total down checks run
+
+type: integer
+
+--
+
+*`state.flap_history`*::
++
+--
+Object is not enabled.
+
+--
+
+*`state.ends`*::
++
+--
+the state that was ended by this state
+
+type: object
+
+--
+
 [[exported-fields-summary]]
 == Monitor summary fields
 
@@ -16570,3 +16756,4 @@ example: 3
 
 --
 
+:edit_url!:

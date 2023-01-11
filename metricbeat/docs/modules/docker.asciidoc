@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: docker
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/docker/_meta/docs.asciidoc
+
 
 [[metricbeat-module-docker]]
 == Docker module
@@ -29,6 +31,8 @@ Docker API already takes up to 2 seconds. Specifying less than 3 seconds will
 result in requests that timeout, and no data will be reported for those
 requests.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -121,3 +125,4 @@ include::docker/network.asciidoc[]
 
 include::docker/network_summary.asciidoc[]
 
+:edit_url!:

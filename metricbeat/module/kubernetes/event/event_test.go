@@ -24,10 +24,13 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateMapStrFromEvent(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.event")
+
 	labels := map[string]string{
 		"app.kubernetes.io/name":      "mysql",
 		"app.kubernetes.io/version":   "5.7.21",
@@ -41,9 +44,9 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		"prometheus.io/scrape": "false",
 	}
 
-	expectedLabelsMapStrWithDot := common.MapStr{
-		"app": common.MapStr{
-			"kubernetes": common.MapStr{
+	expectedLabelsMapStrWithDot := mapstr.M{
+		"app": mapstr.M{
+			"kubernetes": mapstr.M{
 				"io/version":   "5.7.21",
 				"io/component": "database",
 				"io/name":      "mysql",
@@ -51,14 +54,14 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 	}
 
-	expectedLabelsMapStrWithDeDot := common.MapStr{
+	expectedLabelsMapStrWithDeDot := mapstr.M{
 		"app_kubernetes_io/name":      "mysql",
 		"app_kubernetes_io/version":   "5.7.21",
 		"app_kubernetes_io/component": "database",
 	}
 
-	expectedAnnotationsMapStrWithDot := common.MapStr{
-		"prometheus": common.MapStr{
+	expectedAnnotationsMapStrWithDot := mapstr.M{
+		"prometheus": mapstr.M{
 			"io/path":   "/metrics",
 			"io/port":   "9102",
 			"io/scheme": "http",
@@ -66,7 +69,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 	}
 
-	expectedAnnotationsMapStrWithDeDot := common.MapStr{
+	expectedAnnotationsMapStrWithDeDot := mapstr.M{
 		"prometheus_io/path":   "/metrics",
 		"prometheus_io/port":   "9102",
 		"prometheus_io/scheme": "http",
@@ -80,7 +83,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 
 	testCases := map[string]struct {
 		mockEvent        v1.Event
-		expectedMetadata common.MapStr
+		expectedMetadata mapstr.M
 		dedotConfig      dedotConfig
 	}{
 		"no dedots": {
@@ -91,7 +94,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 				},
 				Source: source,
 			},
-			expectedMetadata: common.MapStr{
+			expectedMetadata: mapstr.M{
 				"labels":      expectedLabelsMapStrWithDot,
 				"annotations": expectedAnnotationsMapStrWithDot,
 			},
@@ -108,7 +111,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 				},
 				Source: source,
 			},
-			expectedMetadata: common.MapStr{
+			expectedMetadata: mapstr.M{
 				"labels":      expectedLabelsMapStrWithDeDot,
 				"annotations": expectedAnnotationsMapStrWithDot,
 			},
@@ -125,7 +128,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 				},
 				Source: source,
 			},
-			expectedMetadata: common.MapStr{
+			expectedMetadata: mapstr.M{
 				"labels":      expectedLabelsMapStrWithDot,
 				"annotations": expectedAnnotationsMapStrWithDeDot,
 			},
@@ -142,7 +145,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 				},
 				Source: source,
 			},
-			expectedMetadata: common.MapStr{
+			expectedMetadata: mapstr.M{
 				"labels":      expectedLabelsMapStrWithDeDot,
 				"annotations": expectedAnnotationsMapStrWithDeDot,
 			},
@@ -155,11 +158,11 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
-			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig)
-			assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(common.MapStr)["labels"])
-			assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(common.MapStr)["annotations"])
-			assert.Equal(t, source.Host, mapStrOutput["source"].(common.MapStr)["host"])
-			assert.Equal(t, source.Component, mapStrOutput["source"].(common.MapStr)["component"])
+			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig, logger)
+			assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(mapstr.M)["labels"])
+			assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(mapstr.M)["annotations"])
+			assert.Equal(t, source.Host, mapStrOutput["source"].(mapstr.M)["host"])
+			assert.Equal(t, source.Component, mapStrOutput["source"].(mapstr.M)["component"])
 		})
 	}
 }

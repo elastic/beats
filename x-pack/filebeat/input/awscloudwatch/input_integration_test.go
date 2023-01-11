@@ -15,28 +15,29 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
+
+	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -46,13 +47,6 @@ const (
 	terraformOutputYML = "_meta/terraform/outputs.yml"
 	logGroupNamePrefix = "filebeat-log-group-integtest-"
 )
-
-var cloudwatchConfig = common.MapStr{
-	"start_position":    "beginning",
-	"scan_frequency":    10 * time.Second,
-	"api_timeout":       120 * time.Second,
-	"number_of_workers": 1,
-}
 
 type terraformOutputData struct {
 	AWSRegion  string `yaml:"aws_region"`
@@ -65,7 +59,8 @@ type terraformOutputData struct {
 func getTerraformOutputs(t *testing.T) terraformOutputData {
 	t.Helper()
 
-	ymlData, err := ioutil.ReadFile(terraformOutputYML)
+	_, filename, _, _ := runtime.Caller(0)
+	ymlData, err := ioutil.ReadFile(path.Join(path.Dir(filename), terraformOutputYML))
 	if os.IsNotExist(err) {
 		t.Skipf("Run 'terraform apply' in %v to setup CloudWatch log groups and log streams for the test.", filepath.Dir(terraformOutputYML))
 	}
@@ -83,7 +78,7 @@ func getTerraformOutputs(t *testing.T) terraformOutputData {
 	return rtn
 }
 
-func assertMetric(t *testing.T, snapshot common.MapStr, name string, value interface{}) {
+func assertMetric(t *testing.T, snapshot mapstr.M, name string, value interface{}) {
 	n, _ := snapshot.GetValue(inputID + "." + name)
 	assert.EqualValues(t, value, n, name)
 }
@@ -97,30 +92,8 @@ func newV2Context() (v2.Context, func()) {
 	}, cancel
 }
 
-type testInputStore struct {
-	registry *statestore.Registry
-}
-
-func openTestStatestore() beater.StateStore {
-	return &testInputStore{
-		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
-	}
-}
-
-func (s *testInputStore) Close() {
-	s.registry.Close()
-}
-
-func (s *testInputStore) Access() (*statestore.Store, error) {
-	return s.registry.Get("filebeat")
-}
-
-func (s *testInputStore) CleanupInterval() time.Duration {
-	return 24 * time.Hour
-}
-
-func createInput(t *testing.T, cfg *common.Config) *cloudwatchInput {
-	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
+func createInput(t *testing.T, cfg *conf.C) *cloudwatchInput {
+	inputV2, err := Plugin().Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,21 +101,20 @@ func createInput(t *testing.T, cfg *common.Config) *cloudwatchInput {
 	return inputV2.(*cloudwatchInput)
 }
 
-func makeTestConfigWithLogGroupNamePrefix(regionName string) *common.Config {
-	return common.MustNewConfigFrom(fmt.Sprintf(`---
+func makeTestConfigWithLogGroupNamePrefix(regionName string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
 log_group_name_prefix: %s
 region_name: %s
 `, logGroupNamePrefix, regionName))
 }
 
-func uploadLogMessage(t *testing.T, svc cloudwatchlogsiface.ClientAPI, message string, timestamp int64, logGroupName string, logStreamName string) {
+func uploadLogMessage(t *testing.T, svc *cloudwatchlogs.Client, message string, timestamp int64, logGroupName string, logStreamName string) {
 	describeLogStreamsInput := cloudwatchlogs.DescribeLogStreamsInput{
 		LogGroupName:        awssdk.String(logGroupName),
 		LogStreamNamePrefix: awssdk.String(logStreamName),
 	}
 
-	reqDescribeLogStreams := svc.DescribeLogStreamsRequest(&describeLogStreamsInput)
-	resp, err := reqDescribeLogStreams.Send(context.TODO())
+	resp, err := svc.DescribeLogStreams(context.TODO(), &describeLogStreamsInput)
 	if err != nil {
 		t.Fatalf("Failed to describe log stream %q in log group %q: %v", logStreamName, logGroupName, err)
 	}
@@ -151,38 +123,37 @@ func uploadLogMessage(t *testing.T, svc cloudwatchlogsiface.ClientAPI, message s
 		t.Fatalf("Describe log stream %q in log group %q should return 1 and only 1 value", logStreamName, logGroupName)
 	}
 
-	inputLogEvent := cloudwatchlogs.InputLogEvent{
+	inputLogEvent := cloudwatchlogstypes.InputLogEvent{
 		Message:   awssdk.String(message),
 		Timestamp: awssdk.Int64(timestamp),
 	}
 
-	reqPutLogEvents := svc.PutLogEventsRequest(
-		&cloudwatchlogs.PutLogEventsInput{
-			LogEvents:     []cloudwatchlogs.InputLogEvent{inputLogEvent},
-			LogGroupName:  awssdk.String(logGroupName),
-			LogStreamName: awssdk.String(logStreamName),
-			SequenceToken: resp.LogStreams[0].UploadSequenceToken,
-		})
-	_, err = reqPutLogEvents.Send(context.TODO())
+	_, err = svc.PutLogEvents(context.TODO(), &cloudwatchlogs.PutLogEventsInput{
+		LogEvents:     []cloudwatchlogstypes.InputLogEvent{inputLogEvent},
+		LogGroupName:  awssdk.String(logGroupName),
+		LogStreamName: awssdk.String(logStreamName),
+		SequenceToken: resp.LogStreams[0].UploadSequenceToken,
+	})
 	if err != nil {
 		t.Fatalf("Failed to upload message %q into log stream %q in log group %q: %v", message, logStreamName, logGroupName, err)
 	}
 }
 
 func TestInputWithLogGroupNamePrefix(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
 
 	// Terraform is used to set up S3 and SQS and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
-	cfg, err := external.LoadDefaultAWSConfig()
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
 	cfg.Region = tfConfig.AWSRegion
 
 	// upload log messages for testing
-	svc := cloudwatchlogs.New(cfg)
+	svc := cloudwatchlogs.NewFromConfig(cfg)
 	currentTime := time.Now()
 	timestamp := currentTime.UnixNano() / int64(time.Millisecond)
 
@@ -218,7 +189,7 @@ func TestInputWithLogGroupNamePrefix(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
+	snap := mapstr.M(monitoring.CollectStructSnapshot(
 		monitoring.GetNamespace("dataset").GetRegistry(),
 		monitoring.Full,
 		false))

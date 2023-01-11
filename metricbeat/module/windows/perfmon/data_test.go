@@ -25,8 +25,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGroupToEvents(t *testing.T) {
@@ -217,7 +217,7 @@ func TestGroupToSingleEvent(t *testing.T) {
 	assert.Equal(t, val, float64(44))
 	val, err = event.MetricSetFields.GetValue("%_processor_time:count")
 	assert.NoError(t, err)
-	assert.Equal(t, val, common.MapStr{"processor_count": float64(2)})
+	assert.Equal(t, val, mapstr.M{"processor_count": float64(2)})
 	ok, err = event.MetricSetFields.HasKey("%_user_time")
 	assert.NoError(t, err)
 	assert.True(t, ok)
@@ -229,7 +229,7 @@ func TestGroupToSingleEvent(t *testing.T) {
 	assert.Equal(t, val, float64(21))
 	val, err = event.MetricSetFields.GetValue("%_user_time:count")
 	assert.NoError(t, err)
-	assert.Equal(t, val, common.MapStr{"processor_count": float64(2)})
+	assert.Equal(t, val, mapstr.M{"processor_count": float64(2)})
 }
 
 func TestMatchesParentProcess(t *testing.T) {

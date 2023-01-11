@@ -11,8 +11,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // Config for the O365 audit API input.

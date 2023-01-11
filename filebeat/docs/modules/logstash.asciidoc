@@ -2,11 +2,15 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/logstash/_meta/docs.asciidoc
+
 [[filebeat-module-logstash]]
 :modulename: logstash
 :has-dashboards: true
 
 == Logstash module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 The +{modulename}+ modules parse logstash regular logs and the slow log, it will support the plain text format
 and the JSON format.
@@ -103,3 +107,4 @@ the JSON object starts on a new line, the fileset may not parse the multiline pl
 For a description of each field in the module, see the
 <<exported-fields-logstash,exported fields>> section.
 
+:edit_url!:

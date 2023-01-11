@@ -24,20 +24,20 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestRemovedSetting(t *testing.T) {
 	tests := []struct {
 		name     string
-		cfg      *common.Config
+		cfg      *config.C
 		lookup   string
 		expected error
 	}{
 		{
 			name:   "no obsolete setting",
 			lookup: "notfound",
-			cfg: common.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]interface{}{
 				"hello.world": "ok",
 			}),
 			expected: nil,
@@ -45,7 +45,7 @@ func TestRemovedSetting(t *testing.T) {
 		{
 			name:   "obsolete setting found",
 			lookup: "hello",
-			cfg: common.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]interface{}{
 				"hello.world": "ok",
 			}),
 			expected: errors.New("setting 'hello' has been removed"),
@@ -54,7 +54,7 @@ func TestRemovedSetting(t *testing.T) {
 
 	functions := []struct {
 		name string
-		fn   func(*common.Config, string) error
+		fn   func(*config.C, string) error
 	}{
 		{name: "checkRemovedSetting", fn: checkRemovedSetting},
 		{name: "checkRemoved6xSetting", fn: CheckRemoved6xSetting},
@@ -75,14 +75,14 @@ func TestRemovedSetting(t *testing.T) {
 func TestRemovedSettings(t *testing.T) {
 	tests := []struct {
 		name     string
-		cfg      *common.Config
+		cfg      *config.C
 		lookup   []string
 		expected error
 	}{
 		{
 			name:   "no obsolete setting",
 			lookup: []string{"notfound"},
-			cfg: common.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]interface{}{
 				"hello.world": "ok",
 			}),
 			expected: nil,
@@ -90,7 +90,7 @@ func TestRemovedSettings(t *testing.T) {
 		{
 			name:   "obsolete setting found",
 			lookup: []string{"hello"},
-			cfg: common.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]interface{}{
 				"hello.world": "ok",
 			}),
 			expected: multierror.Errors{errors.New("setting 'hello' has been removed")}.Err(),
@@ -98,7 +98,7 @@ func TestRemovedSettings(t *testing.T) {
 		{
 			name:   "multiple obsolete settings",
 			lookup: []string{"hello", "bad"},
-			cfg: common.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]interface{}{
 				"hello.world": "ok",
 				"bad":         "true",
 			}),
@@ -110,7 +110,7 @@ func TestRemovedSettings(t *testing.T) {
 		{
 			name:   "multiple obsolete settings not on first level",
 			lookup: []string{"filebeat.config.prospectors", "filebeat.prospectors"},
-			cfg: common.MustNewConfigFrom(map[string]interface{}{
+			cfg: config.MustNewConfigFrom(map[string]interface{}{
 				"filebeat.prospectors":        "ok",
 				"filebeat.config.prospectors": map[string]interface{}{"ok": "ok1"},
 			}),
@@ -123,7 +123,7 @@ func TestRemovedSettings(t *testing.T) {
 
 	functions := []struct {
 		name string
-		fn   func(*common.Config, ...string) error
+		fn   func(*config.C, ...string) error
 	}{
 		{name: "checkRemovedSetting", fn: checkRemovedSettings},
 		{name: "checkRemoved6xSetting", fn: CheckRemoved6xSettings},

@@ -42,11 +42,10 @@ package server
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/zookeeper"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -89,9 +88,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	event := mb.Event{
 		MetricSetFields: metricsetFields,
-		RootFields: common.MapStr{
-			"service": common.MapStr{
-				"node": common.MapStr{
+		RootFields: mapstr.M{
+			"service": mapstr.M{
+				"node": mapstr.M{
 					"name": serverID,
 				},
 				"version": version,

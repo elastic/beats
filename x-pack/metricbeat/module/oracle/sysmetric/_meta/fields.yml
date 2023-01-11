@@ -1,0 +1,66 @@
+- name: sysmetric
+  type: group
+  release: beta
+  description: >
+    Sysmetric related metrics.
+  fields:
+    - name: session_count
+      type: long
+      description: >
+        Session Count.
+    - name: average_active_sessions
+      type: double
+      description: >
+        Average Active Sessions.
+    - name: current_os_load
+      type: double
+      description: >
+        Current OS Load.
+    - name: physical_reads_per_sec
+      type: double
+      description: >
+        Physical Reads Per Second.
+    - name: user_transaction_per_sec
+      type: double
+      description: >
+        User Transaction Per Second.
+    - name: total_table_scans_per_txn
+      type: double
+      description: >
+        Total Table Scans Per Transaction.
+    - name: physical_writes_per_sec
+      type: double
+      description: >
+        Physical Writes Per Second.
+    - name: total_index_scans_per_txn
+      type: double
+      description: >
+        Total Index Scans Per Transaction.
+    - name: host_cpu_utilization_pct
+      type: double
+      description: >
+        Host CPU Utilization (%).
+    - name: network_traffic_volume_per_sec
+      type: double
+      description: >
+        Network Traffic Volume Per Second.
+    - name: user_rollbacks_per_sec
+      type: long
+      description: >
+        User Rollbacks Per Second.
+    - name: cpu_usage_per_sec
+      type: double
+      description: >
+        CPU Usage Per Second.
+    - name: db_block_changes_per_sec
+      type: double
+      description: >
+        DB Block Changes Per Second.
+    - name: physical_read_total_bytes_per_sec
+      type: double
+      description: >
+        Physical Read Total Bytes Per Second.
+    - name: response_time_per_txn
+      type: double
+      description: >
+        Response Time Per Transaction.

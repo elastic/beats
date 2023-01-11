@@ -20,7 +20,7 @@ package event
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 )
 
 type kubeEventsConfig struct {

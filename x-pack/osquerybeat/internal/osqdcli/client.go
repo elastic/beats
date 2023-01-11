@@ -8,20 +8,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net"
 	"strconv"
-	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"golang.org/x/sync/semaphore"
-	"gotest.tools/gotestsum/log"
 
 	"github.com/osquery/osquery-go"
 	genosquery "github.com/osquery/osquery-go/gen/osquery"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -135,7 +131,7 @@ func (c *Client) reconnect(ctx context.Context) error {
 	return r.Run(ctx, func(ctx context.Context) error {
 		cli, err := osquery.NewClient(c.socketPath, c.timeout)
 		if err != nil {
-			log.Errorf("failed to connect: %v", err)
+			r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", err)
 			return err
 		}
 		c.cli = cli
@@ -156,34 +152,6 @@ func (c *Client) close() {
 	}
 }
 
-func (c *Client) withReconnect(ctx context.Context, fn func() error) error {
-	err := fn()
-	if err == nil {
-		return nil
-	}
-
-	var netErr *net.OpError
-
-	// The current osquery go library github.com/osquery/osquery-go uses the older version of thrift library that
-	// doesn't not wrap the original error, so we have to use this ugly check for the error message suffix here.
-	// The latest version of thrift library is wrapping the error, so adding this check first here.
-	if (errors.As(err, &netErr) && (netErr.Err == syscall.EPIPE || netErr.Err ==
-		syscall.ECONNRESET)) ||
-		strings.HasSuffix(err.Error(), " broken pipe") {
-
-		c.log.Debugf("osquery error: %v, reconnect", err)
-
-		// reconnect && retry
-		err = c.reconnect(ctx)
-		if err != nil {
-			c.log.Errorf("failed to reconnect: %v", err)
-			return err
-		}
-		return fn()
-	}
-	return nil
-}
-
 // Query executes a given query, resolves the types
 func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{}, error) {
 	c.mx.Lock()
@@ -199,10 +167,7 @@ func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{
 	defer c.cliLimiter.Release(limit)
 
 	var res *genosquery.ExtensionResponse
-	err = c.withReconnect(ctx, func() error {
-		res, err = c.cli.Client.Query(ctx, sql)
-		return err
-	})
+	res, err = c.cli.Client.Query(ctx, sql)
 	if err != nil {
 		return nil, fmt.Errorf("osquery failed: %w", err)
 	}
@@ -261,10 +226,7 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 			err   error
 		)
 
-		err = c.withReconnect(ctx, func() error {
-			exres, err = c.cli.Client.GetQueryColumns(ctx, sql)
-			return err
-		})
+		exres, err = c.cli.Client.GetQueryColumns(ctx, sql)
 
 		if err != nil {
 			return nil, fmt.Errorf("osquery get query columns failed: %w", err)
@@ -291,7 +253,7 @@ func resolveTypes(hits []map[string]string, colTypes map[string]string) []map[st
 }
 
 // Best effort to convert value types and replace values in the
-// If conversion fails the value is kept as string
+// If type conversion fails the value is preserved as string
 func resolveHitTypes(hit, colTypes map[string]string) map[string]interface{} {
 	m := make(map[string]interface{})
 	for k, v := range hit {
@@ -304,25 +266,26 @@ func resolveHitTypes(hit, colTypes map[string]string) map[string]interface{} {
 				n, err = strconv.ParseInt(v, 10, 64)
 				if err == nil {
 					m[k] = n
+					continue
 				}
 			case "UNSIGNED_BIGINT":
 				var n uint64
 				n, err = strconv.ParseUint(v, 10, 64)
 				if err == nil {
 					m[k] = n
+					continue
 				}
 			case "DOUBLE":
 				var n float64
 				n, err = strconv.ParseFloat(v, 64)
 				if err == nil {
 					m[k] = n
+					continue
 				}
-			default:
-				m[k] = v
 			}
-		} else {
-			m[k] = v
 		}
+		// Keep the original string value if the value can not be converted
+		m[k] = v
 	}
 	return m
 }

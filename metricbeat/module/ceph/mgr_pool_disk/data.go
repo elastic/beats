@@ -20,8 +20,8 @@ package mgr_pool_disk
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type DfResponse struct {
@@ -37,24 +37,24 @@ type DfResponse struct {
 	} `json:"pools"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var response DfResponse
 	err := mgr.UnmarshalResponse(content, &response)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get response data")
 	}
 
-	var events []common.MapStr
+	var events []mapstr.M
 	for _, Pool := range response.Pools {
-		event := common.MapStr{
+		event := mapstr.M{
 			"name": Pool.Name,
 			"id":   Pool.ID,
-			"stats": common.MapStr{
-				"used": common.MapStr{
+			"stats": mapstr.M{
+				"used": mapstr.M{
 					"bytes": Pool.Stats.BytesUsed,
 					"kb":    Pool.Stats.KbUsed,
 				},
-				"available": common.MapStr{
+				"available": mapstr.M{
 					"bytes": Pool.Stats.MaxAvail,
 				},
 				"objects": Pool.Stats.Objects,

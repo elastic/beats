@@ -20,11 +20,11 @@ package add_kubernetes_metadata
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -50,7 +50,7 @@ type Indexer interface {
 // MetadataIndex holds a pair of index -> metadata info
 type MetadataIndex struct {
 	Index string
-	Data  common.MapStr
+	Data  mapstr.M
 }
 
 type Indexers struct {
@@ -58,7 +58,7 @@ type Indexers struct {
 }
 
 // IndexerConstructor builds a new indexer from its settings
-type IndexerConstructor func(config common.Config, metaGen metadata.MetaGen) (Indexer, error)
+type IndexerConstructor func(config config.C, metaGen metadata.MetaGen) (Indexer, error)
 
 // NewIndexers builds indexers object
 func NewIndexers(configs PluginConfig, metaGen metadata.MetaGen) *Indexers {
@@ -123,7 +123,7 @@ type PodNameIndexer struct {
 }
 
 // NewPodNameIndexer initializes and returns a PodNameIndexer
-func NewPodNameIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, error) {
+func NewPodNameIndexer(_ config.C, metaGen metadata.MetaGen) (Indexer, error) {
 	return &PodNameIndexer{metaGen: metaGen}, nil
 }
 
@@ -149,7 +149,7 @@ type PodUIDIndexer struct {
 }
 
 // NewPodUIDIndexer initializes and returns a PodUIDIndexer
-func NewPodUIDIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, error) {
+func NewPodUIDIndexer(_ config.C, metaGen metadata.MetaGen) (Indexer, error) {
 	return &PodUIDIndexer{metaGen: metaGen}, nil
 }
 
@@ -175,7 +175,7 @@ type ContainerIndexer struct {
 }
 
 // NewContainerIndexer initializes and returns a ContainerIndexer
-func NewContainerIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, error) {
+func NewContainerIndexer(_ config.C, metaGen metadata.MetaGen) (Indexer, error) {
 	return &ContainerIndexer{metaGen: metaGen}, nil
 }
 
@@ -221,7 +221,7 @@ type IPPortIndexer struct {
 }
 
 // NewIPPortIndexer creates and returns a new indexer for pod IP & ports
-func NewIPPortIndexer(_ common.Config, metaGen metadata.MetaGen) (Indexer, error) {
+func NewIPPortIndexer(_ config.C, metaGen metadata.MetaGen) (Indexer, error) {
 	return &IPPortIndexer{metaGen: metaGen}, nil
 }
 

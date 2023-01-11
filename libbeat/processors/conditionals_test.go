@@ -25,7 +25,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type countFilter struct {
@@ -45,37 +46,37 @@ func TestWhenProcessor(t *testing.T) {
 	tests := []struct {
 		title    string
 		filter   config
-		events   []common.MapStr
+		events   []mapstr.M
 		expected int
 	}{
 		{
 			"condition_matches",
 			config{"when.equals.i": 10},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			1,
 		},
 		{
 			"condition_fails",
 			config{"when.equals.i": 11},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			0,
 		},
 		{
 			"no_condition",
 			config{},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			1,
 		},
 		{
 			"condition_matches",
 			config{"when.has_fields": []string{"i"}},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			1,
 		},
 		{
 			"condition_fails",
 			config{"when.has_fields": []string{"j"}},
-			[]common.MapStr{{"i": 10}},
+			[]mapstr.M{{"i": 10}},
 			0,
 		},
 	}
@@ -83,14 +84,14 @@ func TestWhenProcessor(t *testing.T) {
 	for i, test := range tests {
 		t.Logf("run test (%v): %v", i, test.title)
 
-		config, err := common.NewConfigFrom(test.filter)
+		config, err := conf.NewConfigFrom(test.filter)
 		if err != nil {
 			t.Error(err)
 			continue
 		}
 
 		cf := &countFilter{}
-		filter, err := NewConditional(func(_ *common.Config) (Processor, error) {
+		filter, err := NewConditional(func(_ *conf.C) (Processor, error) {
 			return cf, nil
 		})(config)
 		if err != nil {
@@ -115,17 +116,17 @@ func TestWhenProcessor(t *testing.T) {
 
 func TestConditionRuleInitErrorPropagates(t *testing.T) {
 	testErr := errors.New("test")
-	filter, err := NewConditional(func(_ *common.Config) (Processor, error) {
+	filter, err := NewConditional(func(_ *conf.C) (Processor, error) {
 		return nil, testErr
-	})(common.NewConfig())
+	})(conf.NewConfig())
 
 	assert.Equal(t, testErr, err)
 	assert.Nil(t, filter)
 }
 
 type testCase struct {
-	event common.MapStr
-	want  common.MapStr
+	event mapstr.M
+	want  mapstr.M
 	cfg   string
 }
 
@@ -133,7 +134,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			c, err := common.NewConfigWithYAML([]byte(test.cfg), "test "+name)
+			c, err := conf.NewConfigWithYAML([]byte(test.cfg), "test "+name)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -199,33 +200,33 @@ func TestIfElseThenProcessor(t *testing.T) {
 
 	testProcessors(t, map[string]testCase{
 		"if-then-true": {
-			event: common.MapStr{"uid": 411},
-			want:  common.MapStr{"uid": 411, "uid_type": "reserved"},
+			event: mapstr.M{"uid": 411},
+			want:  mapstr.M{"uid": 411, "uid_type": "reserved"},
 			cfg:   ifThen,
 		},
 		"if-then-false": {
-			event: common.MapStr{"uid": 500},
-			want:  common.MapStr{"uid": 500},
+			event: mapstr.M{"uid": 500},
+			want:  mapstr.M{"uid": 500},
 			cfg:   ifThen,
 		},
 		"if-then-else-true": {
-			event: common.MapStr{"uid": 411},
-			want:  common.MapStr{"uid": 411, "uid_type": "reserved"},
+			event: mapstr.M{"uid": 411},
+			want:  mapstr.M{"uid": 411, "uid_type": "reserved"},
 			cfg:   ifThenElse,
 		},
 		"if-then-else-false": {
-			event: common.MapStr{"uid": 500},
-			want:  common.MapStr{"uid": 500, "uid_type": "user"},
+			event: mapstr.M{"uid": 500},
+			want:  mapstr.M{"uid": 500, "uid_type": "user"},
 			cfg:   ifThenElse,
 		},
 		"if-then-else-false-single-processor": {
-			event: common.MapStr{"uid": 500},
-			want:  common.MapStr{"uid": 500, "uid_type": "user"},
+			event: mapstr.M{"uid": 500},
+			want:  mapstr.M{"uid": 500, "uid_type": "user"},
 			cfg:   ifThenElseSingleProcessor,
 		},
 		"if-then-else-if": {
-			event: common.MapStr{"uid": 500},
-			want:  common.MapStr{"uid": 500, "uid_type": "eq_500"},
+			event: mapstr.M{"uid": 500},
+			want:  mapstr.M{"uid": 500, "uid_type": "eq_500"},
 			cfg:   ifThenElseIf,
 		},
 	})

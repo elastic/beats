@@ -26,10 +26,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -39,11 +39,11 @@ func TestData(t *testing.T) {
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{service.Host()},
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "go_threads",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "go_threads",
 				},
 			},
@@ -68,11 +68,11 @@ func TestQueryFetch(t *testing.T) {
 		"module":     "prometheus",
 		"metricsets": []string{"query"},
 		"hosts":      []string{service.Host()},
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "go_info",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "go_info",
 				},
 			},

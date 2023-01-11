@@ -11,14 +11,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
-	namespaceIs := func(namespace string) func(e common.MapStr) bool {
-		return func(e common.MapStr) bool {
+	namespaceIs := func(namespace string) func(e mapstr.M) bool {
+		return func(e mapstr.M) bool {
 			v, err := e.GetValue("aws.cloudwatch.namespace")
 			return err == nil && v == namespace
 		}

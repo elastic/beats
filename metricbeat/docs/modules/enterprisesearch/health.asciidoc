@@ -1,6 +1,8 @@
 ////
 This file is generated! See scripts/mage/docs_collector.go
 ////
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/enterprisesearch/health/_meta/docs.asciidoc
+
 
 [[metricbeat-metricset-enterprisesearch-health]]
 [role="xpack"]
@@ -12,8 +14,11 @@ include::../../../../x-pack/metricbeat/module/enterprisesearch/health/_meta/docs
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
+:edit_url:
+
 ==== Fields
 
 For a description of each field in the metricset, see the
 <<exported-fields-enterprisesearch,exported fields>> section.
 
+:edit_url!:

@@ -68,8 +68,8 @@ This file is generated! See scripts/mage/docs_collector.go
 .3+| .3+|  |<<metricbeat-metricset-cloudfoundry-container,container>> beta[]  
 |<<metricbeat-metricset-cloudfoundry-counter,counter>> beta[]  
 |<<metricbeat-metricset-cloudfoundry-value,value>> beta[]  
-|<<metricbeat-module-cockroachdb,CockroachDB>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.1+| .1+|  |<<metricbeat-metricset-cockroachdb-status,status>> beta[]  
+|<<metricbeat-module-cockroachdb,CockroachDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.1+| .1+|  |<<metricbeat-metricset-cockroachdb-status,status>>   
 |<<metricbeat-module-consul,Consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]  
 |<<metricbeat-module-containerd,Containerd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -163,7 +163,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kafka-partition,partition>>   
 |<<metricbeat-metricset-kafka-producer,producer>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-kibana-settings,settings>>   
+.7+| .7+|  |<<metricbeat-metricset-kibana-cluster_actions,cluster_actions>> beta[]  
+|<<metricbeat-metricset-kibana-cluster_rules,cluster_rules>> beta[]  
+|<<metricbeat-metricset-kibana-node_actions,node_actions>> beta[]  
+|<<metricbeat-metricset-kibana-node_rules,node_rules>> beta[]  
+|<<metricbeat-metricset-kibana-settings,settings>>   
 |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -234,7 +238,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-openmetrics,Openmetrics>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-openmetrics-collector,collector>> beta[]  
 |<<metricbeat-module-oracle,Oracle>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-oracle-performance,performance>>   
+.3+| .3+|  |<<metricbeat-metricset-oracle-performance,performance>>   
+|<<metricbeat-metricset-oracle-sysmetric,sysmetric>> beta[]  
 |<<metricbeat-metricset-oracle-tablespace,tablespace>>   
 |<<metricbeat-module-php_fpm,PHP_FPM>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>>   
@@ -249,10 +254,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-prometheus-query,query>>   
 |<<metricbeat-metricset-prometheus-remote_write,remote_write>>   
 |<<metricbeat-module-rabbitmq,RabbitMQ>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   
+.5+| .5+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   
 |<<metricbeat-metricset-rabbitmq-exchange,exchange>>   
 |<<metricbeat-metricset-rabbitmq-node,node>>   
 |<<metricbeat-metricset-rabbitmq-queue,queue>>   
+|<<metricbeat-metricset-rabbitmq-shovel,shovel>> beta[]  
 |<<metricbeat-module-redis,Redis>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-redis-info,info>>   
 |<<metricbeat-metricset-redis-key,key>>   

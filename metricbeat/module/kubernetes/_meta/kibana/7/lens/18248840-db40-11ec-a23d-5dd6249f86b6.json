@@ -1,0 +1,121 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "06a776d4-f25a-45c0-a54e-82d0cb913047": {
+                            "columnOrder": [
+                                "f14da5e8-06ea-424c-a149-d0989b1e9c1a",
+                                "7ce9995b-a54d-40ac-a48b-9226e822c0c9",
+                                "a61e3c18-09df-4cec-83d5-ee10e9ec3c4c"
+                            ],
+                            "columns": {
+                                "7ce9995b-a54d-40ac-a48b-9226e822c0c9": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Pod",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "a61e3c18-09df-4cec-83d5-ee10e9ec3c4c",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.pod.name"
+                                },
+                                "a61e3c18-09df-4cec-83d5-ee10e9ec3c4c": {
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.pod.cpu.usage.nanocores:*"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Average of kubernetes.pod.cpu.usage.nanocores",
+                                    "operationType": "average",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.pod.cpu.usage.nanocores"
+                                },
+                                "f14da5e8-06ea-424c-a149-d0989b1e9c1a": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Namespace",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "a61e3c18-09df-4cec-83d5-ee10e9ec3c4c",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 100
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.namespace"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "categoryDisplay": "default",
+                        "groups": [
+                            "f14da5e8-06ea-424c-a149-d0989b1e9c1a",
+                            "7ce9995b-a54d-40ac-a48b-9226e822c0c9"
+                        ],
+                        "layerId": "06a776d4-f25a-45c0-a54e-82d0cb913047",
+                        "layerType": "data",
+                        "legendDisplay": "default",
+                        "metric": "a61e3c18-09df-4cec-83d5-ee10e9ec3c4c",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                    }
+                ],
+                "shape": "treemap"
+            }
+        },
+        "title": "Cpu Usage per Namespace [Metricbeat Kubernetes]",
+        "visualizationType": "lnsPie"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "18248840-db40-11ec-a23d-5dd6249f86b6",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-06a776d4-f25a-45c0-a54e-82d0cb913047",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3ODYsM10="
+}

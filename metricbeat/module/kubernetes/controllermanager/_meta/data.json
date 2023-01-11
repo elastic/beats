@@ -7,14 +7,24 @@
     },
     "kubernetes": {
         "controllermanager": {
-            "client": {
-                "request": {
-                    "count": 1113352
+            "name": "serviceaccount",
+            "workqueue": {
+                "adds": {
+                    "count": 5
+                },
+                "depth": {
+                    "count": 0
+                },
+                "longestrunning": {
+                    "sec": 0
+                },
+                "retries": {
+                    "count": 0
+                },
+                "unfinished": {
+                    "sec": 0
                 }
-            },
-            "code": "200",
-            "host": "192.168.205.10:6443",
-            "method": "GET"
+            }
         }
     },
     "metricset": {

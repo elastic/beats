@@ -310,17 +310,27 @@
     },
     {
         "@timestamp": "2019-04-12T10:11:15.101-02:00",
+        "event.action": "logged-in",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "rabbitmq.log",
         "event.kind": "event",
         "event.module": "rabbitmq",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
         "log.offset": 3420,
         "message": "connection <0.1345.0> (127.0.0.1:64875 -> 127.0.0.1:5672): user 'guest' authenticated and granted access to vhost '/'",
         "rabbitmq.log.pid": "<0.1345.0>",
-        "service.type": "rabbitmq"
+        "service.type": "rabbitmq",
+        "user.name": "guest"
     },
     {
         "@timestamp": "2019-04-12T10:19:14.450-02:00",
@@ -355,16 +365,47 @@
     },
     {
         "@timestamp": "2019-04-12T10:19:14.451-02:00",
+        "event.action": "close-connection",
         "event.dataset": "rabbitmq.log",
         "event.kind": "event",
         "event.module": "rabbitmq",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "end"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
         "log.offset": 4359,
         "message": "closing AMQP connection <0.1345.0> (127.0.0.1:64875 -> 127.0.0.1:5672, vhost: '/', user: 'guest')",
         "rabbitmq.log.pid": "<0.1345.0>",
-        "service.type": "rabbitmq"
+        "service.type": "rabbitmq",
+        "user.name": "guest"
+    },
+    {
+        "@timestamp": "2021-11-22T17:48:20.003-02:00",
+        "event.action": "logon-failed",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "rabbitmq.log",
+        "event.kind": "event",
+        "event.module": "rabbitmq",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access",
+            "start"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 4499,
+        "message": "HTTP access denied: user 'guest' - Not monitor user",
+        "rabbitmq.log.pid": "<0.8084.263>",
+        "service.type": "rabbitmq",
+        "user.name": "guest"
     }
 ]

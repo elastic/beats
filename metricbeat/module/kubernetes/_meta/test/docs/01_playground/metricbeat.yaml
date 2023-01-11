@@ -37,6 +37,9 @@ data:
                     - state_resourcequota
                     - state_statefulset
                     - state_service
+                    - state_persistentvolume
+                    - state_persistentvolumeclaim
+                    - state_storageclass
                 - module: kubernetes
                   metricsets:
                     - apiserver
@@ -269,6 +272,8 @@ rules:
       - events
       - pods
       - services
+      - persistentvolumes
+      - persistentvolumeclaims
     verbs: ["get", "list", "watch"]
   # Enable this rule only if planing to use Kubernetes keystore
   #- apiGroups: [""]
@@ -284,6 +289,16 @@ rules:
       - statefulsets
       - deployments
       - replicasets
+      - daemonsets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources:
+      - storageclasses
     verbs: ["get", "list", "watch"]
   - apiGroups:
       - ""

@@ -11,10 +11,10 @@ import (
 
 	_ "github.com/godror/godror"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -22,8 +22,8 @@ func TestData(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(r.Host()))
 
-	findKey := func(key string) func(common.MapStr) bool {
-		return func(in common.MapStr) bool {
+	findKey := func(key string) func(mapstr.M) bool {
+		return func(in mapstr.M) bool {
 			_, err := in.GetValue("oracle.performance." + key)
 			return err == nil
 		}

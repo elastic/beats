@@ -1,0 +1,78 @@
+[
+  {
+    "@timestamp": "2020-04-03T10:18:01.8822336Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "session-disconnected",
+      "category": [
+        "authentication",
+        "session"
+      ],
+      "code": "4779",
+      "ingested": "2022-06-08T06:21:08.225133500Z",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "end"
+      ]
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A session was disconnected from a Window Station.\n\nSubject:\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x60D1CCB\n\nSession:\n\tSession Name:\t\tRDP-Tcp#116\n\nAdditional Information:\n\tClient Name:\t\tEQP01777\n\tClient Address:\t\t10.100.150.17\n\n\nThis event is generated when a user disconnects from an existing Terminal Services session, or when a user switches away from an existing desktop using Fast User Switching.",
+    "related": {
+      "ip": [
+        "10.100.150.17"
+      ],
+      "user": [
+        "at_adm"
+      ]
+    },
+    "source": {
+      "domain": "EQP01777",
+      "ip": "10.100.150.17"
+    },
+    "user": {
+      "domain": "TEST",
+      "name": "at_adm"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "AccountDomain": "TEST",
+        "AccountName": "at_adm",
+        "ClientAddress": "10.100.150.17",
+        "ClientName": "EQP01777",
+        "LogonID": "0x60d1ccb",
+        "SessionName": "RDP-Tcp#116"
+      },
+      "event_id": "4779",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x60d1ccb"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 496,
+        "thread": {
+          "id": 3852
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "5069070",
+      "task": "Other Logon/Logoff Events"
+    }
+  }
+]

@@ -12,19 +12,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws/awserr"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/smithy-go"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {
-	logp.TestingSetup()
+	require.NoError(t, logp.TestingSetup())
 
 	msg := newSQSMessage(newS3Event("log.json"))
 
@@ -106,7 +109,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		gomock.InOrder(
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 				Do(func(ctx context.Context, _ *logp.Logger, _ *awscommon.EventACKTracker, _ s3EventV2) {
-					timed.Wait(ctx, 5*visibilityTimeout)
+					require.NoError(t, timed.Wait(ctx, 5*visibilityTimeout))
 				}).Return(mockS3Handler),
 			mockS3Handler.EXPECT().ProcessS3Object().Return(nil),
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
@@ -168,34 +171,52 @@ func TestSQSS3EventProcessor(t *testing.T) {
 func TestSqsProcessor_keepalive(t *testing.T) {
 	msg := newSQSMessage(newS3Event("log.json"))
 
-	// Test will call ChangeMessageVisibility once and then keepalive will
-	// exit because the SQS receipt handle is not usable.
-	t.Run("keepalive stops after receipt handle is invalid", func(t *testing.T) {
-		const visibilityTimeout = time.Second
+	// Ensure both ReceiptHandleIsInvalid and InvalidParameterValue error codes trigger stops.
+	// See https://github.com/elastic/beats/issues/30675.
+	testCases := []struct {
+		Name string
+		Err  error
+	}{
+		{
+			Name: "keepalive stop after ReceiptHandleIsInvalid",
+			Err:  &types.ReceiptHandleIsInvalid{Message: aws.String("fake receipt handle is invalid.")},
+		},
+		{
+			Name: "keepalive stop after InvalidParameterValue",
+			Err:  &smithy.GenericAPIError{Code: sqsInvalidParameterValueErrorCode, Message: "The receipt handle has expired."},
+		},
+	}
 
-		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
-		defer cancel()
+	for _, tc := range testCases {
+		tc := tc
 
-		ctrl, ctx := gomock.WithContext(ctx, t)
-		defer ctrl.Finish()
-		mockAPI := NewMockSQSAPI(ctrl)
-		mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
+		// Test will call ChangeMessageVisibility once and then keepalive will
+		// exit because the SQS receipt handle is not usable.
+		t.Run(tc.Name, func(t *testing.T) {
+			const visibilityTimeout = time.Second
 
-		receiptHandleErr := awserr.New(sqs.ErrCodeReceiptHandleIsInvalid, "fake receipt handle is invalid.", nil)
+			ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+			defer cancel()
 
-		mockAPI.EXPECT().ChangeMessageVisibility(gomock.Any(), gomock.Eq(&msg), gomock.Eq(visibilityTimeout)).
-			Times(1).Return(receiptHandleErr)
+			ctrl, ctx := gomock.WithContext(ctx, t)
+			defer ctrl.Finish()
+			mockAPI := NewMockSQSAPI(ctrl)
+			mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockS3HandlerFactory)
-		var wg sync.WaitGroup
-		wg.Add(1)
-		p.keepalive(ctx, p.log, &wg, &msg)
-		wg.Wait()
-	})
+			mockAPI.EXPECT().ChangeMessageVisibility(gomock.Any(), gomock.Eq(&msg), gomock.Eq(visibilityTimeout)).
+				Times(1).Return(tc.Err)
+
+			p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockS3HandlerFactory)
+			var wg sync.WaitGroup
+			wg.Add(1)
+			p.keepalive(ctx, p.log, &wg, &msg)
+			wg.Wait()
+		})
+	}
 }
 
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
-	logp.TestingSetup()
+	require.NoError(t, logp.TestingSetup())
 
 	p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, nil, nil, time.Minute, 5, nil)
 

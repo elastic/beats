@@ -22,9 +22,9 @@ import (
 	"testing"
 	"testing/quick"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func TestGetServiceURIExpectedPath(t *testing.T) {
@@ -32,23 +32,23 @@ func TestGetServiceURIExpectedPath(t *testing.T) {
 	path800 := strings.Replace(path770, statsMetrics, statsMetrics+bulkSuffix, 1)
 
 	tests := map[string]struct {
-		esVersion    *common.Version
+		esVersion    *version.V
 		expectedPath string
 	}{
 		"bulk_stats_unavailable": {
-			esVersion:    common.MustNewVersion("7.6.0"),
+			esVersion:    version.MustNew("7.6.0"),
 			expectedPath: statsPath,
 		},
 		"bulk_stats_available": {
-			esVersion:    common.MustNewVersion("8.0.0"),
+			esVersion:    version.MustNew("8.0.0"),
 			expectedPath: path800,
 		},
 		"expand_wildcards_hidden_unavailable": {
-			esVersion:    common.MustNewVersion("7.6.0"),
+			esVersion:    version.MustNew("7.6.0"),
 			expectedPath: statsPath,
 		},
 		"expand_wildcards_hidden_available": {
-			esVersion:    common.MustNewVersion("7.7.0"),
+			esVersion:    version.MustNew("7.7.0"),
 			expectedPath: path770,
 		},
 	}
@@ -72,7 +72,7 @@ func TestGetServiceURIMultipleCalls(t *testing.T) {
 		var uri string
 		var err error
 		for i := uint(0); i < numCalls; i++ {
-			uri, err = getServicePath(*common.MustNewVersion("8.0.0"))
+			uri, err = getServicePath(*version.MustNew("8.0.0"))
 			if err != nil {
 				return false
 			}

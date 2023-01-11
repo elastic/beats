@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type template struct {
@@ -76,7 +77,7 @@ func (m *metricProcessor) RemoveTemplate(template TemplateConfig) {
 	m.Unlock()
 }
 
-func (m *metricProcessor) Process(message string) (common.MapStr, error) {
+func (m *metricProcessor) Process(message string) (mapstr.M, error) {
 	metric, timestamp, value, err := m.splitMetric(message)
 	if err != nil {
 		return nil, err
@@ -86,7 +87,7 @@ func (m *metricProcessor) Process(message string) (common.MapStr, error) {
 	t := m.FindTemplate(parts)
 
 	var name, namespace string
-	var tags common.MapStr
+	var tags mapstr.M
 	if t == nil {
 		name, tags = m.defaultTemplate.Apply(parts)
 		namespace = m.defaultTemplate.Namespace
@@ -95,7 +96,7 @@ func (m *metricProcessor) Process(message string) (common.MapStr, error) {
 		namespace = t.Namespace
 	}
 
-	event := common.MapStr{
+	event := mapstr.M{
 		"@timestamp":    timestamp,
 		name:            value,
 		mb.NamespaceKey: namespace,
@@ -151,8 +152,8 @@ func (m *metricProcessor) splitMetric(metric string) (string, common.Time, float
 	return metricName, timestamp, value, nil
 }
 
-func (t *template) Apply(parts []string) (string, common.MapStr) {
-	tags := make(common.MapStr)
+func (t *template) Apply(parts []string) (string, mapstr.M) {
+	tags := make(mapstr.M)
 
 	metric := make([]string, 0)
 	for tagKey, tagVal := range t.Tags {

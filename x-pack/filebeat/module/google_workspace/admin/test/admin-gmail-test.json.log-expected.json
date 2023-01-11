@@ -6,9 +6,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "5943039585522715272",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"DROP_FROM_QUARANTINE\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"QUARANTINE_NAME\",\"value\":\"quarantine\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"5943039585522715272\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"DROP_FROM_QUARANTINE\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"QUARANTINE_NAME\",\"value\":\"quarantine\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -55,9 +55,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "0022257643352848884",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"EMAIL_LOG_SEARCH\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_END_DATE\",\"value\":\"2020/07/28 04:59:59 UTC\"},{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"EMAIL_LOG_SEARCH_RECIPIENT\",\"value\":\"recipient\"},{\"name\":\"EMAIL_LOG_SEARCH_SENDER\",\"value\":\"sender\"},{\"name\":\"EMAIL_LOG_SEARCH_SMTP_RECIPIENT_IP\",\"value\":\"89.160.20.156\"},{\"name\":\"EMAIL_LOG_SEARCH_SMTP_SENDER_IP\",\"value\":\"89.160.20.156\"},{\"name\":\"EMAIL_LOG_SEARCH_START_DATE\",\"value\":\"2002-10-02T10:00:00Z\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"0022257643352848884\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"EMAIL_LOG_SEARCH\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_END_DATE\",\"value\":\"2020/07/28 04:59:59 UTC\"},{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"EMAIL_LOG_SEARCH_RECIPIENT\",\"value\":\"recipient\"},{\"name\":\"EMAIL_LOG_SEARCH_SENDER\",\"value\":\"sender\"},{\"name\":\"EMAIL_LOG_SEARCH_SMTP_RECIPIENT_IP\",\"value\":\"89.160.20.156\"},{\"name\":\"EMAIL_LOG_SEARCH_SMTP_SENDER_IP\",\"value\":\"89.160.20.156\"},{\"name\":\"EMAIL_LOG_SEARCH_START_DATE\",\"value\":\"2002-10-02T10:00:00Z\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -75,7 +75,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 431,
+        "log.offset": 451,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -111,9 +111,9 @@
         "event.dataset": "google_workspace.admin",
         "event.duration": 7200000000000,
         "event.end": "2002-10-02T12:00:00.000Z",
-        "event.id": "1",
+        "event.id": "7365260491402483764",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"EMAIL_UNDELETE\",\"parameters\":[{\"name\":\"END_DATE\",\"value\":\"2002-10-02T12:00:00Z\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"START_DATE\",\"value\":\"2002-10-02T10:00:00Z\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7365260491402483764\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"EMAIL_UNDELETE\",\"parameters\":[{\"name\":\"END_DATE\",\"value\":\"2002-10-02T12:00:00Z\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"START_DATE\",\"value\":\"2002-10-02T10:00:00Z\"}]}}",
         "event.provider": "admin",
         "event.start": "2002-10-02T10:00:00.000Z",
         "event.type": [
@@ -126,7 +126,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1198,
+        "log.offset": 1238,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -165,9 +165,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "4087238823427474829",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"CHANGE_EMAIL_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"4087238823427474829\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"CHANGE_EMAIL_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -186,7 +186,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 1680,
+        "log.offset": 1740,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -221,9 +221,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "7747397189025898732",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"CHANGE_GMAIL_SETTING\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_DESCRIPTION\",\"value\":\"setting description\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"},{\"name\":\"USER_DEFINED_SETTING_NAME\",\"value\":\"setting name\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7747397189025898732\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"CHANGE_GMAIL_SETTING\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_DESCRIPTION\",\"value\":\"setting description\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"},{\"name\":\"USER_DEFINED_SETTING_NAME\",\"value\":\"setting name\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -238,7 +238,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2262,
+        "log.offset": 2342,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -273,9 +273,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "3041092703402142835",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"CREATE_GMAIL_SETTING\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_DESCRIPTION\",\"value\":\"setting description\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"},{\"name\":\"USER_DEFINED_SETTING_NAME\",\"value\":\"setting name\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"3041092703402142835\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"CREATE_GMAIL_SETTING\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_DESCRIPTION\",\"value\":\"setting description\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"},{\"name\":\"USER_DEFINED_SETTING_NAME\",\"value\":\"setting name\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -290,7 +290,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2799,
+        "log.offset": 2899,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -325,9 +325,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-3651464097023597757",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"DELETE_GMAIL_SETTING\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_DESCRIPTION\",\"value\":\"setting description\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"},{\"name\":\"USER_DEFINED_SETTING_NAME\",\"value\":\"setting name\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-3651464097023597757\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"DELETE_GMAIL_SETTING\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_DESCRIPTION\",\"value\":\"setting description\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"},{\"name\":\"USER_DEFINED_SETTING_NAME\",\"value\":\"setting name\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion"
@@ -342,7 +342,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3336,
+        "log.offset": 3456,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -376,9 +376,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-0033497245768531943",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"REJECT_FROM_QUARANTINE\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"QUARANTINE_NAME\",\"value\":\"quarantine\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-0033497245768531943\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"REJECT_FROM_QUARANTINE\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"QUARANTINE_NAME\",\"value\":\"quarantine\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -391,7 +391,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3873,
+        "log.offset": 4014,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -425,9 +425,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2081039048358703399",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"RELEASE_FROM_QUARANTINE\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"QUARANTINE_NAME\",\"value\":\"quarantine\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2081039048358703399\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"RELEASE_FROM_QUARANTINE\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"QUARANTINE_NAME\",\"value\":\"quarantine\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -440,7 +440,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4306,
+        "log.offset": 4468,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

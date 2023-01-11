@@ -28,8 +28,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -51,7 +52,7 @@ type Input struct {
 
 // NewInput creates a new TCP input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
@@ -70,7 +71,7 @@ func NewInput(
 
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
 		event := createEvent(data, metadata)
-		forwarder.Send(event)
+		_ = forwarder.Send(event)
 	}
 
 	splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
@@ -127,15 +128,18 @@ func (p *Input) Wait() {
 }
 
 func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
-	return beat.Event{
+	evt := beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": string(raw),
-			"log": common.MapStr{
-				"source": common.MapStr{
-					"address": metadata.RemoteAddr.String(),
-				},
-			},
 		},
 	}
+	if metadata.RemoteAddr != nil {
+		evt.Fields["log"] = mapstr.M{
+			"source": mapstr.M{
+				"address": metadata.RemoteAddr.String(),
+			},
+		}
+	}
+	return evt
 }

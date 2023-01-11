@@ -25,11 +25,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/google/gopacket/pcap"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/npcap"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const installTimeout = 120 * time.Second
@@ -44,7 +42,7 @@ func installNpcap(b *beat.Beat) error {
 
 	defer func() {
 		log := logp.NewLogger("npcap")
-		npcapVersion := pcap.Version()
+		npcapVersion := npcap.Version()
 		if npcapVersion == "" {
 			log.Warn("no version available for npcap")
 		} else {

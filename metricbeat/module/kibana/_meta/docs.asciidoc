@@ -1,3 +1,7 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 The `kibana` module collects metrics about {kib}.
 
 [float]

@@ -6,15 +6,14 @@ package beater
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/gofrs/uuid"
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type mockExecutor struct {
@@ -34,15 +33,17 @@ type mockPublisher struct {
 	index      string
 	actionID   string
 	responseID string
+	meta       map[string]interface{}
 	hits       []map[string]interface{}
 	ecsm       ecs.Mapping
 	reqData    interface{}
 }
 
-func (p *mockPublisher) Publish(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.index = index
 	p.actionID = actionID
 	p.responseID = responseID
+	p.meta = meta
 	p.hits = hits
 	p.ecsm = ecsm
 	p.reqData = reqData
@@ -156,8 +157,6 @@ func TestActionHandlerExecute(t *testing.T) {
 					t.Fatal("Unexpected error, got none in the result")
 				}
 			}
-
-			fmt.Println(res)
 			_ = res
 		})
 	}

@@ -37,7 +37,10 @@ func TestFetchExcludeUsage(t *testing.T) {
 	kib := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/status":
-			w.Write([]byte("{ \"version\": { \"number\": \"7.5.0\" }}"))
+			_, err := w.Write([]byte("{ \"version\": { \"number\": \"8.2.0\" }}"))
+			if err != nil {
+				t.Fatal("write", err)
+			}
 
 		case "/api/stats":
 			excludeUsage := r.FormValue("exclude_usage")
@@ -62,7 +65,7 @@ func TestFetchExcludeUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
-	config := mtest.GetConfig("stats", kib.URL, true)
+	config := mtest.GetConfig("stats", kib.URL)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
@@ -81,7 +84,10 @@ func TestFetchNoExcludeUsage(t *testing.T) {
 	kib := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/status":
-			w.Write([]byte("{ \"version\": { \"number\": \"7.0.0\" }}")) // v7.0.0 does not support exclude_usage and should not be sent
+			_, err := w.Write([]byte("{ \"version\": { \"number\": \"7.0.0\" }}")) // v7.0.0 does not support exclude_usage and should not be sent
+			if err != nil {
+				t.Fatal("write", err)
+			}
 
 		case "/api/stats":
 			excludeUsage := r.FormValue("exclude_usage")
@@ -91,7 +97,7 @@ func TestFetchNoExcludeUsage(t *testing.T) {
 	}))
 	defer kib.Close()
 
-	config := mtest.GetConfig("stats", kib.URL, true)
+	config := mtest.GetConfig("stats", kib.URL)
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 

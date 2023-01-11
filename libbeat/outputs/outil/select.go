@@ -21,9 +21,9 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // Selector is used to produce a string based on the contents of a Beats event.
@@ -104,7 +104,7 @@ func (s Selector) IsConst() bool {
 
 // BuildSelectorFromConfig creates a selector from a configuration object.
 func BuildSelectorFromConfig(
-	cfg *common.Config,
+	cfg *config.C,
 	settings Settings,
 ) (Selector, error) {
 	var sel []SelectorExpr
@@ -120,7 +120,7 @@ func BuildSelectorFromConfig(
 			return Selector{}, err
 		}
 
-		var table []*common.Config
+		var table []*config.C
 		if err := sub.Unpack(&table); err != nil {
 			return Selector{}, err
 		}
@@ -255,7 +255,7 @@ func copyTable(selCase SelectorCase, table map[string]string) map[string]string 
 	return tmp
 }
 
-func buildSingle(cfg *common.Config, key string, selCase SelectorCase) (SelectorExpr, error) {
+func buildSingle(cfg *config.C, key string, selCase SelectorCase) (SelectorExpr, error) {
 	// TODO: check for unknown fields
 
 	// 1. extract required key-word handler

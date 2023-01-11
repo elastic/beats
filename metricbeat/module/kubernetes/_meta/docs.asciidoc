@@ -146,7 +146,7 @@ roleRef:
 === Compatibility
 
 The Kubernetes module is tested with the following versions of Kubernetes:
-1.21.x, 1.22.x, 1.23.x
+1.22.x, 1.23.x, 1.24.x, 1.25.x
 
 [float]
 === Dashboard
@@ -172,6 +172,8 @@ Kubernetes cluster overview example:
 
 image::./images/metricbeat-kubernetes-clusteroverview.png[]
 
+If you are setting collection period to a value bigger than `2m` you will need to increase
+the Interval (in Panel Options) for "Desired Pods", "Available Pods" and "Unavailable Pods" visualisations.
 
 Kubernetes controller manager example:
 

@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDockerJSON(t *testing.T) {
@@ -45,7 +45,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "all",
 			expectedMessage: reader.Message{
 				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested shutdown...\n"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
 				Bytes:   122,
 			},
@@ -65,7 +65,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "all",
 			expectedMessage: reader.Message{
 				Content: []byte(""),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
 				Bytes:   68,
 			},
@@ -103,7 +103,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "all",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
 				Bytes:   115,
 			},
@@ -115,7 +115,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "all",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
 				Bytes:   117,
 			},
@@ -131,7 +131,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "stderr",
 			expectedMessage: reader.Message{
 				Content: []byte("unfiltered\n"),
-				Fields:  common.MapStr{"stream": "stderr"},
+				Fields:  mapstr.M{"stream": "stderr"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
 				Bytes:   158,
 			},
@@ -146,7 +146,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "stderr",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-11-12 23:32:21.212 [ERROR][77] table.go 111: error"),
-				Fields:  common.MapStr{"stream": "stderr"},
+				Fields:  mapstr.M{"stream": "stderr"},
 				Ts:      time.Date(2017, 11, 12, 23, 32, 21, 212771448, time.UTC),
 				Bytes:   212,
 			},
@@ -162,7 +162,7 @@ func TestDockerJSON(t *testing.T) {
 			partial: true,
 			expectedMessage: reader.Message{
 				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested shutdown...\n"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
 				Bytes:   190,
 			},
@@ -177,7 +177,7 @@ func TestDockerJSON(t *testing.T) {
 			partial: true,
 			expectedMessage: reader.Message{
 				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
 				Bytes:   163,
 			},
@@ -192,7 +192,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "stdout",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
 				Bytes:   164,
 			},
@@ -209,7 +209,7 @@ func TestDockerJSON(t *testing.T) {
 			partial: false,
 			expectedMessage: reader.Message{
 				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested "),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
 				Bytes:   109,
 			},
@@ -240,7 +240,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "all",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
 				Bytes:   115,
 			},
@@ -253,7 +253,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "all",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
 				Bytes:   117,
 			},
@@ -270,7 +270,7 @@ func TestDockerJSON(t *testing.T) {
 			partial: true,
 			expectedMessage: reader.Message{
 				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
 				Bytes:   163,
 			},
@@ -286,7 +286,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "stdout",
 			expectedMessage: reader.Message{
 				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
 				Bytes:   164,
 			},
@@ -316,7 +316,7 @@ func TestDockerJSON(t *testing.T) {
 			partial: true,
 			expectedMessage: reader.Message{
 				Content: []byte("hello\n"),
-				Fields:  common.MapStr{"docker": common.MapStr{"attrs": map[string]string{"KEY1": "value1", "KEY2": "value2"}}, "stream": "stdout"},
+				Fields:  mapstr.M{"docker": mapstr.M{"attrs": map[string]string{"KEY1": "value1", "KEY2": "value2"}}, "stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
 				Bytes:   117,
 			},
@@ -339,7 +339,7 @@ func TestDockerJSON(t *testing.T) {
 			stream: "all",
 			expectedMessage: reader.Message{
 				Content: []byte("1:M 09 Nov 13:27:36.276 # User requested"),
-				Fields:  common.MapStr{"stream": "stdout"},
+				Fields:  mapstr.M{"stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
 				Bytes:   205,
 			},

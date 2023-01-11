@@ -14,6 +14,10 @@
 #fields:
 #  env: staging
 
+# Configure the precision of all timestamps in {{ .BeatName | title }}.
+# Available options: millisecond, microsecond, nanosecond
+#timestamp.precision: millisecond
+
 {{if not .ExcludeDashboards }}
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading

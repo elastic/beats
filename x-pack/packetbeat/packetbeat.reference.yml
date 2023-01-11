@@ -10,7 +10,9 @@
 # =============================== Network device ===============================
 
 # Select the network interface to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
+# keyword to sniff on all connected interfaces. On all platforms, you
+# can use "default_route", "default_route_ipv4" or "default_route_ipv6"
+# to sniff on the device carrying the default route.
 packetbeat.interfaces.device: any
 
 # The network CIDR blocks that are considered "internal" networks for
@@ -596,6 +598,10 @@ packetbeat.protocols:
   # Preserve original contents in event.original
   keep_original: true
 
+  # You can monitor tcp SIP traffic by setting the transport_protocol option
+  # to tcp, it defaults to udp.
+  #transport_protocol: tcp
+
   # Overrides where this protocol's events are indexed.
   #index: my-custom-sip-index
 
@@ -635,6 +641,10 @@ packetbeat.ignore_outgoing: false
 # fields in the output document instead of being grouped under a fields
 # sub-dictionary. Default is false.
 #fields_under_root: false
+
+# Configure the precision of all timestamps in Packetbeat.
+# Available options: millisecond, microsecond, nanosecond
+#timestamp.precision: millisecond
 
 # Internal queue configuration for buffering events to be published.
 #queue:
@@ -1238,9 +1248,6 @@ output.elasticsearch:
     # Strategy for fetching the topics metadata from the broker. Default is false.
     #full: false
 
-  # The number of concurrent load-balanced Kafka output workers.
-  #worker: 1
-
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, events are typically dropped.
   # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
@@ -1697,6 +1704,9 @@ output.elasticsearch:
 
 # Name under which the template is stored in Elasticsearch
 #setup.template.json.name: ""
+
+# Set this option if the JSON template is a data stream.
+#setup.template.json.data_stream: false
 
 # Overwrite existing template
 # Do not enable this option for more than one instance of packetbeat as it might

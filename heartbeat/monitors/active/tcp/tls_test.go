@@ -30,18 +30,21 @@ import (
 	"strconv"
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
-	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
+
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
 )
 
 // Tests that we can check a TLS connection with a cert for a SAN IP
@@ -125,7 +128,7 @@ func TestTLSExpiredCert(t *testing.T) {
 	require.NoError(t, err)
 
 	ip, portStr, cert, closeSrv := hbtest.StartHTTPSServer(t, tlsCert)
-	defer closeSrv()
+	defer closeSrv() //nolint:errcheck // intentional discard
 
 	portInt, err := strconv.Atoi(portStr)
 	port := uint16(portInt)
@@ -181,10 +184,10 @@ func setupTLSTestServer(t *testing.T) (ip string, port uint16, cert *x509.Certif
 }
 
 func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string, resolver monitors.Resolver) *beat.Event {
-	config, err := common.NewConfigFrom(common.MapStr{
+	config, err := conf.NewConfigFrom(mapstr.M{
 		"hosts":   host,
 		"ports":   int64(port),
-		"ssl":     common.MapStr{"certificate_authorities": certFileName},
+		"ssl":     mapstr.M{"certificate_authorities": certFileName},
 		"timeout": "1s",
 	})
 	require.NoError(t, err)
@@ -193,7 +196,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

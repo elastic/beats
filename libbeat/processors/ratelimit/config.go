@@ -18,26 +18,26 @@
 package ratelimit
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 // config for rate limit processor.
 type config struct {
-	Limit     rate                   `config:"limit" validate:"required"`
-	Fields    []string               `config:"fields"`
-	Algorithm common.ConfigNamespace `config:"algorithm"`
+	Limit     rate          `config:"limit" validate:"required"`
+	Fields    []string      `config:"fields"`
+	Algorithm cfg.Namespace `config:"algorithm"`
 }
 
 func (c *config) setDefaults() error {
 	if c.Algorithm.Name() == "" {
-		cfg, err := common.NewConfigFrom(map[string]interface{}{
+		cfg, err := cfg.NewConfigFrom(map[string]interface{}{
 			"token_bucket": map[string]interface{}{},
 		})
 
 		if err != nil {
-			return errors.Wrap(err, "could not parse default configuration")
+			return fmt.Errorf("could not parse default configuration: %w", err)
 		}
 
 		c.Algorithm.Unpack(cfg)

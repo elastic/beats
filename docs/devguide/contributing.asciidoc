@@ -46,6 +46,17 @@ After https://golang.org/doc/install[installing Go], set the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 
+NOTE: One deterministic manner to install the proper Go version to work with Beats is to use the
+https://github.com/andrewkroh/gvm[GVM] Go version manager. An example for Mac users would be:
+
+[source,shell,subs=attributes+]
+----------------------------------------------------------------------
+gvm use {go-version}
+eval $(gvm {go-version})
+----------------------------------------------------------------------
+
+Then you can clone Beats git repository:
+
 [source,shell]
 ----------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
@@ -54,13 +65,27 @@ git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beat
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
-Then you can compile a particular Beat by using the Makefile. For example, for
-Packetbeat:
+Beats developers primarily use https://github.com/magefile/mage[Mage] for development.
+You can install mage using a make target:
 
 [source,shell]
 --------------------------------------------------------------------------------
-cd beats/packetbeat
-make
+make mage
+--------------------------------------------------------------------------------
+
+Then you can compile a particular Beat by using Mage. For example, for Filebeat:
+
+[source,shell]
+--------------------------------------------------------------------------------
+cd beats/filebeat
+mage build
+--------------------------------------------------------------------------------
+
+You can list all available mage targets with:
+
+[source,shell]
+--------------------------------------------------------------------------------
+mage -l
 --------------------------------------------------------------------------------
 
 Some of the Beats might have extra development requirements, in which case
@@ -83,7 +108,7 @@ and documentation. The primary command used for this is:
 --------------------------------------------------------------------------------
 make update
 --------------------------------------------------------------------------------
-Each Beat has its own `update` target, as well as a master `update` in the repository root.
+Each Beat has its own `update` target (for both `make` and `mage`), as well as a master `update` in the repository root.
 If a PR adds or removes a dependency, run `make update` in the root `beats` directory.
 
 Another command properly formats go source files and adds a copyright header:
@@ -129,7 +154,27 @@ In addition, you can add or remove from the list of build targets by prepending 
 
 You can find the complete list of supported build targets with `go tool dist list`.
 
+[float]
+[[running-linter]]
+=== Linting
 
+Beats uses https://golangci-lint.run/[golangci-lint]. You can run the pre-configured linter against your change:
+
+[source,shell]
+--------------------------------------------------------------------------------
+mage llc
+--------------------------------------------------------------------------------
+
+`llc` stands for `Lint Last Change` which includes all the Go files that were changed in either the last commit (if you're on the `main` branch) or in a difference between your feature branch and the `main` branch.
+
+It's expected that sometimes a contributor will be asked to fix linter issues unrelated to their contribution since the linter was introduced later than changes in some of the files.
+
+You can also run the linter against an individual package, for example the filbeat command package:
+
+[source,shell]
+--------------------------------------------------------------------------------
+golangci-lint run ./filebeat/cmd/...
+--------------------------------------------------------------------------------
 
 [float]
 [[running-testsuite]]
@@ -166,13 +211,6 @@ contributing docs, see the https://github.com/elastic/docs/blob/master/README.as
 
 In order to create Beats we rely on Golang libraries and other
 external tools.
-
-[float]
-==== Golang
-
-To manage the `vendor/` folder we use go modules.
-
-To update the contents of `vendor/`, run `mage vendor`.
 
 [float]
 ==== Other dependencies

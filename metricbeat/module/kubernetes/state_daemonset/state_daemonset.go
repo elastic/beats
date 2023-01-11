@@ -20,12 +20,12 @@ package state_daemonset
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 )
 
 const (
@@ -89,7 +89,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.ReplicaSet{}, false),
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.DaemonSet{}, mod.GetMetricsRepo(), false),
 		mod:           mod,
 	}, nil
 }
@@ -127,7 +127,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 	}
 
-	return
 }
 
 // Close stops this metricset

@@ -17,11 +17,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -45,7 +45,7 @@ func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
 	return nil
 }
 
-func (im *s3InputManager) Create(cfg *common.Config) (v2.Input, error) {
+func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -155,11 +155,12 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 }
 
 func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsReader, error) {
-	s3ServiceName := awscommon.CreateServiceName("s3", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
-	sqsServiceName := awscommon.CreateServiceName("sqs", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
-
 	sqsAPI := &awsSQSAPI{
-		client:            sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, sqsServiceName, in.awsConfig.Region, in.awsConfig)),
+		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		}),
 		queueURL:          in.config.QueueURL,
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
@@ -167,7 +168,11 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	}
 
 	s3API := &awsS3API{
-		client: s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig)),
+		client: s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		}),
 	}
 
 	log := ctx.Logger.With("queue_url", in.config.QueueURL)
@@ -175,7 +180,6 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
 	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
 	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
-	log.Debugf("AWS S3 service name is %v.", s3ServiceName)
 
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	metrics := newInputMetrics(metricRegistry, ctx.ID)
@@ -195,8 +199,15 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	return sqsReader, nil
 }
 
+type nonAWSBucketResolver struct {
+	endpoint string
+}
+
+func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.EndpointResolverOptions) (awssdk.Endpoint, error) {
+	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
+}
+
 func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
-	s3ServiceName := awscommon.CreateServiceName("s3", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
 	var bucketName string
 	var bucketID string
 	if in.config.NonAWSBucketName != "" {
@@ -206,14 +217,38 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 		bucketName = getBucketNameFromARN(in.config.BucketARN)
 		bucketID = in.config.BucketARN
 	}
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
+
+	s3Client := s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+		if in.config.NonAWSBucketName != "" {
+			o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
+		}
+
+		if in.config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+		o.UsePathStyle = in.config.PathStyle
+	})
 	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
 	}
+
+	originalAwsConfigRegion := in.awsConfig.Region
+
 	in.awsConfig.Region = regionName
-	s3Client = s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
-	s3Client.ForcePathStyle = in.config.PathStyle
+
+	if regionName != originalAwsConfigRegion {
+		s3Client = s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+			if in.config.NonAWSBucketName != "" {
+				o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
+			}
+
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+			o.UsePathStyle = in.config.PathStyle
+		})
+	}
 
 	s3API := &awsS3API{
 		client: s3Client,
@@ -224,7 +259,6 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
 	log.Infof("bucket_list_prefix is set to %v.", in.config.BucketListPrefix)
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
-	log.Debugf("AWS S3 service name is %v.", s3ServiceName)
 
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	metrics := newInputMetrics(metricRegistry, ctx.ID)
@@ -267,16 +301,20 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 }
 
 func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {
-	req := s3Client.GetBucketLocationRequest(&s3.GetBucketLocationInput{
+	getBucketLocationOutput, err := s3Client.GetBucketLocation(ctx, &s3.GetBucketLocationInput{
 		Bucket: awssdk.String(bucketName),
 	})
 
-	resp, err := req.Send(ctx)
 	if err != nil {
 		return "", err
 	}
 
-	return string(s3.NormalizeBucketLocation(resp.LocationConstraint)), nil
+	// Region us-east-1 have a LocationConstraint of null.
+	if len(getBucketLocationOutput.LocationConstraint) == 0 {
+		return "us-east-1", nil
+	}
+
+	return string(getBucketLocationOutput.LocationConstraint), nil
 }
 
 func getBucketNameFromARN(bucketARN string) string {
@@ -299,6 +337,7 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		"c2s.ic.gov":             "aws",
 		"amazonaws.com.cn":       "aws",
 		"backblazeb2.com":        "backblaze",
+		"cloudflarestorage.com":  "cloudflare",
 		"wasabisys.com":          "wasabi",
 		"digitaloceanspaces.com": "digitalocean",
 		"dream.io":               "dreamhost",

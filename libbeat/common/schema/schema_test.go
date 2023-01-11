@@ -23,7 +23,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func nop(key string, data map[string]interface{}) (interface{}, error) {
@@ -47,9 +47,9 @@ func TestSchema(t *testing.T) {
 	}
 
 	event, _ := schema.Apply(source)
-	assert.Equal(t, event, common.MapStr{
+	assert.Equal(t, event, mapstr.M{
 		"test": "hello",
-		"test_obj": common.MapStr{
+		"test_obj": mapstr.M{
 			"test_a": "helloA",
 			"test_b": "helloB",
 		},
@@ -98,7 +98,7 @@ func TestSchemaCases(t *testing.T) {
 		source map[string]interface{}
 
 		expectedErrorMessage string
-		expectedOutput       common.MapStr
+		expectedOutput       mapstr.M
 	}{
 		{
 			name: "standard schema conversion case",
@@ -113,7 +113,7 @@ func TestSchemaCases(t *testing.T) {
 				"inField": "10",
 			},
 
-			expectedOutput: common.MapStr{
+			expectedOutput: mapstr.M{
 				"outField": "10",
 			},
 		},
@@ -131,7 +131,7 @@ func TestSchemaCases(t *testing.T) {
 			},
 
 			expectedErrorMessage: "test error",
-			expectedOutput:       common.MapStr{},
+			expectedOutput:       mapstr.M{},
 		},
 		{
 			name: "ignore error at conversion case",
@@ -147,7 +147,7 @@ func TestSchemaCases(t *testing.T) {
 				"doesntMatter": "",
 			},
 
-			expectedOutput: common.MapStr{},
+			expectedOutput: mapstr.M{},
 		},
 	}
 

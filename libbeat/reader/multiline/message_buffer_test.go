@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMessageBufferAddLine(t *testing.T) {
@@ -90,7 +90,7 @@ func TestFinalizeMessage(t *testing.T) {
 			},
 			expected: reader.Message{
 				Content: []byte("tooooooooooooooooooo"),
-				Fields:  common.MapStr{"log": common.MapStr{"flags": []string{"truncated"}}},
+				Fields:  mapstr.M{"log": mapstr.M{"flags": []string{"truncated"}}},
 			},
 		},
 		"untruncated multiline message": {
@@ -101,7 +101,7 @@ func TestFinalizeMessage(t *testing.T) {
 			},
 			expected: reader.Message{
 				Content: []byte("line1\nline2"),
-				Fields:  common.MapStr{"log": common.MapStr{"flags": []string{"multiline"}}},
+				Fields:  mapstr.M{"log": mapstr.M{"flags": []string{"multiline"}}},
 			},
 		},
 		"truncated multiline message": {
@@ -112,7 +112,7 @@ func TestFinalizeMessage(t *testing.T) {
 			},
 			expected: reader.Message{
 				Content: []byte("line1\nli"),
-				Fields:  common.MapStr{"log": common.MapStr{"flags": []string{"truncated", "multiline"}}},
+				Fields:  mapstr.M{"log": mapstr.M{"flags": []string{"truncated", "multiline"}}},
 			},
 		},
 	}

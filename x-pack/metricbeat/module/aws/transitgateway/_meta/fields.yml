@@ -25,3 +25,9 @@
         - name: PacketDropCountNoRoute.sum
           type: long
           description: The number of packets dropped because they did not match a route.
+        - name: BytesDropCountNoRoute.sum
+          type: long
+          description: The number of bytes dropped because they did not match a route.
+        - name: BytesDropCountBlackhole.sum
+          type: long
+          description: The number of bytes dropped because they matched a blackhole route.

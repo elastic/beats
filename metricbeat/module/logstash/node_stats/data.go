@@ -19,13 +19,15 @@ package node_stats
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -71,8 +73,9 @@ type process struct {
 type cgroup struct {
 	CPUAcct map[string]interface{} `json:"cpuacct"`
 	CPU     struct {
-		Stat         map[string]interface{} `json:"stat"`
-		ControlGroup string                 `json:"control_group"`
+		Stat           map[string]interface{} `json:"stat"`
+		ControlGroup   string                 `json:"control_group"`
+		CFSQuotaMicros int64                  `json:"cfs_quota_micros"`
 	} `json:"cpu"`
 }
 
@@ -144,11 +147,11 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
+func eventMapping(r mb.ReporterV2, content []byte, isXpack bool, logger *logp.Logger) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
-		return errors.Wrap(err, "could not parse node stats response")
+		return fmt.Errorf("could not parse node stats response: %w", err)
 	}
 
 	timestamp := common.Time(time.Now())
@@ -173,9 +176,20 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	}
 
 	var pipelines []PipelineStats
+
+	// The version from which we expect the node stats API to return a hash with pipeline documents. This is really just a formality so that
+	// unit tests with much older fixture versions still work.
+	var PipelineDocumentsContainHashVersion = version.MustNew("7.3.0")
+	var StatsVersion = version.MustNew(nodeStats.Version)
+	pipelineDocumentsShouldContainHash := !StatsVersion.LessThan(PipelineDocumentsContainHashVersion)
+
 	for pipelineID, pipeline := range nodeStats.Pipelines {
-		pipeline.ID = pipelineID
-		pipelines = append(pipelines, pipeline)
+		if pipelineDocumentsShouldContainHash && (pipeline.Hash == "" || pipeline.Vertices == nil) {
+			logger.Warn(fmt.Sprintf("Pipeline document was discarded due to missing properties. This can happen when the Logstash node stats API is polled before the pipeline setup has completed. Pipeline ID: %s", pipelineID))
+		} else {
+			pipeline.ID = pipelineID
+			pipelines = append(pipelines, pipeline)
+		}
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
@@ -192,20 +206,20 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		}
 
 		event := mb.Event{
-			RootFields: common.MapStr{
-				"service": common.MapStr{"name": logstash.ModuleName},
+			RootFields: mapstr.M{
+				"service": mapstr.M{"name": logstash.ModuleName},
 			},
-			ModuleFields: common.MapStr{},
+			ModuleFields: mapstr.M{},
 		}
 
-		event.ModuleFields.Put("node.stats", logstashStats)
-		event.RootFields.Put("service.id", nodeStats.ID)
-		event.RootFields.Put("service.hostname", nodeStats.Host)
-		event.RootFields.Put("service.version", nodeStats.Version)
+		_, _ = event.ModuleFields.Put("node.stats", logstashStats)
+		_, _ = event.RootFields.Put("service.id", nodeStats.ID)
+		_, _ = event.RootFields.Put("service.hostname", nodeStats.Host)
+		_, _ = event.RootFields.Put("service.version", nodeStats.Version)
 
 		if clusterUUID != "" {
-			event.ModuleFields.Put("cluster.id", clusterUUID)
-			event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
+			_, _ = event.ModuleFields.Put("cluster.id", clusterUUID)
+			_, _ = event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 		}
 
 		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
@@ -222,8 +236,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 }
 
 func makeClusterToPipelinesMap(pipelines []PipelineStats, overrideClusterUUID string) map[string][]PipelineStats {
-	var clusterToPipelinesMap map[string][]PipelineStats
-	clusterToPipelinesMap = make(map[string][]PipelineStats)
+	var clusterToPipelinesMap = make(map[string][]PipelineStats)
 
 	if overrideClusterUUID != "" {
 		clusterToPipelinesMap[overrideClusterUUID] = pipelines
