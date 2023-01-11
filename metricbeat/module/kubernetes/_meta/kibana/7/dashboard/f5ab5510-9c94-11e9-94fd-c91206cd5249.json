@@ -3512,7 +3512,7 @@
             }
         ],
         "timeRestore": false,
-        "title": " Scheduler",
+        "title": "[Metricbeat Kubernetes] Scheduler",
         "version": 1
     },
     "coreMigrationVersion": "8.6.0",
