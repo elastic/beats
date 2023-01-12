@@ -70,6 +70,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 - Add GCP CloudSQL region filter {pull}32943[32943]
 
+- Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
+- Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 
 *Packetbeat*
 
