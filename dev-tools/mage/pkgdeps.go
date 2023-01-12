@@ -111,7 +111,12 @@ func (i *PackageInstaller) Install(p PlatformDescription) error {
 
 func installDependencies(arch string, pkgs ...string) error {
 	// See https://github.com/elastic/golang-crossbuild/issues/232
-	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", "/go/src/github.com/elastic/beats"); err != nil {
+	mountPoint, err := DockerMountPoint()
+	if err != nil {
+		return err
+	}
+	// use custom dir for build if given, subdir if not:
+	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", mountPoint); err != nil {
 		return err
 	}
 

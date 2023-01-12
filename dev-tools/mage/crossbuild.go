@@ -272,7 +272,7 @@ func (b GolangCrossBuilder) Build() error {
 		return fmt.Errorf("failed to determine repo root and package sub dir: %w", err)
 	}
 
-	mountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
+	mountPoint, _ := DockerMountPoint()
 	// use custom dir for build if given, subdir if not:
 	cwd := repoInfo.SubDir
 	if b.InDir != "" {
@@ -344,6 +344,15 @@ func (b GolangCrossBuilder) Build() error {
 	)
 
 	return dockerRun(args...)
+}
+
+func DockerMountPoint() (string, error) {
+	repoInfo, err := GetProjectRepoInfo()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath)), nil
 }
 
 // DockerChown chowns files generated during build. EXEC_UID and EXEC_GID must
