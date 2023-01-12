@@ -337,7 +337,7 @@
                     "y": 3
                 },
                 "panelIndex": "a2b844d8-11e3-4469-af4b-744d33b603ad",
-                "title": "Pending pods ",
+                "title": "Pending pods",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -769,7 +769,7 @@
                     "y": 12
                 },
                 "panelIndex": "181a3fe5-e5b5-472e-98af-ea4aaadc3109",
-                "title": "Average scheduling attempt latency ",
+                "title": "Average scheduling attempt latency",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -933,7 +933,7 @@
                     "y": 12
                 },
                 "panelIndex": "d35d8849-89ba-42b8-8120-c14b087f9690",
-                "title": "Attempts counter rate by result ",
+                "title": "Attempts counter rate by result",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1227,7 +1227,7 @@
                     "y": 29
                 },
                 "panelIndex": "2ba53067-d43d-42eb-ac50-2d941977ce95",
-                "title": "Workqueue additions increase rate ",
+                "title": "Workqueue additions increase rate",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1435,7 +1435,7 @@
                     "y": 29
                 },
                 "panelIndex": "1cd3ebab-9630-4253-b9a6-5f921e5cb617",
-                "title": "Workqueue retries increase rate ",
+                "title": "Workqueue retries increase rate",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1864,7 +1864,7 @@
                     "y": 43
                 },
                 "panelIndex": "6a8b9a40-11ec-4790-a38d-2d88c5468f12",
-                "title": "Current unfinished work ",
+                "title": "Current unfinished work",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -2265,7 +2265,7 @@
                     "y": 60
                 },
                 "panelIndex": "a0716ae8-4157-473d-8eba-8ff6625fed4b",
-                "title": "Scheduler process data ",
+                "title": "Scheduler process data",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -2425,7 +2425,7 @@
                     "y": 60
                 },
                 "panelIndex": "303702e1-ba33-49f2-b337-4cc7d7305606",
-                "title": "Average resident memory  ",
+                "title": "Average resident memory",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -2651,7 +2651,7 @@
                     "y": 66
                 },
                 "panelIndex": "1604f0de-edd6-456e-8670-ab9b33988abb",
-                "title": "CPU usage increase over time ",
+                "title": "CPU usage increase over time",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -2928,7 +2928,7 @@
                     "y": 81
                 },
                 "panelIndex": "668a51aa-98da-465e-9b09-d49e4f219968",
-                "title": "Leader scheduler ",
+                "title": "Leader scheduler",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -3506,7 +3506,7 @@
                     "y": 87
                 },
                 "panelIndex": "1bd24fa1-319e-4cae-9d45-d821b06a8034",
-                "title": "Average request latency ",
+                "title": "Average request latency",
                 "type": "lens",
                 "version": "8.6.0"
             }

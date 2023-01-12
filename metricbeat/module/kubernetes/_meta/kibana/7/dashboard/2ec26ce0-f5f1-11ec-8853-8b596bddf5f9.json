@@ -450,7 +450,7 @@
                     "y": 3
                 },
                 "panelIndex": "aef813b5-85d5-46c9-a86a-2e273806d488",
-                "title": "Node collector ",
+                "title": "Node collector",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -744,7 +744,7 @@
                     "y": 13
                 },
                 "panelIndex": "2ba53067-d43d-42eb-ac50-2d941977ce95",
-                "title": "Workqueue additions increase rate ",
+                "title": "Workqueue additions increase rate",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -952,7 +952,7 @@
                     "y": 13
                 },
                 "panelIndex": "1cd3ebab-9630-4253-b9a6-5f921e5cb617",
-                "title": "Workqueue retries increase rate ",
+                "title": "Workqueue retries increase rate",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1361,7 +1361,7 @@
                     "y": 27
                 },
                 "panelIndex": "6a8b9a40-11ec-4790-a38d-2d88c5468f12",
-                "title": "Current unfinished work ",
+                "title": "Current unfinished work",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1778,7 +1778,7 @@
                     "y": 44
                 },
                 "panelIndex": "75255ce8-2d49-4b4f-ac0e-a20fe8f4daec",
-                "title": "Controller manager process data ",
+                "title": "Controller manager process data",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1963,7 +1963,7 @@
                     "y": 44
                 },
                 "panelIndex": "303702e1-ba33-49f2-b337-4cc7d7305606",
-                "title": "Average resident memory  ",
+                "title": "Average resident memory",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -2189,7 +2189,7 @@
                     "y": 50
                 },
                 "panelIndex": "1604f0de-edd6-456e-8670-ab9b33988abb",
-                "title": "CPU usage increase over time ",
+                "title": "CPU usage increase over time",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -2467,7 +2467,7 @@
                     "y": 65
                 },
                 "panelIndex": "fd90adaf-517f-4b92-a5b5-c29f7a16663b",
-                "title": "Leader controller manager ",
+                "title": "Leader controller manager",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -3045,7 +3045,7 @@
                     "y": 71
                 },
                 "panelIndex": "1bd24fa1-319e-4cae-9d45-d821b06a8034",
-                "title": "Average request latency ",
+                "title": "Average request latency",
                 "type": "lens",
                 "version": "8.6.0"
             }

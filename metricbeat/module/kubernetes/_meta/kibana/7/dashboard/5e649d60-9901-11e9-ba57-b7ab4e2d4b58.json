@@ -164,7 +164,7 @@
                     "y": 4
                 },
                 "panelIndex": "ff6afcdf-0de2-47fb-aa9e-72b48f11e0cd",
-                "title": "Proxy ",
+                "title": "Proxy",
                 "type": "visualization",
                 "version": "8.6.0"
             },
@@ -391,7 +391,7 @@
                     "y": 7
                 },
                 "panelIndex": "f74e1a86-4370-4f65-a3b8-d92c9f25ff42",
-                "title": "Average network programming latency ",
+                "title": "Average network programming latency",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -602,7 +602,7 @@
                     "y": 7
                 },
                 "panelIndex": "34de2f11-faf2-49e8-aada-98c2cd5eb266",
-                "title": "Average SyncProxyRules latency ",
+                "title": "Average SyncProxyRules latency",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1019,7 +1019,7 @@
                     "y": 24
                 },
                 "panelIndex": "af47c34c-961a-463c-9d66-ffedcc2eef12",
-                "title": "Proxy process data ",
+                "title": "Proxy process data",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1179,7 +1179,7 @@
                     "y": 24
                 },
                 "panelIndex": "303702e1-ba33-49f2-b337-4cc7d7305606",
-                "title": "Average resident memory  ",
+                "title": "Average resident memory",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1380,7 +1380,7 @@
                     "y": 33
                 },
                 "panelIndex": "1604f0de-edd6-456e-8670-ab9b33988abb",
-                "title": "CPU usage increase over time ",
+                "title": "CPU usage increase over time",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1719,7 +1719,7 @@
                     "y": 52
                 },
                 "panelIndex": "1bd24fa1-319e-4cae-9d45-d821b06a8034",
-                "title": "Average request latency ",
+                "title": "Average request latency",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -1902,7 +1902,7 @@
                     "y": 52
                 },
                 "panelIndex": "91a7ce56-6a49-4b7e-837f-31c184b48c09",
-                "title": "Requests counter rate ",
+                "title": "Requests counter rate",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -2111,7 +2111,7 @@
                     "y": 66
                 },
                 "panelIndex": "24a2f3ce-a762-4e5f-8794-ff67fc70a41d",
-                "title": "Client error responses counter rate ",
+                "title": "Client error responses counter rate",
                 "type": "lens",
                 "version": "8.6.0"
             },
@@ -2353,7 +2353,7 @@
                     "y": 66
                 },
                 "panelIndex": "e3c408a3-6515-4104-b764-888f39fa6185",
-                "title": "Server error responses counter rate ",
+                "title": "Server error responses counter rate",
                 "type": "lens",
                 "version": "8.6.0"
             }
