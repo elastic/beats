@@ -309,6 +309,9 @@ func (b GolangCrossBuilder) Build() error {
 		args = append(args,
 			"--env", "EXEC_UID="+strconv.Itoa(os.Getuid()),
 			"--env", "EXEC_GID="+strconv.Itoa(os.Getgid()),
+			// Force the user/group to match the one from the host
+			// See https://github.com/elastic/golang-crossbuild/issues/232
+			"--user", strconv.Itoa(os.Getuid())+":"+strconv.Itoa(os.Getgid()),
 		)
 	}
 	if versionQualified {
