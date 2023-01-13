@@ -110,6 +110,7 @@ func (i *PackageInstaller) Install(p PlatformDescription) error {
 }
 
 func installDependencies(arch string, pkgs ...string) error {
+	fmt.Printf(">>> installDependencies: Building for %v\n", arch)
 	// See https://github.com/elastic/golang-crossbuild/issues/232
 	mountPoint, err := DockerMountPoint()
 	if err != nil {
