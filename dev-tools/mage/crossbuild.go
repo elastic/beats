@@ -334,7 +334,7 @@ func (b GolangCrossBuilder) Build() error {
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
 		// See https://github.com/elastic/golang-crossbuild/issues/232
-		"--env", "GIT_CEILING_DIRECTORIES=\/"),
+		"--env", "GIT_CEILING_DIRECTORIES=/",
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
