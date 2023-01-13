@@ -105,6 +105,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
 - Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 
+*Osquerybeat*
+
+- Fix data_stream configuration, enforce the default values used before 8.6.0. {pull}34246[34246]
 
 *Packetbeat*
 
