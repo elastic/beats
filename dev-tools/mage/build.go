@@ -130,15 +130,6 @@ func GolangCrossBuild(params BuildArgs) error {
 
 	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
 	defer DockerChown(filepath.Join(params.OutputDir))
-
-	mountPoint, err := ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", mountPoint); err != nil {
-		return err
-	}
-
 	return Build(params)
 }
 
