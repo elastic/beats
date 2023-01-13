@@ -23,9 +23,24 @@ Also read <<yaml-tips>> and <<regexp-support>> to avoid common mistakes.
 
 You can specify the following options in the +{beatname_lc}.inputs+ section of
 the +{beatname_lc}.yml+ config file to control how {beatname_uc} deals with messages
-that span multiple lines. 
+that span multiple lines.
 
-The following example shows how to configure {beatname_uc} to handle a multiline message where the first line of the message begins with a bracket (`[`).
+The following example shows how to configure `filestream` input in {beatname_uc} to handle a multiline message where the first line of the message begins with a bracket (`[`).
+
+Please note that the example below only works with `filestream` input, and not with `log` input.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+parsers:
+- multiline:
+    type: pattern
+    pattern: '^\['
+    negate: true
+    match: after
+
+-------------------------------------------------------------------------------------
+
+If you still use the deprecated `log` input, there is no need to use `parsers`.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
