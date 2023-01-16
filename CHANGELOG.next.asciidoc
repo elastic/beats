@@ -190,6 +190,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add GCP Redis regions support {pull}33728[33728]
 - Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 - Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
+- Add beta ingest metricset to Elasticsearch module for ingest pipeline monitoring {pull}34012[34012]
 
 *Packetbeat*
 
