@@ -77,44 +77,47 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 			// Create the overall pipeline event
 			event := mb.Event{
-				ModuleFields: mapstr.M{},
+				ModuleFields:    mapstr.M{},
+				MetricSetFields: mapstr.M{},
 			}
 
 			// Common fields
 			addCommonFields(&event, &info, nodeId, &nodeStats, pipelineId)
 
 			// Pipeline metrics
-			event.ModuleFields.Put("ingest.pipeline.total.count", pipelineStats.Count)
-			event.ModuleFields.Put("ingest.pipeline.total.failed", pipelineStats.Failed)
-			event.ModuleFields.Put("ingest.pipeline.total.total_cpu_time", pipelineStats.TimeInMillis)
+			event.MetricSetFields.Put("pipeline.total.count", pipelineStats.Count)
+			event.MetricSetFields.Put("pipeline.total.failed", pipelineStats.Failed)
+			event.MetricSetFields.Put("pipeline.total.total_cpu_time", pipelineStats.TimeInMillis)
 
 			// Self time subtracts any processor pipelines
 			selfCpuTime := pipelineStats.TimeInMillis
 			for pIdx, processorObj := range pipelineStats.Processors {
-				for pType, processorStats := range processorObj {
-					if pType == "pipeline" {
+				for pTypeTag, processorStats := range processorObj {
+					if processorStats.Type == "pipeline" {
 						selfCpuTime -= processorStats.Stats.TimeInMillis
 					}
 
-					// Skip when this fetch should not sample processors
+					// Skip creating the processor-level event when this fetch should not sample processors
 					if !sampleProcessors {
 						continue
 					}
 
-					// Create the processor event
+					// Create a processor event
 					processorEvent := mb.Event{
-						ModuleFields: mapstr.M{},
+						ModuleFields:    mapstr.M{},
+						MetricSetFields: mapstr.M{},
 					}
 
 					// Common fields
 					addCommonFields(&processorEvent, &info, nodeId, &nodeStats, pipelineId)
 
 					// Processor metrics
-					processorEvent.ModuleFields.Put("ingest.pipeline.processor.order_index", pIdx)
-					processorEvent.ModuleFields.Put("ingest.pipeline.processor.type", pType)
-					processorEvent.ModuleFields.Put("ingest.pipeline.processor.count", processorStats.Stats.Count)
-					processorEvent.ModuleFields.Put("ingest.pipeline.processor.failed", processorStats.Stats.Failed)
-					processorEvent.ModuleFields.Put("ingest.pipeline.processor.total_cpu_time", processorStats.Stats.TimeInMillis)
+					processorEvent.MetricSetFields.Put("pipeline.processor.order_index", pIdx)
+					processorEvent.MetricSetFields.Put("pipeline.processor.type", processorStats.Type)
+					processorEvent.MetricSetFields.Put("pipeline.processor.type_tag", pTypeTag)
+					processorEvent.MetricSetFields.Put("pipeline.processor.count", processorStats.Stats.Count)
+					processorEvent.MetricSetFields.Put("pipeline.processor.failed", processorStats.Stats.Failed)
+					processorEvent.MetricSetFields.Put("pipeline.processor.total_cpu_time", processorStats.Stats.TimeInMillis)
 					r.Event(processorEvent)
 
 					// processorObj has a single key with the processor type, so break early
@@ -123,7 +126,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 				}
 			}
 
-			event.ModuleFields.Put("ingest.pipeline.total.self_cpu_time", selfCpuTime)
+			event.MetricSetFields.Put("pipeline.total.self_cpu_time", selfCpuTime)
 			r.Event(event)
 		}
 	}
@@ -138,5 +141,5 @@ func addCommonFields(event *mb.Event, info *elasticsearch.Info, nodeId string, n
 	event.ModuleFields.Put("node.name", nodeStats.Name)
 	event.ModuleFields.Put("node.roles", nodeStats.Roles)
 
-	event.ModuleFields.Put("ingest.pipeline.name", pipelineId)
+	event.MetricSetFields.Put("pipeline.name", pipelineId)
 }

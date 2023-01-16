@@ -31732,6 +31732,13 @@ type: keyword
 
 --
 
+*`elasticsearch.ingest.pipeline.processor.type_tag`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.ingest.pipeline.processor.order_index`*::
 +
 --

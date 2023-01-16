@@ -21,6 +21,8 @@
       fields:
         - name: type
           type: keyword
+        - name: type_tag
+          type: keyword
         - name: order_index
           type: long
         - name: count
