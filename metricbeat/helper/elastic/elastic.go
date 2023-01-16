@@ -138,7 +138,7 @@ func FixTimestampField(m mapstr.M, field string) error {
 }
 
 // NewModule returns a new Elastic stack module with the appropriate metricsets configured.
-func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
+func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpackMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
 	moduleName := base.Name()
 
 	config := struct {
@@ -158,8 +158,31 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *log
 		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
 	}
 
-	// These metricsets are exactly the ones required if xpack.enabled == true
-	raw["metricsets"] = xpackEnabledMetricsets
+	// Ensure all required metricsets are enabled when xpack.enabled == true
+	cfgdMetricsets, err := raw.GetValue("metricsets")
+	if err != nil || cfgdMetricsets == nil || len(cfgdMetricsets.([]interface{})) == 0 {
+		raw["metricsets"] = xpackEnabledMetricsets
+	} else {
+		// Allow some optional metricsets to be enabled when xpack.enabled == true
+		cfgdMetricsetsSlice := cfgdMetricsets.([]interface{})
+		metricsets := xpackEnabledMetricsets
+
+		for _, cfgdMs := range cfgdMetricsetsSlice {
+			found := false
+			for _, optMs := range optionalXpackMetricsets {
+				if cfgdMs == optMs {
+					found = true
+					break
+				}
+			}
+
+			if found {
+				metricsets = append(metricsets, cfgdMs.(string))
+			}
+		}
+
+		raw["metricsets"] = metricsets
+	}
 
 	newConfig, err := conf.NewConfigFrom(raw)
 	if err != nil {
