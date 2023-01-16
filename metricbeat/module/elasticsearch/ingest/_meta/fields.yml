@@ -12,9 +12,9 @@
           type: long
         - name: failed
           type: long
-        - name: total_cpu_time
+        - name: total_time
           type: long
-        - name: self_cpu_time
+        - name: self_time
           type: long
     - name: processor
       type: group
@@ -29,5 +29,5 @@
           type: long
         - name: failed
           type: long
-        - name: total_cpu_time
+        - name: total_time
           type: long

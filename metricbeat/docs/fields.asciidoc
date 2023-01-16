@@ -31710,14 +31710,14 @@ type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.total.total_cpu_time`*::
+*`elasticsearch.ingest.pipeline.total.total_time`*::
 +
 --
 type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.total.self_cpu_time`*::
+*`elasticsearch.ingest.pipeline.total.self_time`*::
 +
 --
 type: long
@@ -31760,7 +31760,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.processor.total_cpu_time`*::
+*`elasticsearch.ingest.pipeline.processor.total_time`*::
 +
 --
 type: long
