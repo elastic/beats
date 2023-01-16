@@ -102,7 +102,11 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
+<<<<<<< HEAD
     go: "1.18.5"
+=======
+    go: "1.18.10"
+>>>>>>> 65fb69c23b ([Automation] Update go release version to 1.18.10 (#34266))
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -122,19 +126,31 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
+<<<<<<< HEAD
     go: "1.18.5"
+=======
+    go: "1.18.10"
+>>>>>>> 65fb69c23b ([Automation] Update go release version to 1.18.10 (#34266))
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
+<<<<<<< HEAD
     go: "1.18.5"
+=======
+    go: "1.18.10"
+>>>>>>> 65fb69c23b ([Automation] Update go release version to 1.18.10 (#34266))
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
+<<<<<<< HEAD
     go: "1.18.5"
+=======
+    go: "1.18.10"
+>>>>>>> 65fb69c23b ([Automation] Update go release version to 1.18.10 (#34266))
 
   gosec:
     excludes:
