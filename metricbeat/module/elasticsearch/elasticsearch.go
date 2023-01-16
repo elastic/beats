@@ -49,7 +49,6 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"ccr",
 		"enrich",
 		"cluster_stats",
-		"ingest",
 		"index",
 		"index_recovery",
 		"index_summary",
@@ -57,7 +56,8 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"node_stats",
 		"shard",
 	}
-	return elastic.NewModule(&base, xpackEnabledMetricSets, []string{}, logp.NewLogger(ModuleName))
+	optionalXpackMetricsets := []string{"ingest"}
+	return elastic.NewModule(&base, xpackEnabledMetricSets, optionalXpackMetricsets, logp.NewLogger(ModuleName))
 }
 
 var (
