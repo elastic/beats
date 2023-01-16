@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -41,6 +42,12 @@ func init() {
 // multiple fetch calls.
 type Metricset struct {
 	*mongodb.Metricset
+}
+
+type CollStats struct {
+	Count     int64   `bson:"count"`
+	Size      float64 `bson:"size"`
+	IndexSize float64 `bson:"totalIndexSize"`
 }
 
 // New creates a new instance of the Metricset
@@ -115,6 +122,41 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		reporter.Event(mb.Event{
 			MetricSetFields: event,
 		})
+	}
+
+	databaseNames, err := client.ListDatabaseNames(context.Background(), bson.D{})
+	if err != nil {
+		return fmt.Errorf("ListDatabaseNames failed: %s", err)
+	}
+	for _, databaseName := range databaseNames {
+		database := client.Database(databaseName)
+		collectionNames, err := database.ListCollectionNames(context.Background(), bson.D{})
+		if err != nil {
+			m.Logger().Errorf("%s ListCollectionNames failed: %s", databaseName, err)
+			continue
+		}
+		for _, collectionName := range collectionNames {
+			res = db.RunCommand(context.Background(), bson.D{bson.E{Key: "collStats", Value: collectionName}})
+			if err = res.Err(); err != nil {
+				m.Logger().Errorf("'collStats %s' command returned an error: %w", collectionName, err)
+				continue
+			}
+			var collStats CollStats
+			if err = res.Decode(&collStats); err != nil {
+				m.Logger().Errorf("could not decode %s collection stats: %w", collectionName, err)
+				continue
+			}
+			event := mapstr.M{
+				"db":               databaseName,
+				"collection":       collectionName,
+				"objects":          collStats.Count,
+				"data_size_bytes":  collStats.Size,
+				"index_size_bytes": collStats.IndexSize,
+			}
+			reporter.Event(mb.Event{
+				MetricSetFields: event,
+			})
+		}
 	}
 
 	return nil
