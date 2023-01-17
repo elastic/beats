@@ -140,7 +140,7 @@ def beat(
         k8s_env="kind",
         k8s_cluster="single",
         **kwargs):
-    if beat not in ["metricbeat", "filebeat"]:
+    if beat not in ["metricbeat", "filebeat", "heartbeat"]:
         print("Invalid beat: {}".format(beat))
         exit(-1)
     if mode not in ["run", "debug"]:
@@ -166,8 +166,8 @@ def beat(
         print("K8s_cluter=multi and mode=run is not supported yet")
         exit(-1)
 
-    if beat == "filebeat" and k8s_cluster == "multi":
-        print("K8s_cluter=multi and beat=filebeat is not supported yet")
+    if (beat == "filebeat" or beat == "heartbeat") and k8s_cluster == "multi":
+        print("K8s_cluter=multi and (beat=filebeat or beat=heartbeat) is not supported yet")
         exit(-1)
 
     # Compile
@@ -191,9 +191,10 @@ def beat(
     k8s_expose(beat=beat, mode=mode, k8s_cluster=k8s_cluster)
 
 
-beat(beat="metricbeat",
+beat(beat="heartbeat",
      mode="debug",
+    #  mode="run",
      arch="arm64",
      k8s_env="kind",
-     k8s_cluster="multi",
+     k8s_cluster="single",
      )

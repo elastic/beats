@@ -4,7 +4,9 @@ on:
   workflow_run:
     workflows:
       - check-auditbeat
+      - check-default
       - check-dev-tools
+      - check-docs
       - check-filebeat
       - check-heartbeat
       - check-libbeat
@@ -34,19 +36,14 @@ on:
       - x-pack-metricbeat
       - x-pack-osquerybeat
       - x-pack-packetbeat
-      - check-default
-      - check-docs
     types: [completed]
 
 jobs:
   otel-export-trace:
-    name: OpenTelemetry Export Trace
     runs-on: ubuntu-latest
     steps:
-      - name: Export Workflow Trace
-        uses: inception-health/otel-export-trace-action@latest
+      - uses: elastic/apm-pipeline-library/.github/actions/opentelemetry@current
         with:
-          otlpEndpoint: "${{ secrets.APM_SERVER }}"
-          otlpHeaders: "Authorization=Bearer ${{ secrets.APM_TOKEN }}"
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          runId: ${{ github.event.workflow_run.id }}
+          vaultUrl: ${{ secrets.VAULT_ADDR }}
+          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
+          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
