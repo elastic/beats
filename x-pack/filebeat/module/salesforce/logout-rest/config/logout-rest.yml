@@ -29,7 +29,7 @@ request.proxy_url: {{ .proxy_url }}
 request.transforms:
   - set:
       target: url.params.q
-      value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' AND LogDate > [[.cursor.last_published_logout]] ORDER BY CreatedDate ASC NULLS FIRST"
+      value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' AND LogDate > [[.cursor.last_published_logout]] ORDER BY LogDate ASC NULLS FIRST"
       default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' ORDER BY LogDate ASC NULLS FIRST"
 response.pagination:
   - set:
