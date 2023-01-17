@@ -1,0 +1,1044 @@
+[
+    {
+        "cisco.asa.connection_id": "3263493120",
+        "cisco.asa.destination_interface": "SERVERS",
+        "cisco.asa.mapped_destination_ip": "10.10.227.121",
+        "cisco.asa.mapped_destination_port": 80,
+        "cisco.asa.mapped_source_host": "shule",
+        "cisco.asa.mapped_source_port": 5802,
+        "cisco.asa.message_id": "302013",
+        "cisco.asa.source_interface": "DMZ",
+        "destination.address": "10.10.227.121",
+        "destination.ip": "10.10.227.121",
+        "destination.port": 80,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302013,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302013: Built inbound TCP connection 3263493120 for DMZ:shule/5802 (shule/5802) to SERVERS:10.10.227.121/80 (10.10.227.121/80)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 0,
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "SERVERS",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "DMZ",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "shule"
+        ],
+        "related.ip": [
+            "10.10.227.121"
+        ],
+        "service.type": "cisco",
+        "source.address": "shule",
+        "source.domain": "shule",
+        "source.port": 5802,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.connection_id": "3263492189",
+        "cisco.asa.destination_interface": "SERVERS",
+        "cisco.asa.mapped_destination_ip": "10.10.224.1",
+        "cisco.asa.mapped_destination_port": 46145,
+        "cisco.asa.mapped_source_host": "exp_srv",
+        "cisco.asa.mapped_source_port": 10050,
+        "cisco.asa.message_id": "302013",
+        "cisco.asa.source_interface": "MG",
+        "destination.address": "10.10.227.170",
+        "destination.ip": "10.10.227.170",
+        "destination.nat.ip": "10.10.224.1",
+        "destination.port": 46145,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302013,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302013: Built outbound TCP connection 3263492189 for MG:exp_srv/10050 (exp_srv/10050) to SERVERS:10.10.227.170/46145 (10.10.224.1/46145)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 166,
+        "network.direction": "outbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "SERVERS",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "MG",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "exp_srv"
+        ],
+        "related.ip": [
+            "10.10.224.1",
+            "10.10.227.170"
+        ],
+        "service.type": "cisco",
+        "source.address": "exp_srv",
+        "source.domain": "exp_srv",
+        "source.port": 10050,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.connection_id": "743108828",
+        "cisco.asa.destination_interface": "MND_sec",
+        "cisco.asa.mapped_destination_ip": "89.160.20.128",
+        "cisco.asa.mapped_destination_port": 48347,
+        "cisco.asa.mapped_source_host": "ns10",
+        "cisco.asa.mapped_source_port": 53,
+        "cisco.asa.message_id": "302015",
+        "cisco.asa.source_interface": "outside",
+        "destination.address": "192.168.174.100",
+        "destination.ip": "192.168.174.100",
+        "destination.nat.ip": "89.160.20.128",
+        "destination.port": 48347,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302015,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302015: Built outbound UDP connection 743108828 for outside:ns10/53 (ns10/53) to MND_sec:192.168.174.100/48347 (89.160.20.128/48347)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "81.2.69.142",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 342,
+        "network.direction": "outbound",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "MND_sec",
+        "observer.hostname": "81.2.69.142",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.142",
+            "ns10"
+        ],
+        "related.ip": [
+            "192.168.174.100",
+            "89.160.20.128"
+        ],
+        "service.type": "cisco",
+        "source.address": "ns10",
+        "source.domain": "ns10",
+        "source.port": 53,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.connection_id": "743108738",
+        "cisco.asa.destination_interface": "MND_sec",
+        "cisco.asa.mapped_destination_ip": "81.2.69.192",
+        "cisco.asa.mapped_destination_port": 55653,
+        "cisco.asa.mapped_source_host": "ns10",
+        "cisco.asa.mapped_source_port": 53,
+        "cisco.asa.message_id": "302015",
+        "cisco.asa.source_interface": "outside",
+        "destination.address": "192.168.174.100",
+        "destination.ip": "192.168.174.100",
+        "destination.nat.ip": "81.2.69.192",
+        "destination.port": 55653,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302015,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302015: Built outbound UDP connection 743108738 for outside:ns10/53 (ns10/53) to MND_sec:192.168.174.100/55653 (81.2.69.192/55653)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "81.2.69.142",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 510,
+        "network.direction": "outbound",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "MND_sec",
+        "observer.hostname": "81.2.69.142",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.142",
+            "ns10"
+        ],
+        "related.ip": [
+            "192.168.174.100",
+            "81.2.69.192"
+        ],
+        "service.type": "cisco",
+        "source.address": "ns10",
+        "source.domain": "ns10",
+        "source.port": 53,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "106015",
+        "cisco.asa.source_interface": "SH_INFRA_MGT",
+        "destination.address": "exp-angle",
+        "destination.domain": "exp-angle",
+        "destination.port": 54703,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106015,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-106015: Deny TCP (no connection) from 10.12.227.40/389 to exp-angle/54703 flags RST on interface SH_INFRA_MGT",
+        "event.outcome": "success",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 676,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "SH_INFRA_MGT",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "exp-angle"
+        ],
+        "related.ip": [
+            "10.12.227.40"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.12.227.40",
+        "source.ip": "10.12.227.40",
+        "source.port": 389,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "106015",
+        "cisco.asa.source_interface": "outside",
+        "destination.address": "sh-mailgw1",
+        "destination.domain": "sh-mailgw1",
+        "destination.port": 25,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106015,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-106015: Deny TCP (no connection) from 89.160.20.128/56594 to sh-mailgw1/25 flags FIN ACK on interface outside",
+        "event.outcome": "success",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 825,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "sh-mailgw1"
+        ],
+        "related.ip": [
+            "89.160.20.128"
+        ],
+        "service.type": "cisco",
+        "source.address": "89.160.20.128",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.128",
+        "source.port": 56594,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "outside",
+        "cisco.asa.message_id": "305012",
+        "cisco.asa.source_interface": "SERVERS",
+        "destination.address": "81.2.69.142",
+        "destination.geo.city_name": "London",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.5142,
+        "destination.geo.location.lon": -0.0931,
+        "destination.geo.region_iso_code": "GB-ENG",
+        "destination.geo.region_name": "England",
+        "destination.ip": "81.2.69.142",
+        "destination.port": 62409,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 305012,
+        "event.dataset": "cisco.asa",
+        "event.duration": 41000000000,
+        "event.end": "2023-07-15T13:38:47.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-305012: Teardown dynamic UDP translation from SERVERS:exp-wait/62409 to outside:81.2.69.142/62409 duration 0:00:41",
+        "event.severity": 6,
+        "event.start": "2023-07-15T15:38:06.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 974,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "SERVERS",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "exp-wait"
+        ],
+        "related.ip": [
+            "81.2.69.142"
+        ],
+        "service.type": "cisco",
+        "source.address": "exp-wait",
+        "source.domain": "exp-wait",
+        "source.port": 62409,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "outside",
+        "cisco.asa.message_id": "305012",
+        "cisco.asa.source_interface": "SERVERS",
+        "destination.address": "81.2.69.142",
+        "destination.geo.city_name": "London",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.5142,
+        "destination.geo.location.lon": -0.0931,
+        "destination.geo.region_iso_code": "GB-ENG",
+        "destination.geo.region_name": "England",
+        "destination.ip": "81.2.69.142",
+        "destination.port": 56421,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 305012,
+        "event.dataset": "cisco.asa",
+        "event.duration": 30000000000,
+        "event.end": "2023-07-15T13:37:33.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-305012: Teardown dynamic UDP translation from SERVERS:exp-wait/56421 to outside:81.2.69.142/56421 duration 0:00:30",
+        "event.severity": 6,
+        "event.start": "2023-07-15T15:37:03.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1128,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "SERVERS",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "exp-wait"
+        ],
+        "related.ip": [
+            "81.2.69.142"
+        ],
+        "service.type": "cisco",
+        "source.address": "exp-wait",
+        "source.domain": "exp-wait",
+        "source.port": 56421,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "outside",
+        "cisco.asa.message_id": "305011",
+        "cisco.asa.source_interface": "SERVERS",
+        "destination.address": "81.2.69.142",
+        "destination.geo.city_name": "London",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.5142,
+        "destination.geo.location.lon": -0.0931,
+        "destination.geo.region_iso_code": "GB-ENG",
+        "destination.geo.region_name": "England",
+        "destination.ip": "81.2.69.142",
+        "destination.port": 50578,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 305011,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-305011: Built dynamic TCP translation from SERVERS:exp-srv/50578 to outside:81.2.69.142/50578",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1282,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "SERVERS",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "exp-srv"
+        ],
+        "related.ip": [
+            "81.2.69.142"
+        ],
+        "service.type": "cisco",
+        "source.address": "exp-srv",
+        "source.domain": "exp-srv",
+        "source.port": 50578,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "outside",
+        "cisco.asa.message_id": "305011",
+        "cisco.asa.source_interface": "SERVERS",
+        "destination.address": "81.2.69.142",
+        "destination.geo.city_name": "London",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.5142,
+        "destination.geo.location.lon": -0.0931,
+        "destination.geo.region_iso_code": "GB-ENG",
+        "destination.geo.region_name": "England",
+        "destination.ip": "81.2.69.142",
+        "destination.port": 56570,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 305011,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-305011: Built dynamic UDP translation from SERVERS:exp-wait/56570 to outside:81.2.69.142/56570",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1415,
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "SERVERS",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "exp-wait"
+        ],
+        "related.ip": [
+            "81.2.69.142"
+        ],
+        "service.type": "cisco",
+        "source.address": "exp-wait",
+        "source.domain": "exp-wait",
+        "source.port": 56570,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "SH_OSS",
+        "cisco.asa.message_id": "106023",
+        "cisco.asa.rule_name": "MGT_access_in",
+        "cisco.asa.source_interface": "MG",
+        "destination.address": "89.160.20.128",
+        "destination.as.number": 29518,
+        "destination.as.organization.name": "Bredband2 AB",
+        "destination.geo.city_name": "Link\u00f6ping",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "SE",
+        "destination.geo.country_name": "Sweden",
+        "destination.geo.location.lat": 58.4167,
+        "destination.geo.location.lon": 15.6167,
+        "destination.geo.region_iso_code": "SE-E",
+        "destination.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "destination.ip": "89.160.20.128",
+        "destination.port": 2511,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106023,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-106023: Deny tcp src MG:exp_srv/64593 dst SH_OSS:89.160.20.128/2511 by access-group \"MGT_access_in\" [0x0, 0x0]",
+        "event.outcome": "success",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 1549,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "SH_OSS",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "MG",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "exp_srv"
+        ],
+        "related.ip": [
+            "89.160.20.128"
+        ],
+        "service.type": "cisco",
+        "source.address": "exp_srv",
+        "source.domain": "exp_srv",
+        "source.port": 64593,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "SH_OSS",
+        "cisco.asa.message_id": "106023",
+        "cisco.asa.rule_name": "MGT_access_in",
+        "cisco.asa.source_interface": "MG",
+        "destination.address": "89.160.20.128",
+        "destination.as.number": 29518,
+        "destination.as.organization.name": "Bredband2 AB",
+        "destination.geo.city_name": "Link\u00f6ping",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "SE",
+        "destination.geo.country_name": "Sweden",
+        "destination.geo.location.lat": 58.4167,
+        "destination.geo.location.lon": 15.6167,
+        "destination.geo.region_iso_code": "SE-E",
+        "destination.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "destination.ip": "89.160.20.128",
+        "destination.port": 2511,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106023,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-106023: Deny tcp src MG:exp_srv/63513 dst SH_OSS:89.160.20.128/2511 by access-group \"MGT_access_in\" [0x0, 0x0]",
+        "event.outcome": "success",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 1699,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "SH_OSS",
+        "observer.hostname": "216.160.83.56",
+        "observer.ingress.interface.name": "MG",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56",
+            "exp_srv"
+        ],
+        "related.ip": [
+            "89.160.20.128"
+        ],
+        "service.type": "cisco",
+        "source.address": "exp_srv",
+        "source.domain": "exp_srv",
+        "source.port": 63513,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 8,
+        "cisco.asa.mapped_source_ip": "81.2.69.192",
+        "cisco.asa.message_id": "302020",
+        "destination.domain": "eth0_fw",
+        "event.action": "flow-creation",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302020,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302020: Built inbound ICMP connection for faddr eth0_fw/6553 gaddr 81.2.69.192/0 laddr 81.2.69.192/0 type 8 code 0",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "start"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "81.2.69.142",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1849,
+        "network.direction": "inbound",
+        "network.protocol": "icmp",
+        "observer.hostname": "81.2.69.142",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.142",
+            "eth0_fw"
+        ],
+        "related.ip": [
+            "81.2.69.192"
+        ],
+        "service.type": "cisco",
+        "source.address": "81.2.69.192",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.192",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 8,
+        "cisco.asa.mapped_source_ip": "81.2.69.192",
+        "cisco.asa.message_id": "302020",
+        "destination.domain": "eth0_fw",
+        "event.action": "flow-creation",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302020,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302020: Built inbound ICMP connection for faddr eth0_fw/8396 gaddr 81.2.69.192/0 laddr 81.2.69.192/0 type 8 code 0",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "start"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "81.2.69.142",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1999,
+        "network.direction": "inbound",
+        "network.protocol": "icmp",
+        "observer.hostname": "81.2.69.142",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.142",
+            "eth0_fw"
+        ],
+        "related.ip": [
+            "81.2.69.192"
+        ],
+        "service.type": "cisco",
+        "source.address": "81.2.69.192",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.192",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 8,
+        "cisco.asa.mapped_source_ip": "81.2.69.192",
+        "cisco.asa.message_id": "302021",
+        "destination.domain": "eth0_fw",
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302021,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302021: Teardown ICMP connection for faddr eth0_fw/6553 gaddr 81.2.69.192/0 laddr 81.2.69.192/0 type 8 code 0",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "81.2.69.142",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 2149,
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "observer.hostname": "81.2.69.142",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.142",
+            "eth0_fw"
+        ],
+        "related.ip": [
+            "81.2.69.192"
+        ],
+        "service.type": "cisco",
+        "source.address": "81.2.69.192",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.192",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 8,
+        "cisco.asa.mapped_source_ip": "81.2.69.192",
+        "cisco.asa.message_id": "302021",
+        "destination.domain": "eth0_fw",
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302021,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302021: Teardown ICMP connection for faddr eth0_fw/8396 gaddr 81.2.69.192/0 laddr 81.2.69.192/0 type 8 code 0",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "81.2.69.142",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 2294,
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "observer.hostname": "81.2.69.142",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.142",
+            "eth0_fw"
+        ],
+        "related.ip": [
+            "81.2.69.192"
+        ],
+        "service.type": "cisco",
+        "source.address": "81.2.69.192",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.192",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113039",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113039,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-113039: Group <novpn> User <nt\\minsk> IP <216.160.83.56> AnyConnect parent session started.",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "81.2.69.192",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 2439,
+        "observer.hostname": "81.2.69.192",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.192"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "113039",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 113039,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-113039: Group <Group_VPN> User <support\\column> IP <81.2.69.192> AnyConnect parent session started.",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "216.160.83.56",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 2566,
+        "observer.hostname": "216.160.83.56",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "216.160.83.56"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "304001",
+        "destination.address": "mirror",
+        "destination.domain": "mirror",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 304001,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-304001: 192.168.14.22 Accessed URL mirror:http://mirror.example.com/path/to/resource",
+        "event.outcome": "success",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "81.2.69.142",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 2705,
+        "observer.hostname": "81.2.69.142",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "81.2.69.142",
+            "mirror"
+        ],
+        "related.ip": [
+            "192.168.14.22"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.14.22",
+        "source.ip": "192.168.14.22",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "url.domain": "mirror.example.com",
+        "url.original": "http://mirror.example.com/path/to/resource",
+        "url.path": "/path/to/resource",
+        "url.scheme": "http"
+    }
+]
