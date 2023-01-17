@@ -250,7 +250,6 @@ processors:
       ignore_missing: true
       if: "['ip-src|port', 'ip-dst|port'].contains(ctx.misp?.attribute?.type)"
       # MISP may send a CIDR such as 1.2.3.0/22, which is not a valid Elasticsearch IP data type
-      # https://github.com/elastic/beats/issues/29949
       ignore_failure: true
 
   ## Email indicator operations
