@@ -29,7 +29,7 @@ even though it can get expensive with dealing with a very large number of files.
 
 [id="supported-types-gcs"]
 NOTE: Currently only `JSON` and `NDJSON` are supported object/file formats. Objects/files may be also be gzip compressed. 
-As for authentication types, we currently have support for `json credential keys` and `credential files`.
+"JSON credential keys" and "credential files" are supported authentication types.
 If an array is present as the root object for an object/file, it is automatically split into individual objects and processed. 
 If a download for a file/object fails or gets interrupted, the download is retried for 2 times. This is currently not user configurable.
 

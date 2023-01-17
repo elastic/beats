@@ -312,7 +312,7 @@ func Test_StorageClient(t *testing.T) {
 			unexpectedError: context.Canceled,
 		},
 		{
-			name: "ReadNdJSON",
+			name: "ReadNDJSON",
 			baseConfig: map[string]interface{}{
 				"project_id":                 "elastic-sa",
 				"auth.credentials_file.path": "/gcs_creds.json",
@@ -415,9 +415,9 @@ func Test_StorageClient(t *testing.T) {
 
 			var timeout *time.Timer
 			if conf.PollInterval != nil {
-				timeout = time.NewTimer(1000*time.Second + *conf.PollInterval)
+				timeout = time.NewTimer(1*time.Second + *conf.PollInterval)
 			} else {
-				timeout = time.NewTimer(5000 * time.Second)
+				timeout = time.NewTimer(5 * time.Second)
 			}
 			t.Cleanup(func() { _ = timeout.Stop() })
 

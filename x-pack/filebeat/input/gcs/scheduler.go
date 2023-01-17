@@ -176,7 +176,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	ignore := false
 
 	for _, job := range jobs {
-		switch offset, isPartial := s.state.cp.PartiallyProcessed[job.object.Name]; {
+		switch offset, isPartial := s.state.cp.LastProcessedOffset[job.object.Name]; {
 		case isPartial:
 			job.offset = offset
 			latestJobs = append(latestJobs, job)

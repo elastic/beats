@@ -30,19 +30,19 @@ type Checkpoint struct {
 	LatestEntryTime time.Time
 	// list of failed jobs due to unexpected errors/download errors
 	FailedJobs map[string]int
-	// map to contain root type information for json objects
+	// a mapping from object name to whether the object is having an array type as it's root.
 	IsRootArray map[string]bool
-	// map to contain offset data
-	// if isRootArray == true for object, then PartiallyProcessed will treat offset as an array index
-	PartiallyProcessed map[string]int64
+	//  a mapping from object name to an array index that contains the last processed offset for that object.
+	// if isRootArray == true for object, then LastProcessedOffset will treat offset as an array index
+	LastProcessedOffset map[string]int64
 }
 
 func newState() *state {
 	return &state{
 		cp: &Checkpoint{
-			FailedJobs:         make(map[string]int),
-			PartiallyProcessed: make(map[string]int64),
-			IsRootArray:        make(map[string]bool),
+			FailedJobs:          make(map[string]int),
+			LastProcessedOffset: make(map[string]int64),
+			IsRootArray:         make(map[string]bool),
 		},
 	}
 }
@@ -50,7 +50,7 @@ func newState() *state {
 // save, saves/updates the current state for cursor checkpoint
 func (s *state) save(name string, lastModifiedOn time.Time) {
 	s.mu.Lock()
-	delete(s.cp.PartiallyProcessed, name)
+	delete(s.cp.LastProcessedOffset, name)
 	delete(s.cp.IsRootArray, name)
 	if _, ok := s.cp.FailedJobs[name]; !ok {
 		if len(s.cp.ObjectName) == 0 {
@@ -78,9 +78,7 @@ func (s *state) setRootArray(name string) {
 
 // savePartial, partially saves/updates the current state for cursor checkpoint
 func (s *state) savePartial(name string, offset int64) {
-	s.mu.Lock()
-	s.cp.PartiallyProcessed[name] = offset
-	s.mu.Unlock()
+	s.cp.LastProcessedOffset[name] = offset
 }
 
 // updateFailedJobs, adds a job name to a failedJobs map, which helps
@@ -90,7 +88,7 @@ func (s *state) savePartial(name string, offset int64) {
 // entry is removed from the map
 func (s *state) updateFailedJobs(jobName string) {
 	// we do not store partially processed jobs as failed jobs
-	if _, ok := s.cp.PartiallyProcessed[jobName]; ok {
+	if _, ok := s.cp.LastProcessedOffset[jobName]; ok {
 		return
 	}
 	s.mu.Lock()

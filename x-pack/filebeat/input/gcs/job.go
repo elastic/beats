@@ -26,18 +26,31 @@ import (
 )
 
 type job struct {
-	bucket       *storage.BucketHandle
-	object       *storage.ObjectAttrs
-	objectURI    string
-	hash         string
-	offset       int64
+	// gcs bucket handle
+	bucket *storage.BucketHandle
+	// gcs object attribute struct
+	object *storage.ObjectAttrs
+	// gcs uri for the resource
+	objectURI string
+	// object hash, used in setting event id
+	hash string
+	// offset value for an object, it points to the location inside the data stream
+	// from where we can start processing the object.
+	offset int64
+	// flag to denote if object is gZipped compressed or not.
 	isCompressed bool
-	isRootArray  bool
-	state        *state
-	src          *Source
-	publisher    cursor.Publisher
-	log          *logp.Logger
-	isFailed     bool
+	// flag to denote if object's root element is of an array type
+	isRootArray bool
+	// object state
+	state *state
+	// bucket source struct used for storing bucket related data
+	src *Source
+	// publisher is used to publish a beat event to the output stream
+	publisher cursor.Publisher
+	// custom logger
+	log *logp.Logger
+	// flag used to denote if this object has previously failed without being processed at all.
+	isFailed bool
 }
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
@@ -139,11 +152,7 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 		}
 	}()
 
-	updatedReader, err := j.addGzipDecoderIfNeeded(reader)
-	if err != nil {
-		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
-	}
-	err = j.readJsonAndPublish(ctx, updatedReader, id)
+	err = j.readJsonAndPublish(ctx, reader, id)
 	if err != nil {
 		return fmt.Errorf("failed to read data from object: %s, with error: %w", j.object.Name, err)
 	}
@@ -151,50 +160,26 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	return err
 }
 
-// addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not and adds gzipped decoder if needed. A buffered reader is used
-// so the function can peek into the byte  stream without consuming it. This makes it convenient for
-// code executed after this function call to consume the stream if it wants.
-func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
-	bufReader := bufio.NewReader(body)
-	isStreamGzipped := false
-	// check if stream is gziped or not
-	buf, err := bufReader.Peek(3)
-	if err != nil {
-		if err == io.EOF {
-			err = nil
-		}
-		return bufReader, err
-	}
-
-	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
-	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
-
-	if !isStreamGzipped {
-		return bufReader, nil
-	}
-
-	return gzip.NewReader(bufReader)
-}
-
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
 	var err error
-	var reader io.Reader
+
+	r, err = j.addGzipDecoderIfNeeded(r)
+	if err != nil {
+		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
+	}
+
 	// if offset == 0, then this is a new stream which has not been processed previously
 	if j.offset == 0 {
-		reader, j.isRootArray, err = evaluateJSON(r)
+		r, j.isRootArray, err = evaluateJSON(r)
 		if err != nil {
 			return fmt.Errorf("failed to evaluate json for object: %s, with error: %w", j.object.Name, err)
 		}
 		if j.isRootArray {
 			j.state.setRootArray(j.object.Name)
 		}
-	} else {
-		reader = r
 	}
-
-	dec := json.NewDecoder(reader)
-	// I array is present at root then read json token and advance decoder
+	dec := json.NewDecoder(r)
+	// If array is present at root then read json token and advance decoder
 	if j.isRootArray {
 		_, err := dec.Token()
 		if err != nil {
@@ -229,12 +214,12 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		var parsedData []mapstr.M
 		if j.src.ParseJSON {
 			reader := bytes.NewReader(data)
-			parsedData, _, _, err = httpReadJSON(reader)
+			parsedData, err = decodeJSON(reader)
 			if err != nil {
 				j.log.Errorf(jobErrString, id, err)
 			}
 		}
-		evt := j.createEvent(string(data), parsedData, offset+relativeOffset)
+		evt := j.createEvent(data, parsedData, offset+relativeOffset)
 		// updates the offset after reading the file
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
@@ -250,6 +235,32 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		}
 	}
 	return nil
+}
+
+// addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents gzipped content or not and adds gzipped decoder if needed. A buffered reader is used
+// so the function can peek into the byte  stream without consuming it. This makes it convenient for
+// code executed after this function call to consume the stream if it wants.
+func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
+	bufReader := bufio.NewReader(body)
+	isStreamGzipped := false
+	// check if stream is gziped or not
+	buf, err := bufReader.Peek(3)
+	if err != nil {
+		if err == io.EOF {
+			err = nil
+		}
+		return bufReader, err
+	}
+
+	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
+	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
+
+	if !isStreamGzipped {
+		return bufReader, nil
+	}
+
+	return gzip.NewReader(bufReader)
 }
 
 // evaluateJSON, uses a bufio.NewReader & reader.Peek to evaluate if the
@@ -284,11 +295,11 @@ func evaluateJSON(r io.Reader) (io.Reader, bool, error) {
 	}
 }
 
-func (j *job) createEvent(message string, data []mapstr.M, offset int64) beat.Event {
+func (j *job) createEvent(message []byte, data []mapstr.M, offset int64) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
-			"message": message, // original stringified data
+			"message": string(message), // original stringified data
 			"log": mapstr.M{
 				"offset": offset,
 				"file": mapstr.M{
