@@ -31687,18 +31687,32 @@ type: long
 
 --
 
+[float]
+=== ingest.pipeline
+
+Runtime metrics on ingest pipeline execution
+
 
 *`elasticsearch.ingest.pipeline.name`*::
 +
 --
+Name / id of the ingest pipeline
+
 type: wildcard
 
 --
+
+[float]
+=== total
+
+Metrics on the total ingest pipeline execution, including all processors.
 
 
 *`elasticsearch.ingest.pipeline.total.count`*::
 +
 --
+Number of documents processed by this pipeline
+
 type: long
 
 --
@@ -31706,6 +31720,8 @@ type: long
 *`elasticsearch.ingest.pipeline.total.failed`*::
 +
 --
+Number of documented failed to process by this pipeline
+
 type: long
 
 --
@@ -31713,6 +31729,8 @@ type: long
 *`elasticsearch.ingest.pipeline.total.total_time`*::
 +
 --
+Total time spent processing documents through this pipeline, inclusive of other pipelines called
+
 type: long
 
 --
@@ -31720,6 +31738,8 @@ type: long
 *`elasticsearch.ingest.pipeline.total.self_time`*::
 +
 --
+Time spent processing documents through this pipeline, exclusive of other pipelines called
+
 type: long
 
 --
@@ -31728,6 +31748,8 @@ type: long
 *`elasticsearch.ingest.pipeline.processor.type`*::
 +
 --
+The type of ingest processor
+
 type: keyword
 
 --
@@ -31735,6 +31757,8 @@ type: keyword
 *`elasticsearch.ingest.pipeline.processor.type_tag`*::
 +
 --
+The type and the tag for this processor in the format "<type>:<tag>"
+
 type: keyword
 
 --
@@ -31742,6 +31766,8 @@ type: keyword
 *`elasticsearch.ingest.pipeline.processor.order_index`*::
 +
 --
+The order this processor appears in the pipeline definition
+
 type: long
 
 --
@@ -31749,6 +31775,8 @@ type: long
 *`elasticsearch.ingest.pipeline.processor.count`*::
 +
 --
+Number of documents processed by this processor
+
 type: long
 
 --
@@ -31756,6 +31784,8 @@ type: long
 *`elasticsearch.ingest.pipeline.processor.failed`*::
 +
 --
+Number of documented failed to process by this processor
+
 type: long
 
 --
@@ -31763,6 +31793,8 @@ type: long
 *`elasticsearch.ingest.pipeline.processor.total_time`*::
 +
 --
+Total time spent processing documents through this processor
+
 type: long
 
 --
