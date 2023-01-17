@@ -107,7 +107,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add tags to events based on parsed identifier. {pull}33472[33472]
 - Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
 - Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
-- Fixed the integration testcases for sql and oracle modules {pull}34221[34221]
 
 *Packetbeat*
 
