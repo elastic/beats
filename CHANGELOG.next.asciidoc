@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest
 
 *Functionbeat*
 
