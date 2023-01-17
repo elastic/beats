@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
+- [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
 
 
 *Heartbeat*
