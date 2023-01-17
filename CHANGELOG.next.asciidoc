@@ -41,6 +41,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
 - Fix 'requires pointer' error while getting cursor metadata. {pull}33956[33956]
+- [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
+
 
 *Heartbeat*
 
