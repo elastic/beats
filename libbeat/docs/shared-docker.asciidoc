@@ -112,7 +112,7 @@ using this syntax:
 [source,shell]
 --------------------------------------------
 -E cloud.id=<Cloud ID from Elasticsearch Service> \
--E cloud.auth=elastic:<elastic password>
+-E cloud.auth=username:<elastic password>
 --------------------------------------------
 
 endif::apm-server[]
