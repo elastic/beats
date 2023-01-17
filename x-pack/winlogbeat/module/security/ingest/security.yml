@@ -616,6 +616,13 @@ processors:
             - user
             - change
           action: renamed-user-account
+        "4797":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: query-existence-of-blank-password
         "4798":
           category:
             - iam
@@ -743,6 +750,34 @@ processors:
           type:
             - end
           action: windows-firewall-driver-error
+        "5379":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: credential-manager-credentials-were-read
+        "5380":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: vault-credential-find
+        "5381":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: vault-credentials-were-read
+        "5382":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: vault-credentials-were-read
       source: |-
         if (ctx?.event?.code == null || params.get(ctx.event.code) == null) {
           return;
