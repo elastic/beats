@@ -1,0 +1,18 @@
+---
+name: OpenTelemetry Export Trace
+
+on:
+  workflow_run:
+    workflows:
+      - golangci-lint
+    types: [completed]
+
+jobs:
+  otel-export-trace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: elastic/apm-pipeline-library/.github/actions/opentelemetry@current
+        with:
+          vaultUrl: ${{ secrets.VAULT_ADDR }}
+          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
+          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
