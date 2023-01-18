@@ -118,6 +118,7 @@ output {
   elasticsearch {
     hosts => ["http://localhost:9200"]
     index => "%{[@metadata][beat]}-%{[@metadata][version]}" <1>
+    action => "create"
   }
 }
 ------------------------------------------------------------------------------
@@ -158,6 +159,7 @@ output {
     elasticsearch {
         hosts => ["http://localhost:9200"]
         index => "%{[@metadata][index]}"
+        action => "create"
     }
 }
 ------
@@ -195,6 +197,7 @@ output {
     elasticsearch {
         hosts => ["http://localhost:9200"]
         index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{[processor][event]}" <1>
+        action => "create"
     }
 }
 ------
