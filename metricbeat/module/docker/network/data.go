@@ -37,6 +37,20 @@ func eventMapping(r mb.ReporterV2, stats *NetStats) {
 		RootFields: rootFields,
 		MetricSetFields: mapstr.M{
 			"interface": stats.NameInterface,
+			// Deprecated
+			"in": mapstr.M{
+				"bytes":   stats.RxBytes,
+				"dropped": stats.RxDropped,
+				"errors":  stats.RxErrors,
+				"packets": stats.RxPackets,
+			},
+			// Deprecated
+			"out": mapstr.M{
+				"bytes":   stats.TxBytes,
+				"dropped": stats.TxDropped,
+				"errors":  stats.TxErrors,
+				"packets": stats.TxPackets,
+			},
 			"inbound": mapstr.M{
 				"bytes":   stats.Total.RxBytes,
 				"dropped": stats.Total.RxDropped,
