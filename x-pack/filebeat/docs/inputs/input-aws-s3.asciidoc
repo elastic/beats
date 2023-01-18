@@ -733,6 +733,7 @@ observe the activity of the input.
 | `sqs_messages_returned_total`             | Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 | `sqs_messages_deleted_total`              | Number of SQS messages deleted.
 | `sqs_message_processing_time`             | Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
+| `sqs_message_delayed_time`                | Histogram of delay in SQS processing times in nanoseconds (message sent time to now).
 | `s3_objects_requested_total`              | Number of S3 objects downloaded.
 | `s3_objects_listed_total`                 | Number of S3 objects returned by list operations.
 | `s3_objects_processed_total`              | Number of S3 objects that matched file_selectors rules.
