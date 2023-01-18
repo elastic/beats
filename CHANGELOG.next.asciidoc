@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix handling of non-200/non-429 status codes. {issue}33999[33999] {pull}34002[34002]
 - [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
 - [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
+- Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
 
 *Heartbeat*
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
