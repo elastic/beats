@@ -1,5 +1,5 @@
 Elastic Beats
-Copyright 2014-2022 Elasticsearch BV
+Copyright 2014-2023 Elasticsearch BV
 
 This product includes software developed by The Apache Software 
 Foundation (http://www.apache.org/).
@@ -1167,12 +1167,12 @@ SOFTWARE
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
-Version: v1.0.0
+Dependency : github.com/gpop63/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
+Version: v0.0.0-20221201195319-8eb84523c8e3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption@v1.0.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/gpop63/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption@v0.0.0-20221201195319-8eb84523c8e3/LICENSE.txt:
 
 MIT License
 
