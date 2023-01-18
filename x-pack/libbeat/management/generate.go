@@ -67,21 +67,44 @@ func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
 // that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
-func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo) ([]map[string]interface{}, error) {
-	inputs := make([]map[string]interface{}, len(raw.Streams))
+func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
+	// should this be an error?
+	if raw.GetStreams() == nil {
+		return []map[string]interface{}{}, nil
+	}
+	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
 
 	for iter, stream := range raw.GetStreams() {
 		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
 
 		streamSource = injectIndexStream(inputType, raw, stream, streamSource)
-		streamSource, err := injectStreamProcessors(raw, inputType, stream, streamSource)
-		if err != nil {
-			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
-		}
-		streamSource, err = injectAgentInfoRule(streamSource, agentInfo)
+
+		// the order of building the processors is important
+		// prepend is used to ensure that the processors defined directly on the stream
+		// come last in the order as they take priority over the others as they are the
+		// most specific to this one stream
+
+		// 1. global processors
+		streamSource = injectGlobalProcesssors(raw, streamSource)
+
+		// 2. agentInfo
+		streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
 		if err != nil {
 			return nil, fmt.Errorf("Error injecting agent processors: %w", err)
 		}
+
+		// 3. stream processors
+		streamSource, err = injectStreamProcessors(raw, inputType, stream, streamSource, defaultProcessors)
+		if err != nil {
+			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
+		}
+
+		// now the order of the processors on this input is as follows
+		// 1. stream processors
+		// 2. agentInfo processors
+		// 3. global processors
+		// 4. stream specific processors
+
 		inputs[iter] = streamSource
 	}
 
@@ -123,19 +146,28 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 		mapstr.M{"id": agentInfo.ID},
 		"agent"))
 
-	currentProcs, ok := inputs["processors"]
-	if !ok {
-		inputs["processors"] = processors
-	} else {
-		currentProcsList, ok := currentProcs.([]interface{})
-		if !ok {
-			return nil, fmt.Errorf("error creating list of existing processors, got: %#v", currentProcs)
-		}
-		inputs["processors"] = append(processors, currentProcsList...)
-
-	}
+	inputs["processors"] = prependProcessors(inputs, processors)
 
 	return inputs, nil
+}
+
+// injectGlobalProcesssors re-injects any global processors into the individual streams
+func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[string]interface{}) map[string]interface{} {
+	rootMap := expected.GetSource().AsMap()
+	globalProcFound, ok := rootMap["processors"]
+	if !ok {
+		return stream
+	}
+	globalList, ok := globalProcFound.([]interface{})
+	if !ok {
+		return stream
+	}
+	// copy global processors to ensure that each stream gets its own copy
+	// if the stream doesn't have any processors it will take the slice as the new value
+	// without copying its possible that the processors appended to the streams will be shared
+	newProcs := prependProcessors(stream, append([]interface{}{}, globalList...))
+	stream["processors"] = newProcs
+	return stream
 }
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
@@ -148,13 +180,20 @@ func injectIndexStream(dataStreamType string, expected *proto.UnitExpectedConfig
 }
 
 //injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
-// this adds a variety of processors foe metadata related to the dataset and input config.
-func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}) (map[string]interface{}, error) {
+// this adds a variety of processors for metadata related to the dataset and input config.
+func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}, defaultProcessors []mapstr.M) (map[string]interface{}, error) {
 	//1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
 	procInputType, procInputDataset, procInputNamespace := metadataFromDatastreamValues(dataStreamType, expected, streamExpected)
 
 	var processors = []interface{}{}
+
+	for _, p := range defaultProcessors {
+		if len(p) == 0 {
+			continue
+		}
+		processors = append(processors, p)
+	}
 
 	// In V1, AST injects input_id at the input level and not the stream level,
 	// for reasons I can't understand, as it just ends up shuffling it around
@@ -180,18 +219,9 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType s
 		processors = append(processors, sourceStream)
 	}
 
-	// figure out if we have any existing processors
-	currentProcs, ok := stream["processors"]
-	if !ok {
-		stream["processors"] = processors
-	} else {
-		currentProcsList, ok := currentProcs.([]interface{})
-		if !ok {
-			return nil, fmt.Errorf("error creating list of existing processors, got: %#v", currentProcs)
-		}
-		stream["processors"] = append(processors, currentProcsList...)
-
-	}
+	// prepend with existing processors
+	// streams processors should be first as other processors might adjust values in those fields
+	stream["processors"] = prependProcessors(stream, processors)
 
 	return stream, nil
 }
@@ -224,6 +254,20 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 			"target": target,
 		},
 	}
+}
+
+// prependProcessors takes an existing input or stream-level config, extracts any existing processors in the config,
+// and appends them to a new list of configs. Mostly a helper to deal with all the typecasting
+func prependProcessors(existingConfig map[string]interface{}, newProcs []interface{}) []interface{} {
+	currentProcs, ok := existingConfig["processors"]
+	if !ok {
+		return newProcs
+	}
+	currentList, ok := currentProcs.([]interface{})
+	if !ok {
+		return newProcs
+	}
+	return append(newProcs, currentList...)
 }
 
 // metadataFromDatastreamValues takes the various data_stream values from across the expected config and returns a set of "good" that can be used to add fields
@@ -271,6 +315,9 @@ func groupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, e
 	// I don't think we can get the `Headers()` data reported by the AgentInfo()
 	sourceMap := outCfg.GetSource().AsMap()
 	outputType := outCfg.GetType() //nolint:typecheck // this is used, linter just doesn't seem to see it
+	if outputType == "" {
+		return nil, fmt.Errorf("output config does not have a configured type field")
+	}
 	formattedOut := mapstr.M{
 		outputType: sourceMap,
 	}

@@ -157,7 +157,7 @@ func run(
 
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := config.Request.Transport.Client(clientOptions(config.Request.URL.URL)...)
+	netHTTPClient, err := config.Request.Transport.Client(clientOptions(config.Request.URL.URL, config.Request.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(u *url.URL) []httpcommon.TransportOption {
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
 	scheme, trans, ok := strings.Cut(u.Scheme, "+")
 	var dialer transport.Dialer
 	switch {
@@ -210,7 +210,7 @@ func clientOptions(u *url.URL) []httpcommon.TransportOption {
 	case !ok:
 		return []httpcommon.TransportOption{
 			httpcommon.WithAPMHTTPInstrumentation(),
-			httpcommon.WithKeepaliveSettings{Disable: true},
+			keepalive,
 		}
 
 	// We set the host for the unix socket and Windows named
@@ -228,7 +228,7 @@ func clientOptions(u *url.URL) []httpcommon.TransportOption {
 	u.Scheme = scheme
 	return []httpcommon.TransportOption{
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
+		keepalive,
 		httpcommon.WithBaseDialer(dialer),
 	}
 }
