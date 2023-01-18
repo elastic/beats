@@ -27,6 +27,7 @@ import (
 
 const (
 	sqsApproximateReceiveCountAttribute = "ApproximateReceiveCount"
+	sqsSentTimestampAttribute           = "SentTimestamp"
 	sqsInvalidParameterValueErrorCode   = "InvalidParameterValue"
 	sqsReceiptHandleIsInvalidErrCode    = "ReceiptHandleIsInvalid"
 )
@@ -133,6 +134,19 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	keepaliveWg.Add(1)
 	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
 
+	rawRecieveCount, hasReceiveCountAttribute := msg.Attributes[sqsApproximateReceiveCountAttribute]
+
+	if hasReceiveCountAttribute {
+		if receiveCount, err := strconv.Atoi(rawRecieveCount); err == nil && receiveCount == 1 {
+			if s, found := msg.Attributes[sqsSentTimestampAttribute]; found {
+				if sentTimeMillis, err := strconv.ParseInt(s, 10, 64); err == nil {
+					sentTime := time.UnixMilli(sentTimeMillis)
+					p.metrics.sqsMessageDelayedTime.Update(time.Since(sentTime).Nanoseconds())
+				}
+			}
+		}
+	}
+
 	handles, processingErr := p.processS3Events(ctx, log, *msg.Body)
 
 	// Stop keepalive routine before changing visibility.
@@ -152,15 +166,13 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 		return nil
 	}
 
-	if p.maxReceiveCount > 0 && !errors.Is(processingErr, &nonRetryableError{}) {
+	if p.maxReceiveCount > 0 && !errors.Is(processingErr, &nonRetryableError{}) && hasReceiveCountAttribute {
 		// Prevent poison pill messages from consuming all workers. Check how
 		// many times this message has been received before making a disposition.
-		if v, found := msg.Attributes[sqsApproximateReceiveCountAttribute]; found {
-			if receiveCount, err := strconv.Atoi(v); err == nil && receiveCount >= p.maxReceiveCount {
-				processingErr = nonRetryableErrorWrap(fmt.Errorf(
-					"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
-					receiveCount, p.maxReceiveCount, processingErr))
-			}
+		if receiveCount, err := strconv.Atoi(rawRecieveCount); err == nil && receiveCount >= p.maxReceiveCount {
+			processingErr = nonRetryableErrorWrap(fmt.Errorf(
+				"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
+				receiveCount, p.maxReceiveCount, processingErr))
 		}
 	}
 
