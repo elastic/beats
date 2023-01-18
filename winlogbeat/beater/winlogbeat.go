@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/winlogbeat/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -154,6 +155,12 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	// Initialize metrics.
 	initMetrics("total")
+	if b.API != nil {
+		err := inputmon.AttachHandler(b.API.Router())
+		if err != nil {
+			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+		}
+	}
 
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {

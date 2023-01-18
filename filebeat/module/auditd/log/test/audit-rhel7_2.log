@@ -1,0 +1,1 @@
+type=ANOM_ABEND msg=audit(1605431420.026:123): auid=12345 uid=123 gid=123 ses=123456789 pid=1234 comm="extproc" reason="memory violation" sig=6

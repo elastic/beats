@@ -7,19 +7,16 @@
     },
     "kubernetes": {
         "controllermanager": {
-            "name": "serviceaccount",
+            "name": "noexec_taint_pod",
             "workqueue": {
                 "adds": {
-                    "count": 5
+                    "count": 16
                 },
                 "depth": {
                     "count": 0
                 },
                 "longestrunning": {
                     "sec": 0
-                },
-                "retries": {
-                    "count": 0
                 },
                 "unfinished": {
                     "sec": 0
