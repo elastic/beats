@@ -25,6 +25,11 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "user1"
+      ]
+    },
     "winlog": {
       "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
       "channel": "Security",
@@ -87,6 +92,11 @@
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1"
+      ]
     },
     "winlog": {
       "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
@@ -151,6 +161,11 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "user1"
+      ]
+    },
     "winlog": {
       "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
       "channel": "Security",
@@ -214,6 +229,11 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "user1"
+      ]
+    },
     "winlog": {
       "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
       "channel": "Security",
@@ -276,6 +296,11 @@
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1"
+      ]
     },
     "winlog": {
       "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
