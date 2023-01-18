@@ -191,7 +191,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Remove GCP Compute metadata cache {pull}33655[33655]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add GCP Redis regions support {pull}33728[33728]
-- Migrate Azure billing, monitor and storage to the newer SDK. {pull}33585[33585]
+- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 - Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 
 *Packetbeat*
