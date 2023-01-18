@@ -45,62 +45,44 @@ func NewService(config Config) (*MonitorService, error) {
 		}
 	}
 
+	clientOptions := policy.ClientOptions{
+		Cloud: cloud.Configuration{
+			Services:                     cloudServicesConfig,
+			ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
+		},
+	}
+
 	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret,
 		&azidentity.ClientSecretCredentialOptions{
-			ClientOptions: policy.ClientOptions{
-				Cloud: cloud.Configuration{
-					Services:                     cloudServicesConfig,
-					ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-				},
-			},
+			ClientOptions: clientOptions,
 		})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
 	}
 
 	metricsClient, err := armmonitor.NewMetricsClient(credential, &arm.ClientOptions{
-		ClientOptions: policy.ClientOptions{
-			Cloud: cloud.Configuration{
-				Services:                     cloudServicesConfig,
-				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-			},
-		},
+		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create metrics client: %w", err)
 	}
 
 	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(credential, &arm.ClientOptions{
-		ClientOptions: policy.ClientOptions{
-			Cloud: cloud.Configuration{
-				Services:                     cloudServicesConfig,
-				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-			},
-		},
+		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create metric definitions client: %w", err)
 	}
 
 	resourceClient, err := armresources.NewClient(config.SubscriptionId, credential, &arm.ClientOptions{
-		ClientOptions: policy.ClientOptions{
-			Cloud: cloud.Configuration{
-				Services:                     cloudServicesConfig,
-				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-			},
-		},
+		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create resources client: %w", err)
 	}
 
 	metricNamespaceClient, err := armmonitor.NewMetricNamespacesClient(credential, &arm.ClientOptions{
-		ClientOptions: policy.ClientOptions{
-			Cloud: cloud.Configuration{
-				Services:                     cloudServicesConfig,
-				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-			},
-		},
+		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create metric namespaces client: %w", err)

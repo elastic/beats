@@ -56,37 +56,29 @@ func NewService(config azure.Config) (*UsageService, error) {
 		}
 	}
 
-	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret, &azidentity.ClientSecretCredentialOptions{
-		ClientOptions: policy.ClientOptions{
-			Cloud: cloud.Configuration{
-				Services:                     cloudServicesConfig,
-				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-			},
+	clientOptions := policy.ClientOptions{
+		Cloud: cloud.Configuration{
+			Services:                     cloudServicesConfig,
+			ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
 		},
+	}
+
+	credential, err := azidentity.NewClientSecretCredential(config.TenantId, config.ClientId, config.ClientSecret, &azidentity.ClientSecretCredentialOptions{
+		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
 	}
 
 	usageDetailsClient, err := armconsumption.NewUsageDetailsClient(credential, &arm.ClientOptions{
-		ClientOptions: policy.ClientOptions{
-			Cloud: cloud.Configuration{
-				Services:                     cloudServicesConfig,
-				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-			},
-		},
+		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create usage details client: %w", err)
 	}
 
 	forecastsClient, err := armcostmanagement.NewForecastClient(credential, &arm.ClientOptions{
-		ClientOptions: policy.ClientOptions{
-			Cloud: cloud.Configuration{
-				Services:                     cloudServicesConfig,
-				ActiveDirectoryAuthorityHost: config.ActiveDirectoryEndpoint,
-			},
-		},
+		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create forecast client: %w", err)
