@@ -64,7 +64,7 @@ func EventsMapping(
 					// original fields
 					"billing_period_id": legacy.ID,
 					"product":           legacy.Properties.Product,
-					"pretax_cost":       strconv.FormatFloat(*legacy.Properties.Cost, 'f', -1, 64),
+					"pretax_cost":       legacy.Properties.Cost,
 					"currency":          legacy.Properties.BillingCurrency,
 					"department_name":   legacy.Properties.InvoiceSection,
 					"account_name":      legacy.Properties.BillingAccountName,
@@ -74,8 +74,8 @@ func EventsMapping(
 					// additional fields
 					"usage_date": legacy.Properties.Date, // Date for the usage record.
 					"account_id": legacy.Properties.BillingAccountID,
-					"unit_price": strconv.FormatFloat(*legacy.Properties.UnitPrice, 'f', -1, 64),
-					"quantity":   strconv.FormatFloat(*legacy.Properties.Quantity, 'f', -1, 64),
+					"unit_price": legacy.Properties.UnitPrice,
+					"quantity":   legacy.Properties.Quantity,
 				}
 				_, _ = event.RootFields.Put("cloud.region", legacy.Properties.ResourceLocation)
 				_, _ = event.RootFields.Put("cloud.instance.name", legacy.Properties.ResourceName)
@@ -100,7 +100,7 @@ func EventsMapping(
 					// original fields
 					"billing_period_id": modern.ID,
 					"product":           modern.Properties.Product,
-					"pretax_cost":       strconv.FormatFloat(*modern.Properties.CostInBillingCurrency, 'f', -1, 64),
+					"pretax_cost":       modern.Properties.CostInBillingCurrency,
 					"currency":          modern.Properties.BillingCurrencyCode,
 					"department_name":   modern.Properties.InvoiceSectionName,
 					"account_name":      modern.Properties.BillingAccountName,
@@ -110,8 +110,8 @@ func EventsMapping(
 					// additional fields
 					"usage_date": modern.Properties.Date, // Date for the usage record.
 					"account_id": modern.Properties.BillingAccountID,
-					"unit_price": strconv.FormatFloat(*modern.Properties.UnitPrice, 'f', -1, 64),
-					"quantity":   strconv.FormatFloat(*modern.Properties.Quantity, 'f', -1, 64),
+					"unit_price": modern.Properties.UnitPrice,
+					"quantity":   modern.Properties.Quantity,
 				}
 				_, _ = event.RootFields.Put("cloud.region", modern.Properties.ResourceLocation)
 			default:
