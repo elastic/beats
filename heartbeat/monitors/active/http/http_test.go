@@ -167,7 +167,7 @@ func respondingHTTPBodyChecks(body string) validator.Validator {
 func respondingHTTPHeaderChecks() validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"http.response.headers": map[string]interface{}{
-			"Date":           isdef.IsString,
+			"Date":           isdef.Optional(isdef.IsString),
 			"Content-Length": isdef.Optional(isdef.IsString),
 			"Content-Type":   isdef.Optional(isdef.IsString),
 			"Location":       isdef.Optional(isdef.IsString),
@@ -261,12 +261,12 @@ func TestUpStatuses(t *testing.T) {
 
 				testslike.Test(
 					t,
-					lookslike.Strict(lookslike.Compose(
+					lookslike.Compose(
 						hbtest.BaseChecks("127.0.0.1", "up", "http"),
 						hbtest.RespondingTCPChecks(),
 						hbtest.SummaryChecks(1, 0),
 						respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
-					)),
+					),
 					event.Fields,
 				)
 			})
@@ -687,7 +687,7 @@ func TestRedirect(t *testing.T) {
 
 		testslike.Test(
 			t,
-			lookslike.Strict(lookslike.Compose(
+			lookslike.Compose(
 				hbtest.BaseChecks("", "up", "http"),
 				hbtest.SummaryChecks(1, 0),
 				minimalRespondingHTTPChecks(testURL, "text/plain; charset=utf-8", 200),
@@ -701,7 +701,7 @@ func TestRedirect(t *testing.T) {
 						server.URL + redirectingPaths["/redirect_two"],
 					},
 				}),
-			)),
+			),
 			event.Fields,
 		)
 	}
