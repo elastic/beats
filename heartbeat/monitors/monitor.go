@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
@@ -49,13 +50,14 @@ const (
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
-	stdFields      stdfields.StdMonitorFields
-	pluginName     string
-	config         *conf.C
-	addTask        scheduler.AddTask
-	configuredJobs []*configuredJob
-	enabled        bool
-	state          int
+	stdFields          stdfields.StdMonitorFields
+	parsedMaintWindows []maintwin.ParsedMaintWin
+	pluginName         string
+	config             *conf.C
+	addTask            scheduler.AddTask
+	configuredJobs     []*configuredJob
+	enabled            bool
+	state              int
 	// endpoints is a count of endpoints this monitor measures.
 	endpoints int
 	// internalsMtx is used to synchronize access to critical

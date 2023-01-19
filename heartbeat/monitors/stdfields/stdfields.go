@@ -22,6 +22,7 @@ import (
 	"time"
 
 	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -32,15 +33,16 @@ type ServiceFields struct {
 
 // StdMonitorFields represents the generic configuration options around a monitor plugin.
 type StdMonitorFields struct {
-	ID                 string             `config:"id"`
-	Name               string             `config:"name"`
-	Type               string             `config:"type" validate:"required"`
-	Schedule           *schedule.Schedule `config:"schedule" validate:"required"`
-	MaintenanceWindows []string           `config:"maintenance_windows" `
-	Timeout            time.Duration      `config:"timeout"`
-	Service            ServiceFields      `config:"service"`
-	Origin             string             `config:"origin"`
-	LegacyServiceName  string             `config:"service_name"`
+	ID                       string              `config:"id"`
+	Name                     string              `config:"name"`
+	Type                     string              `config:"type" validate:"required"`
+	Schedule                 *schedule.Schedule  `config:"schedule" validate:"required"`
+	MaintenanceWindows       []maintwin.MaintWin `config:"maintenance_windows" `
+	ParsedMaintenanceWindows []maintwin.ParsedMaintWin
+	Timeout                  time.Duration `config:"timeout"`
+	Service                  ServiceFields `config:"service"`
+	Origin                   string        `config:"origin"`
+	LegacyServiceName        string        `config:"service_name"`
 	// Used by zip_url and local monitors
 	// kibana originating monitors only run one journey at a time
 	// and just use the `fields` syntax / manually set monitor IDs
@@ -72,6 +74,14 @@ func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
 	// TODO: Delete this once browser / local monitors are removed
 	if sFields.Source.Local != nil || sFields.Source.ZipUrl != nil {
 		sFields.IsLegacyBrowserSource = true
+	}
+
+	for _, mw := range sFields.MaintenanceWindows {
+		parsed, err := mw.Parse()
+		if err != nil {
+			return StdMonitorFields{}, fmt.Errorf("could not parse maintenance window for monitor (id:%s name:%s): %w", sFields.ID, sFields.Name, err)
+		}
+		sFields.ParsedMaintenanceWindows = append(sFields.ParsedMaintenanceWindows, parsed)
 	}
 
 	return sFields, nil
