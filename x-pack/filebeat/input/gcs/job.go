@@ -162,15 +162,18 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
 	var err error
-
-	r, err = j.addGzipDecoderIfNeeded(r)
+	bufReader := bufio.NewReader(r)
+	r, isGzipped, err := j.addGzipDecoderIfNeeded(bufReader)
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
 	}
 
 	// if offset == 0, then this is a new stream which has not been processed previously
 	if j.offset == 0 {
-		r, j.isRootArray, err = evaluateJSON(r)
+		if isGzipped {
+			bufReader = bufio.NewReader(r)
+		}
+		r, j.isRootArray, err = evaluateJSON(bufReader)
 		if err != nil {
 			return fmt.Errorf("failed to evaluate json for object: %s, with error: %w", j.object.Name, err)
 		}
@@ -205,12 +208,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		if (j.isCompressed || j.isRootArray) && offset < j.offset {
 			continue
 		}
-
-		data, err := item.MarshalJSON()
-		if err != nil {
-			return err
-		}
-
+		data := []byte(item)
 		var parsedData []mapstr.M
 		if j.src.ParseJSON {
 			reader := bytes.NewReader(data)
@@ -238,40 +236,42 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 }
 
 // addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not and adds gzipped decoder if needed. A buffered reader is used
+// represents gzipped content or not and adds gzipped decoder if needed. A bufio.Reader is used
 // so the function can peek into the byte  stream without consuming it. This makes it convenient for
 // code executed after this function call to consume the stream if it wants.
-func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
-	bufReader := bufio.NewReader(body)
+func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, bool, error) {
 	isStreamGzipped := false
 	// check if stream is gziped or not
-	buf, err := bufReader.Peek(3)
+	buf, err := reader.Peek(3)
 	if err != nil {
 		if err == io.EOF {
 			err = nil
 		}
-		return bufReader, err
+		return reader, false, err
 	}
 
 	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
 	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
 
 	if !isStreamGzipped {
-		return bufReader, nil
+		return reader, false, nil
 	}
 
-	return gzip.NewReader(bufReader)
+	gzReader, err := gzip.NewReader(reader)
+	if err != nil {
+		return reader, false, err
+	}
+
+	return gzReader, true, nil
 }
 
 // evaluateJSON, uses a bufio.NewReader & reader.Peek to evaluate if the
 // data stream contains a json array as the root element or not, without
 // advancing the reader
-func evaluateJSON(r io.Reader) (io.Reader, bool, error) {
-	// create a buffered reader so we can retry
-	rdr := bufio.NewReader(r)
+func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 	eof := false
 	for i := 0; ; i++ {
-		b, err := rdr.Peek((i + 1) * 5)
+		b, err := reader.Peek((i + 1) * 5)
 		if err == io.EOF {
 			eof = true
 		}
@@ -280,9 +280,9 @@ func evaluateJSON(r io.Reader) (io.Reader, bool, error) {
 			char := b[startByte+j : startByte+j+1]
 			switch {
 			case bytes.Equal(char, []byte("[")):
-				return rdr, true, nil
+				return reader, true, nil
 			case bytes.Equal(char, []byte("{")):
-				return rdr, false, nil
+				return reader, false, nil
 			case unicode.IsSpace(bytes.Runes(char)[0]):
 				continue
 			default:
