@@ -16,7 +16,7 @@ required from the user.
 In this guide, you'll learn how to migrate an existing `log` input configuration.
 
 IMPORTANT: You must replace `log` inputs with `filestream` inputs, make sure you have removed
-the all inputs from the configuration before starting Filebeat with the new `filestream` inputs after finishing all the steps. Running old `log` inputs and new `filestream` inputs pointed to the same files will lead to data duplication.
+the all old `log` inputs from the configuration before starting Filebeat with the new `filestream` inputs. Running old `log` inputs and new `filestream` inputs pointed to the same files will lead to data duplication.
 
 The following example shows three `log` inputs:
 
@@ -226,3 +226,16 @@ The example configuration shown earlier needs to be adjusted as well:
 |backoff_max
 |backoff.max
 |===
+
+=== If something went wrong
+
+If for whatever reason you'd like to revert the configuration after running the migrated configuration
+and return old `log` inputs their files taken by `filestream` inputs, you need to do the following:
+
+1. Stop Filebeat as soon as possible
+2. Find your <<configuration-global-options,`registry.path/filebeat` directory>>
+3. Find the created backup files, they have the `<timestamp>.to.bak` suffix. If you have multiple backups for the same file, choose the one with the more recent timestamp.
+4. Replace the files with their backups, e.g. `log.json` should be replaced by `log.json-1673975793.to.bak`
+5. Run Filebeat with the old configuration (no `filestream` inputs with `take_over: true`).
+
+NOTE: Reverting to backups might cause some events to repeat, depends on the amount of time the new configuration was running.
