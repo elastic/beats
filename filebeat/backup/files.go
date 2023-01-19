@@ -56,8 +56,8 @@ func (fb *fileBackuper) Backup() error {
 			defer src.Close()
 
 			// we must put the timestamp as a prefix, so after the restart the new backups don't override the previous ones
-			backupFilename := fmt.Sprintf("%s-%d%s", file, time.Now().Unix(), backupSuffix)
-			dst, err := os.OpenFile(backupFilename, os.O_CREATE|os.O_TRUNC|os.O_APPEND|os.O_WRONLY, 0600)
+			backupFilename := fmt.Sprintf("%s-%d%s", file, time.Now().UnixNano(), backupSuffix)
+			dst, err := os.OpenFile(backupFilename, os.O_CREATE|os.O_EXCL|os.O_APPEND|os.O_WRONLY, 0600)
 			if err != nil {
 				return err
 			}
