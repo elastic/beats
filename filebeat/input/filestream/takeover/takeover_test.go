@@ -198,6 +198,11 @@ inputs:
 				},
 			},
 		},
+		{
+			name:   "does nothing when there is no matching loginput entry",
+			cfg:    takeOver,
+			states: states[3:],
+		},
 	}
 
 	log := logp.NewLogger("takeover-test")
