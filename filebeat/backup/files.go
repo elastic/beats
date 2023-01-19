@@ -28,7 +28,7 @@ import (
 
 // NewFileBackuper creates a new backuper that creates backups for the given files.
 func NewFileBackuper(log *logp.Logger, files []string) Backuper {
-	return fileBackuper{
+	return &fileBackuper{
 		log:   log,
 		files: files,
 	}
@@ -42,7 +42,7 @@ type fileBackuper struct {
 
 // backup creates temporary backups for given files and returns a callback that
 // removes every created backup file
-func (fb fileBackuper) Backup() error {
+func (fb *fileBackuper) Backup() error {
 	var (
 		buf = make([]byte, 64*1024) // 64KB
 	)

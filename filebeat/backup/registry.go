@@ -41,7 +41,7 @@ var (
 // It creates backups for the checkpoint file (if exists) and the registry log.
 // `regHome` must be the final directory with the registry log (`log.json`).
 func NewRegistryBackuper(log *logp.Logger, regHome string) Backuper {
-	return registryBackuper{
+	return &registryBackuper{
 		log:     log,
 		regHome: regHome,
 	}
@@ -54,7 +54,7 @@ type registryBackuper struct {
 }
 
 // Backup backs up the active checkpoint if any and the registry log file
-func (rb registryBackuper) Backup() error {
+func (rb *registryBackuper) Backup() error {
 	var toBackup []string
 
 	rb.log.Debug("Attempting to find the checkpoint...")
