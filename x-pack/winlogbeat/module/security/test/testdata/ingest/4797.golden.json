@@ -25,6 +25,17 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "user1",
+        "Guest"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
+    },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
       "channel": "Security",
@@ -83,6 +94,17 @@
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1",
+        "WDAGUtilityAccount"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
     },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
@@ -143,6 +165,17 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "user1",
+        "DefaultAccount"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
+    },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
       "channel": "Security",
@@ -202,6 +235,17 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "user1",
+        "contoso"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
+    },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
       "channel": "Security",
@@ -260,6 +304,17 @@
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1",
+        "Administrator"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
     },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",

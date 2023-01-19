@@ -25,6 +25,11 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
     "winlog": {
       "channel": "Security",
       "computer_name": "COMPUTER1.contoso.com",
@@ -85,6 +90,11 @@
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
     },
     "winlog": {
       "channel": "Security",
@@ -147,6 +157,11 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
     "winlog": {
       "channel": "Security",
       "computer_name": "COMPUTER1.contoso.com",
@@ -208,6 +223,11 @@
     "log": {
       "level": "information"
     },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
     "winlog": {
       "channel": "Security",
       "computer_name": "COMPUTER1.contoso.com",
@@ -268,6 +288,11 @@
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
     },
     "winlog": {
       "channel": "Security",
