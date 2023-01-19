@@ -14,6 +14,10 @@ in your stand-alone Filebeat configuration. All the integrations or modules that
 required from the user.
 
 In this guide, you'll learn how to migrate an existing `log` input configuration.
+
+IMPORTANT: You must replace `log` inputs with `filestream` inputs, make sure you have removed
+the all inputs from the configuration before starting Filebeat with the new `filestream` inputs after finishing all the steps. Running old `log` inputs and new `filestream` inputs pointed to the same files will lead to data duplication.
+
 The following example shows three `log` inputs:
 
 [source,yaml]
