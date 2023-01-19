@@ -204,6 +204,7 @@ func TestInputRunSQS(t *testing.T) {
 	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
 	assertMetric(t, snap, "s3_objects_requested_total", 7)
 	assertMetric(t, snap, "s3_events_created_total", 12)
+	assert.Greater(t, "sqs_message_delayed_time", 0)
 }
 
 func TestInputRunS3(t *testing.T) {
@@ -465,4 +466,5 @@ func TestInputRunSNS(t *testing.T) {
 	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
 	assertMetric(t, snap, "s3_objects_requested_total", 7)
 	assertMetric(t, snap, "s3_events_created_total", 12)
+	assert.Greater(t, "sqs_message_delayed_time", 0)
 }
