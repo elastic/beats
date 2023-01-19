@@ -11,7 +11,7 @@ beta[]
 
 include::../../../module/elasticsearch/ingest_pipeline/_meta/docs.asciidoc[]
 
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
+This is a default metricset. If the elasticsearch module is unconfigured, this metricset is enabled by default.
 
 :edit_url:
 
