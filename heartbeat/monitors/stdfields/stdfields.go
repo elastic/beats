@@ -32,14 +32,15 @@ type ServiceFields struct {
 
 // StdMonitorFields represents the generic configuration options around a monitor plugin.
 type StdMonitorFields struct {
-	ID                string             `config:"id"`
-	Name              string             `config:"name"`
-	Type              string             `config:"type" validate:"required"`
-	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
-	Timeout           time.Duration      `config:"timeout"`
-	Service           ServiceFields      `config:"service"`
-	Origin            string             `config:"origin"`
-	LegacyServiceName string             `config:"service_name"`
+	ID                 string             `config:"id"`
+	Name               string             `config:"name"`
+	Type               string             `config:"type" validate:"required"`
+	Schedule           *schedule.Schedule `config:"schedule" validate:"required"`
+	MaintenanceWindows []string           `config:"maintenance_windows" `
+	Timeout            time.Duration      `config:"timeout"`
+	Service            ServiceFields      `config:"service"`
+	Origin             string             `config:"origin"`
+	LegacyServiceName  string             `config:"service_name"`
 	// Used by zip_url and local monitors
 	// kibana originating monitors only run one journey at a time
 	// and just use the `fields` syntax / manually set monitor IDs
