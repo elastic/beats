@@ -31,7 +31,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest
+- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest {issue}19627[19627] {pull}34295[34295]
+- Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
 
 *Functionbeat*
 
