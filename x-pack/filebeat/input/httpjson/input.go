@@ -157,7 +157,7 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 	// Make retryable HTTP client
 	netHTTPClient, err := config.Request.Transport.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
+		config.Request.KeepAlive.settings(),
 	)
 	if err != nil {
 		return nil, err
