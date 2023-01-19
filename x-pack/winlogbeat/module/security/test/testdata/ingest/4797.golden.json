@@ -34,7 +34,11 @@
     "user": {
       "domain": "CONTOSO",
       "id": "S-1-5-21-000000000-000000000-000000000-00000",
-      "name": "user1"
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "Guest"
+      }
     },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
@@ -104,7 +108,11 @@
     "user": {
       "domain": "CONTOSO",
       "id": "S-1-5-21-000000000-000000000-000000000-00000",
-      "name": "user1"
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "WDAGUtilityAccount"
+      }
     },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
@@ -174,7 +182,11 @@
     "user": {
       "domain": "CONTOSO",
       "id": "S-1-5-21-000000000-000000000-000000000-00000",
-      "name": "user1"
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "DefaultAccount"
+      }
     },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
@@ -244,7 +256,11 @@
     "user": {
       "domain": "CONTOSO",
       "id": "S-1-5-21-000000000-000000000-000000000-00000",
-      "name": "user1"
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "contoso"
+      }
     },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
@@ -314,7 +330,11 @@
     "user": {
       "domain": "CONTOSO",
       "id": "S-1-5-21-000000000-000000000-000000000-00000",
-      "name": "user1"
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "Administrator"
+      }
     },
     "winlog": {
       "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",

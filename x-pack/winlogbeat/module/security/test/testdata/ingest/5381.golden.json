@@ -30,6 +30,11 @@
         "COMPUTER1$"
       ]
     },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-18",
+      "name": "COMPUTER1$"
+    },
     "winlog": {
       "channel": "Security",
       "computer_name": "COMPUTER1.contoso.com",
@@ -93,6 +98,11 @@
       "user": [
         "COMPUTER1$"
       ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-18",
+      "name": "COMPUTER1$"
     },
     "winlog": {
       "channel": "Security",
@@ -158,6 +168,11 @@
         "COMPUTER1$"
       ]
     },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-18",
+      "name": "COMPUTER1$"
+    },
     "winlog": {
       "channel": "Security",
       "computer_name": "COMPUTER1.contoso.com",
@@ -222,6 +237,11 @@
         "COMPUTER1$"
       ]
     },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-18",
+      "name": "COMPUTER1$"
+    },
     "winlog": {
       "channel": "Security",
       "computer_name": "COMPUTER1.contoso.com",
@@ -285,6 +305,11 @@
       "user": [
         "COMPUTER1$"
       ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-18",
+      "name": "COMPUTER1$"
     },
     "winlog": {
       "channel": "Security",
