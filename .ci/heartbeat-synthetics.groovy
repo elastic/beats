@@ -3,7 +3,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'ubuntu-18 && immutable' }
+  agent { label 'ubuntu-20 && immutable' }
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'

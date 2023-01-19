@@ -11,7 +11,7 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-dockerlogbeat"
     tags: true                 ## for all the tags
-platform: "immutable && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-20" ## default label for all the stages
 stages:
     unitTest:
         mage: "mage build unitTest"

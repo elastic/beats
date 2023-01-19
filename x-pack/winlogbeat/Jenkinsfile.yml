@@ -59,7 +59,7 @@ stages:
         e2e:
             enabled: false
         platforms:             ## override default labels in this specific stage.
-            - "immutable && ubuntu-18"
+            - "immutable && ubuntu-20"
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
