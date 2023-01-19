@@ -16,7 +16,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-
 *Heartbeat*
 
 
@@ -47,6 +46,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Filebeat*
 - [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
 - Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
+- The `close.on_state_change.inactive` default value is now set to 5 minutes, matching the documentation.
 
 
 *Heartbeat*
