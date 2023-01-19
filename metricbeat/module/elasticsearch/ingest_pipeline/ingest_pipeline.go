@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ingest
+package ingest_pipeline
 
 import (
 	"math"
@@ -33,7 +33,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "ingest", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "ingest_pipeline", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.DefaultMetricSet(),
 	)
@@ -66,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	config := struct {
-		ProcessorSampleRate float64 `config:"ingest.processor_sample_rate"`
+		ProcessorSampleRate float64 `config:"ingest_pipeline.processor_sample_rate"`
 	}{
 		ProcessorSampleRate: 0.25,
 	}
@@ -81,7 +81,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		sampleProcessorsEveryN = int(math.Round(1.0 / math.Min(1.0, config.ProcessorSampleRate)))
 	}
 
-	base.Logger().Debugf("Sampling ingest processor stats every %d fetches", sampleProcessorsEveryN)
+	base.Logger().Debugf("Sampling ingest_pipeline processor stats every %d fetches", sampleProcessorsEveryN)
 
 	return &IngestMetricSet{
 		MetricSet:              ms,
@@ -126,6 +126,6 @@ func (m *IngestMetricSet) Fetch(report mb.ReporterV2) error {
 
 	m.fetchCounter++ // It's fine if this overflows, it's only used for modulo
 	sampleProcessors := m.fetchCounter%m.sampleProcessorsEveryN == 0
-	m.Logger().Debugf("Sampling ingest processor stats: %v", sampleProcessors)
+	m.Logger().Debugf("Sampling ingest_pipeline processor stats: %v", sampleProcessors)
 	return eventsMapping(report, *info, content, m.XPackEnabled, sampleProcessors)
 }

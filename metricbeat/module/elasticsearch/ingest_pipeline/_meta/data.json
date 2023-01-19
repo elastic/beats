@@ -7,11 +7,11 @@
     "metricset":{
         "host":"localhost",
         "module":"elasticsearch",
-        "name":"ingest",
+        "name":"ingest_pipeline",
         "rtt":44269
     },
     "elasticsearch":{
-        "ingest":{
+        "ingest_pipeline":{
             "example": "ingest"
         }
     },

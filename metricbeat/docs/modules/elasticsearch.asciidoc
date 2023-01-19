@@ -64,7 +64,7 @@ metricbeat.modules:
     #- index
     #- index_recovery
     #- index_summary
-    #- ingest
+    #- ingest_pipeline
     #- shard
     #- ml_job
   period: 10s
@@ -74,7 +74,7 @@ metricbeat.modules:
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   #index_recovery.active_only: true
-  #ingest.processor_sample_rate: 0.25
+  #ingest_pipeline.processor_sample_rate: 0.25
   #xpack.enabled: false
   #scope: node
 ----
@@ -99,7 +99,7 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-index_summary,index_summary>>
 
-* <<metricbeat-metricset-elasticsearch-ingest,ingest>>
+* <<metricbeat-metricset-elasticsearch-ingest_pipeline,ingest_pipeline>>
 
 * <<metricbeat-metricset-elasticsearch-ml_job,ml_job>>
 
@@ -123,7 +123,7 @@ include::elasticsearch/index_recovery.asciidoc[]
 
 include::elasticsearch/index_summary.asciidoc[]
 
-include::elasticsearch/ingest.asciidoc[]
+include::elasticsearch/ingest_pipeline.asciidoc[]
 
 include::elasticsearch/ml_job.asciidoc[]
 

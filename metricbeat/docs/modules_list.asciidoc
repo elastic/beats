@@ -104,7 +104,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-elasticsearch-index,index>>   
 |<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>   
 |<<metricbeat-metricset-elasticsearch-index_summary,index_summary>>   
-|<<metricbeat-metricset-elasticsearch-ingest,ingest>> beta[]  
+|<<metricbeat-metricset-elasticsearch-ingest_pipeline,ingest_pipeline>> beta[]  
 |<<metricbeat-metricset-elasticsearch-ml_job,ml_job>>   
 |<<metricbeat-metricset-elasticsearch-node,node>>   
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>>   

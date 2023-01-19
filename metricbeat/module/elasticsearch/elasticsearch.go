@@ -56,7 +56,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"node_stats",
 		"shard",
 	}
-	optionalXpackMetricsets := []string{"ingest"}
+	optionalXpackMetricsets := []string{"ingest_pipeline"}
 	return elastic.NewModule(&base, xpackEnabledMetricSets, optionalXpackMetricsets, logp.NewLogger(ModuleName))
 }
 

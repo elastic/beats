@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ingest
+package ingest_pipeline
 
 import (
 	"encoding/json"
@@ -85,9 +85,9 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 			addCommonFields(&event, &info, nodeId, &nodeStats, pipelineId)
 
 			// Pipeline metrics
-			event.MetricSetFields.Put("pipeline.total.count", pipelineStats.Count)
-			event.MetricSetFields.Put("pipeline.total.failed", pipelineStats.Failed)
-			event.MetricSetFields.Put("pipeline.total.total_time", pipelineStats.TimeInMillis)
+			event.MetricSetFields.Put("total.count", pipelineStats.Count)
+			event.MetricSetFields.Put("total.failed", pipelineStats.Failed)
+			event.MetricSetFields.Put("total.total_time", pipelineStats.TimeInMillis)
 
 			// Self time subtracts any processor pipelines
 			selfCpuTime := pipelineStats.TimeInMillis
@@ -112,12 +112,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 					addCommonFields(&processorEvent, &info, nodeId, &nodeStats, pipelineId)
 
 					// Processor metrics
-					processorEvent.MetricSetFields.Put("pipeline.processor.order_index", pIdx)
-					processorEvent.MetricSetFields.Put("pipeline.processor.type", processorStats.Type)
-					processorEvent.MetricSetFields.Put("pipeline.processor.type_tag", pTypeTag)
-					processorEvent.MetricSetFields.Put("pipeline.processor.count", processorStats.Stats.Count)
-					processorEvent.MetricSetFields.Put("pipeline.processor.failed", processorStats.Stats.Failed)
-					processorEvent.MetricSetFields.Put("pipeline.processor.total_time", processorStats.Stats.TimeInMillis)
+					processorEvent.MetricSetFields.Put("processor.order_index", pIdx)
+					processorEvent.MetricSetFields.Put("processor.type", processorStats.Type)
+					processorEvent.MetricSetFields.Put("processor.type_tag", pTypeTag)
+					processorEvent.MetricSetFields.Put("processor.count", processorStats.Stats.Count)
+					processorEvent.MetricSetFields.Put("processor.failed", processorStats.Stats.Failed)
+					processorEvent.MetricSetFields.Put("processor.total_time", processorStats.Stats.TimeInMillis)
 					r.Event(processorEvent)
 
 					// processorObj has a single key with the processor type, so break early
@@ -126,7 +126,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 				}
 			}
 
-			event.MetricSetFields.Put("pipeline.total.self_time", selfCpuTime)
+			event.MetricSetFields.Put("total.self_time", selfCpuTime)
 			r.Event(event)
 		}
 	}
@@ -141,5 +141,5 @@ func addCommonFields(event *mb.Event, info *elasticsearch.Info, nodeId string, n
 	event.ModuleFields.Put("node.name", nodeStats.Name)
 	event.ModuleFields.Put("node.roles", nodeStats.Roles)
 
-	event.MetricSetFields.Put("pipeline.name", pipelineId)
+	event.MetricSetFields.Put("name", pipelineId)
 }

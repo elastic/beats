@@ -1,4 +1,4 @@
-This is the ingest metricset of the module elasticsearch.
+This is the ingest_pipeline metricset of the module elasticsearch.
 
 Collects metrics on ingest pipeline executions, with processor-level granularity.
 

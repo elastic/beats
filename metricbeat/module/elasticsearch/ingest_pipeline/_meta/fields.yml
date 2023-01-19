@@ -1,4 +1,4 @@
-- name: ingest.pipeline
+- name: ingest_pipeline
   type: group
   release: beta
   description: Runtime metrics on ingest pipeline execution

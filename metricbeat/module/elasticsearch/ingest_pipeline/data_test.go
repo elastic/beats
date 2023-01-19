@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ingest
+package ingest_pipeline
 
 import (
 	"io/ioutil"
@@ -68,7 +68,7 @@ func TestMapper(t *testing.T) {
 	var processorEvents []mb.Event
 
 	for _, event := range allEvents {
-		if val, _ := event.MetricSetFields.GetValue("pipeline.processor"); val != nil {
+		if val, _ := event.MetricSetFields.GetValue("processor"); val != nil {
 			processorEvents = append(processorEvents, event)
 		} else {
 			pipelineEvents = append(pipelineEvents, event)
@@ -81,11 +81,11 @@ func TestMapper(t *testing.T) {
 		require.Equal(t, 1, len(pipelineEvents))
 		ev := pipelineEvents[0]
 
-		requireMetricSetFields(t, ev, "pipeline.name", "pipeline1")
-		requireMetricSetFields(t, ev, "pipeline.total.count", 19271022)
-		requireMetricSetFields(t, ev, "pipeline.total.failed", 100)
-		requireMetricSetFields(t, ev, "pipeline.total.total_time", 823888)
-		requireMetricSetFields(t, ev, "pipeline.total.self_time", 823888-4607) // subtract out pipeline processor
+		requireMetricSetFields(t, ev, "name", "pipeline1")
+		requireMetricSetFields(t, ev, "total.count", 19271022)
+		requireMetricSetFields(t, ev, "total.failed", 100)
+		requireMetricSetFields(t, ev, "total.total_time", 823888)
+		requireMetricSetFields(t, ev, "total.self_time", 823888-4607) // subtract out pipeline processor
 	})
 
 	t.Run("Test processor events", func(t *testing.T) {
@@ -93,13 +93,13 @@ func TestMapper(t *testing.T) {
 		ev := processorEvents[0]
 
 		// There's no special handling for different processors, so just test the first one
-		requireMetricSetFields(t, ev, "pipeline.name", "pipeline1")
-		requireMetricSetFields(t, ev, "pipeline.processor.order_index", 0)
-		requireMetricSetFields(t, ev, "pipeline.processor.type", "set")
-		requireMetricSetFields(t, ev, "pipeline.processor.type_tag", "set:tag1")
-		requireMetricSetFields(t, ev, "pipeline.processor.count", 19271022)
-		requireMetricSetFields(t, ev, "pipeline.processor.failed", 100)
-		requireMetricSetFields(t, ev, "pipeline.processor.total_time", 256275)
+		requireMetricSetFields(t, ev, "name", "pipeline1")
+		requireMetricSetFields(t, ev, "processor.order_index", 0)
+		requireMetricSetFields(t, ev, "processor.type", "set")
+		requireMetricSetFields(t, ev, "processor.type_tag", "set:tag1")
+		requireMetricSetFields(t, ev, "processor.count", 19271022)
+		requireMetricSetFields(t, ev, "processor.failed", 100)
+		requireMetricSetFields(t, ev, "processor.total_time", 256275)
 	})
 }
 
@@ -124,7 +124,7 @@ func TestSampling(t *testing.T) {
 	var processorEvents []mb.Event
 
 	for _, event := range allEvents {
-		if val, _ := event.MetricSetFields.GetValue("pipeline.processor"); val != nil {
+		if val, _ := event.MetricSetFields.GetValue("processor"); val != nil {
 			processorEvents = append(processorEvents, event)
 		} else {
 			pipelineEvents = append(pipelineEvents, event)

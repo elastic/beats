@@ -31688,12 +31688,12 @@ type: long
 --
 
 [float]
-=== ingest.pipeline
+=== ingest_pipeline
 
 Runtime metrics on ingest pipeline execution
 
 
-*`elasticsearch.ingest.pipeline.name`*::
+*`elasticsearch.ingest_pipeline.name`*::
 +
 --
 Name / id of the ingest pipeline
@@ -31708,7 +31708,7 @@ type: wildcard
 Metrics on the total ingest pipeline execution, including all processors.
 
 
-*`elasticsearch.ingest.pipeline.total.count`*::
+*`elasticsearch.ingest_pipeline.total.count`*::
 +
 --
 Number of documents processed by this pipeline
@@ -31717,7 +31717,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.total.failed`*::
+*`elasticsearch.ingest_pipeline.total.failed`*::
 +
 --
 Number of documented failed to process by this pipeline
@@ -31726,7 +31726,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.total.total_time`*::
+*`elasticsearch.ingest_pipeline.total.total_time`*::
 +
 --
 Total time spent processing documents through this pipeline, inclusive of other pipelines called
@@ -31735,7 +31735,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.total.self_time`*::
+*`elasticsearch.ingest_pipeline.total.self_time`*::
 +
 --
 Time spent processing documents through this pipeline, exclusive of other pipelines called
@@ -31745,7 +31745,7 @@ type: long
 --
 
 
-*`elasticsearch.ingest.pipeline.processor.type`*::
+*`elasticsearch.ingest_pipeline.processor.type`*::
 +
 --
 The type of ingest processor
@@ -31754,7 +31754,7 @@ type: keyword
 
 --
 
-*`elasticsearch.ingest.pipeline.processor.type_tag`*::
+*`elasticsearch.ingest_pipeline.processor.type_tag`*::
 +
 --
 The type and the tag for this processor in the format "<type>:<tag>"
@@ -31763,7 +31763,7 @@ type: keyword
 
 --
 
-*`elasticsearch.ingest.pipeline.processor.order_index`*::
+*`elasticsearch.ingest_pipeline.processor.order_index`*::
 +
 --
 The order this processor appears in the pipeline definition
@@ -31772,7 +31772,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.processor.count`*::
+*`elasticsearch.ingest_pipeline.processor.count`*::
 +
 --
 Number of documents processed by this processor
@@ -31781,7 +31781,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.processor.failed`*::
+*`elasticsearch.ingest_pipeline.processor.failed`*::
 +
 --
 Number of documented failed to process by this processor
@@ -31790,7 +31790,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest.pipeline.processor.total_time`*::
+*`elasticsearch.ingest_pipeline.processor.total_time`*::
 +
 --
 Total time spent processing documents through this processor
