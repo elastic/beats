@@ -87,7 +87,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 			// Pipeline metrics
 			event.MetricSetFields.Put("total.count", pipelineStats.Count)
 			event.MetricSetFields.Put("total.failed", pipelineStats.Failed)
-			event.MetricSetFields.Put("total.total_time", pipelineStats.TimeInMillis)
+			event.MetricSetFields.Put("total.time.total.ms", pipelineStats.TimeInMillis)
 
 			// Self time subtracts any processor pipelines
 			selfCpuTime := pipelineStats.TimeInMillis
@@ -117,7 +117,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 					processorEvent.MetricSetFields.Put("processor.type_tag", pTypeTag)
 					processorEvent.MetricSetFields.Put("processor.count", processorStats.Stats.Count)
 					processorEvent.MetricSetFields.Put("processor.failed", processorStats.Stats.Failed)
-					processorEvent.MetricSetFields.Put("processor.total_time", processorStats.Stats.TimeInMillis)
+					processorEvent.MetricSetFields.Put("processor.time.total.ms", processorStats.Stats.TimeInMillis)
 					r.Event(processorEvent)
 
 					// processorObj has a single key with the processor type, so break early
@@ -126,7 +126,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 				}
 			}
 
-			event.MetricSetFields.Put("total.self_time", selfCpuTime)
+			event.MetricSetFields.Put("total.time.self.ms", selfCpuTime)
 			r.Event(event)
 		}
 	}

@@ -84,8 +84,8 @@ func TestMapper(t *testing.T) {
 		requireMetricSetFields(t, ev, "name", "pipeline1")
 		requireMetricSetFields(t, ev, "total.count", 19271022)
 		requireMetricSetFields(t, ev, "total.failed", 100)
-		requireMetricSetFields(t, ev, "total.total_time", 823888)
-		requireMetricSetFields(t, ev, "total.self_time", 823888-4607) // subtract out pipeline processor
+		requireMetricSetFields(t, ev, "total.time.total.ms", 823888)
+		requireMetricSetFields(t, ev, "total.time.self.ms", 823888-4607) // subtract out pipeline processor
 	})
 
 	t.Run("Test processor events", func(t *testing.T) {
@@ -99,7 +99,7 @@ func TestMapper(t *testing.T) {
 		requireMetricSetFields(t, ev, "processor.type_tag", "set:tag1")
 		requireMetricSetFields(t, ev, "processor.count", 19271022)
 		requireMetricSetFields(t, ev, "processor.failed", 100)
-		requireMetricSetFields(t, ev, "processor.total_time", 256275)
+		requireMetricSetFields(t, ev, "processor.time.total.ms", 256275)
 	})
 }
 

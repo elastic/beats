@@ -16,10 +16,10 @@
         - name: failed
           type: long
           description: Number of documented failed to process by this pipeline
-        - name: total_time
+        - name: time.total.ms
           type: long
           description: Total time spent processing documents through this pipeline, inclusive of other pipelines called
-        - name: self_time
+        - name: time.self.ms
           type: long
           description: Time spent processing documents through this pipeline, exclusive of other pipelines called
     - name: processor
@@ -40,6 +40,6 @@
         - name: failed
           type: long
           description: Number of documented failed to process by this processor
-        - name: total_time
+        - name: time.total.ms
           type: long
           description: Total time spent processing documents through this processor

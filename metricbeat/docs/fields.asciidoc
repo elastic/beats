@@ -31726,7 +31726,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest_pipeline.total.total_time`*::
+*`elasticsearch.ingest_pipeline.total.time.total.ms`*::
 +
 --
 Total time spent processing documents through this pipeline, inclusive of other pipelines called
@@ -31735,7 +31735,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest_pipeline.total.self_time`*::
+*`elasticsearch.ingest_pipeline.total.time.self.ms`*::
 +
 --
 Time spent processing documents through this pipeline, exclusive of other pipelines called
@@ -31790,7 +31790,7 @@ type: long
 
 --
 
-*`elasticsearch.ingest_pipeline.processor.total_time`*::
+*`elasticsearch.ingest_pipeline.processor.time.total.ms`*::
 +
 --
 Total time spent processing documents through this processor
