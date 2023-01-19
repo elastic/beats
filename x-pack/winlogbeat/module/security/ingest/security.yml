@@ -2384,7 +2384,12 @@ processors:
 
         //ClientAddress to source.ip and related.ip
         if (ctx?.winlog?.event_data?.ClientAddress != null &&
-            ctx.winlog.event_data.ClientAddress != "-") {
+            ctx.winlog.event_data.ClientAddress != "-" &&
+            ctx.winlog.event_data.ClientAddress != "Unknown") {
+          // Correct invalid IP address "LOCAL"
+          if (ctx?.winlog?.event_data?.ClientAddress == "LOCAL") {
+            ctx.winlog.event_data.ClientAddress="127.0.0.1";
+          }
           if (ctx?.source == null) {
             HashMap hm = new HashMap();
             ctx.put("source", hm);
