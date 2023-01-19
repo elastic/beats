@@ -99,7 +99,7 @@ func (rb registryBackuper) Remove() error {
 		}
 	}
 	if len(errs) != 0 {
-		return fmt.Errorf("failed to registry backup: %v", errs)
+		return fmt.Errorf("failed to remove registry backup: %v", errs)
 	}
 
 	return nil
