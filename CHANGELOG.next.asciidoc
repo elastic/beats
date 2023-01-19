@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Heartbeat*
+- Install playwright dependencies from the provided script. {pull}34318[34318]
 
 
 *Metricbeat*
