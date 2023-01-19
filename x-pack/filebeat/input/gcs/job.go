@@ -12,6 +12,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -244,7 +245,7 @@ func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, bool, err
 	// check if stream is gziped or not
 	buf, err := reader.Peek(3)
 	if err != nil {
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			err = nil
 		}
 		return reader, false, err
@@ -272,7 +273,7 @@ func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 	eof := false
 	for i := 0; ; i++ {
 		b, err := reader.Peek((i + 1) * 5)
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			eof = true
 		}
 		startByte := i * 5
