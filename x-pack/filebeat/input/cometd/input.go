@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -51,10 +52,18 @@ func (in *cometdInput) Run() {
 }
 
 func (in *cometdInput) run() error {
+	ticker := time.NewTicker(5 * time.Second)
 	in.msgCh = in.b.Channel(in.workerCtx, in.msgCh, "-1", *in.creds, in.config.ChannelName)
 	for e := range in.msgCh {
 		if e.Failed() {
-			return fmt.Errorf("error collecting events: %w", e.Err)
+			if !strings.Contains(e.Error(), "trying again") {
+				return fmt.Errorf("error collecting events: %w", e.Err)
+			}
+			select {
+			case <-ticker.C:
+				in.log.Warnw("Retrying...! facing issue while collecting data from CometD", "error", e.Error())
+			default:
+			}
 		} else if !e.Msg.Successful {
 			var event event
 			// To handle the last response where the object received was empty
