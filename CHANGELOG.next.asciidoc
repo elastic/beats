@@ -16,8 +16,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
-- Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
 - The `close.on_state_change.inactive` default value is now set to 5 minutes, matching the documentation.
 
 *Heartbeat*
