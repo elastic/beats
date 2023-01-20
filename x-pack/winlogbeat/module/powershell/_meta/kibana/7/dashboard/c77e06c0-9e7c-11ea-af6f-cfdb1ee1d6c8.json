@@ -1,6 +1,6 @@
 {
     "attributes": {
-        "description": "Overview dashboard por powershell module.",
+        "description": "Overview dashboard for PowerShell module.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
@@ -306,7 +306,7 @@
             }
         ],
         "timeRestore": false,
-        "title": "[Winlogbeat powershell] Overview",
+        "title": "[Winlogbeat PowerShell] Overview",
         "version": 1
     },
     "coreMigrationVersion": "7.14.0",
