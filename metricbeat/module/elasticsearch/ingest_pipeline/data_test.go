@@ -19,8 +19,6 @@ package ingest_pipeline
 
 import (
 	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -29,23 +27,6 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
-
-func createEsMuxer() *http.ServeMux {
-	mux := http.NewServeMux()
-	// mux.Handle("")
-
-	return mux
-}
-
-func TestData(t *testing.T) {
-	mux := createEsMuxer()
-	server := httptest.NewServer(mux)
-	defer server.Close()
-
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
-	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
-	require.NoError(t, err)
-}
 
 func TestMapper(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
@@ -134,14 +115,6 @@ func TestSampling(t *testing.T) {
 	require.Equal(t, 1, len(allEvents))
 	require.Equal(t, 1, len(pipelineEvents))
 	require.Equal(t, 0, len(processorEvents))
-}
-
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     elasticsearch.ModuleName,
-		"metricsets": []string{"ingest"},
-		"hosts":      []string{host},
-	}
 }
 
 func requireMetricSetFields(t *testing.T, event mb.Event, fieldName string, expected interface{}) {
