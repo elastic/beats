@@ -616,6 +616,13 @@ processors:
             - user
             - change
           action: renamed-user-account
+        "4797":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: query-existence-of-blank-password
         "4798":
           category:
             - iam
@@ -743,6 +750,34 @@ processors:
           type:
             - end
           action: windows-firewall-driver-error
+        "5379":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: credential-manager-credentials-were-read
+        "5380":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: vault-credential-find
+        "5381":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: vault-credentials-were-read
+        "5382":
+          category:
+            - iam
+          type:
+            - user
+            - info
+          action: vault-credentials-were-read
       source: |-
         if (ctx?.event?.code == null || params.get(ctx.event.code) == null) {
           return;
@@ -2349,7 +2384,12 @@ processors:
 
         //ClientAddress to source.ip and related.ip
         if (ctx?.winlog?.event_data?.ClientAddress != null &&
-            ctx.winlog.event_data.ClientAddress != "-") {
+            ctx.winlog.event_data.ClientAddress != "-" &&
+            ctx.winlog.event_data.ClientAddress != "Unknown") {
+          // Correct invalid IP address "LOCAL"
+          if (ctx?.winlog?.event_data?.ClientAddress == "LOCAL") {
+            ctx.winlog.event_data.ClientAddress="127.0.0.1";
+          }
           if (ctx?.source == null) {
             HashMap hm = new HashMap();
             ctx.put("source", hm);
@@ -2604,7 +2644,7 @@ processors:
               "4750", "4751", "4752", "4753", "4754", "4755", "4756", "4757",
               "4758", "4759", "4760", "4761", "4762", "4763", "4764", "4767",
               "4781", "4798", "4799", "4817", "4904", "4905", "4907", "4912",
-              "4648"].contains(ctx.event.code)) {
+              "4648", "4797", "5379", "5380", "5381", "5382"].contains(ctx.event.code)) {
           return;
         }
         if (ctx?.winlog?.event_data?.SubjectUserSid != null) {
@@ -2649,7 +2689,7 @@ processors:
         if (ctx?.event?.code == null ||
             !["4670", "4720", "4722", "4723", "4724", "4725",
               "4726", "4738", "4740", "4767", "4798", "4817",
-              "4907"].contains(ctx.event.code)) {
+              "4907", "4797"].contains(ctx.event.code)) {
           return;
         }
         if (ctx?.user == null) {
@@ -2971,7 +3011,7 @@ processors:
       allow_duplicates: false
       if: |-
         ctx?.event?.code != null &&
-        ["4624", "4648"].contains(ctx.event.code) &&
+        ["4624", "4648", "4797", "5379", "5380", "5381", "5382"].contains(ctx.event.code) &&
         ctx?.winlog?.event_data?.SubjectUserName != null &&
         ctx.winlog.event_data.SubjectUserName != "-"
 
@@ -2982,7 +3022,7 @@ processors:
       if: |-
         ctx?.event?.code != null &&
         ["4688", "4720", "4722", "4723", "4724", "4725", "4726", "4738",
-         "4740", "4767", "4798"].contains(ctx.event.code) &&
+         "4740", "4767", "4797", "4798"].contains(ctx.event.code) &&
         ctx?.winlog?.event_data?.TargetUserName != null &&
         ctx.winlog.event_data.TargetUserName != "-"
 
