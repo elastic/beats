@@ -234,8 +234,8 @@ and return old `log` inputs their files taken by `filestream` inputs, you need t
 
 1. Stop Filebeat as soon as possible
 2. Find your <<configuration-global-options,`registry.path/filebeat` directory>>
-3. Find the created backup files, they have the `<timestamp>.to.bak` suffix. If you have multiple backups for the same file, choose the one with the more recent timestamp.
-4. Replace the files with their backups, e.g. `log.json` should be replaced by `log.json-1673975793.to.bak`
+3. Find the created backup files, they have the `<timestamp>.bak` suffix. If you have multiple backups for the same file, choose the one with the more recent timestamp.
+4. Replace the files with their backups, e.g. `log.json` should be replaced by `log.json-1673975793.bak`
 5. Run Filebeat with the old configuration (no `filestream` inputs with `take_over: true`).
 
 NOTE: Reverting to backups might cause some events to repeat, depends on the amount of time the new configuration was running.

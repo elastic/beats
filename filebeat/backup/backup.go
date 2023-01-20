@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	backupSuffix = ".to.bak"
+	backupSuffix = ".bak"
 )
 
 // Backuper defines backup-related operations
