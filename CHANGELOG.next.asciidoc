@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix handling of null or empty arrays during split with keep parent option. {pull}34322[34322]
 
 *Heartbeat*
 
