@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"golang.org/x/exp/slices"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -158,31 +159,27 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
 	}
 
-	// Ensure all required metricsets are enabled when xpack.enabled == true
+	// Ensure all required metricsets are enabled when xpack.enabled == true, and add any additional which are optional
 	cfgdMetricsets, err := raw.GetValue("metricsets")
-	if err != nil || cfgdMetricsets == nil || len(cfgdMetricsets.([]interface{})) == 0 {
-		raw["metricsets"] = xpackEnabledMetricsets
-	} else {
-		// Allow some optional metricsets to be enabled when xpack.enabled == true
+	metricsets := xpackEnabledMetricsets
+	if err == nil && cfgdMetricsets != nil {
+		// Type cast the metricsets to a slice of strings
 		cfgdMetricsetsSlice := cfgdMetricsets.([]interface{})
-		metricsets := xpackEnabledMetricsets
+		cfgdMetricsetsStrings := make([]string, len(cfgdMetricsetsSlice))
+		for i := range cfgdMetricsetsSlice {
+			cfgdMetricsetsStrings[i] = cfgdMetricsetsSlice[i].(string)
+		}
 
-		for _, cfgdMs := range cfgdMetricsetsSlice {
-			found := false
-			for _, optMs := range optionalXpackMetricsets {
-				if cfgdMs == optMs {
-					found = true
-					break
-				}
-			}
-
-			if found {
-				metricsets = append(metricsets, cfgdMs.(string))
+		// Add any optional metricsets which are not already configured
+		for _, cfgdMs := range cfgdMetricsetsStrings {
+			if slices.Contains(optionalXpackMetricsets, cfgdMs) {
+				metricsets = append(metricsets, cfgdMs)
 			}
 		}
 
-		raw["metricsets"] = metricsets
 	}
+
+	raw["metricsets"] = metricsets
 
 	newConfig, err := conf.NewConfigFrom(raw)
 	if err != nil {
