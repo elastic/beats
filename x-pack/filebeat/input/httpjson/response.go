@@ -129,78 +129,70 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, log *
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool) <-chan maybeMsg {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps <-chan *http.Response, ch chan<- maybeMsg, paginate bool) {
 	trCtx.clearIntervalData()
 
-	ch := make(chan maybeMsg)
-	go func() {
-		defer close(ch)
+	defer close(ch)
 
-		for i, httpResp := range resps {
-			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
-			for {
-				page, hasNext, err := iter.next()
-				if err != nil {
-					ch <- maybeMsg{err: err}
-					return
-				}
+	for httpResp := range resps {
+		iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
+		for {
+			page, hasNext, err := iter.next()
+			if err != nil {
+				ch <- maybeMsg{err: err}
+				return
+			}
 
-				if !hasNext {
-					if i+1 != len(resps) {
-						break
-					}
-					return
-				}
+			if !hasNext {
+				break
+			}
 
-				respTrs := page.asTransformables(rp.log)
+			respTrs := page.asTransformables(rp.log)
 
-				if len(respTrs) == 0 {
-					return
-				}
+			if len(respTrs) == 0 {
+				return
+			}
 
-				// last_response context object is updated here organically
-				trCtx.updateLastResponse(*page)
+			// last_response context object is updated here organically
+			trCtx.updateLastResponse(*page)
 
-				rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
+			rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
 
-				for _, tr := range respTrs {
-					for _, t := range rp.transforms {
-						tr, err = t.run(trCtx, tr)
-						if err != nil {
-							ch <- maybeMsg{err: err}
-							return
-						}
-					}
-
-					if rp.split == nil {
-						ch <- maybeMsg{msg: tr.body()}
-						rp.log.Debug("no split found: continuing")
-						continue
-					}
-
-					if err := rp.split.run(trCtx, tr, ch); err != nil {
-						switch err { //nolint:errorlint // run never returns a wrapped error.
-						case errEmptyField:
-							// nothing else to send for this page
-							rp.log.Debug("split operation finished")
-						case errEmptyRootField:
-							// root field not found, most likely the response is empty
-							rp.log.Debug(err)
-						default:
-							rp.log.Debug("split operation failed")
-							ch <- maybeMsg{err: err}
-							return
-						}
+			for _, tr := range respTrs {
+				for _, t := range rp.transforms {
+					tr, err = t.run(trCtx, tr)
+					if err != nil {
+						ch <- maybeMsg{err: err}
+						return
 					}
 				}
-				if !paginate {
-					break
+
+				if rp.split == nil {
+					ch <- maybeMsg{msg: tr.body()}
+					rp.log.Debug("no split found: continuing")
+					continue
+				}
+
+				if err := rp.split.run(trCtx, tr, ch); err != nil {
+					switch err { //nolint:errorlint // run never returns a wrapped error.
+					case errEmptyField:
+						// nothing else to send for this page
+						rp.log.Debug("split operation finished")
+					case errEmptyRootField:
+						// root field not found, most likely the response is empty
+						rp.log.Debug(err)
+					default:
+						rp.log.Debug("split operation failed")
+						ch <- maybeMsg{err: err}
+						return
+					}
 				}
 			}
+			if !paginate {
+				break
+			}
 		}
-	}()
-
-	return ch
+	}
 }
 
 func (resp *response) asTransformables(log *logp.Logger) []transformable {

@@ -34,6 +34,11 @@ type httpClient struct {
 	limiter *rateLimiter
 }
 
+type idsStruct struct {
+	ids []string
+	err error
+}
+
 func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Response, error) {
 	resp, err := c.limiter.execute(stdCtx, func() (*http.Response, error) {
 		return c.client.Do(req)
@@ -285,16 +290,20 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		urlCopy                 url.URL
 		urlString               string
 		httpResp                *http.Response
-		initialResponse         []*http.Response
-		intermediateResps       []*http.Response
-		finalResps              []*http.Response
 		isChainWithPageExpected bool
 		chainIndex              int
 	)
+	initialResponseChannel := make(chan *http.Response, 1)
+	defer func(n *int) {
+		r.log.Infof("request finished: %d events published", *n)
+	}(&n)
 
 	for i, rf := range r.requestFactories {
-		finalResps = nil
-		intermediateResps = nil
+		publishedEventsCountChannel := make(chan int, 1)
+		events := make(chan maybeMsg, 1)
+		responseChannel := make(chan *http.Response, 1)
+		intermediateResponseChannel := make(chan *http.Response, 1)
+
 		// iterate over collected ids from last response
 		if i == 0 {
 			// perform and store regular call responses
@@ -321,9 +330,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			trCtx.updateFirstResponse(firstResponse)
 
 			if len(r.requestFactories) == 1 {
-				finalResps = append(finalResps, httpResp)
-				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true)
-				n = processAndPublishEvents(trCtx, events, publisher, true, r.log)
+				responseChannel <- httpResp
+				close(responseChannel)
+				go r.responseProcessors[i].startProcessing(stdCtx, trCtx, responseChannel, events, true)
+				go processAndPublishEvents(trCtx, events, publishedEventsCountChannel, publisher, true, r.log)
+				n = <-publishedEventsCountChannel
 				continue
 			}
 
@@ -338,7 +349,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				// the response is cloned and added to finalResps here, since the response of the 1st page (whether pagination exists or not), will
 				// be sent for further processing to check if any response processors can be applied or not and at the same time update the last_response,
 				// first_event & last_event cursor values.
-				finalResps = append(finalResps, resp)
+				responseChannel <- resp
+				close(responseChannel)
 
 				// if a pagination request factory exists at the root level along with a chain step, only then we will initialize flags & variables here
 				// which are required for chaining with root level pagination
@@ -348,18 +360,23 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					if err != nil {
 						return err
 					}
-					initialResponse = append(initialResponse, resp)
+					initialResponseChannel <- resp
 				}
 			}
 
-			intermediateResps = append(intermediateResps, httpResp)
-			ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
-			if err != nil {
-				return err
+			intermediateResponseChannel <- httpResp
+			close(intermediateResponseChannel)
+			idsChannel := make(chan idsStruct, 1)
+			go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[i+1].replace)
+			newIds := <-idsChannel
+			if newIds.err != nil {
+				return newIds.err
 			}
+			ids = newIds.ids
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
-			events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false)
-			n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
+			go r.responseProcessors[i].startProcessing(stdCtx, trCtx, responseChannel, events, false)
+			go processAndPublishEvents(trCtx, events, publishedEventsCountChannel, publisher, false, r.log)
+			n = <-publishedEventsCountChannel
 		} else {
 			if len(ids) == 0 {
 				n = 0
@@ -385,6 +402,19 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 			}
 
+			if rf.isChain {
+				go rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, responseChannel, events, true)
+			} else {
+				go r.responseProcessors[i].startProcessing(stdCtx, trCtx, responseChannel, events, true)
+			}
+			go processAndPublishEvents(chainTrCtx, events, publishedEventsCountChannel, publisher, i < len(r.requestFactories), r.log)
+			idsChannel := make(chan idsStruct, 1)
+			if i != len(r.requestFactories)-1 {
+				// The if condition (i < len(r.requestFactories)) ensures this branch never runs to the last element
+				// of r.requestFactories, therefore r.requestFactories[i+1] will never be out of bounds.
+				go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[i+1].replace)
+			}
+
 			// perform request over collected ids
 			for _, id := range ids {
 				// reformat urls of requestFactory using ids
@@ -406,74 +436,82 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
 				// store data according to response type
-				if i == len(r.requestFactories)-1 && len(ids) != 0 {
-					finalResps = append(finalResps, httpResp)
-				} else {
-					intermediateResps = append(intermediateResps, httpResp)
+				responseChannel <- httpResp
+				if !(i == len(r.requestFactories)-1 && len(ids) != 0) {
+					intermediateResponseChannel <- httpResp
 				}
 			}
+			close(responseChannel)
+			close(intermediateResponseChannel)
 			rf.url = urlCopy
 
-			var resps []*http.Response
-			if i == len(r.requestFactories)-1 {
-				resps = finalResps
-			} else {
-				// The if comdition (i < len(r.requestFactories)) ensures this branch never runs to the last element
+			if i != len(r.requestFactories)-1 {
+				// The if condition (i < len(r.requestFactories)) ensures this branch never runs to the last element
 				// of r.requestFactories, therefore r.requestFactories[i+1] will never be out of bounds.
-				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
-				if err != nil {
-					return err
+				newIds := <-idsChannel
+				if newIds.err != nil {
+					return newIds.err
 				}
-				resps = intermediateResps
+				ids = newIds.ids
 			}
+			n = <-publishedEventsCountChannel
 
-			var events <-chan maybeMsg
-			if rf.isChain {
-				events = rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true)
-			} else {
-				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps, true)
-			}
-			n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
 		}
 	}
-
+	close(initialResponseChannel)
 	defer httpResp.Body.Close()
 	// if pagination exists for the parent request along with chaining, then for each page response the chain is processed
 	if isChainWithPageExpected {
-		n += r.processRemainingChainEvents(stdCtx, trCtx, publisher, initialResponse, chainIndex)
+		n += r.processRemainingChainEvents(stdCtx, trCtx, publisher, initialResponseChannel, chainIndex)
 	}
-	r.log.Infof("request finished: %d events published", n)
 
 	return nil
 }
 
 // getIdsFromResponses returns ids from responses
-func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, replace string) ([]string, error) {
+func (r *requester) getIdsFromResponses(intermediateResps <-chan *http.Response, outputChannel chan idsStruct, replace string) {
 	var b []byte
 	var ids []string
 	var err error
 	// collect ids from all responses
-	for _, resp := range intermediateResps {
+	defer close(outputChannel)
+	for resp := range intermediateResps {
 		if resp.Body != nil {
 			b, err = io.ReadAll(resp.Body)
 			if err != nil {
-				return nil, fmt.Errorf("error while reading response body: %w", err)
+				outputChannel <- idsStruct{
+					ids: nil,
+					err: fmt.Errorf("error while reading response body: %w", err),
+				}
+				return
 			}
 		}
 		// gracefully close response
 		err = resp.Body.Close()
 		if err != nil {
-			return nil, fmt.Errorf("error closing response body: %w", err)
+			outputChannel <- idsStruct{
+				ids: nil,
+				err: fmt.Errorf("error closing response body: %w", err),
+			}
+			return
 		}
 
 		// get replace values from collected json
 		var v interface{}
 		if err := json.Unmarshal(b, &v); err != nil {
-			return nil, fmt.Errorf("cannot unmarshal data: %w", err)
+			outputChannel <- idsStruct{
+				ids: nil,
+				err: fmt.Errorf("cannot unmarshal data: %w", err),
+			}
+			return
 		}
 		values, err := jsonpath.Get(replace, v)
 		if err != nil {
-			return nil, fmt.Errorf("error while getting keys: %w", err)
+			outputChannel <- idsStruct{
+				ids: nil,
+				err: fmt.Errorf("error while getting keys: %w", err),
+			}
+			return
 		}
 
 		switch tresp := values.(type) {
@@ -493,11 +531,14 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 			r.log.Errorf("cannot collect IDs from type '%T' : '%v'", values, values)
 		}
 	}
-	return ids, nil
+	outputChannel <- idsStruct{
+		ids: ids,
+		err: nil,
+	}
 }
 
 // processAndPublishEvents process and publish events based on event type
-func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, publisher inputcursor.Publisher, publish bool, log *logp.Logger) int {
+func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, publishedEventsCountChannel chan<- int, publisher inputcursor.Publisher, publish bool, log *logp.Logger) {
 	var n int
 	for maybeMsg := range events {
 		if maybeMsg.failed() {
@@ -525,53 +566,52 @@ func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, pu
 
 		n++
 	}
-	return n
+	publishedEventsCountChannel <- n
+	close(publishedEventsCountChannel)
 }
 
 // processRemainingChainEvents, processes the remaining pagination events for chain blocks
-func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
+func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResponseChannel <-chan *http.Response, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
-	events := r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true)
+	events := make(chan maybeMsg, 1)
+	go r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResponseChannel, events, true)
 
-	var n int
 	var eventCount int
+	// skip 1st event as it has already been processed before
+	<-events
 	for maybeMsg := range events {
 		if maybeMsg.failed() {
 			r.log.Errorf("error processing response: %v", maybeMsg)
 			continue
 		}
 
-		if n >= 1 { // skip 1st event as it has already ben processed before
-			var response http.Response
-			response.StatusCode = 200
-			body := new(bytes.Buffer)
-			// we construct a new response here from each of the pagination events
-			err := json.NewEncoder(body).Encode(maybeMsg.msg)
-			if err != nil {
-				r.log.Errorf("error processing chain event: %w", err)
-				continue
-			}
-			response.Body = io.NopCloser(body)
-
-			// updates the cursor for pagination last_event & last_response when chaining is present
-			trCtx.updateLastEvent(maybeMsg.msg)
-			trCtx.updateCursor()
-
-			// for each pagination response, we repeat all the chain steps / blocks
-			count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)
-			if err != nil {
-				r.log.Errorf("error processing chain event: %w", err)
-				continue
-			}
-			eventCount += count
-
-			err = response.Body.Close()
-			if err != nil {
-				r.log.Errorf("error closing http response body: %w", err)
-			}
+		var response http.Response
+		response.StatusCode = 200
+		body := new(bytes.Buffer)
+		// we construct a new response here from each of the pagination events
+		err := json.NewEncoder(body).Encode(maybeMsg.msg)
+		if err != nil {
+			r.log.Errorf("error processing chain event: %w", err)
+			continue
 		}
+		response.Body = io.NopCloser(body)
 
-		n++
+		// updates the cursor for pagination last_event & last_response when chaining is present
+		trCtx.updateLastEvent(maybeMsg.msg)
+		trCtx.updateCursor()
+
+		// for each pagination response, we repeat all the chain steps / blocks
+		count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)
+		if err != nil {
+			r.log.Errorf("error processing chain event: %w", err)
+			continue
+		}
+		eventCount += count
+
+		err = response.Body.Close()
+		if err != nil {
+			r.log.Errorf("error closing http response body: %w", err)
+		}
 	}
 	return eventCount
 }
@@ -579,25 +619,29 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
 func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
 	var (
-		n                 int
-		ids               []string
-		err               error
-		urlCopy           url.URL
-		urlString         string
-		httpResp          *http.Response
-		intermediateResps []*http.Response
-		finalResps        []*http.Response
+		n         int
+		ids       []string
+		err       error
+		urlCopy   url.URL
+		urlString string
+		httpResp  *http.Response
 	)
+	intermediateResponseChannel := make(chan *http.Response, 1)
+	idsChannel := make(chan idsStruct, 1)
 
-	intermediateResps = append(intermediateResps, response)
-	ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[chainIndex].replace)
-	if err != nil {
-		return -1, err
+	intermediateResponseChannel <- response
+	close(intermediateResponseChannel)
+
+	go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[chainIndex].replace)
+	newIds := <-idsChannel
+	if newIds.err != nil {
+		return -1, newIds.err
 	}
+	ids = newIds.ids
 
 	for i := chainIndex; i < len(r.requestFactories); i++ {
-		finalResps = nil
-		intermediateResps = nil
+		processingChannel := make(chan *http.Response, 1)
+		intermediateResponseChannel := make(chan *http.Response, 1)
 		rf := r.requestFactories[i]
 
 		if len(ids) == 0 {
@@ -621,6 +665,13 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 		}
 
+		events := make(chan maybeMsg, 1)
+		publishedEventsCountChannel := make(chan int, 1)
+		idsChannel := make(chan idsStruct, 1)
+
+		go rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, processingChannel, events, true)
+		go processAndPublishEvents(chainTrCtx, events, publishedEventsCountChannel, publisher, i < len(r.requestFactories), r.log)
+		go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[i+1].replace)
 		// perform request over collected ids
 		for _, id := range ids {
 			// reformat urls of requestFactory using ids
@@ -638,40 +689,37 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 
 			// collect data from new urls
+			defer func() {
+				if httpResp != nil && httpResp.Body != nil {
+					httpResp.Body.Close()
+				}
+			}()
+
 			httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
 			if err != nil {
 				return -1, fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
-			// store data according to response type
-			if i == len(r.requestFactories)-1 && len(ids) != 0 {
-				finalResps = append(finalResps, httpResp)
-			} else {
-				intermediateResps = append(intermediateResps, httpResp)
+
+			processingChannel <- httpResp
+			if !(i == len(r.requestFactories)-1 && len(ids) != 0) {
+				intermediateResponseChannel <- httpResp
 			}
 		}
+		close(intermediateResponseChannel)
+		close(processingChannel)
 		rf.url = urlCopy
 
-		var resps []*http.Response
-		if i == len(r.requestFactories)-1 {
-			resps = finalResps
-		} else {
-			// The if comdition (i < len(r.requestFactories)) ensures this branch never runs to the last element
+		if i != len(r.requestFactories)-1 {
+			// The if condition (i < len(r.requestFactories)) ensures this branch never runs to the last element
 			// of r.requestFactories, therefore r.requestFactories[i+1] will never be out of bounds.
-			ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
-			if err != nil {
-				return -1, err
+			newIds := <-idsChannel
+			if newIds.err != nil {
+				return -1, newIds.err
 			}
-			resps = intermediateResps
+			ids = newIds.ids
 		}
-		events := rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true)
-		n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
+		n += <-publishedEventsCountChannel
 	}
-
-	defer func() {
-		if httpResp != nil && httpResp.Body != nil {
-			httpResp.Body.Close()
-		}
-	}()
 
 	return n, nil
 }
