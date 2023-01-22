@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build ( !aix && !solaris )
+// +build !aix,!solaris
+
 package kubernetes
 
 import (
