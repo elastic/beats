@@ -18,128 +18,119 @@
 package tcp
 
 import (
-	"sync"
+	"net"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/dustin/go-humanize"
+
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
-func init() {
-	err := input.Register("tcp", NewInput)
-	if err != nil {
-		panic(err)
+func Plugin() input.Plugin {
+	return input.Plugin{
+		Name:       "tcp",
+		Stability:  feature.Stable,
+		Deprecated: false,
+		Info:       "tcp packet server",
+		Manager:    stateless.NewInputManager(configure),
 	}
 }
 
-// Input for TCP connection
-type Input struct {
-	mutex   sync.Mutex
-	server  *tcp.Server
-	started bool
-	outlet  channel.Outleter
-	config  *config
-	log     *logp.Logger
-}
-
-// NewInput creates a new TCP input
-func NewInput(
-	cfg *conf.C,
-	connector channel.Connector,
-	context input.Context,
-) (input.Input, error) {
-	out, err := connector.Connect(cfg)
-	if err != nil {
+func configure(cfg *conf.C) (stateless.Input, error) {
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	forwarder := harvester.NewForwarder(out)
-
-	config := defaultConfig
-	err = cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
-	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
-		event := createEvent(data, metadata)
-		_ = forwarder.Send(event)
-	}
-
-	splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
-	if err != nil {
-		return nil, err
-	}
-
-	logger := logp.NewLogger("input.tcp").With("address", config.Config.Host)
-	factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logger, tcp.MetadataCallback, cb, splitFunc)
-
-	server, err := tcp.New(&config.Config, factory)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Input{
-		server:  server,
-		started: false,
-		outlet:  out,
-		config:  &config,
-		log:     logger,
-	}, nil
+	return newServer(config)
 }
 
-// Run start a TCP input
-func (p *Input) Run() {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	if !p.started {
-		p.log.Info("Starting TCP input")
-		err := p.server.Start()
-		if err != nil {
-			p.log.Errorw("Error starting the TCP server", "error", err)
-		}
-		p.started = true
-	}
-}
-
-// Stop stops TCP server
-func (p *Input) Stop() {
-	defer p.outlet.Close()
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	p.log.Info("Stopping TCP input")
-	p.server.Stop()
-	p.started = false
-}
-
-// Wait stop the current server
-func (p *Input) Wait() {
-	p.Stop()
-}
-
-func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
-	evt := beat.Event{
-		Timestamp: time.Now(),
-		Fields: mapstr.M{
-			"message": string(raw),
+func defaultConfig() config {
+	return config{
+		Config: tcp.Config{
+			Timeout:        time.Minute * 5,
+			MaxMessageSize: 20 * humanize.MiByte,
 		},
+		LineDelimiter: "\n",
 	}
-	if metadata.RemoteAddr != nil {
-		evt.Fields["log"] = mapstr.M{
-			"source": mapstr.M{
-				"address": metadata.RemoteAddr.String(),
-			},
-		}
+}
+
+type server struct {
+	tcp.Server
+	config
+}
+
+type config struct {
+	tcp.Config `config:",inline"`
+
+	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
+	Framing       streaming.FramingType `config:"framing"`
+}
+
+func newServer(config config) (*server, error) {
+	return &server{config: config}, nil
+}
+
+func (s *server) Name() string { return "tcp" }
+
+func (s *server) Test(_ input.TestContext) error {
+	l, err := net.Listen("tcp", s.config.Config.Host)
+	if err != nil {
+		return err
 	}
-	return evt
+	return l.Close()
+}
+
+func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
+	log := ctx.Logger.With("host", s.config.Config.Host)
+
+	log.Info("starting tcp socket input")
+	defer log.Info("tcp input stopped")
+
+	split, err := streaming.SplitFunc(s.config.Framing, []byte(s.config.LineDelimiter))
+	if err != nil {
+		return err
+	}
+
+	server, err := tcp.New(&s.config.Config, streaming.SplitHandlerFactory(
+		inputsource.FamilyTCP, log, tcp.MetadataCallback, func(data []byte, metadata inputsource.NetworkMetadata) {
+			evt := beat.Event{
+				Timestamp: time.Now(),
+				Fields: mapstr.M{
+					"message": string(data),
+				},
+			}
+			if metadata.RemoteAddr != nil {
+				evt.Fields["log"] = mapstr.M{
+					"source": mapstr.M{
+						"address": metadata.RemoteAddr.String(),
+					},
+				}
+			}
+
+			publisher.Publish(evt)
+		},
+		split,
+	))
+	if err != nil {
+		return err
+	}
+
+	log.Debug("tcp input initialized")
+
+	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
+	// Ignore error from 'Run' in case shutdown was signaled.
+	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
+		err = ctxerr
+	}
+	return err
 }
