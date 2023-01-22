@@ -46,6 +46,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -386,15 +387,19 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer svc.NotifyTermination()
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
-	// sharing same data path.
-	bl := locks.New(b.Info)
-	err := bl.Lock()
-	if err != nil {
-		return err
+	// sharing same data path. This is disabled under elastic-agent.
+	if !fleetmode.Enabled() {
+		bl := locks.New(b.Info)
+		err := bl.Lock()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			_ = bl.Unlock()
+		}()
+	} else {
+		logp.Info("running under elastic-agent, per-beat lockfiles disabled")
 	}
-	defer func() {
-		_ = bl.Unlock()
-	}()
 
 	svc.BeforeRun()
 	defer svc.Cleanup()
@@ -405,6 +410,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// set the appropriate permission on the unix domain file without having to whitelist anything
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
+		var err error
 		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
@@ -422,8 +428,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 	}
 
-	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
-		return err
+	// Do not load seccomp for osquerybeat, it was disabled before V2 in the configuration file
+	// https://github.com/elastic/beats/blob/7cf873fd340172c33f294500ccfec948afd7a47c/x-pack/osquerybeat/osquerybeat.yml#L16
+	if b.Info.Beat != "osquerybeat" {
+		if err := seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+			return err
+		}
 	}
 
 	beater, err := b.createBeater(bt)
@@ -546,7 +556,7 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 	}())
 }
 
-//SetupSettings holds settings necessary for beat setup
+// SetupSettings holds settings necessary for beat setup
 type SetupSettings struct {
 	Dashboard       bool
 	Pipeline        bool
@@ -559,6 +569,7 @@ type SetupSettings struct {
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
+//
 //nolint:forbidigo // required to give feedback to user
 func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) error {
 	return handleError(func() error {

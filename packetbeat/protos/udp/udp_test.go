@@ -104,14 +104,14 @@ type TestStruct struct {
 
 // Helper method for creating mocks and the Udp instance under test.
 func testSetup(t *testing.T) *TestStruct {
-	logp.TestingSetup(logp.WithSelectors("udp"))
+	_ = logp.TestingSetup(logp.WithSelectors("udp"))
 
 	protocols := &TestProtocols{}
 	protocols.udp = make(map[protos.Protocol]protos.UDPPlugin)
 	plugin := &TestProtocol{Ports: []int{PORT}}
 	protocols.udp[PROTO] = plugin
 
-	udp, err := NewUDP(protocols)
+	udp, err := NewUDP(protocols, "", "")
 	if err != nil {
 		t.Error("Error creating UDP handler: ", err)
 	}
@@ -191,7 +191,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				redisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
 			},
-			Err: "Duplicate port (3306) exists",
+			Err: "duplicate port (3306) exists",
 		},
 	}
 

@@ -19,12 +19,14 @@ package beater
 
 import (
 	"flag"
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/service"
@@ -123,6 +125,13 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			logp.Debug("main", "Streams and transactions should all be expired now.")
 		}
 	}()
+
+	if b.API != nil {
+		err := inputmon.AttachHandler(b.API.Router())
+		if err != nil {
+			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+		}
+	}
 
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)

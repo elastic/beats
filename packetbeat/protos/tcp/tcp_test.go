@@ -90,17 +90,20 @@ func (proto TestProtocol) GetPorts() []int {
 }
 
 func (proto TestProtocol) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
-	dir uint8, private protos.ProtocolData) protos.ProtocolData {
+	dir uint8, private protos.ProtocolData,
+) protos.ProtocolData {
 	return proto.parse(pkt, tcptuple, dir, private)
 }
 
 func (proto TestProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	return proto.onFin(tcptuple, dir, private)
 }
 
 func (proto TestProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
+	nbytes int, private protos.ProtocolData,
+) (priv protos.ProtocolData, drop bool) {
 	return proto.gap(tcptuple, dir, nbytes, private)
 }
 
@@ -174,7 +177,7 @@ func Test_configToPortsMap_negative(t *testing.T) {
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				redisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
 			},
-			Err: "Duplicate port (3306) exists",
+			Err: "duplicate port (3306) exists",
 		},
 	}
 
@@ -304,7 +307,7 @@ func TestTCSeqPayload(t *testing.T) {
 					parse: makeCollectPayload(&state, true),
 				},
 			},
-		})
+		}, "", "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -340,7 +343,7 @@ func BenchmarkParallelProcess(b *testing.B) {
 	p := protocols{}
 	p.tcp = make(map[protos.Protocol]protos.TCPPlugin)
 	p.tcp[1] = &TestProtocol{Ports: []int{ServerPort}}
-	tcp, _ := NewTCP(p)
+	tcp, _ := NewTCP(p, "", "")
 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
