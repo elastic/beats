@@ -20,6 +20,7 @@ package locks
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/gofrs/flock"
@@ -72,7 +73,7 @@ func (lock *Locker) Lock() error {
 		if gotLock {
 			return nil
 		}
-		lock.logger.Infof("Could not obtain lock for file %s, retrying %d times", lock.fileLock.Path(), (lock.retryCount - i))
+		lock.logger.Debugf("Could not obtain lock for file %s, retrying %d times", lock.fileLock.Path(), (lock.retryCount - i))
 		time.Sleep(lock.retrySleep)
 	}
 	return fmt.Errorf("%s: %w", lock.fileLock.Path(), ErrAlreadyLocked)
@@ -81,14 +82,26 @@ func (lock *Locker) Lock() error {
 // Unlock attempts to release the lock on a data path previously acquired via Lock().
 func (lock *Locker) Unlock() error {
 	// remove first while we still have the lock, so we reduce the odds of another beat swooping in to start between the Unlock() and Remove() operation.
-	err := os.Remove(lock.fileLock.Path())
-	if err != nil {
-		return fmt.Errorf("unable to remove data path file %s: %w", lock.fileLock.Path(), err)
+
+	// There's some awkwardness on windows, removing before we unlock is usually a fail.
+	if runtime.GOOS != "windows" {
+		err := os.Remove(lock.fileLock.Path())
+		if err != nil {
+			lock.logger.Warnf("could not remove lockfile at %s", lock.fileLock.Path())
+		}
 	}
 
-	err = lock.fileLock.Unlock()
+	err := lock.fileLock.Unlock()
 	if err != nil {
 		return fmt.Errorf("unable to unlock data path: %w", err)
+	}
+
+	// now unlock on windows.
+	if runtime.GOOS == "windows" {
+		err := os.Remove(lock.fileLock.Path())
+		if err != nil {
+			lock.logger.Warnf("could not remove lockfile at %s", lock.fileLock.Path())
+		}
 	}
 
 	return nil
