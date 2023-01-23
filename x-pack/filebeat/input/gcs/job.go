@@ -5,11 +5,18 @@
 package gcs
 
 import (
+	"bufio"
 	"bytes"
+	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"time"
+	"unicode"
 
 	"cloud.google.com/go/storage"
 
@@ -20,14 +27,31 @@ import (
 )
 
 type job struct {
-	bucket    *storage.BucketHandle
-	object    *storage.ObjectAttrs
+	// gcs bucket handle
+	bucket *storage.BucketHandle
+	// gcs object attribute struct
+	object *storage.ObjectAttrs
+	// gcs uri for the resource
 	objectURI string
-	state     *state
-	src       *Source
+	// object hash, used in setting event id
+	hash string
+	// offset value for an object, it points to the location inside the data stream
+	// from where we can start processing the object.
+	offset int64
+	// flag to denote if object is gZipped compressed or not.
+	isCompressed bool
+	// flag to denote if object's root element is of an array type
+	isRootArray bool
+	// object state
+	state *state
+	// bucket source struct used for storing bucket related data
+	src *Source
+	// publisher is used to publish a beat event to the output stream
 	publisher cursor.Publisher
-	log       *logp.Logger
-	isFailed  bool
+	// custom logger
+	log *logp.Logger
+	// flag used to denote if this object has previously failed without being processed at all.
+	isFailed bool
 }
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
@@ -38,6 +62,7 @@ func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI
 		bucket:    bucket,
 		object:    object,
 		objectURI: objectURI,
+		hash:      gcsObjectHash(src, object),
 		state:     state,
 		src:       src,
 		publisher: publisher,
@@ -46,67 +71,51 @@ func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI
 	}
 }
 
+// gcsObjectHash returns a short sha256 hash of the bucket name + object name.
+func gcsObjectHash(src *Source, object *storage.ObjectAttrs) string {
+	h := sha256.New()
+	h.Write([]byte(src.BucketName))
+	h.Write([]byte((object.Name)))
+	return hex.EncodeToString(h.Sum(nil)[:5])
+}
+
 const jobErrString = "job with jobId %s encountered an error : %w"
 
 func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
 
 	if allowedContentTypes[j.object.ContentType] {
-		data, err := j.extractData(ctx)
+		if j.object.ContentType == gzType || j.object.ContentEncoding == encodingGzip {
+			j.isCompressed = true
+		}
+		if result, ok := j.state.cp.IsRootArray[j.object.Name]; ok {
+			j.isRootArray = result
+		}
+		err := j.processAndPublishData(ctx, id)
 		if err != nil {
 			j.state.updateFailedJobs(j.object.Name)
 			j.log.Errorf(jobErrString, id, err)
 			return
 		}
 
-		reader := io.NopCloser(bytes.NewReader(data.Bytes()))
-		defer func() {
-			err = reader.Close()
-			if err != nil {
-				j.log.Errorf("failed to close json reader with error : %w", err)
-			}
-		}()
-
-		var objectData []mapstr.M
-		switch j.object.ContentType {
-		case contentTypeJSON:
-			if j.src.ParseJSON {
-				objectData, _, _, err = httpReadJSON(reader)
-				if err != nil {
-					j.log.Errorf(jobErrString, id, err)
-					return
-				}
-			}
-			// Support for more types will be added here, in the future.
-		default:
-			j.log.Errorf("job with jobId %s encountered an unexpected error", id)
-			return
-		}
-
-		fields = j.createEventFields(data.String(), objectData)
-
 	} else {
-		err := fmt.Errorf("job with jobId %s encountered an error : content-type %s not supported", id, j.object.ContentType)
+		err := fmt.Errorf("job with jobId %s encountered an error: content-type %s not supported", id, j.object.ContentType)
 		fields = mapstr.M{
 			"message": err.Error(),
 			"event": mapstr.M{
 				"kind": "publish_error",
 			},
 		}
+		event := beat.Event{
+			Timestamp: time.Now(),
+			Fields:    fields,
+		}
+		event.SetID(objectID(j.hash, 0))
+		j.state.save(j.object.Name, j.object.Updated)
+		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
+			j.log.Errorf(jobErrString, id, err)
+		}
 	}
-
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields:    fields,
-	}
-	event.SetID(id)
-	j.state.save(j.object.Name, &j.object.Updated)
-
-	if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
-		j.state.updateFailedJobs(j.object.Name)
-		j.log.Errorf(jobErrString, id, err)
-	}
-
 }
 
 func (j *job) Name() string {
@@ -121,57 +130,207 @@ func (j *job) Timestamp() time.Time {
 	return j.object.Updated
 }
 
-func (j *job) extractData(ctx context.Context) (*bytes.Buffer, error) {
+func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	var err error
+	var offset int64
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, j.src.BucketTimeOut)
 	defer cancel()
 	obj := j.bucket.Object(j.object.Name)
-	reader, err := obj.NewReader(ctxWithTimeout)
+	// if object is compressed or object root element is an array, then we cannot use an
+	// offset to read as it will produce an erroneous data stream.
+	if !j.isCompressed && !j.isRootArray {
+		offset = j.offset
+	}
+	reader, err := obj.NewRangeReader(ctxWithTimeout, offset, -1)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read data from object with error: %w", err)
+		return fmt.Errorf("failed to open reader for object: %s, with error: %w", j.object.Name, err)
 	}
 	defer func() {
 		err = reader.Close()
 		if err != nil {
-			j.log.Errorf("failed to close object reader with error: %w", err)
+			j.log.Errorf("failed to close reader for object: %s, with error: %w", j.object.Name, err)
 		}
 	}()
 
-	data := &bytes.Buffer{}
-
-	_, err = data.ReadFrom(reader)
+	err = j.readJsonAndPublish(ctx, reader, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read data from object reader with error: %w", err)
+		return fmt.Errorf("failed to read data from object: %s, with error: %w", j.object.Name, err)
 	}
 
-	return data, err
+	return err
 }
 
-func (j *job) createEventFields(message string, data []mapstr.M) mapstr.M {
-	return mapstr.M{
-		"message": message, // original stringified data
-		"log": mapstr.M{
-			"file": mapstr.M{
-				"path": j.objectURI,
-			},
-		},
-		"gcs": mapstr.M{
-			"storage": mapstr.M{
-				"bucket": mapstr.M{
-					"name": j.src.BucketName,
+func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
+	var err error
+	r, err = j.addGzipDecoderIfNeeded(bufio.NewReader(r))
+	if err != nil {
+		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
+	}
+
+	// if offset == 0, then this is a new stream which has not been processed previously
+	if j.offset == 0 {
+		r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
+		if err != nil {
+			return fmt.Errorf("failed to evaluate json for object: %s, with error: %w", j.object.Name, err)
+		}
+		if j.isRootArray {
+			j.state.setRootArray(j.object.Name)
+		}
+	}
+	dec := json.NewDecoder(r)
+	// If array is present at root then read json token and advance decoder
+	if j.isRootArray {
+		_, err := dec.Token()
+		if err != nil {
+			return fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
+		}
+	}
+
+	var offset, relativeOffset int64
+	// uncompressed files use the client to directly set the offset, this
+	// in turn causes the offset to reset to 0 for the new stream, hence why
+	// we need to keep relative offsets to keep track of the actual offset
+	if !j.isCompressed && !j.isRootArray {
+		relativeOffset = j.offset
+	}
+	dec.UseNumber()
+	for dec.More() && ctx.Err() == nil {
+		var item json.RawMessage
+		offset = dec.InputOffset()
+		if err = dec.Decode(&item); err != nil {
+			return fmt.Errorf("failed to decode json: %w", err)
+		}
+		// manually seek offset only if file is compressed or if root element is an array
+		if (j.isCompressed || j.isRootArray) && offset < j.offset {
+			continue
+		}
+		var parsedData []mapstr.M
+		if j.src.ParseJSON {
+			parsedData, err = decodeJSON(bytes.NewReader(item))
+			if err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
+		}
+		evt := j.createEvent(item, parsedData, offset+relativeOffset)
+		// updates the offset after reading the file
+		// this avoids duplicates for the last read when resuming operation
+		offset = dec.InputOffset()
+		if !dec.More() {
+			// if this is the last object, then peform a complete state save
+			j.state.save(j.object.Name, j.object.Updated)
+		} else {
+			// partially saves read state using offset
+			j.state.savePartial(j.object.Name, offset+relativeOffset)
+		}
+		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
+			j.log.Errorf(jobErrString, id, err)
+		}
+	}
+	return nil
+}
+
+// addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents gzipped content or not and adds gzipped decoder if needed. A bufio.Reader is used
+// so the function can peek into the byte  stream without consuming it. This makes it convenient for
+// code executed after this function call to consume the stream if it wants.
+func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, error) {
+	isStreamGzipped := false
+	// check if stream is gziped or not
+	buf, err := reader.Peek(3)
+	if err != nil {
+		if errors.Is(err, io.EOF) {
+			err = nil
+		}
+		return reader, err
+	}
+
+	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
+	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
+
+	if !isStreamGzipped {
+		return reader, nil
+	}
+
+	gzReader, err := gzip.NewReader(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return gzReader, nil
+}
+
+// evaluateJSON, uses a bufio.NewReader & reader.Peek to evaluate if the
+// data stream contains a json array as the root element or not, without
+// advancing the reader. If the data stream contains an array as the root
+// element, the value of the boolean return type is set to true.
+func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
+	eof := false
+	for i := 0; ; i++ {
+		b, err := reader.Peek((i + 1) * 5)
+		if errors.Is(err, io.EOF) {
+			eof = true
+		}
+		startByte := i * 5
+		for j := 0; j < len(b[startByte:]); j++ {
+			char := b[startByte+j : startByte+j+1]
+			switch {
+			case bytes.Equal(char, []byte("[")):
+				return reader, true, nil
+			case bytes.Equal(char, []byte("{")):
+				return reader, false, nil
+			case unicode.IsSpace(bytes.Runes(char)[0]):
+				continue
+			default:
+				return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+			}
+		}
+		if eof {
+			return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+		}
+	}
+}
+
+func (j *job) createEvent(message []byte, data []mapstr.M, offset int64) beat.Event {
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields: mapstr.M{
+			"message": string(message), // original stringified data
+			"log": mapstr.M{
+				"offset": offset,
+				"file": mapstr.M{
+					"path": j.objectURI,
 				},
-				"object": mapstr.M{
-					"name":         j.object.Name,
-					"content_type": j.object.ContentType,
-					"json_data":    data, // objectified data
+			},
+			"gcs": mapstr.M{
+				"storage": mapstr.M{
+					"bucket": mapstr.M{
+						"name": j.src.BucketName,
+					},
+					"object": mapstr.M{
+						"name":         j.object.Name,
+						"content_type": j.object.ContentType,
+						"json_data":    data, // objectified data, if parseJSON == true, else its empty array
+					},
 				},
 			},
-		},
-		"cloud": mapstr.M{
-			"provider": "goole cloud",
-		},
-		"event": mapstr.M{
-			"kind": "publish_data",
+			// Structs are used here in order to save map allocations
+			"cloud": struct {
+				Provider string `json:"provider"`
+			}{
+				Provider: "google cloud",
+			},
+			"event": struct {
+				Kind string `json:"kind"`
+			}{
+				Kind: "publish_data",
+			},
 		},
 	}
+	event.SetID(objectID(j.hash, offset))
+
+	return event
+}
+
+func objectID(objectHash string, offset int64) string {
+	return fmt.Sprintf("%s-%012d", objectHash, offset)
 }
