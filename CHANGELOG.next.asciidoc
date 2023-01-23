@@ -45,12 +45,13 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 
 *Auditbeat*
 
 
 *Filebeat*
-- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for 
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
    automatic splitting at root level, if root level element is an array. {pull}34155[34155]
 - [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
 - [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
