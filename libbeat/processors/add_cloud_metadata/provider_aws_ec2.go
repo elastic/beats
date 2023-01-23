@@ -18,21 +18,21 @@
 package add_cloud_metadata
 
 import (
-	"fmt"
-	"io"
-	"io/ioutil"
-	"net"
+	"context"
 	"net/http"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	awscfg "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
+//TODO: adjust tests and delete consts:
 const (
 	ec2InstanceIdentityURI            = "/2014-02-25/dynamic/instance-identity/document"
 	ec2InstanceIMDSv2TokenValueHeader = "X-aws-ec2-metadata-token"
@@ -40,72 +40,6 @@ const (
 	ec2InstanceIMDSv2TokenTTLValue    = "21600"
 	ec2InstanceIMDSv2TokenURI         = "/latest/api/token"
 )
-
-// fetches IMDSv2 token, returns empty one on errors
-func getIMDSv2Token(c *conf.C) string {
-	logger := logp.NewLogger("add_cloud_metadata")
-
-	config := defaultConfig()
-	if err := c.Unpack(&config); err != nil {
-		logger.Warnf("error when load config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		logger.Warnf("error when load TLS config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	client := http.Client{
-		Timeout: config.Timeout,
-		Transport: &http.Transport{
-			DisableKeepAlives: true,
-			DialContext: (&net.Dialer{
-				Timeout:   config.Timeout,
-				KeepAlive: 0,
-			}).DialContext,
-			TLSClientConfig: tlsConfig.ToConfig(),
-		},
-	}
-
-	tokenReq, err := http.NewRequest("PUT", fmt.Sprintf("http://%s%s", metadataHost, ec2InstanceIMDSv2TokenURI), nil)
-	if err != nil {
-		logger.Warnf("error when make token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	tokenReq.Header.Add(ec2InstanceIMDSv2TokenTTLHeader, ec2InstanceIMDSv2TokenTTLValue)
-	rsp, err := client.Do(tokenReq)
-	if rsp == nil {
-		logger.Warnf("read token request for getting IMDSv2 token returns empty: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	defer func(body io.ReadCloser) {
-		if body != nil {
-			body.Close()
-		}
-	}(rsp.Body)
-
-	if err != nil {
-		logger.Warnf("error when read token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	if rsp.StatusCode != http.StatusOK {
-		logger.Warnf("error when check request status for getting IMDSv2 token: http request status %d. No token in the metadata request will be used.", rsp.StatusCode)
-		return ""
-	}
-
-	all, err := ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		logger.Warnf("error when reading token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	return string(all)
-}
 
 // AWS EC2 Metadata Service
 var ec2MetadataFetcher = provider{
@@ -115,28 +49,74 @@ var ec2MetadataFetcher = provider{
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		ec2Schema := func(m map[string]interface{}) mapstr.M {
-			m["serviceName"] = "EC2"
-			out, _ := s.Schema{
-				"instance":          s.Object{"id": c.Str("instanceId")},
-				"machine":           s.Object{"type": c.Str("instanceType")},
-				"region":            c.Str("region"),
-				"availability_zone": c.Str("availabilityZone"),
-				"service": s.Object{
-					"name": c.Str("serviceName"),
-				},
-				"account": s.Object{"id": c.Str("accountId")},
-				"image":   s.Object{"id": c.Str("imageId")},
-			}.Apply(m)
-			return mapstr.M{"cloud": out}
+			m["service"] = mapstr.M{
+				"name": "EC2",
+			}
+			return mapstr.M{"cloud": m}
 		}
 
-		headers := make(map[string]string, 1)
-		token := getIMDSv2Token(config)
-		if len(token) > 0 {
-			headers[ec2InstanceIMDSv2TokenValueHeader] = token
-		}
-
-		fetcher, err := newMetadataFetcher(config, "aws", headers, metadataHost, ec2Schema, ec2InstanceIdentityURI)
+		fetcher, err := newGenericMetadataFetcher(config, "aws", ec2Schema, fetchRawProviderMetadata)
 		return fetcher, err
 	},
+}
+
+// fetchRaw queries raw metadata from a hosting provider's metadata service.
+func fetchRawProviderMetadata(
+	ctx context.Context,
+	client http.Client,
+	result *result,
+) {
+	logger := logp.NewLogger("add_cloud_metadata")
+	// config := defaultConfig()
+	// if err := c.Unpack(&config); err != nil {
+	// 	logger.Warnf("error when load config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+	// }
+
+	// LoadDefaultConfig loads the Ec2 role credentials
+	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
+	if err != nil {
+		logger.Warnf("error when loading AWS default configuration: %s.", err)
+	}
+
+	awsClient := imds.NewFromConfig(awsConfig)
+
+	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
+	if err != nil {
+		logger.Warnf("error when fetching EC2 Identity Document: %s.", err)
+	}
+
+	// Region must be set to be able to get EC2 Tags
+	awsConfig.Region = instanceIdentity.Region
+
+	svc := ec2.NewFromConfig(awsConfig)
+	input := &ec2.DescribeTagsInput{
+		Filters: []types.Filter{
+			{
+				Name: awssdk.String("resource-id"),
+				Values: []string{
+					*awssdk.String(instanceIdentity.InstanceIdentityDocument.InstanceID),
+				},
+			},
+			{
+				Name: awssdk.String("key"),
+				Values: []string{
+					*awssdk.String("eks:cluster-name"),
+				},
+			},
+		},
+	}
+
+	tagsResult, err := svc.DescribeTags(context.TODO(), input)
+	if err != nil {
+		logger.Warnf("error when fetching EC2 Tags: %s.", err)
+	}
+
+	result.metadata.Put("cloud.orchestrator.cluster.name", tagsResult.Tags[0].Value)
+	result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
+	result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
+	result.metadata.Put("cloud.region", instanceIdentity.InstanceIdentityDocument.Region)
+	result.metadata.Put("cloud.availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
+	result.metadata.Put("cloud.account.id", instanceIdentity.InstanceIdentityDocument.AccountID)
+	result.metadata.Put("cloud.image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
+
 }
