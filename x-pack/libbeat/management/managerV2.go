@@ -13,11 +13,20 @@ import (
 	"syscall"
 	"time"
 
+<<<<<<< HEAD
+=======
+	"github.com/gofrs/uuid"
+>>>>>>> 870215c6fd (Run make check and commit the changes. (#34349))
 	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/gofrs/uuid"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
