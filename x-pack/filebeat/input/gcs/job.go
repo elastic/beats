@@ -71,13 +71,12 @@ func newJob(bucket *storage.BucketHandle, object *storage.ObjectAttrs, objectURI
 	}
 }
 
-// gcsObjectHash returns a short sha256 hash of the container name + blob name.
+// gcsObjectHash returns a short sha256 hash of the bucket name + object name.
 func gcsObjectHash(src *Source, object *storage.ObjectAttrs) string {
 	h := sha256.New()
 	h.Write([]byte(src.BucketName))
 	h.Write([]byte((object.Name)))
-	prefix := hex.EncodeToString(h.Sum(nil))
-	return prefix[:10]
+	return hex.EncodeToString(h.Sum(nil)[:5])
 }
 
 const jobErrString = "job with jobId %s encountered an error : %w"
@@ -163,18 +162,14 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
 	var err error
-	bufReader := bufio.NewReader(r)
-	r, isGzipped, err := j.addGzipDecoderIfNeeded(bufReader)
+	r, err = j.addGzipDecoderIfNeeded(bufio.NewReader(r))
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
 	}
 
 	// if offset == 0, then this is a new stream which has not been processed previously
 	if j.offset == 0 {
-		if isGzipped {
-			bufReader = bufio.NewReader(r)
-		}
-		r, j.isRootArray, err = evaluateJSON(bufReader)
+		r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
 		if err != nil {
 			return fmt.Errorf("failed to evaluate json for object: %s, with error: %w", j.object.Name, err)
 		}
@@ -209,16 +204,14 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		if (j.isCompressed || j.isRootArray) && offset < j.offset {
 			continue
 		}
-		data := []byte(item)
 		var parsedData []mapstr.M
 		if j.src.ParseJSON {
-			reader := bytes.NewReader(data)
-			parsedData, err = decodeJSON(reader)
+			parsedData, err = decodeJSON(bytes.NewReader(item))
 			if err != nil {
 				j.log.Errorf(jobErrString, id, err)
 			}
 		}
-		evt := j.createEvent(data, parsedData, offset+relativeOffset)
+		evt := j.createEvent(item, parsedData, offset+relativeOffset)
 		// updates the offset after reading the file
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
@@ -240,7 +233,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 // represents gzipped content or not and adds gzipped decoder if needed. A bufio.Reader is used
 // so the function can peek into the byte  stream without consuming it. This makes it convenient for
 // code executed after this function call to consume the stream if it wants.
-func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, bool, error) {
+func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, error) {
 	isStreamGzipped := false
 	// check if stream is gziped or not
 	buf, err := reader.Peek(3)
@@ -248,27 +241,28 @@ func (j *job) addGzipDecoderIfNeeded(reader *bufio.Reader) (io.Reader, bool, err
 		if errors.Is(err, io.EOF) {
 			err = nil
 		}
-		return reader, false, err
+		return reader, err
 	}
 
 	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
 	isStreamGzipped = bytes.Equal(buf, []byte{0x1F, 0x8B, 0x08})
 
 	if !isStreamGzipped {
-		return reader, false, nil
+		return reader, nil
 	}
 
 	gzReader, err := gzip.NewReader(reader)
 	if err != nil {
-		return reader, false, err
+		return nil, err
 	}
 
-	return gzReader, true, nil
+	return gzReader, nil
 }
 
 // evaluateJSON, uses a bufio.NewReader & reader.Peek to evaluate if the
 // data stream contains a json array as the root element or not, without
-// advancing the reader
+// advancing the reader. If the data stream contains an array as the root
+// element, the value of the boolean return type is set to true.
 func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 	eof := false
 	for i := 0; ; i++ {
@@ -319,11 +313,16 @@ func (j *job) createEvent(message []byte, data []mapstr.M, offset int64) beat.Ev
 					},
 				},
 			},
-			"cloud": mapstr.M{
-				"provider": "goole cloud",
+			// Structs are used here in order to save map allocations
+			"cloud": struct {
+				Provider string `json:"provider"`
+			}{
+				Provider: "google cloud",
 			},
-			"event": mapstr.M{
-				"kind": "publish_data",
+			"event": struct {
+				Kind string `json:"kind"`
+			}{
+				Kind: "publish_data",
 			},
 		},
 	}
