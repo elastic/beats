@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build ( aix || solaris )
+//go:build aix || solaris
 // +build aix solaris
 
 package kubernetes
@@ -58,9 +58,8 @@ type EventManager interface {
 
 // Provider implements autodiscover provider for docker containers
 type Provider struct {
-	logger       *logp.Logger
+	logger *logp.Logger
 }
-
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(
@@ -73,7 +72,7 @@ func AutodiscoverBuilder(
 	logger := logp.NewLogger("autodiscover")
 
 	p := &Provider{
-		logger:    logger,
+		logger: logger,
 	}
 
 	return p, nil
