@@ -103,46 +103,24 @@ func (p *forgetfulProducer) Cancel() int {
 }
 
 func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
-		event:    event,
-		producer: p,
-		// We add 1 to the id so the default lastACK of 0 is a
-		// valid initial state and 1 is the first real id.
-		producerID:   producerID(p.producedCount + 1),
-		responseChan: resp}
+		event:        event,
+		producer:     p,
+		responseChan: make(chan queue.EntryID, 1),
+	}
 }
 
 func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
-	id, published := p.openState.publish(p.makePushRequest(event))
-	if published {
-		p.producedCount++
-	}
-	return id, published
+	return p.openState.publish(p.makePushRequest(event))
 }
 
 func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
-	id, published := p.openState.tryPublish(p.makePushRequest(event))
-	if published {
-		p.producedCount++
-	}
-	return id, published
+	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
 func (p *ackProducer) Cancel() int {
 	p.openState.Close()
 
-	if p.dropOnCancel {
-		ch := make(chan producerCancelResponse)
-		p.broker.cancelChan <- producerCancelRequest{
-			producer: p,
-			resp:     ch,
-		}
-
-		// wait for cancel to being processed
-		resp := <-ch
-		return resp.removed
-	}
 	return 0
 }
 

@@ -52,12 +52,6 @@ type broker struct {
 	///////////////////////////
 	// internal channels
 
-	// When events are sent to consumers, the ACK channels for their batches
-	// are collected into chanLists and sent to scheduledACKs.
-	// These are then read by ackLoop and concatenated to its internal
-	// chanList of all outstanding ACK channels.
-	scheduledACKs chan chanList
-
 	// A listener that should be notified when ACKs are processed.
 	// ackLoop calls this listener's OnACK function when it advances
 	// the consumer ACK position.
@@ -69,6 +63,8 @@ type broker struct {
 
 	// wait group for worker shutdown
 	wg sync.WaitGroup
+
+	nextEntryID queue.EntryID
 }
 
 type Settings struct {
@@ -120,6 +116,7 @@ func (acks *pendingACKsList) nextDoneChan() chan batchDoneMsg {
 	if acks.head != nil {
 		return acks.head.doneChan
 	}
+	return nil
 }
 
 func init() {
@@ -145,11 +142,8 @@ func create(
 	}
 
 	return NewQueue(logger, Settings{
-		ACKListener:    ackListener,
-		Events:         config.Events,
-		FlushMinEvents: config.FlushMinEvents,
-		FlushTimeout:   config.FlushTimeout,
-		InputQueueSize: inQueueSize,
+		ACKListener: ackListener,
+		BatchSize:   50,
 	}), nil
 }
 
@@ -160,25 +154,8 @@ func NewQueue(
 	logger *logp.Logger,
 	settings Settings,
 ) *broker {
-	var (
-		sz = settings.Events
-	)
-
-	chanSize := AdjustInputQueueSize(settings.InputQueueSize, sz)
-
-	if minEvents < 1 {
-		minEvents = 1
-	}
-	if minEvents > 1 && flushTimeout <= 0 {
-		minEvents = 1
-		flushTimeout = 0
-	}
-	if minEvents > sz {
-		minEvents = sz
-	}
-
 	if logger == nil {
-		logger = logp.NewLogger("memqueue")
+		logger = logp.NewLogger("proxyqueue")
 	}
 
 	b := &broker{
@@ -186,35 +163,16 @@ func NewQueue(
 		logger: logger,
 
 		// broker API channels
-		pushChan: make(chan pushRequest, chanSize),
+		pushChan: make(chan pushRequest, 8),
 		getChan:  make(chan getRequest),
-
-		// internal broker and ACK handler channels
-		scheduledACKs: make(chan chanList),
 
 		ackListener: settings.ACKListener,
 	}
 
-	var eventLoop interface {
-		run()
-		processACK(chanList, int)
-	}
-
-	eventLoop = newEventLoop(b, sz)
-
-	b.bufSize = sz
-	ackLoop := &ackLoop{
-		broker:     b,
-		processACK: eventLoop.processACK}
-
-	b.wg.Add(2)
+	b.wg.Add(1)
 	go func() {
 		defer b.wg.Done()
 		b.run()
-	}()
-	go func() {
-		defer b.wg.Done()
-		ackLoop.run()
 	}()
 
 	return b
@@ -226,9 +184,7 @@ func (b *broker) Close() error {
 }
 
 func (b *broker) BufferConfig() queue.BufferConfig {
-	return queue.BufferConfig{
-		MaxEvents: b.bufSize,
-	}
+	return queue.BufferConfig{}
 }
 
 func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
@@ -246,7 +202,7 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
-	return &batch{
+	return &ProxiedBatch{
 		queue:    b,
 		entries:  resp.entries,
 		doneChan: resp.ackChan,
@@ -270,43 +226,12 @@ var ackChanPool = sync.Pool{
 	},
 }
 
-func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
-	ch := ackChanPool.Get().(*batchACKState)
-	ch.next = nil
-	ch.start = start
-	ch.count = count
-	ch.entries = entries
-	return ch
-}
-
 func releaseACKChan(c *batchACKState) {
 	c.next = nil
 	ackChanPool.Put(c)
 }
 
-func (l *chanList) prepend(ch *batchACKState) {
-	ch.next = l.head
-	l.head = ch
-	if l.tail == nil {
-		l.tail = ch
-	}
-}
-
-func (l *chanList) concat(other *chanList) {
-	if other.head == nil {
-		return
-	}
-
-	if l.head == nil {
-		*l = *other
-		return
-	}
-
-	l.tail.next = other.head
-	l.tail = other.tail
-}
-
-func (l *chanList) append(ch *batchACKState) {
+func (l *pendingACKsList) append(ch *batchACKState) {
 	if l.head == nil {
 		l.head = ch
 	} else {
@@ -314,23 +239,14 @@ func (l *chanList) append(ch *batchACKState) {
 	}
 	l.tail = ch
 }
-
-func (l *chanList) empty() bool {
-	return l.head == nil
-}
-
-func (l *chanList) front() *batchACKState {
-	return l.head
-}
-
-func (l *chanList) nextBatchChannel() chan batchDoneMsg {
+func (l *pendingACKsList) nextBatchChannel() chan batchDoneMsg {
 	if l.head == nil {
 		return nil
 	}
 	return l.head.doneChan
 }
 
-func (l *chanList) pop() *batchACKState {
+func (l *pendingACKsList) pop() *batchACKState {
 	ch := l.head
 	if ch != nil {
 		l.head = ch.next
@@ -341,15 +257,6 @@ func (l *chanList) pop() *batchACKState {
 
 	ch.next = nil
 	return ch
-}
-
-func (l *chanList) reverse() {
-	tmp := *l
-	*l = chanList{}
-
-	for !tmp.empty() {
-		l.prepend(tmp.pop())
-	}
 }
 
 // AdjustInputQueueSize decides the size for the input queue.

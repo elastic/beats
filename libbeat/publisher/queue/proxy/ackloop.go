@@ -22,7 +22,7 @@ package proxyqueue
 // worker, to reduce the number of signals to return to the producer and the
 // broker event loop.
 // Producer ACKs are run in the ackLoop go-routine.
-type ackLoop struct {
+/*type ackLoop struct {
 	broker *broker
 
 	// A list of ACK channels given to queue consumers,
@@ -104,3 +104,4 @@ func (l *ackLoop) collectAcked() chanList {
 
 	return lst
 }
+*/
