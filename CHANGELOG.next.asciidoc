@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 
 *Auditbeat*
 
