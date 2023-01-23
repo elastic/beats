@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
 - Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
+- The `close.on_state_change.inactive` default value is now set to 5 minutes, matching the documentation.
 
 *Heartbeat*
 
@@ -30,7 +31,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest
+- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest {issue}19627[19627] {pull}34295[34295]
+- Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
 
 *Functionbeat*
 
@@ -87,12 +89,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
 
 *Auditbeat*
 
 
 *Filebeat*
 
+- Fix handling of null or empty arrays during split with keep parent option. {pull}34322[34322]
 
 *Heartbeat*
 
