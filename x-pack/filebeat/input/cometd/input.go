@@ -52,13 +52,17 @@ func (in *cometdInput) Run() {
 }
 
 func (in *cometdInput) run() error {
+	// Ticker with 5 seconds to avoid log too many warnings
 	ticker := time.NewTicker(5 * time.Second)
 	in.msgCh = in.b.Channel(in.workerCtx, in.msgCh, "-1", *in.creds, in.config.ChannelName)
 	for e := range in.msgCh {
 		if e.Failed() {
+			// if err bayeux library returns recoverable error, do not close input.
+			// instead continue with connection warning
 			if !strings.Contains(e.Error(), "trying again") {
 				return fmt.Errorf("error collecting events: %w", e.Err)
 			}
+			// log warning every 5 seconds only to avoid to many unnecessary logs
 			select {
 			case <-ticker.C:
 				in.log.Warnw("Retrying...! facing issue while collecting data from CometD", "error", e.Error())
