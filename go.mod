@@ -209,7 +209,6 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
 	go.elastic.co/apm/v2 v2.0.0
 	go.mongodb.org/mongo-driver v1.5.1
-	golang.org/x/exp v0.0.0-20220921023135-46d9e7742f1e
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
@@ -331,6 +330,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
+	golang.org/x/exp v0.0.0-20220921023135-46d9e7742f1e // indirect
 	golang.org/x/term v0.2.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/appengine v1.6.7 // indirect

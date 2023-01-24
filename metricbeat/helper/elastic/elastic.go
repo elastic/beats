@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"golang.org/x/exp/slices"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -172,7 +171,15 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 
 		// Add any optional metricsets which are not already configured
 		for _, cfgdMs := range cfgdMetricsetsStrings {
-			if slices.Contains(optionalXpackMetricsets, cfgdMs) {
+			found := false
+			for _, ms := range optionalXpackMetricsets {
+					if ms == cfgdMs {
+						found = true
+						break
+					}
+			}
+
+			if found {
 				metricsets = append(metricsets, cfgdMs)
 			}
 		}
