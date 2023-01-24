@@ -3465,7 +3465,7 @@ processors:
         ctx.event?.code != null &&
         ["5140", "5145"].contains(ctx.event.code) &&
         ctx.winlog?.event_data?.RelativeTargetName != null &&
-        ctx.winlog?.event_data?.RelativeTargetName != ""
+        ctx.winlog.event_data.RelativeTargetName != ""
   - set:
       field: file.directory
       copy_from: winlog.event_data.ShareLocalPath
