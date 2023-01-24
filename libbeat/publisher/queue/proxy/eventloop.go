@@ -51,11 +51,29 @@ func (b *broker) run() {
 			b.handlePushRequest(&req)
 
 		case req := <-getChan: // consumer asking for next batch
+			req.responseChan <- getResponse{}
 			b.handleGetRequest(&req)
 
 		case <-pendingACKs.nextDoneChan():
+			next := pendingACKs.pop()
+			b.handleACKs(&pendingACKs)
 			// TODO: propagate ACKs
 		}
+	}
+}
+
+func (b *broker) handleACKs(pendingACKs *pendingACKsList) {
+	for {
+		select {
+		case <-pendingACKs.nextDoneChan():
+			next := pendingACKs.pop()
+			for _, ack := range next.acks {
+				ack.producer.ackHandler(ack.count)
+			}
+		default:
+			break
+		}
+
 	}
 }
 

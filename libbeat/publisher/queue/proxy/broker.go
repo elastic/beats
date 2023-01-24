@@ -253,9 +253,8 @@ func (l *pendingACKsList) pop() *batchACKState {
 		if l.head == nil {
 			l.tail = nil
 		}
+		ch.next = nil
 	}
-
-	ch.next = nil
 	return ch
 }
 

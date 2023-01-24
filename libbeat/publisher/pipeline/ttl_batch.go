@@ -94,6 +94,10 @@ func (b *ttlBatch) RetryEvents(events []publisher.Event) {
 	b.Retry()
 }
 
+func (b *ttlBatch) FreeEvents() {
+	b.events = nil
+}
+
 // reduceTTL reduces the time to live for all events that have no 'guaranteed'
 // sending requirements.  reduceTTL returns true if the batch is still alive.
 func (b *ttlBatch) reduceTTL() bool {
