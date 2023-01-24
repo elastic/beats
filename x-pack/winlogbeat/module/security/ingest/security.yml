@@ -3493,7 +3493,7 @@ processors:
         ctx.event?.code != null &&
         ["5140", "5145"].contains(ctx.event.code) &&
         ctx.winlog?.event_data?.ShareName != null &&
-        ctx.winlog?.event_data?.ShareName != "" &&
+        ctx.winlog.event_data.ShareName != "" &&
         ctx.file?.name != null
   - script:
       description: Adds file information.
