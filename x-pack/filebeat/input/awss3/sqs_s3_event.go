@@ -135,7 +135,6 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
 
 	rawRecieveCount, hasReceiveCountAttribute := msg.Attributes[sqsApproximateReceiveCountAttribute]
-
 	if hasReceiveCountAttribute {
 		if receiveCount, err := strconv.Atoi(rawRecieveCount); err == nil && receiveCount == 1 {
 			if s, found := msg.Attributes[sqsSentTimestampAttribute]; found {
