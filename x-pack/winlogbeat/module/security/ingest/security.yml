@@ -3485,7 +3485,7 @@ processors:
         ctx.event?.code != null &&
         ["5140", "5145"].contains(ctx.event.code) &&
         ctx.winlog?.event_data?.ShareLocalPath != null &&
-        ctx.winlog?.event_data?.ShareLocalPath != ""
+        ctx.winlog.event_data.ShareLocalPath != ""
   - set:
       field: file.target_path
       value: "{{winlog.event_data.ShareName}}\\{{file.name}}"
