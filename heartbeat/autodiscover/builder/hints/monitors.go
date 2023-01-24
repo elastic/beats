@@ -153,7 +153,7 @@ func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int) ([]string, 
 			hb.logger.Warnf("ICMP scheme does not support port specification: %s", h)
 			continue
 		} else if strings.Contains(h, ":") && strings.Contains(h, "data.port") && port == 0 {
-			// 0 is not -technically- a user-defined port, skip if a specific port is set
+			// 0 is not -technically- a user-defined port, skip if a dynamic port is set
 			continue
 		} else if strings.Contains(h, ":") && !strings.Contains(h, "data.port") {
 			// Can filter if port is a static value
