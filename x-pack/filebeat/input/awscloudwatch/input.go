@@ -59,6 +59,7 @@ func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 type cloudwatchInput struct {
 	config    config
 	awsConfig awssdk.Config
+	metrics   *inputMetrics
 }
 
 func newInput(config config) (*cloudwatchInput, error) {
@@ -131,16 +132,17 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	}
 
 	log := inputContext.Logger
-	metrics := newInputMetrics(inputContext.ID, nil)
+	in.metrics = newInputMetrics(inputContext.ID, nil)
+	defer in.metrics.Close()
 	cwPoller := newCloudwatchPoller(
 		log.Named("cloudwatch_poller"),
-		metrics,
+		in.metrics,
 		in.awsConfig.Region,
 		in.config.APISleep,
 		in.config.NumberOfWorkers,
 		in.config.LogStreams,
 		in.config.LogStreamPrefix)
-	logProcessor := newLogProcessor(log.Named("log_processor"), metrics, client, ctx)
+	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
 	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
 }
