@@ -6,6 +6,7 @@ package cometd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -18,6 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/bayeux"
 	bay "github.com/elastic/bayeux"
 	finput "github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
@@ -323,27 +325,22 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	body, _ := ioutil.ReadAll(r.Body)
+	var data bayeux.Subscription
+	json.Unmarshal(body, &data)
 
-	switch string(body) {
-	case `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}`:
+	switch data.Channel {
+	case "/meta/handshake":
 		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 		return
-	case `{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "client_id"} `:
+	case "/meta/connect":
 		if called < uint64(expectedHTTPEventCount) {
 			atomic.AddUint64(&called, 1)
 			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
-		} else {
-			_, _ = w.Write([]byte(`{}`))
+			return
 		}
+		_, _ = w.Write([]byte(`{}`))
 		return
-	case `{
-								"channel": "/meta/subscribe",
-								"subscription": "channel_name",
-								"clientId": "client_id",
-								"ext": {
-									"replay": {"channel_name": "-1"}
-									}
-								}`:
+	case "/meta/subscribe":
 		_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
 		return
 	default:

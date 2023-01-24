@@ -7,6 +7,7 @@ package cometd
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -17,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"golang.org/x/time/rate"
 
 	bay "github.com/elastic/bayeux"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -24,6 +26,9 @@ import (
 
 const (
 	inputName = "cometd"
+
+	// retryInterval is the minimum duration between pub/sub client retries.
+	retryInterval = 30 * time.Second
 )
 
 // Run starts the input worker then returns. Only the first invocation
@@ -38,23 +43,47 @@ func (in *cometdInput) Run() {
 			defer in.workerWg.Done()
 			defer in.workerCancel()
 			in.b = bay.Bayeux{}
-			in.creds, err = bay.GetSalesforceCredentials(in.authParams)
-			if err != nil {
-				in.log.Errorw("not able to get access token", "error", err)
-				return
-			}
-			if err := in.run(); err != nil {
-				in.log.Errorw("got error while running input", "error", err)
-				return
+
+			rt := rate.NewLimiter(rate.Every(retryInterval), 1)
+
+			for in.workerCtx.Err() == nil {
+				// Rate limit.
+				if err := rt.Wait(in.workerCtx); err != nil {
+					continue
+				}
+
+				in.creds, err = bay.GetSalesforceCredentials(in.authParams)
+				if err != nil {
+					in.log.Errorw("not able to get access token", "error", err)
+					// Creating a new channel for cometd input.
+					in.msgCh = make(chan bay.MaybeMsg, 1)
+					continue
+				}
+
+				if err := in.run(); err != nil {
+					if in.workerCtx.Err() == nil {
+						in.log.Warnw("Restarting failed CometD input worker.", "error", err)
+						// Creating a new channel for cometd input.
+						in.msgCh = make(chan bay.MaybeMsg, 1)
+						continue
+					}
+
+					// Log any non-cancellation error before stopping.
+					if !errors.Is(err, context.Canceled) {
+						in.log.Errorw("got error while running input", "error", err)
+					}
+				}
 			}
 		}()
 	})
 }
 
 func (in *cometdInput) run() error {
+	ctx, cancel := context.WithCancel(in.workerCtx)
+	defer cancel()
 	// Ticker with 5 seconds to avoid log too many warnings
 	ticker := time.NewTicker(5 * time.Second)
-	in.msgCh = in.b.Channel(in.workerCtx, in.msgCh, "-1", *in.creds, in.config.ChannelName)
+	in.msgCh = in.b.Channel(ctx, in.msgCh, "-1", *in.creds, in.config.ChannelName)
 	for e := range in.msgCh {
 		if e.Failed() {
 			// if err bayeux library returns recoverable error, do not close input.
@@ -88,6 +117,7 @@ func (in *cometdInput) run() error {
 			}
 			if ok := in.outlet.OnEvent(makeEvent(event.EventId, e.Msg.Channel, string(msg))); !ok {
 				in.log.Debug("OnEvent returned false. Stopping input worker.")
+				cancel()
 				return fmt.Errorf("error ingesting data to elasticsearch")
 			}
 		}
