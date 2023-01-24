@@ -3503,6 +3503,7 @@ processors:
         def extIdx = ctx.file.name.lastIndexOf(".");
         if (extIdx > -1) {
             ctx.file.extension = ctx.file.name.substring(extIdx+1);
+        }
   - convert:
       field: winlog.record_id
       type: string
