@@ -31,11 +31,17 @@ import (
 
 func TestFindCheckpoint(t *testing.T) {
 	tmp := t.TempDir()
+
 	c1Name := filepath.Join(tmp, "12345.json")
-	_, err := os.Create(c1Name)
+	c1File, err := os.Create(c1Name)
 	require.NoError(t, err)
+	err = c1File.Close()
+	require.NoError(t, err)
+
 	c2Name := filepath.Join(tmp, "99999.json")
-	_, err = os.Create(c2Name)
+	c2File, err := os.Create(c2Name)
+	require.NoError(t, err)
+	err = c2File.Close()
 	require.NoError(t, err)
 
 	backuper := registryBackuper{
