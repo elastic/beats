@@ -160,7 +160,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
 - Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 - Add support for recognizing the log level in Elasticsearch JVM logs {pull}34159[34159]
-- Added metric `sqsMessageDelayedTime` for aws-s3 input. {pull}34306[34306]
+- Added metric `sqsLagTime` for aws-s3 input. {pull}34306[34306]
 
 *Auditbeat*
 
