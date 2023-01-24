@@ -24,7 +24,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu-20' }
+      agent { label 'ubuntu-22' }
       when {
         beforeAgent true
         anyOf {
