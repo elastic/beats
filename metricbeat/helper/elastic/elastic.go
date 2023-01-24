@@ -173,10 +173,10 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 		for _, cfgdMs := range cfgdMetricsetsStrings {
 			found := false
 			for _, ms := range optionalXpackMetricsets {
-					if ms == cfgdMs {
-						found = true
-						break
-					}
+				if ms == cfgdMs {
+					found = true
+					break
+				}
 			}
 
 			if found {

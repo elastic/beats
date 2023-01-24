@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
 - Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
 
 
 *Heartbeat*
