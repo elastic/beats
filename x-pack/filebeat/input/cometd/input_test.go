@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -351,4 +352,132 @@ func assertEventMatches(t *testing.T, expected bay.MaybeMsg, got beat.Event) {
 	message, err := got.GetValue("message")
 	require.NoError(t, err)
 	require.Equal(t, string(expected.Msg.Data.Payload), message)
+}
+
+func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
+	var err error
+
+	errorAfterEvent := 2
+	expectedHTTPEventCount := 6
+	expectedEventCount := 4
+
+	eventsCh := make(chan beat.Event)
+	defer close(eventsCh)
+	signal := make(chan struct{}, 1)
+	defer close(signal)
+
+	outlet := &mockedOutleter{
+		onEventHandler: func(event beat.Event) bool {
+			eventsCh <- event
+			return true
+		},
+	}
+	connector := &mockedConnector{
+		outlet: outlet,
+	}
+	var inputContext finput.Context
+
+	var expected bay.MaybeMsg
+	expected.Msg.Data.Event.ReplayID = 1234
+	expected.Msg.Data.Payload = []byte(`{"CountryIso": "IN"}`)
+	expected.Msg.Channel = "channel_name"
+
+	config := map[string]interface{}{
+		"channel_name":              "channel_name",
+		"auth.oauth2.client.id":     "client.id",
+		"auth.oauth2.client.secret": "client.secret",
+		"auth.oauth2.user":          "user",
+		"auth.oauth2.password":      "password",
+	}
+
+	i := 0
+	var server *httptest.Server
+	r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		_ = r.ParseForm()
+		if r.URL.Path == "/token" {
+			response := `{"instance_url": "` + serverURL + `", "expires_in": "60", "access_token": "abcd"}`
+			_, _ = w.Write([]byte(response))
+			return
+		}
+
+		body, _ := ioutil.ReadAll(r.Body)
+		var data bayeux.Subscription
+		json.Unmarshal(body, &data)
+
+		switch data.Channel {
+		case "/meta/handshake":
+			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
+			return
+		case "/meta/connect":
+			if i < expectedHTTPEventCount {
+				if i == errorAfterEvent {
+					// stop server to produce EOF errors
+					signal <- struct{}{}
+				}
+				i++
+				_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
+				return
+			}
+			i++
+			_, _ = w.Write([]byte(`{}`))
+			return
+		case "/meta/subscribe":
+			_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
+			return
+		default:
+		}
+	})
+
+	server, err = newTestServer("localhost:9080", r)
+	assert.NoError(t, err)
+	serverURL = server.URL
+
+	config["auth.oauth2.token_url"] = server.URL + "/token"
+
+	cfg := conf.MustNewConfigFrom(config)
+
+	input, err := NewInput(cfg, connector, inputContext)
+	require.NoError(t, err)
+	require.NotNil(t, input)
+
+	input.Run()
+	go func() {
+		j := 0
+		for event := range eventsCh {
+			if j >= expectedEventCount {
+				signal <- struct{}{}
+			}
+			assertEventMatches(t, expected, event)
+			j++
+		}
+	}()
+
+	<-signal
+	// close previous connection
+	server.Close()
+	time.Sleep(2 * time.Second)
+
+	// restart connection for new events
+	server, err = newTestServer("localhost:9080", r)
+	assert.NoError(t, err)
+	serverURL = server.URL
+	defer server.Close()
+	<-signal
+
+	input.Stop()
+}
+
+func newTestServer(URL string, handler http.Handler) (*httptest.Server, error) {
+	server := httptest.NewUnstartedServer(handler)
+	if URL != "" {
+		l, err := net.Listen("tcp", URL)
+		if err != nil {
+			return nil, err
+		}
+		server.Listener.Close()
+		server.Listener = l
+	}
+	server.Start()
+	return server, nil
 }
