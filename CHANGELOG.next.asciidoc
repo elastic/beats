@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest {issue}19627[19627] {pull}34295[34295]
 - Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
+- Added processing for Windows Event ID's 5140 and 5145 for the Security Ingest Pipeline {pull}34352[34352]
 
 *Functionbeat*
 
@@ -45,11 +46,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 
 *Auditbeat*
 
 
 *Filebeat*
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
+   automatic splitting at root level, if root level element is an array. {pull}34155[34155]
 - [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
 - [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
 - Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
@@ -87,6 +91,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
 
 *Auditbeat*
 
@@ -194,7 +199,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
 - Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}[]
-- Add metrics for TCP and UDP packet processing. {pull}33833[33833]
+- Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
 
 *Packetbeat*
 
