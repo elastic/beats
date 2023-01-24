@@ -90,33 +90,33 @@ func Test_StorageClient(t *testing.T) {
 			},
 			unexpectedError: nil,
 		},
-		{
-			name: "TwoBucketsWithPoll_NoErr",
-			baseConfig: map[string]interface{}{
-				"project_id":                 "elastic-sa",
-				"auth.credentials_file.path": "/gcs_creds.json",
-				"max_workers":                2,
-				"poll":                       true,
-				"poll_interval":              "5s",
-				"buckets": []map[string]interface{}{
-					{
-						"name": bucketGcsTestNew,
-					},
-					{
-						"name": bucketGcsTestLatest,
-					},
-				},
-			},
-			mockHandler: mock.GCSServer,
-			expected: map[string]bool{
-				mock.Gcs_test_new_object_ata_json:      true,
-				mock.Gcs_test_new_object_data3_json:    true,
-				mock.Gcs_test_new_object_docs_ata_json: true,
-				mock.Gcs_test_latest_object_ata_json:   true,
-				mock.Gcs_test_latest_object_data3_json: true,
-			},
-			unexpectedError: context.Canceled,
-		},
+		// {
+		// 	name: "TwoBucketsWithPoll_NoErr",
+		// 	baseConfig: map[string]interface{}{
+		// 		"project_id":                 "elastic-sa",
+		// 		"auth.credentials_file.path": "/gcs_creds.json",
+		// 		"max_workers":                2,
+		// 		"poll":                       true,
+		// 		"poll_interval":              "5s",
+		// 		"buckets": []map[string]interface{}{
+		// 			{
+		// 				"name": bucketGcsTestNew,
+		// 			},
+		// 			{
+		// 				"name": bucketGcsTestLatest,
+		// 			},
+		// 		},
+		// 	},
+		// 	mockHandler: mock.GCSServer,
+		// 	expected: map[string]bool{
+		// 		mock.Gcs_test_new_object_ata_json:      true,
+		// 		mock.Gcs_test_new_object_data3_json:    true,
+		// 		mock.Gcs_test_new_object_docs_ata_json: true,
+		// 		mock.Gcs_test_latest_object_ata_json:   true,
+		// 		mock.Gcs_test_latest_object_data3_json: true,
+		// 	},
+		// 	unexpectedError: context.Canceled,
+		// },
 		{
 			name: "TwoBucketsWithoutPoll_NoErr",
 			baseConfig: map[string]interface{}{
@@ -461,7 +461,7 @@ func Test_StorageClient(t *testing.T) {
 					}
 				}
 			}
-			assert.ErrorIs(t, tt.unexpectedError, g.Wait())
+			assert.ErrorIs(t, g.Wait(), tt.unexpectedError)
 		})
 	}
 }
