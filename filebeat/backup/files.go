@@ -40,7 +40,7 @@ type fileBackuper struct {
 	backups []string
 }
 
-// backup creates temporary backups for given files and returns a callback that
+// Backup creates temporary backups for given files and returns a callback that
 // removes every created backup file
 func (fb *fileBackuper) Backup() error {
 	var (
@@ -81,7 +81,7 @@ func (fb *fileBackuper) Backup() error {
 
 // Remove removes all backups created by this backuper
 func (fb fileBackuper) Remove() error {
-	fb.log.Debugf("Removing backup files: %v...", fb.backups)
+	fb.log.Infof("Removing backup files: %v...", fb.backups)
 
 	var errs []error
 	for _, backup := range fb.backups {

@@ -18,7 +18,6 @@
 package takeover
 
 import (
-	"sort"
 	"testing"
 
 	"github.com/elastic/beats/v7/filebeat/backup"
@@ -64,6 +63,28 @@ inputs:
       - "/path/filestream2-*.log"
       - "/path/log*.log" # taking over from the log input
 
+`)
+	require.NoError(t, err)
+
+	noUniqueID, err := conf.NewConfigFrom(`
+inputs:
+  - type: filestream
+    id: filestream-id-2
+    take_over: true
+    enabled: true
+    paths:
+      - "/path/filestream2-*.log"
+  - type: filestream
+    id: filestream-id-2 # not unique
+    take_over: true
+    enabled: true
+    paths:
+      - "/path/filestream3-*.log"
+  - type: filestream
+    take_over: true # no ID
+    enabled: true
+    paths:
+      - "/path/filestream-*.log"
 `)
 	require.NoError(t, err)
 
@@ -159,6 +180,12 @@ inputs:
 			states: states,
 		},
 		{
+			name:   "returns error if filestreams don't have unique IDs",
+			cfg:    noUniqueID,
+			states: states,
+			expErr: "failed to read input configuration: filestream `filestream-id-2` in `take over` mode requires a unique ID",
+		},
+		{
 			name:       "filestream takes over when there is `take_over: true`",
 			cfg:        takeOver,
 			states:     states,
@@ -231,17 +258,8 @@ inputs:
 				require.Equal(t, 0, backuper.called, "backup must not be called")
 			}
 
-			sort.Strings(tc.mustRemove)
-			sort.Slice(tc.mustSet, func(i, j int) bool {
-				return tc.mustSet[i].key < tc.mustSet[j].key
-			})
-			sort.Strings(store.removed)
-			sort.Slice(store.set, func(i, j int) bool {
-				return store.set[i].key < store.set[j].key
-			})
-
-			require.Equal(t, tc.mustRemove, store.removed)
-			require.Equal(t, tc.mustSet, store.set)
+			require.ElementsMatch(t, tc.mustRemove, store.removed)
+			require.ElementsMatch(t, tc.mustSet, store.set)
 		})
 	}
 }

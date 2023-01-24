@@ -61,7 +61,7 @@ func TakeOverLogInputStates(log *logp.Logger, store backend.Store, backuper back
 		return fmt.Errorf("failed to take over one of loginput states: %w", err)
 	}
 	if len(statesToSet) == 0 {
-		log.Debug("no state to take over")
+		log.Info("no state to take over")
 		return nil
 	}
 
@@ -84,12 +84,11 @@ func TakeOverLogInputStates(log *logp.Logger, store backend.Store, backuper back
 		}
 	}
 
-	log.Debugf("filestream inputs took over %d file(s) from loginputs", len(statesToSet))
+	log.Infof("filestream inputs took over %d file(s) from loginputs", len(statesToSet))
 	return nil
 }
 
 func takeOverStates(log *logp.Logger, store backend.Store, matchers filestreamMatchers) (toSet map[string]mapstr.M, toRemove map[string]struct{}, err error) {
-
 	toSet = make(map[string]mapstr.M)
 	toRemove = make(map[string]struct{})
 
@@ -126,7 +125,7 @@ func takeOverStates(log *logp.Logger, store backend.Store, matchers filestreamMa
 		}
 
 		newKey := loginputToFilestreamKey(key, filestreamID)
-		log.Debugf("found loginput state `%s` to take over by `%s`", key, newKey)
+		log.Infof("found loginput state `%s` to take over by `%s`", key, newKey)
 
 		newState := loginputToFilestream(state)
 
@@ -154,8 +153,8 @@ func findFilestreams(log *logp.Logger, cfg *cfg.Config) (matchers filestreamMatc
 		if inputCfg.Type != "filestream" || !inputCfg.TakeOver {
 			continue
 		}
-		if inputCfg.ID == "" {
-			return matchers, errors.New("filestream `take over` mode requires a unique ID for the input")
+		if _, exists := matchers[inputCfg.ID]; exists || inputCfg.ID == "" {
+			return matchers, fmt.Errorf("filestream `%s` in `take over` mode requires a unique ID", inputCfg.ID)
 		}
 
 		matchers[inputCfg.ID], err = createMatcher(log, inputCfg)
@@ -165,7 +164,7 @@ func findFilestreams(log *logp.Logger, cfg *cfg.Config) (matchers filestreamMatc
 	}
 
 	if len(matchers) > 0 {
-		log.Debugf("found %d filestream inputs in `take over` mode", len(matchers))
+		log.Infof("found %d filestream inputs in `take over` mode", len(matchers))
 	}
 
 	return matchers, nil
@@ -192,7 +191,7 @@ func createMatcher(log *logp.Logger, cfg inputConfig) (matcher func(source strin
 		log.Debugf("recursive glob disabled for filestream `%s`", cfg.ID)
 	}
 
-	log.Debugf("found %d patterns for filestream `%s`", len(patterns), cfg.ID)
+	log.Infof("found %d patterns for filestream `%s`", len(patterns), cfg.ID)
 
 	return func(source string) bool {
 		for _, pattern := range patterns {

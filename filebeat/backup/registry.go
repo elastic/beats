@@ -24,6 +24,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -57,29 +59,29 @@ type registryBackuper struct {
 func (rb *registryBackuper) Backup() error {
 	var toBackup []string
 
-	rb.log.Debug("Attempting to find the checkpoint...")
+	rb.log.Info("Attempting to find the checkpoint...")
 	checkpoint, err := rb.findCheckpoint()
 	if err == nil {
 		toBackup = append(toBackup, checkpoint)
-		rb.log.Debugf("Found checkpoint at %s", checkpoint)
+		rb.log.Infof("Found checkpoint at %s", checkpoint)
 	} else if err != nil && !errors.Is(err, errCheckpointNotFound) {
 		return fmt.Errorf("failed to look for a checkpoint file in %s: %w", rb.regHome, err)
 	} else {
-		rb.log.Debug("Checkpoint not found")
+		rb.log.Info("Checkpoint not found")
 	}
 
 	registryLog := filepath.Join(rb.regHome, regLogFilename)
-	rb.log.Debugf("Checking if the registry log exists at %s...", registryLog)
+	rb.log.Infof("Checking if the registry log exists at %s...", registryLog)
 	exists, err := fileExists(registryLog)
 	if err != nil {
 		return fmt.Errorf("failed to look for a registry log file %s: %w", registryLog, err)
 	}
 	if exists {
 		toBackup = append(toBackup, registryLog)
-		rb.log.Debugf("Found the registry log at %s", registryLog)
+		rb.log.Infof("Found the registry log at %s", registryLog)
 	}
 
-	rb.log.Debugf("Creating backups for %v...", toBackup)
+	rb.log.Infof("Creating backups for %v...", toBackup)
 
 	fb := NewFileBackuper(rb.log, toBackup)
 	rb.removeCallbacks = append(rb.removeCallbacks, fb.Remove)
@@ -89,7 +91,7 @@ func (rb *registryBackuper) Backup() error {
 
 // Remove removes all registry backup files created by this backuper
 func (rb registryBackuper) Remove() error {
-	rb.log.Debugf("Removing %d created backups...", len(rb.removeCallbacks))
+	rb.log.Infof("Removing %d created backups...", len(rb.removeCallbacks))
 
 	var errs []error
 	for _, cb := range rb.removeCallbacks {
@@ -112,27 +114,28 @@ func (rb registryBackuper) findCheckpoint() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to read the directory %s: %w", rb.regHome, err)
 	}
-	var checkpointEntries []os.FileInfo
+	var checkpoints []string
 	for _, entry := range entries {
-		if !checkpointFileRegexp.MatchString(entry.Name()) {
+		name := entry.Name()
+		if !checkpointFileRegexp.MatchString(name) {
 			continue
 		}
-		infoEntry, err := entry.Info()
-		if err != nil {
-			return "", fmt.Errorf("failed to read the checkpoint file %s info: %w", entry.Name(), err)
-		}
-		checkpointEntries = append(checkpointEntries, infoEntry)
+		checkpoints = append(checkpoints, name)
 	}
 
-	if len(checkpointEntries) == 0 {
+	if len(checkpoints) == 0 {
 		return "", errCheckpointNotFound
 	}
 
-	// the latest checkpoint should be on the top
-	sort.Slice(checkpointEntries, func(i, j int) bool {
-		return checkpointEntries[i].ModTime().Unix() > checkpointEntries[j].ModTime().Unix()
+	// the latest checkpoint should be on the top, which means
+	// the greatest filename wins (the latest operation number)
+	sort.Slice(checkpoints, func(i, j int) bool {
+		// `checkpointFileRegexp` guarantees the base file name is a number
+		c1, _ := strconv.ParseInt(strings.TrimSuffix(filepath.Base(checkpoints[i]), ".json"), 10, 64)
+		c2, _ := strconv.ParseInt(strings.TrimSuffix(filepath.Base(checkpoints[j]), ".json"), 10, 64)
+		return c1 > c2
 	})
 
-	checkpoint := checkpointEntries[0]
-	return filepath.Join(rb.regHome, checkpoint.Name()), nil
+	checkpoint := checkpoints[0]
+	return filepath.Join(rb.regHome, checkpoint), nil
 }

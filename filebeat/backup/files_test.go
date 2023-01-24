@@ -30,10 +30,7 @@ import (
 
 func TestFileBackup(t *testing.T) {
 	log := logp.NewLogger("backup-test")
-	files, cleanUp := createFiles(t, 3)
-	t.Cleanup(func() {
-		cleanUp(t)
-	})
+	files := createFiles(t, 3)
 
 	backuper := NewFileBackuper(log, files)
 
@@ -47,7 +44,7 @@ func TestFileBackup(t *testing.T) {
 		// there is a unix time with nanosecond precision in the filename
 		// we can create only one backup per nanosecond
 		// if there is already a file created in the same nanosecond, the backup fails
-		<-time.After(time.Microsecond)
+		time.Sleep(time.Microsecond)
 
 		err := backuper.Backup()
 		require.NoError(t, err)
@@ -63,9 +60,10 @@ func TestFileBackup(t *testing.T) {
 	})
 }
 
-func createFiles(t *testing.T, count int) (created []string, cleanUp func(t *testing.T)) {
-	tmp, err := os.MkdirTemp(os.TempDir(), "backup-files-test-*")
-	require.NoError(t, err)
+func createFiles(t *testing.T, count int) (created []string) {
+	t.Helper()
+
+	tmp := t.TempDir()
 
 	for i := 0; i < count; i++ {
 		file, err := os.CreateTemp(tmp, "file-*")
@@ -76,9 +74,7 @@ func createFiles(t *testing.T, count int) (created []string, cleanUp func(t *tes
 		created = append(created, file.Name())
 	}
 
-	return created, func(t *testing.T) {
-		require.NoError(t, os.RemoveAll(tmp))
-	}
+	return created
 }
 
 func requireBackups(t *testing.T, files []string, expectedCount int) {

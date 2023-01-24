@@ -29,13 +29,28 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestFindCheckpoint(t *testing.T) {
+	tmp := t.TempDir()
+	c1Name := filepath.Join(tmp, "12345.json")
+	_, err := os.Create(c1Name)
+	require.NoError(t, err)
+	c2Name := filepath.Join(tmp, "99999.json")
+	_, err = os.Create(c2Name)
+	require.NoError(t, err)
+
+	backuper := registryBackuper{
+		log:     logp.NewLogger("find-checkpoint-test"),
+		regHome: tmp,
+	}
+	checkpoint, err := backuper.findCheckpoint()
+	require.NoError(t, err)
+	require.Equal(t, c2Name, checkpoint)
+}
+
 func TestRegistryBackup(t *testing.T) {
 	log := logp.NewLogger("backup-test")
 	t.Run("creates backups for registry files including the checkpoint", func(t *testing.T) {
-		regHome, cleanUp := createRegistryFiles(t, true)
-		t.Cleanup(func() {
-			cleanUp(t)
-		})
+		regHome := createRegistryFiles(t, true)
 		backuper := NewRegistryBackuper(log, regHome)
 
 		err := backuper.Backup()
@@ -43,6 +58,11 @@ func TestRegistryBackup(t *testing.T) {
 		requireRegistryBackups(t, regHome, 2)
 
 		t.Run("creates the second round of backups for registry files", func(t *testing.T) {
+			// there is a unix time with nanosecond precision in the filename
+			// we can create only one backup per nanosecond
+			// if there is already a file created in the same nanosecond, the backup fails
+			time.Sleep(time.Microsecond)
+
 			err := backuper.Backup()
 			require.NoError(t, err)
 			requireRegistryBackups(t, regHome, 4)
@@ -56,10 +76,7 @@ func TestRegistryBackup(t *testing.T) {
 	})
 
 	t.Run("creates backups for registry files without a checkpoint", func(t *testing.T) {
-		regHome, cleanUp := createRegistryFiles(t, false)
-		t.Cleanup(func() {
-			cleanUp(t)
-		})
+		regHome := createRegistryFiles(t, false)
 		backuper := NewRegistryBackuper(log, regHome)
 
 		err := backuper.Backup()
@@ -67,6 +84,11 @@ func TestRegistryBackup(t *testing.T) {
 		requireRegistryBackups(t, regHome, 1)
 
 		t.Run("creates the second round of backups for registry files", func(t *testing.T) {
+			// there is a unix time with nanosecond precision in the filename
+			// we can create only one backup per nanosecond
+			// if there is already a file created in the same nanosecond, the backup fails
+			time.Sleep(time.Microsecond)
+
 			err := backuper.Backup()
 			require.NoError(t, err)
 			requireRegistryBackups(t, regHome, 2)
@@ -80,9 +102,10 @@ func TestRegistryBackup(t *testing.T) {
 	})
 }
 
-func createRegistryFiles(t *testing.T, createCheckpoint bool) (regHome string, cleanUp func(t *testing.T)) {
-	tmp, err := os.MkdirTemp(os.TempDir(), "backup-registry-test-*")
-	require.NoError(t, err)
+func createRegistryFiles(t *testing.T, createCheckpoint bool) (regHome string) {
+	t.Helper()
+
+	tmp := t.TempDir()
 
 	registry, err := os.Create(filepath.Join(tmp, regLogFilename))
 	require.NoError(t, err)
@@ -101,9 +124,7 @@ func createRegistryFiles(t *testing.T, createCheckpoint bool) (regHome string, c
 		require.NoError(t, err)
 	}
 
-	return tmp, func(t *testing.T) {
-		require.NoError(t, os.RemoveAll(tmp))
-	}
+	return tmp
 }
 
 func requireRegistryBackups(t *testing.T, regHome string, expectedCount int) {
