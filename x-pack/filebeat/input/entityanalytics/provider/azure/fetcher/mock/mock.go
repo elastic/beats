@@ -61,7 +61,7 @@ var userResponse = []*fetcher.User{
 			"surname":           "One",
 			"jobTitle":          "Software Engineer",
 			"mobilePhone":       "123-555-1000",
-			"businessPhones":    []any{"123-555-0122"},
+			"businessPhones":    []string{"123-555-0122"},
 		},
 	},
 	{
@@ -74,7 +74,7 @@ var userResponse = []*fetcher.User{
 			"surname":           "Two",
 			"jobTitle":          "Accountant",
 			"mobilePhone":       "205-555-2000",
-			"businessPhones":    []any{"205-555-5488", "205-555-7724"},
+			"businessPhones":    []string{"205-555-5488", "205-555-7724"},
 		},
 	},
 }

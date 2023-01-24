@@ -24,8 +24,7 @@ type Input interface {
 	Test(testCtx v2.TestContext) error
 
 	// Run starts the data collection. Run must return an error only if the
-	// error is fatal making it impossible for the input to recover.
-	// The input run a go-routine can call Run per configured Source.
+	// error is fatal, making it impossible for the input to recover.
 	Run(inputCtx v2.Context, store *Store, client beat.Client) error
 }
 

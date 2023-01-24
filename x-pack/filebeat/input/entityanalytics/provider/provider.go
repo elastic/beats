@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// Package provider TODO
 package provider
 
 import (
@@ -64,9 +65,8 @@ func Get(name string) (FactoryFunc, error) {
 // Has returns true if Provider with name has been registered.
 func Has(name string) bool {
 	registryMu.RLock()
-	defer registryMu.RUnlock()
-
 	_, exists := registry[name]
+	registryMu.RUnlock()
 
 	return exists
 }

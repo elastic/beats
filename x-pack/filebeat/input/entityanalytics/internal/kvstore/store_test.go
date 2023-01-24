@@ -155,15 +155,14 @@ func TestStore_RunTransaction(t *testing.T) {
 			testCleanupStore(store)
 		})
 
-		err := store.RunTransaction(true, func(tx *Transaction) error {
-			err := tx.SetBytes(testBucket, testKey, testValue)
-			assert.NoError(t, err)
+		assert.Panics(t, func() {
+			_ = store.RunTransaction(true, func(tx *Transaction) error {
+				err := tx.SetBytes(testBucket, testKey, testValue)
+				assert.NoError(t, err)
 
-			panic("test panic")
+				panic("test panic")
+			})
 		})
-
-		assert.ErrorContains(t, err, "test panic")
-		testAssertValueNil(t, store, testBucket, testKey)
 	})
 
 	t.Run("run-panic-err", func(t *testing.T) {
@@ -174,15 +173,14 @@ func TestStore_RunTransaction(t *testing.T) {
 			testCleanupStore(store)
 		})
 
-		err := store.RunTransaction(true, func(tx *Transaction) error {
-			err := tx.SetBytes(testBucket, testKey, testValue)
-			assert.NoError(t, err)
+		assert.Panics(t, func() {
+			_ = store.RunTransaction(true, func(tx *Transaction) error {
+				err := tx.SetBytes(testBucket, testKey, testValue)
+				assert.NoError(t, err)
 
-			panic(errors.New("test panic-err"))
+				panic(errors.New("test panic-err"))
+			})
 		})
-
-		assert.ErrorContains(t, err, "test panic-err")
-		testAssertValueNil(t, store, testBucket, testKey)
 	})
 }
 

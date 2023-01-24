@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -65,9 +64,8 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	p.logger = inputCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
 	p.auth.SetLogger(p.logger)
 	p.fetcher.SetLogger(p.logger)
-
-	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
-	p.metrics = newMetrics(metricRegistry, inputCtx.ID)
+	p.metrics = newMetrics(inputCtx.ID, nil)
+	defer p.metrics.Close()
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.conf.SyncInterval))
@@ -85,13 +83,14 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 			}
 			return nil
 		case <-syncTimer.C:
+			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
 				p.logger.Errorf("Error running full sync: %v", err)
-				p.metrics.fullSyncFailure.Inc()
-			} else {
-				p.metrics.fullSyncSuccess.Inc()
+				p.metrics.syncError.Inc()
 			}
-			p.metrics.fullSyncTotal.Inc()
+			p.metrics.syncTotal.Inc()
+			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
+
 			syncTimer.Reset(p.conf.SyncInterval)
 			p.logger.Debugf("Next sync expected at: %v", time.Now().Add(p.conf.SyncInterval))
 
@@ -104,13 +103,13 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 			updateTimer.Reset(p.conf.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.conf.UpdateInterval))
 		case <-updateTimer.C:
+			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
 				p.logger.Errorf("Error running incremental update: %v", err)
-				p.metrics.incrementalUpdateFailure.Inc()
-			} else {
-				p.metrics.incrementalUpdateSuccess.Inc()
+				p.metrics.updateError.Inc()
 			}
-			p.metrics.incrementalUpdateTotal.Inc()
+			p.metrics.updateTotal.Inc()
+			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
 			updateTimer.Reset(p.conf.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.conf.UpdateInterval))
 		}
@@ -138,7 +137,7 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 		return err
 	}
 
-	if len(state.users) > 0 {
+	if len(state.users) != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
@@ -184,7 +183,7 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 		return err
 	}
 
-	if updatedUsers.Len() > 0 {
+	if updatedUsers.Len() != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
 		updatedUsers.ForEach(func(id uuid.UUID) {
 			u, ok := state.users[id]
@@ -250,7 +249,6 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore) (*collections.Se
 			continue
 		}
 
-		state.relationships.AddVertex(g.ID)
 		for _, member := range g.Members {
 			switch member.Type {
 			case fetcher.MemberGroup:

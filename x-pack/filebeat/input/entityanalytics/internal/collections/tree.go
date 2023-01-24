@@ -45,8 +45,11 @@ func (t *Tree[T]) AddVertex(value T) {
 // DeleteVertex removes a vertex, and any of its edges, from the graph.
 func (t *Tree[T]) DeleteVertex(value T) {
 	delete(t.Edges, value)
-	for _, v := range t.Edges {
+	for k, v := range t.Edges {
 		v.Remove(value)
+		if v.Len() == 0 {
+			delete(t.Edges, k)
+		}
 	}
 }
 
@@ -68,8 +71,14 @@ func (t *Tree[T]) AddEdge(from T, to ...T) {
 
 // DeleteEdge removes edge (from, to).
 func (t *Tree[T]) DeleteEdge(from T, to T) {
-	if v, ok := t.Edges[from]; ok && v != nil {
-		v.Remove(to)
+	if vertex, ok := t.Edges[from]; ok && vertex != nil {
+		vertex.Remove(to)
+		if vertex.Len() == 0 {
+			delete(t.Edges, from)
+		}
+	}
+	if vertex, ok := t.Edges[to]; ok && vertex.Len() == 0 {
+		delete(t.Edges, to)
 	}
 }
 

@@ -4,40 +4,45 @@
 
 package azure
 
-import "github.com/elastic/elastic-agent-libs/monitoring"
+import (
+	"github.com/rcrowley/go-metrics"
+
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+)
 
 type inputMetrics struct {
-	id       string
-	registry *monitoring.Registry
+	unregister func()
 
-	fullSyncTotal            *monitoring.Uint
-	fullSyncSuccess          *monitoring.Uint
-	fullSyncFailure          *monitoring.Uint
-	incrementalUpdateTotal   *monitoring.Uint
-	incrementalUpdateSuccess *monitoring.Uint
-	incrementalUpdateFailure *monitoring.Uint
+	syncTotal            *monitoring.Uint // The total number of full synchronizations.
+	syncError            *monitoring.Uint // The number of full synchronizations that failed due to an error.
+	syncProcessingTime   metrics.Sample   // Histogram of the elapsed full synchronization times in nanoseconds (time of API contact to items sent to output).
+	updateTotal          *monitoring.Uint // The total number of incremental updates.
+	updateError          *monitoring.Uint // The number of incremental updates that failed due to an error.
+	updateProcessingTime metrics.Sample   // Histogram of the elapsed incremental update times in nanoseconds (time of API contact to items sent to output).
 }
 
+// Close removes metrics from the registry.
 func (m *inputMetrics) Close() {
-	m.registry.Remove(m.id)
+	m.unregister()
 }
 
-func newMetrics(registry *monitoring.Registry, id string) *inputMetrics {
-	reg := registry.NewRegistry(id)
+func newMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(FullName, id, optionalParent)
 
-	monitoring.NewString(reg, "input").Set(Name)
-	monitoring.NewString(reg, "id").Set(id)
-
-	m := inputMetrics{
-		id:                       id,
-		registry:                 registry,
-		fullSyncTotal:            monitoring.NewUint(reg, "sync.full.total"),
-		fullSyncSuccess:          monitoring.NewUint(reg, "sync.full.success"),
-		fullSyncFailure:          monitoring.NewUint(reg, "sync.full.failure"),
-		incrementalUpdateTotal:   monitoring.NewUint(reg, "sync.incremental.total"),
-		incrementalUpdateSuccess: monitoring.NewUint(reg, "sync.incremental.success"),
-		incrementalUpdateFailure: monitoring.NewUint(reg, "sync.incremental.failure"),
+	out := inputMetrics{
+		unregister:           unreg,
+		syncTotal:            monitoring.NewUint(reg, "sync_total"),
+		syncError:            monitoring.NewUint(reg, "sync_error"),
+		syncProcessingTime:   metrics.NewUniformSample(1024),
+		updateTotal:          monitoring.NewUint(reg, "update_total"),
+		updateError:          monitoring.NewUint(reg, "update_error"),
+		updateProcessingTime: metrics.NewUniformSample(1024),
 	}
 
-	return &m
+	adapter.NewGoMetrics(reg, "sync_processing_time", adapter.Accept).Register("histogram", metrics.NewHistogram(out.syncProcessingTime))     //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "update_processing_time", adapter.Accept).Register("histogram", metrics.NewHistogram(out.updateProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+
+	return &out
 }

@@ -37,22 +37,13 @@ func (s *Store) RunTransaction(writable bool, fn func(tx *Transaction) error) (e
 	}
 
 	defer func() {
-		if r := recover(); r != nil {
-			if e, ok := r.(error); ok {
-				err = fmt.Errorf("kvstore transaction: recovered panic: %w", e)
-			} else {
-				err = fmt.Errorf("kvstore transaction: recovered panic: %v", r)
-			}
-			_ = t.Rollback()
-			return
-		}
 		if err != nil {
 			if txErr := t.Rollback(); txErr != nil {
-				s.logger.Errorw("Transaction rollback error", "error", err)
+				s.logger.Errorw("Transaction rollback error", "error", txErr)
 			}
 		} else {
 			if txErr := t.Commit(); txErr != nil {
-				s.logger.Errorw("Transaction commit error", "error", err)
+				s.logger.Errorw("Transaction commit error", "error", txErr)
 			}
 		}
 	}()

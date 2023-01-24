@@ -9,14 +9,14 @@
 <titleabbrev>Entity Analytics</titleabbrev>
 ++++
 
-Experimental[Input]
+experimental[]
 
 The Entity Analytics input collects identity assets, such as users, from external
 identity providers.
 
 The following identity providers are supported:
 
-- <<provider-azure>>
+- <<provider-azure_ad>>
 
 ==== Configuration options
 
@@ -26,17 +26,17 @@ The `entity-analytics` input supports the following configuration options plus t
 [float]
 ==== `provider`
 
-The identity provider. Must be one of: `azure`.
+The identity provider. Must be one of: `azure_ad`.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 ==== Providers
 
-[id="provider-azure"]
-==== Azure Active Directory (`azure`)
+[id="provider-azure_ad"]
+==== Azure Active Directory (`azure_ad`)
 
-The azure provider allows entitystream to retrieve users, with group
+The `azure_ad` provider allows the input to retrieve users, with group
 memberships, from Azure Active Directory (AD).
 
 ==== Setup
@@ -66,7 +66,7 @@ Example configuration:
 - type: entity-analytics
   enabled: true
   id: azure-1
-  provider: azure
+  provider: azure_ad
   sync_interval: "12h"
   update_interval: "30m"
   client_id: "CLIENT_ID"
@@ -74,7 +74,7 @@ Example configuration:
   secret: "SECRET"
 ----
 
-The `azure` provider supports the following configuration:
+The `azure_ad` provider supports the following configuration:
 
 ==== `tenant_id`
 
@@ -108,6 +108,24 @@ so. Altering this value will also require a change to `login_scopes`.
 ==== `login_scopes`
 
 Override the default authentication scopes. Only change if directed to do so.
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                   | Description
+| `sync_total`             | The total number of full synchronizations.
+| `sync_error`             | The number of full synchronizations that failed due to an error.
+| `sync_processing_time`   | Histogram of the elapsed full synchronizations times in nanoseconds (time of API contact to items sent to output).
+| `update_total`           | The total number of incremental updates.
+| `update_error`           | The number of incremental updates that failed due to an error.
+| `update_processing_time` | Histogram of the elapsed incremental updates times in nanoseconds (time of API contact to items sent to output).
+|=======
 
 NOTE: This input is experimental and is under active developement. Configuration
 options and behaviors may change without warning. Use with caution and do not use

@@ -46,13 +46,13 @@ func TestTree_DeleteVertex(t *testing.T) {
 			3: NewSet[int](),
 		},
 	}
-
 	tree.DeleteVertex(3)
 
-	assert.NotContains(t, tree.Edges, 3)
-	for _, v := range tree.Edges {
-		assert.False(t, v.Has(3))
+	want := &Tree[int]{
+		Edges: map[int]*Set[int]{},
 	}
+
+	assert.Equal(t, want, tree)
 }
 
 func TestTree_HasVertex(t *testing.T) {
@@ -90,10 +90,7 @@ func TestTree_DeleteEdge(t *testing.T) {
 		},
 	}
 	want := &Tree[int]{
-		Edges: map[int]*Set[int]{
-			1: NewSet[int](),
-			2: NewSet[int](),
-		},
+		Edges: map[int]*Set[int]{},
 	}
 
 	tree.DeleteEdge(1, 2)
