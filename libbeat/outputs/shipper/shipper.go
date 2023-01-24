@@ -46,8 +46,17 @@ import (
 type pendingBatch struct {
 	batch        publisher.Batch
 	index        uint64
-	serverID     string
+	eventCount   int
 	droppedCount int
+}
+
+type ackLoop struct {
+	log       *logp.Logger
+	observer  outputs.Observer
+	ackClient sc.Producer_PersistedIndexClient
+
+	batchChan chan pendingBatch
+	wg        sync.WaitGroup
 }
 
 type shipper struct {
@@ -57,15 +66,11 @@ type shipper struct {
 	config   Config
 	serverID string
 
-	pending      []pendingBatch
-	pendingMutex sync.Mutex
-
 	conn        *grpc.ClientConn
 	client      sc.ProducerClient
 	clientMutex sync.Mutex
 
-	backgroundCtx    context.Context
-	backgroundCancel func()
+	ackLoop *ackLoop
 }
 
 func init() {
@@ -90,9 +95,6 @@ func makeShipper(
 		observer: observer,
 		config:   config,
 	}
-
-	// for `Close` function to stop all the background work like acknowledgment loop
-	s.backgroundCtx, s.backgroundCancel = context.WithCancel(context.Background())
 
 	swb := outputs.WithBackoff(s, config.Backoff.Init, config.Backoff.Max)
 
@@ -137,18 +139,7 @@ func (s *shipper) Connect() error {
 
 	s.client = sc.NewProducerClient(conn)
 
-	// we don't need a timeout context here anymore, we use the
-	// `s.backgroundCtx` instead, it's going to be a long running client
-	ackCtx, ackCancel := context.WithCancel(s.backgroundCtx)
-	defer func() {
-		// in case we return an error before we start the `ackLoop`
-		// then we don't need this client anymore and must close the stream
-		if err != nil {
-			ackCancel()
-		}
-	}()
-
-	indexClient, err := s.client.PersistedIndex(ackCtx, &messages.PersistedIndexRequest{
+	indexClient, err := s.client.PersistedIndex(context.TODO(), &messages.PersistedIndexRequest{
 		PollingInterval: durationpb.New(s.config.AckPollingInterval),
 	})
 	if err != nil {
@@ -162,27 +153,49 @@ func (s *shipper) Connect() error {
 
 	s.log.Debugf("connection to %s (%s) established.", s.config.Server, s.serverID)
 
+	s.ackLoop = &ackLoop{
+		log:       s.log,
+		observer:  s.observer,
+		ackClient: indexClient,
+		batchChan: make(chan pendingBatch, 10),
+	}
+	s.ackLoop.wg.Add(1)
 	go func() {
-		defer ackCancel()
 		s.log.Debugf("starting acknowledgment loop with server %s", s.serverID)
 		// the loop returns only in case of error
-		err := s.ackLoop(s.backgroundCtx, indexClient)
-		s.log.Errorf("acknowledgment loop stopped: %s", err)
+		err := s.ackLoop.run()
+		if err != nil {
+			s.log.Errorf("acknowledgment loop stopped: %s", err)
+		}
 	}()
 
 	return nil
 }
 
+// disconnect is called to shut down the ack loop and clear out any pending
+// unacknowledged batches.
+func (s *shipper) disconnect() {
+
+}
+
 // Publish converts and sends a batch of events to the shipper server.
 // Also, implements `outputs.Client`
 func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
+	err := s.publish(ctx, batch)
+	if err != nil {
+		// If there was an error then we are dropping our connection;
+		// cancel any outstanding batches.
+
+	}
+	return err
+}
+func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 	if s.client == nil {
 		return fmt.Errorf("connection is not established")
 	}
 
-	st := s.observer
 	events := batch.Events()
-	st.NewBatch(len(events))
+	s.observer.NewBatch(len(events))
 
 	toSend := make([]*messages.Event, 0, len(events))
 
@@ -204,7 +217,7 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 
 	convertedCount := len(toSend)
 
-	st.Dropped(droppedCount)
+	s.observer.Dropped(droppedCount)
 	s.log.Debugf("%d events converted to protobuf, %d dropped", convertedCount, droppedCount)
 
 	var lastAcceptedIndex uint64
@@ -219,8 +232,8 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		})
 
 		if status.Code(err) != codes.OK {
-			batch.Cancelled()         // does not decrease the TTL
-			st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
+			batch.Cancelled()                 // does not decrease the TTL
+			s.observer.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
 			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(toSend), err)
 		}
 
@@ -239,14 +252,12 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 
 	s.log.Debugf("total of %d events have been accepted from batch, %d dropped", convertedCount, droppedCount)
 
-	s.pendingMutex.Lock()
-	s.pending = append(s.pending, pendingBatch{
+	s.ackLoop.batchChan <- pendingBatch{
 		batch:        batch,
 		index:        lastAcceptedIndex,
-		serverID:     s.serverID,
+		eventCount:   len(events),
 		droppedCount: droppedCount,
-	})
-	s.pendingMutex.Unlock()
+	}
 
 	return nil
 }
@@ -257,13 +268,18 @@ func (s *shipper) Close() error {
 	if s.client == nil {
 		return fmt.Errorf("connection is not established")
 	}
-	s.backgroundCancel()
+	s.ackLoop.close()
 	err := s.conn.Close()
 	s.conn = nil
 	s.client = nil
-	s.pending = nil
 
 	return err
+}
+
+func (l *ackLoop) close() {
+	// TODO: make sure this is done cleanly
+	close(l.batchChan)
+	l.wg.Wait()
 }
 
 // String implements `outputs.Client`
@@ -271,33 +287,26 @@ func (s *shipper) String() string {
 	return "shipper"
 }
 
-func (s *shipper) ackLoop(ctx context.Context, ackClient sc.Producer_PersistedIndexClient) error {
-	st := s.observer
-
+func (l *ackLoop) run() error {
+	pending := []pendingBatch{}
 	for {
 		select {
-
-		case <-ctx.Done():
-			return ctx.Err()
+		case newBatch, ok := <-l.batchChan:
+			if !ok {
+				// Channel is closed, ack loop is terminating
+				return nil
+			}
+			pending = append(pending, newBatch)
 
 		default:
 			// this sends an update and unblocks only if the `PersistedIndex` value has changed
-			indexReply, err := ackClient.Recv()
+			indexReply, err := l.ackClient.Recv()
 			if err != nil {
 				return fmt.Errorf("acknowledgment failed due to the connectivity error: %w", err)
 			}
 
-			s.pendingMutex.Lock()
 			lastProcessed := 0
-			for _, p := range s.pending {
-				if p.serverID != indexReply.Uuid {
-					s.log.Errorf("acknowledgment failed due to a connection to a different server %s, batch was accepted by %s", indexReply.Uuid, p.serverID)
-					p.batch.Cancelled()
-					st.Cancelled(len(p.batch.Events()))
-					lastProcessed++
-					continue
-				}
-
+			for _, p := range pending {
 				// if we met a batch that is ahead of the persisted index
 				// we stop iterating and wait for another update from the server.
 				// The latest pending batch has the max(AcceptedIndex).
@@ -306,18 +315,16 @@ func (s *shipper) ackLoop(ctx context.Context, ackClient sc.Producer_PersistedIn
 				}
 
 				p.batch.ACK()
-				ackedCount := len(p.batch.Events()) - p.droppedCount
-				st.Acked(ackedCount)
-				s.log.Debugf("%d events have been acknowledged, %d dropped", ackedCount, p.droppedCount)
+				ackedCount := p.eventCount - p.droppedCount
+				l.observer.Acked(ackedCount)
+				l.log.Debugf("%d events have been acknowledged, %d dropped", ackedCount, p.droppedCount)
 				lastProcessed++
 			}
 			// so we don't perform any manipulation when the pending list is empty
 			// or none of the batches were acknowledged by this persisted index update
 			if lastProcessed != 0 {
-				copy(s.pending[0:], s.pending[lastProcessed:])
-				s.pending = s.pending[lastProcessed:]
+				copy(pending[0:], pending[lastProcessed:])
 			}
-			s.pendingMutex.Unlock()
 		}
 	}
 }

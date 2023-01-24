@@ -71,6 +71,8 @@ func (b *Batch) RetryEvents(events []publisher.Event) {
 	b.doSignal(BatchSignal{Tag: BatchRetryEvents, Events: events})
 }
 
+func (b *Batch) FreeEvents() {}
+
 func (b *Batch) Cancelled() {
 	b.doSignal(BatchSignal{Tag: BatchCancelled})
 }
