@@ -136,12 +136,14 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 
 	rawRecieveCount, hasReceiveCountAttribute := msg.Attributes[sqsApproximateReceiveCountAttribute]
 
+	// Only contribute to the sqs_lag_time histogram on the first message
+	// to avoid skewing the metric when processing retries
 	if hasReceiveCountAttribute {
 		if receiveCount, err := strconv.Atoi(rawRecieveCount); err == nil && receiveCount == 1 {
 			if s, found := msg.Attributes[sqsSentTimestampAttribute]; found {
 				if sentTimeMillis, err := strconv.ParseInt(s, 10, 64); err == nil {
 					sentTime := time.UnixMilli(sentTimeMillis)
-					p.metrics.sqsMessageDelayedTime.Update(time.Since(sentTime).Nanoseconds())
+					p.metrics.sqsLagTime.Update(time.Since(sentTime).Nanoseconds())
 				}
 			}
 		}
