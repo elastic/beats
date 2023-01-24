@@ -46,7 +46,7 @@ pipeline {
   stages {
     stage('Filter build') {
       options { skipDefaultCheckout() }
-      agent { label 'ubuntu-20 && immutable' }
+      agent { label 'ubuntu-22 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -282,7 +282,7 @@ def generateArmStep(beat) {
 
 def generateLinuxStep(beat) {
   return {
-    withNode(labels: 'ubuntu-20.04 && immutable') {
+    withNode(labels: 'ubuntu-22.04 && immutable') {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()
