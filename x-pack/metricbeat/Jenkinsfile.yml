@@ -11,8 +11,13 @@ when:
         - "x-pack-metricbeat"
     parameters:                      ## when parameter was selected in the UI.
         - "x-pack-metricbeat"
+<<<<<<< HEAD
     tags: true                       ## for all the tags
 platform: "immutable && ubuntu-18"   ## default label for all the stages
+=======
+    tags: true                 ## for all the tags
+platform: "immutable && ubuntu-22" ## default label for all the stages
+>>>>>>> a5f15b6c6b (ci: use ubuntu:22 workers (#34315))
 stages:
     unitTest:
         mage: "mage build unitTest"

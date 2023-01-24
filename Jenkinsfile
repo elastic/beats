@@ -3,7 +3,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'ubuntu-18 && immutable' }
+  agent { label 'ubuntu-22 && immutable' }
   environment {
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     AWS_REGION = "${params.awsRegion}"

@@ -24,7 +24,11 @@ pipeline {
   }
   stages {
     stage('Filter build') {
+<<<<<<< HEAD
       agent { label 'ubuntu && immutable' }
+=======
+      agent { label 'ubuntu-22' }
+>>>>>>> a5f15b6c6b (ci: use ubuntu:22 workers (#34315))
       when {
         beforeAgent true
         anyOf {
