@@ -127,11 +127,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 				},
 			}
 			if metadata.RemoteAddr != nil {
-				evt.Fields["log"] = mapstr.M{
-					"source": mapstr.M{
-						"address": metadata.RemoteAddr.String(),
-					},
-				}
+				evt.Fields["log"] = mapstr.M{"source": logSource(metadata.RemoteAddr)}
 			}
 
 			publisher.Publish(evt)
@@ -154,6 +150,29 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		err = ctxerr
 	}
 	return err
+}
+
+// logSource returns the source fields for the provided log source metadata address.
+func logSource(src net.Addr) mapstr.M {
+	addr := src.String()
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return mapstr.M{"address": addr}
+	}
+	p, err := strconv.Atoi(port)
+	if err != nil {
+		return mapstr.M{"address": addr}
+	}
+	m := mapstr.M{
+		"address": host,
+		"port":    p,
+	}
+	// Check whether host parses as an IP address, but use the
+	// original string to avoid unnecessary allocs for String.
+	if net.ParseIP(host) != nil {
+		m["ip"] = host
+	}
+	return m
 }
 
 // inputMetrics handles the input's metric reporting.
