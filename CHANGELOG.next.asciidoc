@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest {issue}19627[19627] {pull}34295[34295]
 - Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
+- Added processing for Windows Event ID's 5140 and 5145 for the Security Ingest Pipeline {pull}34352[34352]
 
 *Functionbeat*
 
@@ -45,6 +46,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 
 *Auditbeat*
 
@@ -79,6 +81,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
 - Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
 
 
 *Heartbeat*
@@ -168,6 +171,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 - Add support for recognizing the log level in Elasticsearch JVM logs {pull}34159[34159]
 - Add new Entity Analytics input with Azure Active Directory support. {pull}34305[34305]
+- Add metrics for TCP packet processing. {pull}34333[34333]
 
 *Auditbeat*
 
@@ -189,6 +193,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add GCP Redis regions support {pull}33728[33728]
 - Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 - Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
+- Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
 
 *Packetbeat*
 
@@ -197,7 +202,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
 - Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}[]
-- Add metrics for TCP and UDP packet processing. {pull}33833[33833]
+- Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
 
 *Packetbeat*
 

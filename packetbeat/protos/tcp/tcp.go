@@ -19,6 +19,9 @@ package tcp
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -68,7 +71,7 @@ func NewTCP(p protos.Protocols, id, device string) (*TCP, error) {
 	tcp := &TCP{
 		protocols: p,
 		portMap:   portMap,
-		metrics:   newInputMetrics(id, device),
+		metrics:   newInputMetrics(id, device, portMap),
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,
@@ -404,14 +407,15 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the TCP processor. If id or
 // device is empty a nil inputMetric is returned.
-func newInputMetrics(id, device string) *inputMetrics {
+func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *inputMetrics {
 	if id == "" || device == "" {
 		// An empty id signals to not record metrics,
 		// while an empty device means we are reading
 		// from a pcap file and no metrics are needed.
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry("tcp", id+"::"+device, nil)
+	devID := fmt.Sprintf("%s-tcp%s::%s", id, portList(ports), device)
+	reg, unreg := inputmon.NewInputRegistry("tcp", devID, nil)
 	out := &inputMetrics{
 		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),
@@ -430,6 +434,24 @@ func newInputMetrics(id, device string) *inputMetrics {
 	out.device.Set(device)
 
 	return out
+}
+
+// portList returns a dash-separated list of port numbers sorted ascending. A leading
+// dash is prepended to the list if it is not empty.
+func portList(m map[uint16]protos.Protocol) string {
+	if len(m) == 0 {
+		return ""
+	}
+	ports := make([]int, 0, len(m))
+	for p := range m {
+		ports = append(ports, int(p))
+	}
+	sort.Ints(ports)
+	s := make([]string, len(ports)+1)
+	for i, p := range ports {
+		s[i+1] = strconv.FormatInt(int64(p), 10)
+	}
+	return strings.Join(s, "-")
 }
 
 // log logs metric for the given packet.
