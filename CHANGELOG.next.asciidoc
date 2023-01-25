@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
 - Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
+- Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
 
 *Auditbeat*
 
