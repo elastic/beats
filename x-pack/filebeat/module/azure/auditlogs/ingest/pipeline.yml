@@ -86,6 +86,7 @@ processors:
 - grok:
     field: azure.auditlogs.callerIpAddress
     patterns:
+      - "%{IPV6:source.ip}"
       - \[%{IPORHOST:source.ip}\]:%{INT:source.port:int}
       - "%{IPORHOST:source.ip}:%{INT:source.port:int}"
       - "%{IPORHOST:source.ip}"
