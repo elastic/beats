@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
 - Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
+- The `close.on_state_change.inactive` default value is now set to 5 minutes, matching the documentation.
 
 *Heartbeat*
 
@@ -30,6 +31,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest {issue}19627[19627] {pull}34295[34295]
+- Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
+- Added processing for Windows Event ID's 5140 and 5145 for the Security Ingest Pipeline {pull}34352[34352]
 
 *Functionbeat*
 
@@ -42,11 +46,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 
 *Auditbeat*
 
 
 *Filebeat*
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
+   automatic splitting at root level, if root level element is an array. {pull}34155[34155]
 - [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
 - [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
 - Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
@@ -66,12 +73,15 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix CEL result deserialisation when evaluation fails. {issue}33992[33992] {pull}33996[33996]
 - Fix handling of non-200/non-429 status codes. {issue}33999[33999] {pull}34002[34002]
 - [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
+- [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
+- Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
 
 *Heartbeat*
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
 - Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
 - Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
 
 
 *Heartbeat*
@@ -82,12 +92,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
 
 *Auditbeat*
 
 
 *Filebeat*
 
+- Fix handling of null or empty arrays during split with keep parent option. {pull}34322[34322]
 
 *Heartbeat*
 
@@ -158,7 +170,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
 - Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 - Add support for recognizing the log level in Elasticsearch JVM logs {pull}34159[34159]
+- Add metrics for TCP packet processing. {pull}34333[34333]
 - Add pagination support for Salesforce module. {issue}34057[34057] {pull}34065[34065]
+
 
 *Auditbeat*
 
@@ -180,6 +194,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add GCP Redis regions support {pull}33728[33728]
 - Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 - Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
+- Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
 
 *Packetbeat*
 
@@ -188,7 +203,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
 - Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}[]
-- Add metrics for TCP and UDP packet processing. {pull}33833[33833]
+- Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
 
 *Packetbeat*
 
