@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 :stack-version: 8.7.0
 :doc-branch: main
+=======
+:stack-version: 8.6.0
+:doc-branch: master
+>>>>>>> 50dad3dab4 (Fixing broken documentation links for filebeat and metricbeat (#34366))
 :go-version: 1.18.10
 :release-state: unreleased
 :python: 3.7
