@@ -22,7 +22,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -64,39 +63,6 @@ type queueEntry struct {
 	id    queue.EntryID
 
 	producer *producer
-}
-
-func init() {
-	// TODO: This queue is not currently registered so it doesn't become
-	// accessible via configurations. The intent is for it to be enabled
-	// automatically when the shipper output is in use, and not otherwise,
-	// which will require some changes to beats initialization and/or
-	// configuration handling.
-	/*queue.RegisterQueueType(
-	"proxy",
-	create,
-	feature.MakeDetails(
-		"Proxy queue",
-		"Pass through batched events to the Elastic Agent Shipper.",
-		feature.Experimental))*/
-}
-
-func create(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *c.C, inQueueSize int,
-) (queue.Queue, error) {
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
-	}
-
-	if logger == nil {
-		logger = logp.L()
-	}
-
-	return NewQueue(logger, Settings{
-		ACKListener: ackListener,
-		BatchSize:   50,
-	}), nil
 }
 
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
