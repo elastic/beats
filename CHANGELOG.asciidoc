@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v8.6.0\...v8.6.1[View commits]
 
 *Affecting all Beats*
 
-- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
+- Fix unnecessarily restarting every time a new configuration was received from the Elastic Agent. {pull}34346[34346]
 
 *Filebeat*
 - [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
