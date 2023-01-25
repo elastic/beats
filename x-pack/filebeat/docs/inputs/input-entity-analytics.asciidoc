@@ -11,37 +11,40 @@
 
 experimental[]
 
-The Entity Analytics input collects identity assets, such as users, from external
-identity providers.
+The Entity Analytics input collects identity assets, such as users, from
+external identity providers.
 
 The following identity providers are supported:
 
-- <<provider-azure_ad>>
+- <<provider-azure-ad>>
 
 ==== Configuration options
 
-The `entity-analytics` input supports the following configuration options plus the
-<<{beatname_lc}-input-{type}-common-options>> described later.
+The `entity-analytics` input supports the following configuration options plus
+the <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
 ==== `provider`
 
-The identity provider. Must be one of: `azure_ad`.
+The identity provider. Must be one of: `azure-ad`.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
-==== Providers
+[float]
+=== Providers
 
-[id="provider-azure_ad"]
-==== Azure Active Directory (`azure_ad`)
+[id="provider-azure-ad"]
+==== Azure Active Directory (`azure-ad`)
 
-The `azure_ad` provider allows the input to retrieve users, with group
+The `azure-ad` provider allows the input to retrieve users, with group
 memberships, from Azure Active Directory (AD).
 
+[float]
 ==== Setup
 
-The necessary API permissions need to be granted in Azure in order for the provider to function properly:
+The necessary API permissions need to be granted in Azure in order for the
+provider to function properly:
 
 |===
 |Permission |Type
@@ -56,6 +59,113 @@ The necessary API permissions need to be granted in Azure in order for the provi
 For a full guide on how to set up the necessary App Registration, permission
 granting, and secret configuration, follow this https://learn.microsoft.com/en-us/graph/auth-v2-service[guide].
 
+[float]
+==== How It Works
+
+[float]
+===== Overview
+
+The Azure AD provider periodically contacts Azure Active Directory, retrieving
+updates for users and groups, updates its internal cache of user metadata and
+group membership information, and ships updated user metadata to Elasticsearch.
+
+Fetching and shipping updates occurs in one of two processes: **full
+synchronizations** and *incremental updates*. Full synchronizations will send the
+entire list of users in state, along with write markers to indicate the start
+and end of the synchronization event. Incremental updates will only send data
+for changed users during that event. Changes on a user can come in many forms,
+whether it be a change to the user's metadata, a user was added or deleted, or
+group membership was changed (either direct or transitive).
+
+[float]
+===== API Interactions
+
+The provider periodically retrieves changes to user and group metadata from the
+Microsoft Graph API for Azure Active Directory. This is done through calls to
+two API endpoints:
+
+- https://learn.microsoft.com/en-us/graph/api/user-delta?view=graph-rest-1.0&tabs=http[/users/delta]
+- https://learn.microsoft.com/en-us/graph/api/group-delta?view=graph-rest-1.0&tabs=http[/groups/delta]
+
+The `/delta` endpoint will provide changes that have occurred since the last
+call, with state being tracked through a delta token. If the /delta endpoint is
+called without a delta token, it will provide a full listing of users or groups,
+similar to the non-delta endpoint. Since many results may be returned, there is
+a paging mechanism that is used. In the response body, there are two fields that
+may appear, `@odata.nextLink` and `@odata.deltaLink`.
+
+- If a `@odata.nextLink` is returned, then there are more results to fetch, and
+the value of this field will contain the URL which should be immediately fetched.
+- If a `@odata.deltaLink` is returned, then there are currently no more results,
+and the value of this field (a URL) should be saved for the next time updates
+need to be fetched (the delta token).
+
+The group metadata will be used to enrich users with group membership information.
+Direct memberships, along with transitive memberships, will provided on users.
+
+[float]
+===== Sending User Metadata to Elasticsearch
+
+During a full synchronization, all users stored in state will be sent to the
+output, while incremental updates will only send users which have been updated.
+Full synchronizations will be bounded on either side by write marker documents,
+which will look something like this:
+
+["source","json",subs="attributes"]
+----
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "started",
+        "start": "2022-11-04T09:57:19.786056-05:00"
+    },
+    "labels": {
+        "identity_source": "azure-1"
+    }
+}
+----
+
+User documents will show the current state of the user.
+
+Example user document:
+
+["source","json",subs="attributes"]
+----
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "azure_ad": {
+        "userPrincipalName": "example.user@example.com",
+        "mail": "example.user@example.com",
+        "displayName": "Example User",
+        "givenName": "Example",
+        "surname": "User",
+        "jobTitle": "Software Engineer",
+        "mobilePhone": "123-555-1000",
+        "businessPhones": ["123-555-0122"]
+    },
+    "user": {
+        "id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+        "group": [
+            {
+                "id": "331676df-b8fd-4492-82ed-02b927f8dd80",
+                "name": "group1"
+            },
+            {
+                "id": "d140978f-d641-4f01-802f-4ecc1acf8935",
+                "name": "group2"
+            }
+        ]
+    },
+    "labels": {
+        "identity_source": "azure-1"
+    }
+}
+----
+
+[float]
 ==== Configuration
 
 Example configuration:
@@ -66,7 +176,7 @@ Example configuration:
 - type: entity-analytics
   enabled: true
   id: azure-1
-  provider: azure_ad
+  provider: azure-ad
   sync_interval: "12h"
   update_interval: "30m"
   client_id: "CLIENT_ID"
@@ -74,43 +184,50 @@ Example configuration:
   secret: "SECRET"
 ----
 
-The `azure_ad` provider supports the following configuration:
+The `azure-ad` provider supports the following configuration:
 
-==== `tenant_id`
+[float]
+===== `tenant_id`
 
 The Tenant ID. Field is required.
 
-==== `client_id`
+[float]
+===== `client_id`
 
 The client/application ID. Used for authentication. Field is required.
 
-==== `secret`
+[float]
+===== `secret`
 
 The secret value, used for authentication. Field is required.
 
-==== `sync_interval`
+[float]
+===== `sync_interval`
 
 The interval in which full synchronizations should occur. The interval must be
 longer than the update interval (`update_interval`) Expressed as a duration
 string (e.g., 1m, 3h, 24h). Defaults to `24h` (24 hours).
 
-==== `update_interval`
+[float]
+===== `update_interval`
 
 The interval in which incremental updates should occur. The interval must be
 shorter than the full synchronization interval (`sync_interval`). Expressed as a
 duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
-==== `login_endpoint`
+[float]
+===== `login_endpoint`
 
 Override the default authentication login endpoint. Only change if directed to do
 so. Altering this value will also require a change to `login_scopes`.
 
-==== `login_scopes`
+[float]
+===== `login_scopes`
 
 Override the default authentication scopes. Only change if directed to do so.
 
 [float]
-=== Metrics
+==== Metrics
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
 These metrics are exposed under the `/inputs` path. They can be used to
