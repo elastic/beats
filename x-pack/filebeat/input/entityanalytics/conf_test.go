@@ -7,9 +7,8 @@ package entityanalytics
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure"
 )
 
 func TestConf_Validate(t *testing.T) {
@@ -19,7 +18,7 @@ func TestConf_Validate(t *testing.T) {
 	}{
 		"ok-provider-azure": {
 			In: conf{
-				Provider: azure.Name,
+				Provider: azuread.Name,
 			},
 		},
 		"err-provider-unknown": {

@@ -11,16 +11,30 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// User represents a user identity asset.
 type User struct {
-	ID                 uuid.UUID                   `json:"id"`
-	Fields             mapstr.M                    `json:"fields"`
-	MemberOf           *collections.Set[uuid.UUID] `json:"memberOf"`
+	// The ID (UUIDv4) of the user.
+	ID uuid.UUID `json:"id"`
+	// The attributes for the user.
+	Fields mapstr.M `json:"fields"`
+	// A set of UUIDs which are groups this user is a member of.
+	MemberOf *collections.Set[uuid.UUID] `json:"memberOf"`
+	// A set of UUIDs which are groups this user is a transitive member of.
 	TransitiveMemberOf *collections.Set[uuid.UUID] `json:"transitiveMemberOf"`
-	Discovered         bool                        `json:"-"`
-	Modified           bool                        `json:"-"`
-	Deleted            bool                        `json:"deleted"`
+	// Discovered indicates that this user was newly discovered. This does not
+	// necessarily imply the user was recently added in Azure Active Directory,
+	// but it does indicate that it's the first time the user has been seen by
+	// the input.
+	Discovered bool `json:"-"`
+	// Modified indicates that an attribute or group membership has been
+	// modified on this user.
+	Modified bool `json:"-"`
+	// Deleted indicates the user has been deleted.
+	Deleted bool `json:"deleted"`
 }
 
+// Merge will merge the attributes and group memberships of another User
+// instance into this User. The IDs of both users must match.
 func (u *User) Merge(other *User) {
 	if u.ID != other.ID {
 		return
@@ -37,6 +51,7 @@ func (u *User) Merge(other *User) {
 	u.Deleted = other.Deleted
 }
 
+// IsMemberOf returns true if this user is a member of a group with the given ID.
 func (u *User) IsMemberOf(value uuid.UUID) bool {
 	if u.MemberOf != nil {
 		return u.MemberOf.Has(value)
@@ -45,6 +60,7 @@ func (u *User) IsMemberOf(value uuid.UUID) bool {
 	return false
 }
 
+// AddMemberOf adds the group ID to the user's MemberOf set.
 func (u *User) AddMemberOf(value uuid.UUID) {
 	if u.MemberOf == nil {
 		u.MemberOf = collections.NewSet[uuid.UUID](value)
@@ -53,12 +69,15 @@ func (u *User) AddMemberOf(value uuid.UUID) {
 	}
 }
 
+// RemoveMemberOf removes the group ID from the user's MemberOf set.
 func (u *User) RemoveMemberOf(value uuid.UUID) {
 	if u.MemberOf != nil {
 		u.MemberOf.Remove(value)
 	}
 }
 
+// IsTransitiveMemberOf returns true if this user is a transitive member of a
+// group with the given ID.
 func (u *User) IsTransitiveMemberOf(value uuid.UUID) bool {
 	if u.TransitiveMemberOf != nil {
 		return u.TransitiveMemberOf.Has(value)
@@ -67,6 +86,7 @@ func (u *User) IsTransitiveMemberOf(value uuid.UUID) bool {
 	return false
 }
 
+// AddTransitiveMemberOf adds the group ID to the user's TransitiveMemberOf set.
 func (u *User) AddTransitiveMemberOf(value uuid.UUID) {
 	if u.TransitiveMemberOf == nil {
 		u.TransitiveMemberOf = collections.NewSet[uuid.UUID](value)
@@ -75,6 +95,7 @@ func (u *User) AddTransitiveMemberOf(value uuid.UUID) {
 	}
 }
 
+// RemoveTransitiveMemberOf removes the group ID from the user's TransitiveMemberOf set.
 func (u *User) RemoveTransitiveMemberOf(value uuid.UUID) {
 	if u.TransitiveMemberOf != nil {
 		u.TransitiveMemberOf.Remove(value)

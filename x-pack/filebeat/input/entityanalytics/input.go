@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
 )
 
 // Name of this input.
@@ -33,8 +33,6 @@ func Plugin(logger *logp.Logger) v2.Plugin {
 }
 
 // manager implements the v2.InputManager interface.
-var _ v2.InputManager = &manager{}
-
 type manager struct {
 	logger   *logp.Logger
 	provider provider.Provider

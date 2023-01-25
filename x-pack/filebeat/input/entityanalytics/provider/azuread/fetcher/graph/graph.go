@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// Package graph provides a fetcher implementation for Microsoft's Graph API,
+// which is used for retrieving user and group identity assets from Azure
+// Active Directory.
 package graph
 
 import (
@@ -15,8 +18,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/authenticator"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/fetcher"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -33,20 +36,24 @@ const (
 	apiUserType  = "#microsoft.graph.user"
 )
 
+// apiUserResponse matches the format of a user response from the Graph API.
 type apiUserResponse struct {
 	NextLink  string    `json:"@odata.nextLink"`
 	DeltaLink string    `json:"@odata.deltaLink"`
 	Users     []userAPI `json:"value"`
 }
 
+// apiGroupResponse matches the format of a group response from the Graph API.
 type apiGroupResponse struct {
 	NextLink  string     `json:"@odata.nextLink"`
 	DeltaLink string     `json:"@odata.deltaLink"`
 	Groups    []groupAPI `json:"value"`
 }
 
+// userAPI matches the format of user data from the API.
 type userAPI mapstr.M
 
+// groupAPI matches the format of group data from the API.
 type groupAPI struct {
 	ID           uuid.UUID   `json:"id"`
 	DisplayName  string      `json:"displayName"`
@@ -54,30 +61,36 @@ type groupAPI struct {
 	Removed      *removed    `json:"@removed,omitempty"`
 }
 
-func (g *groupAPI) Deleted() bool {
+// deleted returns true if the group has been marked as deleted.
+func (g *groupAPI) deleted() bool {
 	return g.Removed != nil
 }
 
+// memberAPI matches the format of group member data from the API.
 type memberAPI struct {
 	ID      uuid.UUID `json:"id"`
 	Type    string    `json:"@odata.type"`
 	Removed *removed  `json:"@removed,omitempty"`
 }
 
-func (o *memberAPI) Deleted() bool {
+// deleted returns true if the group member has been marked as deleted.
+func (o *memberAPI) deleted() bool {
 	return o.Removed != nil
 }
 
+// removed matches the format of the @removed field from the API.
 type removed struct {
 	Reason string `json:"reason"`
 }
 
+// conf contains parameters needed to configure the fetcher.
 type graphConf struct {
 	APIEndpoint string `config:"api_endpoint"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
+// graph implements the fetcher.Fetcher interface.
 type graph struct {
 	conf   graphConf
 	client *http.Client
@@ -88,10 +101,16 @@ type graph struct {
 	groupsURL string
 }
 
+// SetLogger sets the logger on this fetcher.
 func (f *graph) SetLogger(logger *logp.Logger) {
 	f.logger = logger
 }
 
+// Groups retrieves group identity assets from Azure Active Directory using
+// Microsoft's Graph API. If a delta link is given, it will be used to resume
+// from the last query, and only changed groups will be returned. Otherwise,
+// a full list of known groups wil be returned. In either case, a new delta link
+// will be returned as well.
 func (f *graph) Groups(ctx context.Context, deltaLink string) ([]*fetcher.Group, string, error) {
 	fetchURL := f.groupsURL
 	if deltaLink != "" {
@@ -133,6 +152,11 @@ func (f *graph) Groups(ctx context.Context, deltaLink string) ([]*fetcher.Group,
 	}
 }
 
+// Users retrieves user identity assets from Azure Active Directory using
+// Microsoft's Graph API. If a delta link is given, it will be used to resume
+// from the last query, and only changed users will be returned. Otherwise,
+// a full list of known users wil be returned. In either case, a new delta link
+// will be returned as well.
 func (f *graph) Users(ctx context.Context, deltaLink string) ([]*fetcher.User, string, error) {
 	var users []*fetcher.User
 
@@ -180,6 +204,9 @@ func (f *graph) Users(ctx context.Context, deltaLink string) ([]*fetcher.User, s
 	}
 }
 
+// doRequest is a convenience function for making HTTP requests to the Graph API.
+// It will automatically handle requesting a token using the authenticator attached
+// to this fetcher.
 func (f *graph) doRequest(ctx context.Context, method, url string, body io.Reader) (io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
@@ -207,6 +234,7 @@ func (f *graph) doRequest(ctx context.Context, method, url string, body io.Reade
 	return res.Body, nil
 }
 
+// New creates a new instance of the graph fetcher.
 func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (fetcher.Fetcher, error) {
 	var c graphConf
 	if err := cfg.Unpack(&c); err != nil {
@@ -245,6 +273,7 @@ func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (
 	return &f, nil
 }
 
+// newUserFromAPI translates an API-representation of a user to a fetcher.User.
 func newUserFromAPI(u userAPI) (*fetcher.User, error) {
 	var newUser fetcher.User
 	var err error
@@ -269,24 +298,25 @@ func newUserFromAPI(u userAPI) (*fetcher.User, error) {
 	return &newUser, nil
 }
 
+// newGroupFromAPI translates an API-representation of a group to a fetcher.Group.
 func newGroupFromAPI(g groupAPI) *fetcher.Group {
 	newGroup := fetcher.Group{
 		ID:      g.ID,
 		Name:    g.DisplayName,
-		Deleted: g.Deleted(),
+		Deleted: g.deleted(),
 	}
 	for _, v := range g.MembersDelta {
 		if v.Type == apiUserType {
 			newGroup.Members = append(newGroup.Members, fetcher.Member{
 				ID:      v.ID,
 				Type:    fetcher.MemberUser,
-				Deleted: v.Deleted(),
+				Deleted: v.deleted(),
 			})
 		} else if v.Type == apiGroupType {
 			newGroup.Members = append(newGroup.Members, fetcher.Member{
 				ID:      v.ID,
 				Type:    fetcher.MemberGroup,
-				Deleted: v.Deleted(),
+				Deleted: v.deleted(),
 			})
 		}
 	}

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package azure
+package azuread
 
 import (
 	"encoding/json"
@@ -15,7 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/fetcher"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 )
 
 var (
@@ -31,6 +31,8 @@ var (
 	groupMembershipsKey = []byte("group_memberships")
 )
 
+// stateStore wraps a kvstore.Transaction and provides convenience methods for
+// accessing and store relevant data within the kvstore database.
 type stateStore struct {
 	tx *kvstore.Transaction
 
@@ -43,6 +45,11 @@ type stateStore struct {
 	relationships *collections.Tree[uuid.UUID]
 }
 
+// newStateStore creates a new instance of stateStore. It will open a new write
+// transaction on the kvstore and load values from the database. Since this
+// opens a write transaction, only one instance of stateStore may be created
+// at a time. The close function must be called to release the transaction lock
+// on the kvstore database.
 func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	tx, err := store.BeginTx(true)
 	if err != nil {
@@ -100,6 +107,9 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	return &s, nil
 }
 
+// storeUser stores a user. If the user does not exist in the store, then the
+// user will be marked as discovered. Otherwise, the user will be marked
+// as modified.
 func (s *stateStore) storeUser(u *fetcher.User) {
 	if existing, ok := s.users[u.ID]; ok {
 		u.Modified = true
@@ -110,10 +120,16 @@ func (s *stateStore) storeUser(u *fetcher.User) {
 	}
 }
 
+// storeGroup stores a group. If the group already exists, it will be overwritten.
 func (s *stateStore) storeGroup(g *fetcher.Group) {
 	s.groups[g.ID] = g
 }
 
+// close will close out the stateStore. If commit is true, the staged values on the
+// stateStore will be set in the kvstore database, and the transaction will be
+// committed. Otherwise, all changes will be discarded and the transaction will
+// be rolled back. The stateStore must NOT be used after close is called, rather,
+// a new stateStore should be created.
 func (s *stateStore) close(commit bool) (err error) {
 	if !commit {
 		return s.tx.Rollback()
@@ -173,6 +189,8 @@ func (s *stateStore) close(commit bool) (err error) {
 	return s.tx.Commit()
 }
 
+// getLastSync retrieves the last full synchronization time from the kvstore
+// database. If the value doesn't exist, a zero time.Time is returned.
 func getLastSync(store *kvstore.Store) (time.Time, error) {
 	var t time.Time
 	err := store.RunTransaction(false, func(tx *kvstore.Transaction) error {
@@ -182,6 +200,8 @@ func getLastSync(store *kvstore.Store) (time.Time, error) {
 	return t, err
 }
 
+// getLastUpdate retrieves the last incremental update time from the kvstore
+// database. If the value doesn't exist, a zero time.Time is returned.
 func getLastUpdate(store *kvstore.Store) (time.Time, error) {
 	var t time.Time
 	err := store.RunTransaction(false, func(tx *kvstore.Transaction) error {
@@ -191,6 +211,8 @@ func getLastUpdate(store *kvstore.Store) (time.Time, error) {
 	return t, err
 }
 
+// errIsItemNotFound returns true if the error represents an item not found
+// error (bucket not found or key not found).
 func errIsItemNotFound(err error) bool {
 	return errors.Is(err, kvstore.ErrBucketNotFound) || errors.Is(err, kvstore.ErrKeyNotFound)
 }

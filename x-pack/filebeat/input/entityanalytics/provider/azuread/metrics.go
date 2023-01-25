@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package azure
+package azuread
 
 import (
 	"github.com/rcrowley/go-metrics"
@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
+// inputMetrics defines metrics for this provider.
 type inputMetrics struct {
 	unregister func()
 
@@ -28,6 +29,7 @@ func (m *inputMetrics) Close() {
 	m.unregister()
 }
 
+// newMetrics creates a new instance for gathering metrics.
 func newMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(FullName, id, optionalParent)
 

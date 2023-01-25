@@ -25,6 +25,7 @@ type Manager struct {
 	Configure func(cfg *config.C) (Input, error)
 }
 
+// managerConfig contains parameters needed to configure the Manager.
 type managerConfig struct {
 	ID string `config:"id" validate:"required"`
 }

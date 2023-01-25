@@ -2,7 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package azure
+// Package azuread provides an identity asset provider for Azure Active Directory.
+package azuread
 
 import (
 	"context"
@@ -17,22 +18,27 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/authenticator"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/authenticator/oauth2"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/fetcher"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/fetcher/graph"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/oauth2"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/graph"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
-const Name = "azure"
+// Name of this provider.
+const Name = "azure-ad"
+
+// FullName of this provider, including the input name. Prefer using this
+// value for full context, especially if the input name isn't present in an
+// adjacent log field.
 const FullName = "entity-analytics-" + Name
 
-// azure implements the provider.Provider interface.
 var _ provider.Provider = &azure{}
 
+// azure implements the provider.Provider interface.
 type azure struct {
 	*kvstore.Manager
 
@@ -44,10 +50,12 @@ type azure struct {
 	fetcher fetcher.Fetcher
 }
 
+// Name returns the name of this provider.
 func (p *azure) Name() string {
 	return FullName
 }
 
+// Test will test the provider by verifying an OAuth2 token can be obtained.
 func (p *azure) Test(testCtx v2.TestContext) error {
 	p.logger = testCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
 	p.auth.SetLogger(p.logger)
@@ -60,6 +68,7 @@ func (p *azure) Test(testCtx v2.TestContext) error {
 	return nil
 }
 
+// Run will start data collection on this provider.
 func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
 	p.auth.SetLogger(p.logger)
@@ -116,8 +125,12 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	}
 }
 
+// runFullSync performs a full synchronization. It will fetch user and group
+// identities from Azure Active Directory, enrich users with group memberships,
+// and publishes all known users (regardless if they have been modified) to the
+// given beat.Client.
 func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client beat.Client) (err error) {
-	p.logger.Infof("Running full sync...")
+	p.logger.Debugf("Running full sync...")
 
 	p.logger.Debugf("Opening new transaction...")
 	state, err := newStateStore(store)
@@ -164,8 +177,11 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 	return nil
 }
 
+// runIncrementalUpdate will run an incremental update. The process is similar
+// to full synchronization, except only users which have changed (newly
+// discovered, modified, or deleted) will be published.
 func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) (err error) {
-	p.logger.Infof("Running incremental update...")
+	p.logger.Debugf("Running incremental update...")
 
 	state, err := newStateStore(store)
 	if err != nil {
@@ -209,6 +225,8 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 	return nil
 }
 
+// doFetch handles fetching user and group identities from Azure Active Directory
+// and enriching users with group memberships.
 func (p *azure) doFetch(ctx context.Context, state *stateStore) (*collections.Set[uuid.UUID], error) {
 	updatedUsers := collections.NewSet[uuid.UUID]()
 
@@ -294,6 +312,8 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore) (*collections.Se
 	return updatedUsers, nil
 }
 
+// publishMarker will publish a write marker document using the given beat.Client.
+// If start is true, then it will be a start marker, otherwise an end marker.
 func (p *azure) publishMarker(ts, eventTime time.Time, inputID string, start bool, client beat.Client, tracker *kvstore.TxTracker) {
 	fields := mapstr.M{}
 	_, _ = fields.Put("labels.identity_source", inputID)
@@ -321,6 +341,7 @@ func (p *azure) publishMarker(ts, eventTime time.Time, inputID string, start boo
 	client.Publish(event)
 }
 
+// publishUser will publish a user document using the given beat.Client.
 func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
 	userDoc := mapstr.M{}
 
@@ -345,7 +366,7 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 		}
 		groups = append(groups, g.ToECS())
 	})
-	if len(groups) > 0 {
+	if len(groups) != 0 {
 		_, _ = userDoc.Put("user.group", groups)
 	}
 
@@ -361,6 +382,7 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 	client.Publish(event)
 }
 
+// configure configures this provider using the given configuration.
 func (p *azure) configure(cfg *config.C) (kvstore.Input, error) {
 	var err error
 
@@ -378,6 +400,7 @@ func (p *azure) configure(cfg *config.C) (kvstore.Input, error) {
 	return p, nil
 }
 
+// New creates a new instance of an Azure Active Directory identity provider.
 func New(logger *logp.Logger) (provider.Provider, error) {
 	p := azure{
 		conf: defaultConf(),

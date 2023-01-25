@@ -37,6 +37,7 @@ type input struct {
 	managedInput Input
 }
 
+// Name returns the name of this input.
 func (n *input) Name() string {
 	return n.managedInput.Name()
 }

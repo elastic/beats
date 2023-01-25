@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package azure
+package azuread
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mockauth "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/authenticator/mock"
-	mockfetcher "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/fetcher/mock"
+	mockauth "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
+	mockfetcher "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

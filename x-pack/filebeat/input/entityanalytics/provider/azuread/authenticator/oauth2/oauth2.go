@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// Package oauth2 provides an OAuth2 authenticator for authenticating with
+// Azure Active Directory.
 package oauth2
 
 import (
@@ -14,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/authenticator"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -28,6 +30,7 @@ var (
 	defaultScopes = []string{"https://graph.microsoft.com/.default"}
 )
 
+// authResponse matches the format of a token response from the login endpoint.
 type authResponse struct {
 	TokenType    string `json:"token_type"`
 	AccessToken  string `json:"access_token"`
@@ -35,6 +38,7 @@ type authResponse struct {
 	ExtExpiresIn int    `json:"ext_expires_in"`
 }
 
+// conf contains parameters needed to configure the authenticator.
 type conf struct {
 	ClientID string   `config:"client_id" validate:"required"`
 	TenantID string   `config:"tenant_id" validate:"required"`
@@ -54,6 +58,7 @@ type oauth2 struct {
 	client  *http.Client
 }
 
+// renewToken fetches a new token from the login endpoint.
 func (a *oauth2) renewToken(ctx context.Context) error {
 	endpointURL, err := url.Parse(a.conf.Endpoint + "/" + a.conf.TenantID + "/oauth2/v2.0/token")
 	if err != nil {
@@ -114,11 +119,12 @@ func (a *oauth2) Token(ctx context.Context) (string, error) {
 	return a.token, nil
 }
 
+// SetLogger sets the logger on this authenticator.
 func (a *oauth2) SetLogger(logger *logp.Logger) {
 	a.logger = logger
 }
 
-// New creates a new oauth2 instance.
+// New creates a new OAuth2 authenticator.
 func New(cfg *config.C, logger *logp.Logger) (authenticator.Authenticator, error) {
 	var c conf
 	if err := cfg.Unpack(&c); err != nil {

@@ -84,7 +84,7 @@ func NewStore(logger *logp.Logger, filename string, perm os.FileMode) (*Store, e
 		return nil, fmt.Errorf("kvstore: unable to open database: %w", err)
 	}
 
-	s.logger.Infof("Created new store at %q", filename)
+	s.logger.Debugf("Created new kvstore at %q", filename)
 
 	return &s, nil
 }

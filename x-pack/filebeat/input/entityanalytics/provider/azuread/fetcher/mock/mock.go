@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// Package mock provides a mock fetcher for testing purposes.
 package mock
 
 import (
@@ -9,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azure/fetcher"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -82,16 +83,20 @@ var userResponse = []*fetcher.User{
 type mock struct {
 }
 
+// Groups returns a fixed set of groups.
 func (f *mock) Groups(ctx context.Context, _ string) ([]*fetcher.Group, string, error) {
 	return groupResponse, "", nil
 }
 
+// Users returns a fixed set of users.
 func (f *mock) Users(ctx context.Context, _ string) ([]*fetcher.User, string, error) {
 	return userResponse, "", nil
 }
 
+// SetLogger is not used for this implementation.
 func (f *mock) SetLogger(logger *logp.Logger) {}
 
+// New creates a new instance of a mock fetcher.
 func New() fetcher.Fetcher {
 	return &mock{}
 }
