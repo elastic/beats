@@ -144,45 +144,6 @@ func (s *shipper) Connect() error {
 	return s.startACKLoop()
 }
 
-func (s *shipper) startACKLoop() error {
-	ctx, cancel := context.WithCancel(context.Background())
-	s.ackCancel = cancel
-
-	indexClient, err := s.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
-		PollingInterval: durationpb.New(s.config.AckPollingInterval),
-	})
-	if err != nil {
-		return fmt.Errorf("failed to connect to the server: %w", err)
-	}
-	indexReply, err := indexClient.Recv()
-	if err != nil {
-		return fmt.Errorf("failed to fetch server information: %w", err)
-	}
-	s.serverID = indexReply.GetUuid()
-
-	s.log.Debugf("connection to %s (%s) established.", s.config.Server, s.serverID)
-
-	s.ackClient = indexClient
-	s.ackBatchChan = make(chan pendingBatch)
-	s.ackIndexChan = make(chan uint64)
-	s.ackWaitGroup.Add(2)
-
-	go func() {
-		s.ackWorker(ctx)
-		s.ackWaitGroup.Done()
-		if err != nil {
-			s.log.Errorf("acknowledgment loop stopped: %s", err)
-		}
-	}()
-
-	go func() {
-		s.ackListener(ctx)
-		s.ackWaitGroup.Done()
-	}()
-
-	return nil
-}
-
 // Publish converts and sends a batch of events to the shipper server.
 // Also, implements `outputs.Client`
 func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
@@ -291,6 +252,50 @@ func (s *shipper) String() string {
 	return "shipper"
 }
 
+func (s *shipper) startACKLoop() error {
+	ctx, cancel := context.WithCancel(context.Background())
+	s.ackCancel = cancel
+
+	indexClient, err := s.client.PersistedIndex(ctx, &messages.PersistedIndexRequest{
+		PollingInterval: durationpb.New(s.config.AckPollingInterval),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to connect to the server: %w", err)
+	}
+	indexReply, err := indexClient.Recv()
+	if err != nil {
+		return fmt.Errorf("failed to fetch server information: %w", err)
+	}
+	s.serverID = indexReply.GetUuid()
+
+	s.log.Debugf("connection to %s (%s) established.", s.config.Server, s.serverID)
+
+	s.ackClient = indexClient
+	s.ackBatchChan = make(chan pendingBatch)
+	s.ackIndexChan = make(chan uint64)
+	s.ackWaitGroup.Add(2)
+
+	go func() {
+		s.ackWorker(ctx)
+		s.ackWaitGroup.Done()
+	}()
+
+	go func() {
+		err := s.ackListener(ctx)
+		s.ackWaitGroup.Done()
+		if err != nil {
+			// TODO: This will stall all acknowledgments if it ever happens.
+			// We should propagate that failure to the Publish calls and/or
+			// try to reconnect.
+			// (Note: this case would be much easier if the persisted index RPC
+			// were not a stream.)
+			s.log.Errorf("acknowledgment listener stopped: %s", err)
+		}
+	}()
+
+	return nil
+}
+
 // ackListener's only job is to listen to the persisted index RPC stream
 // and forward its values to the ack worker.
 func (s *shipper) ackListener(ctx context.Context) error {
@@ -316,21 +321,19 @@ func (s *shipper) ackListener(ctx context.Context) error {
 // ackWorker listens for newly published batches awaiting acknowledgment,
 // and for new persisted indexes that should be forwarded to already-published
 // batches.
-func (s *shipper) ackWorker(ctx context.Context) error {
+func (s *shipper) ackWorker(ctx context.Context) {
 	s.log.Debugf("starting acknowledgment loop with server %s", s.serverID)
 
 	pending := []pendingBatch{}
-	defer func() {
-		// If there are any pending batches left when the ack loop returns, then
-		// they will never be acknowledged, so send the cancel signal.
-		for _, p := range pending {
-			p.batch.Cancelled()
-		}
-	}()
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			// If there are any pending batches left when the ack loop returns, then
+			// they will never be acknowledged, so send the cancel signal.
+			for _, p := range pending {
+				p.batch.Cancelled()
+			}
+			return
 
 		case newBatch := <-s.ackBatchChan:
 			pending = append(pending, newBatch)
