@@ -7,12 +7,6 @@
 === Beats version 8.6.1
 https://github.com/elastic/beats/compare/v8.6.0\...v8.6.1[View commits]
 
-==== Breaking changes
-
-*Winlogbeat*
-
-- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -33,6 +27,10 @@ https://github.com/elastic/beats/compare/v8.6.0\...v8.6.1[View commits]
 *Osquerybeat*
 
 - Fix data_stream configuration, enforce the default values used before 8.6.0. {pull}34246[34246]
+
+*Winlogbeat*
+
+- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest {issue}19627[19627] {pull}34295[34295]
 
 ==== Added
 
