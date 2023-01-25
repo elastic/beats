@@ -8,7 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -20,7 +20,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/bayeux"
 	bay "github.com/elastic/bayeux"
 	finput "github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
@@ -325,9 +324,12 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(response))
 		return
 	}
-	body, _ := ioutil.ReadAll(r.Body)
-	var data bayeux.Subscription
-	json.Unmarshal(body, &data)
+	body, _ := io.ReadAll(r.Body)
+	var data bay.Subscription
+	err := json.Unmarshal(body, &data)
+	if err != nil {
+		return
+	}
 
 	switch data.Channel {
 	case "/meta/handshake":
@@ -401,9 +403,12 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 			return
 		}
 
-		body, _ := ioutil.ReadAll(r.Body)
-		var data bayeux.Subscription
-		json.Unmarshal(body, &data)
+		body, _ := io.ReadAll(r.Body)
+		var data bay.Subscription
+		err := json.Unmarshal(body, &data)
+		if err != nil {
+			return
+		}
 
 		switch data.Channel {
 		case "/meta/handshake":
