@@ -21,7 +21,6 @@ import (
 	"io"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -68,13 +67,18 @@ type queueEntry struct {
 }
 
 func init() {
-	queue.RegisterQueueType(
-		"proxy",
-		create,
-		feature.MakeDetails(
-			"Proxy queue",
-			"Pass through batched events to the Elastic Agent Shipper.",
-			feature.Experimental))
+	// TODO: This queue is not currently registered so it doesn't become
+	// accessible via configurations. The intent is for it to be enabled
+	// automatically when the shipper output is in use, and not otherwise,
+	// which will require some changes to beats initialization and/or
+	// configuration handling.
+	/*queue.RegisterQueueType(
+	"proxy",
+	create,
+	feature.MakeDetails(
+		"Proxy queue",
+		"Pass through batched events to the Elastic Agent Shipper.",
+		feature.Experimental))*/
 }
 
 func create(
