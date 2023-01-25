@@ -192,6 +192,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add GCP Redis regions support {pull}33728[33728]
 - Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 - Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
+- Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
 
 *Packetbeat*
 
