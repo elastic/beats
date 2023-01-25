@@ -9,29 +9,9 @@ https://github.com/elastic/beats/compare/v8.6.0\...v8.6.1[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest
-
-*Functionbeat*
-
 
 ==== Bugfixes
 
@@ -39,34 +19,13 @@ https://github.com/elastic/beats/compare/v8.6.0\...v8.6.1[View commits]
 
 - Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 
-*Auditbeat*
-
-
 *Filebeat*
 - [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
 - Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
 - The `close.on_state_change.inactive` default value is now set to 5 minutes, matching the documentation.
-
-*Heartbeat*
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
 - Fix handling of null or empty arrays during split with keep parent option. {pull}34322[34322]
 
-*Heartbeat*
-
-
 *Metricbeat*
-
 
 - Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
 - Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
@@ -75,83 +34,12 @@ https://github.com/elastic/beats/compare/v8.6.0\...v8.6.1[View commits]
 
 - Fix data_stream configuration, enforce the default values used before 8.6.0. {pull}34246[34246]
 
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
 - [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for automatic splitting at root level, if root level element is an array. {pull}34155[34155]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
 
 [[release-notes-8.6.0]]
 === Beats version 8.6.0
