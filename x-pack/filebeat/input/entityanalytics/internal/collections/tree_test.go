@@ -16,8 +16,7 @@ func TestTree_JSON(t *testing.T) {
 			1: NewSet[int](2),
 			2: NewSet[int](3),
 			3: NewSet[int](4),
-			4: NewSet[int](),
-			5: NewSet[int](),
+			5: NewSet[int](6),
 		},
 	}
 
@@ -33,7 +32,7 @@ func TestTree_JSON(t *testing.T) {
 
 func TestTree_AddVertex(t *testing.T) {
 	tree := NewTree[int]()
-	tree.AddVertex(1)
+	tree.addVertex(1)
 
 	assert.Contains(t, tree.Edges, 1)
 }
@@ -43,7 +42,6 @@ func TestTree_DeleteVertex(t *testing.T) {
 		Edges: map[int]*Set[int]{
 			1: NewSet[int](3),
 			2: NewSet[int](3),
-			3: NewSet[int](),
 		},
 	}
 	tree.DeleteVertex(3)
@@ -59,7 +57,6 @@ func TestTree_HasVertex(t *testing.T) {
 	tree := &Tree[int]{
 		Edges: map[int]*Set[int]{
 			1: NewSet[int](2),
-			2: NewSet[int](),
 		},
 	}
 
@@ -73,7 +70,6 @@ func TestTree_AddEdge(t *testing.T) {
 	want := &Tree[int]{
 		Edges: map[int]*Set[int]{
 			1: NewSet[int](2),
-			2: NewSet[int](),
 		},
 	}
 
@@ -86,7 +82,6 @@ func TestTree_DeleteEdge(t *testing.T) {
 	tree := &Tree[int]{
 		Edges: map[int]*Set[int]{
 			1: NewSet[int](2),
-			2: NewSet[int](),
 		},
 	}
 	want := &Tree[int]{
@@ -102,7 +97,6 @@ func TestTree_HasEdge(t *testing.T) {
 	tree := &Tree[int]{
 		Edges: map[int]*Set[int]{
 			1: NewSet[int](2),
-			2: NewSet[int](),
 		},
 	}
 
@@ -117,8 +111,7 @@ func TestTree_Expand(t *testing.T) {
 			1: NewSet[int](2),
 			2: NewSet[int](3),
 			3: NewSet[int](4),
-			4: NewSet[int](),
-			5: NewSet[int](),
+			5: NewSet[int](6),
 		},
 	}
 
@@ -134,8 +127,7 @@ func TestTree_ExpandFromSet(t *testing.T) {
 			1: NewSet[int](2),
 			2: NewSet[int](3),
 			3: NewSet[int](4),
-			4: NewSet[int](),
-			5: NewSet[int](),
+			5: NewSet[int](6),
 		},
 	}
 

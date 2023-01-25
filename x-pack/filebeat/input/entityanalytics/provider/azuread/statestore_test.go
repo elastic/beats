@@ -112,6 +112,7 @@ func TestStateStore_Close(t *testing.T) {
 
 	user1ID := uuid.MustParse("a77e8cbb-27a5-49d3-9d5e-801997621f87")
 	group1ID := uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80")
+	group2ID := uuid.MustParse("ec8b17ae-ce9d-4099-97ee-4a959638bc29")
 
 	ss.users = map[uuid.UUID]*fetcher.User{
 		user1ID: {
@@ -145,7 +146,7 @@ func TestStateStore_Close(t *testing.T) {
 		},
 	}
 	ss.relationships = collections.NewTree[uuid.UUID]()
-	ss.relationships.AddVertex(group1ID)
+	ss.relationships.AddEdge(group1ID, group2ID)
 
 	err = ss.close(true)
 	assert.NoError(t, err)

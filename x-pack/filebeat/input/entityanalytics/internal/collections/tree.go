@@ -23,23 +23,9 @@ func (t *Tree[T]) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &newTree.Edges); err != nil {
 		return err
 	}
-
-	for k, v := range newTree.Edges {
-		if v == nil {
-			newTree.Edges[k] = NewSet[T]()
-		}
-	}
-
 	*t = *newTree
 
 	return nil
-}
-
-// AddVertex adds a vertex to the graph.
-func (t *Tree[T]) AddVertex(value T) {
-	if _, ok := t.Edges[value]; !ok {
-		t.Edges[value] = NewSet[T]()
-	}
 }
 
 // DeleteVertex removes a vertex, and any of its edges, from the graph.
@@ -62,10 +48,7 @@ func (t *Tree[T]) HasVertex(value T) bool {
 
 // AddEdge adds an edge (from, to).
 func (t *Tree[T]) AddEdge(from T, to ...T) {
-	t.AddVertex(from)
-	for _, v := range to {
-		t.AddVertex(v)
-	}
+	t.addVertex(from)
 	t.Edges[from].Add(to...)
 }
 
@@ -120,16 +103,22 @@ func (t *Tree[T]) expand(value T, seen *Set[T]) {
 	if seen.Has(value) {
 		return
 	}
+	seen.Add(value)
 
 	members, ok := t.Edges[value]
 	if !ok {
 		return
 	}
-
-	seen.Add(value)
 	members.ForEach(func(member T) {
 		t.expand(member, seen)
 	})
+}
+
+// addVertex adds a vertex to the graph.
+func (t *Tree[T]) addVertex(value T) {
+	if _, ok := t.Edges[value]; !ok {
+		t.Edges[value] = NewSet[T]()
+	}
 }
 
 // NewTree creates a new Tree of type T.
