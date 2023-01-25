@@ -36,10 +36,10 @@ type broker struct {
 	///////////////////////////
 	// api channels
 
-	// Producers send requests to pushChan to add events to the queue.
-	pushChan chan pushRequest
+	// Producers send queue entries to pushChan to add them to the next batch.
+	pushChan chan queueEntry
 
-	// Consumers send requests to getChan to read events from the queue.
+	// Consumers send requests to getChan to read entries from the queue.
 	getChan chan getRequest
 
 	// A listener that should be notified when ACKs are processed.
@@ -60,8 +60,9 @@ type Settings struct {
 
 type queueEntry struct {
 	event interface{}
-	id    queue.EntryID
 
+	// The producer that generated this event, or nil if this producer does
+	// not require ack callbacks.
 	producer *producer
 }
 
@@ -81,7 +82,7 @@ func NewQueue(
 		logger: logger,
 
 		// broker API channels
-		pushChan: make(chan pushRequest),
+		pushChan: make(chan queueEntry),
 		getChan:  make(chan getRequest),
 
 		ackListener: settings.ACKListener,
@@ -138,13 +139,12 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 
 func (b *broker) run() {
 	var (
-		nextEntryID  = queue.EntryID(0)
 		pendingBatch = &batch{queue: b}
 		pendingACKs  pendingACKsList
 	)
 
 	for {
-		var pushChan chan pushRequest
+		var pushChan chan queueEntry
 		// Push requests are enabled if the pending batch isn't yet full.
 		if len(pendingBatch.entries) < b.batchSize {
 			pushChan = b.pushChan
@@ -160,16 +160,10 @@ func (b *broker) run() {
 		case <-b.done:
 			return
 
-		case req := <-pushChan: // producer pushing new event
-			req.responseChan <- nextEntryID
-			req.producer.producedCount++
+		case entry := <-pushChan: // producer pushing new event
+			entry.producer.producedCount++
 			pendingBatch.entries = append(pendingBatch.entries,
-				queueEntry{
-					event:    req.event,
-					id:       nextEntryID,
-					producer: req.producer,
-				})
-			nextEntryID++
+				queueEntry(entry))
 
 		case req := <-getChan: // consumer asking for next batch
 			acks := acksForBatch(pendingBatch)

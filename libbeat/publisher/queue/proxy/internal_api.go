@@ -17,20 +17,6 @@
 
 package proxyqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher/queue"
-
-// producer -> broker API
-
-type pushRequest struct {
-	event interface{}
-
-	// The producer that generated this event, or nil if this producer does
-	// not require ack callbacks.
-	producer *producer
-
-	responseChan chan queue.EntryID
-}
-
 // consumer -> broker API
 
 type getRequest struct {
