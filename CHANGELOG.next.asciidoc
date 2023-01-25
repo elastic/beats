@@ -171,6 +171,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 - Add support for recognizing the log level in Elasticsearch JVM logs {pull}34159[34159]
 - Add metrics for TCP packet processing. {pull}34333[34333]
+- Publish `log.source` details from TCP and UDP inputs in structured form. {issue}34371[34371] {pull}34379[34379]
 
 *Auditbeat*
 
