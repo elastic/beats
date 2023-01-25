@@ -1,5 +1,9 @@
 # Module: rabbitmq
+<<<<<<< HEAD
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.6/metricbeat-module-rabbitmq.html
+=======
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-rabbitmq.html
+>>>>>>> 50dad3dab4 (Fixing broken documentation links for filebeat and metricbeat (#34366))
 
 - module: rabbitmq
   #metricsets:

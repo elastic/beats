@@ -1,5 +1,9 @@
 # Module: nats
+<<<<<<< HEAD
 # Docs: https://www.elastic.co/guide/en/beats/filebeat/8.6/filebeat-module-nats.html
+=======
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-nats.html
+>>>>>>> 50dad3dab4 (Fixing broken documentation links for filebeat and metricbeat (#34366))
 
 - module: nats
   # All logs
