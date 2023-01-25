@@ -23,7 +23,7 @@ type inputMetrics struct {
 	sqsMessagesReturnedTotal            *monitoring.Uint // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 	sqsMessagesDeletedTotal             *monitoring.Uint // Number of SQS messages deleted.
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
-	sqsLagTime                          metrics.Sample   // Histogram of delay in SQS processing times in nanoseconds (message sent time to now).
+	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 
 	s3ObjectsRequestedTotal *monitoring.Uint // Number of S3 objects downloaded.
 	s3ObjectsAckedTotal     *monitoring.Uint // Number of S3 objects processed that were fully ACKed.
