@@ -199,6 +199,18 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		EscapeHTML: false,
 	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
+		// when under agent we don't actually log the message unless trace is enabled
+		//
+		// this is done inside the processor, so we don't have to reload the entire pipeline
+		// because of a log level change
+		agent := underAgent.Load()
+		if agent {
+			trace := underAgentTrace.Load()
+			if !trace {
+				return event, nil
+			}
+		}
+
 		mux.Lock()
 		defer mux.Unlock()
 

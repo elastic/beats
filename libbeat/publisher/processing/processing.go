@@ -19,8 +19,18 @@ package processing
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+var (
+	// underAgent is set to true with this beat is being ran under the elastic-agent
+	underAgent = atomic.MakeBool(false)
+
+	// underAgentTrace is set to true when the elastic-agent has placed this beat into
+	// trace mode (which enables logging of published events)
+	underAgentTrace = atomic.MakeBool(false)
 )
 
 // SupportFactory creates a new processing Supporter that can be used with
@@ -37,4 +47,16 @@ type SupportFactory func(info beat.Info, log *logp.Logger, cfg *config.C) (Suppo
 type Supporter interface {
 	Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error)
 	Close() error
+}
+
+// SetUnderAgent sets that the processing pipeline is being ran under the elastic-agent.
+func SetUnderAgent(val bool) {
+	underAgent.Store(val)
+}
+
+// SetUnderAgentTrace sets that trace mode has been enabled by the elastic-agent.
+//
+// SetUnderAgent must also be called and set to true before this has an effect.
+func SetUnderAgentTrace(val bool) {
+	underAgentTrace.Store(val)
 }

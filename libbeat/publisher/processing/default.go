@@ -356,7 +356,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	// setup 10: debug print final event (P)
-	if b.log.IsDebug() {
+	if b.log.IsDebug() || underAgent.Load() {
 		processors.add(debugPrintProcessor(b.info, b.log))
 	}
 
