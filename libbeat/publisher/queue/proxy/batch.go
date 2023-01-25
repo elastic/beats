@@ -17,30 +17,22 @@
 
 package proxyqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher/queue"
-
-// producer -> broker API
-
-type pushRequest struct {
-	event interface{}
-
-	// The producer that generated this event, or nil if this producer does
-	// not require ack callbacks.
-	producer *producer
-
-	responseChan chan queue.EntryID
+type batch struct {
+	queue    *broker
+	entries  []queueEntry
+	doneChan chan struct{}
 }
 
-// consumer -> broker API
-
-type getRequest struct {
-	entryCount   int              // request entryCount events from the broker
-	responseChan chan getResponse // channel to send response to
+func (b *batch) Count() int {
+	return len(b.entries)
 }
 
-type getResponse struct {
-	// ackChan can be nil if the producers that added these entries do not
-	// listen for acks.
-	ackChan chan struct{}
-	entries []queueEntry
+func (b *batch) Entry(i int) interface{} {
+	return b.entries[i].event
+}
+
+func (b *batch) Done() {
+	if b.doneChan != nil {
+		close(b.doneChan)
+	}
 }

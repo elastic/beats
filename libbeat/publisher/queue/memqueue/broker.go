@@ -387,10 +387,6 @@ func (b *batch) Entry(i int) interface{} {
 	return b.entries[i].event
 }
 
-func (b *batch) ID(i int) queue.EntryID {
-	return b.entries[i].id
-}
-
 func (b *batch) Done() {
 	b.doneChan <- batchDoneMsg{}
 }

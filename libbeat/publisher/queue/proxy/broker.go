@@ -27,11 +27,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const (
-	minInputQueueSize      = 20
-	maxInputQueueSizeRatio = 0.1
-)
-
 type broker struct {
 	done chan struct{}
 
@@ -49,22 +44,15 @@ type broker struct {
 	// Consumers send requests to getChan to read events from the queue.
 	getChan chan getRequest
 
-	///////////////////////////
-	// internal channels
-
 	// A listener that should be notified when ACKs are processed.
-	// ackLoop calls this listener's OnACK function when it advances
-	// the consumer ACK position.
 	// Right now this listener always points at the Pipeline associated with
-	// this queue. Pipeline.OnACK then forwards the notification to
+	// this queue, and Pipeline.OnACK forwards the notification to
 	// Pipeline.observer.queueACKed(), which updates the beats registry
 	// if needed.
 	ackListener queue.ACKListener
 
 	// wait group for worker shutdown
 	wg sync.WaitGroup
-
-	nextEntryID queue.EntryID
 }
 
 type Settings struct {
@@ -76,47 +64,7 @@ type queueEntry struct {
 	event interface{}
 	id    queue.EntryID
 
-	producer *ackProducer
-}
-
-type ProxiedBatch struct {
-	queue    *broker
-	entries  []queueEntry
-	doneChan chan batchDoneMsg
-}
-
-func (b *ProxiedBatch) FreeEntries() {
-	b.entries = nil
-}
-
-// producerACKData tracks the number of events that need to be acknowledged
-// from a single batch targeting a single producer.
-type producerACKData struct {
-	producer *ackProducer
-	count    int
-}
-
-// batchACKState stores the metadata associated with a batch of events sent to
-// a consumer. When the consumer ACKs that batch, its doneChan is closed.
-// The run loop for the broker checks the doneChan for the next sequential
-// outstanding batch (to ensure ACKs are delivered in order) and calls the
-// producer's ackHandler when appropriate.
-type batchACKState struct {
-	next     *batchACKState
-	doneChan chan batchDoneMsg
-	acks     []producerACKData
-}
-
-type pendingACKsList struct {
-	head *batchACKState
-	tail *batchACKState
-}
-
-func (acks *pendingACKsList) nextDoneChan() chan batchDoneMsg {
-	if acks.head != nil {
-		return acks.head.doneChan
-	}
-	return nil
+	producer *producer
 }
 
 func init() {
@@ -163,7 +111,7 @@ func NewQueue(
 		logger: logger,
 
 		// broker API channels
-		pushChan: make(chan pushRequest, 8),
+		pushChan: make(chan pushRequest),
 		getChan:  make(chan getRequest),
 
 		ackListener: settings.ACKListener,
@@ -188,7 +136,7 @@ func (b *broker) BufferConfig() queue.BufferConfig {
 }
 
 func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
-	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
+	return newProducer(b, cfg.ACK)
 }
 
 func (b *broker) Get(count int) (queue.Batch, error) {
@@ -202,7 +150,7 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
-	return &ProxiedBatch{
+	return &batch{
 		queue:    b,
 		entries:  resp.entries,
 		doneChan: resp.ackChan,
@@ -218,70 +166,70 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 	return queue.Metrics{}, nil
 }
 
-var ackChanPool = sync.Pool{
-	New: func() interface{} {
-		return &batchACKState{
-			doneChan: make(chan batchDoneMsg, 1),
+func (b *broker) run() {
+	var (
+		nextEntryID  = queue.EntryID(0)
+		pendingBatch = &batch{queue: b}
+		pendingACKs  pendingACKsList
+	)
+
+	for {
+		var pushChan chan pushRequest
+		// Push requests are enabled if the pending batch isn't yet full.
+		if len(pendingBatch.entries) < b.batchSize {
+			pushChan = b.pushChan
 		}
-	},
-}
 
-func releaseACKChan(c *batchACKState) {
-	c.next = nil
-	ackChanPool.Put(c)
-}
-
-func (l *pendingACKsList) append(ch *batchACKState) {
-	if l.head == nil {
-		l.head = ch
-	} else {
-		l.tail.next = ch
-	}
-	l.tail = ch
-}
-func (l *pendingACKsList) nextBatchChannel() chan batchDoneMsg {
-	if l.head == nil {
-		return nil
-	}
-	return l.head.doneChan
-}
-
-func (l *pendingACKsList) pop() *batchACKState {
-	ch := l.head
-	if ch != nil {
-		l.head = ch.next
-		if l.head == nil {
-			l.tail = nil
+		var getChan chan getRequest
+		// Get requests are enabled if the current pending batch is nonempty.
+		if len(pendingBatch.entries) > 0 {
+			getChan = b.getChan
 		}
-		ch.next = nil
+
+		select {
+		case <-b.done:
+			return
+
+		case req := <-pushChan: // producer pushing new event
+			req.responseChan <- nextEntryID
+			req.producer.producedCount++
+			pendingBatch.entries = append(pendingBatch.entries,
+				queueEntry{
+					event:    req.event,
+					id:       nextEntryID,
+					producer: req.producer,
+				})
+			nextEntryID++
+
+		case req := <-getChan: // consumer asking for next batch
+			acks := acksForBatch(pendingBatch)
+			var doneChan chan struct{}
+			if len(acks) > 0 {
+				// We only actually save the ACK state and give it a done
+				// channel if some producer in this batch has ACKs enabled.
+				doneChan = make(chan struct{})
+				pendingACKs.append(&batchACKState{
+					doneChan: doneChan,
+					acks:     acks,
+				})
+			}
+			req.responseChan <- getResponse{
+				ackChan: doneChan,
+				entries: pendingBatch.entries,
+			}
+			// Reset the pending batch
+			pendingBatch = &batch{queue: b}
+
+		case <-pendingACKs.nextDoneChan(): // Previous batch being acknowledged
+			batch := pendingACKs.pop()
+			// Send any acknowledgments needed for this batch.
+			total := 0
+			for _, ack := range batch.acks {
+				ack.producer.ackHandler(ack.count)
+				total += ack.count
+			}
+			// Also update the ACKs in the metrics observer
+			b.ackListener.OnACK(total)
+		}
 	}
-	return ch
-}
-
-// AdjustInputQueueSize decides the size for the input queue.
-func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
-	actual = requested
-	if max := int(float64(mainQueueSize) * maxInputQueueSizeRatio); mainQueueSize > 0 && actual > max {
-		actual = max
-	}
-	if actual < minInputQueueSize {
-		actual = minInputQueueSize
-	}
-	return actual
-}
-
-func (b *ProxiedBatch) Count() int {
-	return len(b.entries)
-}
-
-func (b *ProxiedBatch) Entry(i int) interface{} {
-	return b.entries[i].event
-}
-
-func (b *ProxiedBatch) ID(i int) queue.EntryID {
-	return b.entries[i].id
-}
-
-func (b *ProxiedBatch) Done() {
-	b.doneChan <- batchDoneMsg{}
 }

@@ -19,134 +19,74 @@ package proxyqueue
 
 import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type forgetfulProducer struct {
+type producer struct {
 	broker    *broker
-	openState openState
-}
-
-type batchID uint64
-
-// producerBatchData is a linked list tracking how many events from
-// this producer are in each pending batch. It's used to track event
-// acknowledgments.
-type producerBatchData struct {
-	next       *producerBatchData
-	batch      batchID
-	entryCount int
-}
-
-type ackProducer struct {
-	broker *broker
-	/*dropOnCancel  bool
-	producedCount uint64
-	state         produceState*/
-	openState  openState
-	ackHandler ackHandler
-
-	// This field is used to track ACKs for pending events.
-	// It can only be safely accessed from the ackLoop.
-	pendingBatches *producerBatchData
-}
-
-type openState struct {
-	log    *logp.Logger
-	done   chan struct{}
-	events chan pushRequest
-}
-
-/*type produceState struct {
-	cb        ackHandler
-	dropCB    func(interface{})
 	cancelled bool
-	lastACK   producerID
-}*/
+	// If ackHandler is nil then this producer does not listen to acks.
+	ackHandler func(count int)
 
-type ackHandler func(count int)
-
-func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCancel bool) queue.Producer {
-	openState := openState{
-		log:    b.logger,
-		done:   make(chan struct{}),
-		events: b.pushChan,
-	}
-
-	if cb != nil {
-		p := &ackProducer{broker: b, openState: openState, ackHandler: cb}
-		//p.state.cb = cb
-		//p.state.dropCB = dropCB
-		return p
-	}
-	return &forgetfulProducer{broker: b, openState: openState}
+	// producedCount and consumedCount are used to assemble batches and
+	// should only be accessed by the broker's main loop.
+	producedCount uint64
+	consumedCount uint64
 }
 
-func (p *forgetfulProducer) makePushRequest(event interface{}) pushRequest {
-	resp := make(chan queue.EntryID, 1)
-	return pushRequest{
+func newProducer(b *broker, ackHandler func(count int)) queue.Producer {
+	return &producer{
+		broker:     b,
+		ackHandler: ackHandler}
+}
+
+func (p *producer) makePushRequest(event interface{}) pushRequest {
+	req := pushRequest{
 		event:        event,
-		responseChan: resp}
-}
-
-func (p *forgetfulProducer) Publish(event interface{}) (queue.EntryID, bool) {
-	return p.openState.publish(p.makePushRequest(event))
-}
-
-func (p *forgetfulProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
-	return p.openState.tryPublish(p.makePushRequest(event))
-}
-
-func (p *forgetfulProducer) Cancel() int {
-	p.openState.Close()
-	return 0
-}
-
-func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
-	return pushRequest{
-		event:        event,
-		producer:     p,
 		responseChan: make(chan queue.EntryID, 1),
 	}
+	if p.ackHandler != nil {
+		req.producer = p
+	}
+	return req
 }
 
-func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
-	return p.openState.publish(p.makePushRequest(event))
+func (p *producer) Publish(event interface{}) (queue.EntryID, bool) {
+	if p.cancelled {
+		return 0, false
+	}
+	return p.broker.publish(p.makePushRequest(event))
 }
 
-func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
-	return p.openState.tryPublish(p.makePushRequest(event))
+func (p *producer) TryPublish(event interface{}) (queue.EntryID, bool) {
+	if p.cancelled {
+		return 0, false
+	}
+	return p.broker.tryPublish(p.makePushRequest(event))
 }
 
-func (p *ackProducer) Cancel() int {
-	p.openState.Close()
-
+func (p *producer) Cancel() int {
+	p.cancelled = true
 	return 0
 }
 
-func (st *openState) Close() {
-	close(st.done)
-}
-
-func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
+func (b *broker) publish(req pushRequest) (queue.EntryID, bool) {
 	select {
-	case st.events <- req:
+	case b.pushChan <- req:
 		return <-req.responseChan, true
-	case <-st.done:
-		st.events = nil
+	case <-b.done:
+		// The queue is shutting down
 		return 0, false
 	}
 }
 
-func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
+func (b *broker) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	select {
-	case st.events <- req:
+	case b.pushChan <- req:
 		return <-req.responseChan, true
-	case <-st.done:
-		st.events = nil
+	case <-b.done:
 		return 0, false
 	default:
-		st.log.Debugf("Dropping event, queue is blocked")
+		b.logger.Debugf("Dropping event, queue is blocked")
 		return 0, false
 	}
 }

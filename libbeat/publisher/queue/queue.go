@@ -141,6 +141,5 @@ type Producer interface {
 type Batch interface {
 	Count() int
 	Entry(i int) interface{}
-	ID(i int) EntryID
 	Done()
 }
