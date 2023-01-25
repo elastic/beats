@@ -135,16 +135,15 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
 
 	rawRecieveCount, hasReceiveCountAttribute := msg.Attributes[sqsApproximateReceiveCountAttribute]
+	receiveCount, receiveConvErr := strconv.Atoi(rawRecieveCount)
 
 	// Only contribute to the sqs_lag_time histogram on the first message
 	// to avoid skewing the metric when processing retries
-	if hasReceiveCountAttribute {
-		if receiveCount, err := strconv.Atoi(rawRecieveCount); err == nil && receiveCount == 1 {
-			if s, found := msg.Attributes[sqsSentTimestampAttribute]; found {
-				if sentTimeMillis, err := strconv.ParseInt(s, 10, 64); err == nil {
-					sentTime := time.UnixMilli(sentTimeMillis)
-					p.metrics.sqsLagTime.Update(time.Since(sentTime).Nanoseconds())
-				}
+	if hasReceiveCountAttribute && receiveConvErr == nil && receiveCount == 1 {
+		if s, found := msg.Attributes[sqsSentTimestampAttribute]; found {
+			if sentTimeMillis, err := strconv.ParseInt(s, 10, 64); err == nil {
+				sentTime := time.UnixMilli(sentTimeMillis)
+				p.metrics.sqsLagTime.Update(time.Since(sentTime).Nanoseconds())
 			}
 		}
 	}
@@ -171,7 +170,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	if p.maxReceiveCount > 0 && !errors.Is(processingErr, &nonRetryableError{}) && hasReceiveCountAttribute {
 		// Prevent poison pill messages from consuming all workers. Check how
 		// many times this message has been received before making a disposition.
-		if receiveCount, err := strconv.Atoi(rawRecieveCount); err == nil && receiveCount >= p.maxReceiveCount {
+		if receiveConvErr == nil && receiveCount >= p.maxReceiveCount {
 			processingErr = nonRetryableErrorWrap(fmt.Errorf(
 				"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
 				receiveCount, p.maxReceiveCount, processingErr))
