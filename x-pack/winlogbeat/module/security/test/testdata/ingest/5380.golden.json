@@ -1,0 +1,357 @@
+[
+  {
+    "@timestamp": "2023-01-17T10:11:25.557Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "vault-credential-find",
+      "category": [
+        "iam"
+      ],
+      "code": "5380",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "USER1"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "21196",
+        "CountOfCredentialsReturned": "16",
+        "ProcessCreationTime": "2023-01-17T10:11:06.2991958Z",
+        "Schema": "{3ccd5499-87a8-4b10-a215-608888dd3b55}",
+        "SchemaFriendlyName": "Windows Web Password Credential",
+        "SearchString": "eqIbCZfcLIdQZ7KOF0olDjCeH3Ex8xHgPVIq5ufbYzI",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x1771180",
+        "SubjectUserName": "USER1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5380",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1771180"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 664,
+        "thread": {
+          "id": 3284
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "2254401",
+      "time_created": "2023-01-17T10:11:25.5570183Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T10:11:25.532Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "vault-credential-find",
+      "category": [
+        "iam"
+      ],
+      "code": "5380",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "USER1"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "21196",
+        "CountOfCredentialsReturned": "16",
+        "ProcessCreationTime": "2023-01-17T10:11:06.2991958Z",
+        "Schema": "{3ccd5499-87a8-4b10-a215-608888dd3b55}",
+        "SchemaFriendlyName": "Windows Web Password Credential",
+        "SearchString": "eqIbCZfcLIdQZ7KOF0olDjCeH3Ex8xHgPVIq5ufbYzI",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x1771180",
+        "SubjectUserName": "USER1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5380",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1771180"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 664,
+        "thread": {
+          "id": 3284
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "2254384",
+      "time_created": "2023-01-17T10:11:25.532896Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T10:11:25.498Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "vault-credential-find",
+      "category": [
+        "iam"
+      ],
+      "code": "5380",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "USER1"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "21196",
+        "CountOfCredentialsReturned": "16",
+        "ProcessCreationTime": "2023-01-17T10:11:06.2991958Z",
+        "Schema": "{3ccd5499-87a8-4b10-a215-608888dd3b55}",
+        "SchemaFriendlyName": "Windows Web Password Credential",
+        "SearchString": "eqIbCZfcLIdQZ7KOF0olDjCeH3Ex8xHgPVIq5ufbYzI",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x1771180",
+        "SubjectUserName": "USER1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5380",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1771180"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 664,
+        "thread": {
+          "id": 3284
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "2254367",
+      "time_created": "2023-01-17T10:11:25.4987379Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T10:11:24.775Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "vault-credential-find",
+      "category": [
+        "iam"
+      ],
+      "code": "5380",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "USER1"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "21196",
+        "CountOfCredentialsReturned": "16",
+        "ProcessCreationTime": "2023-01-17T10:11:06.2991958Z",
+        "Schema": "{3ccd5499-87a8-4b10-a215-608888dd3b55}",
+        "SchemaFriendlyName": "Windows Web Password Credential",
+        "SearchString": "eqIbCZfcLIdQZ7KOF0olDjCeH3Ex8xHgPVIq5ufbYzI",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x1771180",
+        "SubjectUserName": "USER1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5380",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1771180"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 664,
+        "thread": {
+          "id": 9312
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "2254350",
+      "time_created": "2023-01-17T10:11:24.7759283Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T10:11:24.542Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "vault-credential-find",
+      "category": [
+        "iam"
+      ],
+      "code": "5380",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "USER1"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "21196",
+        "CountOfCredentialsReturned": "16",
+        "ProcessCreationTime": "2023-01-17T10:11:06.2991958Z",
+        "Schema": "{3ccd5499-87a8-4b10-a215-608888dd3b55}",
+        "SchemaFriendlyName": "Windows Web Password Credential",
+        "SearchString": "eqIbCZfcLIdQZ7KOF0olDjCeH3Ex8xHgPVIq5ufbYzI",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x1771180",
+        "SubjectUserName": "USER1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5380",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1771180"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 664,
+        "thread": {
+          "id": 9312
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "2254333",
+      "time_created": "2023-01-17T10:11:24.5421935Z"
+    }
+  }
+]
