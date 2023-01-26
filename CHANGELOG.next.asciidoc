@@ -48,6 +48,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
 - Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 - Log errors from v2 client errors channel. {pull}34392[34392]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 
 *Auditbeat*
 
@@ -100,7 +103,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Fix handling of null or empty arrays during split with keep parent option. {pull}34322[34322]
 
 *Heartbeat*
 
@@ -118,9 +120,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
 - Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 
+
 *Osquerybeat*
 
-- Fix data_stream configuration, enforce the default values used before 8.6.0. {pull}34246[34246]
 
 *Packetbeat*
 
@@ -172,6 +174,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 - Add support for recognizing the log level in Elasticsearch JVM logs {pull}34159[34159]
 - Add metrics for TCP packet processing. {pull}34333[34333]
+- Add metrics for unix socket packet processing. {pull}34335[34335]
 
 *Auditbeat*
 
