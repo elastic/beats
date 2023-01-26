@@ -18,11 +18,12 @@
 package ktest
 
 import (
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	"io/ioutil"
 	"strings"
 	"testing"
+
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 )
 
 // GetTestCases Build test cases from the files and returns them

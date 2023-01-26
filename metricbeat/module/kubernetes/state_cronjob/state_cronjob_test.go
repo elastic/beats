@@ -21,10 +21,11 @@
 package state_cronjob
 
 import (
+	"testing"
+
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"testing"
 )
 
 var files = []string{

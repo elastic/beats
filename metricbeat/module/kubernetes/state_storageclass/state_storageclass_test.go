@@ -21,9 +21,10 @@
 package state_storageclass
 
 import (
+	"testing"
+
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 )

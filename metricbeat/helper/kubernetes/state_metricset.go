@@ -19,11 +19,12 @@ package kubernetes
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"strings"
 )
 
 const prefix = "state_"
