@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -199,27 +200,17 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		EscapeHTML: false,
 	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
-		// when under agent we don't actually log the message unless trace is enabled
-		//
-		// this is done inside the processor, so we don't have to reload the entire pipeline
-		// because of a log level change
-		agent := underAgent.Load()
-		if agent {
-			trace := underAgentTrace.Load()
-			if !trace {
+		if publisher.LogWithTrace() {
+			mux.Lock()
+			defer mux.Unlock()
+
+			b, err := encoder.Encode(info.Beat, event)
+			if err != nil {
 				return event, nil
 			}
+
+			log.Debugf("Publish event: %s", b)
 		}
-
-		mux.Lock()
-		defer mux.Unlock()
-
-		b, err := encoder.Encode(info.Beat, event)
-		if err != nil {
-			return event, nil
-		}
-
-		log.Debugf("Publish event: %s", b)
 		return event, nil
 	})
 }

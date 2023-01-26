@@ -26,7 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -116,10 +116,10 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (
 		return nil, fmt.Errorf("error reading control config from agent: %w", err)
 	}
 
-	// officially running under the elastic-agent; we set the processing pipeline
+	// officially running under the elastic-agent; we set the publisher pipeline
 	// to inform it that we are running under elastic-agent (used to ensure "Publish event: "
 	// debug log messages are only outputted when running in trace mode
-	processing.SetUnderAgent(true)
+	publisher.SetUnderAgent(true)
 
 	return NewV2AgentManagerWithClient(c, registry, agentClient)
 }
@@ -449,7 +449,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	// set the new log level (if nothing has changed is a noop)
 	ll, trace := getZapcoreLevel(lowestLevel)
 	logp.SetLevel(ll)
-	processing.SetUnderAgentTrace(trace)
+	publisher.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
 	var errs multierror.Errors
