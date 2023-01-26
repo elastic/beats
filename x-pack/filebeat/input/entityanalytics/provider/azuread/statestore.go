@@ -42,7 +42,7 @@ type stateStore struct {
 	groupsLink    string
 	users         map[uuid.UUID]*fetcher.User
 	groups        map[uuid.UUID]*fetcher.Group
-	relationships *collections.Tree[uuid.UUID]
+	relationships collections.UUIDTree
 }
 
 // newStateStore creates a new instance of stateStore. It will open a new write
@@ -57,10 +57,9 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	}
 
 	s := stateStore{
-		users:         map[uuid.UUID]*fetcher.User{},
-		groups:        map[uuid.UUID]*fetcher.Group{},
-		relationships: collections.NewTree[uuid.UUID](),
-		tx:            tx,
+		users:  map[uuid.UUID]*fetcher.User{},
+		groups: map[uuid.UUID]*fetcher.Group{},
+		tx:     tx,
 	}
 
 	if err = s.tx.Get(stateBucket, lastSyncKey, &s.lastSync); err != nil && !errIsItemNotFound(err) {

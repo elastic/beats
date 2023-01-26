@@ -127,8 +127,8 @@ func TestStateStore_Close(t *testing.T) {
 				"mobilePhone":       "123-555-1000",
 				"businessPhones":    []any{"123-555-0122"},
 			},
-			MemberOf:           collections.NewSet[uuid.UUID](group1ID),
-			TransitiveMemberOf: collections.NewSet[uuid.UUID](group1ID),
+			MemberOf:           collections.NewUUIDSet(group1ID),
+			TransitiveMemberOf: collections.NewUUIDSet(group1ID),
 			Modified:           false,
 			Deleted:            false,
 		},
@@ -145,7 +145,6 @@ func TestStateStore_Close(t *testing.T) {
 			},
 		},
 	}
-	ss.relationships = collections.NewTree[uuid.UUID]()
 	ss.relationships.AddEdge(group1ID, group2ID)
 
 	err = ss.close(true)

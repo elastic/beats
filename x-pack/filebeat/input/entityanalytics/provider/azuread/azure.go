@@ -227,20 +227,20 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 
 // doFetch handles fetching user and group identities from Azure Active Directory
 // and enriching users with group memberships.
-func (p *azure) doFetch(ctx context.Context, state *stateStore) (*collections.Set[uuid.UUID], error) {
-	updatedUsers := collections.NewSet[uuid.UUID]()
+func (p *azure) doFetch(ctx context.Context, state *stateStore) (collections.UUIDSet, error) {
+	var updatedUsers collections.UUIDSet
 
 	// Get user changes.
 	changedUsers, userLink, err := p.fetcher.Users(ctx, state.usersLink)
 	if err != nil {
-		return nil, err
+		return updatedUsers, err
 	}
 	p.logger.Debugf("Received %d users from API", len(changedUsers))
 
 	// Get group changes.
 	changedGroups, groupLink, err := p.fetcher.Groups(ctx, state.groupsLink)
 	if err != nil {
-		return nil, err
+		return updatedUsers, err
 	}
 	p.logger.Debugf("Received %d groups from API", len(changedGroups))
 
@@ -259,11 +259,11 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore) (*collections.Se
 	for _, g := range changedGroups {
 		if g.Deleted {
 			for _, u := range state.users {
-				if u.IsTransitiveMemberOf(g.ID) {
+				if u.TransitiveMemberOf.Contains(g.ID) {
 					updatedUsers.Add(u.ID)
 				}
 			}
-			state.relationships.DeleteVertex(g.ID)
+			state.relationships.RemoveVertex(g.ID)
 			continue
 		}
 
@@ -271,12 +271,12 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore) (*collections.Se
 			switch member.Type {
 			case fetcher.MemberGroup:
 				for _, u := range state.users {
-					if u.IsTransitiveMemberOf(member.ID) {
+					if u.TransitiveMemberOf.Contains(member.ID) {
 						updatedUsers.Add(u.ID)
 					}
 				}
 				if member.Deleted {
-					state.relationships.DeleteEdge(member.ID, g.ID)
+					state.relationships.RemoveEdge(member.ID, g.ID)
 				} else {
 					state.relationships.AddEdge(member.ID, g.ID)
 				}
@@ -285,9 +285,9 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore) (*collections.Se
 				if u, ok := state.users[member.ID]; ok {
 					updatedUsers.Add(u.ID)
 					if member.Deleted {
-						u.RemoveMemberOf(g.ID)
+						u.MemberOf.Remove(g.ID)
 					} else {
-						u.AddMemberOf(g.ID)
+						u.MemberOf.Add(g.ID)
 					}
 				}
 			}
