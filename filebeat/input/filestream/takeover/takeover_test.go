@@ -183,7 +183,7 @@ inputs:
 			name:   "returns error if filestreams don't have unique IDs",
 			cfg:    noUniqueID,
 			states: states,
-			expErr: "failed to read input configuration: filestream `filestream-id-2` in `take over` mode requires a unique ID",
+			expErr: "failed to read input configuration: filestream with ID `filestream-id-2` in `take over` mode requires a unique ID. Add the `id:` key with a unique value",
 		},
 		{
 			name:       "filestream takes over when there is `take_over: true`",
