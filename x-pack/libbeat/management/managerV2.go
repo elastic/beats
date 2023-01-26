@@ -45,6 +45,9 @@ type BeatV2Manager struct {
 
 	logger *logp.Logger
 
+	// handles client errors
+	errCanceller context.CancelFunc
+
 	// track individual units given to us by the V2 API
 	mx      sync.Mutex
 	units   map[unitKey]*client.Unit
@@ -181,11 +184,18 @@ func (cm *BeatV2Manager) Start() error {
 	if !cm.Enabled() {
 		return fmt.Errorf("V2 Manager is disabled")
 	}
-	err := cm.client.Start(context.Background())
+	if cm.errCanceller != nil {
+		cm.errCanceller()
+		cm.errCanceller = nil
+	}
+	ctx := context.Background()
+	err := cm.client.Start(ctx)
 	if err != nil {
 		return fmt.Errorf("error starting connection to client")
 	}
-
+	ctx, canceller := context.WithCancel(ctx)
+	cm.errCanceller = canceller
+	go cm.watchErrChan(ctx)
 	cm.client.RegisterDiagnosticHook("beat-rendered-config", "the rendered config used by the beat", "beat-rendered-config.yml", "application/yaml", cm.handleDebugYaml)
 	go cm.unitListen()
 	cm.isRunning = true
@@ -331,6 +341,17 @@ func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
 // Private V2 implementation
 // ================================
 
+func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case err := <-cm.client.Errors():
+			cm.logger.Errorf("elastic-agent-client error: %s", err)
+		}
+	}
+}
+
 func (cm *BeatV2Manager) unitListen() {
 	const changeDebounce = 100 * time.Millisecond
 
@@ -411,6 +432,10 @@ func (cm *BeatV2Manager) stopBeat() {
 	}
 	cm.client.Stop()
 	cm.UpdateStatus(lbmanagement.Stopped, "Stopped")
+	if cm.errCanceller != nil {
+		cm.errCanceller()
+		cm.errCanceller = nil
+	}
 }
 
 func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
