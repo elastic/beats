@@ -1,23 +1,50 @@
 {
-    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "@timestamp": "2023-01-25T17:15:44.822Z",
+    "service": {
+        "address": "http://kube-state-metrics:8080/metrics",
+        "type": "kubernetes"
+    },
     "event": {
+        "duration": 5737299,
         "dataset": "kubernetes.pod",
-        "duration": 115000,
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "kube-system",
-        "node": {
-            "name": "minikube"
-        },
         "pod": {
-            "host_ip": "192.168.99.100",
-            "ip": "172.17.0.2",
-            "name": "tiller-deploy-3067024529-9lpmb",
+            "name": "kube-proxy-rn76j",
+            "condition": "true",
             "status": {
-                "phase": "running",
-                "ready": "true",
-                "scheduled": "true"
+                "scheduled": true,
+                "ready": true
+            },
+            "uid": "e239a0cd-0f5e-4046-93a2-8702bee287f4",
+            "ip": "172.22.0.2"
+        },
+        "namespace": "kube-system",
+        "namespace_uid": "b4caac51-7edb-4ccf-929a-5c569365224f",
+        "namespace_labels": {
+            "kubernetes_io/metadata_name": "kube-system"
+        },
+        "daemonset": {
+            "name": "kube-proxy"
+        },
+        "labels": {
+            "controller-revision-hash": "b9c5d5dc4",
+            "k8s-app": "kube-proxy",
+            "pod-template-generation": "1"
+        },
+        "node": {
+            "hostname": "kind-control-plane",
+            "name": "kind-control-plane",
+            "uid": "53dd2b43-2488-4cac-9702-921dbd7cf411",
+            "labels": {
+                "beta_kubernetes_io/arch": "amd64",
+                "beta_kubernetes_io/os": "linux",
+                "kubernetes_io/arch": "amd64",
+                "kubernetes_io/hostname": "kind-control-plane",
+                "kubernetes_io/os": "linux",
+                "node-role_kubernetes_io/control-plane": "",
+                "node_kubernetes_io/exclude-from-external-load-balancers": ""
             }
         }
     },
@@ -25,8 +52,23 @@
         "name": "state_pod",
         "period": 10000
     },
-    "service": {
-        "address": "127.0.0.1:55555",
-        "type": "kubernetes"
+    "agent": {
+        "version": "8.7.0",
+        "ephemeral_id": "34c08eda-7485-4da3-99b1-e47d268cdcb4",
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901",
+        "name": "kind-control-plane",
+        "type": "metricbeat"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "kind-control-plane"
+    },
+    "orchestrator": {
+        "cluster": {
+            "url": "kind-control-plane:6443",
+            "name": "kind"
+        }
     }
 }

@@ -6,10 +6,10 @@
   fields:
     - name: name
       type: keyword
-      description: Service name.
+      description: Service name
     - name: cluster_ip
       type: keyword
-      description: Internal IP for the service.
+      description: Internal IP for the service
     - name: external_name
       type: keyword
       description: Service external DNS name

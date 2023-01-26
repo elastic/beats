@@ -1,0 +1,344 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "true",
+			"name": "hello-cronjob-27899488",
+			"status": {
+				"complete": true
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "unknown",
+			"name": "hello-cronjob-27899487",
+			"status": {
+				"complete": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"completions": {
+				"desired": 1
+			},
+			"name": "hello-cronjob-27899489",
+			"parallelism": {
+				"desired": 1
+			},
+			"pods": {
+				"active": 0,
+				"failed": 0,
+				"succeeded": 1
+			},
+			"time": {
+				"completed": "2023-01-17T15:29:04.000Z",
+				"created": "2023-01-17T15:29:00.000Z"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "false",
+			"name": "hello-cronjob-27899489",
+			"status": {
+				"complete": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"completions": {
+				"desired": 1
+			},
+			"name": "pi",
+			"parallelism": {
+				"desired": 1
+			},
+			"pods": {
+				"active": 1,
+				"failed": 0,
+				"succeeded": 0
+			},
+			"time": {
+				"created": "2023-01-17T15:29:15.000Z"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "true",
+			"name": "hello-cronjob-27899489",
+			"status": {
+				"complete": true
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "unknown",
+			"name": "hello-cronjob-27899489",
+			"status": {
+				"complete": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "false",
+			"name": "hello-cronjob-27899487",
+			"status": {
+				"complete": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"completions": {
+				"desired": 1
+			},
+			"name": "hello-cronjob-27899487",
+			"parallelism": {
+				"desired": 1
+			},
+			"pods": {
+				"active": 0,
+				"failed": 0,
+				"succeeded": 1
+			},
+			"time": {
+				"completed": "2023-01-17T15:27:04.000Z",
+				"created": "2023-01-17T15:27:00.000Z"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "true",
+			"name": "hello-cronjob-27899487",
+			"status": {
+				"complete": true
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "false",
+			"name": "hello-cronjob-27899488",
+			"status": {
+				"complete": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"completions": {
+				"desired": 1
+			},
+			"name": "hello-cronjob-27899488",
+			"parallelism": {
+				"desired": 1
+			},
+			"pods": {
+				"active": 0,
+				"failed": 0,
+				"succeeded": 1
+			},
+			"time": {
+				"completed": "2023-01-17T15:28:04.000Z",
+				"created": "2023-01-17T15:28:00.000Z"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"condition": "unknown",
+			"name": "hello-cronjob-27899488",
+			"status": {
+				"complete": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

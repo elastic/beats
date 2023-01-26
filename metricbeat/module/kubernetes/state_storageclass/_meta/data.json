@@ -1,47 +1,41 @@
 {
-  "@timestamp": "2020-02-07T17:10:12.124Z",
-  "@metadata": {
-    "beat": "metricbeat",
-    "type": "_doc",
-    "version": "8.0.0"
-  },
-  "service": {
-    "address": "192.168.39.32:32042",
-    "type": "kubernetes"
-  },
-  "kubernetes": {
-    "storageclass": {
-      "volume_binding_mode": "Immediate",
-      "name": "beats-test-sc2",
-      "created": "2020-02-07T10:14:28.000Z",
-      "provisioner": "kubernetes.io/non-existing2",
-      "reclaim_policy": "Delete"
+    "@timestamp": "2023-01-25T17:19:44.822Z",
+    "service": {
+        "address": "http://kube-state-metrics:8080/metrics",
+        "type": "kubernetes"
     },
-    "labels": {
-      "testl3": "value3",
-      "testl4": "value4"
+    "event": {
+        "dataset": "kubernetes.storageclass",
+        "module": "kubernetes",
+        "duration": 150940
+    },
+    "kubernetes": {
+        "storageclass": {
+            "created": "2023-01-25T09:26:36.000Z",
+            "name": "standard"
+        }
+    },
+    "metricset": {
+        "period": 10000,
+        "name": "state_storageclass"
+    },
+    "orchestrator": {
+        "cluster": {
+            "url": "kind-control-plane:6443",
+            "name": "kind"
+        }
+    },
+    "agent": {
+        "ephemeral_id": "34c08eda-7485-4da3-99b1-e47d268cdcb4",
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901",
+        "name": "kind-control-plane",
+        "type": "metricbeat",
+        "version": "8.7.0"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "kind-control-plane"
     }
-  },
-  "event": {
-    "duration": 13684387,
-    "dataset": "kubernetes.storageclass",
-    "module": "kubernetes"
-  },
-  "ecs": {
-    "version": "1.4.0"
-  },
-  "host": {
-    "name": "pl51"
-  },
-  "agent": {
-    "version": "8.0.0",
-    "type": "metricbeat",
-    "ephemeral_id": "f4458304-dc2e-4831-be7a-45cd34126fd2",
-    "hostname": "tamag8",
-    "id": "e9952df4-592e-4102-84a6-ad0b333b3b98"
-  },
-  "metricset": {
-    "name": "state_storageclass",
-    "period": 10000
-  }
 }

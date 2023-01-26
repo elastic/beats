@@ -1,32 +1,45 @@
-# Kube-state-metrics/PersistentVolume
+### Version history
+
+**January 2023**: Kube state metrics versions 2.4.2-2.7.0
+
+### Resources
+
+- [State persistent volume metrics](https://github.com/kubernetes/kube-state-metrics/blob/main/internal/store/persistentvolume.go):
+  declaration and description
+
+### Metrics insight
+
+All metrics have the label:
+- persistentvolume
+
+Additionally:
+- kube_persistentvolume_capacity_bytes
+- kube_persistentvolume_status_phase
+  - phase
+- kube_persistentvolume_labels
+- kube_persistentvolume_info
+  - storageclass
+  - gce_persistent_disk_name
+  - ebs_volume_id
+  - azure_disk_name
+  - fc_wwids
+  - fc_lun
+  - fc_target_wwns
+  - iscsi_target_portal
+  - iscsi_iqn
+  - iscsi_lun
+  - iscsi_initiator_name
+  - nfs_server
+  - nfs_path
+  - csi_driver
+  - csi_volume_handle
+  - local_path
+  - local_fs
+  - host_path
+  - host_path_type
 
 
-This metricset connects to kube-state-metrics endpoint to retrieve and report Persistent Volume metrics.
 
-## Version history
+### Setup environment for manual tests
+Go to `metricbeat/module/kubernetes/_meta/test/docs`.
 
-- November 2019, first release using kube-state-metrics `v1.8.0`.
-
-## Configuration
-
-See the metricset documentation for the configuration reference.
-
-## Manual testing
-
-Running a minikube cluster allows you to create persistent volume using the `/data/` directory at hostpath
-
-```yaml
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv0001
-spec:
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 5Gi
-  hostPath:
-    path: /data/pv0001/
-```
-
-Try adding labels, and creating volumes from pods using PVC.

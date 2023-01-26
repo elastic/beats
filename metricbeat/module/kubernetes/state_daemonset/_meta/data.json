@@ -1,28 +1,56 @@
 {
-    "@timestamp": "2019-03-01T08:05:34.853Z",
-    "event": {
-        "dataset": "kubernetes.daemonset",
-        "duration": 115000,
-        "module": "kubernetes"
+    "@timestamp": "2023-01-25T17:12:14.815Z",
+    "ecs": {
+        "version": "8.0.0"
     },
-    "kubernetes": {
-        "daemonset": {
-            "name": "kube-proxy",
-            "replicas": {
-                "available": 1,
-                "desired": 1,
-                "ready": 1,
-                "unavailable": 0
-            }
-        },
-        "namespace": "kube-system"
+    "host": {
+        "name": "kind-control-plane"
+    },
+    "service": {
+        "address": "http://kube-state-metrics:8080/metrics",
+        "type": "kubernetes"
+    },
+    "orchestrator": {
+        "cluster": {
+            "url": "kind-control-plane:6443",
+            "name": "kind"
+        }
+    },
+    "event": {
+        "duration": 539441,
+        "dataset": "kubernetes.daemonset",
+        "module": "kubernetes"
     },
     "metricset": {
         "name": "state_daemonset",
         "period": 10000
     },
-    "service": {
-        "address": "127.0.0.1:55555",
-        "type": "kubernetes"
+    "kubernetes": {
+        "namespace": "kube-system",
+        "labels": {
+            "k8s-app": "kindnet",
+            "tier": "node",
+            "app": "kindnet"
+        },
+        "daemonset": {
+            "replicas": {
+                "desired": 1,
+                "unavailable": 0,
+                "available": 1,
+                "ready": 1
+            },
+            "name": "kindnet"
+        },
+        "namespace_uid": "b4caac51-7edb-4ccf-929a-5c569365224f",
+        "namespace_labels": {
+            "kubernetes_io/metadata_name": "kube-system"
+        }
+    },
+    "agent": {
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901",
+        "name": "kind-control-plane",
+        "type": "metricbeat",
+        "version": "8.7.0",
+        "ephemeral_id": "34c08eda-7485-4da3-99b1-e47d268cdcb4"
     }
 }

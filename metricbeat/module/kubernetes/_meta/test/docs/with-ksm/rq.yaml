@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: resource-pods-limit
+spec:
+  hard:
+    pods: "200"

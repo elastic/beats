@@ -1,0 +1,7 @@
+resources:
+  - rq.yaml
+  - github.com/kubernetes/kube-state-metrics?ref=main
+  - ../without-ksm
+
+patchesStrategicMerge:
+  - metricbeat.yaml

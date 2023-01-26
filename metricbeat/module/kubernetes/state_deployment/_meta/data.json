@@ -1,28 +1,52 @@
 {
-  "@timestamp": "2017-05-10T16:44:27.915Z",
-  "beat": {
-    "hostname": "X1",
-    "name": "X1",
-    "version": "6.0.0-alpha1"
-  },
-  "kubernetes": {
-    "deployment": {
-      "name": "wise-lynx-jenkins",
-      "paused": false,
-      "replicas": {
-        "available": 1,
-        "desired": 1,
-        "unavailable": 0,
-        "updated": 1
-      }
+    "@timestamp": "2023-01-25T17:12:44.817Z",
+    "orchestrator": {
+        "cluster": {
+            "url": "kind-control-plane:6443",
+            "name": "kind"
+        }
     },
-    "namespace": "jenkins"
-  },
-  "metricset": {
-    "host": "192.168.99.100:18080",
-    "module": "kubernetes",
-    "name": "state_deployment",
-    "namespace": "deployment",
-    "rtt": 198882
-  }
+    "event": {
+        "dataset": "kubernetes.deployment",
+        "module": "kubernetes",
+        "duration": 7378186
+    },
+    "metricset": {
+        "period": 10000,
+        "name": "state_deployment"
+    },
+    "service": {
+        "address": "http://kube-state-metrics:8080/metrics",
+        "type": "kubernetes"
+    },
+    "kubernetes": {
+        "namespace_labels": {
+            "kubernetes_io/metadata_name": "local-path-storage"
+        },
+        "namespace": "local-path-storage",
+        "deployment": {
+            "replicas": {
+                "updated": 1,
+                "available": 1,
+                "unavailable": 0,
+                "desired": 1
+            },
+            "paused": false,
+            "name": "local-path-provisioner"
+        },
+        "namespace_uid": "7d24345c-eab1-45cd-a677-3f6134414ea1"
+    },
+    "agent": {
+        "ephemeral_id": "34c08eda-7485-4da3-99b1-e47d268cdcb4",
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901",
+        "name": "kind-control-plane",
+        "type": "metricbeat",
+        "version": "8.7.0"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "kind-control-plane"
+    }
 }

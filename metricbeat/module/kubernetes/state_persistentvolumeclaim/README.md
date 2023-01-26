@@ -1,50 +1,30 @@
-# Kube-state-metrics/PersistentVolumeClaim
+### Version history
 
-This metricset connects to kube-state-metrics endpoint to retrieve and report Persistent Volume Claim metrics.
+**January 2023**: Kube state metrics versions 2.4.2-2.7.0
 
-## Version history
+### Resources
 
-- November 2019, first release using kube-state-metrics `v1.8.0`.
+- [State persistent volume claim metrics](https://github.com/kubernetes/kube-state-metrics/blob/main/internal/store/persistentvolumeclaim.go):
+  declaration and description
 
-## Configuration
+### Metrics insight
 
-See the metricset documentation for the configuration reference.
+All metrics have the label:
+- namespace
+- persistentvolumeclaim
 
-## Manual testing
+Additionally:
+- kube_persistentvolumeclaim_access_mode
+  - access_mode
+- kube_persistentvolumeclaim_labels
+- kube_persistentvolumeclaim_info
+  - storageclass
+  - volumename
+- kube_persistentvolumeclaim_resource_requests_storage_bytes
+- kube_persistentvolumeclaim_status_phase
+  - phase
 
-Create Persistent Volume Claims.
-- Use non existent storage classes to stuck them pending
-```
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: claim2
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 8Gi
-  storageClassName: notexisting
-  volumeMode: Filesystem
-```
 
-- Add labels
-```
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    category: disposable
-    team: observability
-  name: claim1
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 80Gi
-  storageClassName: standard
-  volumeMode: Filesystem
-```
+### Setup environment for manual tests
+Go to `metricbeat/module/kubernetes/_meta/test/docs`.
 

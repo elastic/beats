@@ -1,24 +1,21 @@
 {
-    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "@timestamp": "2023-01-25T17:19:14.823Z",
+    "agent": {
+        "type": "metricbeat",
+        "version": "8.7.0",
+        "ephemeral_id": "34c08eda-7485-4da3-99b1-e47d268cdcb4",
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901",
+        "name": "kind-control-plane"
+    },
     "event": {
         "dataset": "kubernetes.statefulset",
-        "duration": 115000,
-        "module": "kubernetes"
+        "module": "kubernetes",
+        "duration": 6258967
     },
-    "kubernetes": {
-        "namespace": "default",
-        "statefulset": {
-            "created": 1511989697,
-            "generation": {
-                "desired": 4,
-                "observed": 2
-            },
-            "name": "mysql",
-            "replicas": {
-                "desired": 5,
-                "observed": 2,
-                "ready": 2
-            }
+    "orchestrator": {
+        "cluster": {
+            "url": "kind-control-plane:6443",
+            "name": "kind"
         }
     },
     "metricset": {
@@ -26,7 +23,33 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:55555",
-        "type": "kubernetes"
+        "type": "kubernetes",
+        "address": "http://kube-state-metrics:8080/metrics"
+    },
+    "kubernetes": {
+        "statefulset": {
+            "replicas": {
+                "ready": 1,
+                "desired": 1,
+                "observed": 1
+            },
+            "created": 1674666293,
+            "name": "web",
+            "generation": {
+                "observed": 1,
+                "desired": 1
+            }
+        },
+        "namespace": "default",
+        "namespace_uid": "fda391d1-12f1-479c-a50d-d5c7b554ed66",
+        "namespace_labels": {
+            "kubernetes_io/metadata_name": "default"
+        }
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "kind-control-plane"
     }
 }

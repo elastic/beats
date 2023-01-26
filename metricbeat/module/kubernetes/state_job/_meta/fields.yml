@@ -8,6 +8,31 @@
       type: keyword
       description: >
         The name of the job resource
+    - name: namespace
+      type: keyword
+      description: >
+        The namespace of the job resource
+    - name: condition
+      type: keyword
+      description: >
+        Whether the job completed/failed
+    - name: owner
+      type: group
+      description: >
+        Kubernetes job owner information
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            The name of the resource that owns this job
+        - name: kind
+          type: keyword
+          description: >
+            The kind of resource that owns this job (eg. "CronJob")
+        - name: is_controller
+          type: keyword
+          description: >
+            Whether the owner is controller
     - name: pods
       type: group
       description: >
@@ -25,6 +50,14 @@
           type: long
           description: >
             Number of successful pods
+    - name: completions.desired
+      type: long
+      description: >
+        The desired number of successfully finished pods the job should be run with
+    - name: parallelism.desired
+      type: long
+      description: >
+        The maximum desired number of pods the job should run at any given time
     - name: time
       type: group
       description: >
@@ -33,46 +66,11 @@
         - name: created
           type: date
           description: >
-            The time at which the job was created
+            The unix time at which the job was created
         - name: completed
           type: date
           description: >
-            The time at which the job completed
-    - name: completions
-      type: group
-      description: >
-        Kubernetes job completion settings
-      fields:
-        - name: desired
-          type: long
-          description: >
-            The configured completion count for the job (Spec)
-    - name: parallelism
-      type: group
-      description: >
-        Kubernetes job parallelism settings
-      fields:
-        - name: desired
-          type: long
-          description: >
-            The configured parallelism of the job (Spec)
-    - name: owner
-      type: group
-      description: >
-        Kubernetes job owner information
-      fields:
-        - name: name
-          type: keyword
-          description: >
-            The name of the resource that owns this job
-        - name: kind
-          type: keyword
-          description: >
-            The kind of resource that owns this job (eg. "CronJob")
-        - name: is_controller
-          type: keyword
-          description: >
-            Owner is controller ("true", "false", or "<none>")
+            The unix time at which the job completed
     - name: status
       type: group
       description: >
@@ -81,8 +79,8 @@
         - name: complete
           type: keyword
           description: >
-            Whether the job completed ("true", "false", or "unknown")
+            Whether the job completed
         - name: failed
           type: keyword
           description: >
-            Whether the job failed ("true", "false", or "unknown")
+            Whether the job failed

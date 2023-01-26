@@ -4,65 +4,42 @@
     kubernetes node metrics
   release: ga
   fields:
+    - name: name
+      type: keyword
+      description:
+        Node name
+    - name: condition
+      type: keyword
+      description:
+        Node condition
+    - name: status
+      type: keyword
+      description:
+        Status of a node condition
+    - name: resource
+      type: keyword
+      description:
+        Name of the resource
+    - name: unit
+      type: keyword
+      description:
+        Resource unit
     - name: status
       type: group
       fields:
-        - name: ready
-          type: keyword
-          description: >
-            Node ready status (true, false or unknown)
         - name: unschedulable
           type: boolean
           description: >
-            Node unschedulable status
-        - name: memory_pressure
-          type: keyword
-          description: >
-            Node MemoryPressure status (true, false or unknown)
-        - name: disk_pressure
-          type: keyword
-          description: >
-            Node DiskPressure status (true, false or unknown)
-        - name: out_of_disk
-          type: keyword
-          description: >
-            Node OutOfDisk status (true, false or unknown)
-        - name: pid_pressure
-          type: keyword
-          description: >
-            Node PIDPressure status (true, false or unknown)
-    - name: cpu
-      type: group
-      fields:
-        - name: allocatable.cores
-          type: float
-          description: >
-            The allocatable CPU cores of a node that are available for pods scheduling
-        - name: capacity.cores
+            Whether a node can schedule new pods
+        - name: allocatable
           type: long
           description: >
-            Node CPU capacity cores
-    - name: memory
-      type: group
-      fields:
-        - name: allocatable.bytes
-          type: long
-          format: bytes
-          description: >
-            The allocatable memory of a node in bytes that is available for pods scheduling
-        - name: capacity.bytes
-          type: long
-          format: bytes
-          description: >
-            Node memory capacity in bytes
-    - name: pod
-      type: group
-      fields:
-        - name: allocatable.total
+            The allocatable for different resources of a node that are available for scheduling
+        - name: capacity
           type: long
           description: >
-            Node allocatable pods
-        - name: capacity.total
-          type: long
+            The capacity for different resources of a node
+        - name: condition
+          type: boolean
           description: >
-            Node pod capacity
+            The condition of a cluster node

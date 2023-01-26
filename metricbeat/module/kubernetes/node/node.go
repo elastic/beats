@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -44,7 +43,7 @@ var (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("kubernetes", "node", New,
+	mb.Registry.MustAddMetricSet("kubernetes", util.NodeResource, New,
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
@@ -76,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Node{}, mod.GetMetricsRepo(), false),
+		enricher:      util.NewResourceMetadataEnricher(base, util.NodeResource, mod.GetMetricsRepo(), false),
 		mod:           mod,
 	}, nil
 }

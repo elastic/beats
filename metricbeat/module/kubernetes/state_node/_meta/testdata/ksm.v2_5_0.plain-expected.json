@@ -1,0 +1,469 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "Ready",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "Ready",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "PIDPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": true
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "DiskPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": true
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "name": "kind-control-plane",
+                "resource": "memory",
+                "status": {
+                    "allocatable": 16259682304,
+                    "capacity": 16259682304
+                },
+                "unit": "byte"
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "name": "kind-control-plane",
+                "resource": "ephemeral_storage",
+                "status": {
+                    "allocatable": 67317051392,
+                    "capacity": 67317051392
+                },
+                "unit": "byte"
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "DiskPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "DiskPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "name": "kind-control-plane",
+                "resource": "pods",
+                "status": {
+                    "allocatable": 110,
+                    "capacity": 110
+                },
+                "unit": "integer"
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "name": "kind-control-plane",
+                "status": {
+                    "unschedulable": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "name": "kind-control-plane",
+                "resource": "cpu",
+                "status": {
+                    "allocatable": 8,
+                    "capacity": 8
+                },
+                "unit": "core"
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "Ready",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": true
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "MemoryPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "MemoryPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "name": "kind-control-plane",
+                "resource": "hugepages_2Mi",
+                "status": {
+                    "allocatable": 0,
+                    "capacity": 0
+                },
+                "unit": "byte"
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "PIDPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "PIDPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "name": "kind-control-plane",
+                "resource": "hugepages_1Gi",
+                "status": {
+                    "allocatable": 0,
+                    "capacity": 0
+                },
+                "unit": "byte"
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "condition": "MemoryPressure",
+                "name": "kind-control-plane",
+                "status": {
+                    "condition": true
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

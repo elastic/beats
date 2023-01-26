@@ -1,48 +1,55 @@
 {
-  "@timestamp": "2017-05-10T16:45:47.726Z",
-  "beat": {
-    "hostname": "X1",
-    "name": "X1",
-    "version": "6.0.0-alpha1"
-  },
-  "kubernetes": {
-    "node": {
-      "cpu": {
-        "allocatable": {
-          "cores": 2
-        },
-        "capacity": {
-          "cores": 2
+    "@timestamp": "2023-01-25T17:14:24.818Z",
+    "agent": {
+        "ephemeral_id": "34c08eda-7485-4da3-99b1-e47d268cdcb4",
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901",
+        "name": "kind-control-plane",
+        "type": "metricbeat",
+        "version": "8.7.0"
+    },
+    "orchestrator": {
+        "cluster": {
+            "url": "kind-control-plane:6443",
+            "name": "kind"
         }
-      },
-      "memory": {
-        "allocatable": {
-          "bytes": 2097786880
+    },
+    "event": {
+        "dataset": "kubernetes.node",
+        "module": "kubernetes",
+        "duration": 352434
+    },
+    "metricset": {
+        "name": "state_node",
+        "period": 10000
+    },
+    "service": {
+        "address": "http://kube-state-metrics:8080/metrics",
+        "type": "kubernetes"
+    },
+    "kubernetes": {
+        "node": {
+            "unit": "byte",
+            "status": {
+                "allocatable": 67317051392,
+                "capacity": 67317051392
+            },
+            "name": "kind-control-plane",
+            "resource": "ephemeral_storage"
         },
-        "capacity": {
-          "bytes": 2097786880
+        "labels": {
+            "beta_kubernetes_io/arch": "amd64",
+            "beta_kubernetes_io/os": "linux",
+            "kubernetes_io/arch": "amd64",
+            "kubernetes_io/hostname": "kind-control-plane",
+            "kubernetes_io/os": "linux",
+            "node-role_kubernetes_io/control-plane": "",
+            "node_kubernetes_io/exclude-from-external-load-balancers": ""
         }
-      },
-      "name": "minikube",
-      "pod": {
-        "allocatable": {
-          "total": 110
-        },
-        "capacity": {
-          "total": 110
-        }
-      },
-      "status": {
-        "ready": "true",
-        "unschedulable": false
-      }
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "kind-control-plane"
     }
-  },
-  "metricset": {
-    "host": "192.168.99.100:18080",
-    "module": "kubernetes",
-    "name": "state_node",
-    "namespace": "node",
-    "rtt": 94611
-  }
 }

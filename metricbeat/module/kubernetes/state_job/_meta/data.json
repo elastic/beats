@@ -1,45 +1,56 @@
 {
-  "@timestamp": "2021-06-24T13:52:28.941Z",
-  "event": {
-    "dataset": "kubernetes.job",
-    "module": "kubernetes",
-    "duration": 159363320
-  },
-  "metricset": {
-    "name": "state_job",
-    "period": 10000
-  },
-  "service": {
-    "address": "http://localhost:8080/metrics",
-    "type": "kubernetes"
-  },
-  "kubernetes": {
-    "namespace": "parallel-ns",
-    "job": {
-      "status": {
-        "complete": "true"
-      },
-      "parallelism": {
-        "desired": 5
-      },
-      "owner": {
-        "kind": "CronJob",
-        "name": "sleep-5-parallel-cron",
-        "is_controller": "true"
-      },
-      "name": "sleep-5-parallel-cron-27075669",
-      "completions": {
-        "desired": 20
-      },
-      "time": {
-        "created": "2021-06-24T13:09:00.000Z",
-        "completed": "2021-06-24T13:38:57.000Z"
-      },
-      "pods": {
-        "active": 0,
-        "succeeded": 20,
-        "failed": 0
-      }
+    "@timestamp": "2023-01-25T17:07:34.813Z",
+    "service": {
+        "type": "kubernetes",
+        "address": "http://kube-state-metrics:8080/metrics"
+    },
+    "kubernetes": {
+        "namespace_labels": {
+            "kubernetes_io/metadata_name": "default"
+        },
+        "cronjob": {
+            "name": "hello"
+        },
+        "labels": {
+            "controller-uid": "2969c02d-8477-4569-97fd-418a42eb759d",
+            "job-name": "hello-27911106"
+        },
+        "namespace": "default",
+        "job": {
+            "name": "hello-27911106",
+            "condition": "false",
+            "status": {
+                "complete": false
+            }
+        },
+        "namespace_uid": "fda391d1-12f1-479c-a50d-d5c7b554ed66"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "kind-control-plane"
+    },
+    "agent": {
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901",
+        "name": "kind-control-plane",
+        "type": "metricbeat",
+        "version": "8.7.0",
+        "ephemeral_id": "34c08eda-7485-4da3-99b1-e47d268cdcb4"
+    },
+    "event": {
+        "dataset": "kubernetes.job",
+        "module": "kubernetes",
+        "duration": 5960197
+    },
+    "orchestrator": {
+        "cluster": {
+            "name": "kind",
+            "url": "kind-control-plane:6443"
+        }
+    },
+    "metricset": {
+        "name": "state_job",
+        "period": 10000
     }
-  }
 }

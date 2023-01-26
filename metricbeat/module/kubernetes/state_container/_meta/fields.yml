@@ -8,6 +8,18 @@
       type: keyword
       description:
         Container id
+    - name: resource
+      type: keyword
+      description:
+        Resource kind
+    - name: unit
+      type: keyword
+      description:
+        Resource kind metric unit
+    - name: reason
+      type: keyword
+      description:
+        Reason for resource status change
     - name: status
       type: group
       fields:
@@ -19,7 +31,7 @@
           type: boolean
           description: >
             Container ready status
-        - name: restarts
+        - name: restarts.count
           type: integer
           description: >
             Container restarts count
@@ -32,27 +44,3 @@
           type: keyword
           description: >
             The last reason the container was in terminated state (Completed, ContainerCannotRun, Error or OOMKilled).
-    - name: cpu
-      type: group
-      fields:
-        - name: limit.cores
-          type: float
-          description: >
-            Container CPU cores limit
-        - name: request.cores
-          type: float
-          description: >
-            Container CPU requested cores
-    - name: memory
-      type: group
-      fields:
-        - name: limit.bytes
-          type: long
-          format: bytes
-          description: >
-            Container memory limit in bytes
-        - name: request.bytes
-          type: long
-          format: bytes
-          description: >
-            Container requested memory in bytes

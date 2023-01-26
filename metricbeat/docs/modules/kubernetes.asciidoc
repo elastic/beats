@@ -396,6 +396,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
 
+* <<metricbeat-metricset-kubernetes-state_persistentvolume,state_persistentvolume>>
+
 * <<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>
 
 * <<metricbeat-metricset-kubernetes-state_pod,state_pod>>
@@ -441,6 +443,8 @@ include::kubernetes/state_deployment.asciidoc[]
 include::kubernetes/state_job.asciidoc[]
 
 include::kubernetes/state_node.asciidoc[]
+
+include::kubernetes/state_persistentvolume.asciidoc[]
 
 include::kubernetes/state_persistentvolumeclaim.asciidoc[]
 

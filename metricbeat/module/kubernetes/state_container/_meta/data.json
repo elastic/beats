@@ -1,74 +1,85 @@
 {
-  "@timestamp": "2019-10-02T16:47:01.499Z",
-  "metricset": {
-    "name": "state_container",
-    "period": 10000
-  },
-  "service": {
-    "address": "kube-state-metrics.kube-system:8080",
-    "type": "kubernetes"
-  },
-  "kubernetes": {
-    "labels": {
-      "app": "playground"
+    "@timestamp": "2023-01-25T11:16:20.840Z",
+    "event": {
+        "dataset": "kubernetes.container",
+        "module": "kubernetes",
+        "duration": 4487922
     },
     "container": {
-      "name": "ubuntu",
-      "cpu": {
-        "request": {
-            "cores": 0.15
+        "id": "1054201d73042965915ad48cb9ac1f1b8fb488e6d5588fd42692bdb5214a573c",
+        "runtime": "containerd",
+        "image": {
+            "name": "docker.io/library/busybox:latest"
         }
-      },
-      "id": "docker://5f8ce416d10ab0b28ce5c7d521de2264aa03ff4d001e1194076f6a02a330139f",
-      "status": {
-        "ready": true,
-        "restarts": 0,
-        "phase": "running"
-      }
     },
-    "pod": {
-      "name": "playground",
-      "uid": "d52bd3cb-df62-4cb5-b293-7009055bcaff"
+    "host": {
+        "name": "kind-control-plane"
     },
-    "namespace": "default",
-    "node": {
-      "name": "minikube"
+    "agent": {
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901",
+        "name": "kind-control-plane",
+        "type": "metricbeat",
+        "version": "8.7.0",
+        "ephemeral_id": "7f590f74-4750-4cfb-973c-d3128a1c57f8"
+    },
+    "service": {
+        "address": "http://kube-state-metrics:8080/metrics",
+        "type": "kubernetes"
+    },
+    "orchestrator": {
+        "cluster": {
+            "url": "kind-control-plane:6443",
+            "name": "kind"
+        }
+    },
+    "metricset": {
+        "name": "state_container",
+        "period": 10000
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "kubernetes": {
+        "job": {
+            "name": "hello"
+        },
+        "labels": {
+            "job-name": "hello",
+            "controller-uid": "9e655af3-c0e8-486c-bf93-415ef883985a"
+        },
+        "namespace_uid": "fda391d1-12f1-479c-a50d-d5c7b554ed66",
+        "container": {
+            "id": "containerd://1054201d73042965915ad48cb9ac1f1b8fb488e6d5588fd42692bdb5214a573c",
+            "name": "hello",
+            "status": {
+                "reason": "Completed",
+                "phase": "terminated",
+                "restarts": 0,
+                "ready": false
+            }
+        },
+        "namespace": "default",
+        "pod": {
+            "name": "hello-cj4sd",
+            "uid": "4c4f1e80-c763-41ae-b333-bc2476b62e24",
+            "ip": "10.244.0.121"
+        },
+        "node": {
+            "name": "kind-control-plane",
+            "uid": "53dd2b43-2488-4cac-9702-921dbd7cf411",
+            "labels": {
+                "beta_kubernetes_io/arch": "amd64",
+                "beta_kubernetes_io/os": "linux",
+                "kubernetes_io/arch": "amd64",
+                "kubernetes_io/hostname": "kind-control-plane",
+                "kubernetes_io/os": "linux",
+                "node-role_kubernetes_io/control-plane": "",
+                "node_kubernetes_io/exclude-from-external-load-balancers": ""
+            },
+            "hostname": "kind-control-plane"
+        },
+        "namespace_labels": {
+            "kubernetes_io/metadata_name": "default"
+        }
     }
-  },
-  "host": {
-    "os": {
-      "codename": "bionic",
-      "platform": "ubuntu",
-      "version": "18.04.3 LTS (Bionic Beaver)",
-      "family": "debian",
-      "name": "Ubuntu",
-      "kernel": "4.15.0"
-    },
-    "containerized": false,
-    "hostname": "minikube",
-    "name": "minikube",
-    "architecture": "x86_64"
-  },
-  "agent": {
-    "version": "8.0.0",
-    "type": "metricbeat",
-    "ephemeral_id": "fed15ef3-ab8f-4e11-aded-115ff923bc1e",
-    "hostname": "minikube",
-    "id": "0df400e0-a5fc-40cc-a0c6-b99029a30cd5"
-  },
-  "ecs": {
-    "version": "1.1.0"
-  },
-  "container": {
-    "runtime": "docker",
-    "id": "5f8ce416d10ab0b28ce5c7d521de2264aa03ff4d001e1194076f6a02a330139f",
-    "image": {
-      "name": "ubuntu:latest"
-    },
-  },
-  "event": {
-    "dataset": "kubernetes.container",
-    "module": "kubernetes",
-    "duration": 33750820
-  }
 }

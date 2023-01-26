@@ -1,0 +1,446 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "completions": {
+                    "desired": 1
+                },
+                "name": "hello-cronjob-27899499",
+                "parallelism": {
+                    "desired": 1
+                },
+                "pods": {
+                    "active": 0,
+                    "failed": 0,
+                    "succeeded": 1
+                },
+                "time": {
+                    "completed": "2023-01-17T15:39:04.000Z",
+                    "created": "2023-01-17T15:39:00.000Z"
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "true",
+                "name": "hello-cronjob-27899499",
+                "status": {
+                    "complete": true
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "unknown",
+                "name": "hello-cronjob-27899497",
+                "status": {
+                    "complete": false
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "true",
+                "name": "hello-cronjob-27899497",
+                "status": {
+                    "complete": true
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "completions": {
+                    "desired": 1
+                },
+                "name": "hello-cronjob-27899497",
+                "parallelism": {
+                    "desired": 1
+                },
+                "pods": {
+                    "active": 0,
+                    "failed": 0,
+                    "succeeded": 1
+                },
+                "time": {
+                    "completed": "2023-01-17T15:37:04.000Z",
+                    "created": "2023-01-17T15:37:00.000Z"
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "unknown",
+                "name": "hello-cronjob-27899498",
+                "status": {
+                    "complete": false
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "completions": {
+                    "desired": 1
+                },
+                "name": "hello-cronjob-27899498",
+                "parallelism": {
+                    "desired": 1
+                },
+                "pods": {
+                    "active": 0,
+                    "failed": 0,
+                    "succeeded": 1
+                },
+                "time": {
+                    "completed": "2023-01-17T15:38:04.000Z",
+                    "created": "2023-01-17T15:38:00.000Z"
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "false",
+                "name": "hello-cronjob-27899499",
+                "status": {
+                    "complete": false
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "true",
+                "name": "hello-cronjob-27899498",
+                "status": {
+                    "complete": true
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "unknown",
+                "name": "pi",
+                "status": {
+                    "complete": false
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "false",
+                "name": "hello-cronjob-27899498",
+                "status": {
+                    "complete": false
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "unknown",
+                "name": "hello-cronjob-27899499",
+                "status": {
+                    "complete": false
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "false",
+                "name": "pi",
+                "status": {
+                    "complete": false
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "true",
+                "name": "pi",
+                "status": {
+                    "complete": true
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "completions": {
+                    "desired": 1
+                },
+                "name": "pi",
+                "parallelism": {
+                    "desired": 1
+                },
+                "pods": {
+                    "active": 0,
+                    "failed": 0,
+                    "succeeded": 1
+                },
+                "time": {
+                    "completed": "2023-01-17T15:30:11.000Z",
+                    "created": "2023-01-17T15:29:15.000Z"
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.job",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "job": {
+                "condition": "false",
+                "name": "hello-cronjob-27899497",
+                "status": {
+                    "complete": false
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_job",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

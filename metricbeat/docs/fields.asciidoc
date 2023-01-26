@@ -45213,6 +45213,33 @@ type: keyword
 
 --
 
+*`kubernetes.container.resource`*::
++
+--
+Resource kind
+
+type: keyword
+
+--
+
+*`kubernetes.container.unit`*::
++
+--
+Resource kind metric unit
+
+type: keyword
+
+--
+
+*`kubernetes.container.reason`*::
++
+--
+Reason for resource status change
+
+type: keyword
+
+--
+
 
 *`kubernetes.container.status.phase`*::
 +
@@ -45234,7 +45261,7 @@ type: boolean
 
 --
 
-*`kubernetes.container.status.restarts`*::
+*`kubernetes.container.status.restarts.count`*::
 +
 --
 Container restarts count
@@ -45261,52 +45288,6 @@ The last reason the container was in terminated state (Completed, ContainerCanno
 
 
 type: keyword
-
---
-
-
-*`kubernetes.container.cpu.limit.cores`*::
-+
---
-Container CPU cores limit
-
-
-type: float
-
---
-
-*`kubernetes.container.cpu.request.cores`*::
-+
---
-Container CPU requested cores
-
-
-type: float
-
---
-
-
-*`kubernetes.container.memory.limit.bytes`*::
-+
---
-Container memory limit in bytes
-
-
-type: long
-
-format: bytes
-
---
-
-*`kubernetes.container.memory.request.bytes`*::
-+
---
-Container requested memory in bytes
-
-
-type: long
-
-format: bytes
 
 --
 
@@ -45540,6 +45521,63 @@ type: keyword
 
 --
 
+*`kubernetes.job.namespace`*::
++
+--
+The namespace of the job resource
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.condition`*::
++
+--
+Whether the job completed/failed
+
+
+type: keyword
+
+--
+
+[float]
+=== owner
+
+Kubernetes job owner information
+
+
+
+*`kubernetes.job.owner.name`*::
++
+--
+The name of the resource that owns this job
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.owner.kind`*::
++
+--
+The kind of resource that owns this job (eg. "CronJob")
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.owner.is_controller`*::
++
+--
+Whether the owner is controller
+
+
+type: keyword
+
+--
+
 [float]
 === pods
 
@@ -45577,6 +45615,26 @@ type: long
 
 --
 
+*`kubernetes.job.completions.desired`*::
++
+--
+The desired number of successfully finished pods the job should be run with
+
+
+type: long
+
+--
+
+*`kubernetes.job.parallelism.desired`*::
++
+--
+The maximum desired number of pods the job should run at any given time
+
+
+type: long
+
+--
+
 [float]
 === time
 
@@ -45587,7 +45645,7 @@ Kubernetes job timestamps
 *`kubernetes.job.time.created`*::
 +
 --
-The time at which the job was created
+The unix time at which the job was created
 
 
 type: date
@@ -45597,81 +45655,10 @@ type: date
 *`kubernetes.job.time.completed`*::
 +
 --
-The time at which the job completed
+The unix time at which the job completed
 
 
 type: date
-
---
-
-[float]
-=== completions
-
-Kubernetes job completion settings
-
-
-
-*`kubernetes.job.completions.desired`*::
-+
---
-The configured completion count for the job (Spec)
-
-
-type: long
-
---
-
-[float]
-=== parallelism
-
-Kubernetes job parallelism settings
-
-
-
-*`kubernetes.job.parallelism.desired`*::
-+
---
-The configured parallelism of the job (Spec)
-
-
-type: long
-
---
-
-[float]
-=== owner
-
-Kubernetes job owner information
-
-
-
-*`kubernetes.job.owner.name`*::
-+
---
-The name of the resource that owns this job
-
-
-type: keyword
-
---
-
-*`kubernetes.job.owner.kind`*::
-+
---
-The kind of resource that owns this job (eg. "CronJob")
-
-
-type: keyword
-
---
-
-*`kubernetes.job.owner.is_controller`*::
-+
---
-Owner is controller ("true", "false", or "<none>")
-
-
-type: keyword
 
 --
 
@@ -45685,7 +45672,7 @@ Kubernetes job status information
 *`kubernetes.job.status.complete`*::
 +
 --
-Whether the job completed ("true", "false", or "unknown")
+Whether the job completed
 
 
 type: keyword
@@ -45695,7 +45682,7 @@ type: keyword
 *`kubernetes.job.status.failed`*::
 +
 --
-Whether the job failed ("true", "false", or "unknown")
+Whether the job failed
 
 
 type: keyword
@@ -45709,131 +45696,89 @@ kubernetes node metrics
 
 
 
-
-*`kubernetes.node.status.ready`*::
+*`kubernetes.node.name`*::
 +
 --
-Node ready status (true, false or unknown)
-
+Node name
 
 type: keyword
 
 --
 
+*`kubernetes.node.condition`*::
++
+--
+Node condition
+
+type: keyword
+
+--
+
+*`kubernetes.node.status`*::
++
+--
+Status of a node condition
+
+type: keyword
+
+--
+
+*`kubernetes.node.resource`*::
++
+--
+Name of the resource
+
+type: keyword
+
+--
+
+*`kubernetes.node.unit`*::
++
+--
+Resource unit
+
+type: keyword
+
+--
+
+
 *`kubernetes.node.status.unschedulable`*::
 +
 --
-Node unschedulable status
+Whether a node can schedule new pods
 
 
 type: boolean
 
 --
 
-*`kubernetes.node.status.memory_pressure`*::
+*`kubernetes.node.status.allocatable`*::
 +
 --
-Node MemoryPressure status (true, false or unknown)
-
-
-type: keyword
-
---
-
-*`kubernetes.node.status.disk_pressure`*::
-+
---
-Node DiskPressure status (true, false or unknown)
-
-
-type: keyword
-
---
-
-*`kubernetes.node.status.out_of_disk`*::
-+
---
-Node OutOfDisk status (true, false or unknown)
-
-
-type: keyword
-
---
-
-*`kubernetes.node.status.pid_pressure`*::
-+
---
-Node PIDPressure status (true, false or unknown)
-
-
-type: keyword
-
---
-
-
-*`kubernetes.node.cpu.allocatable.cores`*::
-+
---
-The allocatable CPU cores of a node that are available for pods scheduling
-
-
-type: float
-
---
-
-*`kubernetes.node.cpu.capacity.cores`*::
-+
---
-Node CPU capacity cores
+The allocatable for different resources of a node that are available for scheduling
 
 
 type: long
 
 --
 
-
-*`kubernetes.node.memory.allocatable.bytes`*::
+*`kubernetes.node.status.capacity`*::
 +
 --
-The allocatable memory of a node in bytes that is available for pods scheduling
-
-
-type: long
-
-format: bytes
-
---
-
-*`kubernetes.node.memory.capacity.bytes`*::
-+
---
-Node memory capacity in bytes
-
-
-type: long
-
-format: bytes
-
---
-
-
-*`kubernetes.node.pod.allocatable.total`*::
-+
---
-Node allocatable pods
+The capacity for different resources of a node
 
 
 type: long
 
 --
 
-*`kubernetes.node.pod.capacity.total`*::
+*`kubernetes.node.status.condition`*::
 +
 --
-Node pod capacity
+The condition of a cluster node
 
 
-type: long
+type: boolean
 
 --
 
@@ -45847,7 +45792,16 @@ kubernetes persistent volume metrics from kube-state-metrics
 *`kubernetes.persistentvolume.name`*::
 +
 --
-Volume name.
+Volume name
+
+type: keyword
+
+--
+
+*`kubernetes.persistentvolume.storage_class`*::
++
+--
+Storage class for the volume
 
 type: keyword
 
@@ -45871,15 +45825,6 @@ type: keyword
 
 --
 
-*`kubernetes.persistentvolume.storage_class`*::
-+
---
-Storage class for the volume
-
-type: keyword
-
---
-
 [float]
 === persistentvolumeclaim
 
@@ -45890,7 +45835,7 @@ kubernetes persistent volume clame metrics from kube-state-metrics
 *`kubernetes.persistentvolumeclaim.name`*::
 +
 --
-PVC name.
+PVC name
 
 type: keyword
 
@@ -45899,7 +45844,7 @@ type: keyword
 *`kubernetes.persistentvolumeclaim.volume_name`*::
 +
 --
-Binded volume name.
+Binded volume name
 
 type: keyword
 
@@ -45908,7 +45853,7 @@ type: keyword
 *`kubernetes.persistentvolumeclaim.request_storage.bytes`*::
 +
 --
-Requested capacity.
+Requested capacity
 
 type: long
 
@@ -45917,7 +45862,7 @@ type: long
 *`kubernetes.persistentvolumeclaim.phase`*::
 +
 --
-PVC phase.
+PVC phase
 
 type: keyword
 
@@ -45926,7 +45871,7 @@ type: keyword
 *`kubernetes.persistentvolumeclaim.access_mode`*::
 +
 --
-Access mode.
+Access mode
 
 type: keyword
 
@@ -45935,7 +45880,7 @@ type: keyword
 *`kubernetes.persistentvolumeclaim.storage_class`*::
 +
 --
-Storage class for the PVC.
+Storage class for the PVC
 
 type: keyword
 
@@ -45954,7 +45899,27 @@ kubernetes pod metrics
 Kubernetes pod host IP
 
 
-type: ip
+type: keyword
+
+--
+
+*`kubernetes.pod.condition`*::
++
+--
+Kubernetes pod condition
+
+
+type: keyword
+
+--
+
+*`kubernetes.pod.phase`*::
++
+--
+Kubernetes pod phase
+
+
+type: keyword
 
 --
 
@@ -45968,7 +45933,7 @@ Kubernetes pod status metrics
 *`kubernetes.pod.status.phase`*::
 +
 --
-Kubernetes pod phase (Running, Pending...)
+Kubernetes pod phase
 
 
 type: keyword
@@ -45978,7 +45943,7 @@ type: keyword
 *`kubernetes.pod.status.ready`*::
 +
 --
-Kubernetes pod ready status (true, false or unknown)
+Kubernetes pod ready status
 
 
 type: keyword
@@ -45988,7 +45953,7 @@ type: keyword
 *`kubernetes.pod.status.scheduled`*::
 +
 --
-Kubernetes pod scheduled status (true, false, unknown)
+Kubernetes pod scheduled status
 
 
 type: keyword
@@ -46121,7 +46086,7 @@ kubernetes service metrics
 *`kubernetes.service.name`*::
 +
 --
-Service name.
+Service name
 
 type: keyword
 
@@ -46130,7 +46095,7 @@ type: keyword
 *`kubernetes.service.cluster_ip`*::
 +
 --
-Internal IP for the service.
+Internal IP for the service
 
 type: keyword
 

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metricbeat-daemonset-modules
+  namespace: kube-system
+  labels:
+    k8s-app: metricbeat
+data:
+  kubernetes.yml: |-
+    - module: kubernetes
+      metricsets:
+        - node
+        - system
+        - pod
+        - container
+        - volume
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["https://${NODE_NAME}:10250"]
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      ssl.verification_mode: "none"
+
+    - module: kubernetes
+      metricsets:
+        - proxy
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["localhost:10249"]
+
+    - module: kubernetes
+      metricsets:
+        - controllermanager
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ['https://0.0.0.0:10257']
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      ssl.verification_mode: "none"
+
+    - module: kubernetes
+      metricsets:
+        - scheduler
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ['https://0.0.0.0:10259']
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      ssl.verification_mode: "none"
+
+    - module: kubernetes
+      enabled: true
+      metricsets:
+        - apiserver
+      hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      ssl.certificate_authorities:
+        - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      period: 10s
+
+    - module: kubernetes
+      enabled: true
+      metricsets:
+        - state_node
+        - state_daemonset
+        - state_deployment
+        - state_replicaset
+        - state_statefulset
+        - state_pod
+        - state_container
+        - state_job
+        - state_cronjob
+        - state_resourcequota
+        - state_service
+        - state_persistentvolume
+        - state_persistentvolumeclaim
+        - state_storageclass
+        - event
+      hosts: ["kube-state-metrics:8080"]
+      period: 10s
+      add_metadata: true

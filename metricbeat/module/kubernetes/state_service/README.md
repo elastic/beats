@@ -1,50 +1,32 @@
-# Kube-state-metrics/Service
+### Version history
 
+**January 2023**: Kube state metrics versions 2.4.2-2.7.0
 
-This metricset connects to kube-state-metrics endpoint to retrieve and report Service metrics.
+### Resources
 
-## Version history
+- [State service metrics](https://github.com/kubernetes/kube-state-metrics/blob/main/internal/store/service.go):
+  declaration and description
 
-- December 2019, first release using kube-state-metrics `v1.8.0`.
+### Metrics insight
 
-## Configuration
+All metrics have the labels:
+- namespace
+- uid
+- service
 
-See the metricset documentation for the configuration reference.
+Additionally:
+- kube_service_info
+  - cluster_ip
+  - external_name
+  - load_balancer_ip
+- kube_service_created
+- kube_service_spec_type
+  - type
+- kube_service_spec_external_ip
+  - external_ip
+- kube_service_status_load_balancer_ingress
+  - ip
+  - hostname
 
-## Manual testing
-
-Create a service. Try different types as:
-
-Example:
-```bash
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Service
-metadata:
-  name: elastic-test-svc
-  labels:
-    test1: value1
-    test2: value2
-spec:
-  selector:
-    app: elastic-test-app
-  ports:
-    - name: port80
-      protocol: TCP
-      port: 80
-      targetPort: 9080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: elastic-external-svc
-  labels:
-    test-external1: value1
-    test-external2: value2
-spec:
-  type: ExternalName
-  externalName: elastic.resource
-EOF
-```
-
-Then run metricbeat pointing to the kube-state-metrics endpoint.
+### Setup environment for manual tests
+Go to `metricbeat/module/kubernetes/_meta/test/docs`.

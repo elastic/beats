@@ -1,0 +1,412 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "PIDPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": true
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "MemoryPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": true
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "Ready",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "Ready",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "DiskPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": true
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "PIDPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "PIDPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "Ready",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": true
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "kind-control-plane",
+			"resource": "pods",
+			"status": {
+				"allocatable": 110,
+				"capacity": 110
+			},
+			"unit": "integer"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "kind-control-plane",
+			"status": {
+				"unschedulable": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "DiskPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "DiskPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "MemoryPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"condition": "MemoryPressure",
+			"name": "kind-control-plane",
+			"status": {
+				"condition": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "kind-control-plane",
+			"resource": "hugepages_1Gi",
+			"status": {
+				"allocatable": 0,
+				"capacity": 0
+			},
+			"unit": "byte"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "kind-control-plane",
+			"resource": "hugepages_2Mi",
+			"status": {
+				"allocatable": 0,
+				"capacity": 0
+			},
+			"unit": "byte"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "kind-control-plane",
+			"resource": "cpu",
+			"status": {
+				"allocatable": 8,
+				"capacity": 8
+			},
+			"unit": "core"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "kind-control-plane",
+			"resource": "ephemeral_storage",
+			"status": {
+				"allocatable": 67317051392,
+				"capacity": 67317051392
+			},
+			"unit": "byte"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "kind-control-plane",
+			"resource": "memory",
+			"status": {
+				"allocatable": 16259682304,
+				"capacity": 16259682304
+			},
+			"unit": "byte"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

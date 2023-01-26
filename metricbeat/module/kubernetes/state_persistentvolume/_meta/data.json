@@ -1,0 +1,47 @@
+{
+    "@timestamp": "2023-01-25T17:14:54.818Z",
+    "kubernetes": {
+        "labels": {
+            "name": "task-pv-volume"
+        },
+        "persistentvolume": {
+            "capacity": {
+                "bytes": 2048
+            },
+            "phase": "Bound",
+            "name": "task-pv-volume"
+        }
+    },
+    "host": {
+        "name": "kind-control-plane"
+    },
+    "agent": {
+        "name": "kind-control-plane",
+        "type": "metricbeat",
+        "version": "8.7.0",
+        "ephemeral_id": "34c08eda-7485-4da3-99b1-e47d268cdcb4",
+        "id": "c9c89c3d-1830-41a7-a2f6-7aa9c3ec4901"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "event": {
+        "module": "kubernetes",
+        "duration": 202760,
+        "dataset": "kubernetes.persistentvolume"
+    },
+    "orchestrator": {
+        "cluster": {
+            "url": "kind-control-plane:6443",
+            "name": "kind"
+        }
+    },
+    "metricset": {
+        "name": "state_persistentvolume",
+        "period": 10000
+    },
+    "service": {
+        "address": "http://kube-state-metrics:8080/metrics",
+        "type": "kubernetes"
+    }
+}
