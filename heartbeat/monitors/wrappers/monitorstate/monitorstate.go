@@ -60,7 +60,7 @@ type State struct {
 	ID string `json:"id"`
 	// StartedAt is the start time of the state, should be the same for a given state ID
 	StartedAt  time.Time   `json:"started_at"`
-	DurationMs int64       `json:"duration_ms"`
+	DurationMs int64       `json:"duration_ms,string"`
 	Status     StateStatus `json:"status"`
 	Checks     int         `json:"checks"`
 	Up         int         `json:"up"`
