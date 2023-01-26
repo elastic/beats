@@ -66,6 +66,11 @@ func NewWithRetry(beatInfo beat.Info, retryCount int, retrySleep time.Duration) 
 // an ErrAlreadyLocked error is returned.
 func (lock *Locker) Lock() error {
 	for i := 0; i < lock.retryCount; i++ {
+		// note that TryLock doesn't set an os.O_EXCL flag,
+		// which means that we could be locking a file we didn't create.
+		// This makes it easy to recover from a failed shutdown or panic,
+		// as the OS will clean up the lock and we'll re-lock the same file.
+		// However, can create odd races if you're not careful, since you don't know if you're locking "your" file.
 		gotLock, err := lock.fileLock.TryLock()
 		if err != nil {
 			return fmt.Errorf("unable to try a lock of the data path: %w", err)
@@ -81,9 +86,12 @@ func (lock *Locker) Lock() error {
 
 // Unlock attempts to release the lock on a data path previously acquired via Lock().
 func (lock *Locker) Unlock() error {
-	// remove first while we still have the lock, so we reduce the odds of another beat swooping in to start between the Unlock() and Remove() operation.
+	// Unlock will remove the file while we still have the lock, so we reduce the odds of another beat swooping in to start between the Unlock() and Remove() operation.
 
-	// There's some awkwardness on windows, removing before we unlock is usually a fail.
+	// Removing a file that's locked seems to be an unsupported or undefined, and will often fail on Windows.
+	// Reverse the order of operations, and unlock first, then remove.
+	// This will slightly increase the odds of a race on Windows if we're in a tight restart loop,
+	// as another beat can swoop in and lock the file before this beat removes it.
 	if runtime.GOOS != "windows" {
 		err := os.Remove(lock.fileLock.Path())
 		if err != nil {
