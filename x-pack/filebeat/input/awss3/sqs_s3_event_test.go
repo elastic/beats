@@ -124,6 +124,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockS3Handler.EXPECT().ProcessS3Object().Return(nil),
 			mockClient.EXPECT().Close(),
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
+			mockS3Handler.EXPECT().FinalizeS3Object().Return(nil),
 		)
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockBeatPipeline, mockS3HandlerFactory)

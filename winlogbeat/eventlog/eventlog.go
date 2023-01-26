@@ -23,11 +23,16 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/rcrowley/go-metrics"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 // Debug selectors used in this package.
@@ -137,4 +142,99 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 	case syscall.Errno:
 		v.Add(strconv.Itoa(int(t)), 1)
 	}
+}
+
+// inputMetrics handles event log metric reporting.
+type inputMetrics struct {
+	unregister func()
+
+	lastBatch time.Time
+
+	name        *monitoring.String // name of the provider being read
+	events      *monitoring.Uint   // total number of events received
+	dropped     *monitoring.Uint   // total number of discarded events
+	errors      *monitoring.Uint   // total number of errors
+	batchSize   metrics.Sample     // histogram of the number of events in each non-zero batch
+	sourceLag   metrics.Sample     // histogram of the difference between timestamped event's creation and reading
+	batchPeriod metrics.Sample     // histogram of the elapsed time between non-zero batch reads
+}
+
+// newInputMetrics returns an input metric for windows event logs. If id is empty
+// a nil inputMetric is returned.
+func newInputMetrics(name, id string) *inputMetrics {
+	if id == "" {
+		return nil
+	}
+	reg, unreg := inputmon.NewInputRegistry(name, id, nil)
+	out := &inputMetrics{
+		unregister:  unreg,
+		name:        monitoring.NewString(reg, "provider"),
+		events:      monitoring.NewUint(reg, "received_events_total"),
+		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
+		errors:      monitoring.NewUint(reg, "errors_total"),
+		batchSize:   metrics.NewUniformSample(1024),
+		sourceLag:   metrics.NewUniformSample(1024),
+		batchPeriod: metrics.NewUniformSample(1024),
+	}
+	out.name.Set(name)
+	_ = adapter.NewGoMetrics(reg, "received_events_count", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.batchSize))
+	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.sourceLag))
+	_ = adapter.NewGoMetrics(reg, "batch_read_period", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.batchPeriod))
+
+	return out
+}
+
+// log logs metric for the given batch.
+func (m *inputMetrics) log(batch []Record) {
+	if m == nil {
+		return
+	}
+	if len(batch) == 0 {
+		return
+	}
+
+	now := time.Now()
+	if !m.lastBatch.IsZero() {
+		m.batchPeriod.Update(now.Sub(m.lastBatch).Nanoseconds())
+	}
+	m.lastBatch = now
+
+	m.events.Add(uint64(len(batch)))
+	m.batchSize.Update(int64(len(batch)))
+	for _, r := range batch {
+		m.sourceLag.Update(now.Sub(r.TimeCreated.SystemTime).Nanoseconds())
+	}
+}
+
+// logError logs error metrics. Nil errors do not increment the error
+// count but the err value is currently otherwise not used. It is included
+// to allow easier extension of the metrics to include error stratification.
+func (m *inputMetrics) logError(err error) {
+	if m == nil {
+		return
+	}
+	if err == nil {
+		return
+	}
+	m.errors.Inc()
+}
+
+// logDropped logs dropped event metrics. Nil errors *do* increment the dropped
+// count; the value is currently otherwise not used, but is included to allow
+// easier extension of the metrics to include error stratification.
+func (m *inputMetrics) logDropped(_ error) {
+	if m == nil {
+		return
+	}
+	m.dropped.Inc()
+}
+
+func (m *inputMetrics) close() {
+	if m == nil {
+		return
+	}
+	m.unregister()
 }

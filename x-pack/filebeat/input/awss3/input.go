@@ -58,6 +58,7 @@ type s3Input struct {
 	config    config
 	awsConfig awssdk.Config
 	store     beater.StateStore
+	metrics   *inputMetrics
 }
 
 func newInput(config config, store beater.StateStore) (*s3Input, error) {
@@ -185,6 +186,11 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
 	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
 
+	if in.config.BackupConfig.GetBucketName() != "" {
+		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets" +
+			"or prefixes to avoid an infinite loop.")
+	}
+
 	fileSelectors := in.config.FileSelectors
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
@@ -193,10 +199,10 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 	if err != nil {
 		return nil, err
 	}
-	metrics := newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors)
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
-	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
+	in.metrics = newInputMetrics(ctx.ID, nil)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
+	sqsReader := newSQSReader(log.Named("sqs"), in.metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
 }
@@ -266,10 +272,10 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
-	metrics := newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors)
+	in.metrics = newInputMetrics(ctx.ID, nil)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
 	s3Poller := newS3Poller(log.Named("s3_poller"),
-		metrics,
+		in.metrics,
 		s3API,
 		client,
 		s3EventHandlerFactory,

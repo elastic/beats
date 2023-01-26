@@ -32,7 +32,7 @@ const (
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := requestCfg.Transport.Client(clientOptions(requestCfg.URL.URL)...)
+	netHTTPClient, err := requestCfg.Transport.Client(clientOptions(requestCfg.URL.URL, requestCfg.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 		lastResponse:  &response{body: dataMap},
 	}
 
-	val, err := expression.Execute(paramCtx, tr, nil, log)
+	val, err := expression.Execute(paramCtx, tr, "", nil, log)
 	if err != nil {
 		return false, fmt.Errorf("error while evaluating expression : %w", err)
 	}

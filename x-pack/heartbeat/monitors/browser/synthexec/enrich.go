@@ -113,7 +113,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	var jobErr error
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
-		je.errorCount++
 		if je.error == nil {
 			je.error = jobErr
 		}
@@ -172,15 +171,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 }
 
 func (je *journeyEnricher) createSummary(event *beat.Event) error {
-	var up, down int
-	if je.errorCount > 0 {
-		up = 0
-		down = 1
-	} else {
-		up = 1
-		down = 0
-	}
-
 	// In case of syntax errors or incorrect runner options, the Synthetics
 	// runner would exit immediately with exitCode 1 and we do not set the duration
 	// to inform the journey never ran
@@ -202,10 +192,6 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		"synthetics": mapstr.M{
 			"type":    "heartbeat/summary",
 			"journey": je.journey,
-		},
-		"summary": mapstr.M{
-			"up":   up,
-			"down": down,
 		},
 	})
 
