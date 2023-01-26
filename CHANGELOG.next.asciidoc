@@ -47,10 +47,10 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
 - Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
-- Log errors from v2 client errors channel. {pull}34392[34392]
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Log errors from the Elastic Agent V2 client errors channel. Avoids blocking when error occurs communicating with the Elastic Agent. {pull}34392[34392]
 
 *Auditbeat*
 
