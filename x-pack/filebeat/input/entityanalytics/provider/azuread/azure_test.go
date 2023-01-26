@@ -11,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	mockauth "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
 	mockfetcher "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher/mock"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -35,8 +36,13 @@ func TestAzure_DoFetch(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	_, err = a.doFetch(ctx, ss)
+	got, err := a.doFetch(ctx, ss, false)
 	assert.NoError(t, err)
 
-	// TODO: Verify doFetch result.
+	var wantModifiedUsers collections.UUIDSet
+	for _, v := range mockfetcher.UserResponse {
+		wantModifiedUsers.Add(v.ID)
+	}
+
+	assert.Equal(t, wantModifiedUsers.Values(), got.Values())
 }

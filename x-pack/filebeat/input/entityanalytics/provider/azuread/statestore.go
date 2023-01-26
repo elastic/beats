@@ -99,7 +99,7 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 		return nil, fmt.Errorf("unable to get users from state: %w", err)
 	}
 
-	if err = s.tx.Get(relationshipsBucket, groupMembershipsKey, s.relationships); err != nil && !errIsItemNotFound(err) {
+	if err = s.tx.Get(relationshipsBucket, groupMembershipsKey, &s.relationships); err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get groups relationships from state: %w", err)
 	}
 
@@ -181,7 +181,7 @@ func (s *stateStore) close(commit bool) (err error) {
 		}
 	}
 
-	if err = s.tx.Set(relationshipsBucket, groupMembershipsKey, s.relationships); err != nil {
+	if err = s.tx.Set(relationshipsBucket, groupMembershipsKey, &s.relationships); err != nil {
 		return fmt.Errorf("unable to save group memberships to state: %w", err)
 	}
 

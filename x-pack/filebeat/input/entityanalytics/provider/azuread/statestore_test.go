@@ -194,7 +194,7 @@ func TestStateStore_Close(t *testing.T) {
 	}
 	assert.EqualValues(t, ss.groups, gotGroups)
 
-	testAssertJSONValueEquals(t, store, relationshipsBucket, groupMembershipsKey, ss.relationships)
+	testAssertJSONValueEquals(t, store, relationshipsBucket, groupMembershipsKey, &ss.relationships)
 }
 
 func TestGetLastSync(t *testing.T) {

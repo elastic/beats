@@ -146,7 +146,7 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	p.logger.Debugf("Starting fetch...")
-	if _, err := p.doFetch(ctx, state); err != nil {
+	if _, err := p.doFetch(ctx, state, true); err != nil {
 		return err
 	}
 
@@ -194,7 +194,7 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 	}()
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	updatedUsers, err := p.doFetch(ctx, state)
+	updatedUsers, err := p.doFetch(ctx, state, false)
 	if err != nil {
 		return err
 	}
@@ -226,19 +226,28 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 }
 
 // doFetch handles fetching user and group identities from Azure Active Directory
-// and enriching users with group memberships.
-func (p *azure) doFetch(ctx context.Context, state *stateStore) (collections.UUIDSet, error) {
+// and enriching users with group memberships. If fullSync is true, then any
+// existing deltaLink will be ignored, forcing a full synchronization from
+// Azure Active Directory. Returns a set of modified users by ID.
+func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (collections.UUIDSet, error) {
 	var updatedUsers collections.UUIDSet
+	var usersDeltaLink string
+	var groupsDeltaLink string
 
 	// Get user changes.
-	changedUsers, userLink, err := p.fetcher.Users(ctx, state.usersLink)
+	if !fullSync {
+		usersDeltaLink = state.usersLink
+		groupsDeltaLink = state.groupsLink
+	}
+
+	changedUsers, userLink, err := p.fetcher.Users(ctx, usersDeltaLink)
 	if err != nil {
 		return updatedUsers, err
 	}
 	p.logger.Debugf("Received %d users from API", len(changedUsers))
 
 	// Get group changes.
-	changedGroups, groupLink, err := p.fetcher.Groups(ctx, state.groupsLink)
+	changedGroups, groupLink, err := p.fetcher.Groups(ctx, groupsDeltaLink)
 	if err != nil {
 		return updatedUsers, err
 	}

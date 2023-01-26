@@ -14,7 +14,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-var groupResponse = []*fetcher.Group{
+var (
+	GroupDeltaLinkResponse = "group-delta-link"
+	UserDeltaLinkResponse  = "user-delta-link"
+)
+
+var GroupResponse = []*fetcher.Group{
 	{
 		ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
 		Name: "group1",
@@ -51,7 +56,7 @@ var groupResponse = []*fetcher.Group{
 	},
 }
 
-var userResponse = []*fetcher.User{
+var UserResponse = []*fetcher.User{
 	{
 		ID: uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
 		Fields: map[string]interface{}{
@@ -85,12 +90,12 @@ type mock struct {
 
 // Groups returns a fixed set of groups.
 func (f *mock) Groups(ctx context.Context, _ string) ([]*fetcher.Group, string, error) {
-	return groupResponse, "", nil
+	return GroupResponse, GroupDeltaLinkResponse, nil
 }
 
 // Users returns a fixed set of users.
 func (f *mock) Users(ctx context.Context, _ string) ([]*fetcher.User, string, error) {
-	return userResponse, "", nil
+	return UserResponse, UserDeltaLinkResponse, nil
 }
 
 // SetLogger is not used for this implementation.
