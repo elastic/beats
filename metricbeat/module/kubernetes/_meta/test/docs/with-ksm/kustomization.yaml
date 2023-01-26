@@ -1,5 +1,9 @@
 resources:
-  - rq.yaml
+  - ss.yaml
+  - pv.yaml
+  - pvc.yaml
+  - cronjob.yaml
+  - job.yaml
   - github.com/kubernetes/kube-state-metrics?ref=main
   - ../without-ksm
 
