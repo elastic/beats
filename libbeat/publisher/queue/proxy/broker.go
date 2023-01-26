@@ -162,8 +162,7 @@ func (b *broker) run() {
 
 		case entry := <-pushChan: // producer pushing new event
 			entry.producer.producedCount++
-			pendingBatch.entries = append(pendingBatch.entries,
-				queueEntry(entry))
+			pendingBatch.entries = append(pendingBatch.entries, entry)
 
 		case req := <-getChan: // consumer asking for next batch
 			acks := acksForBatch(pendingBatch)
