@@ -38,11 +38,14 @@ const (
 func NewService(config Config) (*MonitorService, error) {
 	cloudServicesConfig := cloud.AzurePublic.Services
 
+	resourceManagerConfig := cloudServicesConfig[cloud.ResourceManager]
+
 	if config.ResourceManagerEndpoint != "" && config.ResourceManagerEndpoint != DefaultBaseURI {
-		cloudServicesConfig[cloud.ResourceManager] = cloud.ServiceConfiguration{
-			Audience: config.ResourceManagerEndpoint,
-			Endpoint: config.ResourceManagerEndpoint,
-		}
+		resourceManagerConfig.Endpoint = config.ResourceManagerEndpoint
+	}
+
+	if config.ResourceManagerAudience != "" {
+		resourceManagerConfig.Audience = config.ResourceManagerAudience
 	}
 
 	clientOptions := policy.ClientOptions{

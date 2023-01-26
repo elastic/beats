@@ -35,6 +35,7 @@ type Config struct {
 	SubscriptionId          string        `config:"subscription_id"  validate:"required"`
 	Period                  time.Duration `config:"period" validate:"nonzero,required"`
 	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
+	ResourceManagerAudience string        `config:"resource_manager_audience"`
 	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
 	// specific to resource metrics
 	Resources           []ResourceConfig `config:"resources"`

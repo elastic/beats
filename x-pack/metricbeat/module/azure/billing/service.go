@@ -49,12 +49,17 @@ type UsageService struct {
 func NewService(config azure.Config) (*UsageService, error) {
 	cloudServicesConfig := cloud.AzurePublic.Services
 
+	resourceManagerConfig := cloudServicesConfig[cloud.ResourceManager]
+
 	if config.ResourceManagerEndpoint != "" && config.ResourceManagerEndpoint != azure.DefaultBaseURI {
-		cloudServicesConfig[cloud.ResourceManager] = cloud.ServiceConfiguration{
-			Audience: config.ResourceManagerEndpoint,
-			Endpoint: config.ResourceManagerEndpoint,
-		}
+		resourceManagerConfig.Endpoint = config.ResourceManagerEndpoint
 	}
+
+	if config.ResourceManagerAudience != "" {
+		resourceManagerConfig.Audience = config.ResourceManagerAudience
+	}
+
+	cloudServicesConfig[cloud.ResourceManager] = resourceManagerConfig
 
 	clientOptions := policy.ClientOptions{
 		Cloud: cloud.Configuration{
