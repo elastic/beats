@@ -154,7 +154,7 @@ func findFilestreams(log *logp.Logger, cfg *cfg.Config) (matchers filestreamMatc
 			continue
 		}
 		if _, exists := matchers[inputCfg.ID]; exists || inputCfg.ID == "" {
-			return matchers, fmt.Errorf("filestream `%s` in `take over` mode requires a unique ID", inputCfg.ID)
+			return matchers, fmt.Errorf("filestream with ID `%s` in `take over` mode requires a unique ID. Add the `id:` key with a unique value.", inputCfg.ID)
 		}
 
 		matchers[inputCfg.ID], err = createMatcher(log, inputCfg)

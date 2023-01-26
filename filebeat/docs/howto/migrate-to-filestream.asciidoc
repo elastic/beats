@@ -1,11 +1,11 @@
 [[migrate-to-filestream]]
 == Migrate `log` input configurations to `filestream`
 
-The `filestream` input has been generally available since 7.14. So, it is highly recommended
+The `filestream` input has been generally available since 7.14 and it is highly recommended
 you migrate your existing `log` input configurations. The `filestream` input comes with many
 improvements over the old `log` input, such as configurable order for parsers and more.
 
-The `log` input is deprecated and will be eventually removed from Filebeat. We are not fixing
+The `log` input is deprecated and will eventually be removed from Filebeat. We are not fixing
 new issues or adding any enhancements to the `log` input. Our focus is on `filestream`.
 
 This manual migration is required only if you've defined `log` inputs manually
@@ -16,7 +16,7 @@ required from the user.
 In this guide, you'll learn how to migrate an existing `log` input configuration.
 
 IMPORTANT: You must replace `log` inputs with `filestream` inputs, make sure you have removed
-the all old `log` inputs from the configuration before starting Filebeat with the new `filestream` inputs. Running old `log` inputs and new `filestream` inputs pointed to the same files will lead to data duplication.
+all the old `log` inputs from the configuration before starting Filebeat with the new `filestream` inputs. Running old `log` inputs and new `filestream` inputs pointed to the same files will lead to data duplication.
 
 The following example shows three `log` inputs:
 
@@ -64,7 +64,7 @@ For this example, let's assume that the `log` input is used to collect logs from
 
 === Step 1: Set an identifier for each `filestream` input
 
-All `filestream` inputs require an ID. So make sure you set a unique identifier for every input.
+All `filestream` inputs require an ID. Ensure you set a unique identifier for every input.
 
 IMPORTANT: Never change the ID of an input, or you will end up with duplicate events.
 
@@ -230,7 +230,7 @@ The example configuration shown earlier needs to be adjusted as well:
 === If something went wrong
 
 If for whatever reason you'd like to revert the configuration after running the migrated configuration
-and return old `log` inputs their files taken by `filestream` inputs, you need to do the following:
+and return to old `log` inputs the files that were taken by `filestream` inputs, you need to do the following:
 
 1. Stop Filebeat as soon as possible
 2. Find your <<configuration-global-options,`registry.path/filebeat` directory>>
