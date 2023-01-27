@@ -94,14 +94,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *IngestMetricSet) Fetch(report mb.ReporterV2) error {
-	shouldSkip, err := m.ShouldSkipFetch()
-	if err != nil {
-		return err
-	}
-	if shouldSkip {
-		return nil
-	}
-
 	uri, err := url.Parse(m.GetURI())
 	if err != nil {
 		return err
