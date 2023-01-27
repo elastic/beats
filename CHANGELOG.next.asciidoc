@@ -27,7 +27,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest
 
 *Functionbeat*
 
@@ -39,30 +38,36 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
-- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
+- Log errors from the Elastic Agent V2 client errors channel. Avoids blocking when error occurs communicating with the Elastic Agent. {pull}34392[34392]
 
 *Auditbeat*
 
 
 *Filebeat*
-- [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
-- Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
-- The `close.on_state_change.inactive` default value is now set to 5 minutes, matching the documentation.
+
+*Heartbeat*
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+- Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
+- Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
+
 
 *Heartbeat*
 
-*Auditbeat*
-
-
-*Filebeat*
-
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Fix handling of null or empty arrays during split with keep parent option. {pull}34322[34322]
+
+*Auditbeat*
+
+
+*Filebeat*
+
 
 *Heartbeat*
 
@@ -74,12 +79,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 - Add GCP CloudSQL region filter {pull}32943[32943]
 
-- Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
-- Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 
 *Osquerybeat*
 
-- Fix data_stream configuration, enforce the default values used before 8.6.0. {pull}34246[34246]
 
 *Packetbeat*
 
@@ -108,8 +110,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
 - Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
-- Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
-- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for automatic splitting at root level, if root level element is an array. {pull}34155[34155]
 
 *Auditbeat*
 
@@ -157,6 +157,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
