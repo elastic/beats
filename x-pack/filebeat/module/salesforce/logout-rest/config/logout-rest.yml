@@ -29,10 +29,13 @@ request.proxy_url: {{ .proxy_url }}
 request.transforms:
   - set:
       target: url.params.q
-      value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' AND CreatedDate > [[.cursor.last_published_logout]] ORDER BY CreatedDate ASC NULLS FIRST"
-      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' ORDER BY CreatedDate ASC NULLS FIRST"
-response.split:
-  target: body.records
+      value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' AND LogDate > [[.cursor.last_published_logout]] ORDER BY LogDate ASC NULLS FIRST"
+      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' ORDER BY LogDate ASC NULLS FIRST"
+response.pagination:
+  - set:
+      target: url.value
+      value: '[[if (ne .last_response.body.done true)]]{{ .url }}[[.last_response.body.nextRecordsUrl]][[end]]'
+      fail_on_template_error: true
 chain:
   - step:
       request.url: {{ .url }}/services/data/v52.0/sobjects/EventLogFile/$.records[:].Id/LogFile
@@ -40,7 +43,7 @@ chain:
       replace: $.records[:].Id
 cursor:
   last_published_logout:
-    value: '[[.last_event.CreatedDate]]'
+    value: '[[(formatDate ((parseDate .last_event.TIMESTAMP_DERIVED "RFC3339").Add (parseDuration "-1h")))]]'
 
 {{ else if eq .input "file" }}
 

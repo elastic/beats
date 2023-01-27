@@ -1,14 +1,23 @@
 [[migrate-to-filestream]]
 == Migrate `log` input configurations to `filestream`
 
-The `filestream` input has been generally available since 7.14. So it is high time you
-migrate your existing `log` input configurations.  The `filestream` input comes with many
-improvements over the old input, such as configurable order for parsers and more.
+The `filestream` input has been generally available since 7.14 and it is highly recommended
+you migrate your existing `log` input configurations. The `filestream` input comes with many
+improvements over the old `log` input, such as configurable order for parsers and more.
 
-While we do not plan to remove the `log` input from Filebeat, we are not fixing
-new issues or adding any enhancements to the input. Our focus is on `filestream`.
+The `log` input is deprecated and will eventually be removed from Filebeat. We are not fixing
+new issues or adding any enhancements to the `log` input. Our focus is on `filestream`.
 
-In this guide, you learn how to migrate an existing `log` input configuration.
+This manual migration is required only if you've defined `log` inputs manually
+in your stand-alone Filebeat configuration. All the integrations or modules that are still using
+`log` inputs under the hood will be eventually migrated automatically without any additional actions
+required from the user.
+
+In this guide, you'll learn how to migrate an existing `log` input configuration.
+
+IMPORTANT: You must replace `log` inputs with `filestream` inputs, make sure you have removed
+all the old `log` inputs from the configuration before starting Filebeat with the new `filestream` inputs. Running old `log` inputs and new `filestream` inputs pointed to the same files will lead to data duplication.
+
 The following example shows three `log` inputs:
 
 [source,yaml]
@@ -55,7 +64,7 @@ For this example, let's assume that the `log` input is used to collect logs from
 
 === Step 1: Set an identifier for each `filestream` input
 
-All `filestream` inputs require an ID. So make sure you set a unique identifier for every input. 
+All `filestream` inputs require an ID. Ensure you set a unique identifier for every input.
 
 IMPORTANT: Never change the ID of an input, or you will end up with duplicate events.
 
@@ -81,64 +90,40 @@ filebeat.inputs:
     - /var/log/my-old-files*.log
 ----
 
-=== Step 2: Exclude all processed files
+=== Step 2: Enable the `take over` mode
 
-Filebeat does not provide access to the state information of different inputs.
-Hence, the `filestream` input cannot access the state information of a `log` input in the
-Filebeat registry. You must exclude the files the `log` input has processed
-or is processing. If you do not exclude those files, you will end up with
-duplicate events in the output.
+Now, to indicate that the new `filestream` is supposed to take over the files from a previously
+defined `log` input, we need to add `take_over: true` to each new `filestream`. This will make sure
+that the new `filestream` inputs will continue ingesting files from the same offset where the `log`
+inputs stopped.
 
-Given the file list and ingestion progress shown earlier, 
-you should run the `log` and `filestream` inputs simultaneously until everything
-collected by the `log` input has made it to the output.
-After the files collected by the `log` input are shipped and the files are deleted,
-you can delete the `log` inputs and the `exlude_files` settings from `filestream` input.
+IMPORTANT: If this parameter is not set, all the files will be re-ingested from the beginning
+and this will lead to data duplication. Please, double-check that this parameter is set.
 
 [source,yaml]
 ----
 filebeat.inputs:
- - type: log
-   enabled: true
-   paths:
-     - /var/log/java-exceptions*.log
-   multiline:
-    pattern: '^\['
-    negate: true
-    match: after
-  close_removed: true
-  close_renamed: true
-  exclude_files: java-exceptions[4-5]{1}.log
-
-- type: log
-  enabled: true
-  paths:
-    - /var/log/my-application*.json
-  scan_frequency: 1m
-  json.keys_under_root: true
-  exclude_files: my-application3.log
-
 - type: filestream
   enabled: true
   id: my-java-collector
+  take_over: true
   paths:
     - /var/log/java-exceptions*.log
-  prospector.scanner.exclude_files: java-exceptions[1-3]{1}.log
 
 - type: filestream
   enabled: true
   id: my-application-input
+  take_over: true
   paths:
     - /var/log/my-application*.json
-  prospector.scanner.exclude_files: my-application[1-2]{1}.log
 
 - type: filestream
   enabled: true
   id: my-old-files
+  take_over: true
   paths:
     - /var/log/my-old-files*.log
 ----
-
 
 === Step 3: Use new option names
 
@@ -157,6 +142,7 @@ The example configuration shown earlier needs to be adjusted as well:
 - type: filestream
   enabled: true
   id: my-java-collector
+  take_over: true
   paths:
     - /var/log/java-exceptions*.log
   parsers:
@@ -170,6 +156,7 @@ The example configuration shown earlier needs to be adjusted as well:
 - type: filestream
   enabled: true
   id: my-application-input
+  take_over: true
   paths:
     - /var/log/my-application*.json
   prospector.scanner.check_interval: 1m
@@ -180,6 +167,7 @@ The example configuration shown earlier needs to be adjusted as well:
 - type: filestream
   enabled: true
   id: my-old-files
+  take_over: true
   paths:
     - /var/log/my-old-files*.log
   ignore_inactive: since_last_start
@@ -239,5 +227,15 @@ The example configuration shown earlier needs to be adjusted as well:
 |backoff.max
 |===
 
+=== If something went wrong
 
+If for whatever reason you'd like to revert the configuration after running the migrated configuration
+and return to old `log` inputs the files that were taken by `filestream` inputs, you need to do the following:
 
+1. Stop Filebeat as soon as possible
+2. Find your <<configuration-global-options,`registry.path/filebeat` directory>>
+3. Find the created backup files, they have the `<timestamp>.bak` suffix. If you have multiple backups for the same file, choose the one with the more recent timestamp.
+4. Replace the files with their backups, e.g. `log.json` should be replaced by `log.json-1674152412247684000.bak`
+5. Run Filebeat with the old configuration (no `filestream` inputs with `take_over: true`).
+
+NOTE: Reverting to backups might cause some events to repeat, depends on the amount of time the new configuration was running.
