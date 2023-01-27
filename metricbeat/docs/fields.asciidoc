@@ -45213,28 +45213,10 @@ type: keyword
 
 --
 
-*`kubernetes.container.resource`*::
+*`kubernetes.container.name`*::
 +
 --
-Resource kind
-
-type: keyword
-
---
-
-*`kubernetes.container.unit`*::
-+
---
-Resource kind metric unit
-
-type: keyword
-
---
-
-*`kubernetes.container.reason`*::
-+
---
-Reason for resource status change
+Container name
 
 type: keyword
 
@@ -45288,6 +45270,52 @@ The last reason the container was in terminated state (Completed, ContainerCanno
 
 
 type: keyword
+
+--
+
+
+*`kubernetes.container.cpu.limit.cores`*::
++
+--
+Container CPU cores limit
+
+
+type: float
+
+--
+
+*`kubernetes.container.cpu.request.cores`*::
++
+--
+Container CPU requested cores
+
+
+type: float
+
+--
+
+
+*`kubernetes.container.memory.limit.bytes`*::
++
+--
+Container memory limit in bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.container.memory.request.bytes`*::
++
+--
+Container requested memory in bytes
+
+
+type: long
+
+format: bytes
 
 --
 

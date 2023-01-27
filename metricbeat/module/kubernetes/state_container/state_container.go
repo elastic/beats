@@ -37,8 +37,18 @@ var mapping = &prometheus.MetricsMapping{
 		"kube_pod_info":           prometheus.InfoMetric(),
 		"kube_pod_container_info": prometheus.InfoMetric(),
 
-		"kube_pod_container_resource_requests": prometheus.Metric("resource.requests"),
-		"kube_pod_container_resource_limits":   prometheus.Metric("resource.limits"),
+		"kube_pod_container_resource_requests": prometheus.Metric("", prometheus.OpFilterMap(
+			"resource", map[string]string{
+				"cpu":    "cpu.request.cores",
+				"memory": "memory.request.bytes",
+			},
+		)),
+		"kube_pod_container_resource_limits": prometheus.Metric("", prometheus.OpFilterMap(
+			"resource", map[string]string{
+				"cpu":    "cpu.limit.cores",
+				"memory": "memory.limit.bytes",
+			},
+		)),
 
 		"kube_pod_container_status_ready":   prometheus.BooleanMetric("status.ready"),
 		"kube_pod_container_status_running": prometheus.BooleanMetric("status.phase"),
@@ -55,9 +65,6 @@ var mapping = &prometheus.MetricsMapping{
 		"container":    prometheus.KeyLabel("name"),
 		"node":         prometheus.Label(mb.ModuleDataKey + ".node.name"),
 		"container_id": prometheus.KeyLabel("id"),
-		"resource":     prometheus.Label("resource"),
-		"unit":         prometheus.Label("unit"),
-		"reason":       prometheus.Label("reason"),
 	},
 }
 

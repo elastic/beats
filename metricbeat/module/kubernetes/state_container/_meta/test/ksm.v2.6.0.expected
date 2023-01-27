@@ -7,20 +7,34 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "coredns-565d847f94-q2mmv"
+				"name": "kindnet-4tnzw"
 			}
 		},
 		"MetricSetFields": {
-			"name": "coredns",
-			"resource": "memory",
+			"cpu": {
+				"limit": {
+					"cores": 0.1
+				},
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"memory": {
+				"limit": {
+					"bytes": 52428800
+				},
+				"request": {
+					"bytes": 52428800
+				}
+			},
+			"name": "kindnet-cni",
 			"status": {
 				"phase": true,
 				"ready": true,
 				"restarts": {
 					"count": 0
 				}
-			},
-			"unit": "byte"
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -41,20 +55,64 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "metricbeat-h24sg"
+				"name": "hello-cronjob-27899499-k5d56"
 			}
 		},
 		"MetricSetFields": {
-			"name": "metricbeat",
-			"resource": "memory",
+			"name": "hello-cronjob",
+			"status": {
+				"phase": false,
+				"ready": false,
+				"reason": 1,
+				"restarts": {
+					"count": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "coredns-565d847f94-q2mmv"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"memory": {
+				"limit": {
+					"bytes": 178257920
+				},
+				"request": {
+					"bytes": 73400320
+				}
+			},
+			"name": "coredns",
 			"status": {
 				"phase": true,
 				"ready": true,
 				"restarts": {
 					"count": 0
 				}
-			},
-			"unit": "byte"
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -83,40 +141,6 @@
 			"status": {
 				"phase": true,
 				"ready": true,
-				"restarts": {
-					"count": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "hello-cronjob-27899498-q8cl7"
-			}
-		},
-		"MetricSetFields": {
-			"name": "hello-cronjob",
-			"reason": "Completed",
-			"status": {
-				"phase": false,
-				"ready": false,
-				"reason": 1,
 				"restarts": {
 					"count": 0
 				}
@@ -209,114 +233,20 @@
 			}
 		},
 		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"memory": {
+				"request": {
+					"bytes": 104857600
+				}
+			},
 			"name": "etcd",
-			"resource": "memory",
 			"status": {
 				"phase": true,
 				"ready": true,
-				"restarts": {
-					"count": 0
-				}
-			},
-			"unit": "byte"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "pi-m88dn"
-			}
-		},
-		"MetricSetFields": {
-			"name": "pi",
-			"reason": "Completed",
-			"status": {
-				"phase": false,
-				"ready": false,
-				"reason": 1,
-				"restarts": {
-					"count": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "hello-cronjob-27899500-skmng"
-			}
-		},
-		"MetricSetFields": {
-			"name": "hello-cronjob",
-			"reason": "Completed",
-			"status": {
-				"phase": false,
-				"ready": false,
-				"reason": 1,
-				"restarts": {
-					"count": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "hello-cronjob-27899499-k5d56"
-			}
-		},
-		"MetricSetFields": {
-			"name": "hello-cronjob",
-			"reason": "Completed",
-			"status": {
-				"phase": false,
-				"ready": false,
-				"reason": 1,
 				"restarts": {
 					"count": 0
 				}
@@ -345,16 +275,89 @@
 			}
 		},
 		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.2
+				}
+			},
 			"name": "kube-controller-manager",
-			"resource": "cpu",
 			"status": {
 				"phase": true,
 				"ready": true,
 				"restarts": {
 					"count": 0
 				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
 			},
-			"unit": "core"
+			"pod": {
+				"name": "kube-scheduler-kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"name": "kube-scheduler",
+			"status": {
+				"phase": true,
+				"ready": true,
+				"restarts": {
+					"count": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "pi-m88dn"
+			}
+		},
+		"MetricSetFields": {
+			"name": "pi",
+			"status": {
+				"phase": false,
+				"ready": false,
+				"reason": 1,
+				"restarts": {
+					"count": 0
+				}
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -407,20 +410,31 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "kindnet-4tnzw"
+				"name": "metricbeat-h24sg"
 			}
 		},
 		"MetricSetFields": {
-			"name": "kindnet-cni",
-			"resource": "memory",
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"memory": {
+				"limit": {
+					"bytes": 209715200
+				},
+				"request": {
+					"bytes": 104857600
+				}
+			},
+			"name": "metricbeat",
 			"status": {
 				"phase": true,
 				"ready": true,
 				"restarts": {
 					"count": 0
 				}
-			},
-			"unit": "byte"
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -441,20 +455,52 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "kube-apiserver-kind-control-plane"
+				"name": "hello-cronjob-27899500-skmng"
 			}
 		},
 		"MetricSetFields": {
-			"name": "kube-apiserver",
-			"resource": "cpu",
+			"name": "hello-cronjob",
 			"status": {
-				"phase": true,
-				"ready": true,
+				"phase": false,
+				"ready": false,
+				"reason": 1,
 				"restarts": {
 					"count": 0
 				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
 			},
-			"unit": "core"
+			"pod": {
+				"name": "hello-cronjob-27899498-q8cl7"
+			}
+		},
+		"MetricSetFields": {
+			"name": "hello-cronjob",
+			"status": {
+				"phase": false,
+				"ready": false,
+				"reason": 1,
+				"restarts": {
+					"count": 0
+				}
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -479,16 +525,27 @@
 			}
 		},
 		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"memory": {
+				"limit": {
+					"bytes": 178257920
+				},
+				"request": {
+					"bytes": 73400320
+				}
+			},
 			"name": "coredns",
-			"resource": "memory",
 			"status": {
 				"phase": true,
 				"ready": true,
 				"restarts": {
 					"count": 0
 				}
-			},
-			"unit": "byte"
+			}
 		},
 		"Index": "",
 		"ID": "",
@@ -509,20 +566,23 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "kube-scheduler-kind-control-plane"
+				"name": "kube-apiserver-kind-control-plane"
 			}
 		},
 		"MetricSetFields": {
-			"name": "kube-scheduler",
-			"resource": "cpu",
+			"cpu": {
+				"request": {
+					"cores": 0.25
+				}
+			},
+			"name": "kube-apiserver",
 			"status": {
 				"phase": true,
 				"ready": true,
 				"restarts": {
 					"count": 0
 				}
-			},
-			"unit": "core"
+			}
 		},
 		"Index": "",
 		"ID": "",

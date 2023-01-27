@@ -8,25 +8,17 @@
       type: keyword
       description:
         Container id
-    - name: resource
+    - name: name
       type: keyword
       description:
-        Resource kind
-    - name: unit
-      type: keyword
-      description:
-        Resource kind metric unit
-    - name: reason
-      type: keyword
-      description:
-        Reason for resource status change
+        Container name
     - name: status
       type: group
       fields:
         - name: phase
           type: keyword
           description: >
-                Container phase (running, waiting, terminated)
+            Container phase (running, waiting, terminated)
         - name: ready
           type: boolean
           description: >
@@ -44,3 +36,27 @@
           type: keyword
           description: >
             The last reason the container was in terminated state (Completed, ContainerCannotRun, Error or OOMKilled).
+    - name: cpu
+      type: group
+      fields:
+        - name: limit.cores
+          type: float
+          description: >
+            Container CPU cores limit
+        - name: request.cores
+          type: float
+          description: >
+            Container CPU requested cores
+    - name: memory
+      type: group
+      fields:
+        - name: limit.bytes
+          type: long
+          format: bytes
+          description: >
+            Container memory limit in bytes
+        - name: request.bytes
+          type: long
+          format: bytes
+          description: >
+            Container requested memory in bytes
