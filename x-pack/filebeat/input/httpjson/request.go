@@ -309,12 +309,22 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			// perform and store regular call responses
 			httpResp, err = rf.collectResponse(stdCtx, trCtx, r)
 			if err != nil {
+				closeChannels(
+					[]chan int{publishedEventsCountChannel},
+					[]chan maybeMsg{events},
+					[]chan *http.Response{responseChannel, intermediateResponseChannel, initialResponseChannel},
+				)
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			// store first response in transform context
 			var bodyMap map[string]interface{}
 			body, err := io.ReadAll(httpResp.Body)
 			if err != nil {
+				closeChannels(
+					[]chan int{publishedEventsCountChannel},
+					[]chan maybeMsg{events},
+					[]chan *http.Response{responseChannel, intermediateResponseChannel, initialResponseChannel},
+				)
 				return fmt.Errorf("failed to read http response body: %w", err)
 			}
 			httpResp.Body = io.NopCloser(bytes.NewReader(body))
@@ -331,7 +341,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 			if len(r.requestFactories) == 1 {
 				responseChannel <- httpResp
-				close(responseChannel)
+				closeChannels(
+					nil,
+					nil,
+					[]chan *http.Response{responseChannel, intermediateResponseChannel},
+				)
 				go r.responseProcessors[i].startProcessing(stdCtx, trCtx, responseChannel, events, true)
 				go processAndPublishEvents(trCtx, events, publishedEventsCountChannel, publisher, true, r.log)
 				n = <-publishedEventsCountChannel
@@ -344,6 +358,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				chainIndex = i + 1
 				resp, err := cloneResponse(httpResp)
 				if err != nil {
+					closeChannels(
+						[]chan int{publishedEventsCountChannel},
+						[]chan maybeMsg{events},
+						[]chan *http.Response{responseChannel, intermediateResponseChannel, initialResponseChannel},
+					)
 					return err
 				}
 				// the response is cloned and added to finalResps here, since the response of the 1st page (whether pagination exists or not), will
@@ -358,6 +377,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					isChainWithPageExpected = true
 					resp, err := cloneResponse(httpResp)
 					if err != nil {
+						closeChannels(
+							[]chan int{publishedEventsCountChannel},
+							[]chan maybeMsg{events},
+							[]chan *http.Response{intermediateResponseChannel, initialResponseChannel},
+						)
 						return err
 					}
 					initialResponseChannel <- resp
@@ -370,6 +394,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[i+1].replace)
 			newIds := <-idsChannel
 			if newIds.err != nil {
+				closeChannels(
+					[]chan int{publishedEventsCountChannel},
+					[]chan maybeMsg{events},
+					[]chan *http.Response{responseChannel, initialResponseChannel},
+				)
 				return newIds.err
 			}
 			ids = newIds.ids
@@ -380,6 +409,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		} else {
 			if len(ids) == 0 {
 				n = 0
+				closeChannels(
+					[]chan int{publishedEventsCountChannel},
+					[]chan maybeMsg{events},
+					[]chan *http.Response{responseChannel, intermediateResponseChannel},
+				)
 				continue
 			}
 			urlCopy = rf.url
@@ -398,6 +432,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				replaceArr = strings.Split(rf.replaceWith, ",")
 				val, doReplaceWith, err = fetchValueFromContext(chainTrCtx, strings.TrimSpace(replaceArr[1]))
 				if err != nil {
+					closeChannels(
+						[]chan int{publishedEventsCountChannel},
+						[]chan maybeMsg{events},
+						[]chan *http.Response{responseChannel, intermediateResponseChannel, initialResponseChannel},
+					)
 					return err
 				}
 			}
@@ -420,6 +459,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				// reformat urls of requestFactory using ids
 				rf.url, err = generateNewUrl(rf.replace, urlString, id)
 				if err != nil {
+					closeChannels(
+						nil,
+						nil,
+						[]chan *http.Response{responseChannel, intermediateResponseChannel, initialResponseChannel},
+					)
 					return fmt.Errorf("failed to generate new URL: %w", err)
 				}
 
@@ -427,12 +471,22 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				if doReplaceWith {
 					rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 					if err != nil {
+						closeChannels(
+							nil,
+							nil,
+							[]chan *http.Response{responseChannel, intermediateResponseChannel, initialResponseChannel},
+						)
 						return fmt.Errorf("failed to generate new URL: %w", err)
 					}
 				}
 				// collect data from new urls
 				httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
 				if err != nil {
+					closeChannels(
+						nil,
+						nil,
+						[]chan *http.Response{responseChannel, intermediateResponseChannel, initialResponseChannel},
+					)
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
 				// store data according to response type
@@ -441,21 +495,23 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					intermediateResponseChannel <- httpResp
 				}
 			}
-			close(responseChannel)
-			close(intermediateResponseChannel)
+			closeChannels(
+				nil,
+				nil,
+				[]chan *http.Response{responseChannel, intermediateResponseChannel},
+			)
 			rf.url = urlCopy
 
 			if i != len(r.requestFactories)-1 {
-				// The if condition (i < len(r.requestFactories)) ensures this branch never runs to the last element
-				// of r.requestFactories, therefore r.requestFactories[i+1] will never be out of bounds.
 				newIds := <-idsChannel
 				if newIds.err != nil {
+					close(initialResponseChannel)
+					n = <-publishedEventsCountChannel
 					return newIds.err
 				}
 				ids = newIds.ids
 			}
 			n = <-publishedEventsCountChannel
-
 		}
 	}
 	close(initialResponseChannel)
@@ -602,11 +658,11 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 
 		// for each pagination response, we repeat all the chain steps / blocks
 		count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)
+		eventCount += count
 		if err != nil {
 			r.log.Errorf("error processing chain event: %w", err)
 			continue
 		}
-		eventCount += count
 
 		err = response.Body.Close()
 		if err != nil {
@@ -635,13 +691,11 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 	go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[chainIndex].replace)
 	newIds := <-idsChannel
 	if newIds.err != nil {
-		return -1, newIds.err
+		return n, newIds.err
 	}
 	ids = newIds.ids
 
 	for i := chainIndex; i < len(r.requestFactories); i++ {
-		processingChannel := make(chan *http.Response, 1)
-		intermediateResponseChannel := make(chan *http.Response, 1)
 		rf := r.requestFactories[i]
 
 		if len(ids) == 0 {
@@ -665,25 +719,39 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 		}
 
+		processingChannel := make(chan *http.Response, 1)
+		intermediateResponseChannel := make(chan *http.Response, 1)
 		events := make(chan maybeMsg, 1)
 		publishedEventsCountChannel := make(chan int, 1)
 		idsChannel := make(chan idsStruct, 1)
 
 		go rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, processingChannel, events, true)
 		go processAndPublishEvents(chainTrCtx, events, publishedEventsCountChannel, publisher, i < len(r.requestFactories), r.log)
-		go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[i+1].replace)
+		if i != len(r.requestFactories)-1 {
+			go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[i+1].replace)
+		}
 		// perform request over collected ids
 		for _, id := range ids {
 			// reformat urls of requestFactory using ids
 			rf.url, err = generateNewUrl(rf.replace, urlString, id)
 			if err != nil {
-				return -1, fmt.Errorf("failed to generate new URL: %w", err)
+				closeChannels(
+					nil,
+					nil,
+					[]chan *http.Response{processingChannel, intermediateResponseChannel},
+				)
+				return n, fmt.Errorf("failed to generate new URL: %w", err)
 			}
 
 			// reformat url accordingly if replaceWith clause exists
 			if doReplaceWith {
 				rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 				if err != nil {
+					closeChannels(
+						nil,
+						nil,
+						[]chan *http.Response{processingChannel, intermediateResponseChannel},
+					)
 					return n, fmt.Errorf("failed to generate new URL: %w", err)
 				}
 			}
@@ -697,7 +765,12 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 
 			httpResp, err = rf.collectResponse(stdCtx, chainTrCtx, r)
 			if err != nil {
-				return -1, fmt.Errorf("failed to execute rf.collectResponse: %w", err)
+				closeChannels(
+					nil,
+					nil,
+					[]chan *http.Response{processingChannel, intermediateResponseChannel},
+				)
+				return n, fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 
 			processingChannel <- httpResp
@@ -705,8 +778,11 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 				intermediateResponseChannel <- httpResp
 			}
 		}
-		close(intermediateResponseChannel)
-		close(processingChannel)
+		closeChannels(
+			nil,
+			nil,
+			[]chan *http.Response{intermediateResponseChannel, processingChannel},
+		)
 		rf.url = urlCopy
 
 		if i != len(r.requestFactories)-1 {
@@ -714,7 +790,8 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			// of r.requestFactories, therefore r.requestFactories[i+1] will never be out of bounds.
 			newIds := <-idsChannel
 			if newIds.err != nil {
-				return -1, newIds.err
+				n += <-publishedEventsCountChannel
+				return n, newIds.err
 			}
 			ids = newIds.ids
 		}
@@ -766,4 +843,16 @@ func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
 	}
 
 	return io.NopCloser(&buf), nil
+}
+
+func closeChannels(intChannels []chan int, maybeMsgChannels []chan maybeMsg, httpResponseChannels []chan *http.Response) {
+	for _, c := range intChannels {
+		close(c)
+	}
+	for _, c := range maybeMsgChannels {
+		close(c)
+	}
+	for _, c := range httpResponseChannels {
+		close(c)
+	}
 }
