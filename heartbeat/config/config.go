@@ -64,7 +64,7 @@ func DefaultConfig() *Config {
 		"browser": {Limit: 2},
 	}
 
-	// Read the env key HEARTBEAT_LIMIT_{TYPE} for each type of monitor to set scaling limits
+	// Read the env key SYNTHETICS_LIMIT_{TYPE} for each type of monitor to set scaling limits
 	// hard coded list of types to avoid cycles in current plugin system.
 	// TODO: refactor plugin system to DRY this up
 	for _, t := range []string{"http", "tcp", "icmp", "browser"} {
