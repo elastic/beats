@@ -28,6 +28,7 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/user"
 	"runtime"
@@ -75,6 +76,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/report/buffer"
 	"github.com/elastic/elastic-agent-libs/paths"
 	svc "github.com/elastic/elastic-agent-libs/service"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
@@ -485,6 +487,14 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 
 	// Allow the manager to stop a currently running beats out of bound.
+	// That is the stop callback used by the X-Pack manager. We just need to call
+	// it whenever we need to stop the beat
+	// We might need something like this:
+	// if cm.stopFunc != nil {
+	// 	// I'm not 100% sure the once here is needed,
+	// 	// but various beats tend to handle this in a not-quite-safe way
+	// 	cm.beatStop.Do(cm.stopFunc)
+	// }
 	b.Manager.SetStopCallback(beater.Stop)
 
 	return beater.Run(&b.Beat)
@@ -731,6 +741,7 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
+	// HERE - Manager instantiated!!
 	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
 	if err != nil {
 		return err
@@ -983,6 +994,60 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 	if !cfg.IsSet() {
 		return outputs.Group{}, nil
 	}
+
+	// Here the output is created and we have acces to the Beat struct (with the manager)
+	// as a workaround we can unpack the new settings and trigger the reload-watcher from here
+	gw := cfgfile.NewGlobWatcher("/tmp/foo1.watch")
+	// Ignore the first scan as it will always return
+	// true for files changed. The output has not been
+	// started yet, so even if the files have changed since
+	// the Beat started, they don't need to be reloaded
+	gw.Scan()
+
+	c := cfg.Config()
+	fmt.Println(cfg.Name(), c)
+
+	tlsCfg := tlscommon.Config{}
+
+	// We get an output config, so we extract the 'SSL' bit from it
+	c, err := cfg.Config().Child("ssl", -1)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	if err := c.Unpack(&tlsCfg); err != nil {
+		logp.L().Errorf("could not unpack config: %s", err)
+		panic(err)
+	}
+
+	fmt.Printf("\n\n%#v\n\n", tlsCfg)
+	go func() {
+		ticker := time.Tick(3 * time.Second)
+
+		for {
+			<-ticker
+			fmt.Println("Glob Watcher")
+			files, changed, err := gw.Scan()
+			fmt.Println(files, changed, err)
+		}
+
+	}()
+
+	fmt.Println("Starting Webserver")
+	go func() {
+		m := http.NewServeMux()
+		m.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			logp.Info("****************************************************")
+			logp.Info("****************************************************")
+			logp.Info("****************************************************")
+			logp.Info("****************************************************")
+			logp.Info("Starting beat shutdown")
+			b.Manager.Stop()
+		})
+		if err := http.ListenAndServe(":3000", m); err != nil {
+			panic(err)
+		}
+	}()
 
 	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
 }

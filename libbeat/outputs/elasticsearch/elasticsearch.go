@@ -18,8 +18,12 @@
 package elasticsearch
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -32,6 +36,43 @@ func init() {
 }
 
 const logSelector = "elasticsearch"
+
+func doSomething(cfg *config.C, esconf elasticsearchConfig) {
+	for {
+		time.Sleep(5 * time.Second)
+		fmt.Println("**************************** here! ")
+		if output := reload.RegisterV2.GetReloadableOutput(); output != nil {
+			fmt.Println("Got an output reloader")
+
+			// The outptu reloader needs the config to be "namespaced",
+			// so we add it manually.
+			tmp := map[string]any{
+				"elasticsearch": cfg,
+			}
+
+			uc, err := config.NewConfigFrom(tmp)
+			if err != nil {
+				fmt.Println("cannot create config")
+				panic("err")
+			}
+
+			// Calling this too quicky in a row (like every second) seems to cause panics
+			// however if we wait a bit, it's fine
+			// This might panic because of the metrics registry, I just don't know if will be an
+			// issue in the real world.
+			// The panic is happening on
+			// /home/tiago/go/pkg/mod/github.com/elastic/elastic-agent-libs@v0.2.16/monitoring/metrics.go:264
+			// something there is not safe there.
+			if err := output.Reload(&reload.ConfigWithMeta{Config: uc}); err != nil {
+				fmt.Println("cannot reload output")
+				panic(err)
+			}
+
+			fmt.Println("Output reloaded, waiting 1min")
+			time.Sleep(time.Minute)
+		}
+	}
+}
 
 func makeES(
 	im outputs.IndexManager,
@@ -118,6 +159,9 @@ func makeES(
 		client = outputs.WithBackoff(client, config.Backoff.Init, config.Backoff.Max)
 		clients[i] = client
 	}
+
+	// As the last thing, start the 'reloader'
+	// go doSomething(cfg, config)
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
 }

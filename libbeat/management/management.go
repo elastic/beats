@@ -159,6 +159,7 @@ type nilManager struct {
 	status   Status
 	msg      string
 	stopFunc func()
+	stopOnce sync.Once
 }
 
 func nilFactory(*config.C, *reload.Registry, uuid.UUID) (Manager, error) {
@@ -170,11 +171,6 @@ func nilFactory(*config.C, *reload.Registry, uuid.UUID) (Manager, error) {
 	}, nil
 }
 
-func (*nilManager) SetStopCallback(func())             {}
-func (*nilManager) Enabled() bool                      { return false }
-func (*nilManager) Start() error                       { return nil }
-func (*nilManager) Stop()                              {}
-func (*nilManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *nilManager) UpdateStatus(status Status, msg string) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
@@ -185,8 +181,27 @@ func (n *nilManager) UpdateStatus(status Status, msg string) {
 	}
 }
 
-func (n *nilManager) RegisterAction(action client.Action) {}
+func (n *nilManager) SetStopCallback(f func()) {
+	n.stopFunc = f
+}
 
+func (n *nilManager) Stop() {
+	// I'm not sure we really need the sync.Once here, but
+	// because different Beats can have different requirements
+	// for their stup function, it's better to make sure it will
+	// only be called once.
+	n.stopOnce.Do(func() {
+		n.stopFunc()
+	})
+}
+
+// Enabled returns false because management is disabled.
+// the nilManager is still used for shutdown on some cases,
+// but that does not mean the Beat is being managed externally,
+// hence it will always return false.
+func (n *nilManager) Enabled() bool                         { return false }
+func (n *nilManager) Start() error                          { return nil }
+func (n *nilManager) CheckRawConfig(cfg *config.C) error    { return nil }
+func (n *nilManager) RegisterAction(action client.Action)   {}
 func (n *nilManager) UnregisterAction(action client.Action) {}
-
-func (n *nilManager) SetPayload(map[string]interface{}) {}
+func (n *nilManager) SetPayload(map[string]interface{})     {}
