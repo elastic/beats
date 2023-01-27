@@ -2,16 +2,16 @@
   "@timestamp": "2023-01-19T19:08:28.770Z",
   "elasticsearch": {
     "cluster": {
-      "id": "XXXX",
+      "id": "WocBBA0QRma0sGpdQ7vLfQ",
       "name": "my-cluster"
     },
     "node": {
-      "name": "instance-0000000022",
+      "name": "27fb1c2fd783",
       "roles": [
         "ingest",
         "remote_cluster_client"
       ],
-      "id": "ZZZZZ"
+      "id": "f5i3v9hMT_q__q6B9WOo5A"
     },
     "ingest_pipeline": {
       "name": "my-pipeline",
