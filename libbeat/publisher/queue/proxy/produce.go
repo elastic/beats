@@ -39,26 +39,30 @@ func newProducer(b *broker, ackHandler func(count int)) queue.Producer {
 		ackHandler: ackHandler}
 }
 
-func (p *producer) makeQueueEntry(event interface{}) queueEntry {
-	entry := queueEntry{event: event}
-	if p.ackHandler != nil {
-		entry.producer = p
+func (p *producer) makePushRequest(event interface{}, canBlock bool) pushRequest {
+	req := pushRequest{
+		event:        event,
+		responseChan: make(chan bool, 1),
+		canBlock:     canBlock,
 	}
-	return entry
+	if p.ackHandler != nil {
+		req.producer = p
+	}
+	return req
 }
 
 func (p *producer) Publish(event interface{}) (queue.EntryID, bool) {
 	if p.cancelled {
 		return 0, false
 	}
-	return 0, p.broker.publish(p.makeQueueEntry(event))
+	return 0, p.publish(p.makePushRequest(event, true))
 }
 
 func (p *producer) TryPublish(event interface{}) (queue.EntryID, bool) {
 	if p.cancelled {
 		return 0, false
 	}
-	return 0, p.broker.tryPublish(p.makeQueueEntry(event))
+	return 0, p.publish(p.makePushRequest(event, false))
 }
 
 func (p *producer) Cancel() int {
@@ -66,24 +70,12 @@ func (p *producer) Cancel() int {
 	return 0
 }
 
-func (b *broker) publish(entry queueEntry) bool {
+func (p *producer) publish(req pushRequest) bool {
 	select {
-	case b.pushChan <- entry:
-		return true
-	case <-b.done:
+	case p.broker.pushChan <- req:
+		return <-req.responseChan
+	case <-p.broker.done:
 		// The queue is shutting down
-		return false
-	}
-}
-
-func (b *broker) tryPublish(entry queueEntry) bool {
-	select {
-	case b.pushChan <- entry:
-		return true
-	case <-b.done:
-		return false
-	default:
-		b.logger.Debugf("Dropping event, queue is blocked")
 		return false
 	}
 }

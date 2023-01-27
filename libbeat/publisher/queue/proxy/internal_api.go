@@ -17,6 +17,23 @@
 
 package proxyqueue
 
+// producer -> broker API
+
+type pushRequest struct {
+	event    interface{}
+	producer *producer
+
+	// After receiving a request, the broker will respond on this channel
+	// with whether the new entry was accepted or not.
+	responseChan chan bool
+
+	// If canBlock is true, then the broker will store this request until
+	// either the request can be accepted or the queue itself is closed.
+	// Otherwise it will immediately reject the requst if there is no
+	// space in the pending buffer.
+	canBlock bool
+}
+
 // consumer -> broker API
 
 type getRequest struct {

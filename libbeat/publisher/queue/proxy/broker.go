@@ -37,7 +37,7 @@ type broker struct {
 	// api channels
 
 	// Producers send queue entries to pushChan to add them to the next batch.
-	pushChan chan queueEntry
+	pushChan chan pushRequest
 
 	// Consumers send requests to getChan to read entries from the queue.
 	getChan chan getRequest
@@ -48,6 +48,11 @@ type broker struct {
 	// Pipeline.observer.queueACKed(), which updates the beats registry
 	// if needed.
 	ackListener queue.ACKListener
+
+	// Internal state for the broker's run loop.
+	pendingBatch    *batch
+	pendingACKs     pendingACKsList
+	blockedRequests blockedRequests
 
 	// wait group for worker shutdown
 	wg sync.WaitGroup
@@ -78,11 +83,12 @@ func NewQueue(
 	}
 
 	b := &broker{
-		done:   make(chan struct{}),
-		logger: logger,
+		done:      make(chan struct{}),
+		logger:    logger,
+		batchSize: settings.BatchSize,
 
 		// broker API channels
-		pushChan: make(chan queueEntry),
+		pushChan: make(chan pushRequest),
 		getChan:  make(chan getRequest),
 
 		ackListener: settings.ACKListener,
@@ -137,22 +143,23 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 	return queue.Metrics{}, nil
 }
 
+type blockedRequest struct {
+	next    *blockedRequest
+	request *pushRequest
+}
+
+type blockedRequests struct {
+	first *blockedRequest
+	last  *blockedRequest
+}
+
 func (b *broker) run() {
-	var (
-		pendingBatch = &batch{queue: b}
-		pendingACKs  pendingACKsList
-	)
+	b.pendingBatch = &batch{queue: b}
 
 	for {
-		var pushChan chan queueEntry
-		// Push requests are enabled if the pending batch isn't yet full.
-		if len(pendingBatch.entries) < b.batchSize {
-			pushChan = b.pushChan
-		}
-
 		var getChan chan getRequest
 		// Get requests are enabled if the current pending batch is nonempty.
-		if len(pendingBatch.entries) > 0 {
+		if len(b.pendingBatch.entries) > 0 {
 			getChan = b.getChan
 		}
 
@@ -160,31 +167,14 @@ func (b *broker) run() {
 		case <-b.done:
 			return
 
-		case entry := <-pushChan: // producer pushing new event
-			entry.producer.producedCount++
-			pendingBatch.entries = append(pendingBatch.entries, entry)
+		case req := <-b.pushChan: // producer pushing new event
+			b.handlePushRequest(req)
 
 		case req := <-getChan: // consumer asking for next batch
-			acks := acksForBatch(pendingBatch)
-			var doneChan chan struct{}
-			if len(acks) > 0 {
-				// We only actually save the ACK state and give it a done
-				// channel if some producer in this batch has ACKs enabled.
-				doneChan = make(chan struct{})
-				pendingACKs.append(&batchACKState{
-					doneChan: doneChan,
-					acks:     acks,
-				})
-			}
-			req.responseChan <- getResponse{
-				ackChan: doneChan,
-				entries: pendingBatch.entries,
-			}
-			// Reset the pending batch
-			pendingBatch = &batch{queue: b}
+			b.handleGetRequest(req)
 
-		case <-pendingACKs.nextDoneChan(): // Previous batch being acknowledged
-			batch := pendingACKs.pop()
+		case <-b.pendingACKs.nextDoneChan(): // Previous batch being acknowledged
+			batch := b.pendingACKs.pop()
 			// Send any acknowledgments needed for this batch.
 			total := 0
 			for _, ack := range batch.acks {
@@ -195,4 +185,78 @@ func (b *broker) run() {
 			b.ackListener.OnACK(total)
 		}
 	}
+}
+
+func (b *broker) handlePushRequest(req pushRequest) {
+	if len(b.pendingBatch.entries) < b.batchSize {
+		b.pendingBatch.entries = append(b.pendingBatch.entries,
+			queueEntry{event: req.event, producer: req.producer})
+		if req.producer != nil {
+			req.producer.producedCount++
+		}
+		req.responseChan <- true
+	} else if req.canBlock {
+		// If there isn't room for the event, but the producer wants
+		// to block until there is, add it to the queue.
+		b.blockedRequests.add(&req)
+	} else {
+		// The pending batch is full, the producer doesn't want to
+		// block, so return immediate failure.
+		req.responseChan <- false
+	}
+}
+
+func (b *broker) handleGetRequest(req getRequest) {
+	acks := acksForBatch(b.pendingBatch)
+	var doneChan chan struct{}
+	if len(acks) > 0 {
+		// We only actually save the ACK state and give it a done
+		// channel if some producer in this batch has ACKs enabled.
+		doneChan = make(chan struct{})
+		b.pendingACKs.append(&batchACKState{
+			doneChan: doneChan,
+			acks:     acks,
+		})
+	}
+	req.responseChan <- getResponse{
+		ackChan: doneChan,
+		entries: b.pendingBatch.entries,
+	}
+
+	// Unblock any pending requests we can fit into the new batch.
+	blocked := b.blockedRequests
+	entries := []queueEntry{}
+	for req := blocked.next(); req != nil && len(entries) < b.batchSize; req = blocked.next() {
+		entries = append(entries,
+			queueEntry{event: req.event, producer: req.producer})
+		if req.producer != nil {
+			req.producer.producedCount++
+		}
+		req.responseChan <- true
+	}
+
+	// Reset the pending batch
+	b.pendingBatch = &batch{queue: b, entries: entries}
+}
+
+func (b *blockedRequests) add(request *pushRequest) {
+	blockedReq := &blockedRequest{request: request}
+	if b.first == nil {
+		b.first = blockedReq
+	} else {
+		b.last.next = blockedReq
+	}
+	b.last = b.first
+}
+
+func (b *blockedRequests) next() *pushRequest {
+	var result *pushRequest
+	if b.first != nil {
+		result = b.first.request
+		b.first = b.first.next
+		if b.first == nil {
+			b.last = nil
+		}
+	}
+	return result
 }
