@@ -45213,15 +45213,6 @@ type: keyword
 
 --
 
-*`kubernetes.container.name`*::
-+
---
-Container name
-
-type: keyword
-
---
-
 *`kubernetes.container.reason`*::
 +
 --

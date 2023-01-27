@@ -8,10 +8,6 @@
       type: keyword
       description:
         Container id
-    - name: name
-      type: keyword
-      description:
-        Container name
     - name: reason
       type: keyword
       description:
