@@ -12,6 +12,10 @@
       type: keyword
       description:
         Container name
+    - name: reason
+      type: keyword
+      description:
+        Reason for status
     - name: status
       type: group
       fields:

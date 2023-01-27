@@ -7,6 +7,38 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
+				"name": "hello-cronjob-27900587-r7g6w"
+			}
+		},
+		"MetricSetFields": {
+			"name": "hello-cronjob",
+			"status": {
+				"phase": false,
+				"ready": false,
+				"restarts": {
+					"count": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
 				"name": "kindnet-4tnzw"
 			}
 		},
@@ -55,18 +87,14 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "hello-cronjob-27900586-psw5h"
+				"name": "hello-cronjob-27900587-r7g6w"
 			}
 		},
 		"MetricSetFields": {
 			"name": "hello-cronjob",
+			"reason": "Completed",
 			"status": {
-				"phase": false,
-				"ready": false,
-				"reason": 1,
-				"restarts": {
-					"count": 0
-				}
+				"reason": 1
 			}
 		},
 		"Index": "",
@@ -229,18 +257,14 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "hello-cronjob-27900585-6zngl"
+				"name": "pi-m88dn"
 			}
 		},
 		"MetricSetFields": {
-			"name": "hello-cronjob",
+			"name": "pi",
+			"reason": "Completed",
 			"status": {
-				"phase": false,
-				"ready": false,
-				"reason": 1,
-				"restarts": {
-					"count": 0
-				}
+				"reason": 1
 			}
 		},
 		"Index": "",
@@ -378,15 +402,14 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "pi-m88dn"
+				"name": "hello-cronjob-27900586-psw5h"
 			}
 		},
 		"MetricSetFields": {
-			"name": "pi",
+			"name": "hello-cronjob",
 			"status": {
 				"phase": false,
 				"ready": false,
-				"reason": 1,
 				"restarts": {
 					"count": 0
 				}
@@ -411,18 +434,14 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
-				"name": "hello-cronjob-27900587-r7g6w"
+				"name": "hello-cronjob-27900586-psw5h"
 			}
 		},
 		"MetricSetFields": {
 			"name": "hello-cronjob",
+			"reason": "Completed",
 			"status": {
-				"phase": false,
-				"ready": false,
-				"reason": 1,
-				"restarts": {
-					"count": 0
-				}
+				"reason": 1
 			}
 		},
 		"Index": "",
@@ -489,6 +508,70 @@
 				"name": "kind-control-plane"
 			},
 			"pod": {
+				"name": "hello-cronjob-27900585-6zngl"
+			}
+		},
+		"MetricSetFields": {
+			"name": "hello-cronjob",
+			"status": {
+				"phase": false,
+				"ready": false,
+				"restarts": {
+					"count": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "pi-m88dn"
+			}
+		},
+		"MetricSetFields": {
+			"name": "pi",
+			"status": {
+				"phase": false,
+				"ready": false,
+				"restarts": {
+					"count": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
 				"name": "coredns-565d847f94-dgwk8"
 			}
 		},
@@ -513,6 +596,35 @@
 				"restarts": {
 					"count": 0
 				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "hello-cronjob-27900585-6zngl"
+			}
+		},
+		"MetricSetFields": {
+			"name": "hello-cronjob",
+			"reason": "Completed",
+			"status": {
+				"reason": 1
 			}
 		},
 		"Index": "",

@@ -45222,6 +45222,15 @@ type: keyword
 
 --
 
+*`kubernetes.container.reason`*::
++
+--
+Reason for status
+
+type: keyword
+
+--
+
 
 *`kubernetes.container.status.phase`*::
 +

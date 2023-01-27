@@ -65,6 +65,7 @@ var mapping = &prometheus.MetricsMapping{
 		"container":    prometheus.KeyLabel("name"),
 		"node":         prometheus.Label(mb.ModuleDataKey + ".node.name"),
 		"container_id": prometheus.KeyLabel("id"),
+		"reason":       prometheus.KeyLabel("reason"),
 	},
 }
 
