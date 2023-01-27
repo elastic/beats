@@ -34,6 +34,11 @@ request.transforms:
       default: "SELECT Action,CreatedByContext,CreatedById,CreatedByIssuer,CreatedDate,DelegateUser,Display,Id,ResponsibleNamespacePrefix,Section FROM SetupAuditTrail ORDER BY CreatedDate ASC NULLS FIRST"
 response.split:
   target: body.records
+response.pagination:
+- set:
+    target: url.value
+    value: '[[if (ne .last_response.body.done true)]]{{ .url }}[[.last_response.body.nextRecordsUrl]][[end]]'
+    fail_on_template_error: true
 cursor:
   last_published_setupaudittrail:
     value: '[[.last_event.CreatedDate]]'
