@@ -45724,15 +45724,6 @@ kubernetes node metrics
 
 
 
-*`kubernetes.node.name`*::
-+
---
-Node name
-
-type: keyword
-
---
-
 *`kubernetes.node.condition`*::
 +
 --

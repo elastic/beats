@@ -4,10 +4,6 @@
     kubernetes node metrics
   release: ga
   fields:
-    - name: name
-      type: keyword
-      description:
-        Node name
     - name: condition
       type: keyword
       description:
