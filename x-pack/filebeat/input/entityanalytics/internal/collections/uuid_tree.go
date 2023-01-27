@@ -83,25 +83,25 @@ func (t *UUIDTree) ContainsEdge(from, to uuid.UUID) bool {
 }
 
 // Expand will return a set of value(s) with transitive members included.
-func (t *UUIDTree) Expand(value ...uuid.UUID) UUIDSet {
+func (t *UUIDTree) Expand(value ...uuid.UUID) *UUIDSet {
 	var found UUIDSet
 
 	for _, v := range value {
 		t.expand(v, &found)
 	}
 
-	return found
+	return &found
 }
 
 // ExpandFromSet is like Expand, but takes a Set instead of a slice of values.
-func (t *UUIDTree) ExpandFromSet(values UUIDSet) UUIDSet {
+func (t *UUIDTree) ExpandFromSet(values UUIDSet) *UUIDSet {
 	var found UUIDSet
 
 	values.ForEach(func(elem uuid.UUID) {
 		t.expand(elem, &found)
 	})
 
-	return found
+	return &found
 }
 
 func (t *UUIDTree) expand(value uuid.UUID, seen *UUIDSet) {

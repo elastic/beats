@@ -272,6 +272,11 @@ func TestUUIDSet_Remove(t *testing.T) {
 			InValues: []uuid.UUID{testUUID1, testUUID2, testUUID3},
 			Want:     NewUUIDSet(),
 		},
+		"elements-incomplete": {
+			In:       NewUUIDSet(testUUID1, testUUID2, testUUID3),
+			InValues: []uuid.UUID{testUUID1},
+			Want:     NewUUIDSet(testUUID2, testUUID3),
+		},
 	}
 
 	for name, tc := range tests {
