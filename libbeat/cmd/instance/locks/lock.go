@@ -19,8 +19,6 @@ package locks
 
 import (
 	"fmt"
-	"os"
-	"runtime"
 	"time"
 
 	"github.com/gofrs/flock"
@@ -50,7 +48,7 @@ func New(beatInfo beat.Info) *Locker {
 	return NewWithRetry(beatInfo, 4, time.Millisecond*400)
 }
 
-// NewWithRetry returns a new pid-aware file locker with the given settings
+// NewWithRetry returns a new file locker with the given settings
 func NewWithRetry(beatInfo beat.Info, retryCount int, retrySleep time.Duration) *Locker {
 	lockfilePath := paths.Resolve(paths.Data, beatInfo.Beat+".lock")
 	return &Locker{
@@ -82,35 +80,4 @@ func (lock *Locker) Lock() error {
 		time.Sleep(lock.retrySleep)
 	}
 	return fmt.Errorf("%s: %w", lock.fileLock.Path(), ErrAlreadyLocked)
-}
-
-// Unlock attempts to release the lock on a data path previously acquired via Lock().
-func (lock *Locker) Unlock() error {
-	// Unlock will remove the file while we still have the lock, so we reduce the odds of another beat swooping in to start between the Unlock() and Remove() operation.
-
-	// Removing a file that's locked seems to be an unsupported or undefined, and will often fail on Windows.
-	// Reverse the order of operations, and unlock first, then remove.
-	// This will slightly increase the odds of a race on Windows if we're in a tight restart loop,
-	// as another beat can swoop in and lock the file before this beat removes it.
-	if runtime.GOOS != "windows" {
-		err := os.Remove(lock.fileLock.Path())
-		if err != nil {
-			lock.logger.Warnf("could not remove lockfile at %s", lock.fileLock.Path())
-		}
-	}
-
-	err := lock.fileLock.Unlock()
-	if err != nil {
-		return fmt.Errorf("unable to unlock data path: %w", err)
-	}
-
-	// now unlock on windows.
-	if runtime.GOOS == "windows" {
-		err := os.Remove(lock.fileLock.Path())
-		if err != nil {
-			lock.logger.Warnf("could not remove lockfile at %s", lock.fileLock.Path())
-		}
-	}
-
-	return nil
 }
