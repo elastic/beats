@@ -20,7 +20,6 @@ package locks
 import (
 	"fmt"
 	"os"
-	"runtime"
 )
 
 // Unlock attempts to release the lock on a data path previously acquired via Lock(). This will unlock the file before it removes it.
