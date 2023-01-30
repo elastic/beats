@@ -47971,6 +47971,27 @@ node_stats metrics.
 
 
 
+*`logstash.node.version`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.host`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.id`*::
++
+--
+type: keyword
+
+--
+
 
 *`logstash.node.state.pipeline.id`*::
 +
@@ -47983,6 +48004,64 @@ type: keyword
 +
 --
 type: keyword
+
+--
+
+*`logstash.node.state.pipeline.ephemeral_id`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.batch_size`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.state.pipeline.workers`*::
++
+--
+type: long
+
+--
+
+
+*`logstash.node.state.pipeline.representation.hash`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.representation.type`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.representation.version`*::
++
+--
+type: keyword
+
+--
+
+
+*`logstash.node.state.pipeline.representation.graph.edges`*::
++
+--
+type: object
+
+--
+
+*`logstash.node.state.pipeline.representation.graph.vertices`*::
++
+--
+type: object
 
 --
 
@@ -48039,6 +48118,13 @@ alias to: process.pid
 
 --
 
+
+*`logstash.node.stats.timestamp`*::
++
+--
+type: date
+
+--
 
 
 *`logstash.node.stats.jvm.uptime_in_millis`*::
