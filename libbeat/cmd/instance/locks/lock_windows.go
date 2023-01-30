@@ -34,12 +34,9 @@ func (lock *Locker) Unlock() error {
 		return fmt.Errorf("unable to unlock data path: %w", err)
 	}
 
-	// now unlock on windows.
-	if runtime.GOOS == "windows" {
-		err := os.Remove(lock.fileLock.Path())
-		if err != nil {
-			lock.logger.Warnf("could not remove lockfile at %s: %s", lock.fileLock.Path(), err)
-		}
+	err := os.Remove(lock.fileLock.Path())
+	if err != nil {
+		lock.logger.Warnf("could not remove lockfile at %s: %s", lock.fileLock.Path(), err)
 	}
 
 	return nil
