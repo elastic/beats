@@ -1,8 +1,8 @@
-## Testing Metricbeat
+# Testing metricbeat
 
-### Prerequisites
+## Check that all tests succeed
 
-Make sure that the fields are update. If you don't know how, go to metricbeat directory and run:
+First you need to make sure that the fields are updated. If you don't know how, go to metricbeat directory and run:
 ```bash
 make update
  ```
@@ -12,8 +12,14 @@ Check that the modules pass the tests. Go to the directory of each of them and r
 go test -data
  ```
 
+You can also run the integrations test by applying the following command:
+```bash
+MODULE="kubernetes" mage goIntegTest
+```
 
-### Deploy metricbeat
+
+
+## Deploy metricbeat manually
 1. Spin up the elastic stack:
    ```bash
    elastic-package stack up -v -d
@@ -26,7 +32,7 @@ go test -data
     ```
    > Don't have kind installed? Find how [here](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
 
-3. Set context:
+3. Set the context:
    ```bash
    kubectl cluster-info --context kind-kind
     ```
@@ -67,37 +73,7 @@ go test -data
    metricbeat -e -c /etc/metricbeat.yml
     ```
 
-> **Note**: In case you want to test an updated metricbeat binary, you should delete the manifests
-> and go back to step 5.
+> **Note**: In case you want to test an updated metricbeat binary, you should delete the manifests:
+>   `kubectl delete -k with-ksm` or `kubectl delete -k without-ksm`, and go back to step 5.
 
-
-# Running integration tests.
-
-Running the integration tests for the kubernetes module has the requirement of:
-
-* docker
-* kind
-* kubectl
-
-Once those tools are installed it is as simple as:
-
-```
-MODULE="kubernetes" mage goIntegTest
-```
-
-The integration tester will use the default context from the kubectl configuration defined
-in the `KUBECONFIG` environment variable. There is no requirement that the kubernetes even
-be local to your development machine, it just needs to be accessible.
-
-If no `KUBECONFIG` is set and `kind` is installed then the runner will use `kind` to create
-a local cluster inside your local docker to perform the integration tests inside. The
-`kind` cluster will be created and destroy before and after the test. If you would like to
-keep the `kind` cluster running after the test has finished you can set `KIND_SKIP_DELETE=1`
-inside of your environment.
-
-
-## Starting Kubernetes clusters in Cloud providers
-
-The `terraform` directory contains terraform configurations to start Kubernetes
-clusters in cloud providers.
 
