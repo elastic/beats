@@ -183,6 +183,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add beta `take over` mode for `filestream` for simple migration from `log` inputs {pull}34292[34292]
 - Add pagination support for Salesforce module. {issue}34057[34057] {pull}34065[34065]
 - Allow users to redact sensitive data from CEL input debug logs. {pull}34302[34302]
+- Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
 
 *Auditbeat*
 
