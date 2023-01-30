@@ -224,6 +224,7 @@ func TestConvertMapStr(t *testing.T) {
 				require.Nil(t, converted)
 				return
 			}
+			require.NoError(t, err)
 			requireEqualProto(t, tc.exp, converted)
 		})
 	}
@@ -305,6 +306,9 @@ func TestPublish(t *testing.T) {
 
 			cfg, err := config.NewConfigFrom(map[string]interface{}{
 				"server": addr,
+				"ssl": map[string]interface{}{
+					"enabled": false,
+				},
 			})
 			require.NoError(t, err)
 
@@ -338,7 +342,10 @@ func TestPublish(t *testing.T) {
 		defer stop()
 
 		cfg, err := config.NewConfigFrom(map[string]interface{}{
-			"server":  addr,
+			"server": addr,
+			"ssl": map[string]interface{}{
+				"enabled": false,
+			},
 			"timeout": 5, // 5 sec
 			"backoff": map[string]interface{}{
 				"init": "10ms",
@@ -383,6 +390,9 @@ func TestPublish(t *testing.T) {
 		defer stop()
 
 		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"ssl": map[string]interface{}{
+				"enabled": false,
+			},
 			"server":  addr,
 			"timeout": 5, // 5 sec
 			"backoff": map[string]interface{}{
