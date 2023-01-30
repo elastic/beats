@@ -63,15 +63,10 @@ MODULE="kubernetes" mage goIntegTest
    kubectl cp ./metricbeat `kubectl get pod -n kube-system -l k8s-app=metricbeat -o jsonpath='{.items[].metadata.name}'`:/usr/share/metricbeat/ -n kube-system
     ```
 
-8. Get inside the pod:
+8. Get inside the pod and run metricbeat:
    ```bash
-   kubectl exec `kubectl get pod -n kube-system -l k8s-app=metricbeat -o jsonpath='{.items[].metadata.name}'` -n kube-system -it -- bash
+   kubectl exec `kubectl get pod -n kube-system -l k8s-app=metricbeat -o jsonpath='{.items[].metadata.name}'` -n kube-system -it -- metricbeat -e -c /etc/metricbeat.yml
    ```
-
-9. Once inside the pod, run:
-   ```bash
-   metricbeat -e -c /etc/metricbeat.yml
-    ```
 
 > **Note**: In case you want to test an updated metricbeat binary, you should delete the manifests:
 >   `kubectl delete -k with-ksm` or `kubectl delete -k without-ksm`, and go back to step 5.
