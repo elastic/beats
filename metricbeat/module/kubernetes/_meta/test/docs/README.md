@@ -16,7 +16,7 @@ go test -data
 ### Deploy metricbeat
 1. Spin up the elastic stack:
    ```bash
-   elastic-package stack up -v -dddd
+   elastic-package stack up -v -d
     ```
    > Don't have elastic package installed? Find how [here](https://github.com/elastic/elastic-package/blob/main/README.md).
 
