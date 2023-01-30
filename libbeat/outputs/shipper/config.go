@@ -28,6 +28,7 @@ type backoffConfig struct {
 	Max  time.Duration `config:"max" validate:"nonzero"`
 }
 
+// Config manages configuration for the shipper output
 type Config struct {
 	// Server address in the format of host:port, e.g. `localhost:50051`
 	Server string `config:"server"`
@@ -50,8 +51,11 @@ type Config struct {
 }
 
 func defaultConfig() Config {
+	enabled := true
 	return Config{
-		TLS:                nil,
+		TLS: &tlscommon.Config{
+			Enabled: &enabled,
+		},
 		Timeout:            30 * time.Second,
 		MaxRetries:         3,
 		BulkMaxSize:        50,
