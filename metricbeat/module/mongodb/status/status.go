@@ -20,6 +20,7 @@ package status
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -107,5 +108,76 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 	r.Event(event)
 
+	rate, err := m.calcCacheHitRate(result)
+	if err == nil {
+		r.Event(mb.Event{
+			MetricSetFields: mapstr.M{
+				"cache": mapstr.M{
+					"hit_rate": rate,
+				},
+			},
+		})
+	}
+
 	return nil
+}
+
+func (m *MetricSet) calcCacheHitRate(data map[string]interface{}) (float64, error) {
+	e := fmt.Errorf("cannot calculate cache hit rate")
+	wiredTiger, wiredTigerOk := data["wiredTiger"]
+	if !wiredTigerOk {
+		return 0, e
+	}
+	if _, ok := wiredTiger.(map[string]interface{}); !ok {
+		return 0, e
+	}
+
+	cache, cacheOk := wiredTiger.(map[string]interface{})["cache"]
+	if !cacheOk {
+		return 0, e
+	}
+	if _, ok := cache.(map[string]interface{}); !ok {
+		return 0, e
+	}
+
+	intoCache, intoCacheOk := cache.(map[string]interface{})["bytes read into cache"]
+	fromCache, fromCacheOk := cache.(map[string]interface{})["pages requested from the cache"]
+	if !intoCacheOk || !fromCacheOk {
+		return 0, e
+	}
+	intoCacheNum, e1 := convertToFloat64(intoCache)
+	fromCacheNum, e2 := convertToFloat64(fromCache)
+	if e1 == nil && e2 == nil && fromCacheNum > 0 {
+		return (fromCacheNum-intoCacheNum)/fromCacheNum, nil
+	}
+	return 0, e
+}
+
+func convertToFloat64(n interface{}) (float64, error) {
+	switch n.(type) {
+	case int8:
+		return float64(n.(int8)), nil
+	case uint8:
+		return float64(n.(uint8)), nil
+	case int16:
+		return float64(n.(int16)), nil
+	case uint16:
+		return float64(n.(uint16)), nil
+	case int32:
+		return float64(n.(int32)), nil
+	case uint32:
+		return float64(n.(uint32)), nil
+	case int64:
+		return float64(n.(int64)), nil
+	case uint64:
+		return float64(n.(uint64)), nil
+	case float32:
+		return float64(n.(float32)), nil
+	case float64:
+		return n.(float64), nil
+	case string:
+		return strconv.ParseFloat(n.(string), 64)
+	default:
+		return 0, fmt.Errorf("unsupport data type")
+	}
 }
