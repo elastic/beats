@@ -27,6 +27,7 @@ import (
 
 const (
 	sqsApproximateReceiveCountAttribute = "ApproximateReceiveCount"
+	sqsSentTimestampAttribute           = "SentTimestamp"
 	sqsInvalidParameterValueErrorCode   = "InvalidParameterValue"
 	sqsReceiptHandleIsInvalidErrCode    = "ReceiptHandleIsInvalid"
 )
@@ -133,6 +134,18 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	keepaliveWg.Add(1)
 	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
 
+	receiveCount := getSQSReceiveCount(msg.Attributes)
+	if receiveCount == 1 {
+		// Only contribute to the sqs_lag_time histogram on the first message
+		// to avoid skewing the metric when processing retries.
+		if s, found := msg.Attributes[sqsSentTimestampAttribute]; found {
+			if sentTimeMillis, err := strconv.ParseInt(s, 10, 64); err == nil {
+				sentTime := time.UnixMilli(sentTimeMillis)
+				p.metrics.sqsLagTime.Update(time.Since(sentTime).Nanoseconds())
+			}
+		}
+	}
+
 	handles, processingErr := p.processS3Events(ctx, log, *msg.Body)
 
 	// Stop keepalive routine before changing visibility.
@@ -155,12 +168,10 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	if p.maxReceiveCount > 0 && !errors.Is(processingErr, &nonRetryableError{}) {
 		// Prevent poison pill messages from consuming all workers. Check how
 		// many times this message has been received before making a disposition.
-		if v, found := msg.Attributes[sqsApproximateReceiveCountAttribute]; found {
-			if receiveCount, err := strconv.Atoi(v); err == nil && receiveCount >= p.maxReceiveCount {
-				processingErr = nonRetryableErrorWrap(fmt.Errorf(
-					"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
-					receiveCount, p.maxReceiveCount, processingErr))
-			}
+		if receiveCount >= p.maxReceiveCount {
+			processingErr = nonRetryableErrorWrap(fmt.Errorf(
+				"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
+				receiveCount, p.maxReceiveCount, processingErr))
 		}
 	}
 
@@ -349,4 +360,15 @@ func (p *sqsS3EventProcessor) finalizeS3Objects(handles []s3ObjectHandler) error
 		}
 	}
 	return multierr.Combine(errs...)
+}
+
+// getSQSReceiveCount returns the SQS ApproximateReceiveCount attribute. If the value
+// cannot be read then -1 is returned.
+func getSQSReceiveCount(attributes map[string]string) int {
+	if s, found := attributes[sqsApproximateReceiveCountAttribute]; found {
+		if receiveCount, err := strconv.Atoi(s); err == nil {
+			return receiveCount
+		}
+	}
+	return -1
 }
