@@ -66,9 +66,8 @@ func azureObjectHash(src *Source, blob *azblob.BlobItemInternal) string {
 
 func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
-
 	if allowedContentTypes[*j.blob.Properties.ContentType] {
-		if *j.blob.Properties.ContentType == gzType || *j.blob.Properties.ContentEncoding == encodingGzip {
+		if *j.blob.Properties.ContentType == gzType || (j.blob.Properties.ContentEncoding != nil && *j.blob.Properties.ContentEncoding == encodingGzip) {
 			j.isCompressed = true
 		}
 		err := j.processAndPublishData(ctx, id)
