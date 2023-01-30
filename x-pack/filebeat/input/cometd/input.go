@@ -100,19 +100,26 @@ func (in *cometdInput) run() error {
 			}
 		} else if !e.Msg.Successful {
 			var event event
-			// To handle the last response where the object received was empty
-			if e.Msg.Data.Payload == nil {
+			var msg []byte
+			var err error
+			// Convert json.RawMessage response to []byte
+			if e.Msg.Data.Payload != nil {
+				msg, err = e.Msg.Data.Payload.MarshalJSON()
+				if err != nil {
+					return fmt.Errorf("JSON error: %w", err)
+				}
+			} else if e.Msg.Data.Object != nil {
+				msg, err = e.Msg.Data.Object.MarshalJSON()
+				if err != nil {
+					return fmt.Errorf("JSON error: %w", err)
+				}
+			} else {
+				// To handle the last response where the object received was empty
 				return nil
 			}
 
-			// Convert json.RawMessage response to []byte
-			msg, err := e.Msg.Data.Payload.MarshalJSON()
-			if err != nil {
-				return fmt.Errorf("JSON error: %w", err)
-			}
-
 			// Extract event IDs from json.RawMessage
-			err = json.Unmarshal(e.Msg.Data.Payload, &event)
+			err = json.Unmarshal(msg, &event)
 			if err != nil {
 				return fmt.Errorf("error while parsing JSON: %w", err)
 			}
