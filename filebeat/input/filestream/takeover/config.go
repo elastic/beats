@@ -15,27 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package unix
+package takeover
 
-import (
-	"time"
-
-	"github.com/dustin/go-humanize"
-
-	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
-)
-
-type config struct {
-	unix.Config `config:",inline"`
+type scanner struct {
+	RecursiveGlob bool `config:"recursive_glob"`
 }
 
-func defaultConfig() config {
-	return config{
-		Config: unix.Config{
-			Timeout:        time.Minute * 5,
-			MaxMessageSize: 20 * humanize.MiByte,
-			SocketType:     unix.StreamSocket,
-			LineDelimiter:  "\n",
+type prospector struct {
+	Scanner scanner `config:"scanner"`
+}
+
+type inputConfig struct {
+	Type       string     `config:"type"`
+	ID         string     `config:"id"`
+	Paths      []string   `config:"paths"`
+	TakeOver   bool       `config:"take_over"`
+	Prospector prospector `config:"prospector"`
+}
+
+func defaultInputConfig() inputConfig {
+	return inputConfig{
+		Type:     "",
+		ID:       "",
+		Paths:    []string{},
+		TakeOver: false,
+		Prospector: prospector{
+			Scanner: scanner{
+				RecursiveGlob: true,
+			},
 		},
 	}
 }

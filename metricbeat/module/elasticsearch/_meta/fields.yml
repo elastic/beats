@@ -676,6 +676,10 @@
               type: keyword
               description: >
                 Node name.
+            - name: roles
+              type: keyword
+              description: >
+                Node roles.
             - name: master
               type: boolean
               description: >

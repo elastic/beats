@@ -190,6 +190,7 @@ func TestInputRunSQS(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
+	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
 }
 
 func TestInputRunS3(t *testing.T) {
@@ -426,4 +427,5 @@ func TestInputRunSNS(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
+	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
 }
