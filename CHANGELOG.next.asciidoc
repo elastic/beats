@@ -136,6 +136,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
 - Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
+- Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
 
 *Auditbeat*
 
