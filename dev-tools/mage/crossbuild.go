@@ -246,12 +246,7 @@ func CrossBuildImage(platform string) (string, error) {
 		tagSuffix = "main-debian8"
 	}
 
-	goVersion, err := GoVersion()
-	if err != nil {
-		return "", err
-	}
-
-	return BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
+	return BeatsCrossBuildImage + ":" + "1.20rc2" + "-" + tagSuffix, nil
 }
 
 // GolangCrossBuilder executes the specified mage target inside of the
