@@ -51,7 +51,6 @@ MODULE="kubernetes" mage goIntegTest
    ```bash
    kubectl apply -k without-ksm
     ```
-   > **Note**: Adjust hosts for elasticsearch and kibana if they are not correct.
 
 6. Go to metricbeat directory and build the metricbeat binary:
     ```bash
