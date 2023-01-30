@@ -18,7 +18,7 @@
 package remote_write
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/gogo/protobuf/proto"
@@ -122,7 +122,7 @@ func MetricSetBuilder(genFactory RemoteWriteEventsGeneratorFactory) func(base mb
 
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	// Start event watcher
-	m.server.Start()
+	_ = m.server.Start()
 
 	for {
 		select {
@@ -149,7 +149,7 @@ func (m *MetricSet) handleFunc(writer http.ResponseWriter, req *http.Request) {
 		m.eventGenStarted = true
 	}
 
-	compressed, err := ioutil.ReadAll(req.Body)
+	compressed, err := io.ReadAll(req.Body)
 	if err != nil {
 		m.Logger().Errorf("Read error %v", err)
 		http.Error(writer, err.Error(), http.StatusInternalServerError)

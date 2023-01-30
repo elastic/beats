@@ -15,41 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+package backup
 
 import (
-	"net"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
-	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"errors"
+	"os"
 )
 
-func TestCreateEvent(t *testing.T) {
-	hello := "hello world"
-	ip := "127.0.0.1"
-	parsedIP := net.ParseIP(ip)
-	addr := &net.IPAddr{IP: parsedIP, Zone: ""}
+const (
+	backupSuffix = ".bak"
+)
 
-	message := []byte(hello)
-	mt := inputsource.NetworkMetadata{RemoteAddr: addr}
-
-	event := createEvent(message, mt)
-
-	m, err := event.GetValue("message")
-	assert.NoError(t, err)
-	assert.Equal(t, string(message), m)
-
-	from, _ := event.GetValue("log.source.address")
-	assert.Equal(t, ip, from)
+// Backuper defines backup-related operations
+type Backuper interface {
+	// Backup performs the backup
+	Backup() error
+	// Removes all backups created by this backuper
+	Remove() error
 }
 
-func TestNewInputDone(t *testing.T) {
-	config := mapstr.M{
-		"host": ":0",
+// fileExists checks if the given file exists
+func fileExists(name string) (bool, error) {
+	_, err := os.Stat(name)
+	if err == nil {
+		return true, nil
 	}
-	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
+	if errors.Is(err, os.ErrNotExist) {
+		return false, nil
+	}
+	return false, err
 }
