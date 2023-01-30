@@ -261,7 +261,7 @@ def generateSteps() {
 
 def generateArmStep(beat) {
   return {
-    withNode(labels: 'arm') {
+    withNode(labels: 'ubuntu-2204-aarch64') {
       withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64','PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Arm ${beat}") {
           deleteDir()
