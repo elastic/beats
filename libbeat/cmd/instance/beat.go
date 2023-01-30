@@ -28,7 +28,6 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
-	"net/http"
 	"os"
 	"os/user"
 	"runtime"
@@ -487,14 +486,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	logp.Info("%s start running.", b.Info.Beat)
 
 	// Allow the manager to stop a currently running beats out of bound.
-	// That is the stop callback used by the X-Pack manager. We just need to call
-	// it whenever we need to stop the beat
-	// We might need something like this:
-	// if cm.stopFunc != nil {
-	// 	// I'm not 100% sure the once here is needed,
-	// 	// but various beats tend to handle this in a not-quite-safe way
-	// 	cm.beatStop.Do(cm.stopFunc)
-	// }
 	b.Manager.SetStopCallback(beater.Stop)
 
 	return beater.Run(&b.Beat)
@@ -741,7 +732,6 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	// HERE - Manager instantiated!!
 	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
 	if err != nil {
 		return err
@@ -995,57 +985,61 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 		return outputs.Group{}, nil
 	}
 
+	// TODO (Tiago): find a proper name for this logger
+	logger := logp.L().Named("ssl.cert.reloader")
 	// Here the output is created and we have acces to the Beat struct (with the manager)
 	// as a workaround we can unpack the new settings and trigger the reload-watcher from here
-	gw := cfgfile.NewGlobWatcher("/tmp/foo1.watch")
-	// Ignore the first scan as it will always return
-	// true for files changed. The output has not been
-	// started yet, so even if the files have changed since
-	// the Beat started, they don't need to be reloaded
-	gw.Scan()
-
-	c := cfg.Config()
-	fmt.Println(cfg.Name(), c)
-
-	tlsCfg := tlscommon.Config{}
 
 	// We get an output config, so we extract the 'SSL' bit from it
-	c, err := cfg.Config().Child("ssl", -1)
+	rawTLSCfg, err := cfg.Config().Child("ssl", -1)
 	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	if err := c.Unpack(&tlsCfg); err != nil {
-		logp.L().Errorf("could not unpack config: %s", err)
-		panic(err)
+		return outputs.Group{}, fmt.Errorf("could not extract the 'ssl' section of the output config: %w", err)
 	}
 
-	fmt.Printf("\n\n%#v\n\n", tlsCfg)
+	tlsCfg := tlscommon.Config{}
+	if err := rawTLSCfg.Unpack(&tlsCfg); err != nil {
+		logger.Errorf("could not unpack config: %s", err)
+		return outputs.Group{}, fmt.Errorf("unpacking 'ssl' config: %w", err)
+	}
+
+	watchers := make([]*cfgfile.GlobWatcher, 0, len(tlsCfg.CAs))
+	for _, ca := range tlsCfg.CAs {
+		if tlscommon.IsPEMString(ca) {
+			// That's an embedded cert, we're only interested in files
+			continue
+		}
+
+		logger.Debugf("watching '%s' for changes", ca)
+		gw := cfgfile.NewGlobWatcher(ca)
+		// Ignore the first scan as it will always return
+		// true for files changed. The output has not been
+		// started yet, so even if the files have changed since
+		// the Beat started, they don't need to be reloaded
+		gw.Scan()
+
+		watchers = append(watchers, gw)
+	}
+
+	// Watch for file changes while the Beat is alive
 	go func() {
+		// TODO (Tiago): Make it configurable
 		ticker := time.Tick(3 * time.Second)
 
 		for {
 			<-ticker
-			fmt.Println("Glob Watcher")
-			files, changed, err := gw.Scan()
-			fmt.Println(files, changed, err)
-		}
+			for _, gw := range watchers {
+				files, changed, err := gw.Scan()
+				if err != nil {
+					logger.Warnf("could not scan certificate files: %s", err.Error())
+				}
 
-	}()
-
-	fmt.Println("Starting Webserver")
-	go func() {
-		m := http.NewServeMux()
-		m.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			logp.Info("****************************************************")
-			logp.Info("****************************************************")
-			logp.Info("****************************************************")
-			logp.Info("****************************************************")
-			logp.Info("Starting beat shutdown")
-			b.Manager.Stop()
-		})
-		if err := http.ListenAndServe(":3000", m); err != nil {
-			panic(err)
+				if changed {
+					logger.Infof(
+						"some of the following files have been modified: %v, starting %s shurdown",
+						files, b.Info.Beat)
+					b.Manager.Stop()
+				}
+			}
 		}
 	}()
 

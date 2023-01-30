@@ -124,7 +124,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		})
 }
 
-// Reload the output // HERE - Output Reloader
+// Reload the output
 func (c *outputController) Reload(
 	cfg *reload.ConfigWithMeta,
 	outFactory func(outputs.Observer, config.Namespace) (outputs.Group, error),
@@ -136,7 +136,7 @@ func (c *outputController) Reload(
 		}
 	}
 
-	output, err := loadOutput(c.monitors, func(stats outputs.Observer) (string, outputs.Group, error) { // things happen here
+	output, err := loadOutput(c.monitors, func(stats outputs.Observer) (string, outputs.Group, error) {
 		name := outCfg.Name()
 		out, err := outFactory(stats, outCfg)
 		return name, out, err

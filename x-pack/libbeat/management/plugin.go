@@ -15,7 +15,6 @@ func init() {
 }
 
 // NewFleetManagerPluginV2 registers the V2 callback
-// HERE - X-Pack manager initialised
 func NewFleetManagerPluginV2(config *conf.C) lbmanagement.FactoryFunc {
 	c := DefaultConfig()
 	if config.Enabled() {

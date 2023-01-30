@@ -152,8 +152,8 @@ func defaultModeConfig() *modeConfig {
 	}
 }
 
-// nilManager, fallback when no manager is present
-type nilManager struct {
+// fallbackManager, fallback when no manager is present
+type fallbackManager struct {
 	logger   *logp.Logger
 	lock     sync.Mutex
 	status   Status
@@ -164,14 +164,14 @@ type nilManager struct {
 
 func nilFactory(*config.C, *reload.Registry, uuid.UUID) (Manager, error) {
 	log := logp.NewLogger("mgmt")
-	return &nilManager{
+	return &fallbackManager{
 		logger: log,
 		status: Unknown,
 		msg:    "",
 	}, nil
 }
 
-func (n *nilManager) UpdateStatus(status Status, msg string) {
+func (n *fallbackManager) UpdateStatus(status Status, msg string) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.status != status || n.msg != msg {
@@ -181,27 +181,33 @@ func (n *nilManager) UpdateStatus(status Status, msg string) {
 	}
 }
 
-func (n *nilManager) SetStopCallback(f func()) {
+func (n *fallbackManager) SetStopCallback(f func()) {
+	n.lock.Lock()
 	n.stopFunc = f
+	n.lock.Unlock()
 }
 
-func (n *nilManager) Stop() {
-	// I'm not sure we really need the sync.Once here, but
-	// because different Beats can have different requirements
-	// for their stup function, it's better to make sure it will
-	// only be called once.
-	n.stopOnce.Do(func() {
-		n.stopFunc()
-	})
+func (n *fallbackManager) Stop() {
+	n.lock.Lock()
+	defer n.lock.Unlock()
+	if n.stopFunc != nil {
+		// I'm not sure we really need the sync.Once here, but
+		// because different Beats can have different requirements
+		// for their stup function, it's better to make sure it will
+		// only be called once.
+		n.stopOnce.Do(func() {
+			n.stopFunc()
+		})
+	}
 }
 
 // Enabled returns false because management is disabled.
 // the nilManager is still used for shutdown on some cases,
 // but that does not mean the Beat is being managed externally,
 // hence it will always return false.
-func (n *nilManager) Enabled() bool                         { return false }
-func (n *nilManager) Start() error                          { return nil }
-func (n *nilManager) CheckRawConfig(cfg *config.C) error    { return nil }
-func (n *nilManager) RegisterAction(action client.Action)   {}
-func (n *nilManager) UnregisterAction(action client.Action) {}
-func (n *nilManager) SetPayload(map[string]interface{})     {}
+func (n *fallbackManager) Enabled() bool                         { return false }
+func (n *fallbackManager) Start() error                          { return nil }
+func (n *fallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
+func (n *fallbackManager) RegisterAction(action client.Action)   {}
+func (n *fallbackManager) UnregisterAction(action client.Action) {}
+func (n *fallbackManager) SetPayload(map[string]interface{})     {}
