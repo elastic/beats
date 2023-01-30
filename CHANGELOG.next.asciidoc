@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
+
 - [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
    with the ecs field name `container`. {pull}34403[34403]
 - [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
@@ -72,6 +73,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
 
 *Heartbeat*
+
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
 - Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
@@ -125,6 +127,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
+
+- Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 
 
 *Auditbeat*
