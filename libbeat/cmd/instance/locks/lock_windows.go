@@ -34,7 +34,7 @@ func (lock *Locker) Unlock() error {
 		return fmt.Errorf("unable to unlock data path: %w", err)
 	}
 
-	err := os.Remove(lock.fileLock.Path())
+	err = os.Remove(lock.fileLock.Path())
 	if err != nil {
 		lock.logger.Warnf("could not remove lockfile at %s: %s", lock.fileLock.Path(), err)
 	}
