@@ -6,8 +6,6 @@
   fields:
     - name: version
       type: keyword
-    - name: host
-      type: keyword
     - name: id
       type: keyword
     - name: state.pipeline
