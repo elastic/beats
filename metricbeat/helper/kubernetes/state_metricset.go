@@ -45,10 +45,10 @@ func Init(name string, mapping *prometheus.MetricsMapping) {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	prometheusClient   prometheus.Prometheus
-	prometheusMappings *prometheus.MetricsMapping
-	mod                k8smod.Module
-	enricher           util.Enricher
+	prometheusClient  prometheus.Prometheus
+	prometheusMapping *prometheus.MetricsMapping
+	mod               k8smod.Module
+	enricher          util.Enricher
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -62,14 +62,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	mapping := mappings[base.Name()]
-	var ms = MetricSet{
-		BaseMetricSet:      base,
-		prometheusClient:   prometheusClient,
-		prometheusMappings: mapping,
-		enricher:           util.NewResourceMetadataEnricher(base, strings.ReplaceAll(base.Name(), prefix, ""), mod.GetMetricsRepo(), false),
-		mod:                mod,
-	}
-	return &ms, nil
+	return &MetricSet{
+		BaseMetricSet:     base,
+		prometheusClient:  prometheusClient,
+		prometheusMapping: mapping,
+		enricher:          util.NewResourceMetadataEnricher(base, strings.ReplaceAll(base.Name(), prefix, ""), mod.GetMetricsRepo(), false),
+		mod:               mod,
+	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -84,7 +83,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		reporter.Error(err)
 		return
 	}
-	events, err := m.prometheusClient.ProcessMetrics(families, m.prometheusMappings)
+	events, err := m.prometheusClient.ProcessMetrics(families, m.prometheusMapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -93,6 +92,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
+		// The name of the metric state can be obtained by using m.BaseMetricSet.Name(). However, names that start with state_* (eg state_cronjob)
+		// need to have that prefix removed. So, for example, strings.ReplaceAll("state_cronjob", "state_", "") would result in just cronjob.
 		e, err := util.CreateEvent(event, "kubernetes."+strings.ReplaceAll(m.BaseMetricSet.Name(), "state_", ""))
 		if err != nil {
 			m.Logger().Error(err)

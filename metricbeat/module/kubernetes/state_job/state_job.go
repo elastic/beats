@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
+// mapping stores the state metrics we want to fetch and will be used by this metricset
 var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
 		// Make everything in "kube_job_owner" available for use in the Labels section, below.

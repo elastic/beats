@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
+// mapping stores the state metrics we want to fetch and will be used by this metricset
 var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
 		"kube_node_info":                            p.InfoMetric(),
