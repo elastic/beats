@@ -81,6 +81,14 @@ output.elasticsearch:
   #allow_older_versions: false
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
+
+  # Enable exiting {{.BeatName}} if any of the files pointed by
+  # `ssl.certificate_authorities` changes
+  #ssl.exit_on_ca_cert_change.enabled
+
+  # Interval to scan for changes on CA certificate files
+  #ssl.exit_on_ca_cert_change.period
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 

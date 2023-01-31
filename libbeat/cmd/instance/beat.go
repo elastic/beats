@@ -980,11 +980,7 @@ func (b *Beat) makeOutputFactory(
 	}
 }
 
-func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outputs.Group, error) {
-	if !cfg.IsSet() {
-		return outputs.Group{}, nil
-	}
-
+func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	// TODO (Tiago): find a proper name for this logger
 	logger := logp.L().Named("ssl.cert.reloader")
 	// Here the output is created and we have acces to the Beat struct (with the manager)
@@ -993,23 +989,43 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 	// We get an output config, so we extract the 'SSL' bit from it
 	rawTLSCfg, err := cfg.Config().Child("ssl", -1)
 	if err != nil {
-		return outputs.Group{}, fmt.Errorf("could not extract the 'ssl' section of the output config: %w", err)
+		e, ok := err.(ucfg.Error)
+		if ok {
+			if errors.Is(e.Reason(), ucfg.ErrMissing) {
+				// if the output configuration does not contain a `ssl` section
+				// do nothing and return no error
+				return nil
+			}
+		}
+		return fmt.Errorf("could not extract the 'ssl' section of the output config: %w", err)
 	}
 
-	tlsCfg := tlscommon.Config{}
-	if err := rawTLSCfg.Unpack(&tlsCfg); err != nil {
-		logger.Errorf("could not unpack config: %s", err)
-		return outputs.Group{}, fmt.Errorf("unpacking 'ssl' config: %w", err)
+	extendedTLSCfg := struct {
+		tlscommon.Config `config:",inline" yaml:",inline"`
+		Reload           cfgfile.Reload `config:"exit_on_ca_cert_change" yaml:"exit_on_ca_cert_change"`
+	}{}
+
+	if err := rawTLSCfg.Unpack(&extendedTLSCfg); err != nil {
+		return fmt.Errorf("unpacking 'ssl' config: %w", err)
 	}
 
-	watchers := make([]*cfgfile.GlobWatcher, 0, len(tlsCfg.CAs))
-	for _, ca := range tlsCfg.CAs {
+	if !extendedTLSCfg.Reload.Enabled {
+		return nil
+	}
+	logger.Debug("exit on CA certs change enabled")
+
+	watchers := make([]*cfgfile.GlobWatcher, 0, len(extendedTLSCfg.CAs))
+	for _, ca := range extendedTLSCfg.CAs {
 		if tlscommon.IsPEMString(ca) {
 			// That's an embedded cert, we're only interested in files
 			continue
 		}
 
 		logger.Debugf("watching '%s' for changes", ca)
+		// TODO (Tiago): ca is a file path, not a glob, we need to make sure it works
+		// or get another kind of watcher
+		// TODO (Tiago): replace it by a file watcher like
+		// elastic-agent/internal/pkg/filewatcher
 		gw := cfgfile.NewGlobWatcher(ca)
 		// Ignore the first scan as it will always return
 		// true for files changed. The output has not been
@@ -1022,8 +1038,7 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 
 	// Watch for file changes while the Beat is alive
 	go func() {
-		// TODO (Tiago): Make it configurable
-		ticker := time.Tick(3 * time.Second)
+		ticker := time.Tick(extendedTLSCfg.Reload.Period)
 
 		for {
 			<-ticker
@@ -1035,13 +1050,25 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 
 				if changed {
 					logger.Infof(
-						"some of the following files have been modified: %v, starting %s shurdown",
+						"some of the following files have been modified: %v, starting %s shutdown",
 						files, b.Info.Beat)
 					b.Manager.Stop()
 				}
 			}
 		}
 	}()
+
+	return nil
+}
+
+func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outputs.Group, error) {
+	if !cfg.IsSet() {
+		return outputs.Group{}, nil
+	}
+
+	if err := b.reloadOutputOnCertChange(cfg); err != nil {
+		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
+	}
 
 	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
 }
