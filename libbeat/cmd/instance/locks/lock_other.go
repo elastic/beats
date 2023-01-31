@@ -15,17 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (!darwin || !cgo) && !freebsd && !linux && !windows && !aix
+//go:build !windows
+// +build !windows
 
 package locks
 
 import (
 	"fmt"
-	"runtime"
-
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
+	"os"
 )
 
-func findMatchingPID(pid int) (process.PidState, error) {
-	return process.Dead, fmt.Errorf("findMatchingPID not supported on platform: %s", runtime.GOOS)
+// Unlock attempts to release the lock on a data path previously acquired via Lock(). This will first remove the file, then unlock the file handle.
+func (lock *Locker) Unlock() error {
+	// Unlock will remove the file while we still have the lock, so we reduce the odds of another beat swooping in to start between the Unlock() and Remove() operation.
+	err := os.Remove(lock.fileLock.Path())
+	if err != nil {
+		lock.logger.Warnf("could not remove lockfile at %s: %s", lock.fileLock.Path(), err)
+	}
+
+	err = lock.fileLock.Unlock()
+	if err != nil {
+		return fmt.Errorf("unable to unlock data path: %w", err)
+	}
+
+	return nil
 }
