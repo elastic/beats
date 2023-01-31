@@ -20,6 +20,7 @@ package state_cronjob
 import (
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 var mapping = &p.MetricsMapping{
@@ -40,8 +41,7 @@ var mapping = &p.MetricsMapping{
 	},
 }
 
+// Register metricset
 func init() {
-	mb.Registry.MustAddMetricSet("kubernetes", "state_cronjob",
-		NewCronJobMetricSet,
-		mb.WithHostParser(p.HostParser))
+	sm.Init(util.CronJobResource, mapping)
 }
