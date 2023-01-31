@@ -18,11 +18,7 @@
 package locks
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"os"
-	"runtime"
 	"time"
 
 	"github.com/gofrs/flock"
@@ -30,20 +26,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
-	metricproc "github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 )
 
+// Locker is a retrying file locker
 type Locker struct {
-	fileLock  *flock.Flock
-	logger    *logp.Logger
-	beatName  string
-	filePath  string
-	beatStart time.Time
-}
-
-type pidfile struct {
-	PID       int       `json:"pid"`
-	WriteTime time.Time `json:"write_time"`
+	fileLock   *flock.Flock
+	retryCount int
+	retrySleep time.Duration
+	logger     *logp.Logger
 }
 
 var (
@@ -51,24 +41,21 @@ var (
 	// unsuccessful because another Beat instance already has the lock on the same
 	// data path.
 	ErrAlreadyLocked = fmt.Errorf("data path already locked by another beat. Please make sure that multiple beats are not sharing the same data path (path.data)")
-
-	// ErrLockfileEmpty is returned by readExistingPidfile() when an existing pidfile is found, but the file is empty.
-	ErrLockfileEmpty = fmt.Errorf("lockfile is empty")
 )
 
-// a little wrapper for the gitpid function to make testing easier.
-var pidFetch = os.Getpid
-
-// New returns a new pid-aware file locker
-// all logic, including checking for existing locks, is performed lazily
+// New returns a new file locker
 func New(beatInfo beat.Info) *Locker {
+	return NewWithRetry(beatInfo, 4, time.Millisecond*400)
+}
+
+// NewWithRetry returns a new file locker with the given settings
+func NewWithRetry(beatInfo beat.Info, retryCount int, retrySleep time.Duration) *Locker {
 	lockfilePath := paths.Resolve(paths.Data, beatInfo.Beat+".lock")
 	return &Locker{
-		fileLock:  flock.New(lockfilePath),
-		logger:    logp.L(),
-		beatName:  beatInfo.Beat,
-		filePath:  lockfilePath,
-		beatStart: beatInfo.StartTime,
+		fileLock:   flock.New(lockfilePath),
+		retryCount: retryCount,
+		retrySleep: retrySleep,
+		logger:     logp.L(),
 	}
 }
 
@@ -76,27 +63,23 @@ func New(beatInfo beat.Info) *Locker {
 // Beat instance. If another Beats instance already has a lock on the same data path
 // an ErrAlreadyLocked error is returned.
 func (lock *Locker) Lock() error {
-	new := pidfile{PID: pidFetch(), WriteTime: time.Now()}
-	encoded, err := json.Marshal(&new)
-	if err != nil {
-		return fmt.Errorf("error encoding json for pidfile: %w", err)
-	}
-
-	// The combination of O_CREATE and O_EXCL will ensure we return an error if we don't
-	// manage to create the file
-	fh, openErr := os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0o600)
-	// Don't trust different OSes to report the errors we expect, just try to recover regardless
-	if openErr != nil {
-		err = lock.handleFailedCreate()
+	for i := 0; i < lock.retryCount; i++ {
+		// note that TryLock doesn't set an os.O_EXCL flag,
+		// which means that we could be locking a file we didn't create.
+		// This makes it easy to recover from a failed shutdown or panic,
+		// as the OS will clean up the lock and we'll re-lock the same file.
+		// However, can create odd races if you're not careful, since you don't know if you're locking "your" file.
+		gotLock, err := lock.fileLock.TryLock()
 		if err != nil {
-			return fmt.Errorf("cannot obtain lockfile: %w", err)
+			return fmt.Errorf("unable to try a lock of the data path: %w", err)
 		}
-		// If something fails here, it's probably unrecoverable
-		fh, err = os.OpenFile(lock.filePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0o600)
-		if err != nil {
-			return fmt.Errorf("cannot re-obtain lockfile %s: %w", lock.filePath, err)
+		if gotLock {
+			return nil
 		}
+		lock.logger.Debugf("Could not obtain lock for file %s, retrying %d times", lock.fileLock.Path(), (lock.retryCount - i))
+		time.Sleep(lock.retrySleep)
 	}
+<<<<<<< HEAD
 
 	// a Process can't write to its own locked file on all platforms, write first
 	_, err = fh.Write(encoded)
@@ -259,4 +242,7 @@ func (lock *Locker) readExistingPidfile() (pidfile, error) {
 		return pidfile{}, fmt.Errorf("error reading JSON from pid file %s: %w", lock.filePath, err)
 	}
 	return foundPidFile, nil
+=======
+	return fmt.Errorf("%s: %w", lock.fileLock.Path(), ErrAlreadyLocked)
+>>>>>>> 21b6128c95 (Refactor beats lockfile to use timeout, retry (#34194))
 }
