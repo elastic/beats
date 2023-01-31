@@ -20,6 +20,7 @@ package status
 import (
 	"context"
 	"fmt"
+	"math"
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -148,7 +149,7 @@ func (m *MetricSet) calcCacheHitRate(data map[string]interface{}) (float64, erro
 	intoCacheNum, e1 := convertToFloat64(intoCache)
 	fromCacheNum, e2 := convertToFloat64(fromCache)
 	if e1 == nil && e2 == nil && fromCacheNum > 0 {
-		return (fromCacheNum-intoCacheNum)/fromCacheNum, nil
+		return math.Max((fromCacheNum-intoCacheNum)/fromCacheNum, 0), nil
 	}
 	return 0, e
 }

@@ -43,6 +43,7 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) mapstr.M {
 		"last_committed": replStatus.OpTimes.LastCommitted.Ts.T,
 		"applied":        replStatus.OpTimes.Applied.Ts.T,
 		"durable":        replStatus.OpTimes.Durable.Ts.T,
+		"delay":          findOptimesByState(replStatus.Members, PRIMARY)[0] - int64(replStatus.OpTimes.Applied.Ts.T),
 	}
 
 	// find lag and headroom
