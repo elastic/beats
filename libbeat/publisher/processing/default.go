@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -356,7 +357,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	// setup 10: debug print final event (P)
-	if b.log.IsDebug() {
+	if b.log.IsDebug() || publisher.UnderAgent() {
 		processors.add(debugPrintProcessor(b.info, b.log))
 	}
 
