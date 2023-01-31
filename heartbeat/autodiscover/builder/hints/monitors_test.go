@@ -67,14 +67,13 @@ func TestGenerateHints(t *testing.T) {
 			result: mapstr.M{},
 		},
 		{
-			message: "Hints without matching port should return nothing",
+			message: "Hints without port should return nothing if ${data.port} is used",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"port": 9090,
 				"hints": mapstr.M{
 					"monitor": mapstr.M{
 						"type":  "http",
-						"hosts": "${data.host}:8888",
+						"hosts": "${data.host}:${data.port},test:${data.port}",
 					},
 				},
 			},
@@ -82,26 +81,7 @@ func TestGenerateHints(t *testing.T) {
 			result: mapstr.M{},
 		},
 		{
-			message: "Hints with multiple hosts return only the matching one",
-			event: bus.Event{
-				"host": "1.2.3.4",
-				"port": 9090,
-				"hints": mapstr.M{
-					"monitor": mapstr.M{
-						"type":  "http",
-						"hosts": "${data.host}:8888,${data.host}:9090",
-					},
-				},
-			},
-			len: 1,
-			result: mapstr.M{
-				"type":     "http",
-				"schedule": "@every 5s",
-				"hosts":    []interface{}{"1.2.3.4:9090"},
-			},
-		},
-		{
-			message: "Hints with multiple hosts return only the one with the template",
+			message: "Hints with multiple hosts returns all with the template",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
@@ -116,7 +96,7 @@ func TestGenerateHints(t *testing.T) {
 			result: mapstr.M{
 				"type":     "http",
 				"schedule": "@every 5s",
-				"hosts":    []interface{}{"1.2.3.4:9090"},
+				"hosts":    []interface{}{"1.2.3.4:8888", "1.2.3.4:9090"},
 			},
 		},
 		{
@@ -190,7 +170,7 @@ func TestGenerateHints(t *testing.T) {
 			result: mapstr.M{
 				"type":     "http",
 				"schedule": "@every 5s",
-				"hosts":    []interface{}{"1.2.3.4:9090"},
+				"hosts":    []interface{}{"1.2.3.4:8888", "1.2.3.4:9090"},
 			},
 		},
 		{
@@ -222,7 +202,7 @@ func TestGenerateHints(t *testing.T) {
 			logger: logp.L(),
 		}
 		cfgs := m.CreateConfig(test.event)
-		assert.Equal(t, len(cfgs), test.len, test.message)
+		assert.Equal(t, test.len, len(cfgs), test.message)
 
 		if len(cfgs) != 0 {
 			config := mapstr.M{}

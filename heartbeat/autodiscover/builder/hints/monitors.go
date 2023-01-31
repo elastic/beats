@@ -19,7 +19,6 @@ package hints
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/elastic/go-ucfg"
@@ -65,7 +64,11 @@ func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 
 // Create config based on input hints in the bus event
 func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf.C {
-	var hints mapstr.M
+	var (
+		hints    mapstr.M
+		podEvent bool
+	)
+
 	hIface, ok := event["hints"]
 	if ok {
 		hints, _ = hIface.(mapstr.M)
@@ -79,7 +82,10 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 		return []*conf.C{}
 	}
 
-	port, _ := common.TryToInt(event["port"])
+	port, ok := common.TryToInt(event["port"])
+	if !ok {
+		podEvent = true
+	}
 
 	host, _ := event["host"].(string)
 	if host == "" {
@@ -112,7 +118,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 			monitor[processors] = procs
 		}
 
-		h, err := hb.getHostsWithPort(monitor, port)
+		h, err := hb.getHostsWithPort(monitor, port, podEvent)
 		if err != nil {
 			hb.logger.Warnf("unable to find valid hosts for %+v: %w", monitor, err)
 			continue
@@ -141,33 +147,20 @@ func (hb *heartbeatHints) getProcessors(hints mapstr.M) []mapstr.M {
 	return utils.GetConfigs(hints, "", "processors")
 }
 
-func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int) ([]string, error) {
+func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int, podEvent bool) ([]string, error) {
 	thosts := utils.GetHintAsList(hints, "", hosts)
 	mType := utils.GetHintString(hints, "", scheme)
 
 	// We can't reliable detect duplicated monitors since we don't have all ports/hosts,
-	// relying on scheduler deduping monitors, see https://github.com/elastic/beats/pull/29041
+	// relying on runner deduping monitors, see https://github.com/elastic/beats/pull/29041
 	hostSet := map[string]struct{}{}
 	for _, h := range thosts {
 		if mType == "icmp" && strings.Contains(h, ":") {
 			hb.logger.Warnf("ICMP scheme does not support port specification: %s", h)
 			continue
-		} else if strings.Contains(h, ":") && strings.Contains(h, "data.port") && port == 0 {
-			// 0 is not -technically- a user-defined port, skip if a dynamic port is set
+		} else if strings.Contains(h, "${data.port}") && podEvent {
+			// Pod events don't contain port metadata, skip
 			continue
-		} else if strings.Contains(h, ":") && !strings.Contains(h, "data.port") {
-			// Can filter if port is a static value
-			p, err := strconv.Atoi(strings.SplitN(h, ":", 2)[1])
-
-			if err != nil {
-				hb.logger.Warnf("Invalid port value specified: %s", h)
-				continue
-			}
-
-			if p != port {
-				// Different static port, skip
-				continue
-			}
 		}
 
 		hostSet[h] = struct{}{}
