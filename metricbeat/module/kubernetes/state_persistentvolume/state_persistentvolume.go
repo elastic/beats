@@ -18,8 +18,6 @@
 package state_persistentvolume
 
 import (
-	sm "github.com/elastic/beats/v7/metricbeat/helper/kubernetes"
-
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
@@ -46,5 +44,5 @@ var mapping = &p.MetricsMapping{
 
 // Register metricset
 func init() {
-	sm.Init(util.PersistentVolumeResource, mapping)
+	util.Init(util.PersistentVolumeResource, mapping)
 }

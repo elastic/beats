@@ -18,7 +18,6 @@
 package state_daemonset
 
 import (
-	sm "github.com/elastic/beats/v7/metricbeat/helper/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
@@ -42,5 +41,5 @@ var mapping = &p.MetricsMapping{
 
 // Register metricset
 func init() {
-	sm.Init(util.DaemonSetResource, mapping)
+	util.Init(util.DaemonSetResource, mapping)
 }
