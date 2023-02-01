@@ -21,6 +21,7 @@
 package state_cronjob
 
 import (
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"testing"
 
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
@@ -28,13 +29,6 @@ import (
 )
 
 var files = []string{
-	/*
-		"../_meta/test/ksm.v1.3.0",
-		"../_meta/test/ksm.v1.8.0",
-		"../_meta/test/ksm.v2.0.0",
-
-	*/
-
 	"../_meta/test/ksm.v2.4.2",
 	"../_meta/test/ksm.v2.5.0",
 	"../_meta/test/ksm.v2.6.0",
@@ -47,10 +41,9 @@ func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", name, k.GetTestCases(files))
 }
 
-//
-//func TestData(t *testing.T) {
-//	mbtest.TestDataFiles(t, "kubernetes", name)
-//}
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", name)
+}
 
 func TestMetricsFamily(t *testing.T) {
 	k.TestStateMetricsFamily(t, files, mapping)
