@@ -37,13 +37,13 @@ type pushRequest struct {
 // consumer -> broker API
 
 type getRequest struct {
-	entryCount   int              // request entryCount events from the broker
-	responseChan chan getResponse // channel to send response to
+	entryCount   int         // request entryCount events from the broker
+	responseChan chan *batch // channel to send response to
 }
 
-type getResponse struct {
-	// ackChan can be nil if the producers that added these entries do not
-	// listen for acks.
-	ackChan chan struct{}
-	entries []queueEntry
-}
+//type getResponse struct {
+// ackChan can be nil if the producers that added these entries do not
+// listen for acks.
+//ackChan chan struct{}
+//	entries []queueEntry
+//}

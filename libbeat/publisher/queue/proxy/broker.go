@@ -50,8 +50,7 @@ type broker struct {
 	ackListener queue.ACKListener
 
 	// Internal state for the broker's run loop.
-	pendingBatch    *batch
-	pendingACKs     pendingACKsList
+	queuedEntries   []queueEntry
 	blockedRequests blockedRequests
 
 	// wait group for worker shutdown
@@ -69,6 +68,17 @@ type queueEntry struct {
 	// The producer that generated this event, or nil if this producer does
 	// not require ack callbacks.
 	producer *producer
+}
+
+type blockedRequest struct {
+	next    *blockedRequest
+	request *pushRequest
+}
+
+// linked list helper to store an ordered list of blocked requests
+type blockedRequests struct {
+	first *blockedRequest
+	last  *blockedRequest
 }
 
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
@@ -117,7 +127,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (b *broker) Get(count int) (queue.Batch, error) {
-	responseChan := make(chan getResponse, 1)
+	responseChan := make(chan *batch, 1)
 	select {
 	case <-b.done:
 		return nil, io.EOF
@@ -125,13 +135,8 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 		entryCount: count, responseChan: responseChan}:
 	}
 
-	// if request has been sent, we have to wait for a response
-	resp := <-responseChan
-	return &batch{
-		queue:    b,
-		entries:  resp.entries,
-		doneChan: resp.ackChan,
-	}, nil
+	// if request has been sent, we are guaranteed a response
+	return <-responseChan, nil
 }
 
 // Metrics returns an empty response because the proxy queue
@@ -143,23 +148,11 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 	return queue.Metrics{}, nil
 }
 
-type blockedRequest struct {
-	next    *blockedRequest
-	request *pushRequest
-}
-
-type blockedRequests struct {
-	first *blockedRequest
-	last  *blockedRequest
-}
-
 func (b *broker) run() {
-	b.pendingBatch = &batch{queue: b}
-
 	for {
 		var getChan chan getRequest
 		// Get requests are enabled if the current pending batch is nonempty.
-		if len(b.pendingBatch.entries) > 0 {
+		if len(b.queuedEntries) > 0 {
 			getChan = b.getChan
 		}
 
@@ -172,24 +165,13 @@ func (b *broker) run() {
 
 		case req := <-getChan: // consumer asking for next batch
 			b.handleGetRequest(req)
-
-		case <-b.pendingACKs.nextDoneChan(): // Previous batch being acknowledged
-			batch := b.pendingACKs.pop()
-			// Send any acknowledgments needed for this batch.
-			total := 0
-			for _, ack := range batch.acks {
-				ack.producer.ackHandler(ack.count)
-				total += ack.count
-			}
-			// Also update the ACKs in the metrics observer
-			b.ackListener.OnACK(total)
 		}
 	}
 }
 
 func (b *broker) handlePushRequest(req pushRequest) {
-	if len(b.pendingBatch.entries) < b.batchSize {
-		b.pendingBatch.entries = append(b.pendingBatch.entries,
+	if len(b.queuedEntries) < b.batchSize {
+		b.queuedEntries = append(b.queuedEntries,
 			queueEntry{event: req.event, producer: req.producer})
 		if req.producer != nil {
 			req.producer.producedCount++
@@ -207,20 +189,13 @@ func (b *broker) handlePushRequest(req pushRequest) {
 }
 
 func (b *broker) handleGetRequest(req getRequest) {
-	acks := acksForBatch(b.pendingBatch)
-	var doneChan chan struct{}
-	if len(acks) > 0 {
-		// We only actually save the ACK state and give it a done
-		// channel if some producer in this batch has ACKs enabled.
-		doneChan = make(chan struct{})
-		b.pendingACKs.append(&batchACKState{
-			doneChan: doneChan,
-			acks:     acks,
-		})
-	}
-	req.responseChan <- getResponse{
-		ackChan: doneChan,
-		entries: b.pendingBatch.entries,
+	acks := acksForEntries(b.queuedEntries)
+
+	req.responseChan <- &batch{
+		entries:            b.queuedEntries,
+		entryCount:         len(b.queuedEntries),
+		producerACKs:       acks,
+		metricsACKListener: b.ackListener,
 	}
 
 	// Unblock any pending requests we can fit into the new batch.
@@ -235,8 +210,8 @@ func (b *broker) handleGetRequest(req getRequest) {
 		req.responseChan <- true
 	}
 
-	// Reset the pending batch
-	b.pendingBatch = &batch{queue: b, entries: entries}
+	// Reset the pending entries
+	b.queuedEntries = entries
 }
 
 func (b *blockedRequests) add(request *pushRequest) {

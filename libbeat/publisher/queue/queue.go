@@ -141,5 +141,11 @@ type Producer interface {
 type Batch interface {
 	Count() int
 	Entry(i int) interface{}
+	// Release the internal references to the contained events.
+	// Count() and Entry() cannot be used after this call.
+	// This is only guaranteed to release references when using the
+	// proxy queue, where it is used to avoid keeping multiple copies
+	// of events that have already been queued by the shipper.
+	FreeEntries()
 	Done()
 }

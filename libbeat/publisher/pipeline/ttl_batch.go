@@ -59,6 +59,7 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 			events = append(events, event)
 		}
 	}
+	original.FreeEntries()
 
 	b := &ttlBatch{
 		done:    original.Done,

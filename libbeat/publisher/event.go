@@ -47,7 +47,8 @@ type Batch interface {
 	// to the shipper and when they are acknowledged upstream; during that time,
 	// we need to preserve batch metadata for producer end-to-end acknowledgments,
 	// but we do not need the events themselves since they are already queued by
-	// the shipper.
+	// the shipper. It is only guaranteed to release event pointers when using the
+	// proxy queue.
 	// Never call this on a batch that might be retried.
 	FreeEvents()
 
