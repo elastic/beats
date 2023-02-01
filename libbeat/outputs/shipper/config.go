@@ -53,6 +53,7 @@ type Config struct {
 func defaultConfig() Config {
 	enabled := true
 	return Config{
+		// agent will expect that TLS is enabled by default, will disable explicitly
 		TLS: &tlscommon.Config{
 			Enabled: &enabled,
 		},

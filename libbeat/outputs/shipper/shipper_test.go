@@ -45,6 +45,29 @@ import (
 	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
+func TestShipperConfig(t *testing.T) {
+	input := mapstr.M{
+		"ssl": mapstr.M{
+			"enabled": false,
+		},
+		"timeout": time.Second * 10,
+		"backoff": mapstr.M{
+			"init": time.Second,
+		},
+	}
+	cfg, err := config.NewConfigFrom(input)
+	require.NoError(t, err)
+
+	shipperSettings := defaultConfig()
+	err = cfg.Unpack(&shipperSettings)
+	require.NoError(t, err)
+
+	require.Equal(t, false, *shipperSettings.TLS.Enabled)
+	require.Equal(t, 3, shipperSettings.MaxRetries)
+	require.Equal(t, time.Second*10, shipperSettings.Timeout)
+	require.Equal(t, time.Second, shipperSettings.Backoff.Init)
+}
+
 func TestToShipperEvent(t *testing.T) {
 	wrong := struct{}{}
 	ts := time.Now().Truncate(time.Second)
