@@ -1664,6 +1664,14 @@ output.elasticsearch:
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
+
+  # Enable exiting filebeat if any of the files pointed by
+  # `ssl.certificate_authorities` changes
+  #ssl.exit_on_cert_change.enabled
+
+  # Interval to scan for changes on CA certificate files
+  #ssl.exit_on_cert_change.period
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -1802,6 +1810,13 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enable exiting filebeat if any of the files pointed by
+  # `ssl.certificate_authorities` changes
+  #ssl.exit_on_cert_change.enabled
+
+  # Interval to scan for changes on CA certificate files
+  #ssl.exit_on_cert_change.period
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -2007,6 +2022,13 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enable exiting filebeat if any of the files pointed by
+  # `ssl.certificate_authorities` changes
+  #ssl.exit_on_cert_change.enabled
+
+  # Interval to scan for changes on CA certificate files
+  #ssl.exit_on_cert_change.period
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
