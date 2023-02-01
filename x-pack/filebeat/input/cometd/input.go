@@ -57,13 +57,12 @@ func (in *cometdInput) Run() {
 				if err != nil {
 					in.log.Errorw("not able to get access token", "error", err)
 					// Creating a new channel for cometd input.
-					in.msgCh = make(chan bay.MaybeMsg, 1)
 					continue
 				}
 
 				if err := in.run(); err != nil {
 					if in.workerCtx.Err() == nil {
-						in.log.Warnw("Restarting failed CometD input worker.", "error", err)
+						in.log.Errorw("Restarting failed CometD input worker.", "error", err)
 						// Creating a new channel for cometd input.
 						in.msgCh = make(chan bay.MaybeMsg, 1)
 						continue
@@ -95,7 +94,7 @@ func (in *cometdInput) run() error {
 			// log warning every 5 seconds only to avoid to many unnecessary logs
 			select {
 			case <-ticker.C:
-				in.log.Warnw("Retrying...! facing issue while collecting data from CometD", "error", e.Error())
+				in.log.Errorw("Retrying...! facing issue while collecting data from CometD", "error", e.Error())
 			default:
 			}
 		} else if !e.Msg.Successful {
@@ -106,12 +105,14 @@ func (in *cometdInput) run() error {
 			if e.Msg.Data.Payload != nil {
 				msg, err = e.Msg.Data.Payload.MarshalJSON()
 				if err != nil {
-					return fmt.Errorf("JSON error: %w", err)
+					in.log.Errorw("invalid JSON", "error", err)
+					continue
 				}
 			} else if e.Msg.Data.Object != nil {
 				msg, err = e.Msg.Data.Object.MarshalJSON()
 				if err != nil {
-					return fmt.Errorf("JSON error: %w", err)
+					in.log.Errorw("invalid JSON", "error", err)
+					continue
 				}
 			} else {
 				// To handle the last response where the object received was empty
@@ -121,7 +122,8 @@ func (in *cometdInput) run() error {
 			// Extract event IDs from json.RawMessage
 			err = json.Unmarshal(msg, &event)
 			if err != nil {
-				return fmt.Errorf("error while parsing JSON: %w", err)
+				in.log.Errorw("error while parsing JSON", "error", err)
+				continue
 			}
 			if ok := in.outlet.OnEvent(makeEvent(event.EventId, e.Msg.Channel, string(msg))); !ok {
 				in.log.Debug("OnEvent returned false. Stopping input worker.")
