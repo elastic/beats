@@ -106,7 +106,7 @@ processors:
     field: fortinet.firewall.dst_host
     target_field: destination.domain
     ignore_missing: true
-    if: "ctx.destination?.address == null"
+    if: "ctx.destination?.domain == null"
 - convert:
     field: fortinet.firewall.sentbyte
     target_field: source.bytes
