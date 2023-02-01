@@ -90,17 +90,20 @@ func (proto TestProtocol) GetPorts() []int {
 }
 
 func (proto TestProtocol) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
-	dir uint8, private protos.ProtocolData) protos.ProtocolData {
+	dir uint8, private protos.ProtocolData,
+) protos.ProtocolData {
 	return proto.parse(pkt, tcptuple, dir, private)
 }
 
 func (proto TestProtocol) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	return proto.onFin(tcptuple, dir, private)
 }
 
 func (proto TestProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
+	nbytes int, private protos.ProtocolData,
+) (priv protos.ProtocolData, drop bool) {
 	return proto.gap(tcptuple, dir, nbytes, private)
 }
 
@@ -174,7 +177,7 @@ func Test_configToPortsMap_negative(t *testing.T) {
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				redisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
 			},
-			Err: "Duplicate port (3306) exists",
+			Err: "duplicate port (3306) exists",
 		},
 	}
 
@@ -291,44 +294,45 @@ func TestTCSeqPayload(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
-		t.Logf("Test (%v): %v", i, test.name)
-
-		gap := 0
-		var state []byte
-		tcp, err := NewTCP(protocols{
-			tcp: map[protos.Protocol]protos.TCPPlugin{
-				httpProtocol: &TestProtocol{
-					Ports: []int{ServerPort},
-					gap:   makeCountGaps(nil, &gap),
-					parse: makeCollectPayload(&state, true),
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			gap := 0
+			var state []byte
+			tcp, err := NewTCP(protocols{
+				tcp: map[protos.Protocol]protos.TCPPlugin{
+					httpProtocol: &TestProtocol{
+						Ports: []int{ServerPort},
+						gap:   makeCountGaps(nil, &gap),
+						parse: makeCollectPayload(&state, true),
+					},
 				},
-			},
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		addr := common.NewIPPortTuple(4,
-			net.ParseIP(ServerIP), ServerPort,
-			net.ParseIP(ClientIP), uint16(rand.Intn(65535)))
-
-		for _, segment := range test.segments {
-			hdr := &layers.TCP{Seq: segment.seq}
-			pkt := &protos.Packet{
-				Ts:      time.Now(),
-				Tuple:   addr,
-				Payload: segment.payload,
+			}, "test", "test")
+			if err != nil {
+				t.Fatal(err)
 			}
-			tcp.Process(nil, hdr, pkt)
-		}
+			defer tcp.metrics.close()
 
-		assert.Equal(t, test.expectedGaps, gap)
-		if len(test.expectedState) != len(state) {
-			assert.Equal(t, len(test.expectedState), len(state))
-			continue
-		}
-		assert.Equal(t, test.expectedState, state)
+			addr := common.NewIPPortTuple(4,
+				net.ParseIP(ServerIP), ServerPort,
+				net.ParseIP(ClientIP), uint16(rand.Intn(65535)))
+
+			for _, segment := range test.segments {
+				hdr := &layers.TCP{Seq: segment.seq}
+				pkt := &protos.Packet{
+					Ts:      time.Now(),
+					Tuple:   addr,
+					Payload: segment.payload,
+				}
+				tcp.Process(nil, hdr, pkt)
+			}
+
+			assert.Equal(t, test.expectedGaps, gap)
+			if len(test.expectedState) != len(state) {
+				assert.Equal(t, len(test.expectedState), len(state))
+				return
+			}
+			assert.Equal(t, test.expectedState, state)
+		})
 	}
 }
 
@@ -340,7 +344,7 @@ func BenchmarkParallelProcess(b *testing.B) {
 	p := protocols{}
 	p.tcp = make(map[protos.Protocol]protos.TCPPlugin)
 	p.tcp[1] = &TestProtocol{Ports: []int{ServerPort}}
-	tcp, _ := NewTCP(p)
+	tcp, _ := NewTCP(p, "", "")
 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
