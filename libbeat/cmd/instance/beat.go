@@ -1003,7 +1003,12 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	extendedTLSCfg := struct {
 		tlscommon.Config `config:",inline" yaml:",inline"`
 		Reload           cfgfile.Reload `config:"exit_ca_cert_change" yaml:"exit_on_cert_change"`
-	}{}
+	}{
+		Reload: cfgfile.Reload{
+			Enabled: false,
+			Period:  time.Minute,
+		},
+	}
 
 	if err := rawTLSCfg.Unpack(&extendedTLSCfg); err != nil {
 		return fmt.Errorf("unpacking 'ssl' config: %w", err)

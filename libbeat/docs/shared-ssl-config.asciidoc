@@ -567,6 +567,23 @@ Allows a remote server to request renegotiation repeatedly.
 +
 The default value is `never`.
 
+[float]
+[[exit_on_cert_change_enabled]]
+==== `exit_on_cert_change.enabled`
+If set to `true` {beatname_uc} will exit if any file listed by `key`,
+`certificate`, or `certificate_authorities` is modified.
+
+NOTE: This feature is intended to be used when {beatname_uc} is running
+under a supervisor that can restart it. The default value is `false`.
+
+[float]
+[[exit_on_cert_change_period]]
+==== `exit_on_cert_change.period`
+Specifies how often the files are checked for changes. Do not set the
+period to less than 1s because the modification time of files is often
+stored in seconds. Setting the period to less than 1s will result in
+unnecessary overhead. The default value is 1m.
+
 ifeval::["{beatname_lc}" == "filebeat"]
 [float]
 [[server-client-renegotiation]]
