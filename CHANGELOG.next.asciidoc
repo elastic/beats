@@ -200,6 +200,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Heartbeat*
 
+- Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
 
 *Metricbeat*
 
