@@ -5,12 +5,11 @@
 package containerd
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -42,11 +41,11 @@ func init() {
 
 type Module interface {
 	mb.Module
-	GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, time.Time, error)
+	GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, time.Time, error)
 }
 
 type familiesCache struct {
-	sharedFamilies     []*dto.MetricFamily
+	sharedFamilies     []*p.MetricFamily
 	lastFetchErr       error
 	lastFetchTimestamp time.Time
 }
@@ -78,7 +77,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
-			return nil, errors.Wrap(err, "error generating cache hash for containerdMetricsCache")
+			return nil, fmt.Errorf("error generating cache hash for containerdMetricsCache: %w", err)
 		}
 		m := module{
 			BaseModule:             base,
@@ -89,7 +88,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	}
 }
 
-func (m *module) GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, time.Time, error) {
+func (m *module) GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, time.Time, error) {
 	m.containerdMetricsCache.lock.Lock()
 	defer m.containerdMetricsCache.lock.Unlock()
 
