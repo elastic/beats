@@ -92,6 +92,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
+- Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
 
 *Metricbeat*
 
