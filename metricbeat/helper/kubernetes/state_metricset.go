@@ -15,12 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package util
+package kubernetes
 
 import (
 	"fmt"
 	"strings"
 	"sync"
+
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -58,7 +60,7 @@ type MetricSet struct {
 	prometheusClient  prometheus.Prometheus
 	prometheusMapping *prometheus.MetricsMapping
 	mod               k8smod.Module
-	enricher          Enricher
+	enricher          util.Enricher
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -79,7 +81,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:     base,
 		prometheusClient:  prometheusClient,
 		prometheusMapping: mapping,
-		enricher:          NewResourceMetadataEnricher(base, strings.ReplaceAll(base.Name(), prefix, ""), mod.GetMetricsRepo(), false),
+		enricher:          util.NewResourceMetadataEnricher(base, strings.ReplaceAll(base.Name(), prefix, ""), mod.GetMetricsRepo(), false),
 		mod:               mod,
 	}, nil
 }
@@ -107,7 +109,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	for _, event := range events {
 		// The name of the metric state can be obtained by using m.BaseMetricSet.Name(). However, names that start with state_* (e.g. state_cronjob)
 		// need to have that prefix removed. So, for example, strings.ReplaceAll("state_cronjob", "state_", "") would result in just cronjob.
-		e, err := CreateEvent(event, "kubernetes."+strings.ReplaceAll(m.BaseMetricSet.Name(), "state_", ""))
+		e, err := util.CreateEvent(event, "kubernetes."+strings.ReplaceAll(m.BaseMetricSet.Name(), "state_", ""))
 		if err != nil {
 			m.Logger().Error(err)
 		}

@@ -18,6 +18,7 @@
 package state_pod
 
 import (
+	"github.com/elastic/beats/v7/metricbeat/helper/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
@@ -44,5 +45,5 @@ var mapping = &p.MetricsMapping{
 
 // Register metricset
 func init() {
-	util.Init(util.PodResource, mapping)
+	kubernetes.Init(util.PodResource, mapping)
 }
