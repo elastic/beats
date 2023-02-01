@@ -43,6 +43,7 @@ type config struct {
 	IgnoreOlder    time.Duration      `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
+	TakeOver       bool               `config:"take_over"`
 }
 
 type closerConfig struct {
