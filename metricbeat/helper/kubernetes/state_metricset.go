@@ -20,6 +20,7 @@ package kubernetes
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -36,11 +37,16 @@ E.g: mappings[state_cronjob] = &{map[kube_cronjob_created: prometheus.Metric}
 */
 var mappings = map[string]*prometheus.MetricsMapping{}
 
+// Lock to control concurrent read/writes
+var lock sync.RWMutex
+
 // Init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func Init(name string, mapping *prometheus.MetricsMapping) {
 	name = prefix + name
+	lock.Lock()
 	mappings[name] = mapping
+	lock.Unlock()
 	mb.Registry.MustAddMetricSet("kubernetes", name, New, mb.WithHostParser(prometheus.HostParser))
 }
 
@@ -66,7 +72,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
 
+	lock.Lock()
 	mapping := mappings[base.Name()]
+	lock.Unlock()
+
 	return &MetricSet{
 		BaseMetricSet:     base,
 		prometheusClient:  prometheusClient,
