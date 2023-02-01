@@ -29,6 +29,11 @@ import (
 
 const prefix = "state_"
 
+/*
+mappings stores the metrics for each metricset. The key of the map is the name of the metricset
+and the values are the mapping of the metricset metrics.
+E.g: mappings[state_cronjob] = &{map[kube_cronjob_created: prometheus.Metric}
+*/
 var mappings = map[string]*prometheus.MetricsMapping{}
 
 // Init registers the MetricSet with the central registry.
