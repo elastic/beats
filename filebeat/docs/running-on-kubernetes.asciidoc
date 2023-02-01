@@ -137,7 +137,7 @@ filebeat.autodiscover:
           - /var/log/containers/*.log
 ----
 
-NOTE: `/var/log/containers/*.log` is normally a symlink to `/var/log/pods/*/*.log`, 
+NOTE: `/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/\*/\*.log`, 
 so above paths can be edited accordingly
 
 
