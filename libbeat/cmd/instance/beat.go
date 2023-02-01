@@ -1002,7 +1002,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 
 	extendedTLSCfg := struct {
 		tlscommon.Config `config:",inline" yaml:",inline"`
-		Reload           cfgfile.Reload `config:"exit_on_ca_cert_change" yaml:"exit_on_ca_cert_change"`
+		Reload           cfgfile.Reload `config:"exit_ca_cert_change" yaml:"exit_on_cert_change"`
 	}{}
 
 	if err := rawTLSCfg.Unpack(&extendedTLSCfg); err != nil {
@@ -1014,8 +1014,14 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	}
 	logger.Debug("exit on CA certs change enabled")
 
-	watchers := make([]*cfgfile.GlobWatcher, 0, len(extendedTLSCfg.CAs))
-	for _, ca := range extendedTLSCfg.CAs {
+	watchers := make([]*cfgfile.GlobWatcher, 0, len(extendedTLSCfg.CAs)+2)
+	possibleFilesToWatch := append(
+		extendedTLSCfg.CAs,
+		extendedTLSCfg.Certificate.Certificate,
+		extendedTLSCfg.Certificate.Key,
+	)
+
+	for _, ca := range possibleFilesToWatch {
 		if tlscommon.IsPEMString(ca) {
 			// That's an embedded cert, we're only interested in files
 			continue
