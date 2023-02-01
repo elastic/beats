@@ -15,38 +15,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package pod
+package kubernetes
 
 import (
 	"fmt"
+	"strings"
+	"sync"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
-const (
-	defaultScheme = "http"
-	defaultPath   = "/stats/summary"
-)
+const prefix = "state_"
 
-var (
-	hostParser = parse.URLHostParserBuilder{
-		DefaultScheme: defaultScheme,
-		DefaultPath:   defaultPath,
-	}.Build()
-)
+/*
+mappings stores the metrics for each metricset. The key of the map is the name of the metricset
+and the values are the mapping of the metricset metrics.
+E.g: mappings[state_cronjob] = &{map[kube_cronjob_created: prometheus.Metric}
+*/
+var mappings = map[string]*prometheus.MetricsMapping{}
 
-// init registers the MetricSet with the central registry.
+// Lock to control concurrent read/writes
+var lock sync.RWMutex
+
+// Init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
-func init() {
-	mb.Registry.MustAddMetricSet("kubernetes", "pod", New,
-		mb.WithHostParser(hostParser),
-		mb.DefaultMetricSet(),
-	)
+func Init(name string, mapping *prometheus.MetricsMapping) {
+	name = prefix + name
+	lock.Lock()
+	mappings[name] = mapping
+	lock.Unlock()
+	mb.Registry.MustAddMetricSet("kubernetes", name, New, mb.WithHostParser(prometheus.HostParser))
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -55,16 +57,14 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http     *helper.HTTP
-	enricher util.Enricher
-	mod      k8smod.Module
+	prometheusClient  prometheus.Prometheus
+	prometheusMapping *prometheus.MetricsMapping
+	mod               k8smod.Module
+	enricher          util.Enricher
 }
 
-// New create a new instance of the MetricSet
-// Part of new is also setting up the configuration by processing additional
-// configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	http, err := helper.NewHTTP(base)
+	prometheusClient, err := prometheus.NewPrometheusClient(base)
 	if err != nil {
 		return nil, err
 	}
@@ -73,11 +73,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
 
+	lock.Lock()
+	mapping := mappings[base.Name()]
+	lock.Unlock()
+
 	return &MetricSet{
-		BaseMetricSet: base,
-		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, util.PodResource, mod.GetMetricsRepo(), true),
-		mod:           mod,
+		BaseMetricSet:     base,
+		prometheusClient:  prometheusClient,
+		prometheusMapping: mapping,
+		enricher:          util.NewResourceMetadataEnricher(base, strings.ReplaceAll(base.Name(), prefix, ""), mod.GetMetricsRepo(), false),
+		mod:               mod,
 	}, nil
 }
 
@@ -87,14 +92,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	body, err := m.mod.GetKubeletStats(m.http)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheusClient)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
-
-	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger())
+	events, err := m.prometheusClient.ProcessMetrics(families, m.prometheusMapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -102,26 +106,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	}
 
 	m.enricher.Enrich(events)
-
 	for _, event := range events {
-
-		e, err := util.CreateEvent(event, "kubernetes.pod")
+		// The name of the metric state can be obtained by using m.BaseMetricSet.Name(). However, names that start with state_* (e.g. state_cronjob)
+		// need to have that prefix removed. So, for example, strings.ReplaceAll("state_cronjob", "state_", "") would result in just cronjob.
+		e, err := util.CreateEvent(event, "kubernetes."+strings.ReplaceAll(m.BaseMetricSet.Name(), "state_", ""))
 		if err != nil {
 			m.Logger().Error(err)
-		}
-
-		// Enrich event with container ECS fields
-		containerEcsFields := ecsfields(event, m.Logger())
-		if len(containerEcsFields) != 0 {
-			if e.RootFields != nil {
-				e.RootFields.DeepUpdate(mapstr.M{
-					"container": containerEcsFields,
-				})
-			} else {
-				e.RootFields = mapstr.M{
-					"container": containerEcsFields,
-				}
-			}
 		}
 
 		if reported := reporter.Event(e); !reported {
