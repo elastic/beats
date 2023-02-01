@@ -57,6 +57,7 @@ func (in *cometdInput) Run() {
 				if err != nil {
 					in.log.Errorw("not able to get access token", "error", err)
 					// Creating a new channel for cometd input.
+					in.msgCh = make(chan bay.MaybeMsg, 1)
 					continue
 				}
 
