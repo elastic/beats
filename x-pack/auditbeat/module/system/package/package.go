@@ -525,6 +525,7 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 		}
 		ms.log.Debugf("Homebrew packages: %v", len(homebrewPackages))
 		packages = append(packages, homebrewPackages...)
+		break
 	}
 
 	if !foundPackageManager && !ms.suppressNoPackageWarnings {
