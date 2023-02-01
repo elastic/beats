@@ -58,7 +58,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
-
+- [Auditbeat System Package] Added support for Apple Silicon chips. {pull}34433[34433] 
 - [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
    with the ecs field name `container`. {pull}34403[34403]
 - [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
