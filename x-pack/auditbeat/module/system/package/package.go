@@ -510,30 +510,26 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 		return nil, fmt.Errorf("error opening %v: %w", dpkgPath, err)
 	}
 
-	updatedCellarPath := homebrewCellarPath[0]
-	_, err = os.Stat(homebrewCellarPath[0])
-	if err != nil && errors.Is(err, fs.ErrNotExist) && len(homebrewCellarPath) == 2 {
-		_, err = os.Stat(homebrewCellarPath[1])
-		updatedCellarPath = homebrewCellarPath[1]
-	}
-
-	if err == nil {
+	for _, path := range homebrewCellarPath {
+		_, err = os.Stat(path)
+		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				continue
+			}
+			return nil, fmt.Errorf("error opening %v: %w", path, err)
+		}
 		foundPackageManager = true
-
-		homebrewPackages, err := listBrewPackages(updatedCellarPath)
+		homebrewPackages, err := listBrewPackages(path)
 		if err != nil {
 			return nil, fmt.Errorf("error getting Homebrew packages: %w", err)
 		}
 		ms.log.Debugf("Homebrew packages: %v", len(homebrewPackages))
-
 		packages = append(packages, homebrewPackages...)
-	} else if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("error opening %v: %w", updatedCellarPath, err)
 	}
 
 	if !foundPackageManager && !ms.suppressNoPackageWarnings {
 		ms.log.Warnf("No supported package managers found. None of %v, %v, %v exist.",
-			rpmPath, dpkgPath, updatedCellarPath)
+			rpmPath, dpkgPath, strings.Join(homebrewCellarPath, ","))
 
 		// Only warn once at the start of Auditbeat.
 		ms.suppressNoPackageWarnings = true

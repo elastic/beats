@@ -30,7 +30,7 @@ func TestHomebrew(t *testing.T) {
 	homebrewCellarPath = []string{"testdata/homebrew/"}
 
 	// Test just listBrewPackages()
-	packages, err := listBrewPackages(homebrewCellarPath[0])
+	packages, err := listBrewPackages("testdata/homebrew/")
 	assert.NoError(t, err)
 	if assert.Len(t, packages, 1) {
 		pkg := packages[0]
@@ -88,7 +88,7 @@ func TestHomebrewNotExist(t *testing.T) {
 	homebrewCellarPath = []string{"/does/not/exist"}
 
 	// Test just listBrewPackages()
-	packages, err := listBrewPackages(homebrewCellarPath[0])
+	packages, err := listBrewPackages("/does/not/exist")
 	if assert.Error(t, err) {
 		assert.True(t, os.IsNotExist(err), "Unexpected error %v", err)
 	}
