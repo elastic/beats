@@ -44,6 +44,7 @@ import (
 const (
 	expectedExtension = "-expected.json"
 	applicationJson   = "application/json"
+	expectedFolder    = "_meta/testdata"
 )
 
 // DataConfig is the configuration for testdata tests
@@ -109,21 +110,39 @@ type DataConfig struct {
 	RemoveFieldsForComparison []string `yaml:"remove_fields_from_comparison"`
 }
 
+// Prefix is used to define the location of the expectedFolder
+type Prefix struct {
+	// WritePrefix is the prefix of the expectedFolder with the expected files
+	WritePrefix string
+
+	// ReadPrefix is the prefix of the expectedFolder with the files to read
+	ReadPrefix string
+}
+
 func defaultDataConfig() DataConfig {
 	return DataConfig{
-		Path:        ".",
-		WritePath:   ".",
+		Path:        expectedFolder,
+		WritePath:   expectedFolder,
 		Suffix:      "json",
 		ContentType: applicationJson,
 	}
 }
 
 // ReadDataConfig reads the testdataconfig from a path
-func ReadDataConfig(t *testing.T, f string) DataConfig {
+func ReadDataConfig(t *testing.T, f string, prefix ...Prefix) DataConfig {
 	t.Helper()
 	config := defaultDataConfig()
-	config.Path = filepath.Dir(f)
-	config.WritePath = filepath.Dir(config.Path)
+
+	// If prefix was given, then set the custom configurations
+	if len(prefix) > 0 {
+		if prefix[0].WritePrefix != "" {
+			config.WritePath = filepath.Join(prefix[0].WritePrefix, expectedFolder)
+		}
+		if prefix[0].ReadPrefix != "" {
+			config.Path = filepath.Join(prefix[0].ReadPrefix, expectedFolder)
+		}
+	}
+
 	configFile, err := ioutil.ReadFile(f)
 	if err != nil {
 		t.Fatalf("failed to read '%s': %v", f, err)
@@ -137,15 +156,16 @@ func ReadDataConfig(t *testing.T, f string) DataConfig {
 
 // TestDataConfig is a convenience helper function to read the testdata config
 // from the usual path
-func TestDataConfig(t *testing.T) DataConfig {
+func TestDataConfig(t *testing.T, prefix ...Prefix) DataConfig {
 	t.Helper()
-	return ReadDataConfig(t, "_meta/testdata/config.yml")
+	f := filepath.Join(expectedFolder, "config.yml")
+	return ReadDataConfig(t, f, prefix...)
 }
 
 // TestDataFiles run tests with config from the usual path (`_meta/testdata`)
-func TestDataFiles(t *testing.T, module, metricSet string) {
+func TestDataFiles(t *testing.T, module, metricSet string, prefix ...Prefix) {
 	t.Helper()
-	config := TestDataConfig(t)
+	config := TestDataConfig(t, prefix...)
 	TestDataFilesWithConfig(t, module, metricSet, config)
 }
 
@@ -193,6 +213,8 @@ func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events 
 }
 
 func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
+	t.Logf("Testing %s file\n", file)
+
 	// starts a server serving the given file under the given url
 	s := server(t, file, config.URL, config.ContentType)
 	defer s.Close()
@@ -242,22 +264,26 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 			err, module, metricSetName)
 	}
 
+	filename := file[len(config.Path):]
+	expectedFile := filepath.Join(config.WritePath, filename+expectedExtension)
+
 	// Overwrites the golden files if run with -generate
 	if *flags.DataFlag {
 		outputIndented, err := json.MarshalIndent(&data, "", "    ")
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err = ioutil.WriteFile(file+expectedExtension, outputIndented, 0644); err != nil {
+		if err = ioutil.WriteFile(expectedFile, outputIndented, 0644); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	// Read expected file
-	expected, err := ioutil.ReadFile(file + expectedExtension)
+	expected, err := ioutil.ReadFile(expectedFile)
 	if err != nil {
 		t.Fatalf("could not read file: %s", err)
 	}
+	t.Logf("Expected %s file\n", expectedFile)
 
 	expectedMap := []mapstr.M{}
 	if err := json.Unmarshal(expected, &expectedMap); err != nil {
