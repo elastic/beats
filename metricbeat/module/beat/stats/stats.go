@@ -47,7 +47,7 @@ var (
 // MetricSet defines all fields of the MetricSet
 type MetricSet struct {
 	*beat.MetricSet
-	lastTimestamp time.Time
+	lastClusterUUIDMessageTimestamp time.Time
 }
 
 // New create a new instance of the MetricSet
@@ -74,9 +74,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	clusterUUID, err := m.getClusterUUID()
 	if err != nil {
 		if err == beat.ErrClusterUUID {
-			if time.Since(m.lastTimestamp) > 1*time.Minute {
-				m.lastTimestamp = time.Now()
-				m.Logger().Warn(beat.ErrClusterUUID)
+			if time.Since(m.lastClusterUUIDMessageTimestamp) > 5*time.Minute {
+				m.lastClusterUUIDMessageTimestamp = time.Now()
+				m.Logger().Debug(beat.ErrClusterUUID)
 			}
 			return nil
 		}
