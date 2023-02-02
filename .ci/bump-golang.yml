@@ -29,9 +29,12 @@ sources:
     name: Get minor version in .go-version
     kind: shell
     transformers:
-      - semverinc: "minor"
+      - findsubmatch:
+          pattern: '^\d+.(\d+).\d+$'
+          captureindex: 1
     spec:
       command: cat .go-version
+
   latestGoVersion:
     name: Get Latest Go Release
     kind: githubrelease
@@ -54,11 +57,11 @@ sources:
     name: Get version in go.mod format
     kind: shell
     transformers:
-      - semverinc: "major,minor"
+      - findsubmatch:
+          pattern: '^(\d+.\d+).\d+'
+          captureindex: 1
     spec:
       command: echo {{ source "latestGoVersion" }}
-      environments:
-        - name: PATH
 
 conditions:
   dockerTag:
