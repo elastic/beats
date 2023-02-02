@@ -315,7 +315,10 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 			return
 		}
 
-		u.TransitiveMemberOf = *state.relationships.ExpandFromSet(u.MemberOf)
+		u.TransitiveMemberOf = u.MemberOf
+		state.relationships.ExpandFromSet(u.MemberOf).ForEach(func(elem uuid.UUID) {
+			u.TransitiveMemberOf.Add(elem)
+		})
 	})
 
 	return updatedUsers, nil
