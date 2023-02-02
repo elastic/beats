@@ -105,7 +105,7 @@ def runBeatsTesterJob(Map args = [:]) {
     def props = readProperties(file: 'beats-tester.properties')
     apm = props.get('APM_URL_BASE', '')
     beats = props.get('BEATS_URL_BASE', '')
-    version = props.get('VERSION', '8.7.0-SNAPSHOT')
+    version = props.get('VERSION', '7.17-SNAPSHOT')
   }
   if (apm?.trim() || beats?.trim()) {
     build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false,
