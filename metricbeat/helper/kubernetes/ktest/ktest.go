@@ -62,7 +62,7 @@ func TestStateMetricsFamily(t *testing.T, files []string, mapping *p.MetricsMapp
 			t.Fatalf("Unknown file %s.", files[i])
 		}
 		text := string(content)
-		for metric, _ := range mapping.Metrics {
+		for metric := range mapping.Metrics {
 			// A space is needed to check if the metric exists, since there are metrics that can follow this logic:
 			// some_metric and some_metric_total
 			if !strings.Contains(text, "# TYPE "+metric+" ") {
