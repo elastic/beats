@@ -63,6 +63,8 @@ func TestStateMetricsFamily(t *testing.T, files []string, mapping *p.MetricsMapp
 		}
 		text := string(content)
 		for metric, _ := range mapping.Metrics {
+			// A space is needed to check if the metric exists, since there are metrics that can follow this logic:
+			// some_metric and some_metric_total
 			if !strings.Contains(text, "# TYPE "+metric+" ") {
 				metricsFiles[metric] = append(metricsFiles[metric], files[i])
 			}
