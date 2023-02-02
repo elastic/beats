@@ -397,8 +397,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				closeChannels(
 					[]chan int{publishedEventsCountChannel},
 					[]chan maybeMsg{events},
-					[]chan *http.Response{responseChannel, initialResponseChannel},
+					[]chan *http.Response{initialResponseChannel},
 				)
+				if !r.requestFactories[i+1].isChain {
+					close(responseChannel)
+				}
 				return newIds.err
 			}
 			ids = newIds.ids

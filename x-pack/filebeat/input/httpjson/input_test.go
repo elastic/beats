@@ -629,6 +629,31 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
+			name:        "Test pagination with end condition",
+			setupServer: newPaginationTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target": "body.records",
+				},
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[if (ne .last_response.body.done true)]][[.last_response.body.nextLink]][[end]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+			},
+			handler: defaultHandler(http.MethodGet, "", ""),
+			expected: []string{
+				`{"id":1}`,
+				`{"id":2}`,
+			},
+		},
+		{
 			name:        "Test pagination when used with chaining",
 			setupServer: newChainPaginationTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
@@ -657,6 +682,33 @@ func TestInput(t *testing.T) {
 				`{"hello":{"world":"moon"}}`,
 				`{"space":{"cake":"pumpkin"}}`,
 			},
+		},
+		{
+			name:        "Test pagination when used with chaining Unable to get id from response",
+			setupServer: newChainPaginationTestServerWithInvalidJSON(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.value",
+							"value":                  "[[.last_response.body.nextLink]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": http.MethodGet,
+							"replace":        "$.records[:].id",
+						},
+					},
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", ""),
+			expected: []string{},
 		},
 		{
 			name:        "Test pagination when used with chaining with bulk data",
@@ -1131,8 +1183,13 @@ func TestInput(t *testing.T) {
 			g.Go(func() error {
 				return input.Run(ctx, chanClient)
 			})
-
-			timeout := time.NewTimer(2 * time.Minute)
+			var timeoutDuration time.Duration
+			if testCase.name == "Test pagination when used with chaining with bulk data" {
+				timeoutDuration = 2 * time.Minute
+			} else {
+				timeoutDuration = 10 * time.Second
+			}
+			timeout := time.NewTimer(timeoutDuration)
 			t.Cleanup(func() { _ = timeout.Stop() })
 
 			if len(tc.expected) == 0 {
@@ -1223,6 +1280,56 @@ func newChainPaginationTestServer(
 		config["request.url"] = server.URL
 		serverURL = server.URL
 		config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+		t.Cleanup(func() { registeredTransforms = newRegistry() })
+	}
+}
+
+func newChainPaginationTestServerWithInvalidJSON(
+	newServer func(http.Handler) *httptest.Server,
+) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		registerPaginationTransforms()
+		var serverURL string
+		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.URL.Path {
+			case "/":
+				link := serverURL + "/link2"
+				value := fmt.Sprintf(`"records":[{"id":1}], "nextLink":"%s"}`, link)
+				fmt.Fprintln(w, value)
+			case "/1":
+				fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+			}
+		})
+		server := httptest.NewServer(r)
+		config["request.url"] = server.URL
+		serverURL = server.URL
+		config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+		t.Cleanup(func() { registeredTransforms = newRegistry() })
+	}
+}
+
+func newPaginationTestServer(
+	newServer func(http.Handler) *httptest.Server,
+) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		registerPaginationTransforms()
+		registerResponseTransforms()
+		var serverURL string
+		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.URL.Path {
+			case "/":
+				link := serverURL + "/link2"
+				value := fmt.Sprintf(`{"records":[{"id":1}], "nextLink":"%s", "done": false}`, link)
+				fmt.Fprintln(w, value)
+			case "/link2":
+				link := serverURL + "/"
+				value := fmt.Sprintf(`{"records":[{"id":2}], "nextLink":"%s","done": true}`, link)
+				fmt.Fprintln(w, value)
+			}
+		})
+		server := httptest.NewServer(r)
+		config["request.url"] = server.URL
+		serverURL = server.URL
 		t.Cleanup(func() { registeredTransforms = newRegistry() })
 	}
 }
