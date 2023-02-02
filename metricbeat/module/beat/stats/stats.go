@@ -76,7 +76,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		if errors.Is(err, beat.ErrClusterUUID) {
 			if time.Since(m.lastClusterUUIDMessageTimestamp) > 5*time.Minute {
 				m.lastClusterUUIDMessageTimestamp = time.Now()
-				m.Logger().Debug(beat.ErrClusterUUID)
+				m.Logger().Debug(err)
 			}
 			return nil
 		}
