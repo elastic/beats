@@ -23,6 +23,11 @@ actions:
       automerge: false
       labels:
         - dependencies
+        - backport-skip
+      title: '[Automation] Bump Golang version to {{ source "latestGoVersion" }}'
+      #description: |
+      #  It requires the version to be bumped first in golang-crossbuild project, then a new release will be added to https://github.com/elastic/golang-crossbuild/releases.
+      #  Otherwise it will fail until the docker images are available.
 
 sources:
   minor:
