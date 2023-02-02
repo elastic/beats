@@ -26,13 +26,8 @@ import (
 // mapping stores the state metrics we want to fetch and will be used by this metricset
 var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
-		"kube_node_info":                            p.InfoMetric(),
-		"kube_node_status_allocatable_pods":         p.Metric("pod.allocatable.total"),
-		"kube_node_status_capacity_pods":            p.Metric("pod.capacity.total"),
-		"kube_node_status_capacity_memory_bytes":    p.Metric("memory.capacity.bytes"),
-		"kube_node_status_allocatable_memory_bytes": p.Metric("memory.allocatable.bytes"),
-		"kube_node_status_capacity_cpu_cores":       p.Metric("cpu.capacity.cores"),
-		"kube_node_status_allocatable_cpu_cores":    p.Metric("cpu.allocatable.cores"),
+		"kube_node_info": p.InfoMetric(),
+
 		"kube_node_status_capacity": p.Metric("", p.OpFilterMap(
 			"resource", map[string]string{
 				"pods":   "pod.capacity.total",
@@ -48,7 +43,7 @@ var mapping = &p.MetricsMapping{
 			},
 		)),
 		"kube_node_spec_unschedulable": p.BooleanMetric("status.unschedulable"),
-		"kube_node_status_ready":       p.LabelMetric("status.ready", "condition"),
+
 		"kube_node_status_condition": p.LabelMetric("status", "status", p.OpFilterMap(
 			"condition", map[string]string{
 				"Ready":          "ready",
