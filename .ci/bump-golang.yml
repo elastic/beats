@@ -10,13 +10,13 @@ scms:
       user: '{{ requiredEnv "GIT_USER" }}'
       email: '{{ requiredEnv "GIT_EMAIL" }}'
       owner: elastic
-      repository: apm-pipeline-library
+      repository: beats
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       username: '{{ requiredEnv "GIT_USER" }}'
       branch: main
 
 actions:
-  apm-pipeline-library:
+  beats:
     kind: github/pullrequest
     scmid: githubConfig
     spec:
