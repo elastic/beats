@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	mockauth "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
@@ -19,7 +19,7 @@ import (
 
 func TestAzure_DoFetch(t *testing.T) {
 	dbFilename := "TestAzure_DoFetch.db"
-	store := testSetupStore(dbFilename)
+	store := testSetupStore(t, dbFilename)
 	t.Cleanup(func() {
 		testCleanupStore(store, dbFilename)
 	})
@@ -31,18 +31,18 @@ func TestAzure_DoFetch(t *testing.T) {
 	}
 
 	ss, err := newStateStore(store)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer ss.close(false)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	got, err := a.doFetch(ctx, ss, false)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	var wantModifiedUsers collections.UUIDSet
 	for _, v := range mockfetcher.UserResponse {
 		wantModifiedUsers.Add(v.ID)
 	}
 
-	assert.Equal(t, wantModifiedUsers.Values(), got.Values())
+	require.Equal(t, wantModifiedUsers.Values(), got.Values())
 }

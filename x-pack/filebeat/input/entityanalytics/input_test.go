@@ -8,7 +8,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -81,10 +81,10 @@ func TestInputManager_Create(t *testing.T) {
 			}, nil
 		},
 	}))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = provider.Register("test-err", newTestErrProvider())
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	t.Run("create-ok", func(t *testing.T) {
 		t.Parallel()
@@ -93,12 +93,12 @@ func TestInputManager_Create(t *testing.T) {
 			Provider: "test",
 		}
 		c, err := config.NewConfigFrom(&rawConf)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		plugin := Plugin(logp.L())
 		inp, err := plugin.Manager.Create(c)
-		assert.NoError(t, err)
-		assert.Equal(t, testInputName, inp.Name())
+		require.NoError(t, err)
+		require.Equal(t, testInputName, inp.Name())
 	})
 
 	t.Run("create-err-config", func(t *testing.T) {
@@ -108,12 +108,12 @@ func TestInputManager_Create(t *testing.T) {
 			Provider: "",
 		}
 		c, err := config.NewConfigFrom(&rawConf)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		plugin := Plugin(logp.L())
 		_, err = plugin.Manager.Create(c)
 
-		assert.ErrorContains(t, err, "string value is not set accessing 'provider'")
+		require.ErrorContains(t, err, "string value is not set accessing 'provider'")
 	})
 
 	t.Run("create-err-provider-unknown", func(t *testing.T) {
@@ -123,12 +123,12 @@ func TestInputManager_Create(t *testing.T) {
 			Provider: "foobar",
 		}
 		c, err := config.NewConfigFrom(&rawConf)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		plugin := Plugin(logp.L())
 		_, err = plugin.Manager.Create(c)
 
-		assert.ErrorContains(t, err, ErrProviderUnknown.Error())
+		require.ErrorContains(t, err, ErrProviderUnknown.Error())
 	})
 
 	t.Run("create-err-provider-create", func(t *testing.T) {
@@ -138,11 +138,11 @@ func TestInputManager_Create(t *testing.T) {
 			Provider: "test-err",
 		}
 		c, err := config.NewConfigFrom(&rawConf)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		plugin := Plugin(logp.L())
 		_, err = plugin.Manager.Create(c)
 
-		assert.ErrorContains(t, err, "test error")
+		require.ErrorContains(t, err, "test error")
 	})
 }

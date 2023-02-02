@@ -12,13 +12,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func testSetupServer(tokenValue string, expiresIn int) *httptest.Server {
+func testSetupServer(t *testing.T, tokenValue string, expiresIn int) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		payload := authResponse{
 			TokenType:    "Bearer",
@@ -27,14 +27,10 @@ func testSetupServer(tokenValue string, expiresIn int) *httptest.Server {
 			ExtExpiresIn: expiresIn,
 		}
 		data, err := json.Marshal(payload)
-		if err != nil {
-			panic(err)
-		}
+		require.NoError(t, err)
 
 		_, err = w.Write(data)
-		if err != nil {
-			panic(err)
-		}
+		require.NoError(t, err)
 
 		w.Header().Add("Content-Type", "application/json")
 	}))
@@ -45,7 +41,7 @@ func TestRenew(t *testing.T) {
 		value := "test-value"
 		expiresIn := 1000
 
-		srv := testSetupServer(value, expiresIn)
+		srv := testSetupServer(t, value, expiresIn)
 		defer srv.Close()
 
 		cfg, err := config.NewConfigFrom(&conf{
@@ -54,26 +50,26 @@ func TestRenew(t *testing.T) {
 			ClientID: "client-id",
 			TenantID: "tenant-id",
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		auth, err := New(cfg, logp.L())
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
 		gotToken, err := auth.Token(ctx)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.WithinDuration(t, time.Now().Add(time.Duration(expiresIn)*time.Second), auth.(*oauth2).expires, 5*time.Second)
-		assert.Equal(t, value, gotToken)
+		require.WithinDuration(t, time.Now().Add(time.Duration(expiresIn)*time.Second), auth.(*oauth2).expires, 5*time.Second)
+		require.Equal(t, value, gotToken)
 	})
 
 	t.Run("cached-token", func(t *testing.T) {
 		cachedToken := "cached-value"
 		expireTime := time.Now().Add(1000 * time.Second)
 
-		srv := testSetupServer(cachedToken, 1000)
+		srv := testSetupServer(t, cachedToken, 1000)
 		defer srv.Close()
 
 		cfg, err := config.NewConfigFrom(&conf{
@@ -82,10 +78,10 @@ func TestRenew(t *testing.T) {
 			ClientID: "client-id",
 			TenantID: "tenant-id",
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		auth, err := New(cfg, logp.L())
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		auth.(*oauth2).expires = expireTime
 		auth.(*oauth2).token = cachedToken
@@ -94,9 +90,9 @@ func TestRenew(t *testing.T) {
 		defer cancel()
 
 		gotToken, err := auth.Token(ctx)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.Equal(t, expireTime, auth.(*oauth2).expires)
-		assert.Equal(t, cachedToken, gotToken)
+		require.Equal(t, expireTime, auth.(*oauth2).expires)
+		require.Equal(t, cachedToken, gotToken)
 	})
 }

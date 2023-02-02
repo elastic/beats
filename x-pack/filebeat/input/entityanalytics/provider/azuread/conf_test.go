@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConf_Validate(t *testing.T) {
@@ -37,9 +37,9 @@ func TestConf_Validate(t *testing.T) {
 			gotErr := tc.In.Validate()
 
 			if tc.WantErr == "" {
-				assert.NoError(t, gotErr)
+				require.NoError(t, gotErr)
 			} else {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+				require.ErrorContains(t, gotErr, tc.WantErr)
 			}
 		})
 	}

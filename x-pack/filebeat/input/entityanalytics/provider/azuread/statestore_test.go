@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
@@ -20,11 +20,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func testSetupStore(filename string) *kvstore.Store {
+func testSetupStore(t *testing.T, filename string) *kvstore.Store {
 	store, err := kvstore.NewStore(logp.L(), filename, 0644)
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 
 	return store
 }
@@ -44,13 +42,13 @@ func testAssertValueEquals(t *testing.T, store *kvstore.Store, bucket, key, valu
 
 		return err
 	})
-	assert.NoError(t, err)
-	assert.Equal(t, value, gotValue)
+	require.NoError(t, err)
+	require.Equal(t, value, gotValue)
 }
 
 func testAssertJSONValueEquals(t *testing.T, store *kvstore.Store, bucket, key []byte, value any) {
 	valueData, err := json.Marshal(&value)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	testAssertValueEquals(t, store, bucket, key, valueData)
 }
@@ -60,22 +58,22 @@ func testStoreSetJSONValue(t *testing.T, store *kvstore.Store, bucket, key []byt
 		return tx.Set(bucket, key, &value)
 	})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestStateStore_New(t *testing.T) {
 	dbFilename := "TestStateStore_New.db"
-	store := testSetupStore(dbFilename)
+	store := testSetupStore(t, dbFilename)
 	t.Cleanup(func() {
 		testCleanupStore(store, dbFilename)
 	})
 
 	// Inject test values into store.
 	lastSync, err := time.Parse(time.RFC3339Nano, "2023-01-12T08:47:23.296794-05:00")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	testStoreSetJSONValue(t, store, stateBucket, lastSyncKey, &lastSync)
 	lastUpdate, err := time.Parse(time.RFC3339Nano, "2023-01-12T08:50:04.546457-05:00")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	testStoreSetJSONValue(t, store, stateBucket, lastUpdateKey, &lastUpdate)
 	usersLink := "users-link"
 	groupsLink := "groups-link"
@@ -83,29 +81,29 @@ func TestStateStore_New(t *testing.T) {
 	testStoreSetJSONValue(t, store, stateBucket, groupsLinkKey, &groupsLink)
 
 	ss, err := newStateStore(store)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer ss.close(false)
 
-	assert.Equal(t, lastSync, ss.lastSync)
-	assert.Equal(t, lastUpdate, ss.lastUpdate)
-	assert.Equal(t, usersLink, ss.usersLink)
-	assert.Equal(t, groupsLink, ss.groupsLink)
+	require.Equal(t, lastSync, ss.lastSync)
+	require.Equal(t, lastUpdate, ss.lastUpdate)
+	require.Equal(t, usersLink, ss.usersLink)
+	require.Equal(t, groupsLink, ss.groupsLink)
 }
 
 func TestStateStore_Close(t *testing.T) {
 	dbFilename := "TestStateStore_Close.db"
-	store := testSetupStore(dbFilename)
+	store := testSetupStore(t, dbFilename)
 	t.Cleanup(func() {
 		testCleanupStore(store, dbFilename)
 	})
 
 	ss, err := newStateStore(store)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ss.lastSync, err = time.Parse(time.RFC3339Nano, "2023-01-12T08:47:23.296794-05:00")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	ss.lastUpdate, err = time.Parse(time.RFC3339Nano, "2023-01-12T08:50:04.546457-05:00")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ss.usersLink = "users-link"
 	ss.groupsLink = "groups-link"
@@ -148,7 +146,7 @@ func TestStateStore_Close(t *testing.T) {
 	ss.relationships.AddEdge(group1ID, group2ID)
 
 	err = ss.close(true)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	testAssertJSONValueEquals(t, store, stateBucket, lastSyncKey, &ss.lastSync)
 	testAssertJSONValueEquals(t, store, stateBucket, lastUpdateKey, &ss.lastUpdate)
@@ -160,75 +158,75 @@ func TestStateStore_Close(t *testing.T) {
 		err = tx.ForEach(usersBucket, func(key, value []byte) error {
 			var u fetcher.User
 			err = json.Unmarshal(value, &u)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			gotUsers[u.ID] = &u
 
 			return nil
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		return nil
 	})
-	assert.NoError(t, err)
-	assert.EqualValues(t, ss.users, gotUsers)
+	require.NoError(t, err)
+	require.EqualValues(t, ss.users, gotUsers)
 
 	gotGroups := map[uuid.UUID]*fetcher.Group{}
 	err = store.RunTransaction(false, func(tx *kvstore.Transaction) error {
 		err = tx.ForEach(groupsBucket, func(key, value []byte) error {
 			var g fetcher.Group
 			err = json.Unmarshal(value, &g)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			gotGroups[g.ID] = &g
 
 			return nil
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		return nil
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	// Workaround for verification, Members is not persisted on groups, so it is
 	// nil-ed out here so the assert below works.
 	for _, v := range ss.groups {
 		v.Members = nil
 	}
-	assert.EqualValues(t, ss.groups, gotGroups)
+	require.EqualValues(t, ss.groups, gotGroups)
 
 	testAssertJSONValueEquals(t, store, relationshipsBucket, groupMembershipsKey, &ss.relationships)
 }
 
 func TestGetLastSync(t *testing.T) {
 	dbFilename := "TestGetLastSync.db"
-	store := testSetupStore(dbFilename)
+	store := testSetupStore(t, dbFilename)
 	t.Cleanup(func() {
 		testCleanupStore(store, dbFilename)
 	})
 
 	testTime, err := time.Parse(time.RFC3339Nano, "2023-01-12T08:47:23.296794-05:00")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	testStoreSetJSONValue(t, store, stateBucket, lastSyncKey, &testTime)
 
 	got, gotErr := getLastSync(store)
 
-	assert.NoError(t, gotErr)
-	assert.Equal(t, testTime, got)
+	require.NoError(t, gotErr)
+	require.Equal(t, testTime, got)
 }
 
 func TestGetLastUpdate(t *testing.T) {
 	dbFilename := "TestGetLastUpdate.db"
-	store := testSetupStore(dbFilename)
+	store := testSetupStore(t, dbFilename)
 	t.Cleanup(func() {
 		testCleanupStore(store, dbFilename)
 	})
 
 	testTime, err := time.Parse(time.RFC3339Nano, "2023-01-12T08:47:23.296794-05:00")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	testStoreSetJSONValue(t, store, stateBucket, lastUpdateKey, &testTime)
 
 	got, gotErr := getLastUpdate(store)
 
-	assert.NoError(t, gotErr)
-	assert.Equal(t, testTime, got)
+	require.NoError(t, gotErr)
+	require.Equal(t, testTime, got)
 }
 
 func TestErrIsItemFound(t *testing.T) {
@@ -257,7 +255,7 @@ func TestErrIsItemFound(t *testing.T) {
 
 			got := errIsItemNotFound(tc.In)
 
-			assert.Equal(t, tc.Want, got)
+			require.Equal(t, tc.Want, got)
 		})
 	}
 }

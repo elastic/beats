@@ -7,7 +7,7 @@ package entityanalytics
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
 )
@@ -38,9 +38,9 @@ func TestConf_Validate(t *testing.T) {
 			gotErr := tc.In.Validate()
 
 			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+				require.ErrorContains(t, gotErr, tc.WantErr)
 			} else {
-				assert.NoError(t, gotErr)
+				require.NoError(t, gotErr)
 			}
 		})
 	}

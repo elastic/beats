@@ -8,7 +8,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -37,10 +37,10 @@ func TestManager_Create(t *testing.T) {
 		}
 
 		c, err := config.NewConfigFrom(&managerConfig{ID: "create-ok"})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		_, gotErr := m.Create(c)
-		assert.NoError(t, gotErr)
+		require.NoError(t, gotErr)
 	})
 
 	t.Run("err-configure", func(t *testing.T) {
@@ -51,10 +51,10 @@ func TestManager_Create(t *testing.T) {
 		}
 
 		c, err := config.NewConfigFrom(&managerConfig{ID: "err-configure"})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		_, gotErr := m.Create(c)
-		assert.ErrorContains(t, gotErr, "test error")
+		require.ErrorContains(t, gotErr, "test error")
 	})
 
 	t.Run("err-config-unpack", func(t *testing.T) {
@@ -66,10 +66,10 @@ func TestManager_Create(t *testing.T) {
 
 		emptyCfg := struct{}{}
 		c, err := config.NewConfigFrom(&emptyCfg)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		_, gotErr := m.Create(c)
-		assert.ErrorContains(t, gotErr, "string value is not set accessing 'id'")
+		require.ErrorContains(t, gotErr, "string value is not set accessing 'id'")
 	})
 }
 
@@ -79,5 +79,5 @@ func TestManager_Init(t *testing.T) {
 	m := Manager{}
 	gotErr := m.Init(&grp, v2.ModeRun)
 
-	assert.NoError(t, gotErr)
+	require.NoError(t, gotErr)
 }

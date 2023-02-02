@@ -8,7 +8,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -17,22 +17,22 @@ func TestRegistry(t *testing.T) {
 	err := Register("test", func(logger *logp.Logger) (Provider, error) {
 		return nil, errors.New("test error")
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	err = Register("test", func(logger *logp.Logger) (Provider, error) {
 		return nil, errors.New("test error")
 	})
-	assert.ErrorIs(t, err, ErrExists)
+	require.ErrorIs(t, err, ErrExists)
 
 	exists := Has("test")
-	assert.True(t, exists)
+	require.True(t, exists)
 	exists = Has("foobar")
-	assert.False(t, exists)
+	require.False(t, exists)
 
 	_, err = Get("foobar")
-	assert.ErrorIs(t, err, ErrNotFound)
+	require.ErrorIs(t, err, ErrNotFound)
 	factoryFn, err := Get("test")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = factoryFn(logp.L())
-	assert.ErrorContains(t, err, "test error")
+	require.ErrorContains(t, err, "test error")
 }

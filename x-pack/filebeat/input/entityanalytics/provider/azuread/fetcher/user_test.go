@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 )
@@ -66,10 +66,10 @@ func TestUser_Merge(t *testing.T) {
 
 			tc.In.Merge(tc.InOther)
 
-			assert.Equal(t, tc.Want.ID, tc.In.ID)
-			assert.Equal(t, tc.Want.Fields, tc.In.Fields)
-			assert.ElementsMatch(t, tc.Want.MemberOf.Values(), tc.In.MemberOf.Values(), "list A: Expected, listB: Actual")
-			assert.ElementsMatch(t, tc.Want.TransitiveMemberOf.Values(), tc.In.TransitiveMemberOf.Values(), "list A: Expected, listB: Actual")
+			require.Equal(t, tc.Want.ID, tc.In.ID)
+			require.Equal(t, tc.Want.Fields, tc.In.Fields)
+			require.ElementsMatch(t, tc.Want.MemberOf.Values(), tc.In.MemberOf.Values(), "list A: Expected, listB: Actual")
+			require.ElementsMatch(t, tc.Want.TransitiveMemberOf.Values(), tc.In.TransitiveMemberOf.Values(), "list A: Expected, listB: Actual")
 		})
 	}
 }

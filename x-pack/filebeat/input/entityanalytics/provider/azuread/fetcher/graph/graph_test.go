@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
@@ -119,10 +119,10 @@ func (s *testServer) setup(t *testing.T) {
 		default:
 			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
 		}
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		_, err = w.Write(data)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 	})
 
 	mux.HandleFunc("/groups/delta", func(w http.ResponseWriter, r *http.Request) {
@@ -142,14 +142,14 @@ func (s *testServer) setup(t *testing.T) {
 		default:
 			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
 		}
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		_, err = w.Write(data)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 	})
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		assert.Fail(t, "Matched unknown route")
+		require.Fail(t, "Matched unknown route")
 	})
 
 	s.srv = httptest.NewServer(mux)
@@ -194,19 +194,19 @@ func TestGraph_Groups(t *testing.T) {
 		APIEndpoint: "http://" + testSrv.addr,
 	}
 	c, err := config.NewConfigFrom(&rawConf)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
 	f, err := New(c, logp.L(), auth)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	gotGroups, gotDeltaLink, gotErr := f.Groups(ctx, "")
 
-	assert.NoError(t, gotErr)
-	assert.EqualValues(t, wantGroups, gotGroups)
-	assert.Equal(t, wantDeltaLink, gotDeltaLink)
+	require.NoError(t, gotErr)
+	require.EqualValues(t, wantGroups, gotGroups)
+	require.Equal(t, wantDeltaLink, gotDeltaLink)
 }
 
 func TestGraph_Users(t *testing.T) {
@@ -253,17 +253,17 @@ func TestGraph_Users(t *testing.T) {
 		APIEndpoint: "http://" + testSrv.addr,
 	}
 	c, err := config.NewConfigFrom(&rawConf)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
 	f, err := New(c, logp.L(), auth)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	gotUsers, gotDeltaLink, gotErr := f.Users(ctx, "")
 
-	assert.NoError(t, gotErr)
-	assert.EqualValues(t, wantUsers, gotUsers)
-	assert.Equal(t, wantDeltaLink, gotDeltaLink)
+	require.NoError(t, gotErr)
+	require.EqualValues(t, wantUsers, gotUsers)
+	require.Equal(t, wantDeltaLink, gotDeltaLink)
 }

@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -62,7 +62,7 @@ func TestNewUUIDSet(t *testing.T) {
 			t.Parallel()
 
 			got := NewUUIDSet(tc.In...)
-			assert.Equal(t, tc.Want, got)
+			require.Equal(t, tc.Want, got)
 		})
 	}
 }
@@ -113,10 +113,10 @@ func TestUUIDSet_UnmarshalJSON(t *testing.T) {
 			gotErr := json.Unmarshal(tc.In, &s)
 
 			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+				require.ErrorContains(t, gotErr, tc.WantErr)
 			} else {
-				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.Want, s)
+				require.NoError(t, gotErr)
+				require.Equal(t, tc.Want, s)
 			}
 		})
 	}
@@ -150,10 +150,10 @@ func TestUUIDSet_MarshalJSON(t *testing.T) {
 			got, gotErr := json.Marshal(&tc.In)
 
 			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+				require.ErrorContains(t, gotErr, tc.WantErr)
 			} else {
-				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.Want, got)
+				require.NoError(t, gotErr)
+				require.Equal(t, tc.Want, got)
 			}
 		})
 	}
@@ -180,7 +180,7 @@ func TestUUIDSet_Len(t *testing.T) {
 			t.Parallel()
 
 			got := tc.In.Len()
-			assert.Equal(t, tc.Want, got)
+			require.Equal(t, tc.Want, got)
 		})
 	}
 }
@@ -206,7 +206,7 @@ func TestUUIDSet_Values(t *testing.T) {
 			t.Parallel()
 
 			got := tc.In.Values()
-			assert.Equal(t, tc.Want, got)
+			require.Equal(t, tc.Want, got)
 		})
 	}
 }
@@ -246,7 +246,7 @@ func TestUUIDSet_Add(t *testing.T) {
 
 			tc.InSet.Add(tc.In...)
 
-			assert.Equal(t, tc.Want, tc.InSet)
+			require.Equal(t, tc.Want, tc.InSet)
 		})
 	}
 }
@@ -285,7 +285,7 @@ func TestUUIDSet_Remove(t *testing.T) {
 			t.Parallel()
 
 			tc.In.Remove(tc.InValues...)
-			assert.Equal(t, tc.Want, tc.In)
+			require.Equal(t, tc.Want, tc.In)
 		})
 	}
 }
@@ -320,7 +320,7 @@ func TestUUIDSet_Contains(t *testing.T) {
 
 			got := tc.In.Contains(tc.InValue)
 
-			assert.Equal(t, tc.Want, got)
+			require.Equal(t, tc.Want, got)
 		})
 	}
 }
@@ -337,7 +337,7 @@ func TestUUIDSet_ForEach(t *testing.T) {
 			got = append(got, elem)
 		})
 
-		assert.ElementsMatch(t, expected, got)
+		require.ElementsMatch(t, expected, got)
 	})
 
 	t.Run("empty", func(t *testing.T) {
@@ -349,6 +349,6 @@ func TestUUIDSet_ForEach(t *testing.T) {
 			called++
 		})
 
-		assert.Zero(t, called)
+		require.Zero(t, called)
 	})
 }

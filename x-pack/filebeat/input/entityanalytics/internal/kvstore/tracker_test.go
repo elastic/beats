@@ -8,7 +8,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -19,22 +19,22 @@ func TestTxTracker_Ack(t *testing.T) {
 
 	txTracker.Ack()
 
-	assert.ErrorIs(t, txTracker.ctx.Err(), context.Canceled)
+	require.ErrorIs(t, txTracker.ctx.Err(), context.Canceled)
 }
 
 func TestTxTracker_Add(t *testing.T) {
 	txTracker := NewTxTracker(context.Background())
 
-	assert.Equal(t, 0, txTracker.pending.Load())
+	require.Equal(t, 0, txTracker.pending.Load())
 	txTracker.Add()
-	assert.Equal(t, 1, txTracker.pending.Load())
+	require.Equal(t, 1, txTracker.pending.Load())
 }
 
 func TestTxTracker_Wait(t *testing.T) {
 	txTracker := NewTxTracker(context.Background())
 	txTracker.Wait()
 
-	assert.ErrorIs(t, txTracker.ctx.Err(), context.Canceled)
+	require.ErrorIs(t, txTracker.ctx.Err(), context.Canceled)
 }
 
 func TestTxACKHandler(t *testing.T) {
@@ -43,7 +43,7 @@ func TestTxACKHandler(t *testing.T) {
 		handler := NewTxACKHandler()
 
 		txTracker.Add()
-		assert.Equal(t, 1, txTracker.pending.Load())
+		require.Equal(t, 1, txTracker.pending.Load())
 
 		handler.AddEvent(beat.Event{
 			Private: txTracker,
@@ -52,7 +52,7 @@ func TestTxACKHandler(t *testing.T) {
 
 		txTracker.Wait()
 
-		assert.Zero(t, txTracker.pending.Load())
+		require.Zero(t, txTracker.pending.Load())
 	})
 
 	t.Run("wait-ack", func(t *testing.T) {
@@ -63,7 +63,7 @@ func TestTxACKHandler(t *testing.T) {
 		handler := NewTxACKHandler()
 
 		txTracker.Add()
-		assert.Equal(t, 1, txTracker.pending.Load())
+		require.Equal(t, 1, txTracker.pending.Load())
 
 		handler.AddEvent(beat.Event{
 			Private: txTracker,
@@ -71,6 +71,6 @@ func TestTxACKHandler(t *testing.T) {
 
 		txTracker.Wait()
 
-		assert.Equal(t, 1, txTracker.pending.Load())
+		require.Equal(t, 1, txTracker.pending.Load())
 	})
 }

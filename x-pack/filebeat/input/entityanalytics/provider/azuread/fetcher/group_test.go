@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGroup_ToECS(t *testing.T) {
@@ -22,5 +22,5 @@ func TestGroup_ToECS(t *testing.T) {
 	}
 
 	got := in.ToECS()
-	assert.Equal(t, want, got)
+	require.Equal(t, want, got)
 }

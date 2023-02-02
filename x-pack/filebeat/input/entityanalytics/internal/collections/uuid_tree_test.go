@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUUIDTree_UnmarshalJSON(t *testing.T) {
@@ -54,10 +54,10 @@ func TestUUIDTree_UnmarshalJSON(t *testing.T) {
 			gotErr := json.Unmarshal(tc.In, &tree)
 
 			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+				require.ErrorContains(t, gotErr, tc.WantErr)
 			} else {
-				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.Want, tree)
+				require.NoError(t, gotErr)
+				require.Equal(t, tc.Want, tree)
 			}
 		})
 	}
@@ -90,10 +90,10 @@ func TestUUIDTree_MarshalJSON(t *testing.T) {
 			got, gotErr := json.Marshal(&tc.In)
 
 			if tc.WantErr != "" {
-				assert.ErrorContains(t, gotErr, tc.WantErr)
+				require.ErrorContains(t, gotErr, tc.WantErr)
 			} else {
-				assert.NoError(t, gotErr)
-				assert.Equal(t, tc.Want, got)
+				require.NoError(t, gotErr)
+				require.Equal(t, tc.Want, got)
 			}
 		})
 	}
@@ -130,7 +130,7 @@ func TestUUIDTree_RemoveVertex(t *testing.T) {
 
 			tc.In.RemoveVertex(tc.InValue)
 
-			assert.Equal(t, tc.Want, tc.In)
+			require.Equal(t, tc.Want, tc.In)
 		})
 	}
 }
@@ -171,7 +171,7 @@ func TestUUIDTree_ContainsVertex(t *testing.T) {
 
 			got := tc.In.ContainsVertex(tc.InValue)
 
-			assert.Equal(t, tc.Want, got)
+			require.Equal(t, tc.Want, got)
 		})
 	}
 }
@@ -220,7 +220,7 @@ func TestUUIDTree_AddEdge(t *testing.T) {
 
 			tc.In.AddEdge(tc.InFrom, tc.InTo...)
 
-			assert.Equal(t, tc.Want, tc.In)
+			require.Equal(t, tc.Want, tc.In)
 		})
 	}
 }
@@ -265,7 +265,7 @@ func TestUUIDTree_RemoveEdge(t *testing.T) {
 
 			tc.In.RemoveEdge(tc.InFrom, tc.InTo)
 
-			assert.Equal(t, tc.Want, tc.In)
+			require.Equal(t, tc.Want, tc.In)
 		})
 	}
 }
@@ -300,7 +300,7 @@ func TestUUIDTree_ContainsEdge(t *testing.T) {
 
 			got := tc.In.ContainsEdge(tc.InFrom, tc.InTo)
 
-			assert.Equal(t, tc.Want, got)
+			require.Equal(t, tc.Want, got)
 		})
 	}
 }
@@ -334,7 +334,7 @@ func TestUUIDTree_Expand(t *testing.T) {
 
 			got := tc.In.Expand(tc.InValues...)
 
-			assert.Equal(t, tc.Want.Values(), got.Values())
+			require.Equal(t, tc.Want.Values(), got.Values())
 		})
 	}
 }
@@ -368,7 +368,7 @@ func TestUUIDTree_ExpandFromSet(t *testing.T) {
 
 			got := tc.In.ExpandFromSet(tc.InValues)
 
-			assert.Equal(t, tc.Want.Values(), got.Values())
+			require.Equal(t, tc.Want.Values(), got.Values())
 		})
 	}
 }
