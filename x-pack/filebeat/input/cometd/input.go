@@ -48,6 +48,8 @@ func (in *cometdInput) Run() {
 			rt := rate.NewLimiter(rate.Every(retryInterval), 1)
 
 			for in.workerCtx.Err() == nil {
+				// Creating a new channel for cometd input.
+				in.msgCh = make(chan bay.MaybeMsg, 1)
 				// Rate limit.
 				if err := rt.Wait(in.workerCtx); err != nil {
 					continue
@@ -56,16 +58,12 @@ func (in *cometdInput) Run() {
 				in.creds, err = bay.GetSalesforceCredentials(in.authParams)
 				if err != nil {
 					in.log.Errorw("not able to get access token", "error", err)
-					// Creating a new channel for cometd input.
-					in.msgCh = make(chan bay.MaybeMsg, 1)
 					continue
 				}
 
 				if err := in.run(); err != nil {
 					if in.workerCtx.Err() == nil {
 						in.log.Errorw("Restarting failed CometD input worker.", "error", err)
-						// Creating a new channel for cometd input.
-						in.msgCh = make(chan bay.MaybeMsg, 1)
 						continue
 					}
 
@@ -186,9 +184,6 @@ func NewInput(
 		workerCancel: workerCancel,
 		authParams:   authParams,
 	}
-
-	// Creating a new channel for cometd input.
-	in.msgCh = make(chan bay.MaybeMsg, 1)
 
 	// Build outlet for events.
 	in.outlet, err = connector.Connect(cfg)
