@@ -19,6 +19,10 @@ type configs struct {
 }
 
 func Parse(c *conf.C) error {
+	if c == nil {
+		return nil
+	}
+
 	feats := configs{}
 	if err := c.Unpack(&feats); err != nil {
 		return fmt.Errorf("could not umpack features config: %w", err)

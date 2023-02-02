@@ -52,6 +52,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/kibana"
@@ -81,9 +82,9 @@ import (
 	libversion "github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
-	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -113,7 +114,8 @@ type beatConfig struct {
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
-	Seccomp *config.C `config:"seccomp"`
+	Seccomp  *config.C `config:"seccomp"`
+	Features *config.C `config:"features"`
 
 	// beat internal components configurations
 	HTTP            *config.C              `config:"http"`
@@ -242,6 +244,15 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 		return nil, err
 	}
 
+	var fqdn string
+	if features.FQDN() {
+		h, err := sysinfo.Host()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get FQDN: %w", err)
+		}
+		fqdn = h.Info().FQDN
+	}
+
 	fields, err := asset.GetFields(name)
 	if err != nil {
 		return nil, err
@@ -260,6 +271,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			Version:         v,
 			Name:            hostname,
 			Hostname:        hostname,
+			FQDN:            fqdn,
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
@@ -605,9 +617,9 @@ type SetupSettings struct {
 	Dashboard       bool
 	Pipeline        bool
 	IndexManagement bool
-	//Deprecated: use IndexManagementKey instead
+	// Deprecated: use IndexManagementKey instead
 	Template bool
-	//Deprecated: use IndexManagementKey instead
+	// Deprecated: use IndexManagementKey instead
 	ILMPolicy         bool
 	EnableAllFilesets bool
 }
@@ -747,6 +759,10 @@ func (b *Beat) configure(settings Settings) error {
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return fmt.Errorf("error unpacking config data: %w", err)
+	}
+
+	if err := features.Parse(b.Config.Features); err != nil {
+		return fmt.Errorf("could not parse features: %w", err)
 	}
 
 	b.Beat.Config = &b.Config.BeatConfig

@@ -41,7 +41,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -121,10 +120,6 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	if err := config.FetchConfigs(); err != nil {
 		return nil, err
-	}
-
-	if err := features.Parse(config.Features); err != nil {
-		return nil, fmt.Errorf("could not parse features config: %w", err)
 	}
 
 	if b.API != nil {

@@ -31,6 +31,7 @@ type Info struct {
 	ElasticLicensed bool      // Whether the beat is licensed under and Elastic License
 	Name            string    // configured beat name
 	Hostname        string    // hostname
+	FQDN            string    // FQDN
 	ID              uuid.UUID // ID assigned to beat machine
 	EphemeralID     uuid.UUID // ID assigned to beat process invocation (PID)
 	FirstStart      time.Time // The time of the first start of the Beat.

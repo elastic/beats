@@ -48,7 +48,6 @@ type Config struct {
 	ConfigModules      *conf.C              `config:"config.modules"`
 	Autodiscover       *autodiscover.Config `config:"autodiscover"`
 	OverwritePipelines bool                 `config:"overwrite_pipelines"`
-	Features           *conf.C              `config:"features"`
 }
 
 type Registry struct {

@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
@@ -99,7 +100,7 @@ func MakeDefaultSupport(
 ) SupportFactory {
 	return func(info beat.Info, log *logp.Logger, beatCfg *config.C) (Supporter, error) {
 		cfg := struct {
-			mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
+			mapstr.EventMetadata `config:",inline"` // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
 			TimeSeries           bool                    `config:"timeseries.enabled"`
 		}{}
@@ -143,10 +144,17 @@ var WithHost modifier = builtinModifier(func(info beat.Info) mapstr.M {
 // pipeline.
 func WithAgentMeta() modifier {
 	return builtinModifier(func(info beat.Info) mapstr.M {
+		var hostname string
+		if features.FQDN() {
+			hostname = info.FQDN
+		} else {
+			hostname = info.Hostname
+		}
+		
 		metadata := mapstr.M{
 			"ephemeral_id": info.EphemeralID.String(),
 			"id":           info.ID.String(),
-			"name":         info.Hostname,
+			"name":         hostname,
 			"type":         info.Beat,
 			"version":      info.Version,
 		}

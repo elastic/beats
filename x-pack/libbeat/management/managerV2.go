@@ -388,6 +388,7 @@ func (cm *BeatV2Manager) unitListen() {
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure there is a difference between
 			// A unit add and a unit change, since either way we can't do much more than call the reloader
+			// here!
 			case client.UnitChangedAdded:
 				cm.addUnit(change.Unit)
 				// reset can be called here because `<-t.C` is handled in the same select

@@ -58,20 +58,20 @@ const (
 
 // New constructs a new add_host_metadata processor.
 func New(cfg *config.C) (processors.Processor, error) {
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
 	p := &addHostMetadata{
-		config: config,
+		config: c,
 		data:   mapstr.NewPointer(nil),
 		logger: logp.NewLogger("add_host_metadata"),
 	}
-	p.loadData()
+	_ = p.loadData()
 
-	if config.Geo != nil {
-		geoFields, err := util.GeoConfigToMap(*config.Geo)
+	if c.Geo != nil {
+		geoFields, err := util.GeoConfigToMap(*c.Geo)
 		if err != nil {
 			return nil, err
 		}
