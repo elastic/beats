@@ -1002,7 +1002,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 
 	extendedTLSCfg := struct {
 		tlscommon.Config `config:",inline" yaml:",inline"`
-		Reload           cfgfile.Reload `config:"exit_ca_cert_change" yaml:"exit_on_cert_change"`
+		Reload           cfgfile.Reload `config:"exit_on_cert_change" yaml:"exit_on_cert_change"`
 	}{
 		Reload: cfgfile.Reload{
 			Enabled: false,
@@ -1027,6 +1027,9 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	)
 
 	for _, ca := range possibleFilesToWatch {
+		if ca == "" {
+			continue
+		}
 		if tlscommon.IsPEMString(ca) {
 			// That's an embedded cert, we're only interested in files
 			continue
