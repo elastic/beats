@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 *Heartbeat*
+- Update the recommended Node.js version to 18.12.0 for Synthetics {pull}15196[15196]
 
 *Metricbeat*
 
