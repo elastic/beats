@@ -18,9 +18,9 @@
 package stats
 
 import (
+	"errors"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -73,7 +73,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	clusterUUID, err := m.getClusterUUID()
 	if err != nil {
-		if err == beat.ErrClusterUUID {
+		if errors.Is(err, beat.ErrClusterUUID) {
 			if time.Since(m.lastClusterUUIDMessageTimestamp) > 5*time.Minute {
 				m.lastClusterUUIDMessageTimestamp = time.Now()
 				m.Logger().Debug(beat.ErrClusterUUID)
@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 func (m *MetricSet) getClusterUUID() (string, error) {
 	state, err := beat.GetState(m.MetricSet)
 	if err != nil {
-		return "", errors.Wrap(err, "could not get state information")
+		return "", fmt.Errorf("could not get state information: %w", err)
 	}
 
 	clusterUUID := state.Monitoring.ClusterUUID
