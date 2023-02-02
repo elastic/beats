@@ -35,7 +35,7 @@ func GetTestCases(files []string) ptest.TestCases {
 				MetricsFile  string
 				ExpectedFile string
 			}{
-				// the metrics file is inside the parent directory, while the expect file is in the current directory
+				// the metrics file is inside the parent directory, while the expected file is in the current directory
 				// Example:
 				//	Metricsfile: ../_meta/test/ksm.v2.4.2
 				//	ExpectedFile: ./_meta/test/ksm.v2.4.2.expected
