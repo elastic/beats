@@ -25,6 +25,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
@@ -134,16 +135,20 @@ func (p *addHostMetadata) loadData() error {
 		}
 
 		if len(ipList) > 0 {
-			data.Put("host.ip", ipList)
+			_, _ = data.Put("host.ip", ipList)
 		}
 		if len(hwList) > 0 {
-			data.Put("host.mac", hwList)
+			_, _ = data.Put("host.mac", hwList)
 		}
 	}
 
-	if p.config.Name != "" {
-		data.Put("host.name", p.config.Name)
+	switch {
+	case p.config.Name != "":
+		_, _ = data.Put("host.name", p.config.Name)
+	case features.FQDN():
+		_, _ = data.Put("host.name", h.Info().FQDN)
 	}
+
 	p.data.Set(data)
 	return nil
 }

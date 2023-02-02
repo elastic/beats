@@ -48,6 +48,7 @@ type Config struct {
 	ConfigModules      *conf.C              `config:"config.modules"`
 	Autodiscover       *autodiscover.Config `config:"autodiscover"`
 	OverwritePipelines bool                 `config:"overwrite_pipelines"`
+	Features           *conf.C              `config:"features"`
 }
 
 type Registry struct {
@@ -119,7 +120,7 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 	return nil
 }
 
-// Fetches and merges all config files given by configDir. All are put into one config object
+// FetchConfigs fetches and merges all config files given by configDir. All are put into one config object
 func (config *Config) FetchConfigs() error {
 	configDir := config.ConfigDir
 

@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -122,6 +123,10 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, err
 	}
 
+	if err := features.Parse(config.Features); err != nil {
+		return nil, fmt.Errorf("could not parse features config: %w", err)
+	}
+
 	if b.API != nil {
 		if err = inputmon.AttachHandler(b.API.Router()); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
@@ -190,9 +195,9 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, enableAllFilesets)
 		if fb.config.ConfigModules.Enabled() {
 			if enableAllFilesets {
-				//All module configs need to be loaded to enable all the filesets
-				//contained in the modules.  The default glob just loads the enabled
-				//ones.  Switching the glob pattern from *.yml to * achieves this.
+				// All module configs need to be loaded to enable all the filesets
+				// contained in the modules.  The default glob just loads the enabled
+				// ones.  Switching the glob pattern from *.yml to * achieves this.
 				origPath, _ := fb.config.ConfigModules.String("path", -1)
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
