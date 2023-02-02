@@ -37,24 +37,14 @@ var files = []string{
 	"../_meta/test/ksm.v2.7.0",
 }
 
+const name = "state_deployment"
+
 func TestEventMapping(t *testing.T) {
-	var cases ptest.TestCases
-	for i := 0; i < len(files); i++ {
-		cases = append(cases,
-			struct {
-				MetricsFile  string
-				ExpectedFile string
-			}{
-				MetricsFile:  files[i],
-				ExpectedFile: files[i][1:] + ".expected",
-			},
-		)
-	}
-	ptest.TestMetricSet(t, "kubernetes", "state_deployment", cases)
+	ptest.TestMetricSet(t, "kubernetes", name, k.GetTestCases(files))
 }
 
 func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "kubernetes", "state_deployment")
+	mbtest.TestDataFiles(t, "kubernetes", name)
 }
 
 func TestMetricsFamily(t *testing.T) {
