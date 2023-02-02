@@ -135,5 +135,5 @@ targets:
     kind: file
     spec:
       content: 'go {{ source "gomod" }}'
-      file: libbeat/docs/version.asciidoc
+      file: go.mod
       matchpattern: 'go [0-9]+\.[0-9]+'
