@@ -82,9 +82,7 @@ conditions:
     kind: shell
     sourceid: latestGoVersion
     spec:
-      command: bash .ci/scripts/test-golang-version.sh
-      environments:
-        - name: PATH
+      command: 'grep -v -q {{ source "latestGoVersion" }} .go-version #'
 
 targets:
   update-go-version:
