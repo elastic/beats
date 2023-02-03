@@ -3,6 +3,42 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.6.1]]
+=== Beats version 8.6.1
+https://github.com/elastic/beats/compare/v8.6.0\...v8.6.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix unnecessarily restarting every time a new configuration was received from the Elastic Agent. {pull}34346[34346]
+
+*Filebeat*
+- [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
+- Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
+- The `close.on_state_change.inactive` default value is now set to 5 minutes, matching the documentation.
+- Fix handling of null or empty arrays during split with keep parent option. {pull}34322[34322]
+
+*Metricbeat*
+
+- Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
+- Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
+
+*Osquerybeat*
+
+- Fix data_stream configuration, enforce the default values used before 8.6.0. {pull}34246[34246]
+
+*Winlogbeat*
+
+- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest {issue}19627[19627] {pull}34295[34295]
+
+==== Added
+
+*Filebeat*
+
+- Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+
 [[release-notes-8.6.0]]
 === Beats version 8.6.0
 https://github.com/elastic/beats/compare/v8.5.3\...v8.6.0[View commits]
@@ -43,7 +79,6 @@ https://github.com/elastic/beats/compare/v8.5.3\...v8.6.0[View commits]
 *Affecting all Beats*
 
 - Add `http.pprof` config options for enabling block and mutex profiling. {issue}33572[33572] {pull}33576[33576]
-- Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 - Add `add_formatted_index` processor that allows the resulting index for an event to be changed based on content from the event. {pull}33800[33800]
 - deps: Updated to github.com/elastic/go-sysinfo v1.9.0. {pull}33864[33864]
 - Fix panic due to close of already closed channel during shutdown. {pull}33971[33971]

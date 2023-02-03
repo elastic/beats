@@ -1,0 +1,212 @@
+[
+  {
+    "event": {
+      "code": "4778",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "activity_id": "{7261ec5d-29d2-0001-bdec-6172d229d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "user1",
+        "ClientAddress": "LOCAL",
+        "ClientName": "Unknown",
+        "LogonID": "0x5c7c095",
+        "SessionName": "Console"
+      },
+      "event_id": "4778",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 320,
+        "thread": {
+          "id": 4484
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 6540868,
+      "time_created": "2023-01-17T21:35:22.347697Z"
+    }
+  },
+  {
+    "event": {
+      "code": "4778",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "activity_id": "{7261ec5d-29d2-0001-bdec-6172d229d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "user1",
+        "ClientAddress": "LOCAL",
+        "ClientName": "Unknown",
+        "LogonID": "0x2d7650",
+        "SessionName": "Console"
+      },
+      "event_id": "4778",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 320,
+        "thread": {
+          "id": 9240
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 6533066,
+      "time_created": "2023-01-17T14:30:22.2097094Z"
+    }
+  },
+  {
+    "event": {
+      "code": "4778",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "activity_id": "{7261ec5d-29d2-0001-bdec-6172d229d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "user1",
+        "ClientAddress": "LOCAL",
+        "ClientName": "Unknown",
+        "LogonID": "0x2d7650",
+        "SessionName": "Console"
+      },
+      "event_id": "4778",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 320,
+        "thread": {
+          "id": 20588
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 6529837,
+      "time_created": "2023-01-17T12:16:32.6562756Z"
+    }
+  },
+  {
+    "event": {
+      "code": "4778",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "activity_id": "{7261ec5d-29d2-0001-bdec-6172d229d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "user1",
+        "ClientAddress": "LOCAL",
+        "ClientName": "Unknown",
+        "LogonID": "0x2d7650",
+        "SessionName": "Console"
+      },
+      "event_id": "4778",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 320,
+        "thread": {
+          "id": 1560
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 6528511,
+      "time_created": "2023-01-17T11:38:09.0384455Z"
+    }
+  },
+  {
+    "event": {
+      "code": "4778",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "activity_id": "{7261ec5d-29d2-0001-bdec-6172d229d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "user1",
+        "ClientAddress": "LOCAL",
+        "ClientName": "Unknown",
+        "LogonID": "0x32b6a80",
+        "SessionName": "Console"
+      },
+      "event_id": "4778",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 320,
+        "thread": {
+          "id": 1560
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 6524523,
+      "time_created": "2023-01-17T05:15:18.8083596Z"
+    }
+  }
+]

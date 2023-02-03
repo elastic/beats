@@ -720,6 +720,10 @@ filebeat.modules:
     # based on zone egress and ingress
     #var.external_zones: [ "External" ]
 
+    # IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+    # timestamps without a time zone.
+    #var.timezone_offset: UTC
+
   ftd:
     enabled: false
 
@@ -752,6 +756,10 @@ filebeat.modules:
     # Set external security zones. used to override parsed network.direction
     # based on zone egress and ingress
     #var.external_zones: [ "External" ]
+
+    # IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+    # timestamps without a time zone.
+    #var.timezone_offset: UTC
 
   ios:
     enabled: false
@@ -2976,7 +2984,7 @@ filebeat.inputs:
        # Source of container events. Available options: all, stdin, stderr.
        #stream: all
 
-       # Format of the container events. Available options: auto, cri, docker, json-file 
+       # Format of the container events. Available options: auto, cri, docker, json-file
        #format: auto
 
   ### Log rotation
@@ -2986,7 +2994,7 @@ filebeat.inputs:
   #rotation.external.strategy.copytruncate:
   # Regex that matches the rotated files.
   #  suffix_regex: \.\d$
-  # If the rotated filename suffix is a datetime, set it here. 
+  # If the rotated filename suffix is a datetime, set it here.
   #  dateformat: -20060102
 
   ### State options
@@ -3025,6 +3033,11 @@ filebeat.inputs:
   # ignore_inactive is disabled by default, so no files are ignored by setting it to "".
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
+
+  # If `take_over` is set to `true`, this `filestream` will take over all files
+  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # This functionality is still in beta.
+  #take_over: false
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -3183,7 +3196,7 @@ filebeat.inputs:
   #hosts:
     #- kafka-broker-1:9092
     #- kafka-broker-2:9092
-  
+
   # A list of topics to read from.
   #topics: ["my-topic", "important-logs"]
 
@@ -3218,7 +3231,7 @@ filebeat.inputs:
 
   # The minimum number of bytes to wait for.
   #fetch.min: 1
-  
+
   # The default number of bytes to read per request.
   #fetch.default: 1MB
 
@@ -3351,7 +3364,6 @@ filebeat.inputs:
   #- multiline:
     #type: count
     #count_lines: 3
-
 
 #------------------------------ NetFlow input --------------------------------
 # Experimental: Config options for the Netflow/IPFIX collector over UDP input
