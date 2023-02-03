@@ -123,7 +123,7 @@ require (
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/miekg/dns v1.1.42
 	github.com/mitchellh/gox v1.0.1
-	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
+	github.com/mitchellh/hashstructure v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/osquery/osquery-go v0.0.0-20210622151333-99b4efa62ec5
@@ -377,3 +377,5 @@ replace (
 
 // Exclude this version because the version has an invalid checksum.
 exclude github.com/docker/distribution v2.8.0+incompatible
+
+replace github.com/elastic/elastic-agent-libs v0.2.16 => github.com/belimawr/elastic-agent-libs v0.2.9-0.20230203105521-e3c35631c26e

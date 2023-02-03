@@ -66,6 +66,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
+
+	"github.com/elastic/elastic-agent-libs/filewatcher"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -1019,36 +1021,32 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	}
 	logger.Debug("exit on CA certs change enabled")
 
-	watchers := make([]*cfgfile.GlobWatcher, 0, len(extendedTLSCfg.CAs)+2)
 	possibleFilesToWatch := append(
 		extendedTLSCfg.CAs,
 		extendedTLSCfg.Certificate.Certificate,
 		extendedTLSCfg.Certificate.Key,
 	)
 
-	for _, ca := range possibleFilesToWatch {
-		if ca == "" {
+	filesToWatch := []string{}
+	for _, f := range possibleFilesToWatch {
+		if f == "" {
 			continue
 		}
-		if tlscommon.IsPEMString(ca) {
+		if tlscommon.IsPEMString(f) {
 			// That's an embedded cert, we're only interested in files
 			continue
 		}
 
-		logger.Debugf("watching '%s' for changes", ca)
-		// TODO (Tiago): ca is a file path, not a glob, we need to make sure it works
-		// or get another kind of watcher
-		// TODO (Tiago): replace it by a file watcher like
-		// elastic-agent/internal/pkg/filewatcher
-		gw := cfgfile.NewGlobWatcher(ca)
-		// Ignore the first scan as it will always return
-		// true for files changed. The output has not been
-		// started yet, so even if the files have changed since
-		// the Beat started, they don't need to be reloaded
-		gw.Scan()
-
-		watchers = append(watchers, gw)
+		logger.Debugf("watching '%s' for changes", f)
+		filesToWatch = append(filesToWatch, f)
 	}
+
+	watcher := filewatcher.New(filesToWatch...)
+	// Ignore the first scan as it will always return
+	// true for files changed. The output has not been
+	// started yet, so even if the files have changed since
+	// the Beat started, they don't need to be reloaded
+	watcher.Scan()
 
 	// Watch for file changes while the Beat is alive
 	go func() {
@@ -1056,18 +1054,16 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 
 		for {
 			<-ticker
-			for _, gw := range watchers {
-				files, changed, err := gw.Scan()
-				if err != nil {
-					logger.Warnf("could not scan certificate files: %s", err.Error())
-				}
+			files, changed, err := watcher.Scan()
+			if err != nil {
+				logger.Warnf("could not scan certificate files: %s", err.Error())
+			}
 
-				if changed {
-					logger.Infof(
-						"some of the following files have been modified: %v, starting %s shutdown",
-						files, b.Info.Beat)
-					b.Manager.Stop()
-				}
+			if changed {
+				logger.Infof(
+					"some of the following files have been modified: %v, starting %s shutdown",
+					files, b.Info.Beat)
+				b.Manager.Stop()
 			}
 		}
 	}()
