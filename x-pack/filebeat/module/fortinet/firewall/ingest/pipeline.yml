@@ -6,7 +6,7 @@ processors:
 - grok:
     field: message
     patterns:
-    - '%{SYSLOG5424PRI}%{GREEDYDATA:syslog5424_sd}$'
+    - '%{SYSLOG5424PRI}( )?%{GREEDYDATA:syslog5424_sd}$'
 - kv:
     field: syslog5424_sd
     field_split: " (?=[a-z\\_\\-]+=)"
