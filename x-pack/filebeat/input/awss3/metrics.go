@@ -23,6 +23,7 @@ type inputMetrics struct {
 	sqsMessagesReturnedTotal            *monitoring.Uint // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 	sqsMessagesDeletedTotal             *monitoring.Uint // Number of SQS messages deleted.
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
+	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 
 	s3ObjectsRequestedTotal *monitoring.Uint // Number of S3 objects downloaded.
 	s3ObjectsAckedTotal     *monitoring.Uint // Number of S3 objects processed that were fully ACKed.
@@ -36,7 +37,6 @@ type inputMetrics struct {
 
 // Close removes the metrics from the registry.
 func (m *inputMetrics) Close() {
-	// Thanks to this integration tests fail
 	m.unregister()
 }
 
@@ -51,6 +51,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		sqsMessagesReturnedTotal:            monitoring.NewUint(reg, "sqs_messages_returned_total"),
 		sqsMessagesDeletedTotal:             monitoring.NewUint(reg, "sqs_messages_deleted_total"),
 		sqsMessageProcessingTime:            metrics.NewUniformSample(1024),
+		sqsLagTime:                          metrics.NewUniformSample(1024),
 		s3ObjectsRequestedTotal:             monitoring.NewUint(reg, "s3_objects_requested_total"),
 		s3ObjectsAckedTotal:                 monitoring.NewUint(reg, "s3_objects_acked_total"),
 		s3ObjectsListedTotal:                monitoring.NewUint(reg, "s3_objects_listed_total"),
@@ -62,6 +63,8 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 	}
 	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "sqs_lag_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.sqsLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	return out

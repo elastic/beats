@@ -557,6 +557,16 @@ filebeat.inputs:
     })
 ----
 
+[float]
+==== `redact.fields`
+
+This specifies fields in the `state` to be redacted prior to debug logging. Fields listed in this array will be either replaced with a `*` or deleted entirely from messages sent to debug logs.
+
+[float]
+==== `redact.delete`
+
+This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 

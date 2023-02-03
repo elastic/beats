@@ -13,18 +13,21 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
-
-	"github.com/gofrs/uuid"
+	gproto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // unitKey is used to identify a unique unit in a map
@@ -41,6 +44,9 @@ type BeatV2Manager struct {
 	client   client.V2
 
 	logger *logp.Logger
+
+	// handles client errors
+	errCanceller context.CancelFunc
 
 	// track individual units given to us by the V2 API
 	mx      sync.Mutex
@@ -66,13 +72,17 @@ type BeatV2Manager struct {
 
 	isRunning bool
 
-	// is set on first instance of a config reload,
-	// allowing us to restart the beat if stopOnOutputReload is set
-	outputIsConfigured bool
+	// set with the last applied output config
+	// allows tracking if the configuration actually changed and if the
+	// beat needs to restart if stopOnOutputReload is set
+	lastOutputCfg *proto.UnitExpectedConfig
+
+	// set with the last applied input configs
+	lastInputCfgs map[string]*proto.UnitExpectedConfig
 
 	// used for the debug callback to report as-running config
-	lastOutputCfg *reload.ConfigWithMeta
-	lastInputCfg  []*reload.ConfigWithMeta
+	lastBeatOutputCfg *reload.ConfigWithMeta
+	lastBeatInputCfgs []*reload.ConfigWithMeta
 }
 
 // ================================
@@ -108,6 +118,11 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (
 	if err != nil {
 		return nil, fmt.Errorf("error reading control config from agent: %w", err)
 	}
+
+	// officially running under the elastic-agent; we set the publisher pipeline
+	// to inform it that we are running under elastic-agent (used to ensure "Publish event: "
+	// debug log messages are only outputted when running in trace mode
+	publisher.SetUnderAgent(true)
 
 	return NewV2AgentManagerWithClient(c, registry, agentClient)
 }
@@ -169,11 +184,18 @@ func (cm *BeatV2Manager) Start() error {
 	if !cm.Enabled() {
 		return fmt.Errorf("V2 Manager is disabled")
 	}
-	err := cm.client.Start(context.Background())
+	if cm.errCanceller != nil {
+		cm.errCanceller()
+		cm.errCanceller = nil
+	}
+	ctx := context.Background()
+	err := cm.client.Start(ctx)
 	if err != nil {
 		return fmt.Errorf("error starting connection to client")
 	}
-
+	ctx, canceller := context.WithCancel(ctx)
+	cm.errCanceller = canceller
+	go cm.watchErrChan(ctx)
 	cm.client.RegisterDiagnosticHook("beat-rendered-config", "the rendered config used by the beat", "beat-rendered-config.yml", "application/yaml", cm.handleDebugYaml)
 	go cm.unitListen()
 	cm.isRunning = true
@@ -319,6 +341,17 @@ func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
 // Private V2 implementation
 // ================================
 
+func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case err := <-cm.client.Errors():
+			cm.logger.Errorf("elastic-agent-client error: %s", err)
+		}
+	}
+}
+
 func (cm *BeatV2Manager) unitListen() {
 	const changeDebounce = 100 * time.Millisecond
 
@@ -399,6 +432,10 @@ func (cm *BeatV2Manager) stopBeat() {
 	}
 	cm.client.Stop()
 	cm.UpdateStatus(lbmanagement.Stopped, "Stopped")
+	if cm.errCanceller != nil {
+		cm.errCanceller()
+		cm.errCanceller = nil
+	}
 }
 
 func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
@@ -435,7 +472,9 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	}
 
 	// set the new log level (if nothing has changed is a noop)
-	logp.SetLevel(getZapcoreLevel(lowestLevel))
+	ll, trace := getZapcoreLevel(lowestLevel)
+	logp.SetLevel(ll)
+	publisher.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
 	var errs multierror.Errors
@@ -496,21 +535,30 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 			return fmt.Errorf("failed to reload output: %w", err)
 		}
 		cm.lastOutputCfg = nil
-		return nil
-	}
-
-	if cm.stopOnOutputReload && cm.outputIsConfigured {
-		cm.logger.Info("beat is restarting because output changed")
-		_ = unit.UpdateState(client.UnitStateStopping, "Restarting", nil)
-		cm.Stop()
+		cm.lastBeatOutputCfg = nil
 		return nil
 	}
 
 	_, _, rawConfig := unit.Expected()
 	if rawConfig == nil {
+		// should not happen; hard stop
 		return fmt.Errorf("output unit has no config")
 	}
+
+	if cm.lastOutputCfg != nil && gproto.Equal(cm.lastOutputCfg, rawConfig) {
+		// configuration for the output did not change; do nothing
+		cm.logger.Debug("Skipped reloading output; configuration didn't change")
+		return nil
+	}
+
 	cm.logger.Debugf("Got output unit config '%s'", rawConfig.GetId())
+
+	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
+		cm.logger.Info("beat is restarting because output changed")
+		_ = unit.UpdateState(client.UnitStateStopping, "Restarting", nil)
+		cm.Stop()
+		return nil
+	}
 
 	reloadConfig, err := groupByOutputs(rawConfig)
 	if err != nil {
@@ -521,9 +569,8 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 	if err != nil {
 		return fmt.Errorf("failed to reload output: %w", err)
 	}
-	cm.lastOutputCfg = reloadConfig
-	// set to true, we'll reload the output if we need to re-configure
-	cm.outputIsConfigured = true
+	cm.lastOutputCfg = rawConfig
+	cm.lastBeatOutputCfg = reloadConfig
 	return nil
 }
 
@@ -533,22 +580,40 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		return fmt.Errorf("failed to find beat reloadable type 'input'")
 	}
 
-	var inputCfgs []*reload.ConfigWithMeta
+	inputCfgs := make(map[string]*proto.UnitExpectedConfig, len(inputUnits))
+	inputBeatCfgs := make([]*reload.ConfigWithMeta, 0, len(inputUnits))
 	agentInfo := cm.client.AgentInfo()
 	for _, unit := range inputUnits {
 		_, _, rawConfig := unit.Expected()
+		if rawConfig == nil {
+			// should not happen; hard stop
+			return fmt.Errorf("input unit %s has no config", unit.ID())
+		}
+
+		var prevCfg *proto.UnitExpectedConfig
+		if cm.lastInputCfgs != nil {
+			prevCfg, _ = cm.lastInputCfgs[unit.ID()]
+		}
+		if prevCfg != nil && gproto.Equal(prevCfg, rawConfig) {
+			// configuration for the input did not change; do nothing
+			cm.logger.Debugf("Skipped reloading input unit %s; configuration didn't change", unit.ID())
+			continue
+		}
+
 		inputCfg, err := generateBeatConfig(rawConfig, agentInfo)
 		if err != nil {
 			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
 		}
-		inputCfgs = append(inputCfgs, inputCfg...)
+		inputCfgs[unit.ID()] = rawConfig
+		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
-	err := obj.Reload(inputCfgs)
+	err := obj.Reload(inputBeatCfgs)
 	if err != nil {
 		return fmt.Errorf("failed to reloading inputs: %w", err)
 	}
-	cm.lastInputCfg = inputCfgs
+	cm.lastInputCfgs = inputCfgs
+	cm.lastBeatInputCfgs = inputBeatCfgs
 	return nil
 }
 
@@ -557,7 +622,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 func (cm *BeatV2Manager) handleDebugYaml() []byte {
 	// generate input
 	inputList := []map[string]interface{}{}
-	for _, module := range cm.lastInputCfg {
+	for _, module := range cm.lastBeatInputCfgs {
 		var inputMap map[string]interface{}
 		err := module.Config.Unpack(&inputMap)
 		if err != nil {
@@ -569,8 +634,8 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 
 	// generate output
 	outputCfg := map[string]interface{}{}
-	if cm.lastOutputCfg != nil {
-		err := cm.lastOutputCfg.Config.Unpack(&outputCfg)
+	if cm.lastBeatOutputCfg != nil {
+		err := cm.lastBeatOutputCfg.Config.Unpack(&outputCfg)
 		if err != nil {
 			cm.logger.Errorf("error unpacking output config for debug callback: %s", err)
 			return nil
@@ -619,20 +684,22 @@ func getUnitState(status lbmanagement.Status) client.UnitState {
 	return client.UnitStateStarting
 }
 
-func getZapcoreLevel(ll client.UnitLogLevel) zapcore.Level {
+func getZapcoreLevel(ll client.UnitLogLevel) (zapcore.Level, bool) {
 	switch ll {
 	case client.UnitLogLevelError:
-		return zapcore.ErrorLevel
+		return zapcore.ErrorLevel, false
 	case client.UnitLogLevelWarn:
-		return zapcore.WarnLevel
+		return zapcore.WarnLevel, false
 	case client.UnitLogLevelInfo:
-		return zapcore.InfoLevel
+		return zapcore.InfoLevel, false
 	case client.UnitLogLevelDebug:
-		return zapcore.DebugLevel
+		return zapcore.DebugLevel, false
 	case client.UnitLogLevelTrace:
 		// beats doesn't support trace
-		return zapcore.DebugLevel
+		// but we do allow the "Publish event:" debug logs
+		// when trace mode is enabled
+		return zapcore.DebugLevel, true
 	}
 	// info level for fallback
-	return zapcore.InfoLevel
+	return zapcore.InfoLevel, false
 }
