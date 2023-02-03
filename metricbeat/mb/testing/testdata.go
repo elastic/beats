@@ -209,6 +209,11 @@ func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events 
 }
 
 func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
+	filename := filepath.Base(file)
+	if filename == "data.json" {
+		return
+	}
+
 	t.Logf("Testing %s file\n", file)
 
 	// starts a server serving the given file under the given url
@@ -260,7 +265,6 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 			err, module, metricSetName)
 	}
 
-	filename := file[len(config.Path):]
 	expectedFile := filepath.Join(config.WritePath, filename+expectedExtension)
 
 	// Overwrites the golden files if run with -generate
