@@ -65,7 +65,7 @@ const (
 // A test will be run for each file with the `plain` extension in the same directory
 // where a file with this configuration is placed.
 type DataConfig struct {
-	// Path is the directory containing this configuration
+	// Path is the directory containing the .plain read files
 	Path string
 
 	// WritePath is the path where to write the generated files
@@ -110,15 +110,6 @@ type DataConfig struct {
 	RemoveFieldsForComparison []string `yaml:"remove_fields_from_comparison"`
 }
 
-// Prefix is used to define the location of the expectedFolder
-type Prefix struct {
-	// WritePrefix is the prefix of the expectedFolder with the expected files
-	WritePrefix string
-
-	// ReadPrefix is the prefix of the expectedFolder with the files to read
-	ReadPrefix string
-}
-
 func defaultDataConfig() DataConfig {
 	return DataConfig{
 		Path:        expectedFolder,
@@ -129,19 +120,9 @@ func defaultDataConfig() DataConfig {
 }
 
 // ReadDataConfig reads the testdataconfig from a path
-func ReadDataConfig(t *testing.T, f string, prefix ...Prefix) DataConfig {
+func ReadDataConfig(t *testing.T, f string) DataConfig {
 	t.Helper()
 	config := defaultDataConfig()
-
-	// If prefix was given, then set the custom configurations
-	if len(prefix) > 0 {
-		if prefix[0].WritePrefix != "" {
-			config.WritePath = filepath.Join(prefix[0].WritePrefix, expectedFolder)
-		}
-		if prefix[0].ReadPrefix != "" {
-			config.Path = filepath.Join(prefix[0].ReadPrefix, expectedFolder)
-		}
-	}
 
 	configFile, err := ioutil.ReadFile(f)
 	if err != nil {
@@ -156,28 +137,43 @@ func ReadDataConfig(t *testing.T, f string, prefix ...Prefix) DataConfig {
 
 // TestDataConfig is a convenience helper function to read the testdata config
 // from the usual path
-func TestDataConfig(t *testing.T, prefix ...Prefix) DataConfig {
+func TestDataConfig(t *testing.T) DataConfig {
 	t.Helper()
 	f := filepath.Join(expectedFolder, "config.yml")
-	return ReadDataConfig(t, f, prefix...)
+	return ReadDataConfig(t, f)
 }
 
 // TestDataFiles run tests with config from the usual path (`_meta/testdata`)
-func TestDataFiles(t *testing.T, module, metricSet string, prefix ...Prefix) {
+func TestDataFiles(t *testing.T, module, metricSet string) {
 	t.Helper()
-	config := TestDataConfig(t, prefix...)
+	config := TestDataConfig(t)
 	TestDataFilesWithConfig(t, module, metricSet, config)
 }
 
 // TestDataFilesWithConfig run tests for a testdata config
-func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig) {
+func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig, testPrefix ...string) {
 	t.Helper()
-	ff, err := filepath.Glob(filepath.Join(config.Path, "*."+config.Suffix))
+
+	// the location of the read files
+	location := filepath.Join(config.Path, "*."+config.Suffix)
+
+	// if this function was called from data_test.go then the testPrefix should be 1
+	if len(testPrefix) != 0 {
+		// the prefix for read and write files should be ../../../module/moduleName/metricsetName
+		prefix := filepath.Join(testPrefix[0], module, metricSet)
+		location = filepath.Join(prefix, location)
+
+		// the prefix needs to be appended to the path of the expected files and the original files
+		config.WritePath = filepath.Join(prefix, config.WritePath)
+		config.Path = filepath.Join(prefix, config.Path)
+	}
+	ff, err := filepath.Glob(location)
+
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(ff) == 0 {
-		t.Fatalf("test path with config but without data files: %s", config.Path)
+		t.Fatalf("read test path without data files: %s", config.Path)
 	}
 
 	var files []string
@@ -395,7 +391,7 @@ func documentedFieldCheck(foundKeys mapstr.M, knownKeys map[string]interface{}, 
 			splits := strings.Split(foundKey, ".")
 			found := false
 			for pos := 1; pos < len(splits)-1; pos++ {
-				key := strings.Join(splits[0:pos], ".") + ".*." + strings.Join(splits[pos+1:len(splits)], ".")
+				key := strings.Join(splits[0:pos], ".") + ".*." + strings.Join(splits[pos+1:], ".")
 				if _, ok := knownKeys[key]; ok {
 					found = true
 					break
