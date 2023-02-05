@@ -41,14 +41,14 @@ func TestDefaults(t *testing.T) {
 			123,
 		},
 		{
-			"Browser default is 2 when other monitor is overriden",
+			"Browser default is 2 when other monitor is overridden",
 			"SYNTHETICS_LIMIT_HTTP",
 			"123",
 			"browser",
 			2,
 		},
 		{
-			"Browser default is 2 when nothing is overriden",
+			"Browser default is 2 when nothing is overridden",
 			"FOO",
 			"bar",
 			"browser",
