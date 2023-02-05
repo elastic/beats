@@ -200,6 +200,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
+- Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
 
 - Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
 
