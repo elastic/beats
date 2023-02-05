@@ -73,7 +73,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventMapping(r, *info, clusterUUID, content, m.XPackEnabled)
+	return eventMapping(r, info, clusterUUID, content, m.XPackEnabled)
 }
 
 func (m *MetricSet) getClusterUUID() (string, error) {

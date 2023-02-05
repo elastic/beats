@@ -79,35 +79,27 @@ type State struct {
 }
 
 // GetInfo returns the data for the Beat's / endpoint.
-func GetInfo(m *MetricSet) (*Info, error) {
+func GetInfo(m *MetricSet) (Info, error) {
+	info := Info{}
 	content, err := fetchPath(m.HTTP, "/")
 	if err != nil {
-		return nil, err
+		return info, err
 	}
 
-	info := &Info{}
 	err = json.Unmarshal(content, &info)
-	if err != nil {
-		return nil, err
-	}
-
-	return info, nil
+	return info, err
 }
 
 // GetState returns the data for the Beat's /state endpoint.
-func GetState(m *MetricSet) (*State, error) {
+func GetState(m *MetricSet) (State, error) {
+	state := State{}
 	content, err := fetchPath(m.HTTP, "/state")
 	if err != nil {
-		return nil, err
+		return state, err
 	}
 
-	info := &State{}
-	err = json.Unmarshal(content, &info)
-	if err != nil {
-		return nil, err
-	}
-
-	return info, nil
+	err = json.Unmarshal(content, &state)
+	return state, err
 }
 
 func fetchPath(httpHelper *helper.HTTP, path string) ([]byte, error) {
