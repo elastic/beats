@@ -423,7 +423,7 @@ func TestJsonBody(t *testing.T) {
 			if tc.expression != "" {
 				jsonCheck["expression"] = tc.expression
 			}
-			if tc.condition != nil {
+			if len(tc.condition) > 0 {
 				jsonCheck["condition"] = tc.condition
 			}
 
