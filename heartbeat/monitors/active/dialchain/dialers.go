@@ -106,13 +106,13 @@ func CreateNetDialer(timeout time.Duration) NetDialer {
 			}
 
 			end := time.Now()
-			eventext.MergeEventFields(event, mapstr.M{
-				namespace: mapstr.M{
-					"rtt": mapstr.M{
-						"connect": look.RTT(end.Sub(start)),
-					},
+			ef := mapstr.M{}
+			ef[namespace] = mapstr.M{
+				"rtt": mapstr.M{
+					"connect": look.RTT(end.Sub(start)),
 				},
-			})
+			}
+			eventext.MergeEventFields(event, ef)
 
 			return conn, nil
 		}), nil
