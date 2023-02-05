@@ -50,38 +50,27 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newInput(config, im.store, true)
-}
-
-func (im *s3InputManager) CreateWithoutClosingMetrics(cfg *conf.C) (v2.Input, error) {
-	// This smells, but since we call metrics.Close() on metrics that are not injectable in integration test we need this
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
-	}
-
-	return newInput(config, im.store, false)
+	return newInput(config, im.store)
 }
 
 // s3Input is a input for reading logs from S3 when triggered by an SQS message.
 type s3Input struct {
-	closeMetrics bool
-	config       config
-	awsConfig    awssdk.Config
-	store        beater.StateStore
+	config    config
+	awsConfig awssdk.Config
+	store     beater.StateStore
+	metrics   *inputMetrics
 }
 
-func newInput(config config, store beater.StateStore, closeMetrics bool) (*s3Input, error) {
+func newInput(config config, store beater.StateStore) (*s3Input, error) {
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
 	return &s3Input{
-		closeMetrics: closeMetrics,
-		config:       config,
-		awsConfig:    awsConfig,
-		store:        store,
+		config:    config,
+		awsConfig: awsConfig,
+		store:     store,
 	}, nil
 }
 
@@ -132,9 +121,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		if err != nil {
 			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
 		}
-		if in.closeMetrics {
-			defer receiver.metrics.Close()
-		}
+		defer receiver.metrics.Close()
 
 		if err := receiver.Receive(ctx); err != nil {
 			return err
@@ -162,9 +149,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		if err != nil {
 			return fmt.Errorf("failed to initialize s3 poller: %w", err)
 		}
-		if in.closeMetrics {
-			defer poller.metrics.Close()
-		}
+		defer poller.metrics.Close()
 
 		if err := poller.Poll(ctx); err != nil {
 			return err
@@ -214,10 +199,10 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 	if err != nil {
 		return nil, err
 	}
-	metrics := newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
-	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
+	in.metrics = newInputMetrics(ctx.ID, nil)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
+	sqsReader := newSQSReader(log.Named("sqs"), in.metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
 }
@@ -287,10 +272,10 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
-	metrics := newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
+	in.metrics = newInputMetrics(ctx.ID, nil)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
 	s3Poller := newS3Poller(log.Named("s3_poller"),
-		metrics,
+		in.metrics,
 		s3API,
 		client,
 		s3EventHandlerFactory,

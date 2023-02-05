@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -77,7 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, mod.GetMetricsRepo(), true),
+		enricher:      util.NewResourceMetadataEnricher(base, util.PodResource, mod.GetMetricsRepo(), true),
 		mod:           mod,
 	}, nil
 }
