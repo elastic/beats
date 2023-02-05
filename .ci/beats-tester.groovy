@@ -24,7 +24,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu-20' }
+      agent { label 'ubuntu-22' }
       when {
         beforeAgent true
         anyOf {
@@ -69,8 +69,7 @@ pipeline {
           when { changeRequest() }
           steps {
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT",
-                              apm: "https://storage.googleapis.com/apm-ci-artifacts/jobs/pull-requests/pr-${env.CHANGE_ID}",
-                              beats: "https://storage.googleapis.com/beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}")
+                              beats: "https://storage.googleapis.com/beats-ci-artifacts/beats/pull-requests/pr-${env.CHANGE_ID}")
           }
         }
         stage('Build release branch') {
@@ -106,7 +105,7 @@ def runBeatsTesterJob(Map args = [:]) {
     def props = readProperties(file: 'beats-tester.properties')
     apm = props.get('APM_URL_BASE', '')
     beats = props.get('BEATS_URL_BASE', '')
-    version = props.get('VERSION', '8.0.0-SNAPSHOT')
+    version = props.get('VERSION', '8.7.0-SNAPSHOT')
   }
   if (apm?.trim() || beats?.trim()) {
     build(job: env.BEATS_TESTER_JOB, propagate: false, wait: false,
