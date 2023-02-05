@@ -167,7 +167,7 @@ pipeline {
                     text: """\
                     ## To be consumed by the beats-tester pipeline
                     COMMIT=${env.GIT_BASE_COMMIT}
-                    BEATS_URL_BASE=https://storage.googleapis.com/${env.JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}
+                    BEATS_URL_BASE=https://storage.googleapis.com/${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}
                     VERSION=${env.BEAT_VERSION}-SNAPSHOT""".stripIndent()) // stripIdent() requires '''/
           archiveArtifacts artifacts: 'beats-tester.properties'
         }
