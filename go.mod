@@ -11,6 +11,7 @@ require (
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/magefile/mage v1.13.0
 	github.com/mattn/go-colorable v0.1.12
+	github.com/mitchellh/hashstructure v1.1.0
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/spf13/cobra v1.3.0
 	github.com/stretchr/testify v1.7.0
