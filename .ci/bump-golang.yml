@@ -17,6 +17,7 @@ actions:
   beats:
     kind: github/pullrequest
     scmid: githubConfig
+    sourceid: latestGoVersion
     spec:
       automerge: false
       labels:
@@ -24,7 +25,8 @@ actions:
         - backport-skip
       title: '[Automation] Bump Golang version to {{ source "latestGoVersion" }}'
       description: |
-        It requires the version to be bumped first in golang-crossbuild project, then a new release will be added to https://github.com/elastic/golang-crossbuild/releases/tag/{{ source "latestGoVersion" }}.
+        It requires the version to be bumped first in golang-crossbuild project, then a new release will be added to:
+        https://github.com/elastic/golang-crossbuild/releases/tag/v{{ source "latestGoVersion" }}.
         Otherwise it will fail until the docker images are available.
 
 sources:
@@ -91,7 +93,7 @@ targets:
     spec:
       content: '{{ source "latestGoVersion" }}'
       file: .go-version
-      matchpattern: '[0-9]+\.[0-9]+\.[0-9]+'
+      matchpattern: '\d+.\d+.\d+'
   update-golang.ci:
     name: "Update .golangci.yml"
     sourceid: latestGoVersion
@@ -100,7 +102,7 @@ targets:
     spec:
       content: '{{ source "latestGoVersion" }}'
       file: .golangci.yml
-      matchpattern: '[0-9]+\.[0-9]+\.[0-9]+'
+      matchpattern: '\d+.\d+.\d+'
   update-version.asciidoc:
     name: "Update version.asciidoc"
     sourceid: latestGoVersion
@@ -109,7 +111,7 @@ targets:
     spec:
       content: '{{ source "latestGoVersion" }}'
       file: libbeat/docs/version.asciidoc
-      matchpattern: '[0-9]+\.[0-9]+\.[0-9]+'
+      matchpattern: '\d+.\d+.\d+'
   update-dockerfiles:
     name: "Update from dockerfiles"
     sourceid: latestGoVersion
@@ -123,7 +125,7 @@ targets:
         - ./metricbeat/Dockerfile
         - ./packetbeat/Dockerfile
         - ./x-pack/functionbeat/Dockerfile
-      matchpattern: 'FROM golang:[0-9]+\.[0-9]+\.[0-9]+'
+      matchpattern: 'FROM golang:\d+.\d+.\d+'
   update-gomod:
     name: "Update go.mod"
     sourceid: gomod
@@ -132,4 +134,4 @@ targets:
     spec:
       content: 'go {{ source "gomod" }}'
       file: go.mod
-      matchpattern: 'go [0-9]+\.[0-9]+'
+      matchpattern: 'go \d+.\d+'
