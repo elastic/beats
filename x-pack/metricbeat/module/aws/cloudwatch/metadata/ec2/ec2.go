@@ -36,70 +36,73 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 	// collect monitoring state for each instance
 	monitoringStates := map[string]string{}
 	for instanceID, output := range instancesOutputs {
-		if _, ok := events[instanceID]; !ok {
-			continue
-		}
-
-		for _, tag := range output.Tags {
-			if *tag.Key == "Name" {
-				_, _ = events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
-				_, _ = events[instanceID].RootFields.Put("host.name", *tag.Value)
+		for eventIdentifier := range events {
+			if !strings.HasPrefix(eventIdentifier, instanceID) {
+				continue
 			}
+
+			for _, tag := range output.Tags {
+				if *tag.Key == "Name" {
+					_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.name", *tag.Value)
+					_, _ = events[eventIdentifier].RootFields.Put("host.name", *tag.Value)
+				}
+			}
+
+			_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", instanceID)
+
+			if output.InstanceType != "" {
+				_, _ = events[eventIdentifier].RootFields.Put("cloud.machine.type", output.InstanceType)
+			} else {
+				logp.Error(fmt.Errorf("InstanceType is empty"))
+			}
+
+			placement := output.Placement
+			if placement != nil {
+				_, _ = events[eventIdentifier].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
+			}
+
+			if output.State.Name != "" {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
+			} else {
+				logp.Error(fmt.Errorf("instance.State.Name is empty"))
+			}
+
+			if output.Monitoring.State != "" {
+				monitoringStates[eventIdentifier] = string(output.Monitoring.State)
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
+			} else {
+				logp.Error(fmt.Errorf("Monitoring.State is empty"))
+			}
+
+			cpuOptions := output.CpuOptions
+			if cpuOptions != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"core.count", *cpuOptions.CoreCount)
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"threads_per_core", *cpuOptions.ThreadsPerCore)
+			}
+
+			publicIP := output.PublicIpAddress
+			if publicIP != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"public.ip", *publicIP)
+			}
+
+			privateIP := output.PrivateIpAddress
+			if privateIP != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"private.ip", *privateIP)
+			}
+
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"image.id", *output.ImageId)
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"state.code", *output.State.Code)
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"public.dns_name", *output.PublicDnsName)
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"private.dns_name", *output.PrivateDnsName)
+
+			// add host cpu/network/disk fields and host.id
+			addHostFields(events[eventIdentifier], instanceID)
+
+			// add rate metrics
+			calculateRate(events[eventIdentifier], monitoringStates[instanceID])
 		}
-
-		_, _ = events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
-
-		if output.InstanceType != "" {
-			_, _ = events[instanceID].RootFields.Put("cloud.machine.type", output.InstanceType)
-		} else {
-			logp.Error(fmt.Errorf("InstanceType is empty"))
-		}
-
-		placement := output.Placement
-		if placement != nil {
-			_, _ = events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
-		}
-
-		if output.State.Name != "" {
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
-		} else {
-			logp.Error(fmt.Errorf("instance.State.Name is empty"))
-		}
-
-		if output.Monitoring.State != "" {
-			monitoringStates[instanceID] = string(output.Monitoring.State)
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
-		} else {
-			logp.Error(fmt.Errorf("Monitoring.State is empty"))
-		}
-
-		cpuOptions := output.CpuOptions
-		if cpuOptions != nil {
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"core.count", *cpuOptions.CoreCount)
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"threads_per_core", *cpuOptions.ThreadsPerCore)
-		}
-
-		publicIP := output.PublicIpAddress
-		if publicIP != nil {
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"public.ip", *publicIP)
-		}
-
-		privateIP := output.PrivateIpAddress
-		if privateIP != nil {
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"private.ip", *privateIP)
-		}
-
-		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"image.id", *output.ImageId)
-		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"state.code", *output.State.Code)
-		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"public.dns_name", *output.PublicDnsName)
-		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"private.dns_name", *output.PrivateDnsName)
-
-		// add host cpu/network/disk fields and host.id
-		addHostFields(events[instanceID], instanceID)
-
-		// add rate metrics
-		calculateRate(events[instanceID], monitoringStates[instanceID])
 	}
+
 	return events, nil
 }
 
