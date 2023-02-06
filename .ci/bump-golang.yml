@@ -1,6 +1,4 @@
 ---
-## Workflow to periodically check if there is an available newer APM Go agent version, e.g.
-## "v1.2.3". If so, then update to it.
 name: Bump golang-version to latest version
 
 scms:
@@ -25,9 +23,9 @@ actions:
         - dependencies
         - backport-skip
       title: '[Automation] Bump Golang version to {{ source "latestGoVersion" }}'
-      #description: |
-      #  It requires the version to be bumped first in golang-crossbuild project, then a new release will be added to https://github.com/elastic/golang-crossbuild/releases.
-      #  Otherwise it will fail until the docker images are available.
+      description: |
+        It requires the version to be bumped first in golang-crossbuild project, then a new release will be added to https://github.com/elastic/golang-crossbuild/releases/tag/{{ source "latestGoVersion" }}.
+        Otherwise it will fail until the docker images are available.
 
 sources:
   minor:
