@@ -1,0 +1,32 @@
+[
+    {
+        "@timestamp": "2020-11-15T09:10:20.026Z",
+        "auditd.log.reason": "memory violation",
+        "auditd.log.record_type": "ANOM_ABEND",
+        "auditd.log.sequence": 123,
+        "auditd.log.ses": "123456789",
+        "auditd.log.sig": "6",
+        "event.action": [
+            "crashed-program"
+        ],
+        "event.category": [
+            "process"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=ANOM_ABEND msg=audit(1605431420.026:123): auid=12345 uid=123 gid=123 ses=123456789 pid=1234 comm=\"extproc\" reason=\"memory violation\" sig=6",
+        "event.type": [
+            "end"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "process.name": "extproc",
+        "process.pid": 1234,
+        "service.type": "auditd",
+        "user.audit.id": "12345",
+        "user.group.id": "123",
+        "user.id": "123"
+    }
+]

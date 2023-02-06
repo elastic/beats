@@ -94,11 +94,18 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 		}
 
 		index := strings.Index(uri, "/beats/elastic-agent/")
-		if index == -1 {
-			return "", fmt.Errorf("not an agent uri: '%s'", uri)
-		}
 
-		return uri[:index], nil
+		// Because we're iterating over a map from the API response,
+		// the order is random and some elements there do not contain the
+		// `/beats/elastic-agent/` substring, so we need to go through the
+		// whole map before returning an error.
+		//
+		// One of the elements that might be there and do not contain this
+		// substring is the `elastic-agent-shipper`, whose URL is something like:
+		// https://snapshots.elastic.co/8.7.0-d050210c/downloads/elastic-agent-shipper/elastic-agent-shipper-8.7.0-SNAPSHOT-linux-x86_64.tar.gz
+		if index != -1 {
+			return uri[:index], nil
+		}
 	}
 
 	return "", fmt.Errorf("uri not detected")

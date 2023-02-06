@@ -30,17 +30,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Add extra protection on gRPC server start process to avoid trying to start a nil server.
-- `add_fields` processor is now able to set metadata in events. {pull}30092[30092]
-- Allows disable pod events enrichment with deployment name {pull}28521[28521] {pull}34097[34097]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
-- Fix 'requires pointer' error while getting cursor metadata. {pull}33956[33956]
+
 
 *Heartbeat*
 
@@ -83,7 +79,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Metricbeat*
 
 - Remove GCP Compute metadata cache {pull}33655[33655]
-- Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
 
 *Packetbeat*
 
@@ -118,6 +113,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
