@@ -66,7 +66,7 @@ func TestDpkg(t *testing.T) {
 		homebrewCellarPath = brewPathOld
 	}()
 	rpmPath = "/does/not/exist"
-	homebrewCellarPath = "/does/not/exist"
+	homebrewCellarPath = []string{"/does/not/exist"}
 
 	var err error
 	dpkgPath, err = filepath.Abs("testdata/dpkg/")
@@ -125,7 +125,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		homebrewCellarPath = brewPathOld
 	}()
 	rpmPath = "/does/not/exist"
-	homebrewCellarPath = "/does/not/exist"
+	homebrewCellarPath = []string{"/does/not/exist"}
 
 	var err error
 	dpkgPath, err = filepath.Abs("testdata/dpkg-size/")

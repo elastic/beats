@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -43,6 +44,9 @@ type BeatV2Manager struct {
 	client   client.V2
 
 	logger *logp.Logger
+
+	// handles client errors
+	errCanceller context.CancelFunc
 
 	// track individual units given to us by the V2 API
 	mx      sync.Mutex
@@ -115,6 +119,11 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (
 		return nil, fmt.Errorf("error reading control config from agent: %w", err)
 	}
 
+	// officially running under the elastic-agent; we set the publisher pipeline
+	// to inform it that we are running under elastic-agent (used to ensure "Publish event: "
+	// debug log messages are only outputted when running in trace mode
+	publisher.SetUnderAgent(true)
+
 	return NewV2AgentManagerWithClient(c, registry, agentClient)
 }
 
@@ -175,11 +184,18 @@ func (cm *BeatV2Manager) Start() error {
 	if !cm.Enabled() {
 		return fmt.Errorf("V2 Manager is disabled")
 	}
-	err := cm.client.Start(context.Background())
+	if cm.errCanceller != nil {
+		cm.errCanceller()
+		cm.errCanceller = nil
+	}
+	ctx := context.Background()
+	err := cm.client.Start(ctx)
 	if err != nil {
 		return fmt.Errorf("error starting connection to client")
 	}
-
+	ctx, canceller := context.WithCancel(ctx)
+	cm.errCanceller = canceller
+	go cm.watchErrChan(ctx)
 	cm.client.RegisterDiagnosticHook("beat-rendered-config", "the rendered config used by the beat", "beat-rendered-config.yml", "application/yaml", cm.handleDebugYaml)
 	go cm.unitListen()
 	cm.isRunning = true
@@ -325,6 +341,17 @@ func (cm *BeatV2Manager) deleteUnit(unit *client.Unit) {
 // Private V2 implementation
 // ================================
 
+func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case err := <-cm.client.Errors():
+			cm.logger.Errorf("elastic-agent-client error: %s", err)
+		}
+	}
+}
+
 func (cm *BeatV2Manager) unitListen() {
 	const changeDebounce = 100 * time.Millisecond
 
@@ -405,6 +432,10 @@ func (cm *BeatV2Manager) stopBeat() {
 	}
 	cm.client.Stop()
 	cm.UpdateStatus(lbmanagement.Stopped, "Stopped")
+	if cm.errCanceller != nil {
+		cm.errCanceller()
+		cm.errCanceller = nil
+	}
 }
 
 func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
@@ -441,7 +472,9 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	}
 
 	// set the new log level (if nothing has changed is a noop)
-	logp.SetLevel(getZapcoreLevel(lowestLevel))
+	ll, trace := getZapcoreLevel(lowestLevel)
+	logp.SetLevel(ll)
+	publisher.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
 	var errs multierror.Errors
@@ -651,20 +684,22 @@ func getUnitState(status lbmanagement.Status) client.UnitState {
 	return client.UnitStateStarting
 }
 
-func getZapcoreLevel(ll client.UnitLogLevel) zapcore.Level {
+func getZapcoreLevel(ll client.UnitLogLevel) (zapcore.Level, bool) {
 	switch ll {
 	case client.UnitLogLevelError:
-		return zapcore.ErrorLevel
+		return zapcore.ErrorLevel, false
 	case client.UnitLogLevelWarn:
-		return zapcore.WarnLevel
+		return zapcore.WarnLevel, false
 	case client.UnitLogLevelInfo:
-		return zapcore.InfoLevel
+		return zapcore.InfoLevel, false
 	case client.UnitLogLevelDebug:
-		return zapcore.DebugLevel
+		return zapcore.DebugLevel, false
 	case client.UnitLogLevelTrace:
 		// beats doesn't support trace
-		return zapcore.DebugLevel
+		// but we do allow the "Publish event:" debug logs
+		// when trace mode is enabled
+		return zapcore.DebugLevel, true
 	}
 	// info level for fallback
-	return zapcore.InfoLevel
+	return zapcore.InfoLevel, false
 }
