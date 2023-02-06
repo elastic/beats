@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.18
+go {{ source "gomod" }}
 
 require (
 	cloud.google.com/go/bigquery v1.8.0
