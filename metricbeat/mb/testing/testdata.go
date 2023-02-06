@@ -65,7 +65,7 @@ const (
 // A test will be run for each file with the `plain` extension in the same directory
 // where a file with this configuration is placed.
 type DataConfig struct {
-	// Path is the directory containing the .plain read files
+	// Path is the directory containing the read files
 	Path string
 
 	// WritePath is the path where to write the generated files
