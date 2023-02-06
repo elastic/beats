@@ -153,6 +153,15 @@ func (c certReloadConfig) Validate() error {
 	return nil
 }
 
+func defaultCertReloadConfig() certReloadConfig {
+	return certReloadConfig{
+		Reload: cfgfile.Reload{
+			Enabled: false,
+			Period:  time.Minute,
+		},
+	}
+}
+
 var debugf = logp.MakeDebug("beat")
 
 func init() {
@@ -1013,13 +1022,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 		return fmt.Errorf("could not extract the 'ssl' section of the output config: %w", err)
 	}
 
-	extendedTLSCfg := certReloadConfig{
-		Reload: cfgfile.Reload{
-			Enabled: false,
-			Period:  time.Minute,
-		},
-	}
-
+	extendedTLSCfg := defaultCertReloadConfig()
 	if err := rawTLSCfg.Unpack(&extendedTLSCfg); err != nil {
 		return fmt.Errorf("unpacking 'ssl' config: %w", err)
 	}
