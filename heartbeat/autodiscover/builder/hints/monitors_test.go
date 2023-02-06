@@ -18,6 +18,7 @@
 package hints
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -96,7 +97,7 @@ func TestGenerateHints(t *testing.T) {
 			result: mapstr.M{
 				"type":     "http",
 				"schedule": "@every 5s",
-				"hosts":    []interface{}{"1.2.3.4:8888", "1.2.3.4:9090"},
+				"hosts":    []string{"1.2.3.4:8888", "1.2.3.4:9090"},
 			},
 		},
 		{
@@ -137,7 +138,7 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: mapstr.M{
 				"type":     "http",
-				"hosts":    []interface{}{"1.2.3.4:9090"},
+				"hosts":    []string{"1.2.3.4:9090"},
 				"schedule": "@every 5s",
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -170,7 +171,7 @@ func TestGenerateHints(t *testing.T) {
 			result: mapstr.M{
 				"type":     "http",
 				"schedule": "@every 5s",
-				"hosts":    []interface{}{"1.2.3.4:8888", "1.2.3.4:9090"},
+				"hosts":    []string{"1.2.3.4:8888", "1.2.3.4:9090"},
 			},
 		},
 		{
@@ -208,6 +209,17 @@ func TestGenerateHints(t *testing.T) {
 			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.message)
+
+			// Autodiscover can return configs with different sort orders here, which is irrelevant
+			// To make tests pass consistently we sort the host list
+			hostStrs := []string{}
+			if hostsSlice, ok := config["hosts"].([]interface{}); ok && len(hostsSlice) > 0 {
+				for _, hi := range hostsSlice {
+					hostStrs = append(hostStrs, hi.(string))
+				}
+				sort.Strings(hostStrs)
+				config["hosts"] = hostStrs
+			}
 
 			assert.Equal(t, test.result, config, test.message)
 		}

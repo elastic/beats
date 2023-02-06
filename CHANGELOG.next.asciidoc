@@ -184,6 +184,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Allow user configuration of keep-alive behaviour for HTTPJSON and CEL inputs. {issue}33951[33951] {pull}34014[34014]
 - Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
 - Add support for recognizing the log level in Elasticsearch JVM logs {pull}34159[34159]
+- Add new Entity Analytics input with Azure Active Directory support. {pull}34305[34305]
 - Added metric `sqs_lag_time` for aws-s3 input. {pull}34306[34306]
 - Add metrics for TCP packet processing. {pull}34333[34333]
 - Add metrics for unix socket packet processing. {pull}34335[34335]
@@ -192,6 +193,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Allow users to redact sensitive data from CEL input debug logs. {pull}34302[34302]
 - Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
 - Add support for new Rabbitmq timestamp format for logs {pull}34211[34211]
+- Allow user configuration of timezone offset in Cisco ASA and FTD modules. {pull}34436[34436]
 
 *Auditbeat*
 
@@ -200,6 +202,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
+- Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
 
 - Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
 
@@ -223,8 +226,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
 - Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
 - Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
-- Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}[]
+- Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}33854[33854]
 - Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
+- Allow user to prevent Npcap library installation on Windows. {issue}34420[34420] {pull}34428[34428]
 
 *Packetbeat*
 
