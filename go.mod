@@ -193,7 +193,7 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.5.0
-	github.com/elastic/elastic-agent-libs v0.2.16
+	github.com/elastic/elastic-agent-libs v0.3.0
 	github.com/elastic/elastic-agent-shipper-client v0.4.0
 	github.com/elastic/elastic-agent-system-metrics v0.4.5-0.20220927192933-25a985b07d51
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
@@ -377,5 +377,3 @@ replace (
 
 // Exclude this version because the version has an invalid checksum.
 exclude github.com/docker/distribution v2.8.0+incompatible
-
-replace github.com/elastic/elastic-agent-libs v0.2.16 => github.com/belimawr/elastic-agent-libs v0.2.9-0.20230203105521-e3c35631c26e

@@ -10100,11 +10100,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.2.16
+Version: v0.3.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.2.16/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.3.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -18401,11 +18401,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 --------------------------------------------------------------------------------
 Dependency : github.com/mitchellh/hashstructure
-Version: v0.0.0-20170116052023-ab25296c0f51
+Version: v1.1.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/mitchellh/hashstructure@v0.0.0-20170116052023-ab25296c0f51/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/mitchellh/hashstructure@v1.1.0/LICENSE:
 
 The MIT License (MIT)
 

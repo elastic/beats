@@ -331,8 +331,6 @@ github.com/awslabs/goformation/v4 v4.1.0 h1:JRxIW0IjhYpYDrIZOTJGMu2azXKI+OK5dP56
 github.com/awslabs/goformation/v4 v4.1.0/go.mod h1:MBDN7u1lMNDoehbFuO4uPvgwPeolTMA2TzX1yO6KlxI=
 github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5 h1:lxW5Q6K2IisyF5tlr6Ts0W4POGWQZco05MJjFmoeIHs=
 github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5/go.mod h1:0Qr1uMHFmHsIYMcG4T7BJ9yrJtWadhOmpABCX69dwuc=
-github.com/belimawr/elastic-agent-libs v0.2.9-0.20230203105521-e3c35631c26e h1:x6RJb7wj0yI26JSFtV8L4j9KuSbwIqkHbKT5trN3kvA=
-github.com/belimawr/elastic-agent-libs v0.2.9-0.20230203105521-e3c35631c26e/go.mod h1:GC2VyFWlgQzaG9OZiVpsA9r6Ff/jcvgtx+/afBvbjmI=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/immutable v0.2.1/go.mod h1:uc6OHo6PN2++n98KHLxW8ef4W42ylHiQSENghE1ezxI=
@@ -622,6 +620,8 @@ github.com/elastic/elastic-agent-autodiscover v0.5.0/go.mod h1:p3MSf9813JEnolCTD
 github.com/elastic/elastic-agent-client/v7 v7.0.3 h1:YqZPnO7Z9rlj25sFZEUaxGGK3mZR4v0uSOcfO8GRv7s=
 github.com/elastic/elastic-agent-client/v7 v7.0.3/go.mod h1:cHviLpA5fAwMbfBIHBVNl16qp90bO7pKHMAQaG+9raU=
 github.com/elastic/elastic-agent-libs v0.2.11/go.mod h1:chO3rtcLyGlKi9S0iGVZhYCzDfdDsAQYBc+ui588AFE=
+github.com/elastic/elastic-agent-libs v0.3.0 h1:cDq4aIP4sH+cMidlyU9M0POm1pfDE83RlG/Oh98tnC0=
+github.com/elastic/elastic-agent-libs v0.3.0/go.mod h1:GC2VyFWlgQzaG9OZiVpsA9r6Ff/jcvgtx+/afBvbjmI=
 github.com/elastic/elastic-agent-shipper-client v0.4.0 h1:nsTJF9oo4RHLl+zxFUZqNHaE86C6Ba5aImfegcEf6Sk=
 github.com/elastic/elastic-agent-shipper-client v0.4.0/go.mod h1:OyI2W+Mv3JxlkEF3OeT7K0dbuxvwew8ke2Cf4HpLa9Q=
 github.com/elastic/elastic-agent-system-metrics v0.4.5-0.20220927192933-25a985b07d51 h1:ZFk7hC6eRPJkJNtOSG+GYbRlsgLjSD8rTj4gQq+7rsA=
