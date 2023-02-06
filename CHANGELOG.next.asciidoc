@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Remove GCP Compute metadata cache {pull}33655[33655]
 
 *Packetbeat*
 
