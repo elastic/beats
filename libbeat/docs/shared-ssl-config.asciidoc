@@ -582,7 +582,8 @@ under a supervisor that can restart it. The default value is `false`.
 Specifies how often the files are checked for changes. Do not set the
 period to less than 1s because the modification time of files is often
 stored in seconds. Setting the period to less than 1s will result in
-unnecessary overhead. The default value is 1m.
+validation error and {beatname_uc} will not start. The default value
+is 1m.
 
 ifeval::["{beatname_lc}" == "filebeat"]
 [float]

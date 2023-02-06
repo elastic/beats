@@ -141,6 +141,18 @@ type beatConfig struct {
 	TimestampPrecision *config.C `config:"timestamp"`
 }
 
+type certReloadConfig struct {
+	tlscommon.Config `config:",inline" yaml:",inline"`
+	Reload           cfgfile.Reload `config:"exit_on_cert_change" yaml:"exit_on_cert_change"`
+}
+
+func (c certReloadConfig) Validate() error {
+	if c.Reload.Period < time.Second {
+		return errors.New("'exit_on_cert_change.period' must be equal or greather than 1s")
+	}
+	return nil
+}
+
 var debugf = logp.MakeDebug("beat")
 
 func init() {
@@ -983,7 +995,6 @@ func (b *Beat) makeOutputFactory(
 }
 
 func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
-	// TODO (Tiago): find a proper name for this logger
 	logger := logp.L().Named("ssl.cert.reloader")
 	// Here the output is created and we have acces to the Beat struct (with the manager)
 	// as a workaround we can unpack the new settings and trigger the reload-watcher from here
@@ -991,8 +1002,8 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	// We get an output config, so we extract the 'SSL' bit from it
 	rawTLSCfg, err := cfg.Config().Child("ssl", -1)
 	if err != nil {
-		e, ok := err.(ucfg.Error)
-		if ok {
+		var e ucfg.Error
+		if errors.As(err, &e) {
 			if errors.Is(e.Reason(), ucfg.ErrMissing) {
 				// if the output configuration does not contain a `ssl` section
 				// do nothing and return no error
@@ -1002,10 +1013,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 		return fmt.Errorf("could not extract the 'ssl' section of the output config: %w", err)
 	}
 
-	extendedTLSCfg := struct {
-		tlscommon.Config `config:",inline" yaml:",inline"`
-		Reload           cfgfile.Reload `config:"exit_on_cert_change" yaml:"exit_on_cert_change"`
-	}{
+	extendedTLSCfg := certReloadConfig{
 		Reload: cfgfile.Reload{
 			Enabled: false,
 			Period:  time.Minute,
@@ -1046,10 +1054,11 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	// true for files changed. The output has not been
 	// started yet, so even if the files have changed since
 	// the Beat started, they don't need to be reloaded
-	watcher.Scan()
+	_, _, _ = watcher.Scan()
 
 	// Watch for file changes while the Beat is alive
 	go func() {
+		//nolint:staticcheck // this is an endless function
 		ticker := time.Tick(extendedTLSCfg.Reload.Period)
 
 		for {

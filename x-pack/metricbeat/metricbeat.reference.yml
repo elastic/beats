@@ -1951,7 +1951,7 @@ output.elasticsearch:
   # `ssl.certificate_authorities` changes
   #ssl.exit_on_cert_change.enabled: false
 
-  # Interval to scan for changes on CA certificate files
+  # Period to scan for changes on CA certificate files
   #ssl.exit_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
@@ -2097,7 +2097,7 @@ output.elasticsearch:
   # `ssl.certificate_authorities` changes
   #ssl.exit_on_cert_change.enabled: false
 
-  # Interval to scan for changes on CA certificate files
+  # Period to scan for changes on CA certificate files
   #ssl.exit_on_cert_change.period: 1m
 
   # The number of times to retry publishing an event after a publishing failure.
@@ -2309,7 +2309,7 @@ output.elasticsearch:
   # `ssl.certificate_authorities` changes
   #ssl.exit_on_cert_change.enabled: false
 
-  # Interval to scan for changes on CA certificate files
+  # Period to scan for changes on CA certificate files
   #ssl.exit_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.

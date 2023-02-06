@@ -60,8 +60,6 @@ var Namespace = "libbeat.management"
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
 
-var centralMgmtKey = "x-pack-cm"
-
 // StatusReporter provides a method to update current status of the beat.
 type StatusReporter interface {
 	// UpdateStatus called when the status of the beat has changed.
@@ -140,16 +138,6 @@ func Factory(cfg *config.C) FactoryFunc {
 	}
 
 	return nilFactory
-}
-
-type modeConfig struct {
-	Mode string `config:"mode" yaml:"mode"`
-}
-
-func defaultModeConfig() *modeConfig {
-	return &modeConfig{
-		Mode: centralMgmtKey,
-	}
 }
 
 // fallbackManager, fallback when no manager is present
