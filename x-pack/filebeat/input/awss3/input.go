@@ -124,7 +124,8 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 		defer receiver.metrics.Close()
 
-		go MetricPoll(ctx, receiver)
+		// Poll sqs waiting metric periodically in the background.
+		go PollSqsWaitingMetric(ctx, receiver)
 
 		if err := receiver.Receive(ctx); err != nil {
 			return err
@@ -379,7 +380,7 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 	return "unknown"
 }
 
-func MetricPoll(ctx context.Context, receiver *sqsReader) {
+func PollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 	t := time.NewTicker(1 * time.Minute)
 
 	for range t.C {
