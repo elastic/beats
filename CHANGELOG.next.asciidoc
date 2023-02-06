@@ -35,12 +35,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
-- Support for multiline zookeeper logs {issue}2496[2496]
-- Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
-- Disable lockfile when running under elastic-agent. {pull}33988[33988]
 - Fix lockfile logic, retry locking {pull}34194[34194]
-- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
