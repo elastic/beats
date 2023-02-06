@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -122,6 +123,8 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
 		}
 		defer receiver.metrics.Close()
+
+		go MetricPoll(ctx, receiver)
 
 		if err := receiver.Receive(ctx); err != nil {
 			return err
@@ -374,6 +377,17 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		}
 	}
 	return "unknown"
+}
+
+func MetricPoll(ctx context.Context, receiver *sqsReader) {
+	t := time.NewTicker(1 * time.Minute)
+
+	for range t.C {
+		count := receiver.GetApproximateMessageCount(ctx)
+		if count > -1 {
+			receiver.metrics.sqsMessagesWaiting.Set(uint64(count))
+		}
+	}
 }
 
 // boolPtr returns a pointer to b.

@@ -7,6 +7,7 @@ package awss3
 import (
 	"context"
 	"errors"
+	"strconv"
 	"sync"
 	"time"
 
@@ -19,7 +20,8 @@ import (
 )
 
 const (
-	sqsRetryDelay = 10 * time.Second
+	sqsRetryDelay                  = 10 * time.Second
+	sqsApproximateNumberOfMessages = "ApproximateNumberOfMessages"
 )
 
 type sqsReader struct {
@@ -106,4 +108,15 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		return nil
 	}
 	return ctx.Err()
+}
+
+func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) int {
+	if attributes, err := r.sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages}); err == nil {
+		if c, found := attributes[sqsApproximateNumberOfMessages]; found {
+			if messagesCount, err := strconv.Atoi(c); err == nil {
+				return messagesCount
+			}
+		}
+	}
+	return -1
 }

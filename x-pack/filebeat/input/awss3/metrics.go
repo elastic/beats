@@ -22,6 +22,7 @@ type inputMetrics struct {
 	sqsMessagesInflight                 *monitoring.Uint // Number of SQS messages inflight (gauge).
 	sqsMessagesReturnedTotal            *monitoring.Uint // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 	sqsMessagesDeletedTotal             *monitoring.Uint // Number of SQS messages deleted.
+	sqsMessagesWaiting                  *monitoring.Uint // Number of SQS messages waiting in the SQS Queue (gauge).
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 
@@ -50,6 +51,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
 		sqsMessagesReturnedTotal:            monitoring.NewUint(reg, "sqs_messages_returned_total"),
 		sqsMessagesDeletedTotal:             monitoring.NewUint(reg, "sqs_messages_deleted_total"),
+		sqsMessagesWaiting:                  monitoring.NewUint(reg, "sqs_messages_waiting_gauge"),
 		sqsMessageProcessingTime:            metrics.NewUniformSample(1024),
 		sqsLagTime:                          metrics.NewUniformSample(1024),
 		s3ObjectsRequestedTotal:             monitoring.NewUint(reg, "s3_objects_requested_total"),
