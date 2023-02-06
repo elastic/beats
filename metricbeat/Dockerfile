@@ -1,4 +1,4 @@
-FROM golang:1.18.10
+FROM golang:{{ source "latestGoVersion" }}
 
 RUN \
     apt update \
