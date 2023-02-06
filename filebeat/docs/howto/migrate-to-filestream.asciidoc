@@ -191,7 +191,7 @@ The example configuration shown earlier needs to be adjusted as well:
 |parsers.n.ndjson
 
 |multiline
-|parsers.n.mutiline
+|parsers.n.multiline
 
 |exclude_files
 |prospector.scanner.exclude_files
