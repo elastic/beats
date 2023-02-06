@@ -48,12 +48,13 @@ func (in *cometdInput) Run() {
 			rt := rate.NewLimiter(rate.Every(retryInterval), 1)
 
 			for in.workerCtx.Err() == nil {
-				// Creating a new channel for cometd input.
-				in.msgCh = make(chan bay.MaybeMsg, 1)
 				// Rate limit.
 				if err := rt.Wait(in.workerCtx); err != nil {
 					continue
 				}
+
+				// Creating a new channel for cometd input.
+				in.msgCh = make(chan bay.MaybeMsg, 1)
 
 				in.creds, err = bay.GetSalesforceCredentials(in.authParams)
 				if err != nil {

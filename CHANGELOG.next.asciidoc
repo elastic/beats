@@ -85,7 +85,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
 - Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
 - Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
-- Fix for CometD input worker is closing in case of client-server connection issue with EOF error. {issue}34326[34326] {pull}34327[34327]
+- Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
 
 *Heartbeat*
 
