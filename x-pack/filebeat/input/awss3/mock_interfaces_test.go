@@ -88,6 +88,21 @@ func (mr *MockSQSAPIMockRecorder) ReceiveMessage(ctx, maxMessages interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReceiveMessage", reflect.TypeOf((*MockSQSAPI)(nil).ReceiveMessage), ctx, maxMessages)
 }
 
+// GetQueueAttributes mocks base method.
+func (m *MockSQSAPI) GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQueueAttributes", ctx, attr)
+	ret0, _ := ret[0].(map[string]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetQueueAttributes indicates an expected call of GetQueueAttributes.
+func (mr *MockSQSAPIMockRecorder) GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQueueAttributes", reflect.TypeOf((*MockSQSAPI)(nil).GetQueueAttributes), ctx, attr)
+}
+
 // MocksqsReceiver is a mock of sqsReceiver interface.
 type MocksqsReceiver struct {
 	ctrl     *gomock.Controller
