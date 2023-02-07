@@ -141,7 +141,7 @@ func (m *MetricSet) calcCacheHitRate(data map[string]interface{}) (float64, erro
 		return 0, e
 	}
 
-	intoCache, intoCacheOk := cache.(map[string]interface{})["bytes read into cache"]
+	intoCache, intoCacheOk := cache.(map[string]interface{})["pages read into cache"]
 	fromCache, fromCacheOk := cache.(map[string]interface{})["pages requested from the cache"]
 	if !intoCacheOk || !fromCacheOk {
 		return 0, e
