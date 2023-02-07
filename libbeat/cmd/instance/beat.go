@@ -1052,6 +1052,12 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 		filesToWatch = append(filesToWatch, f)
 	}
 
+	// If there are no files to watch, don't do anything.
+	if len(filesToWatch) == 0 {
+		logger.Debug("no files to watch, filewatcher will not be started")
+		return nil
+	}
+
 	watcher := filewatcher.New(filesToWatch...)
 	// Ignore the first scan as it will always return
 	// true for files changed. The output has not been
