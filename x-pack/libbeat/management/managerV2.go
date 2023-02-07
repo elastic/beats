@@ -580,7 +580,6 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		return fmt.Errorf("failed to find beat reloadable type 'input'")
 	}
 
-	changed := false
 	inputCfgs := make(map[string]*proto.UnitExpectedConfig, len(inputUnits))
 	inputBeatCfgs := make([]*reload.ConfigWithMeta, 0, len(inputUnits))
 	agentInfo := cm.client.AgentInfo()
@@ -597,17 +596,9 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		}
 		inputCfgs[unit.ID()] = rawConfig
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
-
-		var prevCfg *proto.UnitExpectedConfig
-		if cm.lastInputCfgs != nil {
-			prevCfg, _ = cm.lastInputCfgs[unit.ID()]
-		}
-		if prevCfg == nil || !gproto.Equal(prevCfg, rawConfig) {
-			changed = true
-		}
 	}
 
-	if !changed {
+	if !didChange(cm.lastInputCfgs, inputCfgs) {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
 	}
@@ -706,4 +697,23 @@ func getZapcoreLevel(ll client.UnitLogLevel) (zapcore.Level, bool) {
 	}
 	// info level for fallback
 	return zapcore.InfoLevel, false
+}
+
+func didChange(previous map[string]*proto.UnitExpectedConfig, latest map[string]*proto.UnitExpectedConfig) bool {
+	if (previous == nil && latest != nil) || (previous != nil && latest == nil) {
+		return true
+	}
+	if len(previous) != len(latest) {
+		return true
+	}
+	for k, v := range latest {
+		p, ok := previous[k]
+		if !ok {
+			return true
+		}
+		if !gproto.Equal(p, v) {
+			return true
+		}
+	}
+	return false
 }
