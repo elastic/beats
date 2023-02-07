@@ -388,9 +388,9 @@ func PollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 		case <-ctx.Done():
 			return
 		case <-t.C:
-			count, err := receiver.GetApproximateMessageCount(ctx)
-			if strings.Contains(err.Error(), "StatusCode: 403") {
-				// stop polling if permissions error is encountered
+			count := receiver.GetApproximateMessageCount(ctx)
+			if count == -1 {
+				// stop polling if error is encountered
 				return
 			}
 			receiver.metrics.sqsMessagesWaiting.Set(uint64(count))

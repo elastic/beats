@@ -110,14 +110,13 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 	return ctx.Err()
 }
 
-func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) (int, error) {
-	attributes, err := r.sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
-	if err == nil {
+func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) int {
+	if attributes, err := r.sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages}); err == nil {
 		if c, found := attributes[sqsApproximateNumberOfMessages]; found {
 			if messagesCount, err := strconv.Atoi(c); err == nil {
-				return messagesCount, nil
+				return messagesCount
 			}
 		}
 	}
-	return -1, err
+	return -1
 }
