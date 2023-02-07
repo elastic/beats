@@ -85,6 +85,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
 - Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
 - Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
+- [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
 
 *Heartbeat*
 
@@ -194,6 +195,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Added metric `sqs_messages_waiting_gauge` for aws-s3 input. {pull}34488[34488]
 - Add support for new Rabbitmq timestamp format for logs {pull}34211[34211]
 - Allow user configuration of timezone offset in Cisco ASA and FTD modules. {pull}34436[34436]
+- Allow user configuration of timezone offset in Checkpoint module. {pull}34472[34472]
 
 *Auditbeat*
 
