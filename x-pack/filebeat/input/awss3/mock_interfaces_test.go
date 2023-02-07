@@ -73,6 +73,21 @@ func (mr *MockSQSAPIMockRecorder) DeleteMessage(ctx, msg interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMessage", reflect.TypeOf((*MockSQSAPI)(nil).DeleteMessage), ctx, msg)
 }
 
+// GetQueueAttributes mocks base method.
+func (m *MockSQSAPI) GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQueueAttributes", ctx, attr)
+	ret0, _ := ret[0].(map[string]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetQueueAttributes indicates an expected call of GetQueueAttributes.
+func (mr *MockSQSAPIMockRecorder) GetQueueAttributes(ctx, attr interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQueueAttributes", reflect.TypeOf((*MockSQSAPI)(nil).GetQueueAttributes), ctx, attr)
+}
+
 // ReceiveMessage mocks base method.
 func (m *MockSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error) {
 	m.ctrl.T.Helper()
@@ -86,21 +101,6 @@ func (m *MockSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]typ
 func (mr *MockSQSAPIMockRecorder) ReceiveMessage(ctx, maxMessages interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReceiveMessage", reflect.TypeOf((*MockSQSAPI)(nil).ReceiveMessage), ctx, maxMessages)
-}
-
-// GetQueueAttributes mocks base method.
-func (m *MockSQSAPI) GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetQueueAttributes", ctx, attr)
-	ret0, _ := ret[0].(map[string]string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetQueueAttributes indicates an expected call of GetQueueAttributes.
-func (mr *MockSQSAPIMockRecorder) GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQueueAttributes", reflect.TypeOf((*MockSQSAPI)(nil).GetQueueAttributes), ctx, attr)
 }
 
 // MocksqsReceiver is a mock of sqsReceiver interface.
@@ -215,6 +215,44 @@ func (mr *MocksqsVisibilityChangerMockRecorder) ChangeMessageVisibility(ctx, msg
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeMessageVisibility", reflect.TypeOf((*MocksqsVisibilityChanger)(nil).ChangeMessageVisibility), ctx, msg, timeout)
 }
 
+// MocksqsAttributeGetter is a mock of sqsAttributeGetter interface.
+type MocksqsAttributeGetter struct {
+	ctrl     *gomock.Controller
+	recorder *MocksqsAttributeGetterMockRecorder
+}
+
+// MocksqsAttributeGetterMockRecorder is the mock recorder for MocksqsAttributeGetter.
+type MocksqsAttributeGetterMockRecorder struct {
+	mock *MocksqsAttributeGetter
+}
+
+// NewMocksqsAttributeGetter creates a new mock instance.
+func NewMocksqsAttributeGetter(ctrl *gomock.Controller) *MocksqsAttributeGetter {
+	mock := &MocksqsAttributeGetter{ctrl: ctrl}
+	mock.recorder = &MocksqsAttributeGetterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MocksqsAttributeGetter) EXPECT() *MocksqsAttributeGetterMockRecorder {
+	return m.recorder
+}
+
+// GetQueueAttributes mocks base method.
+func (m *MocksqsAttributeGetter) GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQueueAttributes", ctx, attr)
+	ret0, _ := ret[0].(map[string]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetQueueAttributes indicates an expected call of GetQueueAttributes.
+func (mr *MocksqsAttributeGetterMockRecorder) GetQueueAttributes(ctx, attr interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQueueAttributes", reflect.TypeOf((*MocksqsAttributeGetter)(nil).GetQueueAttributes), ctx, attr)
+}
+
 // MockSQSProcessor is a mock of sqsProcessor interface.
 type MockSQSProcessor struct {
 	ctrl     *gomock.Controller
@@ -275,6 +313,36 @@ func (m *MockS3API) EXPECT() *MockS3APIMockRecorder {
 	return m.recorder
 }
 
+// CopyObject mocks base method.
+func (m *MockS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CopyObject", ctx, from_bucket, to_bucket, from_key, to_key)
+	ret0, _ := ret[0].(*s3.CopyObjectOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CopyObject indicates an expected call of CopyObject.
+func (mr *MockS3APIMockRecorder) CopyObject(ctx, from_bucket, to_bucket, from_key, to_key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyObject", reflect.TypeOf((*MockS3API)(nil).CopyObject), ctx, from_bucket, to_bucket, from_key, to_key)
+}
+
+// DeleteObject mocks base method.
+func (m *MockS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteObject", ctx, bucket, key)
+	ret0, _ := ret[0].(*s3.DeleteObjectOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteObject indicates an expected call of DeleteObject.
+func (mr *MockS3APIMockRecorder) DeleteObject(ctx, bucket, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObject", reflect.TypeOf((*MockS3API)(nil).DeleteObject), ctx, bucket, key)
+}
+
 // GetObject mocks base method.
 func (m *MockS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
 	m.ctrl.T.Helper()
@@ -288,32 +356,6 @@ func (m *MockS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetO
 func (mr *MockS3APIMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, bucket, key)
-}
-
-func (m *MockS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CopyObject", ctx, from_bucket, to_bucket, from_key, to_key)
-	ret0, _ := ret[0].(*s3.CopyObjectOutput)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-func (mr *MockS3APIMockRecorder) CopyObject(ctx, from_bucket, to_bucket, from_key, to_key interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, from_bucket, to_bucket, from_key, to_key)
-}
-
-func (m *MockS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteObject", ctx, bucket, key)
-	ret0, _ := ret[0].(*s3.DeleteObjectOutput)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-func (mr *MockS3APIMockRecorder) DeleteObject(ctx, bucket, key interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, bucket, key)
 }
 
 // ListObjectsPaginator mocks base method.
@@ -366,6 +408,59 @@ func (m *Mocks3Getter) GetObject(ctx context.Context, bucket, key string) (*s3.G
 func (mr *Mocks3GetterMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*Mocks3Getter)(nil).GetObject), ctx, bucket, key)
+}
+
+// Mocks3Mover is a mock of s3Mover interface.
+type Mocks3Mover struct {
+	ctrl     *gomock.Controller
+	recorder *Mocks3MoverMockRecorder
+}
+
+// Mocks3MoverMockRecorder is the mock recorder for Mocks3Mover.
+type Mocks3MoverMockRecorder struct {
+	mock *Mocks3Mover
+}
+
+// NewMocks3Mover creates a new mock instance.
+func NewMocks3Mover(ctrl *gomock.Controller) *Mocks3Mover {
+	mock := &Mocks3Mover{ctrl: ctrl}
+	mock.recorder = &Mocks3MoverMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *Mocks3Mover) EXPECT() *Mocks3MoverMockRecorder {
+	return m.recorder
+}
+
+// CopyObject mocks base method.
+func (m *Mocks3Mover) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CopyObject", ctx, from_bucket, to_bucket, from_key, to_key)
+	ret0, _ := ret[0].(*s3.CopyObjectOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CopyObject indicates an expected call of CopyObject.
+func (mr *Mocks3MoverMockRecorder) CopyObject(ctx, from_bucket, to_bucket, from_key, to_key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyObject", reflect.TypeOf((*Mocks3Mover)(nil).CopyObject), ctx, from_bucket, to_bucket, from_key, to_key)
+}
+
+// DeleteObject mocks base method.
+func (m *Mocks3Mover) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteObject", ctx, bucket, key)
+	ret0, _ := ret[0].(*s3.DeleteObjectOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteObject indicates an expected call of DeleteObject.
+func (mr *Mocks3MoverMockRecorder) DeleteObject(ctx, bucket, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObject", reflect.TypeOf((*Mocks3Mover)(nil).DeleteObject), ctx, bucket, key)
 }
 
 // Mocks3Lister is a mock of s3Lister interface.
@@ -522,6 +617,20 @@ func (m *MockS3ObjectHandler) EXPECT() *MockS3ObjectHandlerMockRecorder {
 	return m.recorder
 }
 
+// FinalizeS3Object mocks base method.
+func (m *MockS3ObjectHandler) FinalizeS3Object() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FinalizeS3Object")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// FinalizeS3Object indicates an expected call of FinalizeS3Object.
+func (mr *MockS3ObjectHandlerMockRecorder) FinalizeS3Object() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FinalizeS3Object", reflect.TypeOf((*MockS3ObjectHandler)(nil).FinalizeS3Object))
+}
+
 // ProcessS3Object mocks base method.
 func (m *MockS3ObjectHandler) ProcessS3Object() error {
 	m.ctrl.T.Helper()
@@ -534,20 +643,6 @@ func (m *MockS3ObjectHandler) ProcessS3Object() error {
 func (mr *MockS3ObjectHandlerMockRecorder) ProcessS3Object() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessS3Object", reflect.TypeOf((*MockS3ObjectHandler)(nil).ProcessS3Object))
-}
-
-// ProcessS3Object mocks base method.
-func (m *MockS3ObjectHandler) FinalizeS3Object() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FinalizeS3Object")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// ProcessS3Object indicates an expected call of ProcessS3Object.
-func (mr *MockS3ObjectHandlerMockRecorder) FinalizeS3Object() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FinalizeS3Object", reflect.TypeOf((*MockS3ObjectHandler)(nil).FinalizeS3Object))
 }
 
 // Wait mocks base method.
