@@ -685,6 +685,10 @@ filebeat.modules:
     # based on zone egress and ingress
     #var.external_zones: [ "External" ]
 
+    # IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+    # timestamps without a time zone.
+    #var.timezone_offset: UTC
+
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:

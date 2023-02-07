@@ -193,6 +193,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
 - Add support for new Rabbitmq timestamp format for logs {pull}34211[34211]
 - Allow user configuration of timezone offset in Cisco ASA and FTD modules. {pull}34436[34436]
+- Allow user configuration of timezone offset in Checkpoint module. {pull}34472[34472]
 
 *Auditbeat*
 
