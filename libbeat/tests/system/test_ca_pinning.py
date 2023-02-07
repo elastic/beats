@@ -33,11 +33,21 @@ class TestCAPinning(BaseTest):
 
         self.render_config_template(
             elasticsearch={
+<<<<<<< HEAD
                 "hosts": self.get_elasticsearch_url_ssl(),
                 "username": "admin",
                 "password": "changeme",
                 "ssl.certificate_authorities": [ca],
                 "ssl.ca_sha256": "8hZS8gpciuzlu+7Xi0sdv8T7RKRRxG1TWKumUQsDam0=",
+=======
+                "host": self.get_elasticsearch_url_ssl(),
+                "user": "admin",
+                "pass": "testing",
+                # Use certificate verification only to avoid validating localhost as the hostname.
+                "ssl_verification_mode": "certificate",
+                "ssl_certificate_authorities": [ca],
+                "ssl_ca_sha256": "FDFOtqdUyXZw74YgvAJUC+I67ED1WfcI1qK44Qy2WQM=",
+>>>>>>> d54259d37f (Update ES certificates for system tests (#34500))
             },
         )
 
