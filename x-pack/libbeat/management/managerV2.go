@@ -19,6 +19,7 @@ import (
 	gproto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -276,7 +277,7 @@ func (cm *BeatV2Manager) updateStatuses() {
 	payload := cm.payload
 
 	for _, unit := range cm.units {
-		state, _, _ := unit.Expected()
+		state, _, _, _ := unit.Expected()
 		if state == client.UnitStateStopped {
 			// unit is expected to be stopping (don't adjust the state as the state is now managed by the
 			// `reload` method and will be marked stopped in that code path)
@@ -313,7 +314,7 @@ func (cm *BeatV2Manager) modifyUnit(unit *client.Unit) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
-	state, _, _ := unit.Expected()
+	state, _, _, _ := unit.Expected()
 	if state == client.UnitStateStopped {
 		// expected to be stopped; needs to stop this unit
 		_ = unit.UpdateState(client.UnitStateStopping, "Stopping", nil)
@@ -385,6 +386,8 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.UpdateStatus(lbmanagement.Stopping, "Stopping")
 			return
 		case change := <-cm.client.UnitChanges():
+			// here!!!
+
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure there is a difference between
 			// A unit add and a unit change, since either way we can't do much more than call the reloader
@@ -410,6 +413,7 @@ func (cm *BeatV2Manager) unitListen() {
 				units[k] = u
 			}
 			cm.mx.Unlock()
+			// here!!!
 			cm.reload(units)
 		}
 
@@ -444,8 +448,9 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	var outputUnit *client.Unit
 	var inputUnits []*client.Unit
 	var stoppingUnits []*client.Unit
+
 	for _, unit := range units {
-		state, ll, _ := unit.Expected()
+		state, ll, _, _ := unit.Expected()
 		if ll > lowestLevel {
 			// log level is still used from an expected stopped unit until
 			// the unit is completely removed (aka. fully stopped)
@@ -479,6 +484,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 
 	// reload the output configuration
 	var errs multierror.Errors
+	// reload features
 	if err := cm.reloadOutput(outputUnit); err != nil {
 		errs = append(errs, err)
 	}
@@ -487,6 +493,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	//
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
+	// reload features
 	if err := cm.reloadInputs(inputUnits); err != nil {
 		errs = append(errs, err)
 	}
@@ -509,7 +516,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	payload := cm.payload
 	cm.mx.Unlock()
 	for _, unit := range units {
-		state, _, _ := unit.Expected()
+		state, _, _, _ := unit.Expected()
 		if state == client.UnitStateStopped {
 			// unit is expected to be stopping (don't adjust the state as the state is now managed by the
 			// `reload` method and will be marked stopped in that code path)
@@ -540,7 +547,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return nil
 	}
 
-	_, _, rawConfig := unit.Expected()
+	_, _, featureFlags, rawConfig := unit.Expected()
 	if rawConfig == nil {
 		// should not happen; hard stop
 		return fmt.Errorf("output unit has no config")
@@ -566,6 +573,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return fmt.Errorf("failed to generate config for output: %w", err)
 	}
 
+	features.Update(featureFlags)
 	err = output.Reload(reloadConfig)
 	if err != nil {
 		return fmt.Errorf("failed to reload output: %w", err)
@@ -584,8 +592,11 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 	inputCfgs := make(map[string]*proto.UnitExpectedConfig, len(inputUnits))
 	inputBeatCfgs := make([]*reload.ConfigWithMeta, 0, len(inputUnits))
 	agentInfo := cm.client.AgentInfo()
+	var featureFlags *proto.Features
 	for _, unit := range inputUnits {
-		_, _, rawConfig := unit.Expected()
+		var rawConfig *proto.UnitExpectedConfig
+		// the feature flags are the same for all units, so any will do.
+		_, _, featureFlags, rawConfig = unit.Expected()
 		if rawConfig == nil {
 			// should not happen; hard stop
 			return fmt.Errorf("input unit %s has no config", unit.ID())
@@ -599,6 +610,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
+	features.Update(featureFlags) // TODO(Anderson): add fearure flags change to didChange
 	if !didChange(cm.lastInputCfgs, inputCfgs) {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
