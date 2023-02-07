@@ -1,0 +1,28 @@
+---
+name: Bump golang version
+
+on:
+  schedule:
+    - cron: '0 20 * * 6'
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Setup Git
+        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+
+      - name: Install Updatecli in the runner
+        uses: updatecli/updatecli-action@453502948b442d7b9a923de7b40cc7ce8628505c
+
+      - name: Run Updatecli
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: updatecli apply --config ./.ci/bump-golang.yml
