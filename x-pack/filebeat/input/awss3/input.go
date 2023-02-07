@@ -381,12 +381,17 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 }
 
 func PollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
-	t := time.NewTicker(1 * time.Minute)
-
-	for range t.C {
-		count := receiver.GetApproximateMessageCount(ctx)
-		if count > -1 {
-			receiver.metrics.sqsMessagesWaiting.Set(uint64(count))
+	t := time.NewTicker(time.Minute)
+	for {
+		select {
+		case <-ctx.Done():
+			t.Stop()
+			return
+		case <-t.C:
+			count := receiver.GetApproximateMessageCount(ctx)
+			if count > -1 {
+				receiver.metrics.sqsMessagesWaiting.Set(uint64(count))
+			}
 		}
 	}
 }
