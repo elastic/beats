@@ -134,6 +134,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fixing a race condition in Packetbeat that could cause crashes or instability {pull}34498[34498]
 
 *Winlogbeat*
 
