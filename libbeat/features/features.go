@@ -10,8 +10,12 @@ var (
 	// flags configs
 	mu sync.Mutex
 
-	pfeatures *proto.Features
+	flags fflags
 )
+
+type fflags struct {
+	fqdnEnabled bool
+}
 
 // type configs struct {
 // 	FQDN struct {
@@ -20,9 +24,13 @@ var (
 // }
 
 func Update(f *proto.Features) {
+	if f == nil {
+		return
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
-	pfeatures = f
+	flags = fflags{fqdnEnabled: f.Fqdn.Enabled}
 }
 
 // // Parse ...
@@ -48,5 +56,5 @@ func Update(f *proto.Features) {
 
 // FQDN reports if FQDN should be used instead of hostname for host.name.
 func FQDN() bool {
-	return pfeatures.Fqdn.Enabled
+	return flags.fqdnEnabled
 }
