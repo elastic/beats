@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM golang:1.18.5
-=======
 FROM golang:1.18.10
->>>>>>> 65fb69c23b ([Automation] Update go release version to 1.18.10 (#34266))
 
 RUN \
     apt update \
