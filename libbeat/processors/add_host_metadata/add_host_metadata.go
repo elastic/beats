@@ -142,11 +142,13 @@ func (p *addHostMetadata) loadData() error {
 		}
 	}
 
-	p.logger.Infof("addHostMetadata FQDN: %t", features.FQDN())
+	p.logger.Infof("addHostMetadata feature FQDN: %t", features.FQDN())
 	switch {
 	case p.config.Name != "":
+		p.logger.Infof("addHostMetadata config.Name set, taking precedence: %s", p.config.Name)
 		_, _ = data.Put("host.name", p.config.Name)
 	case features.FQDN():
+		p.logger.Infof("addHostMetadata using fqdn: %s", h.Info().FQDN)
 		_, _ = data.Put("host.name", h.Info().FQDN)
 	}
 

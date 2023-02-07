@@ -1,9 +1,12 @@
 package features
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -33,26 +36,24 @@ func Update(f *proto.Features) {
 	flags = fflags{fqdnEnabled: f.Fqdn.Enabled}
 }
 
-// // Parse ...
-// // Deprecated
-// func Parse(c *conf.C) error {
-// 	logp.L().Info("features.Parse invoked")
-// 	if c == nil {
-// 		logp.L().Info("feature flag config is nil!")
-// 		return nil
-// 	}
-//
-// 	enabled, err := c.Bool("features.fqdn.enabled", -1)
-// 	if err != nil {
-// 		return fmt.Errorf("could not FQDN feature config: %w", err)
-// 	}
-//
-// 	mu.Lock()
-// 	defer mu.Unlock()
-// 	flags.FQDN.Enabled = enabled
-//
-// 	return nil
-// }
+func Parse(c *conf.C) error {
+	logp.L().Info("features.Parse invoked")
+	if c == nil {
+		logp.L().Info("feature flag config is nil!")
+		return nil
+	}
+
+	enabled, err := c.Bool("features.fqdn.enabled", -1)
+	if err != nil {
+		return fmt.Errorf("could not FQDN feature config: %w", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+	flags.fqdnEnabled = enabled
+
+	return nil
+}
 
 // FQDN reports if FQDN should be used instead of hostname for host.name.
 func FQDN() bool {

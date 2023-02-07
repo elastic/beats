@@ -18,6 +18,7 @@
 package cfgfile
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/joeshaw/multierror"
@@ -27,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -98,12 +100,12 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// Wait for all runners to stop before starting new ones
 	wg.Wait()
 
-	// // Feature flags are per unit. Right now it's actually component/process,
-	// // thus it needs to be reloaded only once.
-	// r.logger.Infow("feature flag", "feature_flags", configs[0].Config)
-	// if err := features.Parse(configs[0].Config); err != nil {
-	// 	return fmt.Errorf("could not parse features config during reload: %w", err)
-	// }
+	// Feature flags are per unit. Right now it's actually component/process,
+	// thus it needs to be reloaded only once.
+	if err := features.Parse(configs[0].Config); err != nil {
+		return fmt.Errorf("could not parse features config during reload: %w", err)
+	}
+	r.logger.Infow("reload feature flag fqdn: %t", features.FQDN())
 
 	// Start new runners
 	for hash, config := range startList {
