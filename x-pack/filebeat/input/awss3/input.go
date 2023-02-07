@@ -382,16 +382,18 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 
 func PollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 	t := time.NewTicker(time.Minute)
+	defer t.Stop()
 	for {
 		select {
 		case <-ctx.Done():
-			t.Stop()
 			return
 		case <-t.C:
-			count := receiver.GetApproximateMessageCount(ctx)
-			if count > -1 {
-				receiver.metrics.sqsMessagesWaiting.Set(uint64(count))
+			count, err := receiver.GetApproximateMessageCount(ctx)
+			if strings.Contains(err.Error(), "StatusCode: 403") {
+				// stop polling if permissions error is encountered
+				return
 			}
+			receiver.metrics.sqsMessagesWaiting.Set(uint64(count))
 		}
 	}
 }
