@@ -37,7 +37,9 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 	monitoringStates := map[string]string{}
 	for instanceID, output := range instancesOutputs {
 		for eventIdentifier := range events {
-			if !strings.HasPrefix(eventIdentifier, instanceID) {
+			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
+			potentialInstanceID := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+			if instanceID != potentialInstanceID {
 				continue
 			}
 
