@@ -762,7 +762,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	if err := features.Parse(b.RawConfig); err != nil {
+	if err := features.ParseFromConfig(b.RawConfig); err != nil {
 		logp.L().Errorw("could not parse features, see config",
 			"features_config", b.RawConfig)
 		return fmt.Errorf("could not parse features: %w", err)

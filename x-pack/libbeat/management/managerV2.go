@@ -197,7 +197,13 @@ func (cm *BeatV2Manager) Start() error {
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
 	go cm.watchErrChan(ctx)
-	cm.client.RegisterDiagnosticHook("beat-rendered-config", "the rendered config used by the beat", "beat-rendered-config.yml", "application/yaml", cm.handleDebugYaml)
+	cm.client.RegisterDiagnosticHook(
+		"beat-rendered-config",
+		"the rendered config used by the beat",
+		"beat-rendered-config.yml",
+		"application/yaml",
+		cm.handleDebugYaml)
+
 	go cm.unitListen()
 	cm.isRunning = true
 	return nil
@@ -573,7 +579,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return fmt.Errorf("failed to generate config for output: %w", err)
 	}
 
-	features.Update(featureFlags)
+	features.UpdateFromProto(featureFlags)
 	err = output.Reload(reloadConfig)
 	if err != nil {
 		return fmt.Errorf("failed to reload output: %w", err)
@@ -610,7 +616,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
-	features.Update(featureFlags) // TODO(Anderson): add fearure flags change to didChange
+	features.UpdateFromProto(featureFlags) // TODO(Anderson): add fearure flags change to didChange
 	if !didChange(cm.lastInputCfgs, inputCfgs) {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
