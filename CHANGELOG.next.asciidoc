@@ -108,12 +108,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 - Add GCP CloudSQL region filter {pull}32943[32943]
-- Fix logstash cgroup mappings {pull}33131[33131]
-- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
-- Fix kafka dashboard field names {pull}33555[33555]
-- Add tags to events based on parsed identifier. {pull}33472[33472]
-- Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
-- Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 - Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
 
 
