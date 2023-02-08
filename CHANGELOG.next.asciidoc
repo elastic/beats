@@ -85,6 +85,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
 - Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
 - Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
+- Fixing a wrong if statement in parsing fortinet firewall logs that are of type event. {pull}34446[34446]
 
 *Heartbeat*
 
