@@ -52,7 +52,7 @@ func TestFlowsCounting(t *testing.T) {
 	port1 := []byte{0, 1}
 	port2 := []byte{0, 2}
 
-	module, err := NewFlows(nil, procs.ProcessesWatcher{}, &config.Flows{})
+	module, err := NewFlows(nil, &procs.ProcessesWatcher{}, &config.Flows{})
 	assert.NoError(t, err)
 
 	uint1, err := module.NewUint("uint1")

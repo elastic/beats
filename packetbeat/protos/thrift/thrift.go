@@ -59,7 +59,7 @@ type thriftPlugin struct {
 
 	publishQueue chan *thriftTransaction
 	results      protos.Reporter
-	watcher      procs.ProcessesWatcher
+	watcher      *procs.ProcessesWatcher
 	idl          *thriftIdl
 }
 
@@ -185,7 +185,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &thriftPlugin{}
@@ -205,7 +205,7 @@ func New(
 func (thrift *thriftPlugin) init(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	config *thriftConfig,
 ) error {
 	thrift.InitDefaults()
