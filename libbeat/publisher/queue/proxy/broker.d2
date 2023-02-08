@@ -1,0 +1,59 @@
+
+Input
+
+producer {
+    ackHandler
+}
+
+queue: Proxy Queue (broker) {
+    pushChan
+    getChan
+    ackListener
+}
+
+Input -> producer: Publish
+producer.ackHandler -> Input: Event acknowledgment
+producer -> queue.pushChan: pushRequest
+queue.pushChan -> producer: result
+
+queue.ackListener -> Pipeline
+
+ttlBatch {
+    batch: Proxy queue batch
+    Pipeline metadata
+}
+
+ttlBatch.batch -> queue.ackListener: on batch.Done()
+ttlBatch.batch -> producer.ackHandler: on batch.Done()
+
+queueReader {
+    explanation: |md
+        `queueReader` is a worker that reads raw batches (satisfying the<br>
+        `queue.Batch` interface, in this case via `proxyqueue.batch`)<br>
+        from the queue, wraps them in a `publisher.Batch` interface<br>
+        (`ttlBatch`) to support pipeline operations like retry/error<br>
+        handling, and hands them off to `eventConsumer` which<br>
+        distributes them to output workers.
+    |
+}
+
+queueReader -> queue.getChan: getRequest
+queue.getChan -> queueReader: proxyqueue\.batch
+
+eventConsumer -> queueReader: queueReaderRequest
+queueReader -> eventConsumer: ttlBatch
+
+eventConsumer {
+    explanation: |md
+        `eventConsumer` is a worker that distributes event batches to<br>
+        (potentially) multiple output workers. When a batch fails, the<br>
+        output sends it back to `eventConsumer` for redistribution.<br>
+    |
+}
+
+out1: Output Worker
+out2: ...
+
+eventConsumer -> out1: Publish(ttlBatch)
+eventConsumer -> out2
+
