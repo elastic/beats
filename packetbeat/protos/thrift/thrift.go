@@ -220,6 +220,7 @@ func (thrift *thriftPlugin) init(
 		protos.DefaultTransactionHashSize)
 	thrift.transactions.StartJanitor(thrift.transactionTimeout)
 
+	thrift.watcher = &procs.ProcessesWatcher{}
 	if !testMode {
 		thrift.publishQueue = make(chan *thriftTransaction, 1000)
 		thrift.results = results

@@ -72,6 +72,7 @@ func TestFlowsCounting(t *testing.T) {
 
 	processor := &flowsProcessor{
 		table:    module.table,
+		watcher:  &procs.ProcessesWatcher{},
 		counters: module.counterReg,
 		timeout:  20 * time.Millisecond,
 	}
