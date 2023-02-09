@@ -147,20 +147,20 @@ func TestDataConfig(t *testing.T) DataConfig {
 func TestDataFiles(t *testing.T, module, metricSet string) {
 	t.Helper()
 	config := TestDataConfig(t)
-	TestDataFilesWithConfig(t, module, metricSet, config)
+	TestDataFilesWithConfig(t, module, metricSet, config, "")
 }
 
 // TestDataFilesWithConfig run tests for a testdata config
-func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig, testPrefix ...string) {
+func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig, testPrefix string) {
 	t.Helper()
 
 	// the location of the read files
 	location := filepath.Join(config.Path, "*."+config.Suffix)
 
-	// if this function was called from data_test.go then the testPrefix should be 1
-	if len(testPrefix) != 0 {
+	// if this function was called from data_test.go then the testPrefix is defined and not the default empty string
+	if testPrefix != "" {
 		// the prefix for read and write files should be ../../../module/moduleName/metricsetName
-		prefix := filepath.Join(testPrefix[0], module, metricSet)
+		prefix := filepath.Join(testPrefix, module, metricSet)
 		location = filepath.Join(prefix, location)
 
 		// the prefix needs to be appended to the path of the expected files and the original files
