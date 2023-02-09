@@ -152,7 +152,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			if split != -1 {
 				kubernetes.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
 
+				// Add splitted container.id ECS field and update kubernetes.container.id with splitted value
 				kubernetes.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
+				kubernetes.ShouldPut(event, "id", cID[split+3:], m.Logger())
+
 			}
 		}
 		if containerImage, ok := event["image"]; ok {
