@@ -96,7 +96,7 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 	}
 
 	if len(errors) > 0 {
-		return nil, fmt.Errorf("logErrors: %+v", err)
+		return nil, fmt.Errorf("logErrors: %+v", errors)
 	}
 
 	monitor := MonitorRunInfo{
