@@ -210,6 +210,19 @@ func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events 
 
 func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
 	filename := filepath.Base(file)
+	/*
+		If the expected suffix is '.json' we need to exclude the data.json file, since
+		by the end of this function we may create a data.json file if there is a docs file with the config suffix:
+			if strings.HasSuffix(file, "docs."+config.Suffix) {
+				writeDataJSON(t, data[0], filepath.Join(config.WritePath, "data.json"))
+			}
+		Since the expected file name is obtained through filename + expectedExtension, we could end up testing files like:
+			Metrics file: data.json
+			Expected metrics file: data.json-expected.json
+		If the config extension is '.json'.
+		This is not possible, since running go -test json does not produce an expected file for data.json files. This is why
+		we need to exclude this file from the tests.
+	*/
 	if filename == "data.json" {
 		return
 	}
