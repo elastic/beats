@@ -22,7 +22,7 @@ type inputMetrics struct {
 	sqsMessagesInflight                 *monitoring.Uint // Number of SQS messages inflight (gauge).
 	sqsMessagesReturnedTotal            *monitoring.Uint // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 	sqsMessagesDeletedTotal             *monitoring.Uint // Number of SQS messages deleted.
-	sqsMessagesWaiting                  *monitoring.Uint // Number of SQS messages waiting in the SQS Queue (gauge) (optional).
+	sqsMessagesWaiting                  *monitoring.Uint // Number of SQS messages waiting in the SQS Queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 
