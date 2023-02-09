@@ -23,8 +23,10 @@ import (
 
 const testTimeout = 10 * time.Second
 
-var errFakeConnectivityFailure = errors.New("fake connectivity failure")
-var errFakeGetAttributeFailute = errors.New("something went wrong")
+var (
+	errFakeConnectivityFailure = errors.New("fake connectivity failure")
+	errFakeGetAttributeFailute = errors.New("something went wrong")
+)
 
 func TestSQSReceiver(t *testing.T) {
 	err := logp.TestingSetup()
