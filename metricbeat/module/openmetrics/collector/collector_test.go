@@ -29,7 +29,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -43,23 +43,23 @@ func TestData(t *testing.T) {
 }
 
 func TestSameLabels(t *testing.T) {
-	mbtest.TestDataFiles(t, "openmetrics", "collector")
+	dataConfig := mbtest.ReadDataConfig(t, "_meta/samelabeltestdata/config.yml")
+	mbtest.TestDataFilesWithConfig(t, "openmetrics", "collector", dataConfig)
 }
-
 func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 	labels := mapstr.M{
 		"handler": "query",
 	}
 	tests := []struct {
-		Family *prometheus.MetricFamily
+		Family *p.MetricFamily
 		Event  []OpenMetricEvent
 	}{
 		{
-			Family: &prometheus.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
 				Type: textparse.MetricTypeCounter,
-				Metric: []*prometheus.OpenMetric{
+				Metric: []*p.OpenMetric{
 					{
 						Name: proto.String("http_request_duration_microseconds_total"),
 						Label: []*prometheuslabels.Label{
@@ -68,7 +68,7 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 								Value: "query",
 							},
 						},
-						Counter: &prometheus.Counter{
+						Counter: &p.Counter{
 							Value: proto.Float64(10),
 						},
 					},
@@ -89,13 +89,13 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 		},
 		{
-			Family: &prometheus.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
 				Type: textparse.MetricTypeGauge,
-				Metric: []*prometheus.OpenMetric{
+				Metric: []*p.OpenMetric{
 					{
-						Gauge: &prometheus.Gauge{
+						Gauge: &p.Gauge{
 							Value: proto.Float64(10),
 						},
 					},
@@ -115,16 +115,16 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 		},
 		{
-			Family: &prometheus.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
 				Type: textparse.MetricTypeSummary,
-				Metric: []*prometheus.OpenMetric{
+				Metric: []*p.OpenMetric{
 					{
-						Summary: &prometheus.Summary{
+						Summary: &p.Summary{
 							SampleCount: proto.Uint64(10),
 							SampleSum:   proto.Float64(10),
-							Quantile: []*prometheus.Quantile{
+							Quantile: []*p.Quantile{
 								{
 									Quantile: proto.Float64(0.99),
 									Value:    proto.Float64(10),
@@ -159,16 +159,16 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 		},
 		{
-			Family: &prometheus.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
 				Type: textparse.MetricTypeHistogram,
-				Metric: []*prometheus.OpenMetric{
+				Metric: []*p.OpenMetric{
 					{
-						Histogram: &prometheus.Histogram{
+						Histogram: &p.Histogram{
 							SampleCount: proto.Uint64(10),
 							SampleSum:   proto.Float64(10),
-							Bucket: []*prometheus.Bucket{
+							Bucket: []*p.Bucket{
 								{
 									UpperBound:      proto.Float64(0.99),
 									CumulativeCount: proto.Uint64(10),
@@ -202,11 +202,11 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 			},
 		},
 		{
-			Family: &prometheus.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
 				Type: textparse.MetricTypeUnknown,
-				Metric: []*prometheus.OpenMetric{
+				Metric: []*p.OpenMetric{
 					{
 						Label: []*prometheuslabels.Label{
 							{
@@ -214,7 +214,7 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 								Value: "query",
 							},
 						},
-						Unknown: &prometheus.Unknown{
+						Unknown: &p.Unknown{
 							Value: proto.Float64(10),
 						},
 					},
@@ -243,12 +243,12 @@ func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 }
 
 func TestSkipMetricFamily(t *testing.T) {
-	testFamilies := []*prometheus.MetricFamily{
+	testFamilies := []*p.MetricFamily{
 		{
 			Name: proto.String("http_request_duration_microseconds_a_a_in"),
 			Help: proto.String("foo"),
 			Type: textparse.MetricTypeCounter,
-			Metric: []*prometheus.OpenMetric{
+			Metric: []*p.OpenMetric{
 				{
 					Label: []*prometheuslabels.Label{
 						{
@@ -256,7 +256,7 @@ func TestSkipMetricFamily(t *testing.T) {
 							Value: "query",
 						},
 					},
-					Counter: &prometheus.Counter{
+					Counter: &p.Counter{
 						Value: proto.Float64(10),
 					},
 				},
@@ -266,7 +266,7 @@ func TestSkipMetricFamily(t *testing.T) {
 			Name: proto.String("http_request_duration_microseconds_a_b_in"),
 			Help: proto.String("foo"),
 			Type: textparse.MetricTypeCounter,
-			Metric: []*prometheus.OpenMetric{
+			Metric: []*p.OpenMetric{
 				{
 					Label: []*prometheuslabels.Label{
 						{
@@ -274,7 +274,7 @@ func TestSkipMetricFamily(t *testing.T) {
 							Value: "query",
 						},
 					},
-					Counter: &prometheus.Counter{
+					Counter: &p.Counter{
 						Value: proto.Float64(10),
 					},
 				},
@@ -284,9 +284,9 @@ func TestSkipMetricFamily(t *testing.T) {
 			Name: proto.String("http_request_duration_microseconds_b_in"),
 			Help: proto.String("foo"),
 			Type: textparse.MetricTypeGauge,
-			Metric: []*prometheus.OpenMetric{
+			Metric: []*p.OpenMetric{
 				{
-					Gauge: &prometheus.Gauge{
+					Gauge: &p.Gauge{
 						Value: proto.Float64(10),
 					},
 				},
@@ -296,12 +296,12 @@ func TestSkipMetricFamily(t *testing.T) {
 			Name: proto.String("http_request_duration_microseconds_c_in"),
 			Help: proto.String("foo"),
 			Type: textparse.MetricTypeSummary,
-			Metric: []*prometheus.OpenMetric{
+			Metric: []*p.OpenMetric{
 				{
-					Summary: &prometheus.Summary{
+					Summary: &p.Summary{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Quantile: []*prometheus.Quantile{
+						Quantile: []*p.Quantile{
 							{
 								Quantile: proto.Float64(0.99),
 								Value:    proto.Float64(10),
@@ -315,12 +315,12 @@ func TestSkipMetricFamily(t *testing.T) {
 			Name: proto.String("http_request_duration_microseconds_d_in"),
 			Help: proto.String("foo"),
 			Type: textparse.MetricTypeHistogram,
-			Metric: []*prometheus.OpenMetric{
+			Metric: []*p.OpenMetric{
 				{
-					Histogram: &prometheus.Histogram{
+					Histogram: &p.Histogram{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Bucket: []*prometheus.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(10),
@@ -334,7 +334,7 @@ func TestSkipMetricFamily(t *testing.T) {
 			Name: proto.String("http_request_duration_microseconds_e_in"),
 			Help: proto.String("foo"),
 			Type: textparse.MetricTypeUnknown,
-			Metric: []*prometheus.OpenMetric{
+			Metric: []*p.OpenMetric{
 				{
 					Label: []*prometheuslabels.Label{
 						{
@@ -342,7 +342,7 @@ func TestSkipMetricFamily(t *testing.T) {
 							Value: "query",
 						},
 					},
-					Unknown: &prometheus.Unknown{
+					Unknown: &p.Unknown{
 						Value: proto.Float64(10),
 					},
 				},
