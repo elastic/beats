@@ -1,0 +1,276 @@
+[
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics",
+                "name": "open metrics collector",
+                "version": "6.3.9"
+            },
+            "metrics": {
+                "app_info": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "build": "8.2.7",
+                "entity": "controller",
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "process_cpu_seconds_total": 11111
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "category": "shades",
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "enable_category": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "connection_errors": 42
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics",
+                "type": "netapp"
+            },
+            "metrics": {
+                "disk_errors_total": 17
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "my_counter_last_increment_timestamp_milliseconds": 123
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics",
+                "name": "metrics collector",
+                "version": "8.2.7"
+            },
+            "metrics": {
+                "collector_info": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "category": "shirts",
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "enable_category": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "category": "shoes",
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "enable_category": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "cnt_rulefires_deployment_total": 66666
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:44481",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "up": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    }
+]
