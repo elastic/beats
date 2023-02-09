@@ -129,6 +129,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
 - Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 - Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
+- Fix container metadata enricher with correct container ids for pods with multiple containers. {pull}34516[34516]
 
 
 *Osquerybeat*
