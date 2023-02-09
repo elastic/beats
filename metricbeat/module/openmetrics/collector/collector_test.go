@@ -39,6 +39,10 @@ import (
 )
 
 func TestData(t *testing.T) {
+	/*
+			testdata.go:230: Testing ../../../module/openmetrics/collector/_meta/testdata/docs.plain file
+		    testdata.go:299: Expected ../../../module/openmetrics/collector/_meta/testdata/docs.plain-expected.json file
+	*/
 	mbtest.TestDataFiles(t, "openmetrics", "collector")
 }
 
@@ -46,6 +50,7 @@ func TestSameLabels(t *testing.T) {
 	dataConfig := mbtest.ReadDataConfig(t, "_meta/samelabeltestdata/config.yml")
 	mbtest.TestDataFilesWithConfig(t, "openmetrics", "collector", dataConfig)
 }
+
 func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 	labels := mapstr.M{
 		"handler": "query",
