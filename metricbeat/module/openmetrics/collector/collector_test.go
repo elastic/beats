@@ -39,10 +39,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-	/*
-			testdata.go:230: Testing ../../../module/openmetrics/collector/_meta/testdata/docs.plain file
-		    testdata.go:299: Expected ../../../module/openmetrics/collector/_meta/testdata/docs.plain-expected.json file
-	*/
 	mbtest.TestDataFiles(t, "openmetrics", "collector")
 }
 
