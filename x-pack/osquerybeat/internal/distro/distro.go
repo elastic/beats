@@ -36,14 +36,14 @@ const (
 	osqueryCertsDarwinPath  = "private/var/osquery/certs/" + osqueryCertsPEM
 	osqueryCertsWindowsPath = "osquery/certs/" + osqueryCertsPEM
 
-	osqueryVersion = "5.5.1"
+	osqueryVersion = "5.7.0"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
 
-	osqueryDistroDarwinSHA256   = "e94f364c6d1e7eb9d25999588cfbf16ad013b214598f1307ade06a09d18f153d"
-	osqueryDistroLinuxSHA256    = "5e21502cfd0ce042ce4acb2c20ae64c20296a5deb10ff053e12a5e342e163b7e"
-	osqueryDistroLinuxARMSHA256 = "f5cb69cd15077807a0fba327e1763cf7ab9ecfcc68caeb0280cb5e3738d44ba5"
-	osqueryDistroWindowsSHA256  = "ee2db367f86da2e82268111c6eb813f1f4b935c535fe0564c294fba0e7fbedba"
+	osqueryDistroDarwinSHA256   = "6147f5632d7ae0bfb5c485f3b2211057179ceed18904b375007f23043408261f"
+	osqueryDistroLinuxSHA256    = "0e34979a795be205b2a1bdf0b85464a34951fe94b462bd7c23bd894e24baceef"
+	osqueryDistroLinuxARMSHA256 = "86826541444fe192b3a5f54d0e7d9f83375fc242c44e741fcd0766c8f933cac0"
+	osqueryDistroWindowsSHA256  = "0e54fec4b8b8a800e3bdd178a2473db9de25e53b8ea800775b7f9cc8c847be1c"
 )
 
 type OSArch struct {
