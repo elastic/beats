@@ -220,7 +220,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 			Metrics file: data.json
 			Expected metrics file: data.json-expected.json
 		If the config extension is '.json'.
-		This is not possible, since running go -test json does not produce an expected file for data.json files. This is why
+		This is not possible, since running go -test data does not produce an expected file for data.json files. This is why
 		we need to exclude this file from the tests.
 	*/
 	if filename == "data.json" {
