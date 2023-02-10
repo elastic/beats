@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
 - Add GCP CloudSQL region filter {pull}32943[32943]
 - Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
+- Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
 
 
 *Osquerybeat*
