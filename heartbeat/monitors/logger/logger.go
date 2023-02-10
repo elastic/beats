@@ -47,6 +47,7 @@ type MonitorRunInfo struct {
 }
 
 func (m *MonitorRunInfo) MarshalJSON() ([]byte, error) {
+	// Alias to avoid recusing on marshal
 	type MonitorRunInfoAlias MonitorRunInfo
 	return json.Marshal(&struct {
 		*MonitorRunInfoAlias
