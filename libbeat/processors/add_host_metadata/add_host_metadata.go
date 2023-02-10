@@ -81,7 +81,7 @@ func New(cfg *config.C) (processors.Processor, error) {
 	return p, nil
 }
 
-// Run enriches the given event with the host meta data
+// Run enriches the given event with the host metadata
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// check replace_host_fields field
 	if !p.config.ReplaceFields && skipAddingHostMetadata(event) {
@@ -142,16 +142,18 @@ func (p *addHostMetadata) loadData() error {
 		}
 	}
 
-	p.logger.Infof("addHostMetadata feature FQDN: %t. before switch", features.FQDN())
+	p.logger.Infof("addHostMetadata feature fqdn before switch: %t",
+		features.FQDN())
 	switch {
 	case p.config.Name != "":
 		p.logger.Infof("addHostMetadata config.Name set, taking precedence: %s", p.config.Name)
 		_, _ = data.Put("host.name", p.config.Name)
+		break
 	case features.FQDN():
 		p.logger.Infof("addHostMetadata using fqdn: %s", h.Info().FQDN)
 		_, _ = data.Put("host.name", h.Info().FQDN)
+		break
 	}
-	p.logger.Infof("addHostMetadata feature FQDN: %t. after switch", features.FQDN())
 
 	p.data.Set(data)
 	return nil

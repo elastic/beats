@@ -397,6 +397,17 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.UpdateStatus(lbmanagement.Stopping, "Stopping")
 			return
 		case change := <-cm.client.UnitChanged():
+			cm.logger.Infof("BeatV2Manager.unitListen UnitChanged: %s-%v",
+				change.Type, change.Triggers)
+
+			for _, t := range change.Triggers {
+				if t == client.TriggerFeature {
+					cm.logger.Infof("change: %s/%s: feature fqdn: %v",
+						change.Type, t, change.Features)
+					features.Update(change.Features)
+				}
+			}
+
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure if there is a difference between
 			// A unit add and a unit change, since either way we can't do much more than call the reloader
@@ -405,13 +416,6 @@ func (cm *BeatV2Manager) unitListen() {
 				// reset can be called here because `<-t.C` is handled in the same select
 				t.Reset(changeDebounce)
 			case client.UnitChangedModified:
-				// TODO: split modify unit to handle triggers
-				for _, t := range change.Triggers {
-					if t == client.TriggerFeature {
-						features.UpdateFromProto(change.Features)
-					}
-				}
-
 				cm.modifyUnit(change.Unit)
 				// reset can be called here because `<-t.C` is handled in the same select
 				t.Reset(changeDebounce)
@@ -586,7 +590,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return fmt.Errorf("failed to generate config for output: %w", err)
 	}
 
-	// features.UpdateFromProto(featureFlags)
+	// features.Update(featureFlags)
 	err = output.Reload(reloadConfig)
 	if err != nil {
 		return fmt.Errorf("failed to reload output: %w", err)
