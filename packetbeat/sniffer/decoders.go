@@ -33,18 +33,12 @@ import (
 
 // Decoders functions return a Decoder able to process the provided network
 // link type for use with a Sniffer.
-type Decoders func(layers.LinkType) (*decoder.Decoder, error)
+type Decoders func(_ layers.LinkType, device string) (*decoder.Decoder, error)
 
 // DecodersFor returns a source of Decoders using the provided configuration
-<<<<<<< HEAD
 // components.
-func DecodersFor(publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
-	return func(dl layers.LinkType) (*decoder.Decoder, error) {
-=======
-// components. The id string is expected to be the ID of the beat.
-func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher *procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
-	return func(dl layers.LinkType, device string) (*decoder.Decoder, func(), error) {
->>>>>>> 2f9fa7199e ([Packetbeat] Fix for race condition in ProcessWatcher (#34514))
+func DecodersFor(publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher *procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
+	return func(dl layers.LinkType, device string) (*decoder.Decoder, error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
 		config, err := cfg.ICMP()
