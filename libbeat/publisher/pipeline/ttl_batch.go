@@ -95,7 +95,7 @@ func (b *ttlBatch) RetryEvents(events []publisher.Event) {
 	b.Retry()
 }
 
-func (b *ttlBatch) FreeEvents() {
+func (b *ttlBatch) FreeEntries() {
 	b.events = nil
 }
 

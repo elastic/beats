@@ -50,7 +50,7 @@ type Batch interface {
 	// the shipper. It is only guaranteed to release event pointers when using the
 	// proxy queue.
 	// Never call this on a batch that might be retried.
-	FreeEvents()
+	FreeEntries()
 
 	// Send was aborted, try again but don't decrease the batch's TTL counter.
 	Cancelled()

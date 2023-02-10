@@ -39,8 +39,8 @@ func newProducer(b *broker, ackHandler func(count int)) queue.Producer {
 		ackHandler: ackHandler}
 }
 
-func (p *producer) makePushRequest(event interface{}, canBlock bool) pushRequest {
-	req := pushRequest{
+func (p *producer) makePushRequest(event interface{}, canBlock bool) *pushRequest {
+	req := &pushRequest{
 		event:        event,
 		responseChan: make(chan bool, 1),
 		canBlock:     canBlock,
@@ -70,7 +70,7 @@ func (p *producer) Cancel() int {
 	return 0
 }
 
-func (p *producer) publish(req pushRequest) bool {
+func (p *producer) publish(req *pushRequest) bool {
 	select {
 	case p.broker.pushChan <- req:
 		return <-req.responseChan

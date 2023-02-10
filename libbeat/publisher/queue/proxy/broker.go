@@ -37,7 +37,7 @@ type broker struct {
 	// api channels
 
 	// Producers send queue entries to pushChan to add them to the next batch.
-	pushChan chan pushRequest
+	pushChan chan *pushRequest
 
 	// Consumers send requests to getChan to read entries from the queue.
 	getChan chan getRequest
@@ -100,7 +100,7 @@ func NewQueue(
 		batchSize: settings.BatchSize,
 
 		// broker API channels
-		pushChan: make(chan pushRequest),
+		pushChan: make(chan *pushRequest),
 		getChan:  make(chan getRequest),
 
 		ackListener: settings.ACKListener,
@@ -189,7 +189,7 @@ func (b *broker) run() {
 	}
 }
 
-func (b *broker) handlePushRequest(req pushRequest) {
+func (b *broker) handlePushRequest(req *pushRequest) {
 	if len(b.queuedEntries) < b.batchSize {
 		b.queuedEntries = append(b.queuedEntries,
 			queueEntry{event: req.event, producer: req.producer})
@@ -200,7 +200,7 @@ func (b *broker) handlePushRequest(req pushRequest) {
 	} else if req.canBlock {
 		// If there isn't room for the event, but the producer wants
 		// to block until there is, add it to the queue.
-		b.blockedRequests.add(&req)
+		b.blockedRequests.add(req)
 	} else {
 		// The pending batch is full, the producer doesn't want to
 		// block, so return immediate failure.
@@ -221,9 +221,14 @@ func (b *broker) handleGetRequest(req getRequest) {
 	req.responseChan <- newBatch
 
 	// Unblock any pending requests we can fit into the new batch.
-	blocked := b.blockedRequests
 	entries := []queueEntry{}
-	for req := blocked.next(); req != nil && len(entries) < b.batchSize; req = blocked.next() {
+	for len(entries) < b.batchSize {
+		req := b.blockedRequests.next()
+		if req == nil {
+			// No more blocked requests
+			break
+		}
+
 		entries = append(entries,
 			queueEntry{event: req.event, producer: req.producer})
 		if req.producer != nil {
@@ -244,7 +249,7 @@ func (b *blockedRequests) add(request *pushRequest) {
 	} else {
 		b.last.next = blockedReq
 	}
-	b.last = b.first
+	b.last = blockedReq
 }
 
 // Removes the oldest request from the list and returns it.

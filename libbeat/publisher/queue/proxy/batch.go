@@ -83,13 +83,12 @@ func acksForEntries(entries []queueEntry) []producerACKData {
 
 func (l *batchList) add(b *batch) {
 	b.next = nil // Should be unneeded but let's be cautious
-	if l.last == nil {
-		l.first = b
-		l.last = b
-	} else {
+	if l.last != nil {
 		l.last.next = b
-		l.last = b
+	} else {
+		l.first = b
 	}
+	l.last = b
 }
 
 func (l *batchList) remove() *batch {
