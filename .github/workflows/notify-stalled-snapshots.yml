@@ -3,6 +3,7 @@ name: notify-stalled-snapshots
 
 on:
   workflow_dispatch:
+  pull_request:
   schedule:
     - cron: '0 1 * * 1'
 
