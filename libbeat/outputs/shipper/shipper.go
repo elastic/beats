@@ -220,7 +220,7 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 
 	// We've sent as much as we can to the shipper, release the batch's events and
 	// save it in the queue of batches awaiting acknowledgment.
-	batch.FreeEvents()
+	batch.FreeEntries()
 	s.ackBatchChan <- pendingBatch{
 		batch:        batch,
 		index:        lastAcceptedIndex,
@@ -284,12 +284,14 @@ func (s *shipper) startACKLoop() error {
 		err := s.ackListener(ctx)
 		s.ackWaitGroup.Done()
 		if err != nil {
-			// TODO: This will stall all acknowledgments if it ever happens.
-			// We should propagate that failure to the Publish calls and/or
-			// try to reconnect.
-			// (Note: this case would be much easier if the persisted index RPC
-			// were not a stream.)
 			s.log.Errorf("acknowledgment listener stopped: %s", err)
+
+			// Shut down the connection and clear the output metadata.
+			// This will not propagate back to the pipeline immediately,
+			// but the next time Publish is called it will return an error
+			// because there is no connection, which will signal the pipeline
+			// to try to revive this output worker via Connect().
+			s.Close()
 		}
 	}()
 
