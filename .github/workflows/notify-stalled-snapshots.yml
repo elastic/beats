@@ -2,6 +2,7 @@
 name: notify-stalled-snapshots
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 20 * * 7'
 
@@ -50,5 +51,6 @@ jobs:
           url: ${{ secrets.VAULT_ADDR }}
           roleId: ${{ secrets.VAULT_ROLE_ID }}
           secretId: ${{ secrets.VAULT_SECRET_ID }}
-          channel: "#ingest-notifications"
+          #channel: "#ingest-notifications"
+          channel: "#observablt-bots"
           message: "Elastic Stack version for the ${{ matrix.branch }} branch has not been updated for a while ( > 7 days). Review the (<https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call|open PRs>)"
