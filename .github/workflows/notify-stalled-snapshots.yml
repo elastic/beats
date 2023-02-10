@@ -18,7 +18,7 @@ jobs:
       matrix: ${{ steps.generator.outputs.matrix }}
     steps:
       - id: generator
-        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@test/support-action-list-stack-snapshots
+        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@current
 
   notify:
     runs-on: ubuntu-latest
