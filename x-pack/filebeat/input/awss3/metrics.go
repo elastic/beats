@@ -25,6 +25,7 @@ type inputMetrics struct {
 	sqsMessagesWaiting                  *monitoring.Uint // Number of SQS messages waiting in the SQS Queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
+	sqsHasGetAttributesPermission       *monitoring.Bool // Boolean indicating if input has permissions for SQS GetQueueAttributes API call (gauge).
 
 	s3ObjectsRequestedTotal *monitoring.Uint // Number of S3 objects downloaded.
 	s3ObjectsAckedTotal     *monitoring.Uint // Number of S3 objects processed that were fully ACKed.
@@ -54,6 +55,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		sqsMessagesWaiting:                  monitoring.NewUint(reg, "sqs_messages_waiting_gauge"),
 		sqsMessageProcessingTime:            metrics.NewUniformSample(1024),
 		sqsLagTime:                          metrics.NewUniformSample(1024),
+		sqsHasGetAttributesPermission:       monitoring.NewBool(reg, "sqs_has_get_attributes_permission"),
 		s3ObjectsRequestedTotal:             monitoring.NewUint(reg, "s3_objects_requested_total"),
 		s3ObjectsAckedTotal:                 monitoring.NewUint(reg, "s3_objects_acked_total"),
 		s3ObjectsListedTotal:                monitoring.NewUint(reg, "s3_objects_listed_total"),

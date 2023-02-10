@@ -740,6 +740,7 @@ observe the activity of the input.
 | `sqs_messages_waiting_gauge`              | Number of SQS messages waiting in the SQS Queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
 | `sqs_message_processing_time`             | Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 | `sqs_lag_time`                            | Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
+| `sqs_has_get_attributes_permission`       | Boolean indicating if input has permissions for SQS GetQueueAttributes API call (gauge).
 | `s3_objects_requested_total`              | Number of S3 objects downloaded.
 | `s3_objects_listed_total`                 | Number of S3 objects returned by list operations.
 | `s3_objects_processed_total`              | Number of S3 objects that matched file_selectors rules.
