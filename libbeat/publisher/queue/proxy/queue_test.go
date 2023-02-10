@@ -55,9 +55,7 @@ func TestQueueStuff(t *testing.T) {
 	batch.Done()
 	assert.Equal(t, 2, acked.Load(), "No batches have been acked yet")
 
+	// Make sure that reading an event unblocked the queue
+	_, success = producer.TryPublish(4)
+	assert.True(t, success, "Queue should accept incoming event")
 }
-
-/// limitations of proxy queue (to go in README):
-// - doesn't use real queue.EntryID
-// - doesn't implement producer cancel
-// - doesn't respect requested (consumer) batch size, only the configured size

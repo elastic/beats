@@ -26,7 +26,7 @@ import (
 )
 
 type broker struct {
-	done chan struct{}
+	doneChan chan struct{}
 
 	logger *logp.Logger
 
@@ -46,12 +46,14 @@ type broker struct {
 	// Right now this listener always points at the Pipeline associated with
 	// this queue, and Pipeline.OnACK forwards the notification to
 	// Pipeline.observer.queueACKed(), which updates the beats registry
-	// if needed.
+	// if needed. This pointer is included in batches created by the proxy
+	// queue, so they can call it when they receive a Done call.
 	ackListener queue.ACKListener
 
 	// Internal state for the broker's run loop.
-	queuedEntries   []queueEntry
-	blockedRequests blockedRequests
+	queuedEntries      []queueEntry
+	blockedRequests    blockedRequests
+	outstandingBatches batchList
 
 	// wait group for worker shutdown
 	wg sync.WaitGroup
@@ -93,7 +95,7 @@ func NewQueue(
 	}
 
 	b := &broker{
-		done:      make(chan struct{}),
+		doneChan:  make(chan struct{}),
 		logger:    logger,
 		batchSize: settings.BatchSize,
 
@@ -114,7 +116,7 @@ func NewQueue(
 }
 
 func (b *broker) Close() error {
-	close(b.done)
+	close(b.doneChan)
 	return nil
 }
 
@@ -126,13 +128,14 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK)
 }
 
-func (b *broker) Get(count int) (queue.Batch, error) {
+func (b *broker) Get(_ int) (queue.Batch, error) {
+	// The response channel needs a buffer size of 1 to guarantee that the
+	// broker routine will not block when sending the response.
 	responseChan := make(chan *batch, 1)
 	select {
-	case <-b.done:
+	case <-b.doneChan:
 		return nil, io.EOF
-	case b.getChan <- getRequest{
-		entryCount: count, responseChan: responseChan}:
+	case b.getChan <- getRequest{responseChan: responseChan}:
 	}
 
 	// if request has been sent, we are guaranteed a response
@@ -157,7 +160,13 @@ func (b *broker) run() {
 		}
 
 		select {
-		case <-b.done:
+		case <-b.doneChan:
+			// The queue is closing, reject any requests that were blocked
+			// waiting for space in the queue.
+			blocked := b.blockedRequests
+			for req := blocked.next(); req != nil; req = blocked.next() {
+				req.responseChan <- false
+			}
 			return
 
 		case req := <-b.pushChan: // producer pushing new event
@@ -165,6 +174,17 @@ func (b *broker) run() {
 
 		case req := <-getChan: // consumer asking for next batch
 			b.handleGetRequest(req)
+
+		case <-b.outstandingBatches.nextDoneChan():
+			ackedBatch := b.outstandingBatches.remove()
+			// Notify any listening producers
+			for _, ack := range ackedBatch.producerACKs {
+				ack.producer.ackHandler(ack.count)
+			}
+			// Notify the pipeline's metrics reporter
+			if b.ackListener != nil {
+				b.ackListener.OnACK(ackedBatch.originalEntryCount)
+			}
 		}
 	}
 }
@@ -191,12 +211,14 @@ func (b *broker) handlePushRequest(req pushRequest) {
 func (b *broker) handleGetRequest(req getRequest) {
 	acks := acksForEntries(b.queuedEntries)
 
-	req.responseChan <- &batch{
+	newBatch := &batch{
 		entries:            b.queuedEntries,
-		entryCount:         len(b.queuedEntries),
+		originalEntryCount: len(b.queuedEntries),
 		producerACKs:       acks,
-		metricsACKListener: b.ackListener,
+		doneChan:           make(chan struct{}),
 	}
+	b.outstandingBatches.add(newBatch)
+	req.responseChan <- newBatch
 
 	// Unblock any pending requests we can fit into the new batch.
 	blocked := b.blockedRequests
@@ -214,6 +236,7 @@ func (b *broker) handleGetRequest(req getRequest) {
 	b.queuedEntries = entries
 }
 
+// Adds a new request to the end of the current list.
 func (b *blockedRequests) add(request *pushRequest) {
 	blockedReq := &blockedRequest{request: request}
 	if b.first == nil {
@@ -224,6 +247,7 @@ func (b *blockedRequests) add(request *pushRequest) {
 	b.last = b.first
 }
 
+// Removes the oldest request from the list and returns it.
 func (b *blockedRequests) next() *pushRequest {
 	var result *pushRequest
 	if b.first != nil {

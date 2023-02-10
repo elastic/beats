@@ -1,3 +1,9 @@
+# A diagram of the Beats pipeline and the proxy queue's interaction
+# with it.
+# To regenerate the image after changing this file, run:
+#   d2 broker.d2 broker.svg
+# To live-edit this file with immediate regeneration of the diagram, run:
+#   d2 --watch broker.d2 broker.svg
 
 Input
 
@@ -8,23 +14,12 @@ producer {
 queue: Proxy Queue (broker) {
     pushChan
     getChan
-    ackListener
 }
 
 Input -> producer: Publish
 producer.ackHandler -> Input: Event acknowledgment
 producer -> queue.pushChan: pushRequest
 queue.pushChan -> producer: result
-
-queue.ackListener -> Pipeline
-
-ttlBatch {
-    batch: Proxy queue batch
-    Pipeline metadata
-}
-
-ttlBatch.batch -> queue.ackListener: on batch.Done()
-ttlBatch.batch -> producer.ackHandler: on batch.Done()
 
 queueReader {
     explanation: |md

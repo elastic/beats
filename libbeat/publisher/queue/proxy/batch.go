@@ -17,16 +17,26 @@
 
 package proxyqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher/queue"
-
 type batch struct {
 	entries []queueEntry
 
 	// Original number of entries (persists even if entries are freed).
-	entryCount int
+	originalEntryCount int
 
-	producerACKs       []producerACKData
-	metricsACKListener queue.ACKListener
+	producerACKs []producerACKData
+
+	// When a batch is acknowledged, doneChan is closed to tell
+	// the queue to call the appropriate producer and metrics callbacks.
+	doneChan chan struct{}
+
+	// Batches are collected in linked lists to preserve the order of
+	// acknowledgments. This field should only be used by batchList.
+	next *batch
+}
+
+type batchList struct {
+	first *batch
+	last  *batch
 }
 
 // producerACKData tracks the number of events that need to be acknowledged
@@ -37,7 +47,7 @@ type producerACKData struct {
 }
 
 func (b *batch) Count() int {
-	return b.entryCount
+	return b.originalEntryCount
 }
 
 func (b *batch) Entry(i int) interface{} {
@@ -49,12 +59,7 @@ func (b *batch) FreeEntries() {
 }
 
 func (b *batch) Done() {
-	for _, ack := range b.producerACKs {
-		ack.producer.ackHandler(ack.count)
-	}
-	if b.metricsACKListener != nil {
-		b.metricsACKListener.OnACK(b.entryCount)
-	}
+	close(b.doneChan)
 }
 
 func acksForEntries(entries []queueEntry) []producerACKData {
@@ -74,4 +79,33 @@ func acksForEntries(entries []queueEntry) []producerACKData {
 		}
 	}
 	return results
+}
+
+func (l *batchList) add(b *batch) {
+	b.next = nil // Should be unneeded but let's be cautious
+	if l.last == nil {
+		l.first = b
+		l.last = b
+	} else {
+		l.last.next = b
+		l.last = b
+	}
+}
+
+func (l *batchList) remove() *batch {
+	result := l.first
+	if l.first != nil {
+		l.first = l.first.next
+		if l.first == nil {
+			l.last = nil
+		}
+	}
+	return result
+}
+
+func (l *batchList) nextDoneChan() chan struct{} {
+	if l.first != nil {
+		return l.first.doneChan
+	}
+	return nil
 }

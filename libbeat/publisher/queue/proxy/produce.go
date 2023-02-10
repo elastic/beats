@@ -74,7 +74,7 @@ func (p *producer) publish(req pushRequest) bool {
 	select {
 	case p.broker.pushChan <- req:
 		return <-req.responseChan
-	case <-p.broker.done:
+	case <-p.broker.doneChan:
 		// The queue is shutting down
 		return false
 	}
