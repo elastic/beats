@@ -27,7 +27,6 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
@@ -200,8 +199,6 @@ func (pkg Package) entityID(hostID string) string {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
-
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
