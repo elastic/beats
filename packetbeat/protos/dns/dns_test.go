@@ -115,7 +115,7 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 		"send_request":        true,
 		"send_response":       true,
 	})
-	dns, err := New(false, callback, procs.ProcessesWatcher{}, cfg)
+	dns, err := New(false, callback, &procs.ProcessesWatcher{}, cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -186,25 +186,26 @@ func mapValueHelper(t testing.TB, m mapstr.M, keys []string) interface{} {
 // The validation provided my this method should only be used on results
 // published where the response packet was "sent".
 // The following fields are validated by this method:
-//     type (must be dns)
-//     src (ip and port)
-//     dst (ip and port)
-//     query
-//     resource
-//     method
-//     dns.id
-//     dns.op_code
-//     dns.flags
-//     dns.response_code
-//     dns.question.class
-//     dns.question.type
-//     dns.question.name
-//     dns.answers_count
-//     dns.answers.data
-//     dns.authorities_count
-//     dns.authorities
-//     dns.additionals_count
-//     dns.additionals
+//
+//	type (must be dns)
+//	src (ip and port)
+//	dst (ip and port)
+//	query
+//	resource
+//	method
+//	dns.id
+//	dns.op_code
+//	dns.flags
+//	dns.response_code
+//	dns.question.class
+//	dns.question.type
+//	dns.question.name
+//	dns.answers_count
+//	dns.answers.data
+//	dns.authorities_count
+//	dns.authorities
+//	dns.additionals_count
+//	dns.additionals
 func assertMapStrData(t testing.TB, m mapstr.M, q dnsTestMessage) {
 	t.Helper()
 
