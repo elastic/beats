@@ -60,3 +60,5 @@ heartbeat.jobs:
 
 In the example, at any given time {beatname_uc} guarantees that only 10
 concurrent `http` tasks and only 5 concurrent `browser` tasks will be active.
+
+These limits can also be set via the environment variables `SYNTHETICS_LIMIT_{TYPE}`, where `{TYPE}` is one of `BROWSER`, `HTTP`, `TCP`, and `ICMP`.
