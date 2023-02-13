@@ -1,0 +1,42 @@
+---
+name: bump-elastic-stack-snapshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 15 * * 1-5'
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      matrix: ${{ steps.generator.outputs.matrix }}
+    steps:
+      - id: generator
+        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@current
+
+  bump-elastic-stack:
+    runs-on: ubuntu-latest
+    needs: [filter]
+    strategy:
+      matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Git
+        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+
+      - name: Install Updatecli in the runner
+        uses: updatecli/updatecli-action@453502948b442d7b9a923de7b40cc7ce8628505c
+
+      - name: Run Updatecli
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BRANCH: ${{ matrix.branch }}
+        run: updatecli apply --config ./.ci/bump-elastic-stack-snapshot.yml
+

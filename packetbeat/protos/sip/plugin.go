@@ -56,13 +56,13 @@ type connectionData struct {
 type plugin struct {
 	cfg     *config
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	cfgwarn.Beta("packetbeat SIP protocol is used")
@@ -89,7 +89,7 @@ func New(
 }
 
 // Init initializes the HTTP protocol analyser.
-func (p *plugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *config) {
+func (p *plugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *config) {
 	p.results = results
 	p.watcher = watcher
 	p.cfg = config
