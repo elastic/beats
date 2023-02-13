@@ -767,7 +767,7 @@ func (b *Beat) configure(settings Settings) error {
 			"features_config", b.RawConfig)
 		return fmt.Errorf("could not parse features: %w", err)
 	}
-	logp.L().Infow("Beat.configure feature flag fqdn: %t", features.FQDN())
+	logp.L().Infow("[fqdn] Beat.configure feature flag fqdn: %t", features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
 

@@ -100,7 +100,7 @@ func MakeDefaultSupport(
 ) SupportFactory {
 	return func(info beat.Info, log *logp.Logger, beatCfg *config.C) (Supporter, error) {
 		cfg := struct {
-			mapstr.EventMetadata `config:",inline"` // Fields and tags to add to each event.
+			mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
 			TimeSeries           bool                    `config:"timeseries.enabled"`
 		}{}
@@ -144,11 +144,11 @@ var WithHost modifier = builtinModifier(func(info beat.Info) mapstr.M {
 // pipeline.
 func WithAgentMeta() modifier {
 	return builtinModifier(func(info beat.Info) mapstr.M {
-		logp.L().Infof("WithAgentMeta.builtinModifier feature FQDN: %t", features.FQDN())
+		logp.L().Infof("[fqdn] WithAgentMeta.builtinModifier feature FQDN: %t", features.FQDN())
 
 		var hostname string
 		if features.FQDN() {
-			logp.L().Infof("WithAgentMeta.builtinModifier feature FQDN true, fqdn=%s",
+			logp.L().Infof("[fqdn] WithAgentMeta.builtinModifier feature FQDN true, fqdn=%s",
 				info.FQDN)
 
 			hostname = info.FQDN
