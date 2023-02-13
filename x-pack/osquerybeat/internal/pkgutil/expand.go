@@ -83,7 +83,7 @@ func expandPayload(f *xar.File, dstDir string) error {
 
 		if body != nil {
 			// Discarding the body, need to read in full
-			io.Copy(io.Discard, entry.Body)
+			_, _ = io.Copy(io.Discard, entry.Body)
 		}
 	}
 

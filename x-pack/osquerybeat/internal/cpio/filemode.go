@@ -30,17 +30,16 @@ import (
 // 		 and user following standard POSIX conventions.
 
 const (
-	fileTypeMask        uint64 = 0170000
-	fileTypeSocket      uint64 = 0140000
-	fileTypeSymlink     uint64 = 0120000
-	fileTypeRegularFile uint64 = 0100000
-	fileTypeBlockDev    uint64 = 0060000
-	fileTypeDir         uint64 = 0040000
-	fileTypeCharDev     uint64 = 0020000
-	fileTypePipe        uint64 = 0010000
-	suidBit             uint64 = 0004000
-	sgidBit             uint64 = 0002000
-	stickyBit           uint64 = 0001000
+	fileTypeMask     uint64 = 0170000
+	fileTypeSocket   uint64 = 0140000
+	fileTypeSymlink  uint64 = 0120000
+	fileTypeBlockDev uint64 = 0060000
+	fileTypeDir      uint64 = 0040000
+	fileTypeCharDev  uint64 = 0020000
+	fileTypePipe     uint64 = 0010000
+	suidBit          uint64 = 0004000
+	sgidBit          uint64 = 0002000
+	stickyBit        uint64 = 0001000
 )
 
 func parseFileMode(m [6]byte) (fm fs.FileMode, err error) {

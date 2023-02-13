@@ -99,7 +99,7 @@ func (r *Reader) readTOC() error {
 
 	heapStartOffset := uint64(xh.headerSize) + xh.tocCompressedLen
 
-	// The reader is at the beggining of the heap section here
+	// The reader is at the beginning of the heap section here
 	var files []File
 	if len(x.Toc.Files) > 0 {
 		files = make([]File, 0, len(x.Toc.Files))

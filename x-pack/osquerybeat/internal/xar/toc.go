@@ -25,23 +25,6 @@ type checksum struct {
 	Size    string `xml:"size"`
 }
 
-type signature struct {
-	XMLName xml.Name
-	Style   string `xml:"style,attr"`
-	Offset  string `xml:"offset"`
-	Size    string `xml:"size"`
-}
-
-type keyInfo struct {
-	XMLName  xml.Name
-	X509Data x509Data `xml:"X509Data"`
-}
-
-type x509Data struct {
-	XMLName         xml.Name `xml:"X509Data"`
-	X509Certificate []string `xml:"X509Certificate"`
-}
-
 type file struct {
 	XMLName          xml.Name `xml:"file"`
 	Id               string   `xml:"id,attr"`
