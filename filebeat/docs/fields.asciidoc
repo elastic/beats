@@ -66613,7 +66613,7 @@ Destination property.
 *`gcp.cilium.destination.hosts`*::
 +
 --
-The hostnames the verdict was rendered for.
+The hostnames linked to the traffic destination.
 
 
 type: array
@@ -66627,6 +66627,46 @@ The IP of the traffic destination.
 
 
 type: ip
+
+--
+
+*`gcp.cilium.destination.namespace`*::
++
+--
+The namespace of the destination pod.
+
+
+type: keyword
+
+--
+
+*`gcp.cilium.destination.pod`*::
++
+--
+The name of the destination pod.
+
+
+type: keyword
+
+--
+
+*`gcp.cilium.destination.pod_namespaced`*::
++
+--
+The namespace and pod name of the destination pod.
+
+
+type: keyword
+
+--
+
+*`gcp.cilium.destination.labels`*::
++
+--
+The labels of the destination pod.
+
+
+type: array
 
 --
 
@@ -66660,7 +66700,7 @@ type: ip
 *`gcp.cilium.source.namespace`*::
 +
 --
-The namespace the pod the verdict was rendered for exists in.
+The namespace of the source pod.
 
 
 type: keyword
@@ -66670,10 +66710,30 @@ type: keyword
 *`gcp.cilium.source.pod`*::
 +
 --
-The name of the pod the traffic originated from or is destined for.
+The name of the source pod.
 
 
 type: keyword
+
+--
+
+*`gcp.cilium.source.pod_namespaced`*::
++
+--
+The namespace and pod name of the source pod.
+
+
+type: keyword
+
+--
+
+*`gcp.cilium.source.labels`*::
++
+--
+The labels of the source pod.
+
+
+type: array
 
 --
 
