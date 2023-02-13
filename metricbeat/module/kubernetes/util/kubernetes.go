@@ -218,12 +218,8 @@ func NewContainerMetadataEnricher(
 			mapStatuses(pod.Status.ContainerStatuses)
 			mapStatuses(pod.Status.InitContainerStatuses)
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-<<<<<<< HEAD
 				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-=======
-				cmeta := mapstr.M{}
-				metrics := NewContainerMetrics()
->>>>>>> 4ac4973250 (Fix container enricher with correct container ids for pods with multiple containers (#34516))
+				cmeta := common.MapStr{}
 
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
@@ -242,15 +238,9 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-<<<<<<< HEAD
-						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+						ShouldPut(cmeta, "container.id", s.ContainerID[split+3:], base.Logger())
 
-						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
-=======
-						kubernetes2.ShouldPut(cmeta, "container.id", s.ContainerID[split+3:], base.Logger())
-
-						kubernetes2.ShouldPut(cmeta, "container.runtime", s.ContainerID[:split], base.Logger())
->>>>>>> 4ac4973250 (Fix container enricher with correct container ids for pods with multiple containers (#34516))
+						ShouldPut(cmeta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
