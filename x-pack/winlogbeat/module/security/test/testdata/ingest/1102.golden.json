@@ -1,0 +1,71 @@
+[
+  {
+    "@timestamp": "2019-11-07T10:34:29.0559196Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "audit-log-cleared",
+      "category": [
+        "iam"
+      ],
+      "code": "1102",
+      "ingested": "2022-06-08T06:21:07.838072400Z",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Eventlog",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "The audit log was cleared.\nSubject:\n\tSecurity ID:\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\tAdministrator\n\tDomain Name:\tWLBEAT\n\tLogon ID:\t0x50E87",
+    "related": {
+      "user": [
+        "Administrator"
+      ]
+    },
+    "user": {
+      "domain": "WLBEAT",
+      "id": "S-1-5-21-101361758-2486510592-3018839910-500",
+      "name": "Administrator"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
+      "event_id": "1102",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x50e87"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 1144,
+        "thread": {
+          "id": 1824
+        }
+      },
+      "provider_guid": "{fc65ddd8-d6ef-4962-83d5-6e5cfe9ce148}",
+      "provider_name": "Microsoft-Windows-Eventlog",
+      "record_id": "14224",
+      "task": "Log clear",
+      "user_data": {
+        "SubjectDomainName": "WLBEAT",
+        "SubjectLogonId": "0x50e87",
+        "SubjectUserName": "Administrator",
+        "SubjectUserSid": "S-1-5-21-101361758-2486510592-3018839910-500",
+        "xml_name": "LogFileCleared"
+      }
+    }
+  }
+]

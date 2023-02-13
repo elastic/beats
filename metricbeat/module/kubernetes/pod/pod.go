@@ -20,13 +20,12 @@ package pod
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -39,8 +38,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("kubernetes.pod")
 )
 
 // init registers the MetricSet with the central registry.
@@ -75,10 +72,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, true),
+		enricher:      util.NewResourceMetadataEnricher(base, util.PodResource, mod.GetMetricsRepo(), true),
 		mod:           mod,
 	}, nil
 }
@@ -96,7 +94,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := eventMapping(body, util.PerfMetrics)
+	events, err := eventMapping(body, m.mod.GetMetricsRepo(), m.Logger())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -112,12 +110,25 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			m.Logger().Error(err)
 		}
 
+		// Enrich event with container ECS fields
+		containerEcsFields := ecsfields(event, m.Logger())
+		if len(containerEcsFields) != 0 {
+			if e.RootFields != nil {
+				e.RootFields.DeepUpdate(mapstr.M{
+					"container": containerEcsFields,
+				})
+			} else {
+				e.RootFields = mapstr.M{
+					"container": containerEcsFields,
+				}
+			}
+		}
+
 		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}
 	}
-	return
 }
 
 // Close stops this metricset

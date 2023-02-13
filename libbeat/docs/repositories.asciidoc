@@ -122,6 +122,7 @@ sudo apt-get update && sudo apt-get install {beatname_pkg}
 --------------------------------------------------
 sudo systemctl enable {beatname_pkg}
 --------------------------------------------------
+ifndef::apm-server[]
 +
 If your system does not use `systemd` then run:
 +
@@ -129,6 +130,7 @@ If your system does not use `systemd` then run:
 --------------------------------------------------
 sudo update-rc.d {beatname_pkg} defaults 95 10
 --------------------------------------------------
+endif::[]
 
 endif::[]
 
@@ -224,6 +226,7 @@ sudo yum install {beatname_pkg}
 --------------------------------------------------
 sudo systemctl enable {beatname_pkg}
 --------------------------------------------------
+ifndef::apm-server[]
 +
 If your system does not use `systemd` then run:
 +
@@ -231,5 +234,6 @@ If your system does not use `systemd` then run:
 --------------------------------------------------
 sudo chkconfig --add {beatname_pkg}
 --------------------------------------------------
+endif::[]
 
 endif::[]

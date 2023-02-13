@@ -23,7 +23,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestLightMetricSetRegistration(t *testing.T) {
@@ -75,8 +76,8 @@ func TestLightMetricSetRegistration(t *testing.T) {
 			}
 			ms.Input.Module = c.module
 			ms.Input.MetricSet = c.metricSet
-			ms.Input.Defaults = common.MapStr{
-				"query": common.MapStr{
+			ms.Input.Defaults = mapstr.M{
+				"query": mapstr.M{
 					"extra": "something",
 				},
 			}
@@ -125,7 +126,7 @@ func baseModule(t *testing.T, r *Register, module, metricSet string) BaseMetricS
 	c.Module = module
 	c.MetricSets = []string{metricSet}
 	c.Query = QueryParams{"default": "foo"}
-	raw, err := common.NewConfigFrom(c)
+	raw, err := conf.NewConfigFrom(c)
 	require.NoError(t, err)
 	baseModule, err := newBaseModuleFromConfig(raw)
 	require.NoError(t, err)

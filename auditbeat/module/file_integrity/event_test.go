@@ -31,7 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var testEventTime = time.Now().UTC()
@@ -181,8 +181,14 @@ func TestHashFile(t *testing.T) {
 
 	const data = "hello world!\n"
 	const dataLen = uint64(len(data))
-	f.WriteString(data)
-	f.Sync()
+	_, err = f.WriteString(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = f.Sync()
+	if err != nil {
+		t.Fatal(err)
+	}
 	f.Close()
 
 	t.Run("valid hashes", func(t *testing.T) {
@@ -286,8 +292,14 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 
 	const data = "hello world!\n"
 	const dataLen = uint64(len(data))
-	f.WriteString(data)
-	f.Sync()
+	_, err = f.WriteString(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = f.Sync()
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer f.Close()
 
 	info, err := os.Stat(f.Name())
@@ -296,7 +308,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 	}
 
 	t.Run("file stays the same", func(t *testing.T) {
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
@@ -306,9 +318,15 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 		assert.Equal(t, digest, ev.Hashes[SHA1])
 	})
 	t.Run("file grows before hashing", func(t *testing.T) {
-		f.WriteString(data)
-		f.Sync()
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		_, err = f.WriteString(data)
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = f.Sync()
+		if err != nil {
+			t.Fatal(err)
+		}
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
@@ -322,9 +340,12 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 		if !assert.NoError(t, err) {
 			t.Fatal(err)
 		}
-		f.Sync()
+		err = f.Sync()
+		if err != nil {
+			t.Fatal(err)
+		}
 		assert.NoError(t, err)
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
@@ -351,7 +372,10 @@ func BenchmarkHashFile(b *testing.B) {
 	}
 	size := uint64(iterations * len(zeros))
 	b.Logf("file size: %v bytes", size)
-	f.Sync()
+	err = f.Sync()
+	if err != nil {
+		b.Fatal(err)
+	}
 	f.Close()
 	b.ResetTimer()
 
@@ -515,12 +539,12 @@ func TestBuildEvent(t *testing.T) {
 func mustDecodeHex(v string) []byte {
 	data, err := hex.DecodeString(v)
 	if err != nil {
-		panic(fmt.Errorf("invalid hex value: %v", err))
+		panic(fmt.Errorf("invalid hex value: %w", err))
 	}
 	return data
 }
 
-func assertHasKey(t testing.TB, m common.MapStr, key string) bool {
+func assertHasKey(t testing.TB, m mapstr.M, key string) bool {
 	t.Helper()
 	found, err := m.HasKey(key)
 	if err != nil || !found {

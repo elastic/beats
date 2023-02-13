@@ -1,96 +1,30 @@
 Compute metricset to fetch metrics from https://cloud.google.com/compute/[Compute Engine] Virtual Machines in Google Cloud Platform. No Monitoring or Logging agent is required in your instances to use this metricset.
 
-The `compute` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API]. The field names have been left untouched for people already familiar with them.
+The `compute` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute[Stackdriver API]. The field names are aligned to {beats-devguide}/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.
 
 Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API]. This is enough to get most of the info associated with a metric like Compute labels and metadata and metric specific Labels.
 
 [float]
-=== Metrics and labels
-Here is a list of metrics collected by `compute` metricset:
+=== Labels
+Here is a list of labels collected by `compute` metricset depending on the type of metric being collected:
 
-[float]
-==== firewall
-
-* `instance.firewall.dropped_bytes_count`: Incoming bytes dropped by the firewall.
-- `instance_name`: The name of the VM instance.
-
-* `instance.firewall.dropped_packets_count`: Incoming packets dropped by the firewall.
-- `instance_name`: The name of the VM instance.
-
-[float]
-==== cpu
-
-* `instance.cpu.reserved_cores`: Number of cores reserved on the host of the `instance`.
-- `instance_name`: The name of the VM instance.
-
-* `instance.cpu.utilization`: The fraction of the allocated CPU that is currently in use on the `instance`.
-- `instance_name`: The name of the VM instance.
-
-* `instance.cpu.usage_time`: Usage for all cores in seconds.
-- `instance_name`: The name of the VM instance.
-
-[float]
-==== disk
-
-* `instance.disk.read_bytes_count`: Count of bytes read from disk.
-- `instance_name`: The name of the VM instance.
-- `device_name`: The name of the disk device.
-- `storage_type`: The storage type: `pd-standard`, `pd-ssd`, or `local-ssd`.
-- `device_type`: The disk type: `ephemeral` or `permanent`.
-
-* `instance.disk.read_ops_count`: Count of disk read IO operations.
-- `instance_name`: The name of the VM instance.
-- `device_name`: The name of the disk device.
-- `storage_type`: The storage type: `pd-standard`, `pd-ssd`, or `local-ssd`.
-- `device_type`: The disk type: `ephemeral` or `permanent`.
-
-* `instance.disk.write_bytes_count`: Count of bytes written to disk
-- `instance_name`: The name of the VM instance.
-- `device_name`: The name of the disk device.
-- `storage_type`: The storage type: `pd-standard`, `pd-ssd`, or `local-ssd`.
-- `device_type`: The disk type: `ephemeral` or `permanent`.
-
-* `instance.disk.write_ops_count`: Count of disk write IO operations.
-- `instance_name`: The name of the VM instance.
-- `device_name`: The name of the disk device.
-- `storage_type`: The storage type: `pd-standard`, `pd-ssd`, or `local-ssd`.
-- `device_type`: The disk type: `ephemeral` or `permanent`.
-
-[float]
-==== uptime
-
-* `instance.uptime`: How long the VM has been running, in seconds
-- `instance_name`: The name of the VM instance.
-
-[float]
-==== network
-
-* `instance.network.received_bytes_count`: Count of bytes received from the network
-- `instance_name`: The name of the VM instance.
-- `loadBalanced`: Whether traffic was sent from an L3 loadbalanced IP address assigned to the VM. Traffic that is externally routed from the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
-
-* `instance.network.received_packets_count`: Count of packets received from the network
-- `instance_name`: The name of the VM instance.
-- `loadBalanced`: Whether traffic was sent from an L3 loadbalanced IP address assigned to the VM. Traffic that is externally routed from the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
-
-* `instance.network.sent_bytes_count`: Count of bytes sent over the network
-- `instance_name`: The name of the VM instance.
-- `loadBalanced`: Whether traffic was sent from an L3 loadbalanced IP address assigned to the VM. Traffic that is externally routed from the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
-
-* `instance.network.sent_packets_count`: Count of packets sent over the network
-- `instance_name`: The name of the VM instance.
-- `loadBalanced`: Whether traffic was sent from an L3 loadbalanced IP address assigned to the VM. Traffic that is externally routed from the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
-
-[float]
-==== memory
-* `instance.memory.balloon.ram_size`: The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
-- `instance_name`: The name of the VM instance.
-
-* `instance.memory.balloon.ram_used`: Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
-- `instance_name`: The name of the VM instance.
-
-* `instance.memory.balloon.swap_in_bytes_count`: The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
-- `instance_name`: The name of the VM instance.
-
-* `instance.memory.balloon.swap_out_bytes_count`: The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
-- `instance_name`: The name of the VM instance.
+* `instance_name`: The name of the VM instance.
+Collected with:
+** `gcp.instance.firewall.*`
+** `gcp.instance.cpu.*`
+** `gcp.instance.disk.*`
+** `gcp.instance.memory.*`
+** `gcp.instance.network.*`
+** `gcp.instance.uptime`
+* `device_name`: The name of the disk device.
+Collected with:
+** `gcp.instance.disk.*`
+* `storage_type`: The storage type: `pd-standard`, `pd-ssd`, or `local-ssd`.
+Collected with:
+** `gcp.instance.disk.*`
+* `device_type`: The disk type: `ephemeral` or `permanent`.
+Collected with:
+** `gcp.instance.disk.*`
+* `loadBalanced`: Whether traffic was sent from an L3 loadbalanced IP address assigned to the VM. Traffic that is externally routed from the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
+Collected with:
+** `gcp.instance.network.*`

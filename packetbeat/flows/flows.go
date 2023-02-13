@@ -21,16 +21,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-type Flows struct {
-	worker     *worker
-	table      *flowMetaTable
-	counterReg *counterReg
-}
 
 // Reporter callback type, to report flow events to.
 type Reporter func([]beat.Event)
@@ -42,7 +36,16 @@ const (
 	defaultPeriod  = 10 * time.Second
 )
 
-func NewFlows(pub Reporter, watcher procs.ProcessesWatcher, config *config.Flows) (*Flows, error) {
+// Flows holds and publishes network flow information for running processes.
+type Flows struct {
+	worker     *worker
+	table      *flowMetaTable
+	counterReg *counterReg
+}
+
+// NewFlows returns a Flows publishing to pub after enrichment by the given
+// process watcher. Publication timeout and period are specified by config.
+func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flows) (*Flows, error) {
 	duration := func(s string, d time.Duration) (time.Duration, error) {
 		if s == "" {
 			return d, nil
@@ -101,11 +104,11 @@ func (f *Flows) Get(id *FlowID) *Flow {
 }
 
 func (f *Flows) Start() {
-	f.worker.Start()
+	f.worker.start()
 }
 
 func (f *Flows) Stop() {
-	f.worker.Stop()
+	f.worker.stop()
 }
 
 func (f *Flows) NewInt(name string) (*Int, error) {

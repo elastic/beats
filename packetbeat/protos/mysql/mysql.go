@@ -26,8 +26,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -97,7 +99,7 @@ type mysqlTransaction struct {
 	notes    []string
 	isError  bool
 
-	mysql common.MapStr
+	mysql mapstr.M
 
 	requestRaw  string
 	responseRaw string
@@ -155,7 +157,7 @@ type mysqlPlugin struct {
 	prepareStatementTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 
 	// function pointer for mocking
 	handleMysql func(mysql *mysqlPlugin, m *mysqlMessage, tcp *common.TCPTuple,
@@ -169,8 +171,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &mysqlPlugin{}
 	config := defaultConfig
@@ -186,7 +188,7 @@ func New(
 	return p, nil
 }
 
-func (mysql *mysqlPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *mysqlConfig) error {
+func (mysql *mysqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *mysqlConfig) error {
 	mysql.setFromConfig(config)
 
 	mysql.transactions = common.NewCache(
@@ -732,7 +734,7 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 	trans.query = query
 	trans.method = method
 
-	trans.mysql = common.MapStr{}
+	trans.mysql = mapstr.M{}
 
 	trans.notes = msg.notes
 
@@ -756,7 +758,7 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 
 	}
 	// save json details
-	trans.mysql.Update(common.MapStr{
+	trans.mysql.Update(mapstr.M{
 		"affected_rows": msg.affectedRows,
 		"insert_id":     msg.insertID,
 		"num_rows":      msg.numberOfRows,

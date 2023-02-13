@@ -20,8 +20,8 @@ package fileout
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/file"
 )
 
 type config struct {
@@ -45,7 +45,7 @@ func defaultConfig() config {
 
 func (c *config) Validate() error {
 	if c.NumberOfFiles < 2 || c.NumberOfFiles > file.MaxBackupsLimit {
-		return fmt.Errorf("The number_of_files to keep should be between 2 and %v",
+		return fmt.Errorf("the number_of_files to keep should be between 2 and %v",
 			file.MaxBackupsLimit)
 	}
 

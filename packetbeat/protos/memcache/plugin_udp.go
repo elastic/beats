@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
@@ -144,6 +144,7 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	}
 	if !done {
 		trans.timer = time.AfterFunc(mc.udpConfig.transTimeout, func() {
+			defer logp.Recover("ParseMemcache(UDP) panic during forward")
 			debug("transaction timeout -> forward")
 			mc.onUDPTrans(trans)
 			mc.udpExpTrans.push(trans)
@@ -261,6 +262,9 @@ func (c *udpConnection) killTransaction(t *udpTransaction) {
 }
 
 func (lst *udpExpTransList) push(t *udpTransaction) {
+	if t == nil {
+		return
+	}
 	lst.Lock()
 	defer lst.Unlock()
 	t.next = lst.head

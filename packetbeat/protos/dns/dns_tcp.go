@@ -21,7 +21,7 @@ import (
 	"encoding/binary"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
@@ -54,33 +54,31 @@ type dnsConnectionData struct {
 }
 
 func (dns *dnsPlugin) Parse(pkt *protos.Packet, tcpTuple *common.TCPTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
-	defer logp.Recover("Dns ParseTcp")
+	defer dns.logger.Recover("Dns ParseTcp")
 
-	debugf("Parsing packet addressed with %s of length %d.",
-		pkt.Tuple.String(), len(pkt.Payload))
+	dns.logger.Debugf("dns", "Parsing packet addressed with %s of length %d.", &pkt.Tuple, len(pkt.Payload))
 
-	conn := ensureDNSConnection(private)
+	conn := ensureDNSConnection(private, dns.logger)
 
 	conn = dns.doParse(conn, pkt, tcpTuple, dir)
 	if conn == nil {
 		return nil
 	}
-
 	return conn
 }
 
-func ensureDNSConnection(private protos.ProtocolData) *dnsConnectionData {
+func ensureDNSConnection(private protos.ProtocolData, logger *logp.Logger) *dnsConnectionData {
 	if private == nil {
 		return &dnsConnectionData{}
 	}
 
 	conn, ok := private.(*dnsConnectionData)
 	if !ok {
-		logp.Warn("Dns connection data type error, create new one")
+		logger.Warn("Dns connection data type error, create new one")
 		return &dnsConnectionData{}
 	}
 	if conn == nil {
-		logp.Warn("Unexpected: dns connection data not set, create new one")
+		logger.Warn("Unexpected: dns connection data not set, create new one")
 		return &dnsConnectionData{}
 	}
 
@@ -101,16 +99,15 @@ func (dns *dnsPlugin) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTu
 
 		stream.rawData = append(stream.rawData, payload...)
 		if len(stream.rawData) > tcp.TCPMaxDataInStream {
-			debugf("Stream data too large, dropping DNS stream")
+			dns.logger.Debugf("dns", "Stream data too large, dropping DNS stream")
 			conn.data[dir] = nil
 			return conn
 		}
 	}
 	decodedData, err := stream.handleTCPRawData()
 	if err != nil {
-
-		if err == incompleteMsg {
-			debugf("Waiting for more raw data")
+		if err == incompleteMsg { //nolint:errorlint // incompleteMsg is not wrapped.
+			dns.logger.Debugf("dns", "Waiting for more raw data")
 			return conn
 		}
 
@@ -118,8 +115,7 @@ func (dns *dnsPlugin) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTu
 			dns.publishResponseError(conn, err)
 		}
 
-		debugf("%s addresses %s, length %d", err.Error(),
-			tcpTuple.String(), len(stream.rawData))
+		dns.logger.Debugf("dns", "%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
 
 		// This means that malformed requests or responses are being sent...
 		// TODO: publish the situation also if Request
@@ -176,7 +172,6 @@ func (dns *dnsPlugin) ReceivedFin(tcpTuple *common.TCPTuple, dir uint8, private 
 		return private
 	}
 	stream := conn.data[dir]
-
 	if stream == nil || stream.message == nil {
 		return conn
 	}
@@ -192,8 +187,7 @@ func (dns *dnsPlugin) ReceivedFin(tcpTuple *common.TCPTuple, dir uint8, private 
 		dns.publishResponseError(conn, err)
 	}
 
-	debugf("%s addresses %s, length %d", err.Error(),
-		tcpTuple.String(), len(stream.rawData))
+	dns.logger.Debugf("dns", "%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
 
 	return conn
 }
@@ -213,7 +207,6 @@ func (dns *dnsPlugin) GapInStream(tcpTuple *common.TCPTuple, dir uint8, nbytes i
 	}
 
 	decodedData, err := stream.handleTCPRawData()
-
 	if err == nil {
 		dns.messageComplete(conn, tcpTuple, dir, decodedData)
 		return private, true
@@ -223,9 +216,8 @@ func (dns *dnsPlugin) GapInStream(tcpTuple *common.TCPTuple, dir uint8, nbytes i
 		dns.publishResponseError(conn, err)
 	}
 
-	debugf("%s addresses %s, length %d", err.Error(),
-		tcpTuple.String(), len(stream.rawData))
-	debugf("Dropping the stream %s", tcpTuple.String())
+	dns.logger.Debugf("dns", "%v addresses %s, length %d", err, tcpTuple, len(stream.rawData))
+	dns.logger.Debugf("dns", "Dropping the stream %s", tcpTuple)
 
 	// drop the stream because it is binary Data and it would be unexpected to have a decodable message later
 	return private, true
@@ -243,26 +235,23 @@ func (dns *dnsPlugin) publishResponseError(conn *dnsConnectionData, err error) {
 
 	dataOrigin := conn.prevRequest.data
 	dnsTupleOrigin := dnsTupleFromIPPort(&conn.prevRequest.tuple, transportTCP, dataOrigin.Id)
-	hashDNSTupleOrigin := (&dnsTupleOrigin).hashable()
+	hashDNSTupleOrigin := dnsTupleOrigin.hashable()
 
 	trans := dns.deleteTransaction(hashDNSTupleOrigin)
-
 	if trans == nil { // happens if Parse, Gap or Fin already published the response error
 		return
 	}
 
-	errDNS, ok := err.(*dnsError)
-	if !ok {
-		return
+	if err, ok := err.(*dnsError); ok { //nolint:errorlint // err always comes from handleTCPRawData and is either *dnsError or nil.
+		trans.notes = append(trans.notes, err.responseError())
+
+		// Should we publish the length (bytes_out) of the failed Response?
+		// streamReverse.message.Length = len(streamReverse.rawData)
+		// trans.Response = streamReverse.message
+
+		dns.publishTransaction(trans)
+		dns.deleteTransaction(hashDNSTupleOrigin)
 	}
-	trans.notes = append(trans.notes, errDNS.responseError())
-
-	// Should we publish the length (bytes_out) of the failed Response?
-	// streamReverse.message.Length = len(streamReverse.rawData)
-	// trans.Response = streamReverse.message
-
-	dns.publishTransaction(trans)
-	dns.deleteTransaction(hashDNSTupleOrigin)
 }
 
 // Manages data length prior to decoding the data and manages errors after decoding
@@ -298,6 +287,5 @@ func (stream *dnsStream) handleTCPRawData() (*mkdns.Msg, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return decodedData, nil
 }

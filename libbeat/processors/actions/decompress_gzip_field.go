@@ -26,10 +26,12 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type decompressGzipField struct {
@@ -51,7 +53,7 @@ func init() {
 }
 
 // NewDecompressGzipFields construct a new decompress_gzip_fields processor.
-func NewDecompressGzipFields(c *common.Config) (processors.Processor, error) {
+func NewDecompressGzipFields(c *conf.C) (processors.Processor, error) {
 	config := decompressGzipFieldConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -75,7 +77,9 @@ func (f *decompressGzipField) Run(event *beat.Event) (*beat.Event, error) {
 	err := f.decompressGzipField(event)
 	if err != nil {
 		errMsg := fmt.Errorf("Failed to decompress field in decompress_gzip_field processor: %v", err)
-		f.log.Debug(errMsg.Error())
+		if publisher.LogWithTrace() {
+			f.log.Debug(errMsg.Error())
+		}
 		if f.config.FailOnError {
 			event = backup
 			event.PutValue("error.message", errMsg.Error())
@@ -88,7 +92,7 @@ func (f *decompressGzipField) Run(event *beat.Event) (*beat.Event, error) {
 func (f *decompressGzipField) decompressGzipField(event *beat.Event) error {
 	data, err := event.GetValue(f.config.Field.From)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %v", f.config.Field.From, err)

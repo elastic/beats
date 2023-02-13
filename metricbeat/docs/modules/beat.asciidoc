@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: beat
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/beat/_meta/docs.asciidoc
+
 
 [[metricbeat-module-beat]]
 == Beat module
@@ -26,6 +28,8 @@ NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
 monitoring index instead of the default index typically used by {metricbeat}.
 For more details about the monitoring index, see
 {ref}/config-monitoring-indices.html[Configuring indices for monitoring].
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -65,3 +69,4 @@ include::beat/state.asciidoc[]
 
 include::beat/stats.asciidoc[]
 
+:edit_url!:

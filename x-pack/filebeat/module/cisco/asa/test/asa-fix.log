@@ -9,3 +9,6 @@ Oct 20 2019 15:42:53: %ASA-6-106100: access-list incoming permitted udp dmz2/127
 Oct 20 2019 15:42:54: %ASA-6-106100: access-list incoming permitted udp dmz2/127.2.3.4(56575)(LOCAL\\username) -> inside/127.3.4.5(53) hit-cnt 1 first hit [0x93d0e533, 0x578ef52f]
 Aug  6 2020 11:01:37: %ASA-session-3-106102: access-list dev_inward_client permitted udp for user redacted outside/10.123.123.20(49721) -> inside/10.223.223.40(53) hit-cnt 1 first hit [0x3c8b88c1, 0xbee595c3]
 Aug  6 2020 11:01:38: %ASA-1-106103: access-list filter denied icmp for user joe inside/10.1.2.3(64321) -> outside/1.2.33.40(8080) hit-cnt 1 first hit [0x3c8b88c1, 0xbee595c3]
+Jun 21 2022 11:47:08: %ASA-6-302015: Built inbound UDP connection 7 for outside:81.2.69.142/3424 (81.2.69.142/3424)(LOCAL\alice, 123) to inside:89.160.20.112/9803 (89.160.20.112/9803) (bob)
+Jun 21 2022 11:47:08: %ASA-6-302015: Built inbound UDP connection 7 for outside:81.2.69.142/3424 (81.2.69.142/3424)(LOCAL\alice) to inside:89.160.20.112/9803 (89.160.20.112/9803) (bob)
+Jun 21 2022 11:47:09: %ASA-6-302015: Built inbound UDP connection 7 for outside:81.2.69.142/3424 (81.2.69.142/3424)(LOCAL\alice, 123) to inside:89.160.20.112/9803 (89.160.20.112/9803)(LOCAL\dave, 246) (bob)

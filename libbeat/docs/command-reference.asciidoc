@@ -621,7 +621,7 @@ Lists the modules that are currently enabled and disabled.
 *FLAGS*
 
 *`-h, --help`*::
-Shows help for the `export` command.
+Shows help for the `modules` command.
 
 
 {global-flags}
@@ -834,6 +834,14 @@ Sets up ingest pipelines for configured filesets. {beatname_uc} looks for
 enabled modules in the +{beatname_lc}.yml+ file. If you used the
 <<modules-command,`modules`>> command to enable modules in the `modules.d`
 directory, also specify the `--modules` flag.
+
+*`--enable-all-filesets`*::
+Enables all modules and filesets. This is useful with `--pipelines`
+if you want to load all ingest pipelines. Without this option you
+would have to list every module with the <<modules-command,`modules`>>
+command and enable every fileset within the module with a `-M` option,
+to load all of the ingest pipelines.
+
 endif::[]
 
 *`--index-management`*::

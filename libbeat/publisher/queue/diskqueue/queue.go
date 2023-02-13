@@ -20,13 +20,15 @@ package diskqueue
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // diskQueue is the internal type representing a disk-based implementation
@@ -71,6 +73,9 @@ type diskQueue struct {
 	// The API channel used by diskQueueProducer to write events.
 	producerWriteRequestChan chan producerWriteRequest
 
+	// API channel used by the public Metrics() API to request queue metrics
+	metricsRequestChan chan metricsRequest
+
 	// pendingFrames is a list of all incoming data frames that have been
 	// accepted by the queue and are waiting to be sent to the writer loop.
 	// Segment ids in this list always appear in sorted order, even between
@@ -86,6 +91,16 @@ type diskQueue struct {
 	done chan struct{}
 }
 
+// channel request for metrics from an external client
+type metricsRequest struct {
+	response chan metricsRequestResponse
+}
+
+// metrics response from the disk queue
+type metricsRequestResponse struct {
+	sizeOnDisk uint64
+}
+
 func init() {
 	queue.RegisterQueueType(
 		"disk",
@@ -99,7 +114,7 @@ func init() {
 // queueFactory matches the queue.Factory interface, and is used to add the
 // disk queue to the registry.
 func queueFactory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, _ int, // input queue size param is unused.
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *config.C, _ int, // input queue size param is unused.
 ) (queue.Queue, error) {
 	settings, err := SettingsForUserConfig(cfg)
 	if err != nil {
@@ -155,7 +170,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		// and could also prevent us from creating new ones, so we treat this as a
 		// fatal error on startup rather than quietly providing degraded
 		// performance.
-		return nil, fmt.Errorf("couldn't write to state file: %v", err)
+		return nil, fmt.Errorf("couldn't write to state file: %w", err)
 	}
 
 	// Index any existing data segments to be placed in segments.reading.
@@ -193,6 +208,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 	// events that are still present on disk but were already sent and
 	// acknowledged on a previous run (we probably want to track these as well
 	// in the future.)
+	//nolint:godox // Ignore This
 	// TODO: pass in a context that queues can use to report these events.
 	activeFrameCount := 0
 	for _, segment := range initialSegments {
@@ -219,6 +235,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		deleterLoop: newDeleterLoop(settings),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
+		metricsRequestChan:       make(chan metricsRequest),
 
 		done: make(chan struct{}),
 	}
@@ -266,14 +283,42 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
+	var serializationFormat SerializationFormat
+	if dq.settings.UseProtobuf {
+		serializationFormat = SerializationProtobuf
+	} else {
+		serializationFormat = SerializationCBOR
+	}
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newEventEncoder(),
+		encoder: newEventEncoder(serializationFormat),
 		done:    make(chan struct{}),
 	}
 }
 
-func (dq *diskQueue) Consumer() queue.Consumer {
-	return &diskQueueConsumer{queue: dq, done: make(chan struct{})}
+// Metrics returns current disk metrics
+func (dq *diskQueue) Metrics() (queue.Metrics, error) {
+	respChan := make(chan metricsRequestResponse, 1)
+	req := metricsRequest{response: respChan}
+
+	select {
+	case <-dq.done:
+		return queue.Metrics{}, io.EOF
+	case dq.metricsRequestChan <- req:
+
+	}
+
+	resp := metricsRequestResponse{}
+	select {
+	case <-dq.done:
+		return queue.Metrics{}, io.EOF
+	case resp = <-respChan:
+	}
+
+	maxSize := dq.settings.MaxBufferSize
+	return queue.Metrics{
+		ByteLimit: opt.UintWith(maxSize),
+		ByteCount: opt.UintWith(resp.sizeOnDisk),
+	}, nil
 }

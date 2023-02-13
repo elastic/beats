@@ -24,40 +24,40 @@ import (
 
 var schema = s.Schema{
 	"db":          c.Str("db"),
-	"collections": c.Int("collections"),
-	"objects":     c.Int("objects"),
+	"collections": c.Ifc("collections"),
+	"objects":     c.Ifc("objects"),
 	"avg_obj_size": s.Object{
-		"bytes": c.Int("avgObjSize"),
+		"bytes": c.Ifc("avgObjSize"),
 	},
 	"data_size": s.Object{
-		"bytes": c.Int("dataSize"),
+		"bytes": c.Ifc("dataSize"),
 	},
 	"storage_size": s.Object{
-		"bytes": c.Int("storageSize"),
+		"bytes": c.Ifc("storageSize"),
 	},
-	"num_extents": c.Int("numExtents"),
-	"indexes":     c.Int("indexes"),
+	"num_extents": c.Ifc("numExtents", s.Optional),
+	"indexes":     c.Ifc("indexes"),
 	"index_size": s.Object{
-		"bytes": c.Int("indexSize"),
+		"bytes": c.Ifc("indexSize"),
 	},
 	// mmapv1 only
 	"ns_size_mb": s.Object{
-		"mb": c.Int("nsSizeMB", s.Optional),
+		"mb": c.Ifc("nsSizeMB", s.Optional),
 	},
 	// mmapv1 only
 	"file_size": s.Object{
-		"bytes": c.Int("fileSize", s.Optional),
+		"bytes": c.Ifc("fileSize", s.Optional),
 	},
 	// mmapv1 only
 	"data_file_version": c.Dict("dataFileVersion", s.Schema{
-		"major": c.Int("major"),
-		"minor": c.Int("minor"),
+		"major": c.Ifc("major"),
+		"minor": c.Ifc("minor"),
 	}, c.DictOptional),
 	// mmapv1 only
 	"extent_free_list": c.Dict("extentFreeList", s.Schema{
-		"num": c.Int("num"),
+		"num": c.Ifc("num"),
 		"size": s.Object{
-			"bytes": c.Int("size", s.Optional),
+			"bytes": c.Ifc("size", s.Optional),
 		},
 	}, c.DictOptional),
 }

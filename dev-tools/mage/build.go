@@ -37,6 +37,7 @@ type BuildArgs struct {
 	InputFiles  []string
 	OutputDir   string
 	CGO         bool
+	BuildMode   string // Controls `go build -buildmode`
 	Static      bool
 	Env         map[string]string
 	LDFlags     []string
@@ -61,12 +62,12 @@ func DefaultBuildArgs() BuildArgs {
 	}
 
 	if positionIndependentCodeSupported() {
-		args.ExtraFlags = append(args.ExtraFlags, "-buildmode", "pie")
+		args.BuildMode = "pie"
 	}
 
 	if DevBuild {
 		// Disable optimizations (-N) and inlining (-l) for debugging.
-		args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`)
+		args.ExtraFlags = append(args.ExtraFlags, `-gcflags=all=-N -l`)
 	} else {
 		// Strip all debug symbols from binary (does not affect Go stack traces).
 		args.LDFlags = append(args.LDFlags, "-s")
@@ -129,6 +130,15 @@ func GolangCrossBuild(params BuildArgs) error {
 
 	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
 	defer DockerChown(filepath.Join(params.OutputDir))
+
+	mountPoint, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", mountPoint); err != nil {
+		return err
+	}
+
 	return Build(params)
 }
 
@@ -160,6 +170,9 @@ func Build(params BuildArgs) error {
 		"build",
 		"-o",
 		filepath.Join(params.OutputDir, binaryName),
+	}
+	if params.BuildMode != "" {
+		args = append(args, "-buildmode", params.BuildMode)
 	}
 	args = append(args, params.ExtraFlags...)
 

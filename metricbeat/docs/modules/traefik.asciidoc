@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: traefik
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/traefik/_meta/docs.asciidoc
+
 
 [[metricbeat-module-traefik]]
 == Traefik module
@@ -19,6 +21,8 @@ instance. The Traefik instance must be configured to expose it's HTTP API.
 
 The Traefik metricsets were tested with Traefik 1.6.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -47,3 +51,4 @@ The following metricsets are available:
 
 include::traefik/health.asciidoc[]
 
+:edit_url!:

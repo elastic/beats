@@ -62,10 +62,10 @@ image::./images/metricbeat-aws-ec2-overview.png[]
   session_token: '<session_token>'
   tags_filter:
     - key: "Organization"
-      value: "Engineering"
+      value: ["Engineering", "Product"]
 ----
 
 `tags_filter` can be specified to only collect metrics with certain tag keys/values.
 For example, with the configuration example above, ec2 metricset will only collect
 metrics from EC2 instances that have tag key equals "Organization" and tag value
-equals to "Engineering".
+equals to "Engineering" or "Product".

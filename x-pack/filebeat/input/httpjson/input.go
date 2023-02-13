@@ -14,16 +14,20 @@ import (
 	"time"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -33,7 +37,7 @@ const (
 )
 
 var (
-	userAgent = useragent.UserAgent("Filebeat")
+	userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 	// for testing
 	timeNow = time.Now
@@ -111,9 +115,13 @@ func run(
 		return err
 	}
 
-	requestFactory := newRequestFactory(config.Request, config.Auth, log)
+	requestFactory, err := newRequestFactory(stdCtx, config, log)
+	if err != nil {
+		log.Errorf("Error while creating requestFactory: %v", err)
+		return err
+	}
 	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config.Response, pagination, log)
+	responseProcessor := newResponseProcessor(config, pagination, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()
@@ -149,10 +157,22 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 	// Make retryable HTTP client
 	netHTTPClient, err := config.Request.Transport.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
+		config.Request.KeepAlive.settings(),
 	)
 	if err != nil {
 		return nil, err
+	}
+
+	if config.Request.Tracer != nil {
+		w := zapcore.AddSync(config.Request.Tracer)
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		traceLogger := zap.New(core)
+
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
 	}
 
 	netHTTPClient.CheckRedirect = checkRedirect(config.Request, log)
@@ -207,14 +227,14 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 	}
 }
 
-func makeEvent(body common.MapStr) (beat.Event, error) {
+func makeEvent(body mapstr.M) (beat.Event, error) {
 	bodyBytes, err := json.Marshal(body)
 	if err != nil {
 		return beat.Event{}, err
 	}
 	now := timeNow()
-	fields := common.MapStr{
-		"event": common.MapStr{
+	fields := mapstr.M{
+		"event": mapstr.M{
 			"created": now,
 		},
 		"message": string(bodyBytes),

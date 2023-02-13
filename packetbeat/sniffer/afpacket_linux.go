@@ -32,7 +32,7 @@ import (
 	"github.com/google/gopacket/pcap"
 	"golang.org/x/net/bpf"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type afpacketHandle struct {
@@ -43,9 +43,7 @@ type afpacketHandle struct {
 	device                       string
 }
 
-func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
-	timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error,
-) {
+func newAfpacketHandle(device string, snaplen, block_size, num_blocks int, timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
 	var err error
 	var promiscEnabled bool
 
@@ -161,4 +159,9 @@ func setPromiscMode(device string, enabled bool) error {
 	// and avoid Cgo (pcap)
 	// TODO: replace with x/net/bpf or pcap
 	return syscall.SetLsfPromisc(device, enabled)
+}
+
+// isAfpacketErrTimeout returns whether err is afpacket.ErrTimeout.
+func isAfpacketErrTimeout(err error) bool {
+	return err == afpacket.ErrTimeout
 }

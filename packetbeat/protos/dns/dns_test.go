@@ -34,10 +34,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Test Constants
@@ -83,7 +85,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
-	publish.MarshalPacketbeatFields(&event, nil, nil)
+	_, _ = publish.MarshalPacketbeatFields(&event, nil, nil)
 	e.events = append(e.events, event)
 }
 
@@ -96,7 +98,7 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 	if verbose {
 		level = logp.DebugLevel
 	}
-	logp.DevelopmentSetup(
+	_ = logp.DevelopmentSetup(
 		logp.WithLevel(level),
 		logp.WithSelectors("dns"),
 	)
@@ -106,14 +108,14 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 		callback = store.publish
 	}
 
-	cfg, _ := common.NewConfigFrom(map[string]interface{}{
+	cfg, _ := conf.NewConfigFrom(map[string]interface{}{
 		"ports":               []int{serverPort},
 		"include_authorities": true,
 		"include_additionals": true,
 		"send_request":        true,
 		"send_response":       true,
 	})
-	dns, err := New(false, callback, procs.ProcessesWatcher{}, cfg)
+	dns, err := New(false, callback, &procs.ProcessesWatcher{}, cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -131,7 +133,7 @@ func newPacket(t common.IPPortTuple, payload []byte) *protos.Packet {
 
 // expectResult returns one MapStr result from the Dns results channel. If
 // no result is available then the test fails.
-func expectResult(t testing.TB, e *eventStore) common.MapStr {
+func expectResult(t testing.TB, e *eventStore) mapstr.M {
 	if len(e.events) == 0 {
 		t.Error("No transaction")
 		return nil
@@ -143,13 +145,13 @@ func expectResult(t testing.TB, e *eventStore) common.MapStr {
 }
 
 // Retrieves a map value. The key should be the full dotted path to the element.
-func mapValue(t testing.TB, m common.MapStr, key string) interface{} {
+func mapValue(t testing.TB, m mapstr.M, key string) interface{} {
 	t.Helper()
 	return mapValueHelper(t, m, strings.Split(key, "."))
 }
 
 // Retrieves nested MapStr values.
-func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
+func mapValueHelper(t testing.TB, m mapstr.M, keys []string) interface{} {
 	t.Helper()
 
 	key := keys[0]
@@ -166,9 +168,9 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 		switch typ := value.(type) {
 		default:
 			t.Fatalf("Expected %s to return a MapStr but got %v.", key, value)
-		case common.MapStr:
+		case mapstr.M:
 			return mapValueHelper(t, typ, keys[1:])
-		case []common.MapStr:
+		case []mapstr.M:
 			var values []interface{}
 			for _, m := range typ {
 				values = append(values, mapValueHelper(t, m, keys[1:]))
@@ -184,26 +186,27 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 // The validation provided my this method should only be used on results
 // published where the response packet was "sent".
 // The following fields are validated by this method:
-//     type (must be dns)
-//     src (ip and port)
-//     dst (ip and port)
-//     query
-//     resource
-//     method
-//     dns.id
-//     dns.op_code
-//     dns.flags
-//     dns.response_code
-//     dns.question.class
-//     dns.question.type
-//     dns.question.name
-//     dns.answers_count
-//     dns.answers.data
-//     dns.authorities_count
-//     dns.authorities
-//     dns.additionals_count
-//     dns.additionals
-func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
+//
+//	type (must be dns)
+//	src (ip and port)
+//	dst (ip and port)
+//	query
+//	resource
+//	method
+//	dns.id
+//	dns.op_code
+//	dns.flags
+//	dns.response_code
+//	dns.question.class
+//	dns.question.type
+//	dns.question.name
+//	dns.answers_count
+//	dns.answers.data
+//	dns.authorities_count
+//	dns.authorities
+//	dns.additionals_count
+//	dns.additionals
+func assertMapStrData(t testing.TB, m mapstr.M, q dnsTestMessage) {
 	t.Helper()
 
 	assertRequest(t, m, q)
@@ -257,7 +260,7 @@ func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	}
 }
 
-func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
+func assertRequest(t testing.TB, m mapstr.M, q dnsTestMessage) {
 	t.Helper()
 
 	assert.Equal(t, "dns", mapValue(t, m, "type"))
@@ -280,7 +283,7 @@ func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
 }
 
 // Assert that the specified flags are set.
-func assertFlags(t testing.TB, m common.MapStr, flags []string) {
+func assertFlags(t testing.TB, m mapstr.M, flags []string) {
 	for _, expected := range flags {
 		var key string
 		switch expected {
@@ -325,7 +328,7 @@ func TestRRsToMapStrsWithOPTRecord(t *testing.T) {
 
 	// The OPT record is a pseudo-record so it doesn't become a real record
 	// in our conversion, and there will be 1 entry instead of 2.
-	mapStrs, _ := rrsToMapStrs([]mkdns.RR{o, r}, false)
+	mapStrs, _ := rrsToMapStrs([]mkdns.RR{o, r}, false, logp.NewLogger("dns_test"))
 	assert.Len(t, mapStrs, 1)
 
 	mapStr := mapStrs[0]

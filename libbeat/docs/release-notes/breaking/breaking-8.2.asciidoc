@@ -1,0 +1,19 @@
+[[breaking-changes-8.2]]
+
+=== Breaking changes in 8.2
+++++
+<titleabbrev>8.2</titleabbrev>
+++++
+
+See the <<release-notes,release notes>> for a complete list of breaking changes,
+bug fixes, and enhancements, including changes to beta or experimental
+functionality.
+
+//NOTE: The notable-breaking-changes tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+//tag::notable-breaking-changes[]
+
+There are no breaking changes in this release.
+
+// end::notable-breaking-changes[]

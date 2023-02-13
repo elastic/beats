@@ -32,10 +32,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type jsProcessor struct {
@@ -47,7 +48,7 @@ type jsProcessor struct {
 }
 
 // New constructs a new Javascript processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *config.C) (processors.Processor, error) {
 	conf := defaultConfig()
 	if err := c.Unpack(&conf); err != nil {
 		return nil, err

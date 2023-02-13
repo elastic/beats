@@ -21,6 +21,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike/validator"
 
 	"github.com/stretchr/testify/require"
@@ -31,17 +32,16 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func Test_runPublishJob(t *testing.T) {
-	defineJob := func(fields common.MapStr) func(event *beat.Event) (j []jobs.Job, e error) {
+	defineJob := func(fields mapstr.M) func(event *beat.Event) (j []jobs.Job, e error) {
 		return func(event *beat.Event) (j []jobs.Job, e error) {
 			eventext.MergeEventFields(event, fields)
 			return nil, nil
 		}
 	}
-	simpleJob := defineJob(common.MapStr{"foo": "bar"})
+	simpleJob := defineJob(mapstr.M{"foo": "bar"})
 
 	testCases := []struct {
 		name       string
@@ -58,7 +58,7 @@ func Test_runPublishJob(t *testing.T) {
 		{
 			"one cont",
 			func(event *beat.Event) (j []jobs.Job, e error) {
-				simpleJob(event)
+				_, _ = simpleJob(event)
 				return []jobs.Job{simpleJob}, nil
 			},
 			[]validator.Validator{
@@ -69,10 +69,10 @@ func Test_runPublishJob(t *testing.T) {
 		{
 			"multiple conts",
 			func(event *beat.Event) (j []jobs.Job, e error) {
-				simpleJob(event)
+				_, _ = simpleJob(event)
 				return []jobs.Job{
-					defineJob(common.MapStr{"baz": "bot"}),
-					defineJob(common.MapStr{"blah": "blargh"}),
+					defineJob(mapstr.M{"baz": "bot"}),
+					defineJob(mapstr.M{"blah": "blargh"}),
 				}, nil
 			},
 			[]validator.Validator{
@@ -95,12 +95,9 @@ func Test_runPublishJob(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			client := &MockBeatClient{}
-			queue := runPublishJob(tc.job, &WrappedClient{
-				Publish: client.Publish,
-				Close:   client.Close,
-				wait:    func() {},
-			})
+			pipel := &MockPipeline{}
+			client := pipel.ConnectSync()
+			queue := runPublishJob(tc.job, client)
 			for {
 				if len(queue) == 0 {
 					break
@@ -108,14 +105,14 @@ func Test_runPublishJob(t *testing.T) {
 				tf := queue[0]
 				queue = queue[1:]
 				conts := tf(context.Background())
-				for _, cont := range conts {
-					queue = append(queue, cont)
-				}
+				queue = append(queue, conts...)
 			}
-			client.Close()
+			client.Wait()
+			err := client.Close()
+			require.NoError(t, err)
 
-			require.Len(t, client.publishes, len(tc.validators))
-			for idx, event := range client.publishes {
+			require.Len(t, pipel.PublishedEvents(), len(tc.validators))
+			for idx, event := range pipel.PublishedEvents() {
 				testslike.Test(t, tc.validators[idx], event.Fields)
 			}
 		})

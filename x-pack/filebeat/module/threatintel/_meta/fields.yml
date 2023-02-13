@@ -1,6 +1,6 @@
 - key: threatintel
   title: threatintel
-  release: beta
+  release: ga
   description: >
     Threat intelligence Filebeat Module.
   fields:

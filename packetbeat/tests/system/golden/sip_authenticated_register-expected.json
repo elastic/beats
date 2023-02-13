@@ -9,7 +9,6 @@
         "event.action": "sip-register",
         "event.category": [
             "network",
-            "protocol",
             "authentication"
         ],
         "event.dataset": "sip",
@@ -18,7 +17,8 @@
         "event.original": "REGISTER sip:sip.cybercity.dk SIP/2.0\r\nVia: SIP/2.0/UDP 192.168.1.2;branch=z9hG4bKnp112903503-43a64480192.168.1.2;rport\r\nFrom: <sip:voi18062@sip.cybercity.dk>;tag=6bac55c\r\nTo: <sip:voi18062@sip.cybercity.dk>\r\nCall-ID: 578222729-4665d775@578222732-4665d772\r\nContact:  <sip:voi18062@192.168.1.2:5060;line=aca6b97ca3f5e51a>;expires=1200;q=0.500\r\nExpires: 1200\r\nCSeq: 75 REGISTER\r\nContent-Length: 0\r\nAuthorization: Digest username=\"voi18062\",realm=\"sip.cybercity.dk\",uri=\"sip:192.168.1.2\",nonce=\"1701b22972b90f440c3e4eb250842bb\",opaque=\"1701a1351f70795\",nc=\"00000001\",response=\"79a0543188495d288c9ebbe0c881abdc\"\r\nMax-Forwards: 70\r\nUser-Agent: Nero SIPPS IP Phone Version 2.0.51.16\r\n\r\n",
         "event.sequence": 75,
         "event.type": [
-            "info"
+            "info",
+            "protocol"
         ],
         "network.application": "sip",
         "network.community_id": "1:dOa61R2NaaJsJlcFAiMIiyXX+Kk=",
@@ -85,8 +85,7 @@
         "destination.port": 5060,
         "event.action": "sip-register",
         "event.category": [
-            "network",
-            "protocol"
+            "network"
         ],
         "event.dataset": "sip",
         "event.duration": 0,
@@ -95,7 +94,8 @@
         "event.reason": "Trying",
         "event.sequence": 75,
         "event.type": [
-            "info"
+            "info",
+            "protocol"
         ],
         "network.application": "sip",
         "network.community_id": "1:dOa61R2NaaJsJlcFAiMIiyXX+Kk=",
@@ -148,8 +148,7 @@
         "destination.port": 5060,
         "event.action": "sip-register",
         "event.category": [
-            "network",
-            "protocol"
+            "network"
         ],
         "event.dataset": "sip",
         "event.duration": 0,
@@ -159,7 +158,8 @@
         "event.reason": "OK",
         "event.sequence": 75,
         "event.type": [
-            "info"
+            "info",
+            "protocol"
         ],
         "network.application": "sip",
         "network.community_id": "1:dOa61R2NaaJsJlcFAiMIiyXX+Kk=",

@@ -9,8 +9,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // ContainerOutputConfig has all the options we'll expect from --log-opts
@@ -60,7 +60,7 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 }
 
 // CreateConfig converts the struct into a config object that can be absorbed by libbeat
-func (cfg ContainerOutputConfig) CreateConfig() (*common.Config, error) {
+func (cfg ContainerOutputConfig) CreateConfig() (*config.C, error) {
 
 	// the use of typeconv is a hacky shim so we can impliment `omitempty` where needed.
 	var tmp map[string]interface{}
@@ -68,7 +68,7 @@ func (cfg ContainerOutputConfig) CreateConfig() (*common.Config, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error converting config struct to interface")
 	}
-	cfgFinal, err := common.NewConfigFrom(tmp)
+	cfgFinal, err := config.NewConfigFrom(tmp)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating config object")
 	}

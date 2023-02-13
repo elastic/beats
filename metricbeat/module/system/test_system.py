@@ -43,7 +43,9 @@ SYSTEM_CORE = {
 }
 SYSTEM_CORE[metricbeat.P_DARWIN] = SYSTEM_CORE[metricbeat.P_WIN] + ["nice.pct"]
 SYSTEM_CORE[metricbeat.P_LINUX] = SYSTEM_CORE[metricbeat.P_DARWIN] + \
-    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct"]
+    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct",
+     "model_name", "model_number", "mhz",
+     "core_id", "physical_id"]
 
 SYSTEM_CORE_ALL = {
     metricbeat.P_WIN: SYSTEM_CORE[metricbeat.P_WIN] + ["idle.ticks", "system.ticks", "user.ticks",
@@ -78,7 +80,7 @@ SYSTEM_FILESYSTEM = {
                                     "used.pct"]
 }
 SYSTEM_FILESYSTEM[metricbeat.P_DEF] = SYSTEM_FILESYSTEM[metricbeat.P_WIN] + \
-    ["files", "free_files"]
+    ["files", "free_files", "options"]
 
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
@@ -280,7 +282,6 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         for evt in output:
-            print(evt)
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
             self.assert_fields_for_platform(SYSTEM_FILESYSTEM, filesystem)

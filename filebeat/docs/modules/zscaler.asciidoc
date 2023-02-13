@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/zscaler/_meta/docs.asciidoc
+
 [[filebeat-module-zscaler]]
 [role="xpack"]
 
@@ -12,7 +14,13 @@ This file is generated! See scripts/docs_collector.py
 
 experimental[]
 
+//temporarily override modulename to create working link
+:modulename: zscaler_zia
+
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: zscaler
 
 This is a module for receiving Zscaler NSS logs over Syslog or a file.
 
@@ -79,3 +87,4 @@ will be found under `rsa.raw`. The default is false.
 For a description of each field in the module, see the
 <<exported-fields-zscaler,exported fields>> section.
 
+:edit_url!:

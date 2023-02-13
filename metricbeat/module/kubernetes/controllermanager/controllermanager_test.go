@@ -24,17 +24,21 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
-
-const testFile = "_meta/test/metrics"
 
 func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "controllermanager",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.controllermanager.1.14",
-				ExpectedFile: "./_meta/test/metrics.controllermanager.1.14.expected",
+				MetricsFile:  "./_meta/test/metrics.1.25",
+				ExpectedFile: "./_meta/test/metrics.1.25.expected",
 			},
 		},
 	)
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "controllermanager")
 }

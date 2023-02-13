@@ -32,15 +32,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	sock "github.com/elastic/beats/v7/metricbeat/helper/socket"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
-	directionIs := func(direction string) func(e common.MapStr) bool {
-		return func(e common.MapStr) bool {
+	directionIs := func(direction string) func(e mapstr.M) bool {
+		return func(e mapstr.M) bool {
 			v, err := e.GetValue("network.direction")
 			return err == nil && v == direction
 		}
@@ -110,7 +110,7 @@ func TestFetch(t *testing.T) {
 		s, err := root.GetValue("system.socket")
 		require.NoError(t, err)
 
-		fields, ok := s.(common.MapStr)
+		fields, ok := s.(mapstr.M)
 		require.True(t, ok)
 
 		port, ok := getRequiredValue(t, "local.port", fields).(int)
@@ -151,7 +151,7 @@ func TestFetch(t *testing.T) {
 	assert.True(t, found, "listener not found")
 }
 
-func getRequiredValue(t testing.TB, key string, m common.MapStr) interface{} {
+func getRequiredValue(t testing.TB, key string, m mapstr.M) interface{} {
 	v, err := m.GetValue(key)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get value for key '%s'", key))

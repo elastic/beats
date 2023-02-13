@@ -22,11 +22,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/config"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type Config struct {
@@ -68,7 +68,7 @@ func defaultConfig() Config {
 	}
 }
 
-func readConfig(cfg *common.Config, info beat.Info) (*Config, error) {
+func readConfig(cfg *config.C, info beat.Info) (*Config, error) {
 	c := defaultConfig()
 
 	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")

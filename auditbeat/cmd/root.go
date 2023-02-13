@@ -24,11 +24,11 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -46,8 +46,8 @@ var ShowCmd = &cobra.Command{
 }
 
 // withECSVersion is a modifier that adds ecs.version to events.
-var withECSVersion = processing.WithFields(common.MapStr{
-	"ecs": common.MapStr{
+var withECSVersion = processing.WithFields(mapstr.M{
+	"ecs": mapstr.M{
 		"version": ecs.Version,
 	},
 })

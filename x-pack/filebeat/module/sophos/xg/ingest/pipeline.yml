@@ -1,22 +1,29 @@
-description: Pipeline for parsing sophosxg firewall logs
+---
+description: Pipeline for parsing Sophos XG firewall logs.
 processors:
 - set:
     field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- grok:
-    field: message
-    patterns:
-    - '%{SYSLOG5424PRI}(%{SYSLOGTIMESTAMP} %{NOTSPACE} )?%{GREEDYDATA:log.original}$'
+    copy_from: _ingest.timestamp
 
-# optimize fields / strings in log.original for KV processor
-- gsub:
-    field: log.original
-    pattern: "clients_conn_SSID"
-    replacement: 'clients_conn_ssid'
+- set:
+    field: ecs.version
+    value: '8.0.0'
+
+- set:
+    field: event.original
+    copy_from: message
+    override: false
+- grok:
+    field: event.original
+    patterns:
+    - '^%{SYSLOG5424PRI}(%{SYSLOGTIMESTAMP} %{NOTSPACE} )?%{GREEDYDATA:message}$'
+    - '^%{SYSLOG5424PRI}%{GREEDYDATA:message}$'
+    - '^%{SYSLOGTIMESTAMP} %{HOSTNAME:observer.hostname} %{GREEDYDATA:message}$'
+    - '%{GREEDYDATA:message}$'
 
 # split Sophos-XG fields
 - kv:
-    field: log.original
+    field: message
     field_split: " (?=[a-zA-Z0-9_]+=)"
     value_split: "="
     prefix: "sophos.xg."
@@ -24,19 +31,29 @@ processors:
     ignore_failure: false
     trim_value: "\""
 
+- script:
+    description: Lowercase sophos.xg key name names.
+    tag: lowercase-sophos-keys
+    if: ctx.sophos?.xg != null
+    source: |
+      def lowercaseMap = [:];
+      for(def entry : ctx.sophos.xg.entrySet()){
+        lowercaseMap.put(entry.getKey().toLowerCase(), entry.getValue());
+      }
+      ctx.sophos.xg = lowercaseMap;
+
 # Parse the date
 - set:
     field: _temp_.time
     value: "{{sophos.xg.date}} {{sophos.xg.time}}"
-    if: "ctx?.sophos?.xg?.date != null && ctx?.sophos?.xg?.time != null"
-
+    if: ctx.sophos?.xg?.date != null && ctx.sophos?.xg?.time != null
 - set:
     field: _temp_.time
-    value: "{{sophos.xg.timestamp}}"
+    copy_from: sophos.xg.timestamp
     ignore_empty_value: true
-
+    if: ctx._temp_?.time == null
 - date:
-    if: "ctx?.event?.timezone == null && ctx._temp_?.time != null"
+    if: ctx._temp_?.time != null && ctx.event?.timezone == null
     field: _temp_.time
     target_field: "@timestamp"
     formats:
@@ -44,33 +61,11 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
-    - UNIX
 - date:
-    if: "ctx?.event?.timezone != null && ctx._temp_?.time != null"
+    if: ctx._temp_?.time != null && ctx.event?.timezone != null
     timezone: "{{ event.timezone }}"
     field: _temp_.time
     target_field: "@timestamp"
-    formats:
-    - yyyy-MM-dd HH:mm:ss
-    - yyyy-MM-dd HH:mm:ss Z
-    - yyyy-MM-dd HH:mm:ss z
-    - ISO8601
-    - UNIX
-
-- date:
-    if: "ctx?.event.timezone == null && ctx?.sophos?.xg?.eventtime != null"
-    field: sophos.xg.eventtime
-    target_field: sophos.xg.eventtime
-    formats:
-    - yyyy-MM-dd HH:mm:ss
-    - yyyy-MM-dd HH:mm:ss Z
-    - yyyy-MM-dd HH:mm:ss z
-    - ISO8601
-- date:
-    if: "ctx.event.timezone != null && ctx?.sophos?.xg?.eventtime != null"
-    timezone: "{{ event.timezone }}"
-    field: sophos.xg.eventtime
-    target_field: sophos.xg.eventtime
     formats:
     - yyyy-MM-dd HH:mm:ss
     - yyyy-MM-dd HH:mm:ss Z
@@ -80,7 +75,7 @@ processors:
 # Sets starts, end and duration when start and duration is known
 - script:
     lang: painless
-    if: ctx?.sophos?.xg?.duration != null
+    if: ctx.sophos?.xg?.duration != null
     source: >-
       ctx.event.duration = Integer.parseInt(ctx.sophos.xg.duration) * 1000000000L;
       ctx.event.start = ctx['@timestamp'];
@@ -89,6 +84,8 @@ processors:
 
 # Removes all empty fields
 - script:
+    description: Remove empty fields.
+    tag: remove-empty-fields
     lang: painless
     params:
       values:
@@ -96,70 +93,77 @@ processors:
         - "-"
         - "N/A"
     source: >-
-      ctx?.sophos?.xg.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+      ctx.sophos?.xg.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
 
 #######################
 ## ECS Event Mapping ##
 #######################
-- set:
-    field: event.module
-    value: sophos
-- set:
-    field: event.dataset
-    value: sophos.xg
-- set:
-    field: event.severity
-    value: "{{sophos.xg.log_id}}"
-- rename:
-    field: log.original
-    target_field: event.original
-    ignore_missing: true
 
-# extract from event_severity from log_id, example: 010101600001"
+# log_id consists of (example: 010101600001):
+#   log type: 2 digits
+#   log component: 2 digits
+#   log subtype: 2 digits
+#   severity: 1 digit
+#   message ID: 5 digits
 - gsub:
+    description: Set event.severity from log_id.
+    field: sophos.xg.log_id
+    target_field: event.severity
+    pattern: '^.{6}(.).*$'
+    replacement: '$1'
+    ignore_failure: true
+- convert:
     field: event.severity
-    pattern: "(^.{1,6})"
-    replacement: ""
+    type: long
+    ignore_missing: true
 - gsub:
-    field: event.severity
-    pattern: "(.{1,5}$)"
-    replacement: ""
+    description: Set event.code from log_id.
+    field: sophos.xg.log_id
+    target_field: event.code
+    pattern: '^.{7}(.{5})$'
+    replacement: '$1'
+    ignore_failure: true
 
 #####################
 ## ECS Log Mapping ##
 #####################
 - set:
-    field: "log.level"
-    if: "ctx.event.severity == '0' "
+    if: ctx.event?.severity == 0
+    field: log.level
     value: unknown
 - set:
-    field: "log.level"
-    if: "ctx.event.severity == '1' "
+    if: ctx.event?.severity == 1
+    field: log.level
     value: alert
 - set:
-    field: "log.level"
-    if: "ctx.event.severity == '2' "
+    if: ctx.event?.severity == 2
+    field: log.level
     value: critical
 - set:
-    field: "log.level"
-    if: "ctx.event.severity == '3' "
+    if: ctx.event?.severity == 3
+    field: log.level
     value: error
 - set:
-    field: "log.level"
-    if: "ctx.event.severity == '4' "
+    if: ctx.event?.severity == 4
+    field: log.level
     value: warning
 - set:
-    field: "log.level"
-    if: "ctx.event.severity == '5' "
+    if: ctx.event?.severity == 5
+    field: log.level
     value: notification
 - set:
-    field: "log.level"
-    if: "ctx.event.severity == '6' "
+    if: ctx.event?.severity == 6
+    field: log.level
     value: informational
 - set:
-    field: "log.level"
-    if: "ctx.event.severity == '7' "
+    if: ctx.event?.severity == 7
+    field: log.level
     value: debug
+
+- set:
+    field: log.level
+    copy_from: sophos.xg.severity
+    ignore_empty_value: true
 
 ##########################
 ## ECS Observer Mapping ##
@@ -178,6 +182,10 @@ processors:
     target_field: observer.serial_number
     ignore_missing: true
 - rename:
+    field: sophos.xg.device_serial_id
+    target_field: observer.serial_number
+    ignore_missing: true
+- rename:
     field: sophos.xg.out_interface
     target_field: observer.egress.interface.name
     ignore_missing: true
@@ -186,27 +194,28 @@ processors:
     target_field: observer.ingress.interface.name
     ignore_missing: true
 - rename:
-    field: sophos.xg.srczonetype
+    field: sophos.xg.srczone
     target_field: observer.ingress.zone
     ignore_missing: true
 - rename:
-    field: sophos.xg.dstzonetype
+    field: sophos.xg.src_zone
+    target_field: observer.ingress.zone
+    ignore_missing: true
+- rename:
+    field: sophos.xg.dstzone
     target_field: observer.egress.zone
     ignore_missing: true
-
-# extract from log_id the new field "sophos.xg.message_id"
-- set:
-    field: sophos.xg.message_id
-    value: "{{sophos.xg.log_id}}"
-    ignore_empty_value: true
-- gsub:
-    field: sophos.xg.message_id
-    pattern: "(^.{1,7})"
-    replacement: ""
-    ignore_failure: true
 - rename:
-    field: sophos.xg.log_id
-    target_field: event.code
+    field: sophos.xg.dst_zone
+    target_field: observer.egress.zone
+    ignore_missing: true
+- rename:
+    field: sophos.xg.srczonetype
+    target_field: sophos.xg.src_zone_type
+    ignore_missing: true
+- rename:
+    field: sophos.xg.dstzonetype
+    target_field: sophos.xg.dst_zone_type
     ignore_missing: true
 
 ###################
@@ -214,24 +223,24 @@ processors:
 ###################
 - script:
     lang: painless
-    if: ctx?.observer?.serial_number != null
+    if: ctx.observer?.serial_number != null
     source: >-
         def conf = ctx['_conf'];
         if (conf == null) return;
         def serial = ctx.observer.serial_number;
+        def mappings = conf.mappings;
+        if (mappings == null) return;
         def name = conf['default'];
-        for (def item : conf.mappings) {
-            if (item.serial == serial) {
-                name = item.hostname;
-                break;
-            }
+        for (def item : mappings) {
+          if (item.serial_number == serial) {
+            name = item.hostname;
+            break;
+          }
         }
-        ctx["host"]["name"] = name;
-- append:
-    field: related.hosts
-    value: '{{host.name}}'
-    allow_duplicates: false
-    if: 'ctx.host?.name != null'
+        if (ctx.host == null) {
+          ctx.host = new HashMap();
+        }
+        ctx.host.name = name;
 
 #############
 ## Cleanup ##
@@ -243,11 +252,10 @@ processors:
     - _conf
     - sophos.xg.date
     - sophos.xg.time
+    - sophos.xg.timestamp
     - sophos.xg.duration
     - sophos.xg.timezone
     - sophos.xg.dir_disp
-    - sophos.xg.srczone
-    - sophos.xg.dstzone
     - sophos.xg.log_occurrence
     - sophos.xg.nat_rule_id
     - sophos.xg.in_display_interface
@@ -255,24 +263,86 @@ processors:
     - syslog5424_pri
     ignore_missing: true
 
+- convert:
+    field: sophos.xg.sent_bytes
+    target_field: source.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.sent_bytes != null"
+- convert:
+    field: sophos.xg.bytes_sent
+    target_field: source.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.bytes_sent != null"
+- convert:
+    field: sophos.xg.recv_bytes
+    target_field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.recv_bytes != null"
+- convert:
+    field: sophos.xg.bytes_received
+    target_field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.bytes_received != null"
+
+#############################
+## ECS Source/Destination MAC
+#############################
+- rename:
+    field: sophos.xg.src_mac
+    target_field: source.mac
+    ignore_failure: true
+- uppercase:
+    field: source.mac
+    ignore_missing: true
+- gsub:
+    field: source.mac
+    pattern: '[-:. ]'
+    replacement: ''
+    ignore_missing: true
+- gsub:
+    field: source.mac
+    pattern: '(..)(?!$)'
+    replacement: '$1-'
+    ignore_missing: true
+
+- rename:
+    field: sophos.xg.dst_mac
+    target_field: destination.mac
+    ignore_failure: true
+- uppercase:
+    field: destination.mac
+    ignore_missing: true
+- gsub:
+    field: destination.mac
+    pattern: '[-:.]'
+    replacement: ''
+    ignore_missing: true
+- gsub:
+    field: destination.mac
+    pattern: '(..)(?!$)'
+    replacement: '$1-'
+    ignore_missing: true
+
 ###############################
-## Product Speific Pipelines ##
+## Product Specific Pipelines ##
 ###############################
 - pipeline:
-    name: '{< IngestPipeline "firewall" >}'
-    if: "ctx.sophos?.xg?.log_type == 'Firewall'"
-- pipeline:
-    name: '{< IngestPipeline "idp" >}'
-    if: "ctx.sophos?.xg?.log_type == 'IDP'"
-- pipeline:
-    name: '{< IngestPipeline "atp" >}'
-    if: "ctx.sophos?.xg?.log_type == 'ATP'"
+    name: '{< IngestPipeline "antispam" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Anti-Spam'"
 - pipeline:
     name: '{< IngestPipeline "antivirus" >}'
     if: "ctx.sophos?.xg?.log_type == 'Anti-Virus'"
 - pipeline:
-    name: '{< IngestPipeline "sandstorm" >}'
-    if: "ctx.sophos?.xg?.log_type == 'Sandbox'"
+    name: '{< IngestPipeline "atp" >}'
+    if: "ctx.sophos?.xg?.log_type == 'ATP'"
 - pipeline:
     name: '{< IngestPipeline "cfilter" >}'
     if: "ctx.sophos?.xg?.log_type == 'Content Filtering'"
@@ -280,19 +350,223 @@ processors:
     name: '{< IngestPipeline "event" >}'
     if: "ctx.sophos?.xg?.log_type == 'Event'"
 - pipeline:
-    name: '{< IngestPipeline "waf" >}'
-    if: "ctx.sophos?.xg?.log_type == 'WAF'"
+    name: '{< IngestPipeline "firewall" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Firewall'"
 - pipeline:
-    name: '{< IngestPipeline "antispam" >}'
-    if: "ctx.sophos?.xg?.log_type == 'Anti-Spam'"
+    name: '{< IngestPipeline "idp" >}'
+    if: "ctx.sophos?.xg?.log_type == 'IDP'"
+- pipeline:
+    name: '{< IngestPipeline "sandstorm" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Sandbox'"
 - pipeline:
     name: '{< IngestPipeline "systemhealth" >}'
     if: "ctx.sophos?.xg?.log_type == 'System Health'"
 - pipeline:
+    name: '{< IngestPipeline "waf" >}'
+    if: "ctx.sophos?.xg?.log_type == 'WAF'"
+- pipeline:
     name: '{< IngestPipeline "wifi" >}'
     if: "ctx.sophos?.xg?.log_type == 'Wireless Protection'"
 
+##################
+# GeoIP Enrichment
+##################
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+- geoip:
+    field: source.nat.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.nat.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.nat.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+    if: "ctx.source?.as == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.nat.ip
+    target_field: destination.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+    if: "ctx.destination?.as == null"
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+
+##############
+## ECS Network
+##############
+- lowercase:
+    field: network.protocol
+    ignore_failure: true
+- set:
+    description: Rename pops network.protocol to pop3s.
+    if: ctx.network?.protocol == "pops"
+    field: network.protocol
+    value: pop3s
+- lowercase:
+    field: network.transport
+    ignore_failure: true
+- script:
+    lang: painless
+    source: "ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes"
+    if: "ctx.source?.bytes != null && ctx.destination?.bytes != null"
+    ignore_failure: true
+- script:
+    lang: painless
+    source: "ctx.network.packets = ctx.source.packets + ctx.destination.packets"
+    if: "ctx.source?.packets != null && ctx.destination?.packets != null"
+    ignore_failure: true
+- community_id:
+    ignore_failure: true
+
+####################
+## ECS Related Hosts
+####################
+- append:
+    if: ctx.host?.name != null
+    field: related.hosts
+    value: '{{{host.name}}}'
+    allow_duplicates: false
+- append:
+    if: ctx.url?.domain != null
+    field: related.hosts
+    value: '{{{url.domain}}}'
+    allow_duplicates: false
+- append:
+    if: ctx.source?.domain != null
+    field: related.hosts
+    value: '{{{source.domain}}}'
+    allow_duplicates: false
+- append:
+    if: ctx.destination?.domain != null
+    field: related.hosts
+    value: '{{{destination.domain}}}'
+    allow_duplicates: false
+
+#################
+## ECS Related IP
+#################
+- append:
+    if: ctx.source?.ip != null
+    field: related.ip
+    value: '{{{source.ip}}}'
+    allow_duplicates: false
+- append:
+    if: ctx.destination?.ip != null
+    field: related.ip
+    value: '{{{destination.ip}}}'
+    allow_duplicates: false
+- append:
+    if: ctx.source?.nat?.ip != null
+    field: related.ip
+    value: '{{{source.nat.ip}}}'
+    allow_duplicates: false
+- append:
+    if: ctx.destination?.nat?.ip != null
+    field: related.ip
+    value: '{{{destination.nat.ip}}}'
+    allow_duplicates: false
+
+###################
+## ECS Related User
+###################
+- append:
+    if: ctx.source?.user?.name != null
+    field: related.user
+    value: "{{{source.user.name}}}"
+    allow_duplicates: false
+
+###################
+## ECS Related Hash
+###################
+- append:
+    if: ctx.file?.hash?.sha1 != null
+    field: related.hash
+    value: "{{{file.hash.sha1}}}"
+    allow_duplicates: false
+- append:
+    if: ctx.file?.hash?.sha256 != null
+    field: related.hash
+    value: "{{{file.hash.sha256}}}"
+    allow_duplicates: false
+
+#############
+## Cleanup ##
+#############
+- rename:
+    field: sophos.xg.reason
+    target_field: event.reason
+    ignore_failure: true
+
+- remove:
+    field:
+      - sophos.xg.bytes_received
+      - sophos.xg.bytes_sent
+      - sophos.xg.dst_country
+      - sophos.xg.in_display_interface
+      - sophos.xg.out_display_interface
+      - sophos.xg.recv_bytes
+      - sophos.xg.sent_bytes
+      - sophos.xg.severity
+      - sophos.xg.src_country
+    ignore_missing: true
+- remove:
+    field: event.original
+    if: "ctx.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+    ignore_failure: true
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+    value: |-
+      Processor "{{ _ingest.on_failure_processor_type }}" with tag "{{ _ingest.on_failure_processor_tag }}" failed with message "{{ _ingest.on_failure_message }}"

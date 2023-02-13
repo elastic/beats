@@ -129,6 +129,24 @@ pull_request_rules:
         - files~=^\.mergify\.yml$
     actions:
       delete_head_branch:
+  - name: notify the backport policy
+    conditions:
+      - -label~=^backport
+      - base=main
+      - -merged
+      - -closed
+    actions:
+      comment:
+        message: |
+          This pull request does not have a backport label.
+          If this is a bug or security fix, could you label this PR @{{author}}? 🙏.
+          For such, you'll need to label your PR with:
+          * The upcoming major version of the Elastic Stack
+          * The upcoming minor version of the Elastic Stack (if you're not pushing a breaking change)
+
+          To fixup this pull request, you need to add the backport labels for the needed
+          branches, such as:
+          * `backport-v8./d.0` is the label to automatically backport to the `8./d` branch. `/d` is the digit
   - name: notify the backport has not been merged yet
     conditions:
       - -merged
@@ -141,72 +159,6 @@ pull_request_rules:
       comment:
         message: |
           This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
-  - name: notify the backport policy
-    conditions:
-      - -label~=^backport
-      - base=main
-      - -merged
-      - -closed
-    actions:
-      comment:
-        message: |
-          This pull request does not have a backport label. Could you fix it @{{author}}? 🙏
-          To fixup this pull request, you need to add the backport labels for the needed
-          branches, such as:
-          * `backport-v./d./d./d` is the label to automatically backport to the `7./d` branch. `/d` is the digit
-
-          **NOTE**: `backport-skip` has been added to this pull request.
-      label:
-        add:
-          - backport-skip
-  - name: remove-backport label
-    conditions:
-      - label~=backport-v
-      - -merged
-      - -closed
-    actions:
-      label:
-        remove:
-          - backport-skip
-  - name: backport patches to 7.14 branch
-    conditions:
-      - merged
-      - label=backport-v7.14.0
-    actions:
-      backport:
-        assignees:
-          - "{{ author }}"
-        branches:
-          - "7.14"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-  - name: backport patches to 7.15 branch
-    conditions:
-      - merged
-      - label=backport-v7.15.0
-    actions:
-      backport:
-        assignees:
-          - "{{ author }}"
-        branches:
-          - "7.15"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-  - name: backport patches to 7.16 branch
-    conditions:
-      - merged
-      - label=backport-v7.16.0
-    actions:
-      backport:
-        assignees:
-          - "{{ author }}"
-        branches:
-          - "7.16"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 7.17 branch
     conditions:
       - merged
@@ -220,29 +172,42 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-  - name: backport patches to 8.0 branch
+  - name: backport patches to 8.3 branch
     conditions:
       - merged
-      - label=backport-v8.0.0
+      - label=backport-v8.3.0
     actions:
       backport:
         assignees:
           - "{{ author }}"
         branches:
-          - "8.0"
+          - "8.3"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-  - name: backport patches to 8.1 branch
+  - name: backport patches to 8.4 branch
     conditions:
       - merged
-      - label=backport-v8.1.0
+      - label=backport-v8.4.0
     actions:
       backport:
         assignees:
           - "{{ author }}"
         branches:
-          - "8.1"
+          - "8.4"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.5 branch
+    conditions:
+      - merged
+      - label=backport-v8.5.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.5"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

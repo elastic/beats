@@ -59,6 +59,8 @@ func IntegTest() {
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
+// Uses the docker integration test runner. Prefer the new-style devtools.GoIntegTestFromHost
+// target which allows running tests from the host system instead of from inside a container.
 func GoIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(goTestDeps...)
@@ -76,6 +78,8 @@ func GoIntegTest(ctx context.Context) error {
 // environment (Docker).
 // Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.
 // Use any other PYTEST_* environment variable to influence the behavior of pytest.
+// Uses the docker integration test runner. Prefer the new-style devtools.PythonIntegTestFromHost
+// target which allows running tests from the host system instead of from inside a container.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(pythonTestDeps...)

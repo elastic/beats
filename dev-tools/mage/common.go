@@ -235,6 +235,25 @@ func HaveKubectl() error {
 	return nil
 }
 
+// IsDarwinUniversal indicates whether ot not the darwin/universal should be
+// assembled. If both platforms darwin/adm64 and darwin/arm64 are listed, then
+// IsDarwinUniversal returns true.
+// Note: Platforms might be edited at different moments, therefore it's necessary
+// to perform this check on the fly.
+func IsDarwinUniversal() bool {
+	var darwinAMD64, darwinARM64 bool
+	for _, p := range Platforms {
+		if p.Name == "darwin/arm64" {
+			darwinARM64 = true
+		}
+		if p.Name == "darwin/amd64" {
+			darwinAMD64 = true
+		}
+	}
+
+	return darwinAMD64 && darwinARM64
+}
+
 // FindReplace reads a file, performs a find/replace operation, then writes the
 // output to the same file path.
 func FindReplace(file string, re *regexp.Regexp, repl string) error {
@@ -355,8 +374,9 @@ func unzip(sourceFile, destinationDir string) error {
 	return nil
 }
 
-// Tar compress a directory using tar + gzip algorithms
-func Tar(src string, targetFile string) error {
+// Tar compress a directory using tar + gzip algorithms but without adding
+// the directory
+func TarWithOptions(src string, targetFile string, trimSource bool) error {
 	fmt.Printf(">> creating TAR file from directory: %s, target: %s\n", src, targetFile)
 
 	f, err := os.Create(targetFile)
@@ -390,6 +410,15 @@ func Tar(src string, targetFile string) error {
 		// must provide real name
 		// (see https://golang.org/src/archive/tar/common.go?#L626)
 		header.Name = filepath.ToSlash(file)
+		// Replace the source folder in the files to be compressed
+		if trimSource {
+			header.Name = strings.ReplaceAll(filepath.ToSlash(file), filepath.ToSlash(src), "")
+			header.Name = strings.TrimPrefix(header.Name, "/")
+			if header.Name == "" {
+				fmt.Print(">> skipping root directory\n")
+				return nil
+			}
+		}
 
 		// write header
 		if err := tw.WriteHeader(header); err != nil {
@@ -420,6 +449,11 @@ func Tar(src string, targetFile string) error {
 	}
 
 	return nil
+}
+
+// Tar compress a directory using tar + gzip algorithms
+func Tar(src string, targetFile string) error {
+	return TarWithOptions(src, targetFile, false)
 }
 
 func untar(sourceFile, destinationDir string) error {
@@ -586,7 +620,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 // Parallel runs the given functions in parallel with an upper limit set based
 // on GOMAXPROCS.
 func Parallel(fns ...interface{}) {
-	ParallelCtx(context.Background(), fns...)
+	ParallelCtx(context.TODO(), fns...)
 }
 
 // funcTypeWrap wraps a valid FuncType to FuncContextError

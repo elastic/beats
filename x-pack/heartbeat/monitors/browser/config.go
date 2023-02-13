@@ -2,27 +2,32 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || darwin
+// +build linux darwin
+
 package browser
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func DefaultConfig() *Config {
 	return &Config{
 		Sandbox:     false,
 		Screenshots: "on",
+		Timeout:     15 * time.Minute,
 	}
 }
 
 type Config struct {
 	Schedule  string                 `config:"schedule"`
 	Params    map[string]interface{} `config:"params"`
-	RawConfig *common.Config
+	RawConfig *config.C
 	Source    *source.Source `config:"source"`
 	// Name is optional for lightweight checks but required for browsers
 	Name string `config:"name"`
@@ -32,8 +37,10 @@ type Config struct {
 	Throttling        interface{}                   `config:"throttling"`
 	Screenshots       string                        `config:"screenshots"`
 	SyntheticsArgs    []string                      `config:"synthetics_args"`
+	PlaywrightOpts    map[string]interface{}        `config:"playwright_options"`
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
 	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
+	Timeout           time.Duration                 `config:"timeout"`
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")

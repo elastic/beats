@@ -36,8 +36,10 @@ class TestCAPinning(BaseTest):
                 "host": self.get_elasticsearch_url_ssl(),
                 "user": "admin",
                 "pass": "testing",
+                # Use certificate verification only to avoid validating localhost as the hostname.
+                "ssl_verification_mode": "certificate",
                 "ssl_certificate_authorities": [ca],
-                "ssl_ca_sha256": "8hZS8gpciuzlu+7Xi0sdv8T7RKRRxG1TWKumUQsDam0=",
+                "ssl_ca_sha256": "FDFOtqdUyXZw74YgvAJUC+I67ED1WfcI1qK44Qy2WQM=",
             },
         )
 
@@ -68,6 +70,8 @@ class TestCAPinning(BaseTest):
                 "host": self.get_elasticsearch_url_ssl(),
                 "user": "beats",
                 "pass": "testing",
+                # Use certificate verification only to avoid validating localhost as the hostname.
+                "ssl_verification_mode": "certificate",
                 "ssl_certificate_authorities": [ca],
                 "ssl_ca_sha256": "not-good-sha",
             },

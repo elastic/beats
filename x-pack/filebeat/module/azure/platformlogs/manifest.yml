@@ -9,6 +9,7 @@ var:
   - name: connection_string
   - name: storage_account
   - name: storage_account_key
+  - name: storage_account_container
   - name: resource_manager_endpoint
   - name: tags
     default: [forwarded]

@@ -75,7 +75,6 @@ processors:
       field: event.category
       allow_duplicates: false
       value:
-        - network_traffic
         - network
 on_failure:
   - append:

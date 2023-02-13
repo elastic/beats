@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package synthexec
 
@@ -8,41 +10,47 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const debugSelector = "synthexec"
-
-type StdSuiteFields struct {
-	Name     string
-	Id       string
-	Type     string
-	IsInline bool
-}
 
 type FilterJourneyConfig struct {
 	Tags  []string `config:"tags"`
 	Match string   `config:"match"`
 }
 
-// SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields, extraArgs ...string) (jobs.Job, error) {
-	// Run the command in the given suitePath, use '.' as the first arg since the command runs
+// platformCmdMutate is the hook for OS specific mutation of cmds
+// This is practically just used by synthexec_unix.go to add Sysprocattrs
+// It's still nice for devs to be able to test browser monitors on OSX
+// where these are unsupported
+var platformCmdMutate func(*exec.Cmd) = func(*exec.Cmd) {}
+
+var SynthexecTimeout struct{}
+
+// ProjectJob will run a single journey by name from the given project.
+func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
+	// Run the command in the given projectPath, use '.' as the first arg since the command runs
 	// in the correct dir
-	cmdFactory, err := suiteCommandFactory(suitePath, extraArgs...)
+	cmdFactory, err := projectCommandFactory(projectPath, extraArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,19 +58,19 @@ func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, filte
 	return startCmdJob(ctx, cmdFactory, nil, params, filterJourneys, fields), nil
 }
 
-func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, error) {
-	npmRoot, err := getNpmRoot(suitePath)
+func projectCommandFactory(projectPath string, args ...string) (func() *exec.Cmd, error) {
+	npmRoot, err := getNpmRoot(projectPath)
 	if err != nil {
 		return nil, err
 	}
 
 	newCmd := func() *exec.Cmd {
 		bin := filepath.Join(npmRoot, "node_modules/.bin/elastic-synthetics")
-		// Always put the suite path first to prevent conflation with variadic args!
+		// Always put the project path first to prevent conflation with variadic args!
 		// See https://github.com/tj/commander.js/blob/master/docs/options-taking-varying-arguments.md
 		// Note, we don't use the -- approach because it's cleaner to always know we can add new options
 		// to the end.
-		cmd := exec.Command(bin, append([]string{suitePath}, args...)...)
+		cmd := exec.Command(bin, append([]string{projectPath}, args...)...)
 		cmd.Dir = npmRoot
 		return cmd
 	}
@@ -71,9 +79,9 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, fields StdSuiteFields, extraArgs ...string) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)
+		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...) //nolint:gosec // we are safely building a command here, users can add args at their own risk
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
@@ -82,25 +90,31 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
+		senr := newStreamEnricher(sFields)
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
+			err := senr.enrich(event, &SynthEvent{
+				Type:  "cmd/could_not_start",
+				Error: ECSErrToSynthError(ecserr.NewSyntheticsCmdCouldNotStartErr(err)),
+			})
 			return nil, err
 		}
-		senr := streamEnricher{}
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich, fields)}, nil
+		// We don't just return the readResultsJob, otherwise we'd just send an empty event, execute it right away
+		// then it'll keep executing itself until we're truly done
+		return readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)(event)
 	}
 }
 
 // readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
-func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher, fields StdSuiteFields) jobs.Job {
+func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		se := <-synthEvents
-		err = enrich(event, se, fields)
+		err = enrich(event, se)
 		if se != nil {
-			return []jobs.Job{readResultsJob(ctx, synthEvents, enrich, fields)}, err
+			return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
 		} else {
 			return nil, err
 		}
@@ -113,9 +127,12 @@ func runCmd(
 	ctx context.Context,
 	cmd *exec.Cmd,
 	stdinStr *string,
-	params common.MapStr,
+	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
+	// Attach sysproc attrs to ensure subprocesses are properly killed
+	platformCmdMutate(cmd)
+
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
@@ -136,7 +153,7 @@ func runCmd(
 	}
 
 	// Variant of the command with no params, which could contain sensitive stuff
-	loggableCmd := exec.Command(cmd.Path, cmd.Args...)
+	loggableCmd := exec.Command(cmd.Path, cmd.Args...) //nolint:gosec // we are safely building a command here...
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
 		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
@@ -166,7 +183,11 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			logp.Warn("could not scan stdout events from synthetics: %s", err)
+		}
+
 		wg.Done()
 	}()
 
@@ -176,45 +197,107 @@ func runCmd(
 	}
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		if err != nil {
+			logp.Warn("could not scan stderr events from synthetics: %s", err)
+		}
 		wg.Done()
 	}()
 
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
+		defer jsonReader.Close()
+
+		// We don't use scanToSynthEvents here because all lines here will be JSON
+		// It's more efficient to let the json decoder handle the ndjson than
+		// using the scanner
+		decoder := json.NewDecoder(jsonReader)
+		for {
+			var se SynthEvent
+			err := decoder.Decode(&se)
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if err != nil {
+				logp.L().Warn("error decoding json for test json results: %w", err)
+			}
+
+			mpx.writeSynthEvent(&se)
+		}
+
 		wg.Done()
 	}()
-	err = cmd.Start()
+
+	// This use of channels for results is awkward, but required for the thread locking below
+	cmdStarted := make(chan error)
+	cmdDone := make(chan error)
+	go func() {
+		// We must idle this thread and ensure it is not killed while the external program is running
+		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
+		// could cause the subprocess to die prematurely
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		err = cmd.Start()
+
+		cmdStarted <- err
+
+		err := cmd.Wait()
+		cmdDone <- err
+	}()
+
+	err = <-cmdStarted
 	if err != nil {
 		logp.Warn("Could not start command %s: %s", cmd, err)
 		return nil, err
 	}
 
-	// Kill the process if the context ends
+	// Get timeout from parent ctx
+	timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	go func() {
 		<-ctx.Done()
-		cmd.Process.Kill()
+
+		// ProcessState can be null if it hasn't reported back yet
+		if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
+			return
+		}
+
+		err := cmd.Process.Kill()
+		if err != nil {
+			logp.Warn("could not kill synthetics process: %s", err)
+		}
 	}()
 
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
-		err := cmd.Wait()
-		jsonWriter.Close()
-		jsonReader.Close()
+		err := <-cmdDone
+		_ = jsonWriter.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
+
+		var cmdError *SynthError = nil
 		if err != nil {
-			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
-			mpx.writeSynthEvent(&SynthEvent{
-				Type:                 "cmd/status",
-				Error:                &SynthError{Name: "cmdexit", Message: str},
-				TimestampEpochMicros: float64(time.Now().UnixMicro()),
-			})
+			// err could be generic or it could have been killed by context timeout, log and check context
+			// to decide which error to stream
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
+
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, loggableCmd.String()))
+			} else {
+				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
+			}
 		}
+
+		mpx.writeSynthEvent(&SynthEvent{
+			Type:                 CmdStatus,
+			Error:                cmdError,
+			TimestampEpochMicros: float64(time.Now().UnixMicro()),
+		})
+
 		wg.Wait()
 		mpx.Close()
+		cancel()
 	}()
 
 	return mpx, nil
@@ -223,9 +306,12 @@ func runCmd(
 // scanToSynthEvents takes a reader, a transform function, and a callback, and processes
 // each scanned line via the reader before invoking it with the callback.
 func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text string) (*SynthEvent, error), cb func(*SynthEvent)) error {
+	defer func() {
+		_ = rdr.Close()
+	}()
 	scanner := bufio.NewScanner(rdr)
-	buf := make([]byte, 1024*1024*2)  // 2MiB initial buffer (images can be big!)
-	scanner.Buffer(buf, 1024*1024*40) // Max 50MiB Buffer
+	buf := make([]byte, 1024*10)      // 10KiB initial buffer
+	scanner.Buffer(buf, 1024*1024*10) // Max 10MiB Buffer
 
 	for scanner.Scan() {
 		se, err := transform(scanner.Bytes(), scanner.Text())
@@ -246,8 +332,8 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	return nil
 }
 
-var stdoutToSynthEvent = lineToSynthEventFactory("stdout")
-var stderrToSynthEvent = lineToSynthEventFactory("stderr")
+var stdoutToSynthEvent = lineToSynthEventFactory(Stdout)
+var stderrToSynthEvent = lineToSynthEventFactory(Stderr)
 
 // lineToSynthEventFactory is a factory that can take a line from the scanner and transform it into a *SynthEvent.
 func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
@@ -256,7 +342,7 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
-			Payload: common.MapStr{
+			Payload: mapstr.M{
 				"message": text,
 			},
 		}, nil
@@ -283,7 +369,7 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	if res.Type == "" {
 		return nil, fmt.Errorf("unmarshal succeeded, but no type found for: %s", text)
 	}
-	return
+	return res, err
 }
 
 // getNpmRoot gets the closest ancestor path that contains package.json.

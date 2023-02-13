@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -32,7 +31,6 @@ func init() {
 
 	RootCmd.RemoveCommand(RootCmd.RunCmd)
 	RootCmd.Run = func(_ *cobra.Command, _ []string) {
-		fmt.Println("Functionbeat is going to be removed in 8.1")
 
 		RootCmd.Usage()
 		os.Exit(1)

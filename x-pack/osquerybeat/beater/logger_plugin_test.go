@@ -12,45 +12,45 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/osquery/osquery-go/plugin/logger"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestLoggerPlugin_New(t *testing.T) {
 	validLogger := logp.NewLogger("logger_test")
 
 	tests := []struct {
-		name          string
-		log           *logp.Logger
-		logSnapshotFn HandleSnapshotResultFunc
-		shouldPanic   bool
+		name             string
+		log              *logp.Logger
+		logQueryResultFn HandleQueryResultFunc
+		shouldPanic      bool
 	}{
 		{
-			name:          "invalid",
-			log:           nil,
-			logSnapshotFn: nil,
-			shouldPanic:   true,
+			name:             "invalid",
+			log:              nil,
+			logQueryResultFn: nil,
+			shouldPanic:      true,
 		},
 		{
-			name:          "nologfunc",
-			log:           validLogger,
-			logSnapshotFn: nil,
+			name:             "nologfunc",
+			log:              validLogger,
+			logQueryResultFn: nil,
 		},
 		{
-			name:          "nonempty",
-			log:           validLogger,
-			logSnapshotFn: func(res SnapshotResult) {},
+			name:             "nonempty",
+			log:              validLogger,
+			logQueryResultFn: func(res QueryResult) {},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.shouldPanic {
-				testutil.AssertPanic(t, func() { NewLoggerPlugin(tc.log, tc.logSnapshotFn) })
+				testutil.AssertPanic(t, func() { NewLoggerPlugin(tc.log, tc.logQueryResultFn) })
 				return
 			}
 
-			p := NewLoggerPlugin(tc.log, tc.logSnapshotFn)
+			p := NewLoggerPlugin(tc.log, tc.logQueryResultFn)
 			if p == nil {
 				t.Error("expected nil logger pluggin")
 			}
@@ -61,10 +61,10 @@ func TestLoggerPlugin_New(t *testing.T) {
 func TestLoggerPlugin_Log(t *testing.T) {
 	validLogger := logp.NewLogger("logger_test")
 
-	snapshotFn := func(res SnapshotResult) {
+	queryResultFn := func(res QueryResult) {
 	}
 
-	result := SnapshotResult{
+	result := QueryResult{
 		Action: "foo",
 		Name:   "bar",
 		Hits: []map[string]string{
@@ -83,44 +83,44 @@ func TestLoggerPlugin_Log(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		logSnapshotFn HandleSnapshotResultFunc
-		logType       logger.LogType
-		logMessage    string
-		err           string
+		name             string
+		logQueryResultFn HandleQueryResultFunc
+		logType          logger.LogType
+		logMessage       string
+		err              string
 	}{
 		{
-			name:          "nosnapshot",
-			logSnapshotFn: snapshotFn,
-			logType:       logger.LogTypeString,
-			logMessage:    "",
+			name:             "nosnapshot",
+			logQueryResultFn: queryResultFn,
+			logType:          logger.LogTypeString,
+			logMessage:       "{}",
 		},
 		{
-			name:          "snapshot invalid",
-			logSnapshotFn: snapshotFn,
-			logType:       logger.LogTypeSnapshot,
-			logMessage:    "",
-			err:           "unexpected end of JSON input",
+			name:             "snapshot invalid",
+			logQueryResultFn: queryResultFn,
+			logType:          logger.LogTypeSnapshot,
+			logMessage:       "",
+			err:              "unexpected end of JSON input",
 		},
 		{
-			name:          "snapshot empty",
-			logSnapshotFn: snapshotFn,
-			logType:       logger.LogTypeSnapshot,
-			logMessage:    "{}",
+			name:             "snapshot empty",
+			logQueryResultFn: queryResultFn,
+			logType:          logger.LogTypeSnapshot,
+			logMessage:       "{}",
 		},
 		{
-			name:          "snapshot nonempty",
-			logSnapshotFn: snapshotFn,
-			logType:       logger.LogTypeSnapshot,
-			logMessage:    string(resultbytes),
+			name:             "snapshot nonempty",
+			logQueryResultFn: queryResultFn,
+			logType:          logger.LogTypeSnapshot,
+			logMessage:       string(resultbytes),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			var capturedSnapshot *SnapshotResult
-			p := NewLoggerPlugin(validLogger, func(res SnapshotResult) {
-				capturedSnapshot = &res
+			var capturedQueryResult *QueryResult
+			p := NewLoggerPlugin(validLogger, func(res QueryResult) {
+				capturedQueryResult = &res
 			})
 			err := p.Log(context.Background(), tc.logType, tc.logMessage)
 			if err != nil {
@@ -137,7 +137,7 @@ func TestLoggerPlugin_Log(t *testing.T) {
 					t.Errorf("expected error: %v", tc.err)
 				}
 				if tc.logType == logger.LogTypeSnapshot && tc.logMessage == string(resultbytes) {
-					diff := cmp.Diff(capturedSnapshot, &result)
+					diff := cmp.Diff(capturedQueryResult, &result)
 					if diff != "" {
 						t.Error(diff)
 					}

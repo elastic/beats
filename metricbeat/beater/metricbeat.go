@@ -18,20 +18,19 @@
 package beater
 
 import (
+	"fmt"
 	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	// include all metricbeat specific builders
 	_ "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
@@ -46,6 +45,7 @@ import (
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
 	done         chan struct{}   // Channel used to initiate shutdown.
+	stopOnce     sync.Once       // wraps the Stop() method
 	runners      []module.Runner // Active list of module runners.
 	config       Config
 	autodiscover *autodiscover.Autodiscover
@@ -77,7 +77,7 @@ func WithLightModules() Option {
 // Creator returns a beat.Creator for instantiating a new instance of the
 // Metricbeat framework with the given options.
 func Creator(options ...Option) beat.Creator {
-	return func(b *beat.Beat, c *common.Config) (beat.Beater, error) {
+	return func(b *beat.Beat, c *conf.C) (beat.Beater, error) {
 		return newMetricbeat(b, c, options...)
 	}
 }
@@ -128,10 +128,10 @@ func DefaultTestModulesCreator() beat.Creator {
 }
 
 // newMetricbeat creates and returns a new Metricbeat instance.
-func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbeat, error) {
+func newMetricbeat(b *beat.Beat, c *conf.C, options ...Option) (*Metricbeat, error) {
 	config := defaultConfig
 	if err := c.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "error reading configuration file")
+		return nil, fmt.Errorf("error reading configuration file: %w", err)
 	}
 
 	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.Manager.Enabled()
@@ -219,7 +219,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	// Centrally managed modules
 	factory := module.NewFactory(b.Info, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".modules", modules)
+	reload.RegisterV2.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -273,7 +273,8 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 // Stop should only be called a single time. Calling it more than once may
 // result in undefined behavior.
 func (bt *Metricbeat) Stop() {
-	close(bt.done)
+	bt.stopOnce.Do(func() { close(bt.done) })
+
 }
 
 // Modules return a list of all configured modules.

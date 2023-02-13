@@ -20,14 +20,12 @@ package node
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -40,8 +38,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("kubernetes.node")
 )
 
 // init registers the MetricSet with the central registry.
@@ -79,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Node{}, false),
+		enricher:      util.NewResourceMetadataEnricher(base, util.NodeResource, mod.GetMetricsRepo(), false),
 		mod:           mod,
 	}, nil
 }
@@ -97,14 +93,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	event, err := eventMapping(body)
+	event, err := eventMapping(body, m.Logger())
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
 
-	m.enricher.Enrich([]common.MapStr{event})
+	m.enricher.Enrich([]mapstr.M{event})
 
 	e, err := util.CreateEvent(event, "kubernetes.node")
 	if err != nil {
@@ -115,8 +111,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		m.Logger().Debug("error trying to emit event")
 		return
 	}
-
-	return
 }
 
 // Close stops this metricset

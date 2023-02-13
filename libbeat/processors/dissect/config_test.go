@@ -22,12 +22,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfig(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{value1}",
 			"field":     "message",
 		})
@@ -44,7 +44,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("invalid", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%value1}",
 			"field":     "message",
 		})
@@ -60,7 +60,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("with tokenizer missing", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{})
+		c, err := conf.NewConfigFrom(map[string]interface{}{})
 		if !assert.NoError(t, err) {
 			return
 		}
@@ -73,7 +73,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("with empty tokenizer", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "",
 		})
 		if !assert.NoError(t, err) {
@@ -88,7 +88,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("tokenizer with no field defined", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "hello world",
 		})
 		if !assert.NoError(t, err) {
@@ -103,7 +103,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("with wrong trim_mode", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer":   "hello %{what}",
 			"field":       "message",
 			"trim_values": "bananas",
@@ -120,7 +120,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("with valid trim_mode", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer":   "hello %{what}",
 			"field":       "message",
 			"trim_values": "all",
@@ -140,7 +140,7 @@ func TestConfig(t *testing.T) {
 
 func TestConfigForDataType(t *testing.T) {
 	t.Run("valid data type", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{value1|integer} %{value2|float} %{value3|boolean} %{value4|long} %{value5|double}",
 			"field":     "message",
 		})
@@ -155,7 +155,7 @@ func TestConfigForDataType(t *testing.T) {
 		}
 	})
 	t.Run("invalid data type", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{value1|int} %{value2|short} %{value3|char} %{value4|void} %{value5|unsigned} id=%{id|xyz} status=%{status|abc} msg=\"%{message}\"",
 			"field":     "message",
 		})
@@ -170,7 +170,7 @@ func TestConfigForDataType(t *testing.T) {
 		}
 	})
 	t.Run("missing data type", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{value1|} %{value2|}",
 			"field":     "message",
 		})

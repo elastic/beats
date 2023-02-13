@@ -22,8 +22,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 // SOCKS5Layer configures a SOCKS5 proxy layer in a DialerChain.
@@ -45,11 +45,8 @@ func SOCKS5Layer(config *transport.ProxyConfig) Layer {
 		}
 
 		return afterDial(dialer, func(conn net.Conn) (net.Conn, error) {
-			// TODO: extract connection parameter from connection object?
-			// TODO: add proxy url to event?
-
 			timer.stop()
-			event.Fields.Put("socks5.rtt.connect", look.RTT(timer.duration()))
+			_, _ = event.Fields.Put("socks5.rtt.connect", look.RTT(timer.duration()))
 			return conn, nil
 		}), nil
 	}

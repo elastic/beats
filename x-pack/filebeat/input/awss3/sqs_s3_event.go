@@ -7,6 +7,7 @@ package awss3
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -14,19 +15,22 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/smithy-go"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
-	"github.com/aws/aws-sdk-go-v2/aws/awserr"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/pkg/errors"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
 	sqsApproximateReceiveCountAttribute = "ApproximateReceiveCount"
+	sqsInvalidParameterValueErrorCode   = "InvalidParameterValue"
+	sqsReceiptHandleIsInvalidErrCode    = "ReceiptHandleIsInvalid"
 )
 
 type nonRetryableError struct {
@@ -42,7 +46,7 @@ func (e *nonRetryableError) Error() string {
 }
 
 func (e *nonRetryableError) Is(err error) bool {
-	_, ok := err.(*nonRetryableError)
+	_, ok := err.(*nonRetryableError) //nolint:errorlint // This is not used directly to detected wrapped errors (errors.Is handles unwrapping).
 	return ok
 }
 
@@ -86,13 +90,23 @@ type sqsS3EventProcessor struct {
 	sqsVisibilityTimeout time.Duration
 	maxReceiveCount      int
 	sqs                  sqsAPI
+	pipeline             beat.Pipeline // Pipeline creates clients for publishing events.
 	log                  *logp.Logger
 	warnOnce             sync.Once
 	metrics              *inputMetrics
 	script               *script
 }
 
-func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, script *script, sqsVisibilityTimeout time.Duration, maxReceiveCount int, s3 s3ObjectHandlerFactory) *sqsS3EventProcessor {
+func newSQSS3EventProcessor(
+	log *logp.Logger,
+	metrics *inputMetrics,
+	sqs sqsAPI,
+	script *script,
+	sqsVisibilityTimeout time.Duration,
+	maxReceiveCount int,
+	pipeline beat.Pipeline,
+	s3 s3ObjectHandlerFactory,
+) *sqsS3EventProcessor {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -101,13 +115,14 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 		sqsVisibilityTimeout: sqsVisibilityTimeout,
 		maxReceiveCount:      maxReceiveCount,
 		sqs:                  sqs,
+		pipeline:             pipeline,
 		log:                  log,
 		metrics:              metrics,
 		script:               script,
 	}
 }
 
-func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
+func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message) error {
 	log := p.log.With(
 		"message_id", *msg.MessageId,
 		"message_receipt_time", time.Now().UTC())
@@ -128,11 +143,11 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 
 	// No error. Delete SQS.
 	if processingErr == nil {
-		msgDelErr := p.sqs.DeleteMessage(context.Background(), msg)
-		if msgDelErr == nil {
-			p.metrics.sqsMessagesDeletedTotal.Inc()
+		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
+			return fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr)
 		}
-		return errors.Wrap(msgDelErr, "failed deleting message from SQS queue (it may be reprocessed)")
+		p.metrics.sqsMessagesDeletedTotal.Inc()
+		return nil
 	}
 
 	if p.maxReceiveCount > 0 && !errors.Is(processingErr, &nonRetryableError{}) {
@@ -149,14 +164,14 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 
 	// An error that reprocessing cannot correct. Delete SQS.
 	if errors.Is(processingErr, &nonRetryableError{}) {
-		msgDelErr := p.sqs.DeleteMessage(context.Background(), msg)
-		if msgDelErr == nil {
-			p.metrics.sqsMessagesDeletedTotal.Inc()
+		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
+			return multierr.Combine(
+				fmt.Errorf("failed processing SQS message (attempted to delete message): %w", processingErr),
+				fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr),
+			)
 		}
-		return multierr.Combine(
-			errors.Wrap(processingErr, "failed processing SQS message (message will be deleted)"),
-			errors.Wrap(msgDelErr, "failed deleting message from SQS queue (it may be reprocessed)"),
-		)
+		p.metrics.sqsMessagesDeletedTotal.Inc()
+		return fmt.Errorf("failed processing SQS message (message was deleted): %w", processingErr)
 	}
 
 	// An error that may be resolved by letting the visibility timeout
@@ -164,10 +179,10 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 	// queue is enabled then the message will eventually placed on the DLQ
 	// after maximum receives is reached.
 	p.metrics.sqsMessagesReturnedTotal.Inc()
-	return errors.Wrap(processingErr, "failed processing SQS message (it will return to queue after visibility timeout)")
+	return fmt.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
 }
 
-func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *sqs.Message) {
+func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *types.Message) {
 	defer wg.Done()
 
 	t := time.NewTicker(p.sqsVisibilityTimeout / 2)
@@ -185,18 +200,16 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 
 			// Renew visibility.
 			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
-				var awsErr awserr.Error
-				if errors.As(err, &awsErr) {
-					switch awsErr.Code() {
-					case sqs.ErrCodeReceiptHandleIsInvalid:
+				var apiError smithy.APIError
+				if errors.As(err, &apiError) {
+					switch apiError.ErrorCode() {
+					case sqsReceiptHandleIsInvalidErrCode, sqsInvalidParameterValueErrorCode:
 						log.Warnw("Failed to extend message visibility timeout "+
 							"because SQS receipt handle is no longer valid. "+
 							"Stopping SQS message keepalive routine.", "error", err)
 						return
 					}
 				}
-
-				log.Warnw("Failed to extend message visibility timeout.", "error", err)
 			}
 		}
 	}
@@ -235,7 +248,7 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 }
 
 func (p *sqsS3EventProcessor) getS3Info(events s3EventsV2) ([]s3EventV2, error) {
-	var out []s3EventV2
+	out := make([]s3EventV2, 0, len(events.Records))
 	for _, record := range events.Records {
 		if !p.isObjectCreatedEvents(record) {
 			p.warnOnce.Do(func() {
@@ -260,7 +273,7 @@ func (p *sqsS3EventProcessor) getS3Info(events s3EventsV2) ([]s3EventV2, error) 
 	return out, nil
 }
 
-func (_ *sqsS3EventProcessor) isObjectCreatedEvents(event s3EventV2) bool {
+func (*sqsS3EventProcessor) isObjectCreatedEvents(event s3EventV2) bool {
 	return event.EventSource == "aws:s3" && strings.HasPrefix(event.EventName, "ObjectCreated:")
 }
 
@@ -276,22 +289,40 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 	log.Debugf("SQS message contained %d S3 event notifications.", len(s3Events))
 	defer log.Debug("End processing SQS S3 event notifications.")
 
+	if len(s3Events) == 0 {
+		return nil
+	}
+
+	// Create a pipeline client scoped to this goroutine.
+	client, err := p.pipeline.ConnectWith(beat.ClientConfig{
+		ACKHandler: awscommon.NewEventACKHandler(),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+	})
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
 	// Wait for all events to be ACKed before proceeding.
 	acker := awscommon.NewEventACKTracker(ctx)
 	defer acker.Wait()
 
 	var errs []error
 	for i, event := range s3Events {
-		s3Processor := p.s3ObjectHandler.Create(ctx, log, acker, event)
+		s3Processor := p.s3ObjectHandler.Create(ctx, log, client, acker, event)
 		if s3Processor == nil {
 			continue
 		}
 
 		// Process S3 object (download, parse, create events).
 		if err := s3Processor.ProcessS3Object(); err != nil {
-			errs = append(errs, errors.Wrapf(err,
-				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification)",
-				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events)))
+			errs = append(errs, fmt.Errorf(
+				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification): %w",
+				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events), err))
 		}
 	}
 

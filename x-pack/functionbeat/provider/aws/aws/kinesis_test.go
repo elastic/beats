@@ -12,17 +12,17 @@ import (
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
-	aggRecProto "github.com/awslabs/kinesis-aggregation/go/records"
-	"github.com/golang/protobuf/proto"
+	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
+	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
+	"github.com/golang/protobuf/proto" //nolint:staticcheck // SA1019 dependency uses deprecated package
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestKinesis(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"name": "foobar",
 		"triggers": []map[string]interface{}{
 			map[string]interface{}{
@@ -275,7 +275,7 @@ func testKinesisConfig(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.rawConfig)
+			cfg := conf.MustNewConfigFrom(test.rawConfig)
 			config := &KinesisConfig{LambdaConfig: DefaultLambdaConfig}
 			err := cfg.Unpack(config)
 			if !assert.Equal(t, test.valid, err == nil, fmt.Sprintf("error: %+v", err)) {

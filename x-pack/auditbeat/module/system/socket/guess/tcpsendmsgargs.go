@@ -10,9 +10,9 @@ package guess
 import (
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Guess the position of size parameter in tcp_sendmsg.
@@ -94,7 +94,7 @@ func (g *guessTCPSendMsg) Trigger() (err error) {
 
 // Extract receives the arguments from the tcp_sendmsg call and checks
 // which one contains the number of bytes written by trigger.
-func (g *guessTCPSendMsg) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessTCPSendMsg) Extract(ev interface{}) (mapstr.M, bool) {
 	event := ev.(*tcpSendMsgArgCountGuess)
 	if g.written <= 0 {
 		g.ctx.Log.Errorf("write failed for guess")
@@ -112,7 +112,7 @@ func (g *guessTCPSendMsg) Extract(ev interface{}) (common.MapStr, bool) {
 	default:
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"TCP_SENDMSG_LEN": lenParam,
 	}, true
 }

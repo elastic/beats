@@ -29,9 +29,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type eventStore struct {
@@ -48,7 +49,7 @@ func mongodbModForTests() (*eventStore, *mongodbPlugin) {
 	var mongodb mongodbPlugin
 	results := &eventStore{}
 	config := defaultConfig
-	mongodb.init(results.publish, procs.ProcessesWatcher{}, &config)
+	mongodb.init(results.publish, &procs.ProcessesWatcher{}, &config)
 	return results, &mongodb
 }
 
@@ -67,7 +68,7 @@ func testTCPTuple() *common.TCPTuple {
 
 // Helper function to read from the results Queue. Raises
 // an error if nothing is found in the queue.
-func expectTransaction(t *testing.T, e *eventStore) common.MapStr {
+func expectTransaction(t *testing.T, e *eventStore) mapstr.M {
 	if len(e.events) == 0 {
 		t.Error("No transaction")
 		return nil

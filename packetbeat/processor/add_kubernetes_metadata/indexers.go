@@ -18,18 +18,18 @@
 package add_kubernetes_metadata
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	kubernetes "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
 	// Register default indexers
-	cfg := common.NewConfig()
+	cfg := conf.NewConfig()
 
 	// Add IP Port Indexer as a default indexer
 	kubernetes.Indexing.AddDefaultIndexerConfig(kubernetes.IPPortIndexerName, *cfg)
 
-	formatCfg, err := common.NewConfigFrom(map[string]interface{}{
+	formatCfg, err := conf.NewConfigFrom(map[string]interface{}{
 		"format": "%{[ip]}:%{[port]}",
 	})
 	if err == nil {

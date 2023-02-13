@@ -29,8 +29,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type clientRequest struct {
@@ -75,16 +75,16 @@ func TestFetchEventContents(t *testing.T) {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
-	event := events[0].ModuleFields["cluster_health"].(common.MapStr)
+	event := events[0].ModuleFields["cluster_health"].(mapstr.M)
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	assert.EqualValues(t, "HEALTH_OK", event["overall_status"])
 
-	timechecks := event["timechecks"].(common.MapStr)
+	timechecks := event["timechecks"].(mapstr.M)
 	assert.EqualValues(t, 3, timechecks["epoch"])
 
-	round := timechecks["round"].(common.MapStr)
+	round := timechecks["round"].(mapstr.M)
 	assert.EqualValues(t, 0, round["value"])
 	assert.EqualValues(t, "finished", round["status"])
 }

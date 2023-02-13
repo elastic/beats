@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGetMetaStringValue(t *testing.T) {
@@ -35,17 +35,17 @@ func TestGetMetaStringValue(t *testing.T) {
 	}{
 		"nonexistent_field": {
 			beat.Event{
-				Meta: common.MapStr{
+				Meta: mapstr.M{
 					"foo": "bar",
 				},
 			},
 			"nonexistent",
 			"",
-			common.ErrKeyNotFound,
+			mapstr.ErrKeyNotFound,
 		},
 		"root": {
 			beat.Event{
-				Meta: common.MapStr{
+				Meta: mapstr.M{
 					"foo": "bar",
 					"baz": "hello",
 				},
@@ -56,9 +56,9 @@ func TestGetMetaStringValue(t *testing.T) {
 		},
 		"nested": {
 			beat.Event{
-				Meta: common.MapStr{
+				Meta: mapstr.M{
 					"foo": "bar",
-					"baz": common.MapStr{
+					"baz": mapstr.M{
 						"qux": "hello",
 					},
 				},
@@ -69,7 +69,7 @@ func TestGetMetaStringValue(t *testing.T) {
 		},
 		"non_string": {
 			beat.Event{
-				Meta: common.MapStr{
+				Meta: mapstr.M{
 					"foo": "bar",
 					"baz": 17,
 				},

@@ -26,8 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Response stores the very basic response information to only keep the Status and the ResultType.
@@ -147,8 +147,8 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 				}
 				events = append(events, mb.Event{
 					Timestamp:    getTimestamp(timestamp),
-					ModuleFields: common.MapStr{"labels": result.Metric},
-					MetricSetFields: common.MapStr{
+					ModuleFields: mapstr.M{"labels": result.Metric},
+					MetricSetFields: mapstr.M{
 						queryName: val,
 					},
 				})
@@ -182,8 +182,8 @@ func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 			}
 			events = append(events, mb.Event{
 				Timestamp:    getTimestamp(timestamp),
-				ModuleFields: common.MapStr{"labels": result.Metric},
-				MetricSetFields: common.MapStr{
+				ModuleFields: mapstr.M{"labels": result.Metric},
+				MetricSetFields: mapstr.M{
 					queryName: val,
 				},
 			})
@@ -214,7 +214,7 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 			}
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					queryName: val,
 				},
 			}, nil
@@ -226,12 +226,12 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 			}
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
-				ModuleFields: common.MapStr{
-					"labels": common.MapStr{
+				ModuleFields: mapstr.M{
+					"labels": mapstr.M{
 						queryName: value,
 					},
 				},
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					queryName: 1,
 				},
 			}, nil

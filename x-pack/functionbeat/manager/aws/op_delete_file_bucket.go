@@ -10,8 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type opDeleteFileBucket struct {
@@ -28,7 +28,7 @@ func newOpDeleteFileBucket(
 ) *opDeleteFileBucket {
 	return &opDeleteFileBucket{
 		log:        log,
-		svc:        s3.New(config),
+		svc:        s3.NewFromConfig(config),
 		bucketName: bucketName,
 		path:       path,
 	}
@@ -41,8 +41,7 @@ func (o *opDeleteFileBucket) Execute(_ executor.Context) error {
 		Key:    aws.String(o.path),
 	}
 
-	req := o.svc.DeleteObjectRequest(input)
-	resp, err := req.Send(context.TODO())
+	resp, err := o.svc.DeleteObject(context.TODO(), input)
 
 	if err != nil {
 		o.log.Debugf("Could not remove object to S3, resp: %v", resp)

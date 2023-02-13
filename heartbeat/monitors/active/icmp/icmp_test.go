@@ -25,6 +25,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
+
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -32,8 +35,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
 )
 
 func TestICMPFields(t *testing.T) {
@@ -66,24 +67,20 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	jf, err := newJobFactory(cfg, monitors.NewStdResolver(), tl)
 	require.NoError(t, err)
 	p, err := jf.makePlugin()
+	require.NoError(t, err)
 	require.Len(t, p.Jobs, 1)
 	require.Equal(t, 1, p.Endpoints)
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
-	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1})
-	wrapped[0](e)
+	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1}, nil)
+	_, _ = wrapped[0](e)
 	return tl, e
 }
 
 type mockLoop struct {
-	pingRtt             time.Duration
-	pingRequests        int
-	pingErr             error
-	checkNetworkModeErr error
-}
-
-func (t mockLoop) checkNetworkMode(mode string) error {
-	return t.checkNetworkModeErr
+	pingRtt      time.Duration
+	pingRequests int
+	pingErr      error
 }
 
 func (t mockLoop) ping(addr *net.IPAddr, timeout time.Duration, interval time.Duration) (time.Duration, int, error) {

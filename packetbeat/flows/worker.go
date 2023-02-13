@@ -21,6 +21,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -28,60 +29,135 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
-
-type flowsProcessor struct {
-	spool    spool
-	watcher  procs.ProcessesWatcher
-	table    *flowMetaTable
-	counters *counterReg
-	timeout  time.Duration
-}
 
 var (
 	ErrInvalidTimeout = errors.New("timeout must be >= 1s")
 	ErrInvalidPeriod  = errors.New("report period must be -1 or >= 1s")
 )
 
-func newFlowsWorker(
-	pub Reporter,
-	watcher procs.ProcessesWatcher,
-	table *flowMetaTable,
-	counters *counterReg,
-	timeout, period time.Duration,
-) (*worker, error) {
-	oneSecond := 1 * time.Second
+// worker is a generic asynchronous function processor.
+type worker struct {
+	wg   sync.WaitGroup
+	done chan struct{}
+	run  func(*worker)
+}
 
-	if timeout < oneSecond {
+// newWorker returns a handle to a worker to run fn.
+func newWorker(fn func(w *worker)) *worker {
+	return &worker{
+		done: make(chan struct{}),
+		run:  fn,
+	}
+}
+
+// start starts execution of the worker function.
+func (w *worker) start() {
+	debugf("start flows worker")
+	w.wg.Add(1)
+	go func() {
+		defer w.finished()
+		w.run(w)
+	}()
+}
+
+// finished decrements the workers working function count. finished
+// must be called the same number of times as start over the lifetime
+// of the worker.
+func (w *worker) finished() {
+	w.wg.Done()
+	logp.Info("flows worker loop stopped")
+}
+
+// stop terminates the function and waits until processing is complete.
+// stop may only be called once.
+func (w *worker) stop() {
+	debugf("stop flows worker")
+	close(w.done)
+	w.wg.Wait()
+	debugf("stopped flows worker")
+}
+
+// sleep will sleep for the provided duration unless the worker has been
+// stopped. sleep returns whether the worker can continue processing.
+func (w *worker) sleep(d time.Duration) bool {
+	select {
+	case <-w.done:
+		return false
+	case <-time.After(d):
+		return true
+	}
+}
+
+// tick will sleep until the provided ticker fires unless the worker has been
+// stopped. tick returns whether the worker can continue processing.
+func (w *worker) tick(t *time.Ticker) bool {
+	select {
+	case <-w.done:
+		return false
+	case <-t.C:
+		return true
+	}
+}
+
+// periodically will execute fn each tick duration until the worker has been
+// stopped or fn returns a non-nil error.
+func (w *worker) periodically(tick time.Duration, fn func() error) {
+	defer debugf("stop periodic loop")
+
+	ticker := time.NewTicker(tick)
+	defer ticker.Stop()
+	for {
+		cont := w.tick(ticker)
+		if !cont {
+			return
+		}
+
+		err := fn()
+		if err != nil {
+			return
+		}
+	}
+}
+
+// newFlowsWorker returns a worker with a flow lifetime specified by timeout and a
+// reporting intervals specified by period. If period is less than or equal to zero
+// reporting will be done at flow lifetime end.
+// Flows are published via the pub Reporter after being enriched with process information
+// by watcher.
+func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration) (*worker, error) {
+	if timeout < time.Second {
 		return nil, ErrInvalidTimeout
 	}
 
-	if 0 < period && period < oneSecond {
+	if 0 < period && period < time.Second {
 		return nil, ErrInvalidPeriod
 	}
 
-	tickDuration := timeout
+	tick := timeout
 	ticksTimeout := 1
 	ticksPeriod := -1
 	if period > 0 {
-		tickDuration = time.Duration(gcd(int64(timeout), int64(period)))
-		if tickDuration < oneSecond {
-			tickDuration = oneSecond
+		tick = gcd(timeout, period)
+		if tick < time.Second {
+			tick = time.Second
 		}
 
-		ticksTimeout = int(timeout / tickDuration)
+		ticksTimeout = int(timeout / tick)
 		if ticksTimeout == 0 {
 			ticksTimeout = 1
 		}
 
-		ticksPeriod = int(period / tickDuration)
+		ticksPeriod = int(period / tick)
 		if ticksPeriod == 0 {
 			ticksPeriod = 1
 		}
 	}
 
 	debugf("new flows worker. timeout=%v, period=%v, tick=%v, ticksTO=%v, ticksP=%v",
-		timeout, period, tickDuration, ticksTimeout, ticksPeriod)
+		timeout, period, tick, ticksTimeout, ticksPeriod)
 
 	defaultBatchSize := 1024
 	processor := &flowsProcessor{
@@ -92,20 +168,26 @@ func newFlowsWorker(
 	}
 	processor.spool.init(pub, defaultBatchSize)
 
-	return makeWorker(processor, tickDuration, ticksTimeout, ticksPeriod, 10)
+	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, 10)
 }
 
-func makeWorker(
-	processor *flowsProcessor,
-	tickDuration time.Duration,
-	ticksTimeout, ticksPeriod int,
-	align int64,
-) (*worker, error) {
+// gcd returns the greatest common divisor of a and b.
+func gcd(a, b time.Duration) time.Duration {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+// makeWorker returns a worker that runs processor.execute each tick. Each timeout'th tick,
+// the worker will check flow timeouts and each period'th tick, the worker will report flow
+// events to be published.
+func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period int, align int64) (*worker, error) {
 	return newWorker(func(w *worker) {
 		defer processor.execute(w, false, true, true)
 
 		if align > 0 {
-			// round time to nearest 10 seconds for alignment
+			// Wait until the current time rounded up to nearest align seconds.
 			aligned := time.Unix(((time.Now().Unix()+(align-1))/align)*align, 0)
 			waitStart := time.Until(aligned)
 			debugf("worker wait start(%v): %v", aligned, waitStart)
@@ -114,28 +196,36 @@ func makeWorker(
 			}
 		}
 
-		nTimeout := ticksTimeout
-		nPeriod := ticksPeriod
-		reportPeriodically := ticksPeriod > 0
+		nTimeout := timeout
+		nPeriod := period
+		reportPeriodically := period > 0
 		debugf("start flows worker loop")
-		w.periodically(tickDuration, func() error {
+		w.periodically(tick, func() error {
 			nTimeout--
 			nPeriod--
 			debugf("worker tick, nTimeout=%v, nPeriod=%v", nTimeout, nPeriod)
 
 			handleTimeout := nTimeout == 0
-			handleReports := reportPeriodically && nPeriod == 0
 			if handleTimeout {
-				nTimeout = ticksTimeout
+				nTimeout = timeout
 			}
+			handleReports := reportPeriodically && nPeriod == 0
 			if nPeriod <= 0 {
-				nPeriod = ticksPeriod
+				nPeriod = period
 			}
 
 			processor.execute(w, handleTimeout, handleReports, false)
 			return nil
 		})
 	}), nil
+}
+
+type flowsProcessor struct {
+	spool    spool
+	watcher  *procs.ProcessesWatcher
+	table    *flowMetaTable
+	counters *counterReg
+	timeout  time.Duration
 }
 
 func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastReport bool) {
@@ -190,28 +280,17 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 	fw.spool.flush()
 }
 
-func (fw *flowsProcessor) report(
-	w *worker,
-	ts time.Time,
-	flow *biFlow,
-	isOver bool,
-	intNames, uintNames, floatNames []string,
-) {
+func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver bool, intNames, uintNames, floatNames []string) {
 	event := createEvent(fw.watcher, ts, flow, isOver, intNames, uintNames, floatNames)
 
 	debugf("add event: %v", event)
 	fw.spool.publish(event)
 }
 
-func createEvent(
-	watcher procs.ProcessesWatcher,
-	ts time.Time, f *biFlow,
-	isOver bool,
-	intNames, uintNames, floatNames []string,
-) beat.Event {
+func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver bool, intNames, uintNames, floatNames []string) beat.Event {
 	timestamp := ts
 
-	event := common.MapStr{
+	event := mapstr.M{
 		"start":    common.Time(f.createTS),
 		"end":      common.Time(f.ts),
 		"duration": f.ts.Sub(f.createTS),
@@ -226,26 +305,26 @@ func createEvent(
 	}
 	event["type"] = eventType
 
-	flow := common.MapStr{
+	flow := mapstr.M{
 		"id":    common.NetString(f.id.Serialize()),
 		"final": isOver,
 	}
-	fields := common.MapStr{
+	fields := mapstr.M{
 		"event": event,
 		"flow":  flow,
 		"type":  "flow",
 	}
-	network := common.MapStr{}
-	source := common.MapStr{}
-	dest := common.MapStr{}
+	network := mapstr.M{}
+	source := mapstr.M{}
+	dest := mapstr.M{}
 	tuple := common.IPPortTuple{}
 	var communityID flowhash.Flow
 	var proto applayer.Transport
 
 	// add ethernet layer meta data
 	if src, dst, ok := f.id.EthAddr(); ok {
-		source["mac"] = net.HardwareAddr(src).String()
-		dest["mac"] = net.HardwareAddr(dst).String()
+		source["mac"] = formatHardwareAddr(net.HardwareAddr(src))
+		dest["mac"] = formatHardwareAddr(net.HardwareAddr(dst))
 	}
 
 	// add vlan
@@ -398,7 +477,7 @@ func createEvent(
 	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
 		if proc := watcher.FindProcessesTuple(&tuple, proto); proc != nil {
 			if proc.Src.PID > 0 {
-				p := common.MapStr{
+				p := mapstr.M{
 					"pid":               proc.Src.PID,
 					"name":              proc.Src.Name,
 					"args":              proc.Src.Args,
@@ -414,7 +493,7 @@ func createEvent(
 				fields["process"] = p
 			}
 			if proc.Dst.PID > 0 {
-				p := common.MapStr{
+				p := mapstr.M{
 					"pid":               proc.Dst.PID,
 					"name":              proc.Dst.Name,
 					"args":              proc.Dst.Args,
@@ -441,10 +520,20 @@ func createEvent(
 	}
 }
 
-func encodeStats(
-	stats *flowStats,
-	ints, uints, floats []string,
-) map[string]interface{} {
+// formatHardwareAddr formats hardware addresses according to the ECS spec.
+func formatHardwareAddr(addr net.HardwareAddr) string {
+	buf := make([]byte, 0, len(addr)*3-1)
+	for _, b := range addr {
+		if len(buf) != 0 {
+			buf = append(buf, '-')
+		}
+		const hexDigit = "0123456789ABCDEF"
+		buf = append(buf, hexDigit[b>>4], hexDigit[b&0xf])
+	}
+	return string(buf)
+}
+
+func encodeStats(stats *flowStats, ints, uints, floats []string) map[string]interface{} {
 	report := make(map[string]interface{})
 
 	i := 0
@@ -480,7 +569,7 @@ func encodeStats(
 	return report
 }
 
-func putOrAppendString(m common.MapStr, key, value string) {
+func putOrAppendString(m mapstr.M, key, value string) {
 	old, found := m[key]
 	if !found {
 		m[key] = value
@@ -497,7 +586,7 @@ func putOrAppendString(m common.MapStr, key, value string) {
 	}
 }
 
-func putOrAppendUint64(m common.MapStr, key string, value uint64) {
+func putOrAppendUint64(m mapstr.M, key string, value uint64) {
 	old, found := m[key]
 	if !found {
 		m[key] = value
@@ -513,9 +602,48 @@ func putOrAppendUint64(m common.MapStr, key string, value uint64) {
 		case uint32:
 			m[key] = []uint64{uint64(v), value}
 		case uint64:
-			m[key] = []uint64{uint64(v), value}
+			m[key] = []uint64{v, value}
 		case []uint64:
 			m[key] = append(v, value)
 		}
 	}
+}
+
+// spool is an event publisher spool.
+type spool struct {
+	pub    Reporter
+	events []beat.Event
+}
+
+// init sets the destination and spool size.
+func (s *spool) init(pub Reporter, sz int) {
+	s.pub = pub
+	s.events = make([]beat.Event, 0, sz)
+}
+
+// publish queues the event for publication, flushing to the destination
+// if the spool is full.
+func (s *spool) publish(event beat.Event) {
+	s.events = append(s.events, event)
+	if len(s.events) == cap(s.events) {
+		s.flush()
+	}
+}
+
+// flush sends the spooled events to the destination and clears them
+// from the spool.
+func (s *spool) flush() {
+	if len(s.events) == 0 {
+		return
+	}
+	s.pub(s.events)
+	// A newly allocated spool is created since the
+	// elements of s.events are no longer owned by s
+	// during testing and mutating them causes a panic.
+	//
+	// The beat.Client interface which Reporter is
+	// derived from is silent on whether the caller
+	// is allowed to modify elements of the slice
+	// after the call to the PublishAll method returns.
+	s.events = make([]beat.Event, 0, cap(s.events))
 }

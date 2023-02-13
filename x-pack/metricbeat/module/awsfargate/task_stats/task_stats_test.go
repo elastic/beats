@@ -46,6 +46,8 @@ var (
 		"TaskARN": "arn:aws:ecs:us-west-2:123:task/default/febee207c04a",
 		"Family": "query-metadata-1",
 		"Revision": "7",
+        "DesiredStatus": "RUNNING",
+        "KnownStatus": "ACTIVATING",
 		"Containers": [{
 			"DockerId": "query-metadata-1",
 			"Name": "query-metadata",
@@ -82,6 +84,8 @@ func TestGetTask(t *testing.T) {
 	assert.Equal(t, "arn:aws:ecs:us-west-2:123:task/default/febee207c04a", taskOutput.TaskARN)
 	assert.Equal(t, "query-metadata-1", taskOutput.Family)
 	assert.Equal(t, "7", taskOutput.Revision)
+	assert.Equal(t, "RUNNING", taskOutput.DesiredStatus)
+	assert.Equal(t, "ACTIVATING", taskOutput.KnownStatus)
 
 	assert.Equal(t, 1, len(taskOutput.Containers))
 	assert.Equal(t, "query-metadata-1", taskOutput.Containers[0].DockerId)

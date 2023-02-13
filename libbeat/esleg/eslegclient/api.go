@@ -24,7 +24,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // QueryResult contains the result of a query.
@@ -237,7 +237,7 @@ func (es *Connection) SearchURIWithBody(
 	params map[string]string,
 	body interface{},
 ) (int, *SearchResults, error) {
-	if !es.version.LessThan(&common.Version{Major: 8}) {
+	if !es.version.LessThan(&version.V{Major: 8}) {
 		docType = ""
 	}
 	status, resp, err := es.apiCall("GET", index, docType, "_search", "", params, body)

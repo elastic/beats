@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/kibana"
+	"github.com/elastic/elastic-agent-libs/version"
 
 	// Make sure metricsets are registered in mb.Registry
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/stats"
@@ -41,7 +41,7 @@ func TestIsStatsAPIAvailable(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual := kibana.IsStatsAPIAvailable(common.MustNewVersion(test.input))
+		actual := kibana.IsStatsAPIAvailable(version.MustNew(test.input))
 		require.Equal(t, test.expected, actual)
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type reloader struct {
@@ -35,7 +35,7 @@ func (r *reloader) debugLogConfig(cfg *reload.ConfigWithMeta) {
 
 func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
 	r.log.Debug("Inputs reloader got configuration update")
-	var inputConfigs []InputConfig
+	inputConfigs := make([]InputConfig, 0)
 	for _, cfg := range configs {
 		var icfg InputConfig
 		err := cfg.Config.Unpack(&icfg)
@@ -65,7 +65,7 @@ func WatchInputs(ctx context.Context, log *logp.Logger) <-chan []InputConfig {
 		log: log,
 		ch:  ch,
 	}
-	reload.Register.MustRegisterList("inputs", r)
+	reload.RegisterV2.MustRegisterInput(r)
 
 	return ch
 }

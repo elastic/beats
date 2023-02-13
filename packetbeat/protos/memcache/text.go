@@ -29,8 +29,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type textCommandType struct {
@@ -124,7 +124,7 @@ var argNoReply = argDef{
 		parser.message.noreply = b
 		return err
 	},
-	serialize: func(msg *message, event common.MapStr) error {
+	serialize: func(msg *message, event mapstr.M) error {
 		event["noreply"] = msg.noreply
 		return nil
 	},
@@ -135,7 +135,7 @@ var argErrorMessage = argDef{
 		parser.message.errorMsg = memcacheString{buf.Bytes()}
 		return nil
 	},
-	serialize: func(msg *message, event common.MapStr) error {
+	serialize: func(msg *message, event mapstr.M) error {
 		event["error_msg"] = msg.errorMsg
 		return nil
 	},
@@ -414,7 +414,7 @@ func makeIValueArg(name string) argDef {
 				msg.ivalue = v
 			})
 		},
-		serialize: func(msg *message, event common.MapStr) error {
+		serialize: func(msg *message, event mapstr.M) error {
 			event[name] = msg.ivalue
 			return nil
 		},
@@ -428,7 +428,7 @@ func makeIValue2Arg(name string) argDef {
 				msg.ivalue2 = v
 			})
 		},
-		serialize: func(msg *message, event common.MapStr) error {
+		serialize: func(msg *message, event mapstr.M) error {
 			event[name] = msg.ivalue2
 			return nil
 		},
@@ -684,7 +684,7 @@ func serializeRequest(
 ) eventFn {
 	command := code.String()
 	eventType := typ.String()
-	return func(msg *message, event common.MapStr) error {
+	return func(msg *message, event mapstr.M) error {
 		event["command"] = command
 		event["type"] = eventType
 		return serializeArgs(msg, event, args)
@@ -698,7 +698,7 @@ func serializeDataRequest(
 ) eventFn {
 	command := code.String()
 	eventType := typ.String()
-	return func(msg *message, event common.MapStr) error {
+	return func(msg *message, event mapstr.M) error {
 		event["command"] = command
 		event["type"] = eventType
 		event["count_values"] = msg.countValues
@@ -716,7 +716,7 @@ func serializeDataResponse(
 ) eventFn {
 	response := code.String()
 	eventType := typ.String()
-	return func(msg *message, event common.MapStr) error {
+	return func(msg *message, event mapstr.M) error {
 		event["command"] = response
 		event["type"] = eventType
 		event["count_values"] = msg.countValues
@@ -727,26 +727,26 @@ func serializeDataResponse(
 	}
 }
 
-func serializeUnknown(msg *message, event common.MapStr) error {
+func serializeUnknown(msg *message, event mapstr.M) error {
 	event["line"] = msg.commandLine
 	event["command"] = memcacheCmdUNKNOWN.String()
 	event["type"] = memcacheUnknownType.String()
 	return nil
 }
 
-func serializeCounterResponse(msg *message, event common.MapStr) error {
+func serializeCounterResponse(msg *message, event mapstr.M) error {
 	event["command"] = memcacheResCounterOp.String()
 	event["type"] = memcacheCounterMsg.String()
 	event["value"] = msg.value
 	return nil
 }
 
-func serializeRawArgs(msg *message, event common.MapStr) error {
+func serializeRawArgs(msg *message, event mapstr.M) error {
 	event["raw_args"] = memcacheString{msg.rawArgs}
 	return nil
 }
 
-func serializeAutomove(msg *message, event common.MapStr) error {
+func serializeAutomove(msg *message, event mapstr.M) error {
 	var s string
 	switch msg.value {
 	case 0:

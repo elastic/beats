@@ -25,7 +25,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestInputSyslogIdentifier(t *testing.T) {
@@ -51,7 +51,7 @@ func TestInputSyslogIdentifier(t *testing.T) {
 	for name, testCase := range tests {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
-			inp := env.mustCreateInput(common.MapStr{
+			inp := env.mustCreateInput(mapstr.M{
 				"paths":              []string{path.Join("testdata", "input-multiline-parser.journal")},
 				"syslog_identifiers": testCase.identifiers,
 			})
@@ -108,7 +108,7 @@ func TestInputUnits(t *testing.T) {
 	for name, testCase := range tests {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
-			inp := env.mustCreateInput(common.MapStr{
+			inp := env.mustCreateInput(mapstr.M{
 				"paths":  []string{path.Join("testdata", "input-multiline-parser.journal")},
 				"units":  testCase.units,
 				"kernel": testCase.kernel,
@@ -197,7 +197,7 @@ func TestInputIncludeMatches(t *testing.T) {
 	for name, testCase := range tests {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
-			inp := env.mustCreateInput(common.MapStr{
+			inp := env.mustCreateInput(mapstr.M{
 				"paths":           []string{path.Join("testdata", "input-multiline-parser.journal")},
 				"include_matches": testCase.includeMatches,
 			})

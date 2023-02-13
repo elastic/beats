@@ -13,7 +13,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -58,7 +57,7 @@
           "reason_text": "Normal Operation",
           "service_name": "https",
           "source_ipv4_address": "10.236.5.4",
-          "source_mac_address": "00:50:56:b9:26:46",
+          "source_mac_address": "00-50-56-B9-26-46",
           "source_transport_port": 51917,
           "timestamp": 1524039407,
           "traffic_type": 0,
@@ -85,7 +84,7 @@
           "bytes": 0,
           "ip": "10.236.5.4",
           "locality": "internal",
-          "mac": "00:50:56:b9:26:46",
+          "mac": "00-50-56-B9-26-46",
           "packets": 0,
           "port": 51917
         }
@@ -105,7 +104,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -150,7 +148,7 @@
           "reason_text": "Normal Operation",
           "service_name": "https",
           "source_ipv4_address": "64.235.151.76",
-          "source_mac_address": "00:00:00:00:00:00",
+          "source_mac_address": "00-00-00-00-00-00",
           "source_transport_port": 443,
           "timestamp": 1524039407,
           "traffic_type": 0,
@@ -177,7 +175,7 @@
           "bytes": 0,
           "ip": "64.235.151.76",
           "locality": "external",
-          "mac": "00:00:00:00:00:00",
+          "mac": "00-00-00-00-00-00",
           "packets": 0,
           "port": 443
         }

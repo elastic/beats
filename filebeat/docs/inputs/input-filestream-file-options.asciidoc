@@ -21,11 +21,9 @@ supported.
 A unique identifier for this filestream input. Each filestream input
 must have a unique ID.
 
-WARNING: If there are multiple inputs without an ID, there will be
-data duplication when {beatname_lc} is restarted.
-
-WARNING: Adding an ID to an existing configuration will read the files
-from the beginning.
+WARNING: Changing input ID may cause data duplication because the
+state of the files will be lost and they will be read from the
+beginning again.
 
 [float]
 [[filestream-input-paths]]
@@ -170,8 +168,8 @@ The files affected by this setting fall into two categories:
 * Files that were harvested but weren't updated for longer than `ignore_older`
 
 For files which were never seen before, the offset state is set to the end of
-the file. If a state already exists, the offset is not changed. If a file is
-updated again later, reading continues at the set offset position.
+the file. If a state already exists, the offset is reset to the size of the file.
+If a file is updated again later, reading continues at the set offset position.
 
 The `ignore_older` setting relies on the modification time of the file to
 determine if a file is ignored. If the modification time of the file is not
@@ -308,7 +306,7 @@ rotate files, make sure this option is enabled.
 
 [float]
 [id="{beatname_lc}-input-{type}-close-eof"]
-===== `close.reader.eof`
+===== `close.reader.on_eof`
 
 WARNING: Only use this option if you understand that data loss is a potential
 side effect.

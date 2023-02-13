@@ -27,8 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -106,15 +107,15 @@ type protocolInstance struct {
 }
 
 type reporterFactory interface {
-	CreateReporter(*common.Config) (func(beat.Event), error)
+	CreateReporter(*conf.C) (func(beat.Event), error)
 }
 
 func (s ProtocolsStruct) Init(
 	testMode bool,
 	pub reporterFactory,
-	watcher procs.ProcessesWatcher,
-	configs map[string]*common.Config,
-	listConfigs []*common.Config,
+	watcher *procs.ProcessesWatcher,
+	configs map[string]*conf.C,
+	listConfigs []*conf.C,
 ) error {
 	if len(configs) > 0 {
 		cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
@@ -149,9 +150,9 @@ func (s ProtocolsStruct) Init(
 func (s ProtocolsStruct) configureProtocol(
 	testMode bool,
 	pub reporterFactory,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	name string,
-	config *common.Config,
+	config *conf.C,
 ) error {
 	// XXX: icmp is special, ignore here :/
 	if name == "icmp" {

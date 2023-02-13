@@ -1,6 +1,8 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+//go:build linux || darwin
+// +build linux darwin
 
 package synthexec
 
@@ -15,16 +17,14 @@ func TestExecMultiplexer(t *testing.T) {
 	em := NewExecMultiplexer()
 
 	// Generate three fake journeys with three fake steps
-	var testJourneys []*Journey
 	var testEvents []*SynthEvent
 	time := float64(0)
 	for jIdx := 0; jIdx < 3; jIdx++ {
 		time++ // fake time to make events seem spaced out
 		journey := &Journey{
 			Name: fmt.Sprintf("J%d", jIdx),
-			Id:   fmt.Sprintf("j-%d", jIdx),
+			ID:   fmt.Sprintf("j-%d", jIdx),
 		}
-		testJourneys = append(testJourneys, journey)
 		testEvents = append(testEvents, &SynthEvent{
 			Journey:              journey,
 			Type:                 "journey/start",
@@ -62,21 +62,18 @@ func TestExecMultiplexer(t *testing.T) {
 
 	// Wait for all results
 Loop:
-	for {
-		select {
-		case result := <-em.synthEvents:
-			if result == nil {
-				break Loop
-			}
-			results = append(results, result)
+	for result := range em.synthEvents {
+		if result == nil {
+			break Loop
 		}
+		results = append(results, result)
 	}
 
 	require.Len(t, results, len(testEvents))
 	i := 0 // counter for index, resets on journey change
 	for _, se := range results {
 		require.Equal(t, i, se.index)
-		if se.Type == "journey/end" {
+		if se.Type == JourneyEnd {
 			i = 0
 		} else {
 			i++

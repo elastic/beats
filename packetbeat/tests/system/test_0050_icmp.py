@@ -4,14 +4,16 @@ from packetbeat import BaseTest
 class Test(BaseTest):
 
     def test_2_pings(self):
-        self.render_config_template()
+        self.render_config_template(
+            timestamp_precision="nanosecond",
+        )
         self.run_packetbeat(pcap="icmp/icmp_2_pings.pcap", debug_selectors=["*"])
         objs = self.read_output()
         assert len(objs) == 2
         assert all([o["icmp.version"] == 4 for o in objs])
-        assert objs[0]["@timestamp"] == "2015-10-19T21:47:49.900Z"
+        assert objs[0]["@timestamp"] == "2015-10-19T21:47:49.900657Z"
         assert objs[0]["event.duration"] == 12152000
-        assert objs[1]["@timestamp"] == "2015-10-19T21:47:49.924Z"
+        assert objs[1]["@timestamp"] == "2015-10-19T21:47:49.924909Z"
         assert objs[1]["event.duration"] == 11935000
         self.assert_common_fields(objs)
         self.assert_common_icmp4_fields(objs[0])
@@ -30,13 +32,15 @@ class Test(BaseTest):
         self.assert_common_icmp4_fields(objs[0])
 
     def test_icmp4_ping_over_vlan(self):
-        self.render_config_template()
+        self.render_config_template(
+            timestamp_precision="nanosecond",
+        )
         self.run_packetbeat(pcap="icmp/icmp4_ping_over_vlan.pcap", debug_selectors=["*"])
         objs = self.read_output()
 
         assert len(objs) == 1
         assert objs[0]["icmp.version"] == 4
-        assert objs[0]["@timestamp"] == "2015-10-19T20:49:23.849Z"
+        assert objs[0]["@timestamp"] == "2015-10-19T20:49:23.849085Z"
         assert objs[0]["event.duration"] == 12192000
         self.assert_common_fields(objs)
         self.assert_common_icmp4_fields(objs[0])
@@ -54,13 +58,15 @@ class Test(BaseTest):
         self.assert_common_icmp6_fields(objs[0])
 
     def test_icmp6_ping_over_vlan(self):
-        self.render_config_template()
+        self.render_config_template(
+            timestamp_precision="nanosecond",
+        )
         self.run_packetbeat(pcap="icmp/icmp6_ping_over_vlan.pcap", debug_selectors=["*"])
         objs = self.read_output()
 
         assert len(objs) == 1
         assert objs[0]["icmp.version"] == 6
-        assert objs[0]["@timestamp"] == "2015-10-19T20:49:23.901Z"
+        assert objs[0]["@timestamp"] == "2015-10-19T20:49:23.901349Z"
         assert objs[0]["event.duration"] == 12333000
         self.assert_common_fields(objs)
         self.assert_common_icmp6_fields(objs[0])

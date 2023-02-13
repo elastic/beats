@@ -84,8 +84,19 @@ func (dq *diskQueue) run() {
 			// If there were blocked producers waiting for more queue space,
 			// we might be able to unblock them now.
 			dq.maybeUnblockProducers()
+
+		case metricsReq := <-dq.metricsRequestChan:
+			dq.handleMetricsRequest(metricsReq)
 		}
 	}
+}
+
+// handleMetricsRequest responds to an event on the metricsRequestChan chan
+func (dq *diskQueue) handleMetricsRequest(request metricsRequest) {
+	resp := metricsRequestResponse{
+		sizeOnDisk: dq.segments.sizeOnDisk(),
+	}
+	request.response <- resp
 }
 
 func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
@@ -277,7 +288,7 @@ func (dq *diskQueue) handleShutdown() {
 	dq.acks.lock.Lock()
 	finalPosition := dq.acks.nextPosition
 	// We won't be updating the position anymore, so we can close the file.
-	dq.acks.positionFile.Sync()
+	_ = dq.acks.positionFile.Sync()
 	dq.acks.positionFile.Close()
 	dq.acks.lock.Unlock()
 

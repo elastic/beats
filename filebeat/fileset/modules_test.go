@@ -31,12 +31,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/paths"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func load(t *testing.T, from interface{}) *common.Config {
-	config, err := common.NewConfigFrom(from)
+func load(t *testing.T, from interface{}) *conf.C {
+	config, err := conf.NewConfigFrom(from)
 	if err != nil {
 		t.Fatalf("Config err: %v", err)
 	}
@@ -82,7 +82,7 @@ func TestNewModuleRegistry(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -149,7 +149,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -175,7 +175,7 @@ func TestMovedModule(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, false)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }
@@ -203,7 +203,7 @@ func TestApplyOverrides(t *testing.T) {
 			module:  "nginx",
 			fileset: "access",
 			overrides: &ModuleOverrides{
-				"nginx": map[string]*common.Config{
+				"nginx": map[string]*conf.C{
 					"access": load(t, map[string]interface{}{
 						"var.a":   "test1",
 						"var.b.c": "test2",
@@ -230,7 +230,7 @@ func TestApplyOverrides(t *testing.T) {
 			module:  "nginx",
 			fileset: "access",
 			overrides: &ModuleOverrides{
-				"nginx": map[string]*common.Config{
+				"nginx": map[string]*conf.C{
 					"access": load(t, map[string]interface{}{
 						"enabled":   true,
 						"var.paths": []interface{}{"/var/local/nginx/log"},
@@ -251,7 +251,7 @@ func TestApplyOverrides(t *testing.T) {
 			module:  "nginx",
 			fileset: "access",
 			overrides: &ModuleOverrides{
-				"nginx": map[string]*common.Config{
+				"nginx": map[string]*conf.C{
 					"access": load(t, map[string]interface{}{
 						"input.close_eof": true,
 					}),
@@ -371,7 +371,7 @@ func TestMcfgFromConfig(t *testing.T) {
 	falseVar := false
 	tests := []struct {
 		name     string
-		config   *common.Config
+		config   *conf.C
 		expected ModuleConfig
 	}{
 		{
@@ -442,11 +442,11 @@ func TestMissingModuleFolder(t *testing.T) {
 	paths.Paths.Home = "/no/such/path"
 	defer func() { paths.Paths.Home = home }()
 
-	configs := []*common.Config{
+	configs := []*conf.C{
 		load(t, map[string]interface{}{"module": "nginx"}),
 	}
 
-	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0"}, true)
+	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0"}, true, false)
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 

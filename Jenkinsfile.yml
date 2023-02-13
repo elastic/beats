@@ -9,7 +9,6 @@ projects:
     - "winlogbeat"
     - "x-pack/auditbeat"
     - "x-pack/dockerlogbeat"
-    - "x-pack/elastic-agent"
     - "x-pack/filebeat"
     - "x-pack/functionbeat"
     - "x-pack/heartbeat"
@@ -18,7 +17,6 @@ projects:
     - "x-pack/osquerybeat"
     - "x-pack/packetbeat"
     - "x-pack/winlogbeat"
-    - "dev-tools"
 
 ## Changeset macros that are defined here and used in each specific 2.0 pipeline.
 changeset:

@@ -27,8 +27,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -39,7 +41,7 @@ import (
 type memcache struct {
 	ports   protos.PortsConfig
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 	config  parserConfig
 
 	udpMemcache
@@ -133,8 +135,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &memcache{}
 	config := defaultConfig
@@ -151,7 +153,7 @@ func New(
 }
 
 // Called to initialize the Plugin
-func (mc *memcache) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *memcacheConfig) error {
+func (mc *memcache) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *memcacheConfig) error {
 	debug("init memcache plugin")
 
 	mc.handler = mc
@@ -196,13 +198,16 @@ func (mc *memcache) GetPorts() []int {
 }
 
 func (mc *memcache) finishTransaction(t *transaction) error {
+	if t == nil {
+		return nil
+	}
 	mc.handler.onTransaction(t)
 	return nil
 }
 
 func (mc *memcache) onTransaction(t *transaction) {
 	event := beat.Event{
-		Fields: common.MapStr{},
+		Fields: mapstr.M{},
 	}
 	t.Event(&event)
 	debug("publish event: %s", event)
@@ -219,7 +224,7 @@ func (m *message) String() string {
 	return commandCodeStrings[m.command.code]
 }
 
-func (m *message) Event(event common.MapStr) error {
+func (m *message) Event(event mapstr.M) error {
 	if m.command == nil {
 		return errInvalidMessage
 	}
@@ -228,13 +233,13 @@ func (m *message) Event(event common.MapStr) error {
 
 func (m *message) SubEvent(
 	name string,
-	event common.MapStr,
-) (common.MapStr, error) {
+	event mapstr.M,
+) (mapstr.M, error) {
 	if m == nil {
 		return nil, nil
 	}
 
-	msgEvent := common.MapStr{}
+	msgEvent := mapstr.M{}
 	event[name] = msgEvent
 	return msgEvent, m.Event(msgEvent)
 }
@@ -390,7 +395,7 @@ func (t *transaction) Event(event *beat.Event) error {
 		return err
 	}
 
-	mc := common.MapStr{}
+	mc := mapstr.M{}
 	event.Fields["memcache"] = mc
 
 	msg := t.request

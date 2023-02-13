@@ -23,10 +23,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Settings contains the configuration fields to create a new disk queue
@@ -68,6 +68,15 @@ type Settings struct {
 	// use exponential backoff up to the specified limit.
 	RetryInterval    time.Duration
 	MaxRetryInterval time.Duration
+
+	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
+	EncryptionKey []byte
+
+	// UseCompression enables or disables LZ4 compression
+	UseCompression bool
+
+	// UseProtobuf enables protobuf serialization instead of CBOR
+	UseProtobuf bool
 }
 
 // userConfig holds the parameters for a disk queue that are configurable
@@ -134,7 +143,7 @@ func DefaultSettings() Settings {
 
 // SettingsForUserConfig returns a Settings struct initialized with the
 // end-user-configurable settings in the given config tree.
-func SettingsForUserConfig(config *common.Config) (Settings, error) {
+func SettingsForUserConfig(config *config.C) (Settings, error) {
 	userConfig := userConfig{}
 	if err := config.Unpack(&userConfig); err != nil {
 		return Settings{}, fmt.Errorf("parsing user config: %w", err)

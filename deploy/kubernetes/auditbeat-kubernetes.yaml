@@ -1,3 +1,99 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: auditbeat
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: auditbeat
+  labels:
+    k8s-app: auditbeat
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+    - replicasets
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: auditbeat
+  # should be the namespace where auditbeat is running
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: auditbeat-kubeadm-config
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+rules:
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    resourceNames:
+      - kubeadm-config
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: auditbeat
+subjects:
+- kind: ServiceAccount
+  name: auditbeat
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: auditbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: auditbeat
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: auditbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: auditbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: auditbeat-kubeadm-config
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: auditbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: auditbeat-kubeadm-config
+  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -109,7 +205,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
-        image: docker.elastic.co/beats/auditbeat:8.2.0
+        image: docker.elastic.co/beats/auditbeat:8.6.1
         args: [
           "-c", "/etc/auditbeat.yml",
           "-e",
@@ -211,101 +307,4 @@ spec:
         hostPath:
           path: /run/containerd
           type: DirectoryOrCreate
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: auditbeat
-subjects:
-- kind: ServiceAccount
-  name: auditbeat
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: auditbeat
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: auditbeat
-  namespace: kube-system
-subjects:
-  - kind: ServiceAccount
-    name: auditbeat
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: auditbeat
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: auditbeat-kubeadm-config
-  namespace: kube-system
-subjects:
-  - kind: ServiceAccount
-    name: auditbeat
-    namespace: kube-system
-roleRef:
-  kind: Role
-  name: auditbeat-kubeadm-config
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: auditbeat
-  labels:
-    k8s-app: auditbeat
-rules:
-- apiGroups: [""]
-  resources:
-  - nodes
-  - namespaces
-  - pods
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["apps"]
-  resources:
-    - replicasets
-  verbs: ["get", "list", "watch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: auditbeat
-  # should be the namespace where auditbeat is running
-  namespace: kube-system
-  labels:
-    k8s-app: auditbeat
-rules:
-  - apiGroups:
-      - coordination.k8s.io
-    resources:
-      - leases
-    verbs: ["get", "create", "update"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: auditbeat-kubeadm-config
-  namespace: kube-system
-  labels:
-    k8s-app: auditbeat
-rules:
-  - apiGroups: [""]
-    resources:
-      - configmaps
-    resourceNames:
-      - kubeadm-config
-    verbs: ["get"]
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: auditbeat
-  namespace: kube-system
-  labels:
-    k8s-app: auditbeat
 ---

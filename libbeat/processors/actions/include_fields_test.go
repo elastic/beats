@@ -23,36 +23,36 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestIncludeFields(t *testing.T) {
 
 	var tests = []struct {
 		Fields []string
-		Input  common.MapStr
-		Output common.MapStr
+		Input  mapstr.M
+		Output mapstr.M
 	}{
 		{
 			Fields: []string{"test"},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"hello": "world",
 				"test":  17,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"test": 17,
 			},
 		},
 		{
 			Fields: []string{"test", "a.b"},
-			Input: common.MapStr{
+			Input: mapstr.M{
 				"a.b":  "b",
 				"a.c":  "c",
 				"test": 17,
 			},
-			Output: common.MapStr{
+			Output: mapstr.M{
 				"test": 17,
-				"a": common.MapStr{
+				"a": mapstr.M{
 					"b": "b",
 				},
 			},

@@ -510,7 +510,29 @@
                     "avg_response_time_ns": 235770,
                     "rank": "0.2"
                 }
-            }
+            },
+      "indexing_pressure" : {
+        "memory" : {
+          "current" : {
+            "combined_coordinating_and_primary_in_bytes" : 0,
+            "coordinating_in_bytes" : 0,
+            "primary_in_bytes" : 0,
+            "replica_in_bytes" : 0,
+            "all_in_bytes" : 0
+          },
+          "total" : {
+            "combined_coordinating_and_primary_in_bytes" : 83922782,
+            "coordinating_in_bytes" : 83922782,
+            "primary_in_bytes" : 86169526,
+            "replica_in_bytes" : 0,
+            "all_in_bytes" : 83922782,
+            "coordinating_rejections" : 0,
+            "primary_rejections" : 0,
+            "replica_rejections" : 0
+          },
+          "limit_in_bytes" : 429496729
+        }
+      }
         }
     }
 }

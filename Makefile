@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent x-pack/osquerybeat
+BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/osquerybeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -8,9 +8,9 @@ PYTHON_EXE?=python3
 PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 VENV_PARAMS?=
 FIND=find . -type f -not -path "*/build/*" -not -path "*/.git/*"
-GOLINT=golint
-GOLINT_REPO=golang.org/x/lint/golint
 XPACK_SUFFIX=x-pack/
+
+BEAT_VERSION=$(shell grep defaultBeatVersion libbeat/version/version.go | cut -d'=' -f2 | tr -d '" ')
 
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
 # in the x-pack directory (rather than having the OSS build produce both sets
@@ -86,7 +86,6 @@ update: notice
 clean: mage
 	@rm -rf build
 	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) clean || exit 1;)
-	@$(MAKE) -C generator clean
 	@-mage -clean
 
 ## check : TBD.
@@ -198,7 +197,7 @@ test-apm:
 ## get-version : Get the libbeat version
 .PHONY: get-version
 get-version:
-	@mage dumpVariables | grep 'beat_version' | cut -d"=" -f 2 | tr -d " "
+	@echo $(BEAT_VERSION)
 
 ### Packaging targets ####
 
@@ -230,3 +229,12 @@ release-manager-release:
 .PHONY: beats-dashboards
 beats-dashboards: mage update
 	@mage packageBeatDashboards
+
+## build/distributions/dependencies.csv : Generates the dependencies file
+build/distributions/dependencies.csv: $(PYTHON)
+	@mkdir -p build/distributions
+	$(PYTHON) dev-tools/dependencies-report --csv $@
+
+## test-mage : Test the mage installation used by the Unified Release process
+test-mage: mage
+	@mage dumpVariables

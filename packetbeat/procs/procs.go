@@ -19,76 +19,87 @@ package procs
 
 import (
 	"net"
-	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-sysinfo"
 )
 
 // This controls how often process info for a running process is reloaded
 // A big value means less unnecessary refreshes at a higher risk of missing
 // a PID being recycled by the OS
-const processCacheExpiration = time.Second * 30
+const processCacheExpiration = 30 * time.Second
 
 var (
 	anyIPv4 = net.IPv4zero.String()
 	anyIPv6 = net.IPv6unspecified.String()
 )
 
+// ProcessWatcher implements process enrichment for network traffic.
+type ProcessesWatcher struct {
+	mu           sync.Mutex
+	portProcMap  map[applayer.Transport]map[endpoint]portProcMapping
+	localAddrs   []net.IP         // localAddrs lists IP addresses that are to be treated as local.
+	processCache map[int]*process // processCache is a time-expiration cache of process details keyed on PID.
+
+	enabled   bool         // enabled specifier whether the ProcessWatcher will be active.
+	monitored []ProcConfig // monitored is the set of processes that are monitored by the ProcessWatcher.
+
+	// watcher is the OS-dependent engine for the ProcessWatcher.
+	watcher processWatcher
+}
+
+// endpoint is a network address/port number complex.
 type endpoint struct {
 	address string
 	port    uint16
 }
 
+// portProcMapping is an association between an endpoint and a process.
 type portProcMapping struct {
-	endpoint endpoint
+	endpoint endpoint // FIXME: This is never used.
 	pid      int
 	proc     *process
 }
 
+// process describes an OS process.
 type process struct {
 	pid, ppid      int
 	name, exe, cwd string
 	args           []string
 	startTime      time.Time
 
-	// To control cache expiration
-	expiration time.Time
+	// expires is the time at which the process will be dropped
+	// from the cache during enrichment queries.
+	expires time.Time
 }
 
-// Allow the OS-dependent implementation to be replaced by a mock for testing
-type processWatcherImpl interface {
+// Init initializes the ProcessWatcher with the provided configuration.
+func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
+	return proc.init(config, proc)
+}
+
+// processWatcher allows the OS-dependent implementation to be replaced by a mock for testing
+type processWatcher interface {
 	// GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 	// that owns them.
 	GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error)
+
 	// GetProcess returns the process metadata.
 	GetProcess(pid int) *process
-	// GetLocalIPs returns the list of local addresses.
+
+	// GetLocalIPs returns the list of local addresses. If the returned error
+	// is non-nil, the IP slice is nil.
 	GetLocalIPs() ([]net.IP, error)
 }
 
-type ProcessesWatcher struct {
-	portProcMap  map[applayer.Transport]map[endpoint]portProcMapping
-	localAddrs   []net.IP
-	processCache map[int]*process
-
-	// config
-	enabled    bool
-	procConfig []ProcConfig
-
-	impl processWatcherImpl
-}
-
-func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
-	return proc.initWithImpl(config, proc)
-}
-
-func (proc *ProcessesWatcher) initWithImpl(config ProcsConfig, impl processWatcherImpl) error {
-	proc.impl = impl
+// init sets up the necessary data structures for the ProcessWatcher.
+func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher) error {
+	proc.watcher = watcher
 	proc.portProcMap = map[applayer.Transport]map[endpoint]portProcMapping{
 		applayer.TransportUDP: make(map[endpoint]portProcMapping),
 		applayer.TransportTCP: make(map[endpoint]portProcMapping),
@@ -103,15 +114,14 @@ func (proc *ProcessesWatcher) initWithImpl(config ProcsConfig, impl processWatch
 		logp.Info("Process watcher disabled")
 	}
 
-	// Read the local IP addresses
+	// Read the local IP addresses.
 	var err error
-	proc.localAddrs, err = impl.GetLocalIPs()
+	proc.localAddrs, err = watcher.GetLocalIPs()
 	if err != nil {
 		logp.Err("Error getting local IP addresses: %s", err)
-		proc.localAddrs = []net.IP{}
 	}
 
-	proc.procConfig = config.Monitored
+	proc.monitored = config.Monitored
 
 	return nil
 }
@@ -130,48 +140,57 @@ func (proc *ProcessesWatcher) FindProcessesTupleUDP(tuple *common.IPPortTuple) (
 
 // FindProcessesTuple looks up local process information for the source and
 // destination addresses of a tuple for the given transport protocol
-func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple, transport applayer.Transport) (procTuple *common.ProcessTuple) {
-	procTuple = &common.ProcessTuple{}
-
+func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple, transport applayer.Transport) *common.ProcessTuple {
+	var procTuple common.ProcessTuple
 	if !proc.enabled {
+		return &procTuple
+	}
+	proc.enrich(&procTuple.Src, tuple.SrcIP, tuple.SrcPort, transport)
+	proc.enrich(&procTuple.Dst, tuple.DstIP, tuple.DstPort, transport)
+	return &procTuple
+}
+
+// enrich adds process information to dst for the process associated with the given IP, port and
+// transport if the IP is not local and the information is available to the ProcessWatcher.
+func (proc *ProcessesWatcher) enrich(dst *common.Process, ip net.IP, port uint16, transport applayer.Transport) {
+	if !proc.isLocalIP(ip) {
 		return
 	}
+	p := proc.findProc(ip, port, transport)
+	if p == nil {
+		return
+	}
+	dst.PID = p.pid
+	dst.PPID = p.ppid
+	dst.Name = p.name
+	dst.Args = p.args
+	dst.Exe = p.exe
+	dst.StartTime = p.startTime
+	if logp.IsDebug("procs") {
+		logp.Debug("procs", "Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, ip, port, transport)
+	}
+}
 
-	if proc.isLocalIP(tuple.SrcIP) {
-		if p := proc.findProc(tuple.SrcIP, tuple.SrcPort, transport); p != nil {
-			procTuple.Src.PID = p.pid
-			procTuple.Src.PPID = p.ppid
-			procTuple.Src.Name = p.name
-			procTuple.Src.Args = p.args
-			procTuple.Src.Exe = p.exe
-			procTuple.Src.StartTime = p.startTime
-			if logp.IsDebug("procs") {
-				logp.Debug("procs", "Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, tuple.SrcIP, tuple.SrcPort, transport)
-			}
+func (proc *ProcessesWatcher) isLocalIP(ip net.IP) bool {
+	if ip.IsLoopback() {
+		return true
+	}
+	for _, addr := range proc.localAddrs {
+		if ip.Equal(addr) {
+			return true
 		}
 	}
-
-	if proc.isLocalIP(tuple.DstIP) {
-		if p := proc.findProc(tuple.DstIP, tuple.DstPort, transport); p != nil {
-			procTuple.Dst.PID = p.pid
-			procTuple.Dst.PPID = p.ppid
-			procTuple.Dst.Name = p.name
-			procTuple.Dst.Args = p.args
-			procTuple.Dst.Exe = p.exe
-			procTuple.Dst.StartTime = p.startTime
-			if logp.IsDebug("procs") {
-				logp.Debug("procs", "Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, tuple.DstIP, tuple.DstPort, transport)
-			}
-		}
-	}
-
-	return
+	return false
 }
 
 func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport applayer.Transport) *process {
+	// This should not be necessary; none of the
+	// dependency code panics in normal operation.
 	defer logp.Recover("FindProc exception")
 
+	proc.mu.Lock()
 	procMap, ok := proc.portProcMap[transport]
+	proc.mu.Unlock()
 	if !ok {
 		return nil
 	}
@@ -198,7 +217,7 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 	// This function takes the naive approach of giving precedence to the more
 	// specific address and then to INADDR_ANY.
 	if p, found = procMap[endpoint{address.String(), port}]; found {
-		return
+		return p, found
 	}
 
 	nullAddr := anyIPv4
@@ -206,7 +225,7 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 		nullAddr = anyIPv6
 	}
 	p, found = procMap[endpoint{nullAddr, port}]
-	return
+	return p, found
 }
 
 func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
@@ -217,7 +236,7 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 		}()
 	}
 
-	endpoints, err := proc.impl.GetLocalPortToPIDMapping(transport)
+	endpoints, err := proc.watcher.GetLocalPortToPIDMapping(transport)
 	if err != nil {
 		logp.Err("unable to list local ports: %v", err)
 	}
@@ -229,7 +248,18 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 	}
 }
 
+func (proc *ProcessesWatcher) expireProcessCache() {
+	now := time.Now()
+	for pid, info := range proc.processCache {
+		if now.After(info.expires) {
+			delete(proc.processCache, pid)
+		}
+	}
+}
+
 func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e endpoint, pid int) {
+	proc.mu.Lock()
+	defer proc.mu.Unlock()
 	prev, ok := proc.portProcMap[transport][e]
 	if ok && prev.pid == pid {
 		// This port->pid mapping already exists
@@ -253,33 +283,26 @@ func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e
 	}
 }
 
-func (proc *ProcessesWatcher) isLocalIP(ip net.IP) bool {
-	if ip.IsLoopback() {
-		return true
-	}
-
-	for _, addr := range proc.localAddrs {
-		if ip.Equal(addr) {
-			return true
-		}
-	}
-
-	return false
-}
-
+// getProcessInfo returns a potentially cached process corresponding to the
+// provided process ID.
+//
+// If any part of the process's argv contains a substring in proc.monitored.CmdlineGrep,
+// the name of the process is replaced with the corresponding proc.monitored.Process.
+// This behaviour is not recommended to be used and is not available to integrations
+// packages by design.
 func (proc *ProcessesWatcher) getProcessInfo(pid int) *process {
 	if p, ok := proc.processCache[pid]; ok {
 		return p
 	}
 	// Not in cache, resolve process info
-	p := proc.impl.GetProcess(pid)
+	p := proc.watcher.GetProcess(pid)
 	if p == nil {
 		return nil
 	}
 
 	// The packetbeat.procs.monitored*.cmdline_grep allows you to overwrite
 	// the process name with an alias.
-	for _, match := range proc.procConfig {
+	for _, match := range proc.monitored {
 		if strings.Contains(strings.Join(p.args, " "), match.CmdlineGrep) {
 			p.name = match.Process
 			break
@@ -287,15 +310,6 @@ func (proc *ProcessesWatcher) getProcessInfo(pid int) *process {
 	}
 	proc.processCache[pid] = p
 	return p
-}
-
-func (proc *ProcessesWatcher) expireProcessCache() {
-	now := time.Now()
-	for pid, info := range proc.processCache {
-		if now.After(info.expiration) {
-			delete(proc.processCache, pid)
-		}
-	}
 }
 
 // GetProcess returns the process metadata.
@@ -316,20 +330,15 @@ func (proc *ProcessesWatcher) GetProcess(pid int) *process {
 		return nil
 	}
 
-	name := info.Name
-	if len(info.Args) > 0 {
-		// Workaround the 20 char limit on comm values on Linux.
-		name = filepath.Base(info.Args[0])
-	}
 	return &process{
-		pid:        info.PID,
-		ppid:       info.PPID,
-		name:       name,
-		exe:        info.Exe,
-		cwd:        info.CWD,
-		args:       info.Args,
-		startTime:  info.StartTime,
-		expiration: time.Now().Add(processCacheExpiration),
+		pid:       info.PID,
+		ppid:      info.PPID,
+		name:      procName(info),
+		exe:       info.Exe,
+		cwd:       info.CWD,
+		args:      info.Args,
+		startTime: info.StartTime,
+		expires:   time.Now().Add(processCacheExpiration),
 	}
 }
 

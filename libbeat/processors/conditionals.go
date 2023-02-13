@@ -24,15 +24,15 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // NewConditional returns a constructor suitable for registering when conditionals as a plugin.
 func NewConditional(
 	ruleFactory Constructor,
 ) Constructor {
-	return func(cfg *common.Config) (Processor, error) {
+	return func(cfg *config.C) (Processor, error) {
 		rule, err := ruleFactory(cfg)
 		if err != nil {
 			return nil, err
@@ -43,9 +43,9 @@ func NewConditional(
 }
 
 // NewConditionList takes a slice of Config objects and turns them into real Condition objects.
-func NewConditionList(config []conditions.Config) ([]conditions.Condition, error) {
-	out := make([]conditions.Condition, len(config))
-	for i, condConfig := range config {
+func NewConditionList(configs []conditions.Config) ([]conditions.Condition, error) {
+	out := make([]conditions.Condition, len(configs))
+	for i, condConfig := range configs {
 		cond, err := conditions.NewCondition(&condConfig)
 		if err != nil {
 			return nil, err
@@ -64,10 +64,10 @@ type WhenProcessor struct {
 
 // NewConditionRule returns a processor that will execute the provided processor if the condition is true.
 func NewConditionRule(
-	config conditions.Config,
+	c conditions.Config,
 	p Processor,
 ) (Processor, error) {
-	cond, err := conditions.NewCondition(&config)
+	cond, err := conditions.NewCondition(&c)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize condition")
 	}
@@ -91,7 +91,7 @@ func (r *WhenProcessor) String() string {
 }
 
 func addCondition(
-	cfg *common.Config,
+	cfg *config.C,
 	p Processor,
 ) (Processor, error) {
 	if !cfg.HasField("when") {
@@ -112,8 +112,8 @@ func addCondition(
 
 type ifThenElseConfig struct {
 	Cond conditions.Config `config:"if"   validate:"required"`
-	Then *common.Config    `config:"then" validate:"required"`
-	Else *common.Config    `config:"else"`
+	Then *config.C         `config:"then" validate:"required"`
+	Else *config.C         `config:"else"`
 }
 
 // IfThenElseProcessor executes one set of processors (then) if the condition is
@@ -125,23 +125,23 @@ type IfThenElseProcessor struct {
 }
 
 // NewIfElseThenProcessor construct a new IfThenElseProcessor.
-func NewIfElseThenProcessor(cfg *common.Config) (*IfThenElseProcessor, error) {
-	var config ifThenElseConfig
-	if err := cfg.Unpack(&config); err != nil {
+func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
+	var c ifThenElseConfig
+	if err := cfg.Unpack(&c); err != nil {
 		return nil, err
 	}
 
-	cond, err := conditions.NewCondition(&config.Cond)
+	cond, err := conditions.NewCondition(&c.Cond)
 	if err != nil {
 		return nil, err
 	}
 
-	newProcessors := func(c *common.Config) (*Processors, error) {
+	newProcessors := func(c *config.C) (*Processors, error) {
 		if c == nil {
 			return nil, nil
 		}
 		if !c.IsArray() {
-			return New([]*common.Config{c})
+			return New([]*config.C{c})
 		}
 
 		var pc PluginConfig
@@ -152,10 +152,10 @@ func NewIfElseThenProcessor(cfg *common.Config) (*IfThenElseProcessor, error) {
 	}
 
 	var ifProcessors, elseProcessors *Processors
-	if ifProcessors, err = newProcessors(config.Then); err != nil {
+	if ifProcessors, err = newProcessors(c.Then); err != nil {
 		return nil, err
 	}
-	if elseProcessors, err = newProcessors(config.Else); err != nil {
+	if elseProcessors, err = newProcessors(c.Else); err != nil {
 		return nil, err
 	}
 

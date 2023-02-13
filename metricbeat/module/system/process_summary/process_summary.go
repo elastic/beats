@@ -21,14 +21,18 @@
 package process_summary
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+	"io/ioutil"
+	"runtime"
+	"strconv"
+	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/metric/system/process"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // init registers the MetricSet with the central registry.
@@ -67,7 +71,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	procList, err := process.ListStates(m.sys)
 	if err != nil {
-		return errors.Wrap(err, "error fetching process list")
+		return fmt.Errorf("error fetching process list: %w", err)
 	}
 
 	procStates := map[string]int{}
@@ -79,8 +83,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}
 
-	outMap := common.MapStr{}
-	typeconv.Convert(&outMap, procStates)
+	outMap := mapstr.M{}
+	err = typeconv.Convert(&outMap, procStates)
+	if err != nil {
+		return fmt.Errorf("error formatting process stats: %w", err)
+	}
+	if runtime.GOOS == "linux" {
+		threads, err := threadStats(m.sys)
+		if err != nil {
+			return fmt.Errorf("error fetching thread stats: %w", err)
+		}
+		outMap["threads"] = threads
+	}
 	outMap["total"] = len(procList)
 	r.Event(mb.Event{
 		// change the name space to use . instead of _
@@ -89,4 +103,35 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	})
 
 	return nil
+}
+
+// threadStats returns a map of state counts for running threads on a system
+func threadStats(sys resolve.Resolver) (mapstr.M, error) {
+	statPath := sys.ResolveHostFS("/proc/stat")
+	procData, err := ioutil.ReadFile(statPath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading procfs file %s: %w", statPath, err)
+	}
+	threadData := mapstr.M{}
+	for _, line := range strings.Split(string(procData), "\n") {
+		// look for format procs_[STATE] [COUNT]
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+		if strings.Contains(fields[0], "procs_") {
+			keyFields := strings.Split(fields[0], "_")
+			// the field isn't what we're expecting, continue
+			if len(keyFields) < 2 {
+				continue
+			}
+			procsInt, err := strconv.ParseInt(fields[1], 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("Error parsing value %s from %s: %w", fields[0], statPath, err)
+			}
+
+			threadData[keyFields[1]] = procsInt
+		}
+	}
+	return threadData, nil
 }

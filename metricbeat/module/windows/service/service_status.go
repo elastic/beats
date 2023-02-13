@@ -22,6 +22,7 @@ package service
 
 import (
 	"bytes"
+	"os"
 	"strconv"
 	"syscall"
 	"time"
@@ -33,7 +34,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/gosigar"
 )
 
@@ -232,7 +233,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 	if ServiceState(rawService.ServiceStatusProcess.DwCurrentState) != ServiceStopped {
 		processUpTime, err := getServiceUptime(rawService.ServiceStatusProcess.DwProcessId)
 		if err != nil {
-			if _, ok := protectedServices[service.ServiceName]; errors.Cause(err) == syscall.ERROR_ACCESS_DENIED && !ok {
+			if _, ok := protectedServices[service.ServiceName]; errors.Is(err, os.ErrPermission) && !ok {
 				protectedServices[service.ServiceName] = struct{}{}
 				logp.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
 			} else {

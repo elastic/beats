@@ -23,11 +23,13 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type copyFields struct {
@@ -51,7 +53,7 @@ func init() {
 }
 
 // NewCopyFields returns a new copy_fields processor.
-func NewCopyFields(c *common.Config) (processors.Processor, error) {
+func NewCopyFields(c *conf.C) (processors.Processor, error) {
 	config := copyFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -78,7 +80,9 @@ func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
 		err := f.copyField(field.From, field.To, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to copy fields in copy_fields processor: %s", err)
-			f.logger.Debug(errMsg.Error())
+			if publisher.LogWithTrace() {
+				f.logger.Debug(errMsg.Error())
+			}
 			if f.config.FailOnError {
 				event = backup
 				event.PutValue("error.message", errMsg.Error())
@@ -98,7 +102,7 @@ func (f *copyFields) copyField(from string, to string, event *beat.Event) error 
 
 	value, err := event.GetValue(from)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)
@@ -120,10 +124,10 @@ func (f *copyFields) String() string {
 // maps without doing any type conversions.
 func cloneValue(value interface{}) interface{} {
 	switch v := value.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		return v.Clone()
 	case map[string]interface{}:
-		return common.MapStr(v).Clone()
+		return mapstr.M(v).Clone()
 	case []interface{}:
 		len := len(v)
 		newArr := make([]interface{}, len)

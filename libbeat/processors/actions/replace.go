@@ -24,15 +24,18 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type replaceString struct {
 	config replaceStringConfig
+	log    *logp.Logger
 }
 
 type replaceStringConfig struct {
@@ -56,7 +59,7 @@ func init() {
 }
 
 // NewReplaceString returns a new replace processor.
-func NewReplaceString(c *common.Config) (processors.Processor, error) {
+func NewReplaceString(c *conf.C) (processors.Processor, error) {
 	config := replaceStringConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -68,6 +71,7 @@ func NewReplaceString(c *common.Config) (processors.Processor, error) {
 
 	f := &replaceString{
 		config: config,
+		log:    logp.NewLogger("replace"),
 	}
 	return f, nil
 }
@@ -83,7 +87,9 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to replace fields in processor: %s", err)
-			logp.Debug("replace", errMsg.Error())
+			if publisher.LogWithTrace() {
+				f.log.Debug(errMsg.Error())
+			}
 			if f.config.FailOnError {
 				event = backup
 				event.PutValue("error.message", errMsg.Error())
@@ -99,7 +105,7 @@ func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, repla
 	currentValue, err := event.GetValue(field)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)

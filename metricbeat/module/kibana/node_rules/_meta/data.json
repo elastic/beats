@@ -1,0 +1,21 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"kibana",
+        "name":"node_rules",
+        "rtt":44269
+    },
+    "kibana":{
+        "node_rules":{
+            "executions": 10,
+            "failures": 0,
+            "timeouts": 0
+        }
+    },
+    "type":"metricsets"
+}

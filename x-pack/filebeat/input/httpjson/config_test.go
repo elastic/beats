@@ -7,6 +7,7 @@ package httpjson
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"testing"
 
@@ -14,7 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2/google"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 func TestProviderCanonical(t *testing.T) {
@@ -90,7 +92,7 @@ func TestConfigFailsWithInvalidMethod(t *testing.T) {
 	m := map[string]interface{}{
 		"request.method": "DELETE",
 	}
-	cfg := common.MustNewConfigFrom(m)
+	cfg := conf.MustNewConfigFrom(m)
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
@@ -101,7 +103,7 @@ func TestConfigMustFailWithInvalidURL(t *testing.T) {
 	m := map[string]interface{}{
 		"request.url": "::invalid::",
 	}
-	cfg := common.MustNewConfigFrom(m)
+	cfg := conf.MustNewConfigFrom(m)
 	conf := defaultConfig()
 	err := cfg.Unpack(&conf)
 	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'request.url'`)
@@ -150,6 +152,32 @@ func TestConfigOauth2Validation(t *testing.T) {
 			expectedErr: "both token_url and client credentials must be provided accessing 'auth.oauth2'",
 			input: map[string]interface{}{
 				"auth.oauth2": map[string]interface{}{},
+			},
+		},
+		{
+			name: "client credential secret may be empty",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"enabled":   true,
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id":     "a_client_id",
+						"secret": "",
+					},
+				},
+			},
+		},
+		{
+			name:        "client credential secret may not be missing",
+			expectedErr: "both token_url and client credentials must be provided accessing 'auth.oauth2'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"enabled":   true,
+					"token_url": "localhost",
+					"client": map[string]interface{}{
+						"id": "a_client_id",
+					},
+				},
 			},
 		},
 		{
@@ -325,6 +353,21 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 		},
 		{
+			name: "google must work if jwt_json is correct",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider": "google",
+					"google.jwt_json": `{
+						"type":           "service_account",
+						"project_id":     "foo",
+						"private_key_id": "x",
+						"client_email":   "foo@bar.com",
+						"client_id":      "0"
+					}`,
+				},
+			},
+		},
+		{
 			name: "google must work if credentials_json is correct",
 			input: map[string]interface{}{
 				"auth.oauth2": map[string]interface{}{
@@ -346,6 +389,16 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"auth.oauth2": map[string]interface{}{
 					"provider":                "google",
 					"google.credentials_json": `invalid`,
+				},
+			},
+		},
+		{
+			name:        "google must fail if jwt_json is not a valid JSON",
+			expectedErr: "the field can't be converted to valid JSON accessing 'auth.oauth2.google.jwt_json'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":        "google",
+					"google.jwt_json": `invalid`,
 				},
 			},
 		},
@@ -394,7 +447,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 			}
 
 			c.input["request.url"] = "localhost"
-			cfg := common.MustNewConfigFrom(c.input)
+			cfg := conf.MustNewConfigFrom(c.input)
 			conf := defaultConfig()
 			err := cfg.Unpack(&conf)
 
@@ -426,11 +479,67 @@ func TestCursorEntryConfig(t *testing.T) {
 		},
 		"entry4": map[string]interface{}{},
 	}
-	cfg := common.MustNewConfigFrom(in)
+	cfg := conf.MustNewConfigFrom(in)
 	conf := cursorConfig{}
 	require.NoError(t, cfg.Unpack(&conf))
 	assert.True(t, conf["entry1"].mustIgnoreEmptyValue())
 	assert.False(t, conf["entry2"].mustIgnoreEmptyValue())
 	assert.True(t, conf["entry3"].mustIgnoreEmptyValue())
 	assert.True(t, conf["entry4"].mustIgnoreEmptyValue())
+}
+
+var keepAliveTests = []struct {
+	name    string
+	input   map[string]interface{}
+	want    httpcommon.WithKeepaliveSettings
+	wantErr error
+}{
+	{
+		name:  "keep_alive_none", // Default to the old behaviour of true.
+		input: map[string]interface{}{},
+		want:  httpcommon.WithKeepaliveSettings{Disable: true},
+	},
+	{
+		name: "keep_alive_true",
+		input: map[string]interface{}{
+			"request.keep_alive.disable": true,
+		},
+		want: httpcommon.WithKeepaliveSettings{Disable: true},
+	},
+	{
+		name: "keep_alive_false",
+		input: map[string]interface{}{
+			"request.keep_alive.disable": false,
+		},
+		want: httpcommon.WithKeepaliveSettings{Disable: false},
+	},
+	{
+		name: "keep_alive_invalid_max",
+		input: map[string]interface{}{
+			"request.keep_alive.disable":              false,
+			"request.keep_alive.max_idle_connections": -1,
+		},
+		wantErr: errors.New("max_idle_connections must not be negative accessing 'request.keep_alive'"),
+	},
+}
+
+func TestKeepAliveSetting(t *testing.T) {
+	for _, test := range keepAliveTests {
+		t.Run(test.name, func(t *testing.T) {
+			test.input["request.url"] = "localhost"
+			cfg := conf.MustNewConfigFrom(test.input)
+			conf := defaultConfig()
+			err := cfg.Unpack(&conf)
+			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+				t.Errorf("unexpected error return from Unpack: got: %q want: %q", err, test.wantErr)
+			}
+			if err != nil {
+				return
+			}
+			got := conf.Request.KeepAlive.settings()
+			if got != test.want {
+				t.Errorf("unexpected setting for %s: got: %#v\nwant:%#v", test.name, got, test.want)
+			}
+		})
+	}
 }

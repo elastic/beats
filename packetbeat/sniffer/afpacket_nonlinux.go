@@ -50,3 +50,9 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 
 func (h *afpacketHandle) Close() {
 }
+
+// isAfpacketErrTimeout returns whether the error is afpacket.ErrTimeout, always false on
+// non-linux systems.
+func isAfpacketErrTimeout(error) bool {
+	return false
+}

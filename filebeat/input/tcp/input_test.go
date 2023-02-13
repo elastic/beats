@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestCreateEvent(t *testing.T) {
@@ -48,7 +48,7 @@ func TestCreateEvent(t *testing.T) {
 }
 
 func TestNewInputDone(t *testing.T) {
-	config := common.MapStr{
+	config := mapstr.M{
 		"host": ":0",
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)

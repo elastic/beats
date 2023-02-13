@@ -1,6 +1,8 @@
 ////
 This file is generated! See scripts/mage/docs_collector.go
 ////
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/kubernetes/state_persistentvolumeclaim/_meta/docs.asciidoc
+
 
 [[metricbeat-metricset-kubernetes-state_persistentvolumeclaim]]
 === Kubernetes state_persistentvolumeclaim metricset
@@ -8,8 +10,11 @@ This file is generated! See scripts/mage/docs_collector.go
 include::../../../module/kubernetes/state_persistentvolumeclaim/_meta/docs.asciidoc[]
 
 
+:edit_url:
+
 ==== Fields
 
 For a description of each field in the metricset, see the
 <<exported-fields-kubernetes,exported fields>> section.
 
+:edit_url!:

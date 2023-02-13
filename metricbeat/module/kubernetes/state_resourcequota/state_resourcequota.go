@@ -97,5 +97,4 @@ func (m *ResourceQuotaMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-	return
 }

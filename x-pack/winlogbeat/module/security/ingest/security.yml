@@ -2,8 +2,8 @@
 description: Pipeline for Windows Security events
 processors:
   - set:
-      field: event.ingested
-      value: '{{_ingest.timestamp}}'
+      field: event.module
+      value: security
   - convert:
       field: event.code
       type: string
@@ -815,10 +815,15 @@ processors:
         }
         Long newUacValue = Long.decode(ctx.winlog.event_data.NewUacValue);
         ArrayList uacResult = new ArrayList();
-        for (entry in params.entrySet()) {
-          Long flag = Long.decode(entry.getKey());
-          if ((newUacValue.longValue() & flag.longValue()) == flag.longValue()) {
-            uacResult.add(entry.getValue());
+        def[] w = new def[] { null };
+        for (long b = 0; b < 32; b++) {
+          long flag = 1L << b;
+          if ((newUacValue.longValue() & flag) == flag) {
+            w[0] = flag;
+            def desc = params[String.format("0x%08X", w)];
+            if (desc != null) {
+              uacResult.add(desc);
+            }
           }
         }
         if (uacResult.length == 0) {
@@ -870,10 +875,15 @@ processors:
         }
         Long tOpts = Long.decode(ctx.winlog.event_data.TicketOptions);
         ArrayList tDescs = new ArrayList();
-        for (entry in params.entrySet()) {
-          Long flag = Long.decode(entry.getKey());
-          if ((tOpts.longValue() & flag.longValue()) == flag.longValue()) {
-            tDescs.add(entry.getValue());
+        def[] w = new def[] { null };
+        for (long b = 0; b < 32; b++) {
+          long flag = 1L << b;
+          if ((tOpts.longValue() & flag) == flag) {
+            w[0] = flag;
+            def desc = params[String.format("0x%08X", w)];
+            if (desc != null) {
+              tDescs.add(desc);
+            }
           }
         }
         if (tDescs.length == 0) {
@@ -2085,6 +2095,22 @@ processors:
           "0x40000000": ADS_RIGHT_GENERIC_WRITE
           "0x80000000": ADS_RIGHT_GENERIC_READ
       source: |-
+        def split(String s) {
+          def f = new ArrayList();
+          int last = 0;
+          for (; last < s.length() && Character.isWhitespace(s.charAt(last)); last++) {}
+          for (def i = last; i < s.length(); i++) {
+            if (!Character.isWhitespace(s.charAt(i))) {
+              continue;
+            }
+            f.add(s.substring(last, i));
+            for (; i < s.length() && Character.isWhitespace(s.charAt(i)); i++) {}
+            last = i;
+          }
+          f.add(s.substring(last));
+          return f;
+        }
+
         if (ctx?.winlog?.event_data?.FailureReason != null) {
           def code = ctx.winlog.event_data.FailureReason.replace("%%","");
           if (params.descriptions.containsKey(code)) {
@@ -2113,7 +2139,7 @@ processors:
         }
         if (ctx?.winlog?.event_data?.AccessList != null) {
           ArrayList results = new ArrayList();
-          for (elem in ctx.winlog.event_data.AccessList.splitOnToken(" ")) {
+          for (elem in split(ctx.winlog.event_data.AccessList)) {
             def code = elem.replace("%%","").trim();
             if (params.descriptions.containsKey(code)) {
               results.add(params.descriptions[code]);
@@ -2124,17 +2150,36 @@ processors:
           }
         }
         if (ctx?.winlog?.event_data?.AccessMask != null) {
-          ArrayList results = new ArrayList();
-          Long accessMask = Long.decode(ctx.winlog.event_data.AccessMask);
-          for (entry in params.AccessMaskDescriptions.entrySet()) {
-            Long accessFlag = Long.decode(entry.getKey());
-            if ((accessMask.longValue() & accessFlag.longValue()) == accessFlag.longValue()) {
-              results.add(entry.getValue());
+          ArrayList list = new ArrayList();
+          long accessMask;
+          for (elem in split(ctx.winlog.event_data.AccessMask)) {
+            if (elem.length() == 0) {
+              continue;
+            }
+            list.add(elem);
+            def code = elem.replace("%%","").trim();
+            accessMask |= Long.decode(code).longValue();
+          }
+          if (list.length > 0) {
+            ctx.winlog.event_data.put("AccessMask", list);
+          }
+
+          ArrayList desc = new ArrayList();
+          def[] w = new def[] { null };
+          for (long b = 0; b < 32; b++) {
+            long flag = 1L << b;
+            if ((accessMask & flag) == flag) {
+              w[0] = flag;
+              def fDesc = params.AccessMaskDescriptions[String.format("0x%08X", w)];
+              if (fDesc != null) {
+                desc.add(fDesc);
+              }
             }
           }
-          if (results.length > 0) {
-            ctx.winlog.event_data.put("AccessMaskDescription", results);
+          if (desc.length > 0) {
+            ctx.winlog.event_data.put("AccessMaskDescription", desc);
           }
+          ArrayList results = new ArrayList();
         }
   - script:
       lang: painless
@@ -2304,7 +2349,12 @@ processors:
 
         //ClientAddress to source.ip and related.ip
         if (ctx?.winlog?.event_data?.ClientAddress != null &&
-            ctx.winlog.event_data.ClientAddress != "-") {
+            ctx.winlog.event_data.ClientAddress != "-" &&
+            ctx.winlog.event_data.ClientAddress != "Unknown") {
+          // Correct invalid IP address "LOCAL"
+          if (ctx?.winlog?.event_data?.ClientAddress == "LOCAL") {
+            ctx.winlog.event_data.ClientAddress="127.0.0.1";
+          }
           if (ctx?.source == null) {
             HashMap hm = new HashMap();
             ctx.put("source", hm);
@@ -2860,6 +2910,22 @@ processors:
           def parts = ctx.process.parent.executable.splitOnToken("\\");
           ctx.process.parent.put("name", parts[-1]);
         }
+        if (ctx?.winlog?.event_data?.ProcessId != null) {
+          if (ctx?.process == null) {
+            HashMap hm = new HashMap();
+            ctx.put("process", hm);
+          }
+          if (ctx?.process?.parent == null) {
+            HashMap hm = new HashMap();
+            ctx.process.put("parent", hm);
+          }
+          if (ctx.winlog.event_data.ProcessId instanceof String) {
+            Long pid = Long.decode(ctx.winlog.event_data.ProcessId);
+            ctx.process.parent.put("pid", pid.longValue());
+          } else {
+            ctx.process.parent.put("pid", ctx.winlog.event_data.ProcessId);
+          }
+        }
         if (ctx?.winlog?.event_data?.CommandLine != null) {
           int start = 0;
           int end = 0;
@@ -3299,14 +3365,32 @@ processors:
           }
         }
 
-        void splitSidList(def sids, def params, def ctx) {
-          ArrayList al = new ArrayList();
-          def sidList = sids.splitOnToken(" ");
-          ctx.winlog.event_data.put("SidList", sidList);
-          for (def i = 0; i < sidList.length; i++ ) {
-            al.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", "").replace(" ",""), params));
+        def split(String s) {
+          def f = new ArrayList();
+          int last = 0;
+          for (; last < s.length() && Character.isWhitespace(s.charAt(last)); last++) {}
+          for (def i = last; i < s.length(); i++) {
+            if (!Character.isWhitespace(s.charAt(i))) {
+              continue;
+            }
+            f.add(s.substring(last, i));
+            for (; i < s.length() && Character.isWhitespace(s.charAt(i)); i++) {}
+            last = i;
           }
-          ctx.winlog.event_data.put("SidListDesc", al);
+          f.add(s.substring(last));
+          return f;
+        }
+
+        void splitSidList(def sids, def params, def ctx) {
+          ArrayList list = new ArrayList();
+          ArrayList desc = new ArrayList();
+          def sidList = split(sids);
+          for (def i = 0; i < sidList.length; i++) {
+            list.add(sidList[i]);
+            desc.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", ""), params));
+          }
+          ctx.winlog.event_data.put("SidList", list);
+          ctx.winlog.event_data.put("SidListDesc", desc);
         }
 
         if (ctx?.event?.code == null ||

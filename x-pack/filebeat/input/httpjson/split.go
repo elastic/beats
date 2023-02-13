@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -19,6 +19,7 @@ var (
 	errExpectedSplitArr    = errors.New("split was expecting field to be an array")
 	errExpectedSplitObj    = errors.New("split was expecting field to be an object")
 	errExpectedSplitString = errors.New("split was expecting field to be a string")
+	errUnknownSplitType    = errors.New("unknown split type")
 )
 
 // split is a split processor chain element. Split processing is executed
@@ -100,9 +101,9 @@ func (s *split) run(ctx *transformContext, resp transformable, ch chan<- maybeMs
 }
 
 // split recursively executes the split processor chain.
-func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybeMsg) error {
+func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) error {
 	v, err := root.GetValue(s.targetInfo.Name)
-	if err != nil && err != common.ErrKeyNotFound {
+	if err != nil && err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by GetValue.
 		return err
 	}
 
@@ -111,9 +112,16 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 			if s.child != nil {
 				return s.child.split(ctx, root, ch)
 			}
+			if s.keepParent {
+				ch <- maybeMsg{msg: root}
+			}
 			return nil
 		}
 		if s.isRoot {
+			if s.keepParent {
+				ch <- maybeMsg{msg: root}
+				return errEmptyField
+			}
 			return errEmptyRootField
 		}
 		ch <- maybeMsg{msg: root}
@@ -132,9 +140,13 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 				if s.child != nil {
 					return s.child.split(ctx, root, ch)
 				}
+				if s.keepParent {
+					ch <- maybeMsg{msg: root}
+				}
 				return nil
 			}
 			if s.isRoot {
+				ch <- maybeMsg{msg: root}
 				return errEmptyRootField
 			}
 			ch <- maybeMsg{msg: root}
@@ -142,14 +154,15 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		for _, e := range varr {
-			if err := s.sendMessage(ctx, root, "", e, ch); err != nil {
+			err := s.sendMessage(ctx, root, s.targetInfo.Name, e, ch)
+			if err != nil {
 				s.log.Debug(err)
 			}
 		}
 
 		return nil
 	case splitTypeMap:
-		vmap, ok := toMapStr(v)
+		vmap, ok := toMapStr(v, s.targetInfo.Name)
 		if !ok {
 			return errExpectedSplitObj
 		}
@@ -158,6 +171,9 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 			if s.ignoreEmptyValue {
 				if s.child != nil {
 					return s.child.split(ctx, root, ch)
+				}
+				if s.keepParent {
+					ch <- maybeMsg{msg: root}
 				}
 				return nil
 			}
@@ -203,25 +219,23 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		return nil
 	}
 
-	return errors.New("unknown split type")
+	return errUnknownSplitType
 }
 
 // sendMessage sends an array or map split result value, v, on ch after performing
 // any necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessage(ctx *transformContext, root common.MapStr, key string, v interface{}, ch chan<- maybeMsg) error {
-	obj, ok := toMapStr(v)
+func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, ch chan<- maybeMsg) error {
+	obj, ok := toMapStr(v, s.targetInfo.Name)
 	if !ok {
 		return errExpectedSplitObj
 	}
-
-	clone := root.Clone()
-
 	if s.keyField != "" && key != "" {
 		_, _ = obj.Put(s.keyField, key)
 	}
 
+	clone := root.Clone()
 	if s.keepParent {
-		_, _ = clone.Put(s.targetInfo.Name, obj)
+		_, _ = clone.Put(s.targetInfo.Name, v)
 	} else {
 		clone = obj
 	}
@@ -246,22 +260,24 @@ func (s *split) sendMessage(ctx *transformContext, root common.MapStr, key strin
 	return nil
 }
 
-func toMapStr(v interface{}) (common.MapStr, bool) {
+func toMapStr(v interface{}, key string) (mapstr.M, bool) {
 	if v == nil {
-		return common.MapStr{}, false
+		return mapstr.M{}, false
 	}
 	switch t := v.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		return t, true
 	case map[string]interface{}:
-		return common.MapStr(t), true
+		return mapstr.M(t), true
+	case string, []bool, []int, []string, []interface{}:
+		return mapstr.M{key: t}, true
 	}
-	return common.MapStr{}, false
+	return mapstr.M{}, false
 }
 
 // sendMessage sends a string split result value, v, on ch after performing any
 // necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessageSplitString(ctx *transformContext, root common.MapStr, v string, ch chan<- maybeMsg) error {
+func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v string, ch chan<- maybeMsg) error {
 	clone := root.Clone()
 	_, _ = clone.Put(s.targetInfo.Name, v)
 

@@ -55,3 +55,8 @@
               type: double
               description: >
                 Total inodes
+            - name: pct
+              type: scaled_float
+              format: percent
+              description: >
+                Percentage of used inodes

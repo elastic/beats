@@ -22,13 +22,13 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
 )
 
 type fakeInputManager struct {
 	OnInit      func(Mode) error
-	OnConfigure func(*common.Config) (Input, error)
+	OnConfigure func(*conf.C) (Input, error)
 }
 
 type fakeInput struct {
@@ -37,8 +37,8 @@ type fakeInput struct {
 	OnRun  func(Context, beat.PipelineConnector) error
 }
 
-func makeConfigFakeInput(prototype fakeInput) func(*common.Config) (Input, error) {
-	return func(cfg *common.Config) (Input, error) {
+func makeConfigFakeInput(prototype fakeInput) func(*conf.C) (Input, error) {
+	return func(cfg *conf.C) (Input, error) {
 		tmp := prototype
 		return &tmp, nil
 	}
@@ -51,7 +51,7 @@ func (m *fakeInputManager) Init(_ unison.Group, mode Mode) error {
 	return nil
 }
 
-func (m *fakeInputManager) Create(cfg *common.Config) (Input, error) {
+func (m *fakeInputManager) Create(cfg *conf.C) (Input, error) {
 	if m.OnConfigure != nil {
 		return m.OnConfigure(cfg)
 	}

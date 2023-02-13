@@ -26,11 +26,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestData(t *testing.T) {
@@ -42,7 +43,8 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	require.NoError(t, err)
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -52,13 +54,14 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		event.StringToPrint())
 
-	_, err := event.GetValue("system.process.summary")
+	_, err = event.GetValue("system.process.summary")
 	require.NoError(t, err)
 
 }
 
 func TestStateNames(t *testing.T) {
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	require.NoError(t, err)
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -69,7 +72,7 @@ func TestStateNames(t *testing.T) {
 	summary, err := event.GetValue("system.process.summary")
 	require.NoError(t, err)
 
-	event, ok := summary.(common.MapStr)
+	event, ok := summary.(mapstr.M)
 	require.True(t, ok)
 
 	// if there's nothing marked as sleeping or idle, something weird is happening
@@ -79,6 +82,9 @@ func TestStateNames(t *testing.T) {
 	total := event["total"].(int)
 	for key, val := range event {
 		if key == "total" {
+			continue
+		}
+		if _, ok := val.(int); !ok {
 			continue
 		}
 		// Check to make sure the values we got actually exist
@@ -95,6 +101,15 @@ func TestStateNames(t *testing.T) {
 	}
 	assert.Equal(t, total, sum)
 
+}
+
+func TestThreads(t *testing.T) {
+	root := resolve.NewTestResolver("_meta/testdata")
+	stats, err := threadStats(root)
+	require.NoError(t, err)
+	require.Equal(t, int64(1), stats["blocked"])
+	require.Equal(t, int64(3), stats["running"])
+	t.Logf("metrics: %#v", stats)
 }
 
 func getConfig() map[string]interface{} {

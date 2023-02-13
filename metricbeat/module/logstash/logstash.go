@@ -24,11 +24,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func init() {
@@ -48,7 +48,7 @@ const ModuleName = "logstash"
 
 // PipelineGraphAPIsAvailableVersion is the version of Logstash since when its APIs
 // can return pipeline graphs
-var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
+var PipelineGraphAPIsAvailableVersion = version.MustNew("7.3.0")
 
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
@@ -172,7 +172,7 @@ func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID str
 	return clusterUUID
 }
 
-func (m *MetricSet) getVersion() (*common.Version, error) {
+func (m *MetricSet) getVersion() (*version.V, error) {
 	const rootPath = "/"
 	content, err := fetchPath(m.HTTP, rootPath, "")
 	if err != nil {
@@ -180,7 +180,7 @@ func (m *MetricSet) getVersion() (*common.Version, error) {
 	}
 
 	var response struct {
-		Version *common.Version `json:"version"`
+		Version *version.V `json:"version"`
 	}
 
 	err = json.Unmarshal(content, &response)

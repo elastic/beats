@@ -10,7 +10,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 )
@@ -61,6 +61,7 @@ func newStates(ctx v2.Context) *states {
 
 func (s *states) MustSkip(state state, store *statestore.Store) bool {
 	if !s.IsNew(state) {
+		s.log.Debugw("not new state in must skip", "state", state)
 		return true
 	}
 
@@ -70,16 +71,17 @@ func (s *states) MustSkip(state state, store *statestore.Store) bool {
 	// the state.LastModified is before the last cleanStore
 	// write commit we can remove
 	var commitWriteState commitWriteState
-	err := store.Get(awsS3WriteCommitPrefix+state.Bucket, &commitWriteState)
+	err := store.Get(awsS3WriteCommitPrefix+state.Bucket+state.ListPrefix, &commitWriteState)
 	if err == nil && previousState.IsEmpty() &&
 		(state.LastModified.Before(commitWriteState.Time) || state.LastModified.Equal(commitWriteState.Time)) {
+		s.log.Debugw("state.LastModified older than writeCommitState in must skip", "state", state, "commitWriteState", commitWriteState)
 		return true
 	}
 
-	// we have no previous state or the previous state
-	// is not stored: refresh the state
-	if previousState.IsEmpty() || (!previousState.Stored && !previousState.Error) {
-		s.Update(state, "")
+	// the previous state is stored or has error: let's skip
+	if !previousState.IsEmpty() && previousState.IsProcessed() {
+		s.log.Debugw("previous state is stored or has error", "state", state)
+		return true
 	}
 
 	return false
@@ -105,8 +107,15 @@ func (s *states) Delete(id string) {
 // IsListingFullyStored check if listing if fully stored
 // After first time the condition is met it will always return false
 func (s *states) IsListingFullyStored(listingID string) bool {
-	info, _ := s.listingInfo.Load(listingID)
-	listingInfo := info.(*listingInfo)
+	info, ok := s.listingInfo.Load(listingID)
+	if !ok {
+		return false
+	}
+	listingInfo, ok := info.(*listingInfo)
+	if !ok {
+		return false
+	}
+
 	listingInfo.mu.Lock()
 	defer listingInfo.mu.Unlock()
 	if listingInfo.finalCheck {
@@ -145,7 +154,7 @@ func (s *states) Update(newState state, listingID string) {
 	s.Lock()
 	defer s.Unlock()
 
-	id := newState.Bucket + newState.Key
+	id := newState.ID
 	index := s.findPrevious(id)
 
 	if index >= 0 {
@@ -157,13 +166,19 @@ func (s *states) Update(newState state, listingID string) {
 		s.log.Debug("New state added for ", newState.ID)
 	}
 
-	if listingID == "" || (!newState.Stored && !newState.Error) {
+	if listingID == "" || !newState.IsProcessed() {
 		return
 	}
 
 	// here we increase the number of stored object
-	info, _ := s.listingInfo.Load(listingID)
-	listingInfo := info.(*listingInfo)
+	info, ok := s.listingInfo.Load(listingID)
+	if !ok {
+		return
+	}
+	listingInfo, ok := info.(*listingInfo)
+	if !ok {
+		return
+	}
 
 	listingInfo.mu.Lock()
 
@@ -189,7 +204,7 @@ func (s *states) Update(newState state, listingID string) {
 func (s *states) FindPrevious(newState state) state {
 	s.RLock()
 	defer s.RUnlock()
-	id := newState.Bucket + newState.Key
+	id := newState.ID
 	i := s.findPrevious(id)
 	if i < 0 {
 		return state{}
@@ -212,7 +227,7 @@ func (s *states) FindPreviousByID(id string) state {
 func (s *states) IsNew(state state) bool {
 	s.RLock()
 	defer s.RUnlock()
-	id := state.Bucket + state.Key
+	id := state.ID
 	i := s.findPrevious(id)
 
 	if i < 0 {
@@ -282,7 +297,7 @@ func (s *states) readStatesFrom(store *statestore.Store) error {
 			// XXX: Do we want to log here? In case we start to store other
 			// state types in the registry, then this operation will likely fail
 			// quite often, producing some false-positives in the logs...
-			return true, nil
+			return false, err
 		}
 
 		st.ID = key[len(awsS3ObjectStatePrefix):]

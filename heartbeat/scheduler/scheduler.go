@@ -29,8 +29,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/timerqueue"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var debugf = logp.MakeDebug("scheduler")
@@ -72,10 +72,11 @@ type Schedule interface {
 	RunOnInit() bool
 }
 
-func getJobLimitSem(jobLimitByType map[string]config.JobLimit) map[string]*semaphore.Weighted {
+func getJobLimitSem(jobLimitByType map[string]*config.JobLimit) map[string]*semaphore.Weighted {
 	jobLimitSem := map[string]*semaphore.Weighted{}
 	for jobType, jobLimit := range jobLimitByType {
 		if jobLimit.Limit > 0 {
+			logp.L().Infof("limiting to %d concurrent jobs for '%s' type", jobLimit.Limit, jobType)
 			jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
 		}
 	}
@@ -83,7 +84,7 @@ func getJobLimitSem(jobLimitByType map[string]config.JobLimit) map[string]*semap
 }
 
 // NewWithLocation creates a new Scheduler using the given runAt zone.
-func Create(limit int64, registry *monitoring.Registry, location *time.Location, jobLimitByType map[string]config.JobLimit, runOnce bool) *Scheduler {
+func Create(limit int64, registry *monitoring.Registry, location *time.Location, jobLimitByType map[string]*config.JobLimit, runOnce bool) *Scheduler {
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	if limit < 1 {

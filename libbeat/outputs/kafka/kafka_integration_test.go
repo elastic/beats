@@ -35,18 +35,19 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
-	kafkaDefaultHost     = "kafka"
-	kafkaDefaultPort     = "9092"
+	kafkaDefaultHost     = "localhost"
+	kafkaDefaultPort     = "9094"
 	kafkaDefaultSASLPort = "9093"
 )
 
@@ -68,10 +69,10 @@ func TestKafkaPublish(t *testing.T) {
 		events []eventInfo
 	}{
 		{
-			"publish single event to test topic",
+			"publish single event to test topic with nil config",
 			nil,
 			testTopic,
-			single(common.MapStr{
+			single(mapstr.M{
 				"host":    "test-host",
 				"message": id,
 			}),
@@ -82,7 +83,7 @@ func TestKafkaPublish(t *testing.T) {
 				"topic": "%{[type]}",
 			},
 			logType,
-			single(common.MapStr{
+			single(mapstr.M{
 				"host":    "test-host",
 				"type":    logType,
 				"message": id,
@@ -94,7 +95,7 @@ func TestKafkaPublish(t *testing.T) {
 				"codec.format.string": "%{[message]}",
 			},
 			testTopic,
-			single(common.MapStr{
+			single(mapstr.M{
 				"host":    "test-host",
 				"message": id,
 			}),
@@ -103,7 +104,7 @@ func TestKafkaPublish(t *testing.T) {
 			"batch publish to test topic",
 			nil,
 			testTopic,
-			randMulti(5, 100, common.MapStr{
+			randMulti(5, 100, mapstr.M{
 				"host": "test-host",
 			}),
 		},
@@ -113,7 +114,7 @@ func TestKafkaPublish(t *testing.T) {
 				"topic": "%{[type]}",
 			},
 			logType,
-			randMulti(5, 100, common.MapStr{
+			randMulti(5, 100, mapstr.M{
 				"host": "test-host",
 				"type": logType,
 			}),
@@ -126,7 +127,7 @@ func TestKafkaPublish(t *testing.T) {
 				},
 			},
 			testTopic,
-			randMulti(1, 10, common.MapStr{
+			randMulti(1, 10, mapstr.M{
 				"host": "test-host",
 				"type": "log",
 			}),
@@ -139,7 +140,7 @@ func TestKafkaPublish(t *testing.T) {
 				},
 			},
 			testTopic,
-			randMulti(1, 10, common.MapStr{
+			randMulti(1, 10, mapstr.M{
 				"host": "test-host",
 				"type": "log",
 			}),
@@ -150,7 +151,7 @@ func TestKafkaPublish(t *testing.T) {
 				"partition.hash": map[string]interface{}{},
 			},
 			testTopic,
-			randMulti(1, 10, common.MapStr{
+			randMulti(1, 10, mapstr.M{
 				"host": "test-host",
 				"type": "log",
 			}),
@@ -163,7 +164,7 @@ func TestKafkaPublish(t *testing.T) {
 				"partition.hash": map[string]interface{}{},
 			},
 			testTopic,
-			randMulti(1, 10, common.MapStr{
+			randMulti(1, 10, mapstr.M{
 				"host": "test-host",
 				"type": "log",
 			}),
@@ -179,16 +180,16 @@ func TestKafkaPublish(t *testing.T) {
 				},
 			},
 			testTopic,
-			randMulti(1, 10, common.MapStr{
+			randMulti(1, 10, mapstr.M{
 				"host": "test-host",
 				"type": "log",
 			}),
 		},
 		{
-			"publish single event to test topic",
+			"publish single event to test topic with empty config",
 			map[string]interface{}{},
 			testTopic,
-			single(common.MapStr{
+			single(mapstr.M{
 				"host":    "test-host",
 				"message": id,
 			}),
@@ -198,11 +199,13 @@ func TestKafkaPublish(t *testing.T) {
 			// that added a full 30sec to the test. Instead most tests run
 			// in plaintext, and individual tests can switch to SCRAM
 			// by inserting the config in this example:
-			"publish single event to test topic over SASL/SCRAM",
+			"SASL/SCRAM publish single event to test topic",
 			map[string]interface{}{
 				"hosts":          []string{getTestSASLKafkaHost()},
 				"protocol":       "https",
 				"sasl.mechanism": "SCRAM-SHA-512",
+				// Disable hostname verification since we are likely writing to localhost.
+				"ssl.verification_mode": "certificate",
 				"ssl.certificate_authorities": []string{
 					"../../../testing/environments/docker/kafka/certs/ca-cert",
 				},
@@ -210,7 +213,7 @@ func TestKafkaPublish(t *testing.T) {
 				"password": "KafkaTest",
 			},
 			testTopic,
-			single(common.MapStr{
+			single(mapstr.M{
 				"host":    "test-host",
 				"message": id,
 			}),
@@ -234,7 +237,7 @@ func TestKafkaPublish(t *testing.T) {
 				},
 			},
 			testTopic,
-			randMulti(5, 100, common.MapStr{
+			randMulti(5, 100, mapstr.M{
 				"host": "test-host",
 			}),
 		},
@@ -399,8 +402,8 @@ func getTestSASLKafkaHost() string {
 	)
 }
 
-func makeConfig(t *testing.T, in map[string]interface{}) *common.Config {
-	cfg, err := common.NewConfigFrom(in)
+func makeConfig(t *testing.T, in map[string]interface{}) *config.C {
+	cfg, err := config.NewConfigFrom(in)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -526,7 +529,7 @@ func flatten(infos []eventInfo) []beat.Event {
 	return out
 }
 
-func single(fields common.MapStr) []eventInfo {
+func single(fields mapstr.M) []eventInfo {
 	return []eventInfo{
 		{
 			events: []beat.Event{
@@ -536,12 +539,12 @@ func single(fields common.MapStr) []eventInfo {
 	}
 }
 
-func randMulti(batches, n int, event common.MapStr) []eventInfo {
+func randMulti(batches, n int, event mapstr.M) []eventInfo {
 	var out []eventInfo
 	for i := 0; i < batches; i++ {
 		var data []beat.Event
 		for j := 0; j < n; j++ {
-			tmp := common.MapStr{}
+			tmp := mapstr.M{}
 			for k, v := range event {
 				tmp[k] = v
 			}

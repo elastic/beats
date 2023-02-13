@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -76,6 +77,7 @@ const (
 type Config struct {
 	Paths               []string        `config:"paths" validate:"required"`
 	HashTypes           []HashType      `config:"hash_types"`
+	FileParsers         []string        `config:"file_parsers"`
 	MaxFileSize         string          `config:"max_file_size"`
 	MaxFileSizeBytes    uint64          `config:",ignore"`
 	ScanAtStart         bool            `config:"scan_at_start"`
@@ -89,11 +91,19 @@ type Config struct {
 // Validate validates the config data and return an error explaining all the
 // problems with the config. This method modifies the given config.
 func (c *Config) Validate() error {
-	// Resolve symlinks.
+	// Resolve symlinks and make filepaths absolute if possible
+	// anything that does not resolve will be logged during
+	// scanning and metric set collection.
 	for i, p := range c.Paths {
-		if evalPath, err := filepath.EvalSymlinks(p); err == nil {
-			c.Paths[i] = evalPath
+		p, err := filepath.EvalSymlinks(p)
+		if err != nil {
+			continue
 		}
+		p, err = filepath.Abs(p)
+		if err != nil {
+			continue
+		}
+		c.Paths[i] = p
 	}
 	// Sort and deduplicate.
 	sort.Strings(c.Paths)
@@ -111,6 +121,30 @@ nextHash:
 			}
 		}
 		errs = append(errs, fmt.Errorf("invalid hash_types value '%v'", ht))
+	}
+
+	for _, p := range c.FileParsers {
+		if pat, ok := unquoteRegexp(p); ok {
+			re, err := regexp.Compile(pat)
+			if err != nil {
+				errs = append(errs, err)
+				continue
+			}
+			found := false
+			for k := range fileParserFor {
+				if re.MatchString(k) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				errs = append(errs, fmt.Errorf("invalid file_parsers value '%v'", p))
+			}
+			continue
+		}
+		if _, ok := fileParserFor[p]; !ok {
+			errs = append(errs, fmt.Errorf("invalid file_parsers value '%v'", p))
+		}
 	}
 
 	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)

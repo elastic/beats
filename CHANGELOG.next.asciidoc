@@ -4,19 +4,17 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-- Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
 
 *Auditbeat*
 
 
 *Filebeat*
-
 
 *Heartbeat*
 
@@ -37,42 +35,90 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
-- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
-- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
-- Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
-- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
-- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
-- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
-- Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
-- Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
-- Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
+- Fix lockfile logic, retry locking {pull}34194[34194]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Log errors from the Elastic Agent V2 client errors channel. Avoids blocking when error occurs communicating with the Elastic Agent. {pull}34392[34392]
+- Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
+- Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
+
+*Auditbeat*
+
+
+*Filebeat*
+- [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
+   with the ecs field name `container`. {pull}34403[34403]
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
+   automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
+- [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
+- Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
+- Fix handling of error in states in direct aws-s3 listing input {issue}33513[33513] {pull}33722[33722]
+- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+- Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
+- Fix splitting array of strings/arrays in httpjson input {issue}30345[30345] {pull}33609[33609]
+- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+- Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
+- Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
+- Fix 'requires pointer' error while getting cursor metadata. {pull}33956[33956]
+- Fix input cancellation handling when HTTP client does not support contexts. {issue}33962[33962] {pull}33968[33968]
+- Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
+- Fix CEL result deserialisation when evaluation fails. {issue}33992[33992] {pull}33996[33996]
+- Fix handling of non-200/non-429 status codes. {issue}33999[33999] {pull}34002[34002]
+- [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
+- [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
+- Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
+- Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
+- [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
+
+*Heartbeat*
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+- Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
+- Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
+- Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
+
+
+*Heartbeat*
+
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
-- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
-- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
-- Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
-- Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
-- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
+
+*Auditbeat*
+
 
 *Filebeat*
 
 
 *Heartbeat*
 
+
 *Metricbeat*
 
-- Enhance metricbeat on openshift documentation {pull}30054[30054]
-- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
-- Fix Docker module: rename fields on dashboards. {pull}30500[30500]
-- Add back missing metrics to system/linux. {pull}30774[30774]
+- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
+- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
+- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
+- Add GCP CloudSQL region filter {pull}32943[32943]
+- Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
+- Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
+
+
+*Osquerybeat*
+
 
 *Packetbeat*
+
+- Fixed a race condition in Packetbeat that could cause crashes or instability {pull}34514[34514]
 
 
 *Winlogbeat*
@@ -89,47 +135,28 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
-- Add support for kafka message headers. {pull}29940[29940]
-- Add FIPS configuration option for all AWS API calls. {pull}[28899]
-- Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
-- Add action_input_type for the .fleet-actions-results {pull}30562[30562]
-- Add cronjob metadata by default {pull}30637[30637]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
-- Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
-- Add pipeline in FB's supported hints. {pull}30212[30212]
+- add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
+- httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
+- Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
+- Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
+- Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Extend documentation about hints annotation for processors {pull}30561[30561]
 
 *Heartbeat*
 
 
-
 *Metricbeat*
-
-- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
-- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
-- Fix overflow in `iostat` metrics {pull}30679[30679]
-- Add `commandstats` field to Redis module {pull}29662[29662]
 
 
 *Packetbeat*
@@ -139,8 +166,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 
 *Winlogbeat*
-
-- Improve the error message when the registry file content is invalid. {pull}30543[30543]
 
 
 *Elastic Log Driver*
@@ -156,6 +181,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
+
 *Metricbeat*
 
 
@@ -163,7 +189,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
+
 *Functionbeat*
 
 ==== Known Issue
+
+
+
+
+
 

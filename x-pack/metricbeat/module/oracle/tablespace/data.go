@@ -8,10 +8,10 @@ import (
 	"context"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -38,8 +38,8 @@ func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMeth
 // transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
 // to create a Kibana/Elasticsearch friendly JSON. Data from Oracle is pretty fragmented by design so a lot of data
 // was necessary. Data is organized by Tablespace entity (Tablespaces might contain one or more data files)
-func (m *MetricSet) transform(in *extractedData) (out map[string]common.MapStr) {
-	out = make(map[string]common.MapStr, 0)
+func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
+	out = make(map[string]mapstr.M, 0)
 
 	for _, dataFile := range in.dataFiles {
 		m.addDataFileData(&dataFile, out)
@@ -68,7 +68,7 @@ func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error)
 }
 
 // addTempFreeSpaceData is specific to the TEMP Tablespace.
-func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map[string]common.MapStr) {
+func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map[string]mapstr.M) {
 	for key, cm := range out {
 		val, err := cm.GetValue("name")
 		if err != nil {
@@ -88,7 +88,7 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 }
 
 // addUsedAndFreeSpaceData is specific to all Tablespaces but TEMP
-func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out map[string]common.MapStr) {
+func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out map[string]mapstr.M) {
 	for key, cm := range out {
 		val, err := cm.GetValue("name")
 		if err != nil {
@@ -109,9 +109,9 @@ func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out m
 }
 
 // addDataFileData is a specific data file which generates a JSON output.
-func (m *MetricSet) addDataFileData(d *dataFile, output map[string]common.MapStr) {
+func (m *MetricSet) addDataFileData(d *dataFile, output map[string]mapstr.M) {
 	if _, found := output[d.hash()]; !found {
-		output[d.hash()] = common.MapStr{}
+		output[d.hash()] = mapstr.M{}
 	}
 
 	_, _ = output[d.hash()].Put("name", d.eventKey())

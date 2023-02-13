@@ -13,9 +13,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core/bundle"
+	"github.com/elastic/elastic-agent-libs/keystore"
 )
 
 func rawYaml() ([]byte, error) {

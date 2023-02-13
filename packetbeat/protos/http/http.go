@@ -32,11 +32,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -100,7 +102,7 @@ type httpPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 var (
@@ -115,8 +117,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &httpPlugin{}
 	config := defaultConfig
@@ -133,7 +135,7 @@ func New(
 }
 
 // Init initializes the HTTP protocol analyser.
-func (http *httpPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *httpConfig) error {
+func (http *httpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *httpConfig) error {
 	http.setFromConfig(config)
 
 	isDebug = logp.IsDebug("http")
@@ -653,7 +655,7 @@ func (http *httpPlugin) publishTransaction(event beat.Event) {
 	http.results(event)
 }
 
-func (http *httpPlugin) collectHeaders(m *message) common.MapStr {
+func (http *httpPlugin) collectHeaders(m *message) mapstr.M {
 	hdrs := map[string]interface{}{}
 
 	hdrs["content-length"] = m.contentLength

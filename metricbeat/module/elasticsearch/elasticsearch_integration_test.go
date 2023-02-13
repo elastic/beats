@@ -35,7 +35,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -50,6 +49,8 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 var metricSets = []string{
@@ -180,7 +181,7 @@ func getConfig(host string) map[string]interface{} {
 	}
 }
 
-func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
+func setupTest(t *testing.T, esHost string, esVersion *version.V) {
 	_, err := createIndex(esHost, false)
 	require.NoError(t, err)
 
@@ -225,7 +226,7 @@ func createIndex(host string, isHidden bool) (string, error) {
 }
 
 // enableTrialLicense creates and elasticsearch index in case it does not exit yet
-func enableTrialLicense(host string, version *common.Version) error {
+func enableTrialLicense(host string, version *version.V) error {
 	client := &http.Client{}
 
 	enabled, err := checkTrialLicenseEnabled(host, version)
@@ -266,7 +267,7 @@ func enableTrialLicense(host string, version *common.Version) error {
 }
 
 // checkTrialLicenseEnabled creates and elasticsearch index in case it does not exit yet
-func checkTrialLicenseEnabled(host string, version *common.Version) (bool, error) {
+func checkTrialLicenseEnabled(host string, version *version.V) (bool, error) {
 	var licenseURL string
 	if version.Major < 7 {
 		licenseURL = "/_xpack/license"
@@ -301,7 +302,7 @@ func checkTrialLicenseEnabled(host string, version *common.Version) (bool, error
 	return active && isTrial, nil
 }
 
-func createMLJob(host string, version *common.Version) error {
+func createMLJob(host string, version *version.V) error {
 
 	mlJob, err := ioutil.ReadFile("ml_job/_meta/test/test_job.json")
 	if err != nil {
@@ -535,7 +536,7 @@ func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, e
 		return 0, err
 	}
 
-	var data []common.MapStr
+	var data []mapstr.M
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return 0, err
@@ -544,9 +545,9 @@ func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, e
 	return len(data), nil
 }
 
-func checkSkip(t *testing.T, metricset string, version *common.Version) {
-	checkSkipFeature := func(name string, availableVersion *common.Version) {
-		isAPIAvailable := elastic.IsFeatureAvailable(version, availableVersion)
+func checkSkip(t *testing.T, metricset string, ver *version.V) {
+	checkSkipFeature := func(name string, availableVersion *version.V) {
+		isAPIAvailable := elastic.IsFeatureAvailable(ver, availableVersion)
 		if !isAPIAvailable {
 			t.Skipf("elasticsearch %s stats API is not available until %s", name, availableVersion)
 		}
@@ -560,7 +561,7 @@ func checkSkip(t *testing.T, metricset string, version *common.Version) {
 	}
 }
 
-func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, error) {
+func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 	resp, err := http.Get("http://" + elasticsearchHostPort + "/")
 	if err != nil {
 		return nil, err
@@ -572,18 +573,18 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, err
 		return nil, err
 	}
 
-	var data common.MapStr
+	var data mapstr.M
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err
 	}
 
-	version, err := data.GetValue("version.number")
+	v, err := data.GetValue("version.number")
 	if err != nil {
 		return nil, err
 	}
 
-	return common.NewVersion(version.(string))
+	return version.New(v.(string))
 }
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {

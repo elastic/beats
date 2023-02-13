@@ -1,0 +1,203 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "15362d53-5f27-48a6-a339-8a5fc2c5339d": {
+                            "columnOrder": [
+                                "5bcc83c1-a9ef-4489-841c-e5c6e82f346b",
+                                "5288fb8d-2eec-4da6-a9e6-81e6ee0a429f",
+                                "2d715eff-85bb-431f-a5a6-3432b6a704a9",
+                                "07f7d695-1388-41fb-a4fc-4bf13d299688",
+                                "8d4e5a02-d3f5-4960-b3a9-121f64d42ba6",
+                                "226bd103-5a5d-4756-bbc5-2c7f5da03488"
+                            ],
+                            "columns": {
+                                "07f7d695-1388-41fb-a4fc-4bf13d299688": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Cluster IP",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.service.cluster_ip"
+                                },
+                                "226bd103-5a5d-4756-bbc5-2c7f5da03488": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Created",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.service.created"
+                                },
+                                "2d715eff-85bb-431f-a5a6-3432b6a704a9": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Type",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.service.type"
+                                },
+                                "5288fb8d-2eec-4da6-a9e6-81e6ee0a429f": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Namespace",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.namespace"
+                                },
+                                "5bcc83c1-a9ef-4489-841c-e5c6e82f346b": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Service Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.service.name"
+                                },
+                                "8d4e5a02-d3f5-4960-b3a9-121f64d42ba6": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Ingress IP",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.service.ingress_ip"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "56fdeb82-d55f-457c-b05c-8e45d652eb00",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_service"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_service"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "5bcc83c1-a9ef-4489-841c-e5c6e82f346b",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "07f7d695-1388-41fb-a4fc-4bf13d299688",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "2d715eff-85bb-431f-a5a6-3432b6a704a9",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "226bd103-5a5d-4756-bbc5-2c7f5da03488",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "5288fb8d-2eec-4da6-a9e6-81e6ee0a429f",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "8d4e5a02-d3f5-4960-b3a9-121f64d42ba6",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "15362d53-5f27-48a6-a339-8a5fc2c5339d",
+                "layerType": "data",
+                "rowHeight": "single",
+                "rowHeightLines": 1
+            }
+        },
+        "title": "Services Informations [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-32e1cac0-bcba-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-15362d53-5f27-48a6-a339-8a5fc2c5339d",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "56fdeb82-d55f-457c-b05c-8e45d652eb00",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-23T08:46:51.937Z",
+    "version": "Wzc0NSwxXQ=="
+}

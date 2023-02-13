@@ -1,28 +1,58 @@
+
 {
-    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "@timestamp": "2022-12-30T17:25:02.246Z",
+    "service": {
+        "address": "https://0.0.0.0:10257/metrics",
+        "type": "kubernetes"
+    },
     "event": {
         "dataset": "kubernetes.controllermanager",
-        "duration": 115000,
-        "module": "kubernetes"
+        "module": "kubernetes",
+        "duration": 16374842
     },
     "kubernetes": {
         "controllermanager": {
-            "client": {
-                "request": {
-                    "count": 1113352
+            "name": "bootstrap_signer_queue",
+            "workqueue": {
+                "depth": {
+                    "count": 0
+                },
+                "longestrunning": {
+                    "sec": 0
+                },
+                "retries": {
+                    "count": 0
+                },
+                "adds": {
+                    "count": 1
+                },
+                "unfinished": {
+                    "sec": 0
                 }
-            },
-            "code": "200",
-            "host": "192.168.205.10:6443",
-            "method": "GET"
+            }
+        }
+    },
+    "host": {
+        "name": "fournodecluster-control-plane"
+    },
+    "agent": {
+        "version": "8.7.0",
+        "ephemeral_id": "04246647-4474-4dbc-aeaa-2ad7ec591e93",
+        "id": "90f9684c-750c-4e1c-a036-2370196a9d93",
+        "name": "fournodecluster-control-plane",
+        "type": "metricbeat"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "orchestrator": {
+        "cluster": {
+            "name": "fournodecluster",
+            "url": "fournodecluster-external-load-balancer:6443"
         }
     },
     "metricset": {
         "name": "controllermanager",
         "period": 10000
-    },
-    "service": {
-        "address": "127.0.0.1:55555",
-        "type": "kubernetes"
     }
 }

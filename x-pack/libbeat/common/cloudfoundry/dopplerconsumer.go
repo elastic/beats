@@ -15,7 +15,7 @@ import (
 	"github.com/cloudfoundry/noaa/consumer"
 	"github.com/cloudfoundry/sonde-go/events"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type DopplerCallbacks struct {
@@ -80,27 +80,15 @@ func (c *DopplerConsumer) Run() {
 }
 
 func (c *DopplerConsumer) logsFirehose() {
-	c.firehose(c.callbacks.Log, consumer.LogMessages)
+	c.firehose(c.callbacks.Log, filterLogs, consumer.LogMessages)
 }
 
 func (c *DopplerConsumer) metricsFirehose() {
-	c.firehose(c.callbacks.Metric, consumer.Metrics)
+	c.firehose(c.callbacks.Metric, filterNoFilter, consumer.Metrics)
 }
 
-func (c *DopplerConsumer) firehose(cb func(evt Event), filter consumer.EnvelopeFilter) {
-	var msgChan <-chan *events.Envelope
-	var errChan <-chan error
-	filterFn := filterNoFilter
-	if filter == consumer.LogMessages {
-		// We are interested in more envelopes than the ones obtained when filtering
-		// by log messages, retrieve them all and filter later.
-		// If this causes performance or other problems, we will have to investigate
-		// if it is possible to pass different filters to the firehose url.
-		filterFn = filterLogs
-		msgChan, errChan = c.consumer.Firehose(c.subscriptionID, "")
-	} else {
-		msgChan, errChan = c.consumer.FilteredFirehose(c.subscriptionID, "", filter)
-	}
+func (c *DopplerConsumer) firehose(cb func(evt Event), filterFn func(*events.Envelope) bool, filter consumer.EnvelopeFilter) {
+	msgChan, errChan := c.consumer.FilteredFirehose(c.subscriptionID, "", filter)
 	for {
 		select {
 		case env := <-msgChan:
