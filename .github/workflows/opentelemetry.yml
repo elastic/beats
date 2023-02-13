@@ -3,6 +3,8 @@ name: OpenTelemetry Export Trace
 on:
   workflow_run:
     workflows:
+      - bump-elastic-stack-snapshot
+      - bump-golang
       - check-auditbeat
       - check-default
       - check-dev-tools
