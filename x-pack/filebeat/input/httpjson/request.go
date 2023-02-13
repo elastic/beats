@@ -39,6 +39,11 @@ type idsStruct struct {
 	err error
 }
 
+type processResponse struct {
+	httpResponse       *http.Response
+	startSignalChannel chan struct{}
+}
+
 func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Response, error) {
 	resp, err := c.limiter.execute(stdCtx, func() (*http.Response, error) {
 		return c.client.Do(req)
@@ -293,7 +298,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		isChainWithPageExpected bool
 		chainIndex              int
 	)
-	initialResponseChannel := make(chan *http.Response, 1)
+	initialResponseChannel := make(chan processResponse, 1)
 	defer func() {
 		r.log.Infof("request finished: %d events published", n)
 	}()
@@ -301,8 +306,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 	for i, rf := range r.requestFactories {
 		publishedEventsCountChannel := make(chan int, 1)
 		events := make(chan maybeMsg, 1)
-		responseChannel := make(chan *http.Response, 1)
-		intermediateResponseChannel := make(chan *http.Response, 1)
+		responseChannel := make(chan processResponse, 1)
+		intermediateResponseChannel := make(chan processResponse, 1)
 
 		// iterate over collected ids from last response
 		if i == 0 {
@@ -336,7 +341,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			trCtx.updateFirstResponse(firstResponse)
 
 			if len(r.requestFactories) == 1 {
-				responseChannel <- httpResp
+				responseChannel <- processResponse{httpResponse: httpResp}
 				closeChannels(responseChannel, intermediateResponseChannel)
 				go r.responseProcessors[i].startProcessing(stdCtx, trCtx, responseChannel, events, true)
 				go processAndPublishEvents(trCtx, events, publishedEventsCountChannel, publisher, true, r.log)
@@ -358,7 +363,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				// the response is cloned and added to finalResps here, since the response of the 1st page (whether pagination exists or not), will
 				// be sent for further processing to check if any response processors can be applied or not and at the same time update the last_response,
 				// first_event & last_event cursor values.
-				responseChannel <- resp
+				responseChannel <- processResponse{httpResponse: resp}
 				close(responseChannel)
 
 				// if a pagination request factory exists at the root level along with a chain step, only then we will initialize flags & variables here
@@ -372,11 +377,15 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 						closeChannels(intermediateResponseChannel, initialResponseChannel)
 						return err
 					}
-					initialResponseChannel <- resp
+					initialResponseChannel <- processResponse{httpResponse: resp}
 				}
 			}
 
-			intermediateResponseChannel <- httpResp
+			// passing signal channel here to avoid closing of nil channel in getIdsFromResponses function
+			intermediateResponseChannel <- processResponse{
+				httpResponse:       httpResp,
+				startSignalChannel: make(chan struct{}),
+			}
 			close(intermediateResponseChannel)
 			idsChannel := make(chan idsStruct, 1)
 			go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[i+1].replace)
@@ -462,11 +471,13 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					closeChannels(responseChannel, intermediateResponseChannel, initialResponseChannel)
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
+				resp := processResponse{httpResponse: httpResp}
 				// store data according to response type
-				responseChannel <- httpResp
 				if !(i == len(r.requestFactories)-1 && len(ids) != 0) {
-					intermediateResponseChannel <- httpResp
+					resp.startSignalChannel = make(chan struct{})
+					intermediateResponseChannel <- resp
 				}
+				responseChannel <- resp
 			}
 			closeChannels(responseChannel, intermediateResponseChannel)
 			rf.url = urlCopy
@@ -494,24 +505,28 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 }
 
 // getIdsFromResponses returns ids from responses
-func (r *requester) getIdsFromResponses(intermediateResps <-chan *http.Response, outputChannel chan idsStruct, replace string) {
+func (r *requester) getIdsFromResponses(intermediateResps <-chan processResponse, outputChannel chan idsStruct, replace string) {
 	var b []byte
 	var ids []string
 	var err error
 	// collect ids from all responses
 	defer close(outputChannel)
 	for resp := range intermediateResps {
-		if resp.Body != nil {
-			b, err = io.ReadAll(resp.Body)
+		if resp.httpResponse.Body != nil {
+			b, err = io.ReadAll(resp.httpResponse.Body)
 			if err != nil {
 				outputChannel <- idsStruct{err: fmt.Errorf("error while reading response body: %w", err)}
+				close(resp.startSignalChannel)
+				closeSignalChannels(intermediateResps)
 				return
 			}
 		}
 		// gracefully close response
-		err = resp.Body.Close()
+		err = resp.httpResponse.Body.Close()
 		if err != nil {
 			outputChannel <- idsStruct{err: fmt.Errorf("error closing response body: %w", err)}
+			close(resp.startSignalChannel)
+			closeSignalChannels(intermediateResps)
 			return
 		}
 
@@ -519,11 +534,15 @@ func (r *requester) getIdsFromResponses(intermediateResps <-chan *http.Response,
 		var v interface{}
 		if err := json.Unmarshal(b, &v); err != nil {
 			outputChannel <- idsStruct{err: fmt.Errorf("cannot unmarshal data: %w", err)}
+			close(resp.startSignalChannel)
+			closeSignalChannels(intermediateResps)
 			return
 		}
 		values, err := jsonpath.Get(replace, v)
 		if err != nil {
 			outputChannel <- idsStruct{err: fmt.Errorf("error while getting keys: %w", err)}
+			close(resp.startSignalChannel)
+			closeSignalChannels(intermediateResps)
 			return
 		}
 
@@ -535,6 +554,7 @@ func (r *requester) getIdsFromResponses(intermediateResps <-chan *http.Response,
 					ids = append(ids, fmt.Sprintf("%v", v))
 				default:
 					r.log.Errorf("events must a number or string, but got %T: skipping", v)
+					close(resp.startSignalChannel)
 					continue
 				}
 			}
@@ -543,6 +563,7 @@ func (r *requester) getIdsFromResponses(intermediateResps <-chan *http.Response,
 		default:
 			r.log.Errorf("cannot collect IDs from type '%T' : '%v'", values, values)
 		}
+		close(resp.startSignalChannel)
 	}
 	outputChannel <- idsStruct{ids: ids}
 }
@@ -581,7 +602,7 @@ func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, pu
 }
 
 // processRemainingChainEvents, processes the remaining pagination events for chain blocks
-func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResponseChannel <-chan *http.Response, chainIndex int) int {
+func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResponseChannel <-chan processResponse, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
 	events := make(chan maybeMsg, 1)
 	go r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResponseChannel, events, true)
@@ -636,10 +657,14 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 		urlString string
 		httpResp  *http.Response
 	)
-	intermediateResponseChannel := make(chan *http.Response, 1)
+	intermediateResponseChannel := make(chan processResponse, 1)
 	idsChannel := make(chan idsStruct, 1)
 
-	intermediateResponseChannel <- response
+	// passing signal channel here to avoid closing of nil channel in getIdsFromResponses function
+	intermediateResponseChannel <- processResponse{
+		httpResponse:       response,
+		startSignalChannel: make(chan struct{}),
+	}
 	close(intermediateResponseChannel)
 
 	go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[chainIndex].replace)
@@ -673,8 +698,8 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 		}
 
-		processingChannel := make(chan *http.Response, 1)
-		intermediateResponseChannel := make(chan *http.Response, 1)
+		processingChannel := make(chan processResponse, 1)
+		intermediateResponseChannel := make(chan processResponse, 1)
 		events := make(chan maybeMsg, 1)
 		publishedEventsCountChannel := make(chan int, 1)
 		idsChannel := make(chan idsStruct, 1)
@@ -715,10 +740,12 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 				return n, fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 
-			processingChannel <- httpResp
+			resp := processResponse{httpResponse: httpResp}
 			if !(i == len(r.requestFactories)-1 && len(ids) != 0) {
-				intermediateResponseChannel <- httpResp
+				resp.startSignalChannel = make(chan struct{})
+				intermediateResponseChannel <- resp
 			}
+			processingChannel <- resp
 		}
 		closeChannels(intermediateResponseChannel, processingChannel)
 		rf.url = urlCopy
@@ -783,8 +810,14 @@ func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
 	return io.NopCloser(&buf), nil
 }
 
-func closeChannels(channels ...chan *http.Response) {
+func closeChannels(channels ...chan processResponse) {
 	for _, c := range channels {
 		close(c)
+	}
+}
+
+func closeSignalChannels(channel <-chan processResponse) {
+	for c := range channel {
+		close(c.startSignalChannel)
 	}
 }

@@ -129,13 +129,18 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, log *
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps <-chan *http.Response, ch chan<- maybeMsg, paginate bool) {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps <-chan processResponse, ch chan<- maybeMsg, paginate bool) {
 	trCtx.clearIntervalData()
 
 	defer close(ch)
 
-	for httpResp := range resps {
-		iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
+	for resp := range resps {
+		// in case of intermediate responses wait for IDs to be collected
+		if resp.startSignalChannel != nil {
+			<-resp.startSignalChannel
+		}
+
+		iter := rp.pagination.newPageIterator(stdCtx, trCtx, resp.httpResponse)
 		for {
 			page, hasNext, err := iter.next()
 			if err != nil {
