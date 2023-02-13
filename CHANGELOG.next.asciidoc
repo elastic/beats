@@ -86,6 +86,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Change max query size for GetMetricData API to 500 and add RecentlyActive for ListMetrics API call {pull}33105[33105]
+- Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
 
 *Packetbeat*
 
