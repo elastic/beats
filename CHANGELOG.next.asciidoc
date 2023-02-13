@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Check for nil metadata in GCP. {pull}32281[32281]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
+- Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
 
 *Packetbeat*
 

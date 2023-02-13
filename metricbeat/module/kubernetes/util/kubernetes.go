@@ -215,7 +215,7 @@ func NewContainerMetadataEnricher(
 			if !ok {
 				base.Logger().Debugf("Error while casting event: %s", ok)
 			}
-			meta := metaGen.Generate(pod)
+			pmeta := metaGen.Generate(pod)
 
 			statuses := make(map[string]*kubernetes.PodContainerStatus)
 			mapStatuses := func(s []kubernetes.PodContainerStatus) {
@@ -227,6 +227,7 @@ func NewContainerMetadataEnricher(
 			mapStatuses(pod.Status.InitContainerStatuses)
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
+				cmeta := mapstr.M{}
 
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
@@ -245,13 +246,14 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+						ShouldPut(cmeta, "container.id", s.ContainerID[split+3:], base.Logger())
 
-						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
+						ShouldPut(cmeta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-				m[id] = meta
+				cmeta.DeepUpdate(pmeta)
+				m[id] = cmeta
 			}
 		},
 		// delete
