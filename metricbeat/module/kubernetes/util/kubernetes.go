@@ -202,18 +202,9 @@ func NewContainerMetadataEnricher(
 
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
-<<<<<<< HEAD
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
 			pod := r.(*kubernetes.Pod)
-			meta := metaGen.Generate(pod)
-=======
-		func(m map[string]mapstr.M, r kubernetes.Resource) {
-			pod, ok := r.(*kubernetes.Pod)
-			if !ok {
-				base.Logger().Debugf("Error while casting event: %s", ok)
-			}
 			pmeta := metaGen.Generate(pod)
->>>>>>> 4ac4973250 (Fix container enricher with correct container ids for pods with multiple containers (#34516))
 
 			statuses := make(map[string]*kubernetes.PodContainerStatus)
 			mapStatuses := func(s []kubernetes.PodContainerStatus) {
@@ -224,12 +215,8 @@ func NewContainerMetadataEnricher(
 			mapStatuses(pod.Status.ContainerStatuses)
 			mapStatuses(pod.Status.InitContainerStatuses)
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
-<<<<<<< HEAD
 				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-=======
-				cmeta := mapstr.M{}
-				metrics := NewContainerMetrics()
->>>>>>> 4ac4973250 (Fix container enricher with correct container ids for pods with multiple containers (#34516))
+				cmeta := common.MapStr{}
 
 				// Report container limits to PerfMetrics cache
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
@@ -248,14 +235,8 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-<<<<<<< HEAD
-						meta.Put("container.id", s.ContainerID[split+3:])
-						meta.Put("container.runtime", s.ContainerID[:split])
-=======
-						kubernetes2.ShouldPut(cmeta, "container.id", s.ContainerID[split+3:], base.Logger())
-
-						kubernetes2.ShouldPut(cmeta, "container.runtime", s.ContainerID[:split], base.Logger())
->>>>>>> 4ac4973250 (Fix container enricher with correct container ids for pods with multiple containers (#34516))
+						cmeta.Put("container.id", s.ContainerID[split+3:])
+						cmeta.Put("container.runtime", s.ContainerID[:split])
 					}
 				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
