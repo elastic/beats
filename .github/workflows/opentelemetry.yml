@@ -26,6 +26,7 @@ on:
       - check-x-pack-packetbeat
       - check-x-pack-winlogbeat
       - golangci-lint
+      - notify-stalled-snapshots
       - auditbeat
       - filebeat
       - heartbeat
