@@ -397,12 +397,12 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.UpdateStatus(lbmanagement.Stopping, "Stopping")
 			return
 		case change := <-cm.client.UnitChanged():
-			cm.logger.Infof("BeatV2Manager.unitListen UnitChanged: %s-%v",
+			cm.logger.Infof("[fqdn] BeatV2Manager.unitListen UnitChanged: %s-%v",
 				change.Type, change.Triggers)
 
 			for _, t := range change.Triggers {
 				if t == client.TriggerFeature {
-					cm.logger.Infof("change: %s/%s: feature fqdn: %v",
+					cm.logger.Infof("[fqdn] change: %s/%s: feature fqdn: %v",
 						change.Type, t, change.Features)
 					features.Update(change.Features)
 				}

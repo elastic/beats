@@ -20,19 +20,19 @@ type fflags struct {
 }
 
 func Update(f client.Features) {
-	logp.L().Info("features.Update fqdn invoked")
+	logp.L().Info("[fqdn] features.Update fqdn invoked")
 
 	mu.Lock()
 	defer mu.Unlock()
 	flags = fflags{fqdnEnabled: f.FQDN.Enabled}
 
-	logp.L().Infof("features.Update: fqdn: %t", flags.fqdnEnabled)
+	logp.L().Infof("[fqdn] features.Update: fqdn: %t", flags.fqdnEnabled)
 }
 
 func ParseFromConfig(c *conf.C) error {
-	logp.L().Info("features.ParseFromConfig invoked")
+	logp.L().Info("[fqdn] features.ParseFromConfig invoked")
 	if c == nil {
-		logp.L().Info("feature flag config is nil!")
+		logp.L().Info("[fqdn] feature flag config is nil!")
 		return nil
 	}
 
@@ -44,7 +44,7 @@ func ParseFromConfig(c *conf.C) error {
 
 	parsedFlags := cfg{}
 	if err := c.Unpack(&parsedFlags); err != nil {
-		logp.L().Errorf("could not Unpack features config: %v", err)
+		logp.L().Errorf("[fqdn] could not Unpack features config: %v", err)
 		return fmt.Errorf("could not Unpack features config: %w", err)
 	}
 
@@ -52,7 +52,7 @@ func ParseFromConfig(c *conf.C) error {
 	defer mu.Unlock()
 	flags.fqdnEnabled = parsedFlags.Features.FQDN.Enabled()
 
-	logp.L().Infof("features.ParseFromConfig: fqdn: %t", flags.fqdnEnabled)
+	logp.L().Infof("[fqdn] features.ParseFromConfig: fqdn: %t", flags.fqdnEnabled)
 
 	return nil
 }
