@@ -189,6 +189,7 @@ func (cm *BeatV2Manager) Start() error {
 		cm.errCanceller()
 		cm.errCanceller = nil
 	}
+
 	ctx := context.Background()
 	err := cm.client.Start(ctx)
 	if err != nil {
