@@ -182,6 +182,7 @@ func (b *broker) run() {
 				ack.producer.ackHandler(ack.count)
 			}
 			// Notify the pipeline's metrics reporter
+			//nolint:typecheck // this nil check is ok
 			if b.ackListener != nil {
 				b.ackListener.OnACK(ackedBatch.originalEntryCount)
 			}
