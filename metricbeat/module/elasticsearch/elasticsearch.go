@@ -205,11 +205,7 @@ func GetInfo(http *helper.HTTP, uri string) (Info, error) {
 	}
 
 	err = json.Unmarshal(content, &info)
-	if err != nil {
-		return info, err
-	}
-
-	return info, nil
+	return info, err
 }
 
 func fetchPath(http *helper.HTTP, uri, path string, query string) ([]byte, error) {
