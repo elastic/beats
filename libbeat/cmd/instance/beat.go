@@ -30,7 +30,6 @@ import (
 	"math/rand"
 	"os"
 	"os/user"
-	"path/filepath"
 	"runtime"
 	"runtime/debug"
 	"strconv"
@@ -39,7 +38,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
-	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
@@ -534,17 +532,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 // DoReexec restarts the Beat
 // TODO(Tiago): Implement the Windows version
 func (b *Beat) DoReexec() error {
-	pwd, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("could not get working directory: %w", err)
-	}
-
-	binary := filepath.Join(pwd, os.Args[0])
-	if err := unix.Exec(binary, os.Args, os.Environ()); err != nil {
-		return fmt.Errorf("could not exec '%s', err: %w", binary, err)
-	}
-
-	return nil
+	return b.doReexec()
 }
 
 // registerMetrics registers metrics with the internal monitoring API. This data
