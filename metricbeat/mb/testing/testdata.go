@@ -42,9 +42,10 @@ import (
 )
 
 const (
-	expectedExtension = "-expected.json"
-	applicationJson   = "application/json"
-	expectedFolder    = "_meta/testdata"
+	expectedExtension  = "-expected.json"
+	applicationJson    = "application/json"
+	expectedFolder     = "_meta/testdata"
+	expectedDataFolder = "_meta"
 )
 
 // DataConfig is the configuration for testdata tests
@@ -56,11 +57,14 @@ const (
 // url: "/server-status?auto="
 // suffix: plain
 // omit_documented_fields_check:
-//  - "apache.status.hostname"
+//   - "apache.status.hostname"
+//
 // remove_fields_from_comparison:
 // - "apache.status.hostname"
 // module:
-//   namespace: test
+//
+//	namespace: test
+//
 // ```
 // A test will be run for each file with the `plain` extension in the same directory
 // where a file with this configuration is placed.
@@ -70,6 +74,9 @@ type DataConfig struct {
 
 	// WritePath is the path where to write the generated files
 	WritePath string
+
+	// DataPath is the path to the data.json file
+	DataPath string
 
 	// The type of the test to run, usually `http`.
 	Type string
@@ -114,6 +121,7 @@ func defaultDataConfig() DataConfig {
 	return DataConfig{
 		Path:        expectedFolder,
 		WritePath:   expectedFolder,
+		DataPath:    expectedDataFolder,
 		Suffix:      "json",
 		ContentType: applicationJson,
 	}
@@ -166,6 +174,7 @@ func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config Data
 		// the prefix needs to be appended to the path of the expected files and the original files
 		config.WritePath = filepath.Join(prefix, config.WritePath)
 		config.Path = filepath.Join(prefix, config.Path)
+		config.DataPath = filepath.Join(prefix, expectedDataFolder)
 	}
 	ff, err := filepath.Glob(location)
 
@@ -346,7 +355,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 	}
 
 	if strings.HasSuffix(file, "docs."+config.Suffix) {
-		writeDataJSON(t, data[0], filepath.Join(config.WritePath, "data.json"))
+		writeDataJSON(t, data[0], filepath.Join(config.DataPath, "data.json"))
 	}
 }
 
