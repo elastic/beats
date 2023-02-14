@@ -30,6 +30,7 @@ import (
 	"math/rand"
 	"os"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"runtime/debug"
 	"strconv"
@@ -38,6 +39,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
+	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
@@ -98,6 +100,14 @@ type Beat struct {
 	processing processing.Supporter
 
 	InputQueueSize int // Size of the producer queue used by most queues.
+
+	// Flag to indicate the Beat should restart
+	// TODO(Tiago): Do we need a mutex?
+	// The shutdown process is pretty linear, at least the
+	// functions returning.
+	// If that's the case, this should be unexported and we
+	// should have methods to set/reset it
+	Reexec bool
 }
 
 type beatConfig struct {
@@ -511,7 +521,30 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Allow the manager to stop a currently running beats out of bound.
 	b.Manager.SetStopCallback(beater.Stop)
 
-	return beater.Run(&b.Beat)
+	err = beater.Run(&b.Beat)
+	if b.Reexec {
+		if err := b.DoReexec(); err != nil {
+			return fmt.Errorf("could not restart %s: %w", b.Info.Beat, err)
+		}
+	}
+
+	return err
+}
+
+// DoReexec restarts the Beat
+// TODO(Tiago): Implement the Windows version
+func (b *Beat) DoReexec() error {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("could not get working directory: %w", err)
+	}
+
+	binary := filepath.Join(pwd, os.Args[0])
+	if err := unix.Exec(binary, os.Args, os.Environ()); err != nil {
+		return fmt.Errorf("could not exec '%s', err: %w", binary, err)
+	}
+
+	return nil
 }
 
 // registerMetrics registers metrics with the internal monitoring API. This data
@@ -1081,7 +1114,12 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 				logger.Infof(
 					"some of the following files have been modified: %v, starting %s shutdown",
 					files, b.Info.Beat)
+
+				b.Reexec = true
 				b.Manager.Stop()
+
+				// we're done, finish the goroutine just for the sake of it
+				return
 			}
 		}
 	}()
