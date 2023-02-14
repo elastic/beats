@@ -26,7 +26,8 @@ An alternative is to just run from metricbeat `mage mockedTests` to achieve the 
 ### Available settings in `config.yml`
 
 - `path`: (string) Path to reach the directory containing the files to read from. Default is "_meta/testdata".
-- `wirtepath`: (string) Path to the directory where the expected files are going to be written. Default is "_meta/testdata".
+- `writepath`: (string) Path to the directory where the expected files are going to be written. Default is "_meta/testdata".
+- `datapath`: (string) Path to the directory where the data.json file is going to be written. Default is "_meta".
 - `type`: (string) The type of the test to run. At the moment, only `http` is supported.
 - `url`: (string) This is the URL path that the module usually fetches to get metrics. For example, in case of Apache module this url is `/server-status?auto=`
 - `suffix`: (string) The suffix that the input file has. By default `json` other common suffixes are `plain` (string) for plain text files.
