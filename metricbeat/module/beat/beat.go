@@ -80,26 +80,34 @@ type State struct {
 
 // GetInfo returns the data for the Beat's / endpoint.
 func GetInfo(m *MetricSet) (Info, error) {
-	info := Info{}
 	content, err := fetchPath(m.HTTP, "/")
 	if err != nil {
-		return info, err
+		return Info{}, err
 	}
 
+	info := Info{}
 	err = json.Unmarshal(content, &info)
-	return info, err
+	if err != nil {
+		return Info{}, err
+	}
+
+	return info, nil
 }
 
 // GetState returns the data for the Beat's /state endpoint.
 func GetState(m *MetricSet) (State, error) {
-	state := State{}
 	content, err := fetchPath(m.HTTP, "/state")
 	if err != nil {
-		return state, err
+		return State{}, err
 	}
 
+	state := State{}
 	err = json.Unmarshal(content, &state)
-	return state, err
+	if err != nil {
+		return State{}, err
+	}
+
+	return state, nil
 }
 
 func fetchPath(httpHelper *helper.HTTP, path string) ([]byte, error) {

@@ -198,14 +198,18 @@ func getMasterName(http *helper.HTTP, uri string) (string, error) {
 
 // GetInfo returns the data for the Elasticsearch / endpoint.
 func GetInfo(http *helper.HTTP, uri string) (Info, error) {
-	info := Info{}
 	content, err := fetchPath(http, uri, "/", "")
 	if err != nil {
-		return info, err
+		return Info{}, err
 	}
 
+	info := Info{}
 	err = json.Unmarshal(content, &info)
-	return info, err
+	if err != nil {
+		return Info{}, err
+	}
+
+	return info, nil
 }
 
 func fetchPath(http *helper.HTTP, uri, path string, query string) ([]byte, error) {
