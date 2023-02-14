@@ -1112,7 +1112,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 
 			if changed {
 				logger.Infof(
-					"some of the following files have been modified: %v, starting %s shutdown",
+					"some of the following files have been modified: %v, restarting %s.",
 					files, b.Info.Beat)
 
 				b.Reexec = true
