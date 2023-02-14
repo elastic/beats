@@ -1,5 +1,5 @@
 ---
-name: Bump golang version
+name: bump-golang
 
 on:
   schedule:
