@@ -136,9 +136,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 
 	for resp := range resps {
 		// in case of intermediate responses wait for IDs to be collected
-		if resp.startSignalChannel != nil {
-			<-resp.startSignalChannel
-		}
+		resp.wait()
 
 		iter := rp.pagination.newPageIterator(stdCtx, trCtx, resp.httpResponse)
 		for {

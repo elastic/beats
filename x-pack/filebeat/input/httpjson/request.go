@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 
 	"github.com/PaesslerAG/jsonpath"
 
@@ -40,8 +41,33 @@ type idsStruct struct {
 }
 
 type processResponse struct {
-	httpResponse       *http.Response
-	startSignalChannel chan struct{}
+	httpResponse *http.Response
+	idsReady     *sync.Mutex
+}
+
+func block(resp *http.Response) processResponse {
+	var mu sync.Mutex
+	mu.Lock()
+	return processResponse{resp, &mu}
+}
+
+func (p *processResponse) block() processResponse {
+	var mu sync.Mutex
+	mu.Lock()
+	p.idsReady = &mu
+	return *p
+}
+
+func (p processResponse) done() {
+	if p.idsReady != nil {
+		p.idsReady.Unlock()
+	}
+}
+
+func (p processResponse) wait() {
+	if p.idsReady != nil {
+		p.idsReady.Lock()
+	}
 }
 
 func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Response, error) {
@@ -382,10 +408,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 
 			// passing signal channel here to avoid closing of nil channel in getIdsFromResponses function
-			intermediateResponseChannel <- processResponse{
-				httpResponse:       httpResp,
-				startSignalChannel: make(chan struct{}),
-			}
+			intermediateResponseChannel <- block(httpResp)
 			close(intermediateResponseChannel)
 			idsChannel := make(chan idsStruct, 1)
 			go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[i+1].replace)
@@ -474,8 +497,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				resp := processResponse{httpResponse: httpResp}
 				// store data according to response type
 				if !(i == len(r.requestFactories)-1 && len(ids) != 0) {
-					resp.startSignalChannel = make(chan struct{})
-					intermediateResponseChannel <- resp
+					intermediateResponseChannel <- resp.block()
 				}
 				responseChannel <- resp
 			}
@@ -516,8 +538,8 @@ func (r *requester) getIdsFromResponses(intermediateResps <-chan processResponse
 			b, err = io.ReadAll(resp.httpResponse.Body)
 			if err != nil {
 				outputChannel <- idsStruct{err: fmt.Errorf("error while reading response body: %w", err)}
-				close(resp.startSignalChannel)
-				closeSignalChannels(intermediateResps)
+				resp.done()
+				setIdsReady(intermediateResps)
 				return
 			}
 		}
@@ -525,8 +547,8 @@ func (r *requester) getIdsFromResponses(intermediateResps <-chan processResponse
 		err = resp.httpResponse.Body.Close()
 		if err != nil {
 			outputChannel <- idsStruct{err: fmt.Errorf("error closing response body: %w", err)}
-			close(resp.startSignalChannel)
-			closeSignalChannels(intermediateResps)
+			resp.done()
+			setIdsReady(intermediateResps)
 			return
 		}
 
@@ -534,15 +556,15 @@ func (r *requester) getIdsFromResponses(intermediateResps <-chan processResponse
 		var v interface{}
 		if err := json.Unmarshal(b, &v); err != nil {
 			outputChannel <- idsStruct{err: fmt.Errorf("cannot unmarshal data: %w", err)}
-			close(resp.startSignalChannel)
-			closeSignalChannels(intermediateResps)
+			resp.done()
+			setIdsReady(intermediateResps)
 			return
 		}
 		values, err := jsonpath.Get(replace, v)
 		if err != nil {
 			outputChannel <- idsStruct{err: fmt.Errorf("error while getting keys: %w", err)}
-			close(resp.startSignalChannel)
-			closeSignalChannels(intermediateResps)
+			resp.done()
+			setIdsReady(intermediateResps)
 			return
 		}
 
@@ -554,7 +576,7 @@ func (r *requester) getIdsFromResponses(intermediateResps <-chan processResponse
 					ids = append(ids, fmt.Sprintf("%v", v))
 				default:
 					r.log.Errorf("events must a number or string, but got %T: skipping", v)
-					close(resp.startSignalChannel)
+					resp.done()
 					continue
 				}
 			}
@@ -563,7 +585,7 @@ func (r *requester) getIdsFromResponses(intermediateResps <-chan processResponse
 		default:
 			r.log.Errorf("cannot collect IDs from type '%T' : '%v'", values, values)
 		}
-		close(resp.startSignalChannel)
+		resp.done()
 	}
 	outputChannel <- idsStruct{ids: ids}
 }
@@ -660,11 +682,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 	intermediateResponseChannel := make(chan processResponse, 1)
 	idsChannel := make(chan idsStruct, 1)
 
-	// passing signal channel here to avoid closing of nil channel in getIdsFromResponses function
-	intermediateResponseChannel <- processResponse{
-		httpResponse:       response,
-		startSignalChannel: make(chan struct{}),
-	}
+	intermediateResponseChannel <- block(response)
 	close(intermediateResponseChannel)
 
 	go r.getIdsFromResponses(intermediateResponseChannel, idsChannel, r.requestFactories[chainIndex].replace)
@@ -742,8 +760,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 
 			resp := processResponse{httpResponse: httpResp}
 			if !(i == len(r.requestFactories)-1 && len(ids) != 0) {
-				resp.startSignalChannel = make(chan struct{})
-				intermediateResponseChannel <- resp
+				intermediateResponseChannel <- resp.block()
 			}
 			processingChannel <- resp
 		}
@@ -816,8 +833,8 @@ func closeChannels(channels ...chan processResponse) {
 	}
 }
 
-func closeSignalChannels(channel <-chan processResponse) {
-	for c := range channel {
-		close(c.startSignalChannel)
+func setIdsReady(channel <-chan processResponse) {
+	for resp := range channel {
+		resp.done()
 	}
 }
