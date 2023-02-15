@@ -151,7 +151,8 @@ RUN cd /usr/share/heartbeat/.node \
 RUN chown -R {{ .user }} $NODE_PATH
 USER {{ .user }}
 # If this fails dump the NPM logs
-RUN npm i -g --loglevel verbose --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
+RUN npm config set registry=http://host.docker.internal:4873
+RUN npm i -g --loglevel verbose --engine-strict @elastic/synthetics@1.0.0-onweek || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
 RUN chmod ug+rwX -R $NODE_PATH 
 USER root
 

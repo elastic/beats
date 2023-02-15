@@ -38,6 +38,11 @@ type FilterJourneyConfig struct {
 	Match string   `config:"match"`
 }
 
+type CrossLinkingAPM struct {
+	MonitorID  string
+	Checkgroup string
+}
+
 // platformCmdMutate is the hook for OS specific mutation of cmds
 // This is practically just used by synthexec_unix.go to add Sysprocattrs
 // It's still nice for devs to be able to test browser monitors on OSX
@@ -93,7 +98,10 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		senr := newStreamEnricher(sFields)
-		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
+
+		// ON WEEK changes: crosslinking
+		crossLinking := CrossLinkingAPM{MonitorID: senr.sFields.ID, Checkgroup: senr.checkGroup}
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys, crossLinking)
 		if err != nil {
 			err := senr.enrich(event, &SynthEvent{
 				Type:  "cmd/could_not_start",
@@ -129,6 +137,7 @@ func runCmd(
 	stdinStr *string,
 	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
+	crosslinking CrossLinkingAPM,
 ) (mpx *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
@@ -143,6 +152,11 @@ func runCmd(
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
 	cmd.Args = append(cmd.Args, "--rich-events")
+
+	// ONWEEK changes: crosslinking args
+	if len(crosslinking.MonitorID) > 0 && len(crosslinking.Checkgroup) > 0 {
+		cmd.Env = append(cmd.Env, "MONITOR_ID="+crosslinking.MonitorID, "CHECKGROUP="+crosslinking.Checkgroup)
+	}
 
 	if len(filterJourneys.Tags) > 0 {
 		cmd.Args = append(cmd.Args, "--tags", strings.Join(filterJourneys.Tags, " "))

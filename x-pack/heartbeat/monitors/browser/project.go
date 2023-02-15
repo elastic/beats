@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -95,6 +96,7 @@ func (p *Project) extraArgs() []string {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}
 	}
+
 	if p.projectCfg.IgnoreHTTPSErrors {
 		extraArgs = append(extraArgs, "--ignore-https-errors")
 	}
@@ -120,6 +122,9 @@ func (p *Project) extraArgs() []string {
 				extraArgs = append(extraArgs, "--throttling", string(j))
 			}
 		}
+	}
+	if p.projectCfg.TraceUrlPatterns != nil {
+		extraArgs = append(extraArgs, "--trace-url-patterns", strings.Join(p.projectCfg.TraceUrlPatterns, ","))
 	}
 
 	return extraArgs
