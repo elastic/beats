@@ -42,15 +42,26 @@ type idsStruct struct {
 
 type processResponse struct {
 	httpResponse *http.Response
-	idsReady     *sync.Mutex
+
+	// idsReady ensures that a response will not be processed
+	// until every id is collected from the response.
+	// While idsReady is a sync.Mutex it is being used here as
+	// a waitgroup with a single member. This means that the
+	// wait method may only be called once, otherwise a deadlock
+	// will result. If multiple wait calls are required in the future,
+	// the type should be replaced with a sync.WaitGroup.
+	idsReady *sync.Mutex
 }
 
+// block returns a processResponse that will block until response completion.
 func block(resp *http.Response) processResponse {
 	var mu sync.Mutex
 	mu.Lock()
 	return processResponse{resp, &mu}
 }
 
+// block upgrades the receiver to a blocking state. It may only be called once
+// in the lifetime of the processResponse. The upgraded value is returned.
 func (p *processResponse) block() processResponse {
 	var mu sync.Mutex
 	mu.Lock()
@@ -58,12 +69,16 @@ func (p *processResponse) block() processResponse {
 	return *p
 }
 
+// done releases the receiver block. It may only be called once in the lifetime
+// of the processResponse.
 func (p processResponse) done() {
 	if p.idsReady != nil {
 		p.idsReady.Unlock()
 	}
 }
 
+// wait will block until the receiver's block has been released. In the current
+// implementation it may only be called once in the lifetime of the processResponse.
 func (p processResponse) wait() {
 	if p.idsReady != nil {
 		p.idsReady.Lock()
@@ -833,6 +848,7 @@ func closeChannels(channels ...chan processResponse) {
 	}
 }
 
+// setIdsReady releases the block of every response passed in the channel
 func setIdsReady(channel <-chan processResponse) {
 	for resp := range channel {
 		resp.done()
