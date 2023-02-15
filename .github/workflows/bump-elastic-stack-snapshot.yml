@@ -7,8 +7,7 @@ on:
     - cron: '0 15 * * 1-5'
 
 permissions:
-  pull-requests: write
-  contents: write
+  contents: read
 
 jobs:
   filter:
@@ -29,15 +28,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Git
-        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
-
-      - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@453502948b442d7b9a923de7b40cc7ce8628505c
-
-      - name: Run Updatecli
+      - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
+        with:
+          vaultUrl: ${{ secrets.VAULT_ADDR }}
+          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
+          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
+          pipeline: ./.ci/bump-elastic-stack-snapshot.yml
         env:
-          GITHUB_TOKEN: ${{ github.token }}
           BRANCH: ${{ matrix.branch }}
-        run: updatecli apply --config ./.ci/bump-elastic-stack-snapshot.yml
-
