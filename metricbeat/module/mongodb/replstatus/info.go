@@ -57,7 +57,7 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 		return nil, errors.New("collection oplog.rs was not found")
 	}
 
-	collection := db.Collection(oplogCol)
+	//collection := db.Collection(oplogCol)
 
 	// get oplog size
 	var oplogSize CollSize
@@ -70,25 +70,26 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 		return nil, fmt.Errorf("could not decode mongodb op log size: %w", err)
 	}
 
+	// TODO: oplog.rs collection is too large, which will cause errors when sorting
 	// get first and last items in the oplog
-	firstTs, err := getOpTimestamp(collection, "$natural")
-	if err != nil {
-		return nil, fmt.Errorf("could not get first operation timestamp in op log: %w", err)
-	}
-
-	lastTs, err := getOpTimestamp(collection, "-$natural")
-	if err != nil {
-		return nil, fmt.Errorf("could not get last operation timestamp in op log: %w", err)
-	}
-
-	diff := lastTs - firstTs
+	//firstTs, err := getOpTimestamp(collection, "$natural")
+	//if err != nil {
+	//	return nil, fmt.Errorf("could not get first operation timestamp in op log: %w", err)
+	//}
+	//
+	//lastTs, err := getOpTimestamp(collection, "-$natural")
+	//if err != nil {
+	//	return nil, fmt.Errorf("could not get last operation timestamp in op log: %w", err)
+	//}
+	//
+	//diff := lastTs - firstTs
 
 	return &oplogInfo{
 		allocated: oplogSize.MaxSize,
 		used:      oplogSize.Size,
-		firstTs:   firstTs,
-		lastTs:    lastTs,
-		diff:      diff,
+		//firstTs:   firstTs,
+		//lastTs:    lastTs,
+		//diff:      diff,
 	}, nil
 }
 
