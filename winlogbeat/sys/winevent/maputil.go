@@ -46,14 +46,10 @@ func AddPairs(m common.MapStr, key string, pairs []KeyValue) common.MapStr {
 		return nil
 	}
 
-<<<<<<< HEAD
-	h := make(common.MapStr, len(pairs))
-=======
 	// Explicitly use the unnamed type to prevent accidental use
-	// of mapstr.M path look-up methods.
+	// of common.MapStr path look-up methods.
 	h := make(map[string]interface{}, len(pairs))
 
->>>>>>> ab589cebe2 (winlogbeat/sys/winevent: do not interpret dots as JSON path separators (#34549))
 	for i, kv := range pairs {
 		// Ignore empty values.
 		if kv.Value == "" {
@@ -68,15 +64,8 @@ func AddPairs(m common.MapStr, key string, pairs []KeyValue) common.MapStr {
 		}
 
 		// Do not overwrite.
-<<<<<<< HEAD
-		_, err := h.GetValue(k)
-		if err == common.ErrKeyNotFound {
-			_, _ = h.Put(k, sys.RemoveWindowsLineEndings(kv.Value))
-		} else {
-=======
 		_, exists := h[k]
 		if exists {
->>>>>>> ab589cebe2 (winlogbeat/sys/winevent: do not interpret dots as JSON path separators (#34549))
 			debugf("Dropping key/value (k=%s, v=%s) pair because key already "+
 				"exists. event=%+v", k, kv.Value, m)
 		} else {
@@ -88,7 +77,7 @@ func AddPairs(m common.MapStr, key string, pairs []KeyValue) common.MapStr {
 		return nil
 	}
 
-	_, _ = m.Put(key, mapstr.M(h))
+	_, _ = m.Put(key, common.MapStr(h))
 
 	return h
 }
