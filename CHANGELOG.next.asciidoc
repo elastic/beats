@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
 
 *Functionbeat*
 
