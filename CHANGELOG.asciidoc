@@ -3,6 +3,180 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.6.2]]
+=== Beats version 8.6.2
+https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix lockfile logic, retry locking {pull}34194[34194]
+- Log errors from the Elastic Agent V2 client errors channel. Avoids blocking when error occurs communicating with the Elastic Agent. {pull}34392[34392]
+- Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
+- Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
+
+*Auditbeat*
+
+
+*Filebeat*
+- [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
+- [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
+- Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
+- Fix handling of error in states in direct aws-s3 listing input {issue}33513[33513] {pull}33722[33722]
+- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
+- Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
+- Fix splitting array of strings/arrays in httpjson input {issue}30345[30345] {pull}33609[33609]
+- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+- Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
+- [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
+- Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
+- [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
+
+*Heartbeat*
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
+- Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
+- Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
+
+
+*Heartbeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
+- Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+- Fixed a race condition in Packetbeat that could cause crashes or instability {pull}34514[34514]
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
+
+
 [[release-notes-8.6.1]]
 === Beats version 8.6.1
 https://github.com/elastic/beats/compare/v8.6.0\...v8.6.1[View commits]
