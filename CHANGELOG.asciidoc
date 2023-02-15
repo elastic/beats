@@ -7,30 +7,6 @@
 === Beats version 8.6.2
 https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 
 ==== Bugfixes
 
@@ -42,7 +18,6 @@ https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
 - Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
 
 *Auditbeat*
-
 
 *Filebeat*
 - [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
@@ -67,114 +42,22 @@ https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
 - Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
 - Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
 
-
-*Heartbeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
 *Metricbeat*
 
 - Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
-
-
-*Osquerybeat*
-
 
 *Packetbeat*
 
 - Fixed a race condition in Packetbeat that could cause crashes or instability {pull}34514[34514]
 
 
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
 
 
 *Filebeat*
 
 - Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
 
 
 [[release-notes-8.6.1]]
