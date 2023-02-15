@@ -261,8 +261,6 @@ func (http *httpPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseHttp exception")
-
 	conn := ensureHTTPConnection(private)
 	conn = http.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
@@ -401,8 +399,6 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (http *httpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(http) exception")
-
 	conn := getHTTPConnection(private)
 	if conn == nil {
 		return private, false
