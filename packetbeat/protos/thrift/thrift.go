@@ -918,8 +918,6 @@ func (thrift *thriftPlugin) ConnectionTimeout() time.Duration {
 func (thrift *thriftPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseThrift exception")
-
 	priv := thriftPrivateData{}
 	if private != nil {
 		var ok bool
@@ -1059,7 +1057,6 @@ func (thrift *thriftPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (thrift *thriftPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(thrift) exception")
 	logp.Debug("thriftdetailed", "GapInStream called")
 
 	if private == nil {
