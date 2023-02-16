@@ -1,5 +1,6 @@
 ---
 name: Bump elastic-stack to latest snapshot version
+pipelineid: 'bump-elastic-stack-snapshot-{{ requiredEnv "BRANCH" }}'
 
 actions:
   default:
