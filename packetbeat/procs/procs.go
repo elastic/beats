@@ -184,10 +184,6 @@ func (proc *ProcessesWatcher) isLocalIP(ip net.IP) bool {
 }
 
 func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport applayer.Transport) *process {
-	// This should not be necessary; none of the
-	// dependency code panics in normal operation.
-	defer logp.Recover("FindProc exception")
-
 	proc.mu.Lock()
 	procMap, ok := proc.portProcMap[transport]
 	proc.mu.Unlock()
