@@ -402,7 +402,8 @@ def packagingArm(Map args = [:]) {
   def PLATFORMS = [ 'linux/arm64' ].join(' ')
   withEnv([
     "PLATFORMS=${PLATFORMS}",
-    "PACKAGES=docker"
+    "PACKAGES=docker",
+    "ELASTIC_SYNTHETICS_CAPABLE=true"
   ]) {
     target(args)
   }
@@ -432,7 +433,8 @@ def packagingLinux(Map args = [:]) {
                 'darwin/arm64'
               ].join(' ')
   withEnv([
-    "PLATFORMS=${PLATFORMS}"
+    "PLATFORMS=${PLATFORMS}",
+    "ELASTIC_SYNTHETICS_CAPABLE=true"
   ]) {
     target(args)
   }
