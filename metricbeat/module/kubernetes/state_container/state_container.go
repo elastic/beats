@@ -58,19 +58,15 @@ var (
 					"memory": "memory.limit.bytes",
 				},
 			)),
-			"kube_pod_container_resource_limits_cpu_cores":      p.Metric("cpu.limit.cores"),
-			"kube_pod_container_resource_requests_cpu_cores":    p.Metric("cpu.request.cores"),
-			"kube_pod_container_resource_limits_memory_bytes":   p.Metric("memory.limit.bytes"),
-			"kube_pod_container_resource_requests_memory_bytes": p.Metric("memory.request.bytes"),
-			"kube_pod_container_status_ready":                   p.BooleanMetric("status.ready"),
-			"kube_pod_container_status_restarts":                p.Metric("status.restarts"),
-			"kube_pod_container_status_restarts_total":          p.Metric("status.restarts"),
-			"kube_pod_container_status_running":                 p.KeywordMetric("status.phase", "running"),
-			"kube_pod_container_status_terminated":              p.KeywordMetric("status.phase", "terminated"),
-			"kube_pod_container_status_waiting":                 p.KeywordMetric("status.phase", "waiting"),
-			"kube_pod_container_status_terminated_reason":       p.LabelMetric("status.reason", "reason"),
-			"kube_pod_container_status_waiting_reason":          p.LabelMetric("status.reason", "reason"),
-			"kube_pod_container_status_last_terminated_reason":  p.LabelMetric("status.last_terminated_reason", "reason"),
+
+			"kube_pod_container_status_ready":                  p.BooleanMetric("status.ready"),
+			"kube_pod_container_status_restarts_total":         p.Metric("status.restarts"),
+			"kube_pod_container_status_running":                p.KeywordMetric("status.phase", "running"),
+			"kube_pod_container_status_terminated":             p.KeywordMetric("status.phase", "terminated"),
+			"kube_pod_container_status_waiting":                p.KeywordMetric("status.phase", "waiting"),
+			"kube_pod_container_status_terminated_reason":      p.LabelMetric("status.reason", "reason"),
+			"kube_pod_container_status_waiting_reason":         p.LabelMetric("status.reason", "reason"),
+			"kube_pod_container_status_last_terminated_reason": p.LabelMetric("status.last_terminated_reason", "reason"),
 		},
 
 		Labels: map[string]p.LabelMap{
@@ -156,7 +152,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			if split != -1 {
 				kubernetes.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
 
+				// Add splitted container.id ECS field and update kubernetes.container.id with splitted value
 				kubernetes.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
+				kubernetes.ShouldPut(event, "id", cID[split+3:], m.Logger())
+
 			}
 		}
 		if containerImage, ok := event["image"]; ok {

@@ -112073,6 +112073,16 @@ type: keyword
 
 --
 
+*`okta.debug_context.debug_data.factor`*::
++
+--
+The factor used for authentication.
+
+
+type: keyword
+
+--
+
 *`okta.debug_context.debug_data.request_id`*::
 +
 --
@@ -112103,10 +112113,30 @@ type: keyword
 
 --
 
+*`okta.debug_context.debug_data.risk_behaviors`*::
++
+--
+The set of behaviors that contribute to a risk assessment.
+
+
+type: keyword
+
+--
+
 *`okta.debug_context.debug_data.risk_level`*::
 +
 --
 The risk level assigned to the sign in attempt.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.risk_reasons`*::
++
+--
+The reasons for the risk.
 
 
 type: keyword

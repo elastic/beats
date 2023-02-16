@@ -37,7 +37,8 @@ func AddOptional(m mapstr.M, key string, v interface{}) {
 
 // AddPairs adds a new dictionary to the given MapStr. The key/value pairs are
 // added to the new dictionary. If any keys are duplicates, the first key/value
-// pair is added and the remaining duplicates are dropped.
+// pair is added and the remaining duplicates are dropped. Pair keys are not
+// expanded into dotted paths.
 //
 // The new dictionary is added to the given MapStr and it is also returned for
 // convenience purposes.
@@ -46,7 +47,10 @@ func AddPairs(m mapstr.M, key string, pairs []KeyValue) mapstr.M {
 		return nil
 	}
 
-	h := make(mapstr.M, len(pairs))
+	// Explicitly use the unnamed type to prevent accidental use
+	// of mapstr.M path look-up methods.
+	h := make(map[string]interface{}, len(pairs))
+
 	for i, kv := range pairs {
 		// Ignore empty values.
 		if kv.Value == "" {
@@ -61,12 +65,12 @@ func AddPairs(m mapstr.M, key string, pairs []KeyValue) mapstr.M {
 		}
 
 		// Do not overwrite.
-		_, err := h.GetValue(k)
-		if err == mapstr.ErrKeyNotFound {
-			_, _ = h.Put(k, sys.RemoveWindowsLineEndings(kv.Value))
-		} else {
+		_, exists := h[k]
+		if exists {
 			debugf("Dropping key/value (k=%s, v=%s) pair because key already "+
 				"exists. event=%+v", k, kv.Value, m)
+		} else {
+			h[k] = sys.RemoveWindowsLineEndings(kv.Value)
 		}
 	}
 
@@ -74,7 +78,7 @@ func AddPairs(m mapstr.M, key string, pairs []KeyValue) mapstr.M {
 		return nil
 	}
 
-	_, _ = m.Put(key, h)
+	_, _ = m.Put(key, mapstr.M(h))
 
 	return h
 }

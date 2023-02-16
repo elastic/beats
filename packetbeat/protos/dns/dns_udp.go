@@ -23,7 +23,6 @@ import "github.com/elastic/beats/v7/packetbeat/protos"
 const maxDNSPacketSize = (1 << 9) // 512 (bytes)
 
 func (dns *dnsPlugin) ParseUDP(pkt *protos.Packet) {
-	defer dns.logger.Recover("Dns ParseUdp")
 	packetSize := len(pkt.Payload)
 
 	dns.logger.Debugf("Parsing packet addressed with %s of length %d.", &pkt.Tuple, packetSize)
