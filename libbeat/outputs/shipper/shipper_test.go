@@ -29,7 +29,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.elastic.co/fastjson"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -131,9 +130,6 @@ func TestToShipperEvent(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			converted, err := toShipperEvent(tc.value)
 			if tc.expErr != "" {
-				fj := &fastjson.Writer{}
-				converted.Metadata.MarshalFastJSON(fj)
-				t.Logf("got: %s", string(fj.Bytes()))
 				require.Error(t, err)
 				require.Contains(t, err.Error(), tc.expErr)
 				require.Nil(t, converted)
@@ -215,11 +211,6 @@ func TestPublish(t *testing.T) {
 			Meta:      mapstr.M{"event": "first"},
 			Fields:    mapstr.M{"a": "b"},
 		},
-		// {
-		// 	Timestamp: time.Now(),
-		// 	Meta:      mapstr.M{"event": "second", "dropped": true, "invalid": math.NaN()}, // this event is always dropped
-		// 	Fields:    mapstr.M{"c": "d"},
-		// },
 		{
 			Timestamp: time.Now(),
 			Meta:      mapstr.M{"event": "third"},
