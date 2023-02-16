@@ -106,7 +106,7 @@ func (u *Upgrader) Upgradeable() bool {
 
 // Upgrade upgrades running agent, function returns shutdown callback if some needs to be executed for cases when
 // reexec is called by caller.
-func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ reexec.ShutdownCallbackFn, err error) {
+func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool, skipVerifyOverride bool, pgpBytes ...string) (_ reexec.ShutdownCallbackFn, err error) {
 	// report failed
 	defer func() {
 		if err != nil {
@@ -131,7 +131,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ ree
 	u.reportUpdating(a.Version())
 
 	sourceURI, err := u.sourceURI(a.Version(), a.SourceURI())
-	archivePath, err := u.downloadArtifact(ctx, a.Version(), sourceURI)
+	archivePath, err := u.downloadArtifact(ctx, a.Version(), sourceURI, skipVerifyOverride, pgpBytes...)
 	if err != nil {
 		return nil, err
 	}

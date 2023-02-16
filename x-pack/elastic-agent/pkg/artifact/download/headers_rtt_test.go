@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package http
+package download
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ func TestAddingHeaders(t *testing.T) {
 	defer server.Close()
 
 	c := server.Client()
-	rtt := withHeaders(c.Transport, headers)
+	rtt := WithHeaders(c.Transport, Headers)
 
 	c.Transport = rtt
 	resp, err := c.Get(server.URL)
