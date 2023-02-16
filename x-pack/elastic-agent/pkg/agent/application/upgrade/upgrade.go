@@ -123,7 +123,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool, skipVe
 	}
 
 	if u.caps != nil {
-		if _, err := u.caps.Apply(a); err == capabilities.ErrBlocked {
+		if _, err := u.caps.Apply(a); errors.Is(err, capabilities.ErrBlocked) {
 			return nil, nil
 		}
 	}
@@ -148,7 +148,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool, skipVe
 	if strings.HasPrefix(release.Commit(), newHash) {
 		// not an error
 		if action := a.FleetAction(); action != nil {
-			u.ackAction(ctx, action)
+			_ = u.ackAction(ctx, action)
 		}
 		u.log.Warn("upgrading to same version")
 		return nil, nil
@@ -257,8 +257,8 @@ func (u *Upgrader) reportUpdating(version string) {
 }
 
 func rollbackInstall(ctx context.Context, hash string) {
-	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
-	ChangeSymlink(ctx, release.ShortCommit())
+	_ = os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
+	_ = ChangeSymlink(ctx, release.ShortCommit())
 }
 
 func copyActionStore(newHash string) error {

@@ -17,7 +17,7 @@ import (
 	"path"
 	"strings"
 
-	"golang.org/x/crypto/openpgp"
+	"golang.org/x/crypto/openpgp" //nolint:staticcheck // won't update the package for now
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"

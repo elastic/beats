@@ -21,7 +21,7 @@ func TestAddingHeaders(t *testing.T) {
 	msg := []byte("OK")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		assert.Equal(t, fmt.Sprintf("Beat elastic-agent v%s", release.Version()), req.Header.Get("User-Agent"))
-		w.Write(msg)
+		_, _ = w.Write(msg)
 	}))
 	defer server.Close()
 
