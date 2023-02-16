@@ -47,7 +47,7 @@ const (
 	defaultEnvironmentString        = "default"
 	systemdEnvironmentString        = "systemd"
 	containerEnvironmentString      = "container"
-	macOSServiceEnvironmentString   = "macOS_service"
+	macOSServiceEnvironmentString   = "macos_service"
 	windowsServiceEnvironmentString = "windows_service"
 	invalidEnvironmentString        = "<invalid>"
 )
