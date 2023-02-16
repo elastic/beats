@@ -87,6 +87,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
 - [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
 - Prevent Elasticsearch from spewing log warnings about redundant wildcard when setting up ingest pipelines. {issue}34249[34249] {pull}34550[34550]
+- Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
 
 *Heartbeat*
 
@@ -145,6 +146,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
+- Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
 
 *Functionbeat*
 
