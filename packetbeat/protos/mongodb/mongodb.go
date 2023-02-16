@@ -49,7 +49,7 @@ type mongodbPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 type transactionKey struct {
@@ -66,7 +66,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &mongodbPlugin{}
@@ -83,7 +83,7 @@ func New(
 	return p, nil
 }
 
-func (mongodb *mongodbPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *mongodbConfig) error {
+func (mongodb *mongodbPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *mongodbConfig) error {
 	debugf("Init a MongoDB protocol parser")
 	mongodb.setFromConfig(config)
 
@@ -124,7 +124,6 @@ func (mongodb *mongodbPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseMongodb exception")
 	debugf("Parse method triggered")
 
 	conn := ensureMongodbConnection(private)
