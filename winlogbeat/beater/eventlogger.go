@@ -133,12 +133,17 @@ func (e *eventLogger) run(
 runLoop:
 	for stop := false; !stop; {
 		err = api.Open(state)
+
 		if eventlog.IsRecoverable(err) {
-			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err)
+			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err, "channel", api.Channel())
+			time.Sleep(time.Second * 5)
+			continue
+		} else if !api.IsFile() && eventlog.IsChannelNotFound(err) {
+			e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
 			time.Sleep(time.Second * 5)
 			continue
 		} else if err != nil {
-			e.log.Warnw("Open() error. No events will be read from this source.", "error", err)
+			e.log.Warnw("Open() error. No events will be read from this source.", "error", err, "channel", api.Channel())
 			return
 		}
 		e.log.Debug("Opened successfully.")
@@ -153,7 +158,14 @@ runLoop:
 			// Read from the event.
 			records, err := api.Read()
 			if eventlog.IsRecoverable(err) {
-				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err)
+				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err, "channel", api.Channel())
+				if closeErr := api.Close(); closeErr != nil {
+					e.log.Warnw("Close() error.", "error", err)
+				}
+				continue runLoop
+			}
+			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
+				e.log.Warnw("Read() encountered channel not found error for channel %q. Reopening handle...", "error", err, "channel", api.Channel())
 				if closeErr := api.Close(); closeErr != nil {
 					e.log.Warnw("Close() error.", "error", err)
 				}
@@ -165,7 +177,7 @@ runLoop:
 				// Graceful stop.
 				stop = true
 			default:
-				e.log.Warnw("Read() error.", "error", err)
+				e.log.Warnw("Read() error.", "error", err, "channel", api.Channel())
 				return
 			}
 

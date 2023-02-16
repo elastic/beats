@@ -72,6 +72,12 @@ type EventLog interface {
 
 	// Name returns the event log's name.
 	Name() string
+
+	// Channel returns the event log's channel name.
+	Channel() string
+
+	// IsFile returns true if the event log is an evtx file.
+	IsFile() bool
 }
 
 // Record represents a single event from the log.

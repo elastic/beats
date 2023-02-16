@@ -282,6 +282,16 @@ func (l *winEventLog) Name() string {
 	return l.id
 }
 
+// Channel returns the event log's channel name.
+func (l *winEventLog) Channel() string {
+	return l.channelName
+}
+
+// IsFile returns true if the event log is an evtx file.
+func (l *winEventLog) IsFile() bool {
+	return l.file
+}
+
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	var bookmark win.EvtHandle
 	var err error
