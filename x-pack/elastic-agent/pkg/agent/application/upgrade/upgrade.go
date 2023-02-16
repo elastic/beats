@@ -236,7 +236,7 @@ func (u *Upgrader) ackAction(ctx context.Context, action fleetapi.Action) error 
 // and state is changed to FAILED
 func (u *Upgrader) reportFailure(ctx context.Context, action fleetapi.Action, err error) {
 	// ack action
-	u.acker.Ack(ctx, action)
+	_ = u.acker.Ack(ctx, action)
 
 	// report failure
 	u.reporter.OnStateChange(

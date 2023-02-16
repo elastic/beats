@@ -27,7 +27,6 @@ import (
 )
 
 const (
-	publicKeyURI = "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
 	ascSuffix    = ".asc"
 	sha512Length = 128
 )
@@ -42,7 +41,7 @@ type Verifier struct {
 }
 
 // NewVerifier create a verifier checking downloaded package on preconfigured
-// location agains a key stored on elastic.co website.
+// location against a key stored on elastic.co website.
 func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Verifier, error) {
 	if len(pgp) == 0 && !allowEmptyPgp {
 		return nil, errors.New("expecting PGP but retrieved none", errors.TypeSecurity)
@@ -69,7 +68,7 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 }
 
 // Verify checks downloaded package on preconfigured
-// location agains a key stored on elastic.co website.
+// location against a key stored on elastic.co website.
 func (v *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool, pgpBytes ...string) (isMatch bool, err error) {
 	filename, err := artifact.GetArtifactName(spec, version, v.config.OS(), v.config.Arch())
 	if err != nil {
