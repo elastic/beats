@@ -156,7 +156,8 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 		panic(err)
 	}
 	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
-	secondBeat.loadMeta(metaPath)
+	err = secondBeat.loadMeta(metaPath)
+	require.NoError(t, err)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.True(t, firstStart.Equal(secondBeat.Info.FirstStart), "Cannot load first start")
