@@ -75,10 +75,14 @@ func upgradeCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 			pgpChecks = append(pgpChecks, download.PgpSourceRawPrefix+pgpBytes)
 		}
 
-		pgpUri, _ := cmd.Flags().GetString(flagPGPBytesURI)
-		if len(pgpUri) > 0 {
+		pgpURI, _ := cmd.Flags().GetString(flagPGPBytesURI)
+		if len(pgpURI) > 0 {
+			if uriErr := download.CheckValidDownloadURI(pgpURI); uriErr != nil {
+				return uriErr
+			}
+
 			// URI is parsed later with proper TLS and Proxy config within downloader
-			pgpChecks = append(pgpChecks, download.PgpSourceURIPrefix+pgpUri)
+			pgpChecks = append(pgpChecks, download.PgpSourceURIPrefix+pgpURI)
 		}
 	}
 

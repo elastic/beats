@@ -25,6 +25,7 @@ type Verifier interface {
 	Verify(spec program.Spec, version string, removeOnFailure bool, pgpBytes ...string) (bool, error)
 }
 
+// PgpBytesFromSource returns clean PGP key from raw source or remote URI.
 func PgpBytesFromSource(source string, client http.Client) ([]byte, error) {
 	if strings.HasPrefix(source, PgpSourceRawPrefix) {
 		return []byte(strings.TrimPrefix(source, PgpSourceRawPrefix)), nil
@@ -37,7 +38,8 @@ func PgpBytesFromSource(source string, client http.Client) ([]byte, error) {
 	return nil, errors.New("unknown pgp source")
 }
 
-func CheckValidDownloadUri(rawURI string) error {
+// CheckValidDownloadUri checks whether specified string is a valid HTTP URI.
+func CheckValidDownloadURI(rawURI string) error {
 	uri, err := url.Parse(rawURI)
 	if err != nil {
 		return err
@@ -51,7 +53,7 @@ func CheckValidDownloadUri(rawURI string) error {
 }
 
 func fetchPgpFromURI(uri string, client http.Client) ([]byte, error) {
-	if err := CheckValidDownloadUri(uri); err != nil {
+	if err := CheckValidDownloadURI(uri); err != nil {
 		return nil, err
 	}
 
