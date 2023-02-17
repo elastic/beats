@@ -16,7 +16,9 @@ import (
 )
 
 const (
+	// PgpSourceRawPrefix prefixes raw PGP keys.
 	PgpSourceRawPrefix = "pgp_raw:"
+	// PgpSourceURIPrefix prefixes URI pointing to remote PGP key.
 	PgpSourceURIPrefix = "pgp_uri:"
 )
 
@@ -38,7 +40,7 @@ func PgpBytesFromSource(source string, client http.Client) ([]byte, error) {
 	return nil, errors.New("unknown pgp source")
 }
 
-// CheckValidDownloadUri checks whether specified string is a valid HTTP URI.
+// CheckValidDownloadURI checks whether specified string is a valid HTTP URI.
 func CheckValidDownloadURI(rawURI string) error {
 	uri, err := url.Parse(rawURI)
 	if err != nil {
