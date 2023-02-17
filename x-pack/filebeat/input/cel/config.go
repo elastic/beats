@@ -137,7 +137,7 @@ func (c rateLimitConfig) Validate() error {
 		return errors.New("limit must be greater than zero")
 	}
 	if c.Limit == nil && c.Burst != nil && *c.Burst <= 0 {
-		return errors.New("limit must be greater than zero if limit is specified")
+		return errors.New("burst must be greater than zero if limit is not specified")
 	}
 	return nil
 }
