@@ -24,6 +24,13 @@ output.redis:
   timeout: 5
 ------------------------------------------------------------------------------
 
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
+
 ==== Compatibility
 
 This output is expected to work with all Redis versions between 3.2.4 and 5.0.8. Other versions might work as well,
