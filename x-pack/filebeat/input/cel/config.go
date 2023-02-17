@@ -5,6 +5,7 @@
 package cel
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -32,6 +33,8 @@ type config struct {
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
+	// Redact is the debug log state redaction configuration.
+	Redact redact `config:"redact"`
 
 	// Auth is the authentication config for connection to an HTTP
 	// API endpoint.
@@ -40,6 +43,15 @@ type config struct {
 	// Resource is the configuration for establishing an
 	// HTTP request or for locating a local resource.
 	Resource *ResourceConfig `config:"resource" validate:"required"`
+}
+
+type redact struct {
+	// Fields indicates which fields to apply redaction to prior
+	// to logging.
+	Fields []string `config:"fields"`
+	// Delete indicates that fields should be completely deleted
+	// before logging rather than redaction with a "*".
+	Delete bool `config:"delete"`
 }
 
 func (c config) Validate() error {
@@ -59,7 +71,7 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, err = newProgram(c.Program, root, client, nil, patterns)
+	_, err = newProgram(context.Background(), c.Program, root, client, nil, patterns)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -137,9 +149,41 @@ func (c rateLimitConfig) Validate() error {
 		return errors.New("limit must be greater than zero")
 	}
 	if c.Limit == nil && c.Burst != nil && *c.Burst <= 0 {
-		return errors.New("limit must be greater than zero if limit is specified")
+		return errors.New("burst must be greater than zero if limit is not specified")
 	}
 	return nil
+}
+
+type keepAlive struct {
+	Disable             *bool         `config:"disable"`
+	MaxIdleConns        int           `config:"max_idle_connections"`
+	MaxIdleConnsPerHost int           `config:"max_idle_connections_per_host"` // If zero, http.DefaultMaxIdleConnsPerHost is the value used by http.Transport.
+	IdleConnTimeout     time.Duration `config:"idle_connection_timeout"`
+}
+
+func (c keepAlive) Validate() error {
+	if c.Disable == nil || *c.Disable {
+		return nil
+	}
+	if c.MaxIdleConns < 0 {
+		return errors.New("max_idle_connections must not be negative")
+	}
+	if c.MaxIdleConnsPerHost < 0 {
+		return errors.New("max_idle_connections_per_host must not be negative")
+	}
+	if c.IdleConnTimeout < 0 {
+		return errors.New("idle_connection_timeout must not be negative")
+	}
+	return nil
+}
+
+func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
+	return httpcommon.WithKeepaliveSettings{
+		Disable:             c.Disable == nil || *c.Disable,
+		MaxIdleConns:        c.MaxIdleConns,
+		MaxIdleConnsPerHost: c.MaxIdleConnsPerHost,
+		IdleConnTimeout:     c.IdleConnTimeout,
+	}
 }
 
 type ResourceConfig struct {
@@ -149,6 +193,7 @@ type ResourceConfig struct {
 	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
 	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
 	RateLimit              *rateLimitConfig `config:"rate_limit"`
+	KeepAlive              keepAlive        `config:"keep_alive"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 

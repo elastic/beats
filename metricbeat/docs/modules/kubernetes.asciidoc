@@ -157,7 +157,7 @@ roleRef:
 === Compatibility
 
 The Kubernetes module is tested with the following versions of Kubernetes:
-1.22.x, 1.23.x, 1.24.x, 1.25.x
+1.23.x, 1.24.x, 1.25.x, 1.26.x
 
 [float]
 === Dashboard
@@ -237,8 +237,7 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
-  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
-  # `add_resource_metadata` can be defined.
+  # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
   #   namespace:
@@ -284,8 +283,7 @@ metricbeat.modules:
   #kube_config: ~/.kube/config
   # Set the namespace to watch for resources
   #namespace: staging
-  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
-  # `add_resource_metadata` can be defined.
+  # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
   #   namespace:

@@ -20,6 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"syscall"
 	"time"
@@ -45,9 +46,10 @@ import (
 
 // Heartbeat represents the root datastructure of this beat.
 type Heartbeat struct {
-	done chan struct{}
+	done     chan struct{}
+	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
-	config             config.Config
+	config             *config.Config
 	scheduler          *scheduler.Scheduler
 	monitorReloader    *cfgfile.Reloader
 	monitorFactory     *monitors.RunnerFactory
@@ -57,7 +59,7 @@ type Heartbeat struct {
 
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
-	parsedConfig := config.DefaultConfig
+	parsedConfig := config.DefaultConfig()
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
@@ -257,7 +259,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
-	close(bt.done)
+	bt.stopOnce.Do(func() { close(bt.done) })
 }
 
 func makeStatesClient(cfg *conf.C, replace func(monitorstate.StateLoader), runFrom *config.LocationWithID) error {

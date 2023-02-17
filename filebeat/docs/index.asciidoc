@@ -23,6 +23,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :has_kubernetes_logs_path_matcher:
 :has_nomad_logs_path_matcher:
 :has_registry:
+:has_inputs_endpoint:
 :deb_os:
 :rpm_os:
 :mac_os:

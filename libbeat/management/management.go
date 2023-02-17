@@ -50,6 +50,8 @@ const (
 	Failed
 	// Stopping is status describing application is stopping.
 	Stopping
+	// Stopped is status describing application is stopped.
+	Stopped
 )
 
 // Namespace is the feature namespace for queue definition.

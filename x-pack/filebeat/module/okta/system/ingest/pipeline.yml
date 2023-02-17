@@ -249,6 +249,10 @@ processors:
       target_field: okta.debug_context.debug_data.flattened.behaviors
       ignore_missing: true
       ignore_failure: true
+  - set:
+      field: okta.debug_context.debug_data.flattened.risk_object
+      copy_from: okta.debug_context.debug_data.flattened.risk
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
   - dissect:
       field: okta.debug_context.debug_data.flattened.risk
       pattern: "{%{okta.debug_context.debug_data.flattened.risk}}"
@@ -260,6 +264,30 @@ processors:
       value_split: "="
       target_field: _risk_object
       if: ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      on_failure:
+        - remove:
+            field: _risk_object
+  - remove:
+      field: okta.debug_context.debug_data.flattened.risk_object
+      if: ctx._risk_object != null
+
+  # Make heroic efforts to capture risk level and reason if kv could not get them.
+  - grok:
+      field: okta.debug_context.debug_data.flattened.risk
+      patterns:
+        - level=%{NOTSPACE:_risk_object.level}
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk_object != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      ignore_failure: true
+  - grok:
+      field: okta.debug_context.debug_data.flattened.risk
+      patterns:
+        - reasons=%{DATA:_risk_object.reasons}, %{KEY}
+        - reasons=%{DATA:_risk_object.reasons}$
+      pattern_definitions:
+        KEY: '%{NOTSPACE}='
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk_object != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      ignore_failure: true
+
   - remove:
       field: okta.debug_context.debug_data.flattened.risk
       if: ctx._risk_object != null
@@ -367,6 +395,36 @@ processors:
       field: okta.debug_context.debug_data.risk_level
       value: "{{{okta.debug_context.debug_data.flattened.risk.level}}}"
       if: 'ctx.okta?.debug_context?.debug_data?.risk_level == null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != ""'
+  - set:
+      field: okta.debug_context.debug_data.factor
+      value: "{{{okta.debug_context.debug_data.flattened.factor}}}"
+      if: 'ctx.okta?.debug_context?.debug_data?.factor == null && ctx.okta?.debug_context?.debug_data?.flattened?.factor != null && ctx.okta?.debug_context?.debug_data?.flattened?.factor != ""'
+  - split:
+      field: okta.debug_context.debug_data.flattened.logOnlySecurityData.risk.reasons
+      target_field: okta.debug_context.debug_data.risk_reasons
+      separator: ',\s*'
+      if: 'ctx.okta?.debug_context?.debug_data?.flattened?.logOnlySecurityData?.risk?.reasons != null && ctx.okta?.debug_context?.debug_data?.flattened?.logOnlySecurityData?.risk?.reasons != ""'
+  - split:
+      field: okta.debug_context.debug_data.flattened.risk.reasons
+      target_field: okta.debug_context.debug_data.risk_reasons
+      separator: ',\s*'
+      if: 'ctx.okta?.debug_context?.debug_data?.risk_reasons == null && ctx.okta?.debug_context?.debug_data?.flattened?.risk?.reasons != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk?.reasons != ""'
+  - script:
+      lang: painless
+      source: |
+        def src = ctx.okta?.debug_context?.debug_data?.flattened?.behaviors;
+        if (src == null) {
+          return;
+        }
+        def dst = new ArrayList();
+        for (e in src.entrySet()) {
+          if (e != null && e.getValue() == "POSITIVE") {
+            dst.add(e.getKey());
+          }
+        }
+        if (dst.length != 0) {
+          ctx.okta.debug_context.debug_data['risk_behaviors'] = dst;
+        }
   - rename:
       field: json.authenticationContext.authenticationProvider
       target_field: okta.authentication_context.authentication_provider

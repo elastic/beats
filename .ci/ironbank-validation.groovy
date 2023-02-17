@@ -3,13 +3,13 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'ubuntu-20 && immutable' }
+  agent { label 'ubuntu-22 && immutable' }
   environment {
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     PIPELINE_LOG_LEVEL = "INFO"
     BEATS_FOLDER = "x-pack/heartbeat"
-    SLACK_CHANNEL = '#beats'
+    SLACK_CHANNEL = '#ingest-notifications'
     NOTIFY_TO = 'observability-robots-internal+ironbank-beats-validation@elastic.co'
   }
   options {

@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/mitchellh/hashstructure"
-	dto "github.com/prometheus/client_model/go"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -40,13 +39,13 @@ func init() {
 
 type Module interface {
 	mb.Module
-	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
+	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, error)
 	GetKubeletStats(http *helper.HTTP) ([]byte, error)
 	GetMetricsRepo() *util.MetricsRepo
 }
 
 type familiesCache struct {
-	sharedFamilies     []*dto.MetricFamily
+	sharedFamilies     []*p.MetricFamily
 	lastFetchErr       error
 	lastFetchTimestamp time.Time
 }
@@ -115,7 +114,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	}
 }
 
-func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
+func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, error) {
 	m.kubeStateMetricsCache.lock.Lock()
 	defer m.kubeStateMetricsCache.lock.Unlock()
 

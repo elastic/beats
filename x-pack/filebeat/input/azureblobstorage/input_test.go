@@ -24,11 +24,16 @@ import (
 )
 
 const (
-	beatsContainer  = "beatscontainer"
-	beatsContainer2 = "beatscontainer2"
+	beatsContainer              = "beatscontainer"
+	beatsContainer2             = "beatscontainer2"
+	beatsMultilineJSONContainer = "beatsmultilinejsoncontainer"
+	beatsJSONContainer          = "beatsjsoncontainer"
+	beatsNdJSONContainer        = "beatsndjsoncontainer"
+	beatsGzJSONContainer        = "beatsgzjsoncontainer"
 )
 
 func Test_StorageClient(t *testing.T) {
+	t.Skip("Flaky test: issue -  https://github.com/elastic/beats/issues/34332")
 	tests := []struct {
 		name            string
 		baseConfig      map[string]interface{}
@@ -236,6 +241,91 @@ func Test_StorageClient(t *testing.T) {
 			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
 			unexpectedError: nil,
 		},
+		{
+			name: "ReadJSON",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_log_json[0]: true,
+				mock.BeatsFilesContainer_log_json[1]: true,
+				mock.BeatsFilesContainer_log_json[2]: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadOctetStreamJSON",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsMultilineJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json[0]: true,
+				mock.BeatsFilesContainer_multiline_json[1]: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadNdJSON",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsNdJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_log_ndjson[0]: true,
+				mock.BeatsFilesContainer_log_ndjson[1]: true,
+			},
+			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadMultilineGzJSON",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsGzJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+			unexpectedError: context.Canceled,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -313,7 +403,7 @@ func Test_StorageClient(t *testing.T) {
 					}
 				}
 			}
-			assert.ErrorIs(t, tt.unexpectedError, g.Wait())
+			assert.ErrorIs(t, g.Wait(), tt.unexpectedError)
 		})
 	}
 }

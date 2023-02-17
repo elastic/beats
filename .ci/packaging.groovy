@@ -22,7 +22,7 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     PIPELINE_LOG_LEVEL = "INFO"
-    SLACK_CHANNEL = '#beats'
+    SLACK_CHANNEL = '#ingest-notifications'
     NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
     DRA_OUTPUT = 'release-manager.out'
   }
@@ -46,7 +46,7 @@ pipeline {
   stages {
     stage('Filter build') {
       options { skipDefaultCheckout() }
-      agent { label 'ubuntu-20 && immutable' }
+      agent { label 'ubuntu-22 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -162,7 +162,7 @@ pipeline {
                     text: """\
                     ## To be consumed by the beats-tester pipeline
                     COMMIT=${env.GIT_BASE_COMMIT}
-                    BEATS_URL_BASE=https://storage.googleapis.com/${env.JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}
+                    BEATS_URL_BASE=https://storage.googleapis.com/${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}
                     VERSION=${env.BEAT_VERSION}-SNAPSHOT""".stripIndent()) // stripIdent() requires '''/
           archiveArtifacts artifacts: 'beats-tester.properties'
         }
@@ -261,7 +261,7 @@ def generateSteps() {
 
 def generateArmStep(beat) {
   return {
-    withNode(labels: 'arm') {
+    withNode(labels: 'ubuntu-2204-aarch64') {
       withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64','PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Arm ${beat}") {
           deleteDir()
@@ -282,7 +282,7 @@ def generateArmStep(beat) {
 
 def generateLinuxStep(beat) {
   return {
-    withNode(labels: 'ubuntu-20.04 && immutable') {
+    withNode(labels: 'ubuntu-22.04 && immutable') {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()

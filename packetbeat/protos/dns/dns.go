@@ -58,7 +58,7 @@ type dnsPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter // Channel where results are pushed.
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 
 	logger *logp.Logger
 }
@@ -219,7 +219,7 @@ func init() {
 	protos.Register("dns", New)
 }
 
-func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
+func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
 	p := &dnsPlugin{logger: logp.NewLogger("dns")}
 	config := defaultConfig
 	if !testMode {
@@ -234,7 +234,7 @@ func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher,
 	return p, nil
 }
 
-func (dns *dnsPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *dnsConfig) error {
+func (dns *dnsPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *dnsConfig) error {
 	dns.setFromConfig(config)
 	dns.transactions = common.NewCacheWithRemovalListener(
 		dns.transactionTimeout,
@@ -849,21 +849,16 @@ func dnsToString(dns *mkdns.Msg, logger *logp.Logger) string {
 }
 
 // decodeDnsData decodes a byte array into a DNS struct. If an error occurs
-// then the returned dns pointer will be nil. This method recovers from panics
-// and is concurrency-safe.
+// then the returned dns pointer will be nil. This is concurrency-safe.
 // We do not handle Unpack ErrTruncated for now. See https://github.com/miekg/dns/pull/281
 func decodeDNSData(transp transport, rawData []byte) (dns *mkdns.Msg, err error) {
 	var offset int
 	if transp == transportTCP {
 		offset = decodeOffset
 	}
-
-	// Recover from any panics that occur while parsing a packet.
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("panic: %v", r)
-		}
-	}()
+	if len(rawData) < offset {
+		return nil, nonDNSMsg
+	}
 
 	msg := &mkdns.Msg{}
 	err = msg.Unpack(rawData[offset:])

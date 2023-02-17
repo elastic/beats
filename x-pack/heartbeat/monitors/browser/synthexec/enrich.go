@@ -25,9 +25,10 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je         *journeyEnricher
-	sFields    stdfields.StdMonitorFields
-	checkGroup string
+	je           *journeyEnricher
+	journeyCount int
+	sFields      stdfields.StdMonitorFields
+	checkGroup   string
 }
 
 func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
@@ -39,8 +40,15 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		senr.je = newJourneyEnricher(senr)
 	}
 
-	eventext.MergeEventFields(event, map[string]interface{}{"monitor": map[string]interface{}{"check_group": senr.checkGroup}})
+	// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
+	if se != nil && se.Type == JourneyStart {
+		senr.journeyCount++
+		if senr.journeyCount > 1 {
+			senr.checkGroup = makeUuid()
+		}
+	}
 
+	eventext.MergeEventFields(event, map[string]interface{}{"monitor": map[string]interface{}{"check_group": senr.checkGroup}})
 	return senr.je.enrich(event, se)
 }
 
@@ -105,7 +113,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	var jobErr error
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
-		je.errorCount++
 		if je.error == nil {
 			je.error = jobErr
 		}
@@ -153,7 +160,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	eventext.MergeEventFields(event, se.ToMap())
 
-	if je.urlFields == nil {
+	if len(je.urlFields) == 0 {
 		if urlFields, err := event.GetValue("url"); err == nil {
 			if ufMap, ok := urlFields.(mapstr.M); ok {
 				je.urlFields = ufMap
@@ -164,15 +171,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 }
 
 func (je *journeyEnricher) createSummary(event *beat.Event) error {
-	var up, down int
-	if je.errorCount > 0 {
-		up = 0
-		down = 1
-	} else {
-		up = 1
-		down = 0
-	}
-
 	// In case of syntax errors or incorrect runner options, the Synthetics
 	// runner would exit immediately with exitCode 1 and we do not set the duration
 	// to inform the journey never ran
@@ -195,10 +193,6 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 			"type":    "heartbeat/summary",
 			"journey": je.journey,
 		},
-		"summary": mapstr.M{
-			"up":   up,
-			"down": down,
-		},
 	})
 
 	eventext.SetMeta(event, wrappers.META_STEP_COUNT, je.stepCount)
@@ -206,10 +200,6 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	if je.journeyComplete {
 		return je.error
 	}
-
-	// create a new check group for the next journey
-	je.streamEnricher.checkGroup = makeUuid()
-
 	return fmt.Errorf("journey did not finish executing, %d steps ran: %w", je.stepCount, je.error)
 }
 

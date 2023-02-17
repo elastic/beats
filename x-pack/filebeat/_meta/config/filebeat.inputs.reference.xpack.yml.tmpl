@@ -102,6 +102,16 @@
   # Overrides the `cloud.provider` field for non-AWS S3 buckets. See docs for auto recognized providers.
   #provider: minio
 
+  # Configures backing up processed files to another (or the same) bucket
+  #backup_to_bucket_arn: 'arn:aws:s3:::mybucket'
+  #non_aws_backup_to_bucket_name: 'mybucket'
+
+  # Sets a prefix to prepend to object keys when backing up
+  #backup_to_bucket_prefix: 'backup/'
+
+  # Controls deletion of objects after backing them up
+  #delete_after_backup: false
+
 #------------------------------ AWS CloudWatch input --------------------------------
 # Beta: Config options for AWS CloudWatch input
 #- type: aws-cloudwatch

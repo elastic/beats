@@ -144,6 +144,14 @@ func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetO
 	return newS3GetObjectResponse(c.filename, c.data, c.contentType), nil
 }
 
+func (c constantS3) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+	return nil, nil
+}
+
+func (c constantS3) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+	return nil, nil
+}
+
 func (c constantS3) ListObjectsPaginator(bucket, prefix string) s3Pager {
 	return c.pagerConstant
 }
@@ -199,13 +207,13 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
 		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics(metricRegistry, "test_id")
+		metrics := newInputMetrics("test_id", metricRegistry)
 		sqsAPI := newConstantSQS()
 		s3API := newConstantS3(t)
 		pipeline := &fakePipeline{}
 		conf := makeBenchmarkConfig(t)
 
-		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors)
+		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{})
 		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
 		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
 
@@ -290,7 +298,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		log.Infof("benchmark with %d number of workers", numberOfWorkers)
 
 		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics(metricRegistry, "test_id")
+		metrics := newInputMetrics("test_id", metricRegistry)
 
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
 			event.Private.(*awscommon.EventACKTracker).ACK()
@@ -336,7 +344,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					return
 				}
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors)
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
 				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, client, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
 
 				if err := s3Poller.Poll(ctx); err != nil {

@@ -20,14 +20,18 @@ package beater
 import (
 	"flag"
 	"fmt"
+	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/backup"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/filestream/takeover"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
 	"github.com/elastic/beats/v7/filebeat/registrar"
@@ -38,12 +42,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -67,6 +73,7 @@ type Filebeat struct {
 	moduleRegistry *fileset.ModuleRegistry
 	pluginFactory  PluginFactory
 	done           chan struct{}
+	stopOnce       sync.Once // wraps the Stop() method
 	pipeline       beat.PipelineConnector
 }
 
@@ -113,6 +120,12 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	if err := config.FetchConfigs(); err != nil {
 		return nil, err
+	}
+
+	if b.API != nil {
+		if err = inputmon.AttachHandler(b.API.Router()); err != nil {
+			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+		}
 	}
 
 	// Add inputs created by the modules
@@ -251,6 +264,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 	defer stateStore.Close()
+
+	err = processLogInputTakeOver(stateStore, config)
+	if err != nil {
+		logp.Err("Failed to attempt filestream state take over: %+v", err)
+		return err
+	}
 
 	// Setup registrar to persist state
 	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout)
@@ -431,7 +450,7 @@ func (fb *Filebeat) Stop() {
 	logp.Info("Stopping filebeat")
 
 	// Stop Filebeat
-	close(fb.done)
+	fb.stopOnce.Do(func() { close(fb.done) })
 }
 
 // Create a new pipeline loader (es client) factory
@@ -444,4 +463,22 @@ func newPipelineLoaderFactory(esConfig *conf.C) fileset.PipelineLoaderFactory {
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
+}
+
+// some of the filestreams might want to take over the loginput state
+// if their `take_over` flag is set to `true`.
+func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
+	store, err := stateStore.Access()
+	if err != nil {
+		return fmt.Errorf("Failed to access state for attempting take over: %w", err)
+	}
+	defer store.Close()
+	logger := logp.NewLogger("filestream-takeover")
+
+	registryHome := paths.Resolve(paths.Data, config.Registry.Path)
+	registryHome = filepath.Join(registryHome, "filebeat")
+
+	backuper := backup.NewRegistryBackuper(logger, registryHome)
+
+	return takeover.TakeOverLogInputStates(logger, store, backuper, config)
 }

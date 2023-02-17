@@ -83,8 +83,6 @@ type udpMessage struct {
 }
 
 func (mc *memcache) ParseUDP(pkt *protos.Packet) {
-	defer logp.Recover("ParseMemcache(UDP) exception")
-
 	buffer := streambuf.NewFixed(pkt.Payload)
 	header, err := parseUDPHeader(buffer)
 	if err != nil {
@@ -261,6 +259,9 @@ func (c *udpConnection) killTransaction(t *udpTransaction) {
 }
 
 func (lst *udpExpTransList) push(t *udpTransaction) {
+	if t == nil {
+		return
+	}
 	lst.Lock()
 	defer lst.Unlock()
 	t.next = lst.head
