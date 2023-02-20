@@ -66,6 +66,16 @@ message UpgradeRequest {
   // If provided the upgrade process will use the provided sourceURI instead of the configured
   // sourceURI in the configuration.
   string sourceURI = 2;
+  
+  // (Optional) Overrides predefined behavior for agent package verification.
+  //
+  // If provided Elastic Agent package is not checked for signature during upgrade.
+  bool skipVerify = 3;
+
+  // (Optional) Overrides predefined behavior for agent package verification.
+  //
+  // If provided Elastic Agent package is checked against these pgp keys as well.
+  repeated string pgpBytes = 4;
 }
 
 // A upgrade response message.
