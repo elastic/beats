@@ -79,7 +79,7 @@ func gcsObjectHash(src *Source, object *storage.ObjectAttrs) string {
 	return hex.EncodeToString(h.Sum(nil)[:5])
 }
 
-const jobErrString = "job with jobId %s encountered an error : %w"
+const jobErrString = "job with jobId %s encountered an error : %v"
 
 func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
@@ -140,18 +140,18 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	}
 	reader, err := obj.NewRangeReader(ctxWithTimeout, offset, -1)
 	if err != nil {
-		return fmt.Errorf("failed to open reader for object: %s, with error: %w", j.object.Name, err)
+		return fmt.Errorf("failed to open reader for object: %s, with error: %v", j.object.Name, err)
 	}
 	defer func() {
 		err = reader.Close()
 		if err != nil {
-			j.log.Errorf("failed to close reader for object: %s, with error: %w", j.object.Name, err)
+			j.log.Errorf("failed to close reader for object: %s, with error: %v", j.object.Name, err)
 		}
 	}()
 
 	err = j.readJsonAndPublish(ctx, reader, id)
 	if err != nil {
-		return fmt.Errorf("failed to read data from object: %s, with error: %w", j.object.Name, err)
+		return fmt.Errorf("failed to read data from object: %s, with error: %v", j.object.Name, err)
 	}
 
 	return err
@@ -161,14 +161,14 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	var err error
 	r, err = j.addGzipDecoderIfNeeded(bufio.NewReader(r))
 	if err != nil {
-		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
+		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %v", j.object.Name, err)
 	}
 
 	// if offset == 0, then this is a new stream which has not been processed previously
 	if j.offset == 0 {
 		r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
 		if err != nil {
-			return fmt.Errorf("failed to evaluate json for object: %s, with error: %w", j.object.Name, err)
+			return fmt.Errorf("failed to evaluate json for object: %s, with error: %v", j.object.Name, err)
 		}
 		if j.isRootArray {
 			j.state.setRootArray(j.object.Name)
@@ -179,7 +179,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	if j.isRootArray {
 		_, err := dec.Token()
 		if err != nil {
-			return fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
+			return fmt.Errorf("failed to read JSON token for object: %s, with error: %v", j.object.Name, err)
 		}
 	}
 
@@ -195,7 +195,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		var item json.RawMessage
 		offset = dec.InputOffset()
 		if err = dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode json: %w", err)
+			return fmt.Errorf("failed to decode json: %v", err)
 		}
 		// manually seek offset only if file is compressed or if root element is an array
 		if (j.isCompressed || j.isRootArray) && offset < j.offset {
