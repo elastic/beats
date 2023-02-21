@@ -96,7 +96,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		m.log.Debug("event not reported")
 	}
 
-	// 检查 io wait是否能报上来
 	ioWaitStrs := m.fetchIOWait(reporter)
 	err = m.reportEvents(ioWaitStrs, reporter, ioWaitSchema)
 	if err != nil {
@@ -143,7 +142,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 func (m *MetricSet) reportEvents(mapStrs []mapstr.M, reporter mb.ReporterV2, schema s.Schema) error {
 	for _, mapStr := range mapStrs {
-		res, err := tableSpaceSchema.Apply(mapStr)
+		res, err := schema.Apply(mapStr)
 		if err != nil {
 			m.log.Error(fmt.Errorf("error applying schema %w", err))
 			return err
