@@ -65,6 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	mapStr := mapstr.M{}
+	var err error
 
 	tpsStr := m.fetchTps(reporter)
 	mapStr.DeepUpdate(tpsStr)
@@ -84,16 +85,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	pageFaultStr := m.fetchMemoryPageFault(reporter)
 	mapStr.DeepUpdate(pageFaultStr)
 
-	res, err := schema.Apply(mapStr)
+	err = m.reportEvent(mapStr, reporter, schema)
 	if err != nil {
 		m.log.Error(fmt.Errorf("error applying schema %w", err))
-		return
 	}
 
-	if isReported := reporter.Event(mb.Event{
-		MetricSetFields: res,
-	}); !isReported {
-		m.log.Debug("event not reported")
+	connectionPctStr := m.fetchConnectionsPct(reporter)
+	err = m.reportEvent(connectionPctStr, reporter, databaseNetworkSchema)
+	if err != nil {
+		m.log.Error(fmt.Errorf("error applying schema %w", err))
 	}
 
 	ioWaitStrs := m.fetchIOWait(reporter)
@@ -103,7 +103,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	}
 
 	diskReadWriteBytesStrs := m.fetchDiskReadWriteBytes(reporter)
-	err = m.reportEvents(diskReadWriteBytesStrs, reporter, ioWaitSchema)
+	err = m.reportEvents(diskReadWriteBytesStrs, reporter, diskReadWriteBytesSchema)
 	if err != nil {
 		m.log.Error(fmt.Errorf("error applying disk read write bytes schema %w", err))
 	}
@@ -135,9 +135,23 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	blockCountStrs := m.fetchBlockCount(reporter)
 	err = m.reportEvents(blockCountStrs, reporter, databaseSessionSchema)
 	if err != nil {
-		m.log.Error(fmt.Errorf("error applying table log schema %w", err))
+		m.log.Error(fmt.Errorf("error applying block count schema %w", err))
 	}
 
+}
+
+func (m *MetricSet) reportEvent(mapStr mapstr.M, reporter mb.ReporterV2, schema s.Schema) error {
+	res, err := schema.Apply(mapStr)
+	if err != nil {
+		return err
+	}
+
+	if isReported := reporter.Event(mb.Event{
+		MetricSetFields: res,
+	}); !isReported {
+		m.log.Debug("event not reported")
+	}
+	return nil
 }
 
 func (m *MetricSet) reportEvents(mapStrs []mapstr.M, reporter mb.ReporterV2, schema s.Schema) error {
@@ -443,6 +457,63 @@ FROM
 		})
 	}
 	return result
+}
+
+func (m *MetricSet) fetchConnectionsPct(reporter mb.ReporterV2) mapstr.M {
+	maxConnections := m.fetchMaxConnections(reporter)
+
+	userConnections := m.fetchUserConnections(reporter)
+
+	if maxConnections < 0 {
+		return mapstr.M{
+			"connections_used_pct": "-1",
+		}
+	} else if maxConnections == 0 {
+		return mapstr.M{
+			"connections_used_pct": "0",
+		}
+	} else {
+		return mapstr.M{
+			"connections_used_pct": fmt.Sprintf("%v", float64(userConnections) / float64(maxConnections)),
+		}
+	}
+
+}
+func (m *MetricSet) fetchUserConnections(reporter mb.ReporterV2) int64 {
+	query := `select CONVERT(int, cntr_value) from sys.dm_os_performance_counters where counter_name = 'User Connections';`
+	type maxConRow struct {
+		userConnections *int64
+	}
+	var counter rowCounter = func(rows *sql.Rows, mapStr *mapstr.M) error {
+		var err error
+		var row maxConRow
+		if err = rows.Scan(&row.userConnections); err != nil {
+			return err
+		}
+		(*mapStr)["userConnections"] = *row.userConnections
+		return err
+	}
+	mapStr := m.fetchRowsWithRowCounter(query, reporter, counter)
+	return mapStr["userConnections"].(int64)
+}
+
+
+func (m *MetricSet) fetchMaxConnections(reporter mb.ReporterV2) int64 {
+	queryMaxConnections := `SELECT CONVERT(int, @@MAX_CONNECTIONS) AS 'Max Connections';`
+	type maxConRow struct {
+		MaxConnection *int64
+	}
+	var counter rowCounter = func(rows *sql.Rows, mapStr *mapstr.M) error {
+		var err error
+		var row maxConRow
+		if err = rows.Scan(&row.MaxConnection); err != nil {
+			return err
+		}
+		(*mapStr)["maxConnection"] = *row.MaxConnection
+		return err
+	}
+	mapStr := m.fetchRowsWithRowCounter(queryMaxConnections, reporter, counter)
+	return mapStr["maxConnection"].(int64)
 }
 
 func (m *MetricSet) fetchTableUsedSpace(reporter mb.ReporterV2) []mapstr.M {

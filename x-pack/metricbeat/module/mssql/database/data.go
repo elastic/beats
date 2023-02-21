@@ -24,33 +24,45 @@ var (
 		"table_used_space": c.Int("table_used_space", s.Optional),
 		"table_unused_space": c.Int("table_unused_space", s.Optional),
 		"table_space_used_pct": c.Float("table_space_used_pct", s.Optional),
+		"db_name": c.Str("db_name", s.Optional),
+		"table_name": c.Str("table_name", s.Optional),
 	}
 
 	tableIndexSchema = s.Schema{
 		"index_size": c.Int("index_size", s.Optional),
 		"table_index_size": c.Int("table_index_size", s.Optional),
+		"db_name": c.Str("db_name", s.Optional),
+		"table_name": c.Str("table_name", s.Optional),
 	}
 
 	tableLogSchema = s.Schema{
 		"log_size": c.Int("log_size", s.Optional),
+		"db_name": c.Str("db_name", s.Optional),
 	}
 
 	ioWaitSchema = s.Schema{
 		"io_wait": c.Float("io_wait", s.Optional),
+		"db_name": c.Str("db_name", s.Optional),
 	}
 
 	diskReadWriteBytesSchema = s.Schema{
 		"disk_input": c.Int("disk_input", s.Optional),
 		"disk_output": c.Int("disk_output", s.Optional),
 		"disk_io_avg_milli_second": c.Float("disk_io_avg_milli_second", s.Optional),
+		"db_name": c.Str("db_name", s.Optional),
+		"disk_file": c.Str("disk_file", s.Optional),
+		"type_desc": c.Str("type_desc", s.Optional),
 	}
 
 	databaseNetworkSchema = s.Schema{
-		"network_input_bytes": c.Int("input_bytes", s.Optional),
+		"network_input_bytes": c.Int("network_input_bytes", s.Optional),
 		"network_output_bytes": c.Int("network_output_bytes", s.Optional),
+		"connections_used_pct": c.Float("connections_used_pct", s.Optional),
+		"db_name": c.Str("db_name", s.Optional),
 	}
 
 	databaseSessionSchema = s.Schema{
 		"session_block_count": c.Int("session_block_count", s.Optional),
+		"db_name": c.Str("db_name", s.Optional),
 	}
 )
