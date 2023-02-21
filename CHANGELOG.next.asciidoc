@@ -120,6 +120,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
 - Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
+- Fix handling of RFC5988 links' relation parameters by `getRFC5988Link` in HTTPJSON. {issue}34603[34603] {pull}34622[34622]
 
 *Auditbeat*
 
