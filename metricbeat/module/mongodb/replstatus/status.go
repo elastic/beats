@@ -173,3 +173,19 @@ func findOptimesByState(members []Member, state MemberState) []int64 {
 
 	return optimes
 }
+
+func findOptimeDelay(members []Member) (int64, bool) {
+	var selfOptimeDate, primaryOptimeDate time.Time
+	var cnt int8 = 0
+	for _, member := range members {
+		if member.Self {
+			selfOptimeDate = member.OpTimeDate
+			cnt += 1
+		}
+		if MemberState(member.State) == PRIMARY {
+			primaryOptimeDate = member.OpTimeDate
+			cnt += 1
+		}
+	}
+	return primaryOptimeDate.Unix() - selfOptimeDate.Unix(), cnt == 2
+}
