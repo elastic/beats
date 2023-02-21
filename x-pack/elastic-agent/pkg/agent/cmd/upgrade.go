@@ -50,8 +50,6 @@ func newUpgradeCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Comman
 }
 
 func upgradeCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
-	fmt.Fprintln(streams.Out, "The upgrade process of Elastic Agent is currently EXPERIMENTAL and should not be used in production")
-
 	version := args[0]
 	sourceURI, _ := cmd.Flags().GetString(flagSourceURI)
 
