@@ -30,12 +30,12 @@ func NewVerifier(verifiers ...download.Verifier) *Verifier {
 }
 
 // Verify checks the package from configured source.
-func (e *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool) (bool, error) {
+func (e *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool, pgpBytes ...string) (bool, error) {
 	var err error
 
 	for i, v := range e.vv {
 		isLast := (i + 1) == len(e.vv)
-		b, e := v.Verify(spec, version, isLast && removeOnFailure)
+		b, e := v.Verify(spec, version, isLast && removeOnFailure, pgpBytes...)
 		if e == nil {
 			return b, nil
 		}

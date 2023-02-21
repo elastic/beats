@@ -33,6 +33,8 @@ import (
 
 // Server is the daemon side of the control protocol.
 type Server struct {
+	proto.UnimplementedElasticAgentControlServer
+
 	logger     *logger.Logger
 	rex        reexec.ExecManager
 	statusCtrl status.Controller
@@ -148,7 +150,7 @@ func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*p
 			Error:  "cannot be upgraded; perform upgrading using Fleet",
 		}, nil
 	}
-	cb, err := u.Upgrade(ctx, &upgradeRequest{request}, false)
+	cb, err := u.Upgrade(ctx, &upgradeRequest{request}, false, request.SkipVerify, request.PgpBytes...)
 	if err != nil {
 		return &proto.UpgradeResponse{
 			Status: proto.ActionStatus_FAILURE,
