@@ -98,10 +98,6 @@ func (tcp *TCP) removalListener(_ common.Key, value common.Value) {
 }
 
 func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet) {
-	// This Recover should catch all exceptions in
-	// protocol modules.
-	defer logp.Recover("Process tcp exception")
-
 	tcp.expiredConns.notifyAll()
 
 	stream, created := tcp.getStream(pkt)
