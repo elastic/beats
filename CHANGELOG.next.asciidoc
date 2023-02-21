@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Log errors from the Elastic Agent V2 client errors channel. Avoids blocking when error occurs communicating with the Elastic Agent. {pull}34392[34392]
 - Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
 - Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
+- Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
 
 *Auditbeat*
 
@@ -86,6 +87,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
 - Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
 - [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
+- Prevent Elasticsearch from spewing log warnings about redundant wildcard when setting up ingest pipelines. {issue}34249[34249] {pull}34550[34550]
 
 *Heartbeat*
 
@@ -143,6 +145,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
 
 *Functionbeat*
 
@@ -201,6 +204,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add support for new Rabbitmq timestamp format for logs {pull}34211[34211]
 - Allow user configuration of timezone offset in Cisco ASA and FTD modules. {pull}34436[34436]
 - Allow user configuration of timezone offset in Checkpoint module. {pull}34472[34472]
+- Add support for Okta debug attributes, `risk_reasons`, `risk_behaviors` and `factor`. {issue}33677[33677] {pull}34508[34508]
 
 *Auditbeat*
 
