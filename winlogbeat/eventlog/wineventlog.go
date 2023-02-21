@@ -23,6 +23,7 @@ package eventlog
 import (
 	"encoding/xml"
 	"errors"
+	"expvar"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -41,6 +42,17 @@ import (
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+var (
+	detailf = logp.MakeDebug(detailSelector)
+
+	// dropReasons contains counters for the number of dropped events for each
+	// reason.
+	dropReasons = expvar.NewMap("drop_reasons")
+
+	// readErrors contains counters for the read error types that occur.
+	readErrors = expvar.NewMap("read_errors")
 )
 
 const (

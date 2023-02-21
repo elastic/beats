@@ -18,6 +18,7 @@
 package winlog
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -60,7 +61,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	//       as is common for other inputs?
 	eventLog, err := eventlog.New(cfg)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to create new event log. %v", err)
+		return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
 	}
 
 	sources := []cursor.Source{eventLog}
@@ -135,13 +136,13 @@ runLoop:
 				}
 				continue runLoop
 			}
-			switch err {
-			case nil:
-				break
-			case io.EOF:
-				log.Debugw("End of Winlog event stream reached", "error", err)
-				return nil
-			default:
+
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					log.Debugw("End of Winlog event stream reached", "error", err)
+					return nil
+				}
+
 				// only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					return nil

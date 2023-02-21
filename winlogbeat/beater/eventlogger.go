@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"errors"
 	"io"
 	"time"
 
@@ -171,14 +172,15 @@ runLoop:
 				}
 				continue runLoop
 			}
-			switch err {
-			case nil:
-			case io.EOF:
-				// Graceful stop.
-				stop = true
-			default:
-				e.log.Warnw("Read() error.", "error", err, "channel", api.Channel())
-				return
+
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					// Graceful stop.
+					stop = true
+				} else {
+					e.log.Warnw("Read() error.", "error", err, "channel", api.Channel())
+					return
+				}
 			}
 
 			e.log.Debugf("Read() returned %d records.", len(records))

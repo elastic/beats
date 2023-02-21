@@ -43,17 +43,7 @@ const (
 
 // Debug logging functions for this package.
 var (
-	debugf  = logp.MakeDebug(debugSelector)
-	detailf = logp.MakeDebug(detailSelector)
-)
-
-var (
-	// dropReasons contains counters for the number of dropped events for each
-	// reason.
-	dropReasons = expvar.NewMap("drop_reasons")
-
-	// readErrors contains counters for the read error types that occur.
-	readErrors = expvar.NewMap("read_errors")
+	debugf = logp.MakeDebug(debugSelector)
 )
 
 // EventLog is an interface to a Windows Event Log.
@@ -93,20 +83,20 @@ type Record struct {
 func (e Record) ToEvent() beat.Event {
 	win := e.Fields()
 
-	win.Delete("time_created")
-	win.Put("api", e.API)
+	_ = win.Delete("time_created")
+	_, _ = win.Put("api", e.API)
 
 	m := mapstr.M{
 		"winlog": win,
 	}
 
 	// ECS data
-	m.Put("event.created", time.Now())
+	_, _ = m.Put("event.created", time.Now())
 
 	eventCode, _ := win.GetValue("event_id")
-	m.Put("event.code", eventCode)
-	m.Put("event.kind", "event")
-	m.Put("event.provider", e.Provider.Name)
+	_, _ = m.Put("event.code", eventCode)
+	_, _ = m.Put("event.kind", "event")
+	_, _ = m.Put("event.provider", e.Provider.Name)
 
 	rename(m, "winlog.outcome", "event.outcome")
 	rename(m, "winlog.level", "log.level")
@@ -132,8 +122,8 @@ func rename(m mapstr.M, oldKey, newKey string) {
 	if err != nil {
 		return
 	}
-	m.Put(newKey, v)
-	m.Delete(oldKey)
+	_, _ = m.Put(newKey, v)
+	_ = m.Delete(oldKey)
 }
 
 // incrementMetric increments a value in the specified expvar.Map. The key
