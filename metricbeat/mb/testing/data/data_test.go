@@ -49,7 +49,7 @@ func TestAll(t *testing.T) {
 
 			} else {
 				config := mbtest.ReadDataConfig(t, f)
-				mbtest.TestDataFilesWithConfig(t, moduleName, metricSetName, config)
+				mbtest.TestDataFilesWithConfig(t, moduleName, metricSetName, config, getModulesPath())
 			}
 		})
 	}

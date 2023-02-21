@@ -48,7 +48,7 @@ type icmpPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 type ICMPv4Processor interface {
@@ -78,7 +78,7 @@ var (
 	duplicateRequests  = monitoring.NewInt(nil, "icmp.duplicate_requests")
 )
 
-func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (*icmpPlugin, error) {
+func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (*icmpPlugin, error) {
 	p := &icmpPlugin{}
 	config := defaultConfig
 	if !testMode {
@@ -93,7 +93,7 @@ func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher,
 	return p, nil
 }
 
-func (icmp *icmpPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *icmpConfig) error {
+func (icmp *icmpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *icmpConfig) error {
 	icmp.setFromConfig(config)
 
 	var err error
