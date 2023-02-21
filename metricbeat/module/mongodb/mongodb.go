@@ -123,7 +123,7 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 		Username:                c.Username,
 		Password:                c.Password,
 	}
-	clientOptions.SetDirect(true)
+
 	clientOptions.ApplyURI(host)
 
 	// https://docs.mongodb.com/manual/reference/connection-string/
@@ -154,7 +154,6 @@ func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (
 			clientOptions.Auth.AuthMechanismProperties = config.Credentials.AuthMechanismProperties
 		}
 	}
-	clientOptions.SetHosts(config.Hosts)
 
 	if mode == 0 {
 		mode = readpref.NearestMode
@@ -165,7 +164,6 @@ func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (
 		return nil, err
 	}
 	clientOptions.SetReadPreference(readPreference)
-	clientOptions.SetDirect(true)
 	clientOptions.SetConnectTimeout(timeout)
 
 	if config.TLS.IsEnabled() {
