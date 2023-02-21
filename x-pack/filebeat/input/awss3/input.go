@@ -391,13 +391,11 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 			count := receiver.GetApproximateMessageCount(ctx)
 			if count == -1 {
 				// stop polling if error is encountered
-				receiver.metrics.sqsHasGetAttributesPermission.Set(false)
+				receiver.metrics.sqsMessagesWaiting.Set(int64(count))
 				return
 			}
-			if !receiver.metrics.sqsHasGetAttributesPermission.Get() {
-				receiver.metrics.sqsHasGetAttributesPermission.Set(true)
-			}
-			receiver.metrics.sqsMessagesWaiting.Set(uint64(count))
+			receiver.metrics.Initialize()
+			receiver.metrics.sqsMessagesWaiting.Set(int64(count))
 		}
 	}
 }

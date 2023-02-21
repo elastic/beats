@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"io"
+	"sync"
 
 	"github.com/rcrowley/go-metrics"
 
@@ -14,7 +15,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
+var initWaitingMetricOnce sync.Once
+
 type inputMetrics struct {
+	registry   *monitoring.Registry
 	unregister func()
 
 	sqsMessagesReceivedTotal            *monitoring.Uint // Number of SQS messages received (not necessarily processed fully).
@@ -22,10 +26,9 @@ type inputMetrics struct {
 	sqsMessagesInflight                 *monitoring.Uint // Number of SQS messages inflight (gauge).
 	sqsMessagesReturnedTotal            *monitoring.Uint // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 	sqsMessagesDeletedTotal             *monitoring.Uint // Number of SQS messages deleted.
-	sqsMessagesWaiting                  *monitoring.Uint // Number of SQS messages waiting in the SQS Queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
+	sqsMessagesWaiting                  *monitoring.Int  // Number of SQS messages waiting in the SQS Queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
-	sqsHasGetAttributesPermission       *monitoring.Bool // Boolean indicating if input has permissions for SQS GetQueueAttributes API call (gauge).
 
 	s3ObjectsRequestedTotal *monitoring.Uint // Number of S3 objects downloaded.
 	s3ObjectsAckedTotal     *monitoring.Uint // Number of S3 objects processed that were fully ACKed.
@@ -42,20 +45,26 @@ func (m *inputMetrics) Close() {
 	m.unregister()
 }
 
+func (m *inputMetrics) Initialize() {
+	initWaitingMetricOnce.Do(func() {
+		m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
+	})
+}
+
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
 
 	out := &inputMetrics{
+		registry:                            reg,
 		unregister:                          unreg,
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
 		sqsMessagesReturnedTotal:            monitoring.NewUint(reg, "sqs_messages_returned_total"),
 		sqsMessagesDeletedTotal:             monitoring.NewUint(reg, "sqs_messages_deleted_total"),
-		sqsMessagesWaiting:                  monitoring.NewUint(reg, "sqs_messages_waiting_gauge"),
+		sqsMessagesWaiting:                  nil,
 		sqsMessageProcessingTime:            metrics.NewUniformSample(1024),
 		sqsLagTime:                          metrics.NewUniformSample(1024),
-		sqsHasGetAttributesPermission:       monitoring.NewBool(reg, "sqs_has_get_attributes_permission"),
 		s3ObjectsRequestedTotal:             monitoring.NewUint(reg, "s3_objects_requested_total"),
 		s3ObjectsAckedTotal:                 monitoring.NewUint(reg, "s3_objects_acked_total"),
 		s3ObjectsListedTotal:                monitoring.NewUint(reg, "s3_objects_listed_total"),
