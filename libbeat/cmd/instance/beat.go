@@ -1186,13 +1186,13 @@ func initPaths(cfg *common.Config) error {
 	return nil
 }
 
-<<<<<<< HEAD
 func setUmaskWithSettings(settings Settings) error {
 	if settings.Umask != nil {
 		return setUmask(*settings.Umask)
 	}
 	return setUmask(0027) // 0640 for files | 0750 for dirs
-=======
+}
+
 // every IP address received from `Info()` has a netmask suffix
 // which makes every IP address invalid from the validation perspective.
 // If this log entry is ingested to a data stream as it is, the event will be dropped.
@@ -1213,5 +1213,4 @@ func sanitizeIPs(ips []string) []string {
 		validIPs = append(validIPs, ip)
 	}
 	return validIPs
->>>>>>> b2e2aad3ec (Make `Host info` IPs valid (#34599))
 }
