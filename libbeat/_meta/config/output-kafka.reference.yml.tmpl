@@ -129,7 +129,7 @@
   #client_id: beats
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
-  # Enable exiting {{.BeatName}} if any of the files pointed by
+  # Enable restarting {{.BeatName}} if any of the files pointed by
   # `ssl.certificate_authorities` changes
   #ssl.restart_on_cert_change.enabled: false
 

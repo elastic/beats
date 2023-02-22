@@ -4019,7 +4019,7 @@ output.elasticsearch:
   #ssl.ca_trusted_fingerprint: ""
 
 
-  # Enable exiting filebeat if any of the files pointed by
+  # Enable restarting filebeat if any of the files pointed by
   # `ssl.certificate_authorities` changes
   #ssl.restart_on_cert_change.enabled: false
 
@@ -4165,7 +4165,7 @@ output.elasticsearch:
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
-  # Enable exiting filebeat if any of the files pointed by
+  # Enable restarting filebeat if any of the files pointed by
   # `ssl.certificate_authorities` changes
   #ssl.restart_on_cert_change.enabled: false
 
@@ -4377,7 +4377,7 @@ output.elasticsearch:
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
-  # Enable exiting filebeat if any of the files pointed by
+  # Enable restarting filebeat if any of the files pointed by
   # `ssl.certificate_authorities` changes
   #ssl.restart_on_cert_change.enabled: false
 
