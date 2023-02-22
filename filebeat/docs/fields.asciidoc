@@ -112415,93 +112415,13 @@ Fields that let you store information about the request, in the form of list of 
 
 
 
-[float]
-=== ip_chain
-
+*`okta.request.ip_chain`*::
++
+--
 List of ip_chain objects.
 
 
-
-*`okta.request.ip_chain.ip`*::
-+
---
-IP address.
-
-
-type: ip
-
---
-
-*`okta.request.ip_chain.version`*::
-+
---
-IP version. Must be one of V4, V6.
-
-
-type: keyword
-
---
-
-*`okta.request.ip_chain.source`*::
-+
---
-Source information.
-
-
-type: keyword
-
---
-
-[float]
-=== geographical_context
-
-Geographical information.
-
-
-
-*`okta.request.ip_chain.geographical_context.city`*::
-+
---
-The city.
-
-type: keyword
-
---
-
-*`okta.request.ip_chain.geographical_context.state`*::
-+
---
-The state.
-
-type: keyword
-
---
-
-*`okta.request.ip_chain.geographical_context.postal_code`*::
-+
---
-The postal code.
-
-type: keyword
-
---
-
-*`okta.request.ip_chain.geographical_context.country`*::
-+
---
-The country.
-
-type: keyword
-
---
-
-*`okta.request.ip_chain.geographical_context.geolocation`*::
-+
---
-Geolocation information.
-
-
-type: geo_point
+type: flattened
 
 --
 
