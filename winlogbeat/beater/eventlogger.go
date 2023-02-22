@@ -135,18 +135,20 @@ runLoop:
 	for stop := false; !stop; {
 		err = api.Open(state)
 
-		if eventlog.IsRecoverable(err) {
+		switch {
+		case eventlog.IsRecoverable(err):
 			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err, "channel", api.Channel())
 			time.Sleep(time.Second * 5)
 			continue
-		} else if !api.IsFile() && eventlog.IsChannelNotFound(err) {
+		case !api.IsFile() && eventlog.IsChannelNotFound(err):
 			e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
 			time.Sleep(time.Second * 5)
 			continue
-		} else if err != nil {
+		case err != nil:
 			e.log.Warnw("Open() error. No events will be read from this source.", "error", err, "channel", api.Channel())
 			return
 		}
+
 		e.log.Debug("Opened successfully.")
 
 		for !stop {

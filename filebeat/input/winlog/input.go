@@ -106,17 +106,19 @@ runLoop:
 		evtCheckpoint := initCheckpoint(log, cursor)
 		openErr := api.Open(evtCheckpoint)
 
-		if eventlog.IsRecoverable(openErr) {
+		switch {
+		case eventlog.IsRecoverable(openErr):
 			log.Errorw("Encountered recoverable error when opening Windows Event Log", "error", openErr)
 			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
-		} else if !api.IsFile() && eventlog.IsChannelNotFound(openErr) {
+		case !api.IsFile() && eventlog.IsChannelNotFound(openErr):
 			log.Errorw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
 			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
-		} else if openErr != nil {
+		case openErr != nil:
 			return fmt.Errorf("failed to open Windows Event Log channel %q: %w", api.Channel(), openErr)
 		}
+
 		log.Debug("Windows Event Log opened successfully")
 
 		// read loop
@@ -151,7 +153,6 @@ runLoop:
 				log.Errorw("Error occurred while reading from Windows Event Log", "error", err)
 				return err
 			}
-
 			if len(records) == 0 {
 				_ = timed.Wait(cancelCtx, time.Second)
 				continue
