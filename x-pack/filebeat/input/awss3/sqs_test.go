@@ -140,7 +140,9 @@ func TestGetApproximateMessageCount(t *testing.T) {
 		)
 
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		assert.Equal(t, count, receiver.GetApproximateMessageCount(ctx))
+		receivedCount, err := receiver.GetApproximateMessageCount(ctx)
+		assert.Equal(t, count, receivedCount)
+		assert.Nil(t, err)
 	})
 
 	t.Run("GetApproximateMessageCount error", func(t *testing.T) {
@@ -163,7 +165,9 @@ func TestGetApproximateMessageCount(t *testing.T) {
 		)
 
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		assert.Equal(t, -1, receiver.GetApproximateMessageCount(ctx))
+		receivedCount, err := receiver.GetApproximateMessageCount(ctx)
+		assert.Equal(t, -1, receivedCount)
+		assert.NotNil(t, err)
 	})
 }
 
