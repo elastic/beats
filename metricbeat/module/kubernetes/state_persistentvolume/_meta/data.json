@@ -1,24 +1,22 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
-        "dataset": "kubernetes.proxy",
+        "dataset": "kubernetes.persistentvolume",
         "duration": 115000,
         "module": "kubernetes"
     },
     "kubernetes": {
-        "proxy": {
-            "client": {
-                "request": {
-                    "count": 25
-                }
+        "persistentvolume": {
+            "capacity": {
+                "bytes": 5368709120
             },
-            "code": "200",
-            "host": "kind-control-plane:6443",
-            "method": "GET"
+            "name": "pv0003",
+            "phase": "Available",
+            "storage_class": "slow"
         }
     },
     "metricset": {
-        "name": "proxy",
+        "name": "state_persistentvolume",
         "period": 10000
     },
     "service": {
