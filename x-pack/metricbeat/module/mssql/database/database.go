@@ -48,7 +48,20 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logger := logp.NewLogger("mssql.database").With("host", base.HostData().SanitizedURI)
 
-	db, err := mssql.NewConnection(base.HostData().URI)
+	rowConfig := make(map[string]interface{})
+	err := base.Module().UnpackConfig(rowConfig)
+	if err != nil {
+		return nil, fmt.Errorf("unpack rowConfig failed, err=%s", err)
+	}
+
+	uri := base.HostData().URI
+	if dbName, ok := rowConfig["database"].(string); ok {
+		uri =	fmt.Sprintf("sqlserver://%s:%s@%s?database=%s",
+			base.HostData().User, base.HostData().Password,
+			base.HostData().Host, dbName)
+	}
+
+	db, err := mssql.NewConnection(uri)
 	if err != nil {
 		return nil, fmt.Errorf("could not create connection to db %w", err)
 	}
@@ -497,7 +510,6 @@ func (m *MetricSet) fetchUserConnections(reporter mb.ReporterV2) int64 {
 	return mapStr["userConnections"].(int64)
 }
 
-
 func (m *MetricSet) fetchMaxConnections(reporter mb.ReporterV2) int64 {
 	queryMaxConnections := `SELECT CONVERT(int, @@MAX_CONNECTIONS) AS 'Max Connections';`
 	type maxConRow struct {
@@ -745,6 +757,7 @@ func (m *MetricSet) fetchLogSize(reporter mb.ReporterV2) []mapstr.M {
 --      CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size END) * 8. AS DECIMAL(8,2)) AS row_size_mb,
 --      CAST(SUM(size) * 8. / 1024 AS DECIMAL(8,2)) AS total_size_mb
 FROM sys.master_files WITH(NOWAIT)
+WHERE database_id = DB_ID()
 GROUP BY database_id`
 
 	type logSizeRow struct {
