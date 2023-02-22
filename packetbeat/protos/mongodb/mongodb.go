@@ -124,7 +124,6 @@ func (mongodb *mongodbPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseMongodb exception")
 	debugf("Parse method triggered")
 
 	conn := ensureMongodbConnection(private)

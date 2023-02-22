@@ -553,8 +553,6 @@ func (mysql *mysqlPlugin) ConnectionTimeout() time.Duration {
 func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseMysql exception")
-
 	priv := mysqlPrivateData{}
 	if private != nil {
 		var ok bool
@@ -613,8 +611,6 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 func (mysql *mysqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(mysql) exception")
-
 	if private == nil {
 		return private, false
 	}

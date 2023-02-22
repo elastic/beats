@@ -29,6 +29,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewInstance(t *testing.T) {
@@ -155,8 +156,71 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 		panic(err)
 	}
 	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
-	secondBeat.loadMeta(metaPath)
+	err = secondBeat.loadMeta(metaPath)
+	require.NoError(t, err)
 
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.True(t, firstStart.Equal(secondBeat.Info.FirstStart), "Cannot load first start")
+}
+
+func TestSanitizeIPs(t *testing.T) {
+	cases := []struct {
+		name        string
+		ips         []string
+		expectedIPs []string
+	}{
+		{
+			name: "does not change valid IPs",
+			ips: []string{
+				"127.0.0.1",
+				"::1",
+				"fe80::1",
+				"fe80::6ca6:cdff:fe6a:4f59",
+				"192.168.1.101",
+			},
+			expectedIPs: []string{
+				"127.0.0.1",
+				"::1",
+				"fe80::1",
+				"fe80::6ca6:cdff:fe6a:4f59",
+				"192.168.1.101",
+			},
+		},
+		{
+			name: "cuts the masks",
+			ips: []string{
+				"127.0.0.1/8",
+				"::1/128",
+				"fe80::1/64",
+				"fe80::6ca6:cdff:fe6a:4f59/64",
+				"192.168.1.101/24",
+			},
+			expectedIPs: []string{
+				"127.0.0.1",
+				"::1",
+				"fe80::1",
+				"fe80::6ca6:cdff:fe6a:4f59",
+				"192.168.1.101",
+			},
+		},
+		{
+			name: "excludes invalid IPs",
+			ips: []string{
+				"",
+				"fe80::6ca6:cdff:fe6a:4f59",
+				"invalid",
+				"192.168.1.101",
+			},
+			expectedIPs: []string{
+				"fe80::6ca6:cdff:fe6a:4f59",
+				"192.168.1.101",
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, tc.expectedIPs, sanitizeIPs(tc.ips))
+		})
+	}
 }
