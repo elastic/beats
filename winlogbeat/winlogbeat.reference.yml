@@ -464,8 +464,9 @@ output.elasticsearch:
   #ssl.ca_trusted_fingerprint: ""
 
 
-  # Enable restarting winlogbeat if any of the files pointed by
-  # `ssl.certificate_authorities` changes
+  # Enables restarting winlogbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
   #ssl.restart_on_cert_change.enabled: false
 
   # Period to scan for changes on CA certificate files
@@ -610,8 +611,9 @@ output.elasticsearch:
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
-  # Enable restarting winlogbeat if any of the files pointed by
-  # `ssl.certificate_authorities` changes
+  # Enables restarting winlogbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
   #ssl.restart_on_cert_change.enabled: false
 
   # Period to scan for changes on CA certificate files
@@ -822,8 +824,9 @@ output.elasticsearch:
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
-  # Enable restarting winlogbeat if any of the files pointed by
-  # `ssl.certificate_authorities` changes
+  # Enables restarting winlogbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
   #ssl.restart_on_cert_change.enabled: false
 
   # Period to scan for changes on CA certificate files
