@@ -58,9 +58,9 @@ func TestFQDN(t *testing.T) {
 				t.Fatalf("could not parse config YAML: %v", err)
 			}
 
-			err = ParseFromConfig(c)
+			err = UpdateFromConfig(c)
 			if err != nil {
-				t.Fatalf("ParseFromConfig failed: %v", err)
+				t.Fatalf("UpdateFromConfig failed: %v", err)
 			}
 
 			got := FQDN()

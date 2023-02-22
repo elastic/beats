@@ -284,8 +284,8 @@ func (cm *BeatV2Manager) updateStatuses() {
 	payload := cm.payload
 
 	for _, unit := range cm.units {
-		state, _, _ := unit.Expected()
-		if state == client.UnitStateStopped {
+		expected := unit.Expected()
+		if expected.State == client.UnitStateStopped {
 			// unit is expected to be stopping (don't adjust the state as the state is now managed by the
 			// `reload` method and will be marked stopped in that code path)
 			continue
@@ -326,8 +326,8 @@ func (cm *BeatV2Manager) modifyUnit(unit *client.Unit) {
 	// is reflected here.
 	// cm.units[unitKey{unit.Type(), unit.ID()}] = unit
 
-	state, _, _ := unit.Expected()
-	if state == client.UnitStateStopped {
+	expected := unit.Expected()
+	if expected.State == client.UnitStateStopped {
 		// expected to be stopped; needs to stop this unit
 		_ = unit.UpdateState(client.UnitStateStopping, "Stopping", nil)
 	} else {
@@ -377,7 +377,7 @@ func (cm *BeatV2Manager) unitListen() {
 	t := time.NewTimer(changeDebounce)
 	t.Stop() // starts stopped, until a change occurs
 
-	cm.logger.Debugf("Listening for agent unit changes")
+	cm.logger.Info("Listening for agent unit changes")
 	for {
 		select {
 		// The stopChan channel comes from the Manager interface Stop() method
@@ -397,16 +397,13 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.isRunning = false
 			cm.UpdateStatus(lbmanagement.Stopping, "Stopping")
 			return
-		case change := <-cm.client.UnitChanged():
-			cm.logger.Infof("[fqdn] BeatV2Manager.unitListen UnitChanged: %s-%v",
-				change.Type, change.Triggers)
+		case change := <-cm.client.UnitChanges():
+			cm.logger.Infof(
+				"[features] BeatV2Manager.unitListen UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
+				change.Type, int64(change.Triggers), change.Type, change.Triggers)
 
-			for _, t := range change.Triggers {
-				if t == client.TriggerFeature {
-					cm.logger.Infof("[fqdn] change: %s/%s: feature fqdn: %v",
-						change.Type, t, change.Features)
-					features.Update(change.Features)
-				}
+			if change.Triggers&client.TriggeredFeatureChange == client.TriggeredFeatureChange {
+				features.UpdateFromProto(change.Features)
 			}
 
 			switch change.Type {
@@ -468,23 +465,24 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	var stoppingUnits []*client.Unit
 
 	for _, unit := range units {
-		state, ll, _ := unit.Expected()
-		if ll > lowestLevel {
+		expected := unit.Expected()
+		if expected.LogLevel > lowestLevel {
 			// log level is still used from an expected stopped unit until
 			// the unit is completely removed (aka. fully stopped)
-			lowestLevel = ll
+			lowestLevel = expected.LogLevel
 		}
-		if state == client.UnitStateStopped {
+		if expected.State == client.UnitStateStopped {
 			// unit is being stopped
 			//
 			// we keep the unit so after reload is performed
 			// these units can be marked as stopped
 			stoppingUnits = append(stoppingUnits, unit)
 			continue
-		} else if state != client.UnitStateHealthy {
+		} else if expected.State != client.UnitStateHealthy {
 			// only stopped or healthy are known (and expected) state
 			// for a unit
-			cm.logger.Errorf("unit %s has an unknown state %+v", unit.ID(), state)
+			cm.logger.Errorf("unit %s has an unknown state %+v",
+				unit.ID(), expected.State)
 		}
 		if unit.Type() == client.UnitTypeOutput {
 			outputUnit = unit
@@ -534,8 +532,8 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	payload := cm.payload
 	cm.mx.Unlock()
 	for _, unit := range units {
-		state, _, _ := unit.Expected()
-		if state == client.UnitStateStopped {
+		expected := unit.Expected()
+		if expected.State == client.UnitStateStopped {
 			// unit is expected to be stopping (don't adjust the state as the state is now managed by the
 			// `reload` method and will be marked stopped in that code path)
 			continue
@@ -565,19 +563,19 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return nil
 	}
 
-	_, _, rawConfig := unit.Expected()
-	if rawConfig == nil {
+	expected := unit.Expected()
+	if expected.Config == nil {
 		// should not happen; hard stop
 		return fmt.Errorf("output unit has no config")
 	}
 
-	if cm.lastOutputCfg != nil && gproto.Equal(cm.lastOutputCfg, rawConfig) {
+	if cm.lastOutputCfg != nil && gproto.Equal(cm.lastOutputCfg, expected.Config) {
 		// configuration for the output did not change; do nothing
 		cm.logger.Debug("Skipped reloading output; configuration didn't change")
 		return nil
 	}
 
-	cm.logger.Debugf("Got output unit config '%s'", rawConfig.GetId())
+	cm.logger.Debugf("Got output unit config '%s'", expected.Config.GetId())
 
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
@@ -586,17 +584,17 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return nil
 	}
 
-	reloadConfig, err := groupByOutputs(rawConfig)
+	reloadConfig, err := groupByOutputs(expected.Config)
 	if err != nil {
 		return fmt.Errorf("failed to generate config for output: %w", err)
 	}
 
-	// features.Update(featureFlags)
+	// features.UpdateFromProto(featureFlags)
 	err = output.Reload(reloadConfig)
 	if err != nil {
 		return fmt.Errorf("failed to reload output: %w", err)
 	}
-	cm.lastOutputCfg = rawConfig
+	cm.lastOutputCfg = expected.Config
 	cm.lastBeatOutputCfg = reloadConfig
 	return nil
 }
@@ -610,12 +608,10 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 	inputCfgs := make(map[string]*proto.UnitExpectedConfig, len(inputUnits))
 	inputBeatCfgs := make([]*reload.ConfigWithMeta, 0, len(inputUnits))
 	agentInfo := cm.client.AgentInfo()
-	// var featureFlags *proto.Features
+
 	for _, unit := range inputUnits {
-		var rawConfig *proto.UnitExpectedConfig
-		// the feature flags are the same for all units, so any will do.
-		_, _, rawConfig = unit.Expected()
-		if rawConfig == nil {
+		expected := unit.Expected()
+		if expected.Config == nil {
 			// should not happen; hard stop
 			return fmt.Errorf("input unit %s has no config", unit.ID())
 		}
@@ -624,7 +620,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		if err != nil {
 			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
 		}
-		inputCfgs[unit.ID()] = rawConfig
+		inputCfgs[unit.ID()] = expected.Config
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
