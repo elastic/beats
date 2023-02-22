@@ -117,6 +117,7 @@ func NewQueue(
 
 func (b *broker) Close() error {
 	close(b.doneChan)
+	b.wg.Wait()
 	return nil
 }
 
