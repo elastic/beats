@@ -37,9 +37,9 @@ class TestCAPinning(BaseTest):
                 "user": "admin",
                 "pass": "testing",
                 # Use certificate verification only to avoid validating localhost as the hostname.
-                "ssl_verification_mode": "certificate",
-                "ssl_certificate_authorities": [ca],
-                "ssl_ca_sha256": "FDFOtqdUyXZw74YgvAJUC+I67ED1WfcI1qK44Qy2WQM=",
+                "ssl.verification_mode": "certificate",
+                "ssl.certificate_authorities": [ca],
+                "ssl.ca_sha256": "FDFOtqdUyXZw74YgvAJUC+I67ED1WfcI1qK44Qy2WQM=",
             },
         )
 
@@ -71,9 +71,9 @@ class TestCAPinning(BaseTest):
                 "user": "beats",
                 "pass": "testing",
                 # Use certificate verification only to avoid validating localhost as the hostname.
-                "ssl_verification_mode": "certificate",
-                "ssl_certificate_authorities": [ca],
-                "ssl_ca_sha256": "not-good-sha",
+                "ssl.verification_mode": "certificate",
+                "ssl.certificate_authorities": [ca],
+                "ssl.ca_sha256": "not-good-sha",
             },
         )
 
