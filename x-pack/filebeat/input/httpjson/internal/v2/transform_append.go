@@ -119,7 +119,7 @@ func newAppend(cfg *common.Config, log *logp.Logger) (appendt, error) {
 }
 
 func (append *appendt) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value, err := append.value.Execute(ctx, tr, append.defaultValue, append.log)
+	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, append.log)
 	if err != nil && append.failOnTemplateError {
 		return transformable{}, err
 	}

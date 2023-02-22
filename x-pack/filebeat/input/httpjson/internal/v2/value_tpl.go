@@ -78,11 +78,11 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
 			log.Debugf("template execution: falling back to default value")
-			return defaultVal.Execute(emptyTransformContext(), transformable{}, nil, log)
+			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, log)
 		}
 		return "", err
 	}
@@ -94,7 +94,7 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 		if err != nil {
 			log.Debugf("template execution failed: %v", err)
 		}
-		log.Debugf("template execution: evaluated template %q", val)
+		tryDebugTemplateValue(targetName, val, log)
 	}()
 
 	buf := new(bytes.Buffer)
@@ -113,6 +113,15 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 		return fallback(errEmptyTemplateResult)
 	}
 	return val, nil
+}
+
+func tryDebugTemplateValue(target, val string, log *logp.Logger) {
+	switch target {
+	case "Authorization", "Proxy-Authorization":
+		// ignore filtered headers
+	default:
+		log.Debugf("template execution: evaluated template %q", val)
+	}
 }
 
 var (
