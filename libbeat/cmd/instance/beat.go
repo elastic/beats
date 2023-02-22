@@ -67,7 +67,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-
 	"github.com/elastic/elastic-agent-libs/filewatcher"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
@@ -100,13 +99,8 @@ type Beat struct {
 
 	InputQueueSize int // Size of the producer queue used by most queues.
 
-	// Flag to indicate the Beat should restart
-	// TODO(Tiago): Do we need a mutex?
-	// The shutdown process is pretty linear, at least the
-	// functions returning.
-	// If that's the case, this should be unexported and we
-	// should have methods to set/reset it
-	Reexec bool
+	// shouldReexec is a flag to indicate the Beat should restart
+	shouldReexec bool
 }
 
 type beatConfig struct {
@@ -521,8 +515,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	b.Manager.SetStopCallback(beater.Stop)
 
 	err = beater.Run(&b.Beat)
-	if b.Reexec {
-		if err := b.DoReexec(); err != nil {
+	if b.shouldReexec {
+		if err := b.reexec(); err != nil {
 			return fmt.Errorf("could not restart %s: %w", b.Info.Beat, err)
 		}
 	}
@@ -530,8 +524,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	return err
 }
 
-// DoReexec restarts the Beat, it calls the OS-specific implementation.
-func (b *Beat) DoReexec() error {
+// reexec restarts the Beat, it calls the OS-specific implementation.
+func (b *Beat) reexec() error {
 	return b.doReexec()
 }
 
@@ -1103,7 +1097,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 					"some of the following files have been modified: %v, restarting %s.",
 					files, b.Info.Beat)
 
-				b.Reexec = true
+				b.shouldReexec = true
 				b.Manager.Stop()
 
 				// we're done, finish the goroutine just for the sake of it

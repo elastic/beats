@@ -576,9 +576,9 @@ If set to `true` {beatname_uc} will restart if any file listed by `key`,
 NOTE: This feature is NOT supported on Windows. The default value is
 `false`.
 
-NOTE: This feature requres the `reexec` system call to be enabled. If
+NOTE: This feature requres the `execve` system call to be enabled. If
 you have a custom seccomp policy in place, make sure to allow for
-reexec.
+`execve`.
 
 [float]
 [[restart_on_cert_change_period]]
