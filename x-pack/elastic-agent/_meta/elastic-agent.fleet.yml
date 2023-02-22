@@ -13,9 +13,6 @@ fleet:
 #   target_directory: "${path.data}/downloads"
 #   # timeout for downloading package
 #   timeout: 120s
-#   # file path to a public key used for verifying downloaded artifacts
-#   # if not file is present Elastic Agent will try to load public key from elastic.co website.
-#   pgpfile: "${path.data}/elastic.pgp"
 #   # install_path describes the location of installed packages/programs. It is also used
 #   # for reading program specifications.
 #   install_path: "${path.data}/install"

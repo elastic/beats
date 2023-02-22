@@ -30,20 +30,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Add extra protection on gRPC server start process to avoid trying to start a nil server.
-- `add_fields` processor is now able to set metadata in events. {pull}30092[30092]
-- Allows disable pod events enrichment with deployment name {pull}28521[28521] {pull}34097[34097]
-
 *Auditbeat*
 
 
 *Filebeat*
 
-- Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
-- Fix 'requires pointer' error while getting cursor metadata. {pull}33956[33956]
-- [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
-- Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
-
+- [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
+- Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
 
 *Heartbeat*
 
@@ -53,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
 
 *Winlogbeat*
 
@@ -85,7 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
+- Remove GCP Compute metadata cache {pull}33655[33655]
 
 *Packetbeat*
 
@@ -120,6 +114,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 

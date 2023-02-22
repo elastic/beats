@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package http
+package download
 
 import (
 	"fmt"
@@ -21,12 +21,12 @@ func TestAddingHeaders(t *testing.T) {
 	msg := []byte("OK")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		assert.Equal(t, fmt.Sprintf("Beat elastic-agent v%s", release.Version()), req.Header.Get("User-Agent"))
-		w.Write(msg)
+		_, _ = w.Write(msg)
 	}))
 	defer server.Close()
 
 	c := server.Client()
-	rtt := withHeaders(c.Transport, headers)
+	rtt := WithHeaders(c.Transport, Headers)
 
 	c.Transport = rtt
 	resp, err := c.Get(server.URL)

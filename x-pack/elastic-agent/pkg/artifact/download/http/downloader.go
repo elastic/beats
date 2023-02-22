@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 )
 
 const (
@@ -38,10 +38,6 @@ const (
 	// passed is this percentage or more of the total allotted time to download.
 	warningProgressIntervalPercentage = 0.75
 )
-
-var headers = map[string]string{
-	"User-Agent": fmt.Sprintf("Beat elastic-agent v%s", release.Version()),
-}
 
 // Downloader is a downloader able to fetch artifacts from elastic.co web page.
 type Downloader struct {
@@ -59,7 +55,7 @@ func NewDownloader(log progressLogger, config *artifact.Config) (*Downloader, er
 		return nil, err
 	}
 
-	client.Transport = withHeaders(client.Transport, headers)
+	client.Transport = download.WithHeaders(client.Transport, download.Headers)
 	return NewDownloaderWithClient(log, config, *client), nil
 }
 
