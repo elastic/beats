@@ -1667,10 +1667,10 @@ output.elasticsearch:
 
   # Enable exiting filebeat if any of the files pointed by
   # `ssl.certificate_authorities` changes
-  #ssl.exit_on_cert_change.enabled: false
+  #ssl.restart_on_cert_change.enabled: false
 
   # Period to scan for changes on CA certificate files
-  #ssl.exit_on_cert_change.period: 1m
+  #ssl.restart_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -1813,10 +1813,10 @@ output.elasticsearch:
 
   # Enable exiting filebeat if any of the files pointed by
   # `ssl.certificate_authorities` changes
-  #ssl.exit_on_cert_change.enabled: false
+  #ssl.restart_on_cert_change.enabled: false
 
   # Period to scan for changes on CA certificate files
-  #ssl.exit_on_cert_change.period: 1m
+  #ssl.restart_on_cert_change.period: 1m
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -2025,10 +2025,10 @@ output.elasticsearch:
 
   # Enable exiting filebeat if any of the files pointed by
   # `ssl.certificate_authorities` changes
-  #ssl.exit_on_cert_change.enabled: false
+  #ssl.restart_on_cert_change.enabled: false
 
   # Period to scan for changes on CA certificate files
-  #ssl.exit_on_cert_change.period: 1m
+  #ssl.restart_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true

@@ -151,12 +151,12 @@ type beatConfig struct {
 
 type certReloadConfig struct {
 	tlscommon.Config `config:",inline" yaml:",inline"`
-	Reload           cfgfile.Reload `config:"exit_on_cert_change" yaml:"exit_on_cert_change"`
+	Reload           cfgfile.Reload `config:"restart_on_cert_change" yaml:"restart_on_cert_change"`
 }
 
 func (c certReloadConfig) Validate() error {
 	if c.Reload.Period < time.Second {
-		return errors.New("'exit_on_cert_change.period' must be equal or greather than 1s")
+		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
 	}
 	return nil
 }
@@ -529,8 +529,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	return err
 }
 
-// DoReexec restarts the Beat
-// TODO(Tiago): Implement the Windows version
+// DoReexec restarts the Beat, it calls the OS-specific implementation.
 func (b *Beat) DoReexec() error {
 	return b.doReexec()
 }
