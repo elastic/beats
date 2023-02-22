@@ -15,16 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build (darwin && cgo) || freebsd || linux || windows || aix
-
 package locks
 
 import (
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"fmt"
+	"os"
 )
 
-// findMatchingPID is a small wrapper to deal with cgo compat issues in libbeat's CI
-func findMatchingPID(pid int) (process.PidState, error) {
-	return process.GetPIDState(resolve.NewTestResolver("/"), pid)
+// Unlock attempts to release the lock on a data path previously acquired via Lock(). This will unlock the file before it removes it.
+func (lock *Locker) Unlock() error {
+	// Removing a file that's locked seems to be an unsupported or undefined, and will often fail on Windows.
+	// Reverse the order of operations, and unlock first, then remove.
+	// This will slightly increase the odds of a race on Windows if we're in a tight restart loop,
+	// as another beat can swoop in and lock the file before this beat removes it.
+	err := lock.fileLock.Unlock()
+	if err != nil {
+		return fmt.Errorf("unable to unlock data path: %w", err)
+	}
+
+	err = os.Remove(lock.fileLock.Path())
+	if err != nil {
+		lock.logger.Warnf("could not remove lockfile at %s: %s", lock.fileLock.Path(), err)
+	}
+
+	return nil
 }

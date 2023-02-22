@@ -498,8 +498,8 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 			labels := strings.Split(*metricDataResult.Label, labelSeparator)
 			for valI, metricDataResultValue := range metricDataResult.Values {
 				if len(labels) != 5 {
-					// when there is no identifier value in label, use region+accountID+label+index instead
-					identifier := regionName + m.AccountID + *metricDataResult.Label + fmt.Sprint("-", valI)
+					// when there is no identifier value in label, use region+accountID+namespace+index instead
+					identifier := regionName + m.AccountID + labels[namespaceIdx] + fmt.Sprint("-", valI)
 					if _, ok := events[identifier]; !ok {
 						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, metricDataResult.Timestamps[valI])
 					}
@@ -507,7 +507,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					continue
 				}
 
-				identifierValue := *metricDataResult.Label + fmt.Sprint("-", valI)
+				identifierValue := labels[identifierValueIdx] + fmt.Sprint("-", valI)
 				if _, ok := events[identifierValue]; !ok {
 					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, metricDataResult.Timestamps[valI])
 				}
@@ -554,8 +554,8 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 						continue
 					}
 
-					// when there is no identifier value in label, use region+accountID+labels instead
-					identifier := regionName + m.AccountID + *output.Label + fmt.Sprint("-", valI)
+					// when there is no identifier value in label, use region+accountID+namespace+index instead
+					identifier := regionName + m.AccountID + labels[namespaceIdx] + fmt.Sprint("-", valI)
 					if _, ok := events[identifier]; !ok {
 						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, output.Timestamps[valI])
 					}
@@ -564,7 +564,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				}
 
 				identifierValue := labels[identifierValueIdx]
-				uniqueIdentifierValue := *output.Label + fmt.Sprint("-", valI)
+				uniqueIdentifierValue := identifierValue + fmt.Sprint("-", valI)
 
 				// add tags to event based on identifierValue
 				// Check if identifier includes dimensionSeparator (comma in this case),
