@@ -198,7 +198,6 @@ func (amqp *amqpPlugin) ConnectionTimeout() time.Duration {
 func (amqp *amqpPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseAmqp exception")
 	detailedf("Parse method triggered")
 
 	priv := amqpPrivateData{}
