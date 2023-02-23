@@ -359,7 +359,9 @@ func (s *shipper) ackWorker(ctx context.Context) {
 			// so we don't perform any manipulation when the pending list is empty
 			// or none of the batches were acknowledged by this persisted index update
 			if lastProcessed != 0 {
+				remaining := len(pending) - lastProcessed
 				copy(pending[0:], pending[lastProcessed:])
+				pending = pending[:remaining]
 			}
 		}
 	}
