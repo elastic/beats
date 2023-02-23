@@ -83,8 +83,6 @@ type udpMessage struct {
 }
 
 func (mc *memcache) ParseUDP(pkt *protos.Packet) {
-	defer logp.Recover("ParseMemcache(UDP) exception")
-
 	buffer := streambuf.NewFixed(pkt.Payload)
 	header, err := parseUDPHeader(buffer)
 	if err != nil {
@@ -144,7 +142,6 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	}
 	if !done {
 		trans.timer = time.AfterFunc(mc.udpConfig.transTimeout, func() {
-			defer logp.Recover("ParseMemcache(UDP) panic during forward")
 			debug("transaction timeout -> forward")
 			mc.onUDPTrans(trans)
 			mc.udpExpTrans.push(trans)

@@ -45,7 +45,7 @@ type Flows struct {
 
 // NewFlows returns a Flows publishing to pub after enrichment by the given
 // process watcher. Publication timeout and period are specified by config.
-func NewFlows(pub Reporter, watcher procs.ProcessesWatcher, config *config.Flows) (*Flows, error) {
+func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flows) (*Flows, error) {
 	duration := func(s string, d time.Duration) (time.Duration, error) {
 		if s == "" {
 			return d, nil

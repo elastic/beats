@@ -102,9 +102,6 @@ func (j *job) do(ctx context.Context, id string) {
 		err := fmt.Errorf("job with jobId %s encountered an error: content-type %s not supported", id, j.object.ContentType)
 		fields = mapstr.M{
 			"message": err.Error(),
-			"event": mapstr.M{
-				"kind": "publish_error",
-			},
 		}
 		event := beat.Event{
 			Timestamp: time.Now(),
@@ -318,11 +315,6 @@ func (j *job) createEvent(message []byte, data []mapstr.M, offset int64) beat.Ev
 				Provider string `json:"provider"`
 			}{
 				Provider: "google cloud",
-			},
-			"event": struct {
-				Kind string `json:"kind"`
-			}{
-				Kind: "publish_data",
 			},
 		},
 	}
