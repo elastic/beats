@@ -40,6 +40,41 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
 - Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
 - Fix panics when a processor is closed twice {pull}34647[34647]
+- Prevent Elasticsearch from spewing log warnings about redundant wildcard when setting up ingest pipelines. {issue}34249[34249] {pull}34550[34550]
+- Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
+- Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
+
+*Heartbeat*
+
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+- Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
+- Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
+- Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
+with the ecs field name `container`. {pull}34403[34403]
+automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
+- Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
+
+*Auditbeat*
+
+
+*Filebeat*
+
 
 *Heartbeat*
 
