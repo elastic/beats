@@ -49,7 +49,7 @@ func fetchDeviceName(major, minor uint64) (bool, string, error) {
 		if !ok {
 			return nil
 		}
-		devID := infoT.Rdev
+		devID := uint64(infoT.Rdev) // On GOARCH=mips* syscall.Stat_t.Rdev is uint32, so make explicit conversion.
 		// do some bitmapping to extract the major and minor device values
 		// The odd duplicated logic here is to deal with 32 and 64 bit values.
 		// see bits/sysmacros.h
