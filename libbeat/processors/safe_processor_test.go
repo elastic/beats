@@ -20,10 +20,13 @@ package processors
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/stretchr/testify/require"
 )
+
+var mockEvent = &beat.Event{}
 
 type mockProcessor struct {
 	runCount   int
@@ -40,7 +43,7 @@ func newMockConstructor() (Constructor, *mockProcessor) {
 
 func (p *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	p.runCount++
-	return nil, nil
+	return mockEvent, nil
 }
 
 func (p *mockProcessor) Close() error {
@@ -64,14 +67,24 @@ func TestSafeProcessor(t *testing.T) {
 	})
 
 	t.Run("propagates Run to a processor", func(t *testing.T) {
-		sp.Run(nil)
-		sp.Run(nil)
+		e, err := sp.Run(nil)
+		require.NoError(t, err)
+		require.Equal(t, e, mockEvent)
+
+		e, err = sp.Run(nil)
+		require.NoError(t, err)
+		require.Equal(t, e, mockEvent)
+
 		require.Equal(t, 2, p.runCount)
 	})
 
 	t.Run("propagates Close to a processor only once", func(t *testing.T) {
-		Close(sp)
-		Close(sp)
+		err := Close(sp)
+		require.NoError(t, err)
+
+		err = Close(sp)
+		require.NoError(t, err)
+
 		require.Equal(t, 1, p.closeCount)
 	})
 

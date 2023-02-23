@@ -20,9 +20,10 @@ package processors
 import (
 	"sync/atomic"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/pkg/errors"
 )
 
 var ErrClosed = errors.New("attempt to use a closed processor")
