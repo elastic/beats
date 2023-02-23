@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"errors"
 	"io"
 	"time"
 
@@ -133,14 +134,21 @@ func (e *eventLogger) run(
 runLoop:
 	for stop := false; !stop; {
 		err = api.Open(state)
-		if eventlog.IsRecoverable(err) {
-			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err)
+
+		switch {
+		case eventlog.IsRecoverable(err):
+			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err, "channel", api.Channel())
 			time.Sleep(time.Second * 5)
 			continue
-		} else if err != nil {
-			e.log.Warnw("Open() error. No events will be read from this source.", "error", err)
+		case !api.IsFile() && eventlog.IsChannelNotFound(err):
+			e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			time.Sleep(time.Second * 5)
+			continue
+		case err != nil:
+			e.log.Warnw("Open() error. No events will be read from this source.", "error", err, "channel", api.Channel())
 			return
 		}
+
 		e.log.Debug("Opened successfully.")
 
 		for !stop {
@@ -153,20 +161,28 @@ runLoop:
 			// Read from the event.
 			records, err := api.Read()
 			if eventlog.IsRecoverable(err) {
-				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err)
+				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err, "channel", api.Channel())
 				if closeErr := api.Close(); closeErr != nil {
 					e.log.Warnw("Close() error.", "error", err)
 				}
 				continue runLoop
 			}
-			switch err {
-			case nil:
-			case io.EOF:
-				// Graceful stop.
-				stop = true
-			default:
-				e.log.Warnw("Read() error.", "error", err)
-				return
+			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
+				e.log.Warnw("Read() encountered channel not found error for channel %q. Reopening handle...", "error", err, "channel", api.Channel())
+				if closeErr := api.Close(); closeErr != nil {
+					e.log.Warnw("Close() error.", "error", err)
+				}
+				continue runLoop
+			}
+
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					// Graceful stop.
+					stop = true
+				} else {
+					e.log.Warnw("Read() error.", "error", err, "channel", api.Channel())
+					return
+				}
 			}
 
 			e.log.Debugf("Read() returned %d records.", len(records))
