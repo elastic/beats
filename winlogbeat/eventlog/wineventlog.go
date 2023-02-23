@@ -34,7 +34,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/rcrowley/go-metrics"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -44,7 +43,6 @@ import (
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -620,19 +618,4 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 	case syscall.Errno:
 		v.Add(strconv.Itoa(int(t)), 1)
 	}
-}
-
-// inputMetrics handles event log metric reporting.
-type inputMetrics struct {
-	unregister func()
-
-	lastBatch time.Time
-
-	name        *monitoring.String // name of the provider being read
-	events      *monitoring.Uint   // total number of events received
-	dropped     *monitoring.Uint   // total number of discarded events
-	errors      *monitoring.Uint   // total number of errors
-	batchSize   metrics.Sample     // histogram of the number of events in each non-zero batch
-	sourceLag   metrics.Sample     // histogram of the difference between timestamped event's creation and reading
-	batchPeriod metrics.Sample     // histogram of the elapsed time between non-zero batch reads
 }
