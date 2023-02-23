@@ -51,6 +51,22 @@
         "okta.display_message": "User logout from Okta",
         "okta.event_type": "user.session.end",
         "okta.outcome.result": "SUCCESS",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Dublin",
+                    "country": "United States",
+                    "geolocation": {
+                        "lat": 37.7201,
+                        "lon": -121.919
+                    },
+                    "postal_code": "94568",
+                    "state": "California"
+                },
+                "ip": "67.43.156.12",
+                "version": "V4"
+            }
+        ],
         "okta.transaction.id": "XkccyyMli2Uay2I93ZgRzQAAB0c",
         "okta.transaction.type": "WEB",
         "okta.uuid": "faf7398a-4f77-11ea-97fb-5925e98228bd",
@@ -138,6 +154,22 @@
         "okta.display_message": "User login to Okta",
         "okta.event_type": "user.session.start",
         "okta.outcome.result": "SUCCESS",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Dublin",
+                    "country": "United States",
+                    "geolocation": {
+                        "lat": 37.7201,
+                        "lon": -121.919
+                    },
+                    "postal_code": "94568",
+                    "state": "California"
+                },
+                "ip": "67.43.156.12",
+                "version": "V4"
+            }
+        ],
         "okta.transaction.id": "XkcAsWb8WjwDP76xh@1v8wAABp0",
         "okta.transaction.type": "WEB",
         "okta.uuid": "3aeede38-4f67-11ea-abd3-1f5d113f2546",
@@ -223,6 +255,22 @@
         "okta.event_type": "policy.evaluate_sign_on",
         "okta.outcome.reason": "Sign-on policy evaluation resulted in ALLOW",
         "okta.outcome.result": "ALLOW",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Dublin",
+                    "country": "United States",
+                    "geolocation": {
+                        "lat": 37.7201,
+                        "lon": -121.919
+                    },
+                    "postal_code": "94568",
+                    "state": "California"
+                },
+                "ip": "67.43.156.12",
+                "version": "V4"
+            }
+        ],
         "okta.target": [
             {
                 "alternate_id": "unknown",
@@ -346,6 +394,22 @@
         "okta.event_type": "policy.evaluate_sign_on",
         "okta.outcome.reason": "Sign-on policy evaluation resulted in ALLOW",
         "okta.outcome.result": "ALLOW",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Dublin",
+                    "country": "United States",
+                    "geolocation": {
+                        "lat": 37.7201,
+                        "lon": -121.919
+                    },
+                    "postal_code": "94568",
+                    "state": "California"
+                },
+                "ip": "67.43.156.12",
+                "version": "V4"
+            }
+        ],
         "okta.target": [
             {
                 "alternate_id": "unknown",
@@ -459,6 +523,22 @@
         "okta.display_message": "User report suspicious activity",
         "okta.event_type": "user.account.report_suspicious_activity_by_enduser",
         "okta.outcome.result": "SUCCESS",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Dublin",
+                    "country": "United States",
+                    "geolocation": {
+                        "lat": 37.7201,
+                        "lon": -121.919
+                    },
+                    "postal_code": "94568",
+                    "state": "California"
+                },
+                "ip": "67.43.156.12",
+                "version": "V4"
+            }
+        ],
         "okta.security_context.as.number": 7018,
         "okta.security_context.as.organization.name": "AT&T Services, Inc.",
         "okta.security_context.domain": "att.com",
@@ -576,6 +656,22 @@
         "okta.display_message": "User login to Okta",
         "okta.event_type": "user.session.start",
         "okta.outcome.result": "SUCCESS",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Ashburn",
+                    "country": "United States",
+                    "geolocation": {
+                        "lat": 39.1469,
+                        "lon": -77.5903
+                    },
+                    "postal_code": "20149",
+                    "state": "Virginia"
+                },
+                "ip": "81.2.69.144",
+                "version": "V4"
+            }
+        ],
         "okta.security_context.as.number": 14618,
         "okta.security_context.as.organization.name": "amazon data services nova",
         "okta.security_context.domain": "amazonaws.com",
@@ -670,6 +766,22 @@
         "okta.display_message": "Verify user identity",
         "okta.event_type": "user.authentication.verify",
         "okta.outcome.result": "SUCCESS",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Purcellville",
+                    "country": "United States",
+                    "geolocation": {
+                        "lat": 39.64,
+                        "lon": -77.8346
+                    },
+                    "postal_code": "20132",
+                    "state": "Virginia"
+                },
+                "ip": "67.43.156.14",
+                "version": "V4"
+            }
+        ],
         "okta.security_context.as.number": 7922,
         "okta.security_context.as.organization.name": "comcast",
         "okta.security_context.domain": "comcast.net",
@@ -776,6 +888,22 @@
         "okta.display_message": "Verify user identity",
         "okta.event_type": "user.authentication.verify",
         "okta.outcome.result": "SUCCESS",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "City",
+                    "country": "Country",
+                    "geolocation": {
+                        "lat": 0,
+                        "lon": 0
+                    },
+                    "postal_code": "00000",
+                    "state": "State"
+                },
+                "ip": "81.2.69.144",
+                "version": "V4"
+            }
+        ],
         "okta.security_context.as.number": 1828,
         "okta.security_context.as.organization.name": "org",
         "okta.security_context.domain": "domain.com",
@@ -873,6 +1001,22 @@
         "okta.display_message": "Authentication of user via MFA",
         "okta.event_type": "user.authentication.auth_via_mfa",
         "okta.outcome.result": "SUCCESS",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Lucerne",
+                    "country": "Switzerland",
+                    "geolocation": {
+                        "lat": 47.0511,
+                        "lon": 8.3056
+                    },
+                    "postal_code": "6007",
+                    "state": "Lucerne"
+                },
+                "ip": "127.0.0.1",
+                "version": "V4"
+            }
+        ],
         "okta.security_context.as.number": 3303,
         "okta.security_context.as.organization.name": "bluewin is an lir and isp in switzerland.",
         "okta.security_context.domain": "swisscom.ch",
@@ -981,6 +1125,22 @@
         "okta.display_message": "Authentication of user via MFA",
         "okta.event_type": "user.authentication.auth_via_mfa",
         "okta.outcome.result": "SUCCESS",
+        "okta.request.ip_chain": [
+            {
+                "geographical_context": {
+                    "city": "Bredstedt",
+                    "country": "Germany",
+                    "geolocation": {
+                        "lat": 54.6208,
+                        "lon": 8.9631
+                    },
+                    "postal_code": "25821",
+                    "state": "Schleswig-Holstein"
+                },
+                "ip": "127.0.0.1",
+                "version": "V4"
+            }
+        ],
         "okta.security_context.as.number": 62336,
         "okta.security_context.as.organization.name": "customer access",
         "okta.security_context.domain": "german-local.net",

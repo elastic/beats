@@ -414,7 +414,7 @@
   - name: ip_chain
     description: >
       List of ip_chain objects.
-    type: group
+    type: flattened
     fields:
 
     - name: ip
