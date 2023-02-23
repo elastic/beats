@@ -167,7 +167,7 @@ func TestPublish(t *testing.T) {
 		serverError error
 		expError    string
 		// note: this sets the queue size used by the mock output
-		// if the mock shipper recieves more than this count of events, the test will fail
+		// if the mock shipper receives more than this count of events, the test will fail
 		qSize            int
 		observerExpected *TestObserver
 		marshalMethod    func(e publisher.Event) (*messages.Event, error)
@@ -457,10 +457,6 @@ func protoStruct(t *testing.T, values map[string]interface{}) *messages.Struct {
 	s, err := helpers.NewStruct(values)
 	require.NoError(t, err)
 	return s
-}
-func protoStructValue(t *testing.T, values map[string]interface{}) *messages.Value {
-	s := protoStruct(t, values)
-	return helpers.NewStructValue(s)
 }
 
 func requireEqualProto(t *testing.T, expected, actual proto.Message) {

@@ -178,7 +178,7 @@ func (s *shipper) Connect() error {
 // Publish converts and sends a batch of events to the shipper server.
 // Also, implements `outputs.Client`
 func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
-	if s.client == nil {
+	if s.client == nil { //nolint:typecheck //linter has issues with the imported interface
 		return fmt.Errorf("connection is not established")
 	}
 
@@ -256,7 +256,7 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 // Close closes the connection to the shipper server.
 // Also, implements `outputs.Client`
 func (s *shipper) Close() error {
-	if s.client == nil {
+	if s.client == nil { //nolint:typecheck //linter has issues with the imported interface
 		return fmt.Errorf("connection is not established")
 	}
 	s.backgroundCancel()
