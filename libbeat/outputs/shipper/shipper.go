@@ -31,7 +31,6 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	"google.golang.org/grpc"
@@ -71,6 +70,9 @@ type shipper struct {
 func init() {
 	outputs.RegisterType("shipper", makeShipper)
 }
+
+// shipperProcessor serves as a wrapper for testing Publish() calls with alternate marshalling callbacks
+var shipperProcessor = toShipperEvent
 
 func makeShipper(
 	_ outputs.IndexManager,
@@ -180,9 +182,9 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		return fmt.Errorf("connection is not established")
 	}
 
-	st := s.observer
+	outObserver := s.observer
 	events := batch.Events()
-	st.NewBatch(len(events))
+	outObserver.NewBatch(len(events))
 
 	toSend := make([]*messages.Event, 0, len(events))
 
@@ -191,7 +193,7 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 	droppedCount := 0
 
 	for i, e := range events {
-		converted, err := toShipperEvent(e)
+		converted, err := shipperProcessor(e)
 		if err != nil {
 			// conversion errors are not recoverable, so we have to drop the event completely
 			s.log.Errorf("%d/%d: %q, dropped", i+1, len(events), err)
@@ -204,7 +206,7 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 
 	convertedCount := len(toSend)
 
-	st.Dropped(droppedCount)
+	outObserver.Dropped(droppedCount)
 	s.log.Debugf("%d events converted to protobuf, %d dropped", convertedCount, droppedCount)
 
 	var lastAcceptedIndex uint64
@@ -219,8 +221,8 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		})
 
 		if status.Code(err) != codes.OK {
-			batch.Cancelled()         // does not decrease the TTL
-			st.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
+			batch.Cancelled()                  // does not decrease the TTL
+			outObserver.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
 			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(toSend), err)
 		}
 
@@ -234,7 +236,7 @@ func (s *shipper) Publish(ctx context.Context, batch publisher.Batch) error {
 		}
 		toSend = toSend[publishReply.AcceptedCount:]
 		lastAcceptedIndex = publishReply.AcceptedIndex
-		s.log.Debugf("%d events have been accepted during a publish request", len(toSend))
+		s.log.Debugf("%d events have been accepted during a publish request", publishReply.AcceptedCount)
 	}
 
 	s.log.Debugf("total of %d events have been accepted from batch, %d dropped", convertedCount, droppedCount)
@@ -322,44 +324,13 @@ func (s *shipper) ackLoop(ctx context.Context, ackClient sc.Producer_PersistedIn
 	}
 }
 
-func convertMapStr(m mapstr.M) (*messages.Value, error) {
-	if m == nil {
-		return helpers.NewNullValue(), nil
-	}
-
-	fields := make(map[string]*messages.Value, len(m))
-
-	for key, value := range m {
-		var (
-			protoValue *messages.Value
-			err        error
-		)
-		switch v := value.(type) {
-		case mapstr.M:
-			protoValue, err = convertMapStr(v)
-		default:
-			protoValue, err = helpers.NewValue(v)
-		}
-		if err != nil {
-			return nil, err
-		}
-		fields[key] = protoValue
-	}
-
-	s := &messages.Struct{
-		Data: fields,
-	}
-
-	return helpers.NewStructValue(s), nil
-}
-
 func toShipperEvent(e publisher.Event) (*messages.Event, error) {
-	meta, err := convertMapStr(e.Content.Meta)
+	meta, err := helpers.NewValue(e.Content.Meta)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert event metadata to protobuf: %w", err)
 	}
 
-	fields, err := convertMapStr(e.Content.Fields)
+	fields, err := helpers.NewValue(e.Content.Fields)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert event fields to protobuf: %w", err)
 	}

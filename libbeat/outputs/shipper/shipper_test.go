@@ -140,75 +140,17 @@ func TestToShipperEvent(t *testing.T) {
 	}
 }
 
-func TestConvertMapStr(t *testing.T) {
-	cases := []struct {
-		name   string
-		value  mapstr.M
-		exp    *messages.Value
-		expErr string
-	}{
-		{
-			name: "nil returns nil",
-			exp:  helpers.NewNullValue(),
-		},
-		{
-			name:  "empty map returns empty struct",
-			value: mapstr.M{},
-			exp:   protoStructValue(t, nil),
-		},
-		// {
-		// 	name: "returns error when type is not supported",
-		// 	value: mapstr.M{
-		// 		"key": struct{}{},
-		// 	},
-		// 	expErr: "invalid type: struct {}",
-		// },
-		{
-			name: "values are preserved",
-			value: mapstr.M{
-				"key1": "string",
-				"key2": 42,
-				"key3": 42.2,
-				"key4": mapstr.M{
-					"subkey1": "string",
-					"subkey2": mapstr.M{
-						"subsubkey1": "string",
-					},
-				},
-			},
-			exp: protoStructValue(t, map[string]interface{}{
-				"key1": "string",
-				"key2": 42,
-				"key3": 42.2,
-				"key4": map[string]interface{}{
-					"subkey1": "string",
-					"subkey2": map[string]interface{}{
-						"subsubkey1": "string",
-					},
-				},
-			}),
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			converted, err := convertMapStr(tc.value)
-			if tc.expErr != "" {
-				require.Error(t, err)
-				require.Contains(t, err.Error(), tc.expErr)
-				require.Nil(t, converted)
-				return
-			}
-			requireEqualProto(t, tc.exp, converted)
-		})
-	}
-}
-
 func TestPublish(t *testing.T) {
+	//logp.DevelopmentSetup()
 	events := []beat.Event{
 		{
 			Timestamp: time.Now(),
 			Meta:      mapstr.M{"event": "first"},
+			Fields:    mapstr.M{"a": "b"},
+		},
+		{
+			Timestamp: time.Now(),
+			Meta:      nil, // see failMarshal()
 			Fields:    mapstr.M{"a": "b"},
 		},
 		{
@@ -219,23 +161,28 @@ func TestPublish(t *testing.T) {
 	}
 
 	cases := []struct {
-		name          string
-		events        []beat.Event
-		expSignals    []outest.BatchSignal
-		serverError   error
-		expError      string
-		qSize         int
-		acceptedCount uint32
+		name        string
+		events      []beat.Event
+		expSignals  []outest.BatchSignal
+		serverError error
+		expError    string
+		// note: this sets the queue size used by the mock output
+		// if the mock shipper recieves more than this count of events, the test will fail
+		qSize            int
+		observerExpected *TestObserver
+		marshalMethod    func(e publisher.Event) (*messages.Event, error)
 	}{
 		{
-			name:   "sends a batch excluding dropped",
-			events: events[:1],
+			name:          "sends a batch",
+			events:        events,
+			marshalMethod: toShipperEvent,
 			expSignals: []outest.BatchSignal{
 				{
 					Tag: outest.BatchACK,
 				},
 			},
-			qSize: 2,
+			qSize:            3,
+			observerExpected: &TestObserver{batch: 3, acked: 3},
 		},
 		{
 			name:   "retries not accepted events",
@@ -245,8 +192,9 @@ func TestPublish(t *testing.T) {
 					Tag: outest.BatchACK,
 				},
 			},
-			qSize:         2,
-			acceptedCount: 1, // we'll enforce 2 `PublishEvents` requests
+			marshalMethod:    failMarshal, // emulate a dropped event
+			qSize:            3,
+			observerExpected: &TestObserver{batch: 3, dropped: 1, acked: 2},
 		},
 		{
 			name:   "cancels the batch if server error",
@@ -256,9 +204,11 @@ func TestPublish(t *testing.T) {
 					Tag: outest.BatchCancelled,
 				},
 			},
-			qSize:       3,
-			serverError: errors.New("some error"),
-			expError:    "failed to publish the batch to the shipper, none of the 2 events were accepted",
+			marshalMethod:    toShipperEvent,
+			qSize:            3,
+			observerExpected: &TestObserver{cancelled: 3, batch: 3},
+			serverError:      errors.New("some error"),
+			expError:         "failed to publish the batch to the shipper, none of the 3 events were accepted",
 		},
 	}
 
@@ -267,6 +217,9 @@ func TestPublish(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.marshalMethod != nil {
+				shipperProcessor = tc.marshalMethod
+			}
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
 
@@ -277,8 +230,9 @@ func TestPublish(t *testing.T) {
 				"server": addr,
 			})
 			require.NoError(t, err)
+			observer := &TestObserver{}
 
-			client := createShipperClient(t, cfg)
+			client := createShipperClient(t, cfg, observer)
 
 			batch := outest.NewBatch(tc.events...)
 
@@ -297,8 +251,13 @@ func TestPublish(t *testing.T) {
 				return reflect.DeepEqual(tc.expSignals, batch.Signals)
 			}, 100*time.Millisecond, 10*time.Millisecond)
 			require.Equal(t, tc.expSignals, batch.Signals)
+			if tc.observerExpected != nil {
+				require.Equal(t, tc.observerExpected, observer)
+			}
 		})
 	}
+	// reset marshaler
+	shipperProcessor = toShipperEvent
 
 	t.Run("cancels the batch when a different server responds", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
@@ -316,8 +275,8 @@ func TestPublish(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-
-		client := createShipperClient(t, cfg)
+		observer := &TestObserver{}
+		client := createShipperClient(t, cfg, observer)
 
 		// Should accept the batch and put it to the pending list
 		batch := outest.NewBatch(events...)
@@ -349,7 +308,7 @@ func TestPublish(t *testing.T) {
 		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 
-		addr, producer, stop := runServer(t, 6, nil, "localhost:0")
+		addr, producer, stop := runServer(t, 9, nil, "localhost:0")
 		defer stop()
 
 		cfg, err := config.NewConfigFrom(map[string]interface{}{
@@ -361,8 +320,9 @@ func TestPublish(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-
-		client := createShipperClient(t, cfg)
+		observer := &TestObserver{}
+		expectedObserver := &TestObserver{batch: 9, acked: 9}
+		client := createShipperClient(t, cfg, observer)
 
 		// Should accept the batch and put it to the pending list
 		batch1 := outest.NewBatch(events...)
@@ -383,7 +343,7 @@ func TestPublish(t *testing.T) {
 			},
 		}
 
-		producer.Persist(6) // 2 events per batch, 3 batches
+		producer.Persist(9) // 2 events per batch, 3 batches
 
 		assert.Eventually(t, func() bool {
 			// there is a background routine that checks acknowledgments,
@@ -395,6 +355,7 @@ func TestPublish(t *testing.T) {
 		require.Equal(t, expSignals, batch1.Signals, "batch1")
 		require.Equal(t, expSignals, batch2.Signals, "batch2")
 		require.Equal(t, expSignals, batch3.Signals, "batch3")
+		require.Equal(t, expectedObserver, observer)
 	})
 }
 
@@ -474,11 +435,11 @@ func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAdd
 	return actualAddr, producer, stop
 }
 
-func createShipperClient(t *testing.T, cfg *config.C) outputs.NetworkClient {
+func createShipperClient(t *testing.T, cfg *config.C, observer outputs.Observer) outputs.NetworkClient {
 	group, err := makeShipper(
 		nil,
 		beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"},
-		outputs.NewNilObserver(),
+		observer,
 		cfg,
 	)
 	require.NoError(t, err)
@@ -509,3 +470,42 @@ func requireEqualProto(t *testing.T, expected, actual proto.Message) {
 		fmt.Sprintf("These two protobuf messages are not equal:\nexpected: %v\nactual:  %v", expected, actual),
 	)
 }
+
+// emulates the toShipperEvent, but looks for a nil meta field, and throws an error
+func failMarshal(e publisher.Event) (*messages.Event, error) {
+	if e.Content.Meta == nil {
+		return nil, fmt.Errorf("nil meta field")
+	}
+	return toShipperEvent(e)
+}
+
+// mock test observer for tracking events
+
+type TestObserver struct {
+	acked     int
+	dropped   int
+	cancelled int
+	batch     int
+	duplicate int
+	failed    int
+
+	writeError error
+	readError  error
+
+	writeBytes int
+	readBytes  int
+
+	errTooMany int
+}
+
+func (to *TestObserver) NewBatch(batch int)      { to.batch += batch }
+func (to *TestObserver) Acked(acked int)         { to.acked += acked }
+func (to *TestObserver) Duplicate(duplicate int) { to.duplicate += duplicate }
+func (to *TestObserver) Failed(failed int)       { to.failed += failed }
+func (to *TestObserver) Dropped(dropped int)     { to.dropped += dropped }
+func (to *TestObserver) Cancelled(cancelled int) { to.cancelled += cancelled }
+func (to *TestObserver) WriteError(we error)     { to.writeError = we }
+func (to *TestObserver) WriteBytes(wb int)       { to.writeBytes += wb }
+func (to *TestObserver) ReadError(re error)      { to.readError = re }
+func (to *TestObserver) ReadBytes(rb int)        { to.readBytes += rb }
+func (to *TestObserver) ErrTooMany(err int)      { to.errTooMany = +err }
