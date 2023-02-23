@@ -51,7 +51,7 @@ func fetchDeviceName(major uint64, minor uint64) (bool, string, error) {
 		if !ok {
 			return nil
 		}
-		devID = infoT.Rdev
+		devID = uint64(infoT.Rdev)
 
 		// do some bitmapping to extract the major and minor device values
 		// The odd duplicated logic here is to deal with 32 and 64 bit values.
