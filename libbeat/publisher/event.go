@@ -41,6 +41,17 @@ type Batch interface {
 	// Try sending the events in this list again; all others are acknowledged.
 	RetryEvents(events []Event)
 
+	// Release the internal pointer to this batch's events but do not yet
+	// acknowledge this batch. This exists specifically for the shipper output,
+	// where there is potentially a long gap between when events are handed off
+	// to the shipper and when they are acknowledged upstream; during that time,
+	// we need to preserve batch metadata for producer end-to-end acknowledgments,
+	// but we do not need the events themselves since they are already queued by
+	// the shipper. It is only guaranteed to release event pointers when using the
+	// proxy queue.
+	// Never call this on a batch that might be retried.
+	FreeEntries()
+
 	// Send was aborted, try again but don't decrease the batch's TTL counter.
 	Cancelled()
 }
@@ -64,6 +75,7 @@ type EventCache struct {
 
 // Put lets outputs put key-value pairs into the event cache
 func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
+	//nolint:typecheck // Nil checks are ok here
 	if ec.m == nil {
 		// uninitialized map
 		ec.m = mapstr.M{}
@@ -74,6 +86,7 @@ func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 
 // GetValue lets outputs retrieve values from the event cache by key
 func (ec *EventCache) GetValue(key string) (interface{}, error) {
+	//nolint:typecheck // Nil checks are ok here
 	if ec.m == nil {
 		// uninitialized map
 		return nil, mapstr.ErrKeyNotFound
