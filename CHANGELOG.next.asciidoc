@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Filebeat*
 
 - Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
+- Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
 
 *Auditbeat*
 
