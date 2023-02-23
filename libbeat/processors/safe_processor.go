@@ -18,9 +18,8 @@
 package processors
 
 import (
+	"errors"
 	"sync/atomic"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
