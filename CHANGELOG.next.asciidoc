@@ -118,6 +118,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Filebeat*
 
 - Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
+- Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
 
 *Auditbeat*
 
@@ -213,6 +214,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow user configuration of timezone offset in Cisco ASA and FTD modules. {pull}34436[34436]
 - Allow user configuration of timezone offset in Checkpoint module. {pull}34472[34472]
 - Add support for Okta debug attributes, `risk_reasons`, `risk_behaviors` and `factor`. {issue}33677[33677] {pull}34508[34508]
+- Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
 
 *Auditbeat*
 
