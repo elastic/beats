@@ -1,5 +1,4 @@
 type: http
 url: "/metrics"
 suffix: plain
-module:
-  timeout: 30s
+path: "../_meta/test"

@@ -38,10 +38,15 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 	for _, queueURL := range queueURLs {
 		queueURLParsed := strings.Split(queueURL, "/")
 		queueName := queueURLParsed[len(queueURLParsed)-1]
-		if _, ok := events[queueName]; !ok {
-			continue
+		for eventIdentifier := range events {
+			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
+			potentialQueueName := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+			if queueName != potentialQueueName {
+				continue
+			}
+
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+".name", queueName)
 		}
-		_, _ = events[queueName].RootFields.Put(metadataPrefix+".name", queueName)
 	}
 	return events, nil
 }

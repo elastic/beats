@@ -33,6 +33,8 @@ type config struct {
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
+	// Redact is the debug log state redaction configuration.
+	Redact redact `config:"redact"`
 
 	// Auth is the authentication config for connection to an HTTP
 	// API endpoint.
@@ -41,6 +43,15 @@ type config struct {
 	// Resource is the configuration for establishing an
 	// HTTP request or for locating a local resource.
 	Resource *ResourceConfig `config:"resource" validate:"required"`
+}
+
+type redact struct {
+	// Fields indicates which fields to apply redaction to prior
+	// to logging.
+	Fields []string `config:"fields"`
+	// Delete indicates that fields should be completely deleted
+	// before logging rather than redaction with a "*".
+	Delete bool `config:"delete"`
 }
 
 func (c config) Validate() error {
@@ -138,7 +149,7 @@ func (c rateLimitConfig) Validate() error {
 		return errors.New("limit must be greater than zero")
 	}
 	if c.Limit == nil && c.Burst != nil && *c.Burst <= 0 {
-		return errors.New("limit must be greater than zero if limit is specified")
+		return errors.New("burst must be greater than zero if limit is not specified")
 	}
 	return nil
 }
