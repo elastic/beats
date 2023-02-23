@@ -80,6 +80,10 @@ var (
 		"start_time": s.Object{
 			"ms": c.Int("start_time_in_millis", s.Optional),
 		},
+
+		"total_time": s.Object{
+			"ms": c.Int("total_time_in_millis", s.Optional),
+		},
 	}
 )
 
