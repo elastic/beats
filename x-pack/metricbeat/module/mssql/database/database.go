@@ -682,18 +682,27 @@ func (m *MetricSet) fetchAllDbs(reporter mb.ReporterV2) mapstr.M {
 
 func (m *MetricSet) fetchTableIndexSize(reporter mb.ReporterV2) []mapstr.M {
 	query := `
-SELECT
-    Scheme.TABLE_CATALOG AS dbName,
-    t.[name] AS TableName,
-    i.[name] AS IndexName,
-    SUM(s.[used_page_count]) * 8 AS IndexSizeKB
-FROM sys.dm_db_partition_stats AS s
-INNER JOIN sys.indexes AS i ON s.[object_id] = i.[object_id]
+;WITH tbl_page_count AS (
+    SELECT
+    Scheme.TABLE_CATALOG AS DatabaseName, t.[name] AS TableName, i.[name] AS IndexName, SUM (s.[used_page_count]) AS used_pages_count, SUM (CASE WHEN (i.index_id < 2) THEN in_row_data_page_count + lob_used_page_count + row_overflow_used_page_count
+    ELSE lob_used_page_count + row_overflow_used_page_count END) as pages
+    FROM sys.dm_db_partition_stats AS s
+    INNER JOIN sys.indexes AS i ON s.[object_id] = i.[object_id]
     AND s.[index_id] = i.[index_id]
-JOIN sys.tables AS t ON s.[object_id] = t.[object_id]
-JOIN INFORMATION_SCHEMA.TABLES AS Scheme ON Scheme.TABLE_NAME = t.name
-WHERE i.[name] IS NOT NULL
-GROUP BY Scheme.TABLE_CATALOG, i.[name], t.[name]`
+    JOIN sys.tables AS t ON s.[object_id] = t.[object_id]
+    JOIN INFORMATION_SCHEMA.TABLES AS Scheme ON Scheme.TABLE_NAME = t.name
+    GROUP BY i.[name], t.[name], s.partition_id, Scheme.TABLE_CATALOG
+    )
+ SELECT
+     tbl_page_count.DatabaseName AS 'db_name',
+     tbl_page_count.TableName AS 'table_name',
+     tbl_page_count.IndexName AS 'index_name',
+     CAST(((CASE
+         WHEN tbl_page_count.used_pages_count > tbl_page_count.pages
+         THEN tbl_page_count.used_pages_count - tbl_page_count.pages
+         ELSE 0
+         END) * 8. ) AS int) AS 'index_size'
+FROM tbl_page_count;`
 
 	type tableIndexRow struct {
 		dbName string
