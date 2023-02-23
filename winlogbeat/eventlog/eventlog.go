@@ -18,9 +18,6 @@
 package eventlog
 
 import (
-	"expvar"
-	"strconv"
-	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -32,23 +29,12 @@ import (
 
 // Debug selectors used in this package.
 const (
-	debugSelector  = "eventlog"
-	detailSelector = "eventlog_detail"
+	debugSelector = "eventlog"
 )
 
 // Debug logging functions for this package.
 var (
-	debugf  = logp.MakeDebug(debugSelector)
-	detailf = logp.MakeDebug(detailSelector)
-)
-
-var (
-	// dropReasons contains counters for the number of dropped events for each
-	// reason.
-	dropReasons = expvar.NewMap("drop_reasons")
-
-	// readErrors contains counters for the read error types that occur.
-	readErrors = expvar.NewMap("read_errors")
+	debugf = logp.MakeDebug(debugSelector)
 )
 
 // EventLog is an interface to a Windows Event Log.
@@ -67,6 +53,12 @@ type EventLog interface {
 
 	// Name returns the event log's name.
 	Name() string
+
+	// Channel returns the event log's channel name.
+	Channel() string
+
+	// IsFile returns true if the event log is an evtx file.
+	IsFile() bool
 }
 
 // Record represents a single event from the log.
@@ -82,20 +74,20 @@ type Record struct {
 func (e Record) ToEvent() beat.Event {
 	win := e.Fields()
 
-	win.Delete("time_created")
-	win.Put("api", e.API)
+	_ = win.Delete("time_created")
+	_, _ = win.Put("api", e.API)
 
 	m := mapstr.M{
 		"winlog": win,
 	}
 
 	// ECS data
-	m.Put("event.created", time.Now())
+	_, _ = m.Put("event.created", time.Now())
 
 	eventCode, _ := win.GetValue("event_id")
-	m.Put("event.code", eventCode)
-	m.Put("event.kind", "event")
-	m.Put("event.provider", e.Provider.Name)
+	_, _ = m.Put("event.code", eventCode)
+	_, _ = m.Put("event.kind", "event")
+	_, _ = m.Put("event.provider", e.Provider.Name)
 
 	rename(m, "winlog.outcome", "event.outcome")
 	rename(m, "winlog.level", "log.level")
@@ -121,6 +113,7 @@ func rename(m mapstr.M, oldKey, newKey string) {
 	if err != nil {
 		return
 	}
+<<<<<<< HEAD
 	m.Put(newKey, v)
 	m.Delete(oldKey)
 }
@@ -137,4 +130,8 @@ func incrementMetric(v *expvar.Map, key interface{}) {
 	case syscall.Errno:
 		v.Add(strconv.Itoa(int(t)), 1)
 	}
+=======
+	_, _ = m.Put(newKey, v)
+	_ = m.Delete(oldKey)
+>>>>>>> 34a87e51a5 ([winlog/winlogbeat] Gracefully handle event channel not found errors (#34605))
 }
