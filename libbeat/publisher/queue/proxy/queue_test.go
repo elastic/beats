@@ -164,6 +164,18 @@ func TestOutOfOrderACK(t *testing.T) {
 	assert.NoError(t, listener.waitForTotalACKs(BATCH_COUNT*2, time.Second))
 }
 
+func TestWriteAfterClose(t *testing.T) {
+	logger := logp.NewLogger("proxy-queue-tests")
+
+	testQueue := NewQueue(logger, Settings{BatchSize: 2})
+	producer := testQueue.Producer(queue.ProducerConfig{})
+	testQueue.Close()
+
+	// Make sure Publish fails instead of blocking
+	_, success := producer.Publish(1)
+	assert.False(t, success, "Publish should fail since queue is closed")
+}
+
 func newTestACKListener() *testACKListener {
 	return &testACKListener{
 		updateChan: make(chan struct{}, 1),
