@@ -98,6 +98,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// Wait for all runners to stop before starting new ones
 	wg.Wait()
 
+	// TODO: not sure if it's needed for loading feature flags from config.
 	// // Feature flags are per unit. Right now it's actually component/process,
 	// // thus it needs to be reloaded only once.
 	// if len(configs) > 0 {

@@ -321,10 +321,10 @@ func (cm *BeatV2Manager) modifyUnit(unit *client.Unit) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
-	// no need to do that because the elastic-agent-client and the beats share
-	// the pointer to this unit, so when the client updates it on its side, it
-	// is reflected here.
-	// cm.units[unitKey{unit.Type(), unit.ID()}] = unit
+	// no need to update cm.units because the elastic-agent-client and the beats share
+	// the pointer to each unit, so when the client updates a unit on its side, it
+	// is reflected here. As this deals with modifications, they're already present.
+	// Only the state needs to be updated.
 
 	expected := unit.Expected()
 	if expected.State == client.UnitStateStopped {
@@ -377,7 +377,7 @@ func (cm *BeatV2Manager) unitListen() {
 	t := time.NewTimer(changeDebounce)
 	t.Stop() // starts stopped, until a change occurs
 
-	cm.logger.Info("Listening for agent unit changes")
+	cm.logger.Debug("Listening for agent unit changes")
 	for {
 		select {
 		// The stopChan channel comes from the Manager interface Stop() method
@@ -500,7 +500,6 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 
 	// reload the output configuration
 	var errs multierror.Errors
-	// reload features
 	if err := cm.reloadOutput(outputUnit); err != nil {
 		errs = append(errs, err)
 	}
@@ -509,7 +508,6 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	//
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
-	// reload features
 	if err := cm.reloadInputs(inputUnits); err != nil {
 		errs = append(errs, err)
 	}

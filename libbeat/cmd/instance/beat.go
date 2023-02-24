@@ -250,7 +250,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to get FQDN: %w", err)
 		}
-		logp.L().Infof("[features] NewBeat feature FQDN true, fqdn=%s", h.Info().FQDN)
 		fqdn = h.Info().FQDN
 	}
 
@@ -763,11 +762,8 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
-		logp.L().Errorw("[features]  could not parse features, see config",
-			"features_config", b.RawConfig)
 		return fmt.Errorf("could not parse features: %w", err)
 	}
-	logp.L().Infow("[features] Beat.configure feature flag fqdn: %t", features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
 
