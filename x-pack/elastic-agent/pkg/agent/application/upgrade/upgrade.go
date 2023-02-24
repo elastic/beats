@@ -106,7 +106,7 @@ func (u *Upgrader) Upgradeable() bool {
 
 // Upgrade upgrades running agent, function returns shutdown callback if some needs to be executed for cases when
 // reexec is called by caller.
-func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ reexec.ShutdownCallbackFn, err error) {
+func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool, skipVerifyOverride bool, pgpBytes ...string) (_ reexec.ShutdownCallbackFn, err error) {
 	// report failed
 	defer func() {
 		if err != nil {
@@ -123,7 +123,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ ree
 	}
 
 	if u.caps != nil {
-		if _, err := u.caps.Apply(a); err == capabilities.ErrBlocked {
+		if _, err := u.caps.Apply(a); errors.Is(err, capabilities.ErrBlocked) {
 			return nil, nil
 		}
 	}
@@ -131,7 +131,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ ree
 	u.reportUpdating(a.Version())
 
 	sourceURI, err := u.sourceURI(a.Version(), a.SourceURI())
-	archivePath, err := u.downloadArtifact(ctx, a.Version(), sourceURI)
+	archivePath, err := u.downloadArtifact(ctx, a.Version(), sourceURI, skipVerifyOverride, pgpBytes...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ ree
 	if strings.HasPrefix(release.Commit(), newHash) {
 		// not an error
 		if action := a.FleetAction(); action != nil {
-			u.ackAction(ctx, action)
+			_ = u.ackAction(ctx, action)
 		}
 		u.log.Warn("upgrading to same version")
 		return nil, nil
@@ -236,7 +236,7 @@ func (u *Upgrader) ackAction(ctx context.Context, action fleetapi.Action) error 
 // and state is changed to FAILED
 func (u *Upgrader) reportFailure(ctx context.Context, action fleetapi.Action, err error) {
 	// ack action
-	u.acker.Ack(ctx, action)
+	_ = u.acker.Ack(ctx, action)
 
 	// report failure
 	u.reporter.OnStateChange(
@@ -257,8 +257,8 @@ func (u *Upgrader) reportUpdating(version string) {
 }
 
 func rollbackInstall(ctx context.Context, hash string) {
-	os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
-	ChangeSymlink(ctx, release.ShortCommit())
+	_ = os.RemoveAll(filepath.Join(paths.Data(), fmt.Sprintf("%s-%s", agentName, hash)))
+	_ = ChangeSymlink(ctx, release.ShortCommit())
 }
 
 func copyActionStore(newHash string) error {

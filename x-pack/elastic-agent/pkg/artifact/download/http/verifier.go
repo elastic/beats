@@ -17,16 +17,16 @@ import (
 	"path"
 	"strings"
 
-	"golang.org/x/crypto/openpgp"
+	"golang.org/x/crypto/openpgp" //nolint:staticcheck // won't update the package for now
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 )
 
 const (
-	publicKeyURI = "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
 	ascSuffix    = ".asc"
 	sha512Length = 128
 )
@@ -41,7 +41,7 @@ type Verifier struct {
 }
 
 // NewVerifier create a verifier checking downloaded package on preconfigured
-// location agains a key stored on elastic.co website.
+// location against a key stored on elastic.co website.
 func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Verifier, error) {
 	if len(pgp) == 0 && !allowEmptyPgp {
 		return nil, errors.New("expecting PGP but retrieved none", errors.TypeSecurity)
@@ -50,7 +50,7 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 	client, err := config.HTTPTransportSettings.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
-			return withHeaders(rt, headers)
+			return download.WithHeaders(rt, download.Headers)
 		}),
 	)
 	if err != nil {
@@ -68,8 +68,8 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 }
 
 // Verify checks downloaded package on preconfigured
-// location agains a key stored on elastic.co website.
-func (v *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool) (isMatch bool, err error) {
+// location against a key stored on elastic.co website.
+func (v *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool, pgpBytes ...string) (isMatch bool, err error) {
 	filename, err := artifact.GetArtifactName(spec, version, v.config.OS(), v.config.Arch())
 	if err != nil {
 		return false, errors.New(err, "retrieving package name")
@@ -93,7 +93,7 @@ func (v *Verifier) Verify(spec program.Spec, version string, removeOnFailure boo
 		return isMatch, err
 	}
 
-	return v.verifyAsc(spec, version)
+	return v.verifyAsc(spec, version, pgpBytes...)
 }
 
 func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
@@ -141,8 +141,28 @@ func (v *Verifier) verifyHash(filename, fullPath string) (bool, error) {
 	return expectedHash == computedHash, nil
 }
 
-func (v *Verifier) verifyAsc(spec program.Spec, version string) (bool, error) {
-	if len(v.pgpBytes) == 0 {
+func (v *Verifier) verifyAsc(spec program.Spec, version string, pgpSources ...string) (bool, error) {
+	var pgpBytes [][]byte
+	if len(v.pgpBytes) > 0 {
+		pgpBytes = append(pgpBytes, v.pgpBytes)
+	}
+
+	for _, check := range pgpSources {
+		if len(check) == 0 {
+			continue
+		}
+		raw, err := download.PgpBytesFromSource(check, v.client)
+		if err != nil {
+			return false, err
+		}
+		if len(raw) == 0 {
+			continue
+		}
+
+		pgpBytes = append(pgpBytes, raw)
+	}
+
+	if len(pgpBytes) == 0 {
 		// no pgp available skip verification process
 		return true, nil
 	}
@@ -170,24 +190,32 @@ func (v *Verifier) verifyAsc(spec program.Spec, version string) (bool, error) {
 		return false, errors.New(err, fmt.Sprintf("fetching asc file from %s", ascURI), errors.TypeNetwork, errors.M(errors.MetaKeyURI, ascURI))
 	}
 
-	pubkeyReader := bytes.NewReader(v.pgpBytes)
-	ascReader := bytes.NewReader(ascBytes)
-	fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
-	if err != nil {
-		return false, errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, fullPath))
-	}
-	defer fileReader.Close()
+	var lastCheckErr error
+	for _, check := range pgpBytes {
+		pubkeyReader := bytes.NewReader(check)
+		ascReader := bytes.NewReader(ascBytes)
+		fileReader, err := os.OpenFile(fullPath, os.O_RDONLY, 0666)
+		if err != nil {
+			lastCheckErr = err
+			continue
+		}
+		defer fileReader.Close()
 
-	keyring, err := openpgp.ReadArmoredKeyRing(pubkeyReader)
-	if err != nil {
-		return false, errors.New(err, "read armored key ring", errors.TypeSecurity)
-	}
-	_, err = openpgp.CheckArmoredDetachedSignature(keyring, fileReader, ascReader)
-	if err != nil {
-		return false, errors.New(err, "check detached signature", errors.TypeSecurity)
+		keyring, err := openpgp.ReadArmoredKeyRing(pubkeyReader)
+		if err != nil {
+			lastCheckErr = err
+			continue
+		}
+		_, err = openpgp.CheckArmoredDetachedSignature(keyring, fileReader, ascReader)
+		if err != nil {
+			lastCheckErr = err
+			continue
+		}
+
+		return true, nil
 	}
 
-	return true, nil
+	return false, lastCheckErr
 
 }
 

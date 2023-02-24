@@ -92,7 +92,7 @@ type Client interface {
 	// Restart triggers restarting the current running daemon.
 	Restart(ctx context.Context) error
 	// Upgrade triggers upgrade of the current running daemon.
-	Upgrade(ctx context.Context, version string, sourceURI string) (string, error)
+	Upgrade(ctx context.Context, version string, sourceURI string, skipVerify bool, pgpBytes ...string) (string, error)
 	// ProcMeta gathers running process meta-data.
 	ProcMeta(ctx context.Context) ([]ProcMeta, error)
 }
@@ -192,10 +192,12 @@ func (c *client) Restart(ctx context.Context) error {
 }
 
 // Upgrade triggers upgrade of the current running daemon.
-func (c *client) Upgrade(ctx context.Context, version string, sourceURI string) (string, error) {
+func (c *client) Upgrade(ctx context.Context, version string, sourceURI string, skipVerify bool, pgpBytes ...string) (string, error) {
 	res, err := c.client.Upgrade(ctx, &proto.UpgradeRequest{
-		Version:   version,
-		SourceURI: sourceURI,
+		Version:    version,
+		SourceURI:  sourceURI,
+		SkipVerify: skipVerify,
+		PgpBytes:   pgpBytes,
 	})
 	if err != nil {
 		return "", err
