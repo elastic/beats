@@ -15,23 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package eventlog
+package proxyqueue
 
-import (
-	"errors"
+// producer -> broker API
 
-	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
-)
+type pushRequest struct {
+	event    interface{}
+	producer *producer
 
-// IsRecoverable returns a boolean indicating whether the error represents
-// a condition where the Windows Event Log session can be recovered through a
-// reopening of the handle (Close, Open).
-//nolint:errorlint // These are never wrapped.
-func IsRecoverable(err error) bool {
-	return err == win.ERROR_INVALID_HANDLE || err == win.RPC_S_SERVER_UNAVAILABLE || err == win.RPC_S_CALL_CANCELLED || err == win.ERROR_EVT_QUERY_RESULT_STALE
+	// After receiving a request, the broker will respond on this channel
+	// with whether the new entry was accepted or not.
+	responseChan chan bool
+
+	// If canBlock is true, then the broker will store this request until
+	// either the request can be accepted or the queue itself is closed.
+	// Otherwise it will immediately reject the requst if there is no
+	// space in the pending buffer.
+	canBlock bool
 }
 
-// IsChannelNotFound returns true if the error indicates the channel was not found.
-func IsChannelNotFound(err error) bool {
-	return errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND)
+// consumer -> broker API
+
+type getRequest struct {
+	responseChan chan *batch // channel to send response to
 }

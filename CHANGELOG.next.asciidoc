@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Fix panics when a processor is closed twice {pull}34647[34647]
 
 *Auditbeat*
 
@@ -92,6 +93,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
 - [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
 - Prevent Elasticsearch from spewing log warnings about redundant wildcard when setting up ingest pipelines. {issue}34249[34249] {pull}34550[34550]
+- Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
 - Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
 
 *Heartbeat*
@@ -155,6 +157,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Winlogbeat*
 
 - Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
+- Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
 
 *Functionbeat*
 
@@ -215,6 +218,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow user configuration of timezone offset in Checkpoint module. {pull}34472[34472]
 - Add support for Okta debug attributes, `risk_reasons`, `risk_behaviors` and `factor`. {issue}33677[33677] {pull}34508[34508]
 - Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
+- Fixed GCS log format issues. {pull}34659[34659]
 
 *Auditbeat*
 
