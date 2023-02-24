@@ -55,8 +55,8 @@ func (p *SafeProcessor) Close() (err error) {
 // processor of that group which leads to multiple `Close` calls
 // on the same processor.
 //
-// If not use `SafeWrap`, the processor must handle multiple
-// `Close` calls with adding `sync.Once` in its `Close` function.
+// If `SafeWrap` is not used, the processor must handle multiple
+// `Close` calls by using `sync.Once` in its `Close` function.
 // We make it easer for processor developers and take care of it
 // in the processor registry instead.
 func SafeWrap(constructor Constructor) Constructor {
