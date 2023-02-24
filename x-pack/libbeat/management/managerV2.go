@@ -614,7 +614,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 			return fmt.Errorf("input unit %s has no config", unit.ID())
 		}
 
-		inputCfg, err := generateBeatConfig(rawConfig, agentInfo)
+		inputCfg, err := generateBeatConfig(expected.Config, agentInfo)
 		if err != nil {
 			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
 		}
