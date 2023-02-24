@@ -22,7 +22,7 @@ import (
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var ErrClosed = errors.New("attempt to use a closed processor")
@@ -60,7 +60,7 @@ func (p *SafeProcessor) Close() (err error) {
 // We make it easer for processor developers and take care of it
 // in the processor registry instead.
 func SafeWrap(constructor Constructor) Constructor {
-	return func(config *config.C) (Processor, error) {
+	return func(config *common.Config) (Processor, error) {
 		processor, err := constructor(config)
 		if err != nil {
 			return nil, err

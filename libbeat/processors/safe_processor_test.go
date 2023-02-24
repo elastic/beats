@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var mockEvent = &beat.Event{}
@@ -35,7 +35,7 @@ type mockProcessor struct {
 
 func newMockConstructor() (Constructor, *mockProcessor) {
 	p := mockProcessor{}
-	constructor := func(config *config.C) (Processor, error) {
+	constructor := func(config *common.Config) (Processor, error) {
 		return &p, nil
 	}
 	return constructor, &p
