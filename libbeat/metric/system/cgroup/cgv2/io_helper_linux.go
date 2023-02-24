@@ -34,7 +34,7 @@ func fetchDeviceName(major, minor uint64) (bool, string, error) {
 	// iterate over /dev/ and pull major and minor values
 	found := false
 	var devName string
-	walkFunc := func(path string, d fs.DirEntry, err error) error {
+	walkFunc := func(path string, d fs.DirEntry, _ error) error {
 		if d.IsDir() && path != "/dev/" {
 			return fs.SkipDir
 		}
@@ -49,7 +49,7 @@ func fetchDeviceName(major, minor uint64) (bool, string, error) {
 		if !ok {
 			return nil
 		}
-		devID := uint64(infoT.Rdev) // On GOARCH=mips* syscall.Stat_t.Rdev is uint32, so make explicit conversion.
+		devID := uint64(infoT.Rdev) //nolint:unconvert // On GOARCH=mips* syscall.Stat_t.Rdev is uint32, so make explicit conversion.
 		// do some bitmapping to extract the major and minor device values
 		// The odd duplicated logic here is to deal with 32 and 64 bit values.
 		// see bits/sysmacros.h
