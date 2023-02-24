@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/smithy-go"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -25,7 +27,10 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-const inputName = "aws-s3"
+const (
+	inputName                = "aws-s3"
+	sqsAccessDeniedErrorCode = "AccessDeniedException"
+)
 
 func Plugin(store beater.StateStore) v2.Plugin {
 	return v2.Plugin{
@@ -389,11 +394,17 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 			return
 		case <-t.C:
 			count, err := receiver.GetApproximateMessageCount(ctx)
-			if count == -1 && strings.Contains(err.Error(), "StatusCode: 403") {
-				// stop polling if auth error is encountered
-				receiver.metrics.setSQSMessagesWaiting(int64(count))
-				return
+
+			var apiError smithy.APIError
+			if errors.As(err, &apiError) {
+				switch apiError.ErrorCode() {
+				case sqsAccessDeniedErrorCode:
+					// stop polling if auth error is encountered
+					receiver.metrics.setSQSMessagesWaiting(int64(count))
+					return
+				}
 			}
+
 			receiver.metrics.setSQSMessagesWaiting(int64(count))
 		}
 	}
