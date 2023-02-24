@@ -208,6 +208,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Allow user configuration of timezone offset in Cisco ASA and FTD modules. {pull}34436[34436]
 - Allow user configuration of timezone offset in Checkpoint module. {pull}34472[34472]
 - Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
+- Fixed GCS log format issues. {pull}34659[34659]
 
 *Auditbeat*
 
