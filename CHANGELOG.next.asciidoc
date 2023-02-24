@@ -55,6 +55,11 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
 - Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
 
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Fix panics when a processor is closed twice {pull}34647[34647]
+
 *Auditbeat*
 
 
