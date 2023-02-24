@@ -54,7 +54,7 @@ var registry = NewNamespace()
 func RegisterPlugin(name string, constructor Constructor) {
 	logp.L().Named(logName).Debugf("Register plugin %s", name)
 
-	err := registry.Register(name, constructor)
+	err := registry.Register(name, SafeWrap(constructor))
 	if err != nil {
 		panic(err)
 	}
