@@ -104,7 +104,7 @@ func newSet(cfg *common.Config, log *logp.Logger) (set, error) {
 }
 
 func (set *set) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value, err := set.value.Execute(ctx, tr, set.defaultValue, set.log)
+	value, err := set.value.Execute(ctx, tr, set.targetInfo.Name, set.defaultValue, set.log)
 	if err != nil && set.failOnTemplateError {
 		return transformable{}, err
 	}

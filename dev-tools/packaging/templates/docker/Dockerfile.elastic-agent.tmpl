@@ -127,7 +127,7 @@ RUN mkdir -p {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_ins
     chmod 0644 {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }}/*/*.yml && \
     # heartbeat requires cap_net_raw,cap_setuid to run ICMP checks and change npm user
     setcap cap_net_raw,cap_setuid+p {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }}/heartbeat-*/heartbeat
-    
+
 {{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal")))  }}
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
@@ -140,7 +140,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=14.17.5
+ENV NODE_VERSION=18.12.0
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
@@ -180,7 +180,7 @@ RUN for iter in {1..10}; do \
     fonts-noto \
     fonts-noto-cjk && \
     exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
-done; \ 
+done; \
 (exit $exit_code)
 {{- end }}
 
