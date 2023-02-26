@@ -296,6 +296,10 @@ processors:
       value: "{{destination.ip}}"
       if: "ctx?.destination?.ip != null"
   - append:
+      field: related.ip
+      value: "{{nginx.ingress_controller.upstream.ip}}"
+      if: "ctx?.nginx?.ingress_controller?.upstream?.ip != null"
+  - append:
       field: related.user
       value: "{{user.name}}"
       if: "ctx?.user?.name != null"
