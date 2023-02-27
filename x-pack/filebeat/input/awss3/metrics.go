@@ -6,7 +6,6 @@ package awss3
 
 import (
 	"io"
-	"sync"
 
 	"github.com/rcrowley/go-metrics"
 
@@ -16,9 +15,8 @@ import (
 )
 
 type inputMetrics struct {
-	registry                  *monitoring.Registry
-	unregister                func()
-	initSQSMessageWaitingOnce sync.Once
+	registry   *monitoring.Registry
+	unregister func()
 
 	sqsMessagesReceivedTotal            *monitoring.Uint // Number of SQS messages received (not necessarily processed fully).
 	sqsVisibilityTimeoutExtensionsTotal *monitoring.Uint // Number of SQS visibility timeout extensions.
@@ -50,9 +48,7 @@ func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
 		return
 	}
 
-	m.initSQSMessageWaitingOnce.Do(func() {
-		m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
-	})
+	m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
 	m.sqsMessagesWaiting.Set(count)
 }
 
