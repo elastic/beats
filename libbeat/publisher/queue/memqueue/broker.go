@@ -387,8 +387,9 @@ func (b *batch) Entry(i int) interface{} {
 	return b.entries[i].event
 }
 
-func (b *batch) ID(i int) queue.EntryID {
-	return b.entries[i].id
+func (b *batch) FreeEntries() {
+	// Memory queue can't release event references until they're fully acknowledged,
+	// so do nothing.
 }
 
 func (b *batch) Done() {
