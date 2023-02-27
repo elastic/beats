@@ -707,7 +707,7 @@ FROM tbl_page_count;`
 	type tableIndexRow struct {
 		dbName string
 		tableName string
-		indexName string
+		indexName *string
 		indexSizeKB *int64
 	}
 
@@ -720,19 +720,23 @@ FROM tbl_page_count;`
 		}
 		// database_index_size
 		// database_table_index_size
-		key := fmt.Sprintf("%s-%s-%s", row.dbName, row.tableName, row.indexName)
-		(*mapStr)[key] = *row.indexSizeKB
+		key := fmt.Sprintf("%s-%s", row.dbName, row.tableName)
+		var totalSize int64 = *row.indexSizeKB
+		if val, ok := (*mapStr)[key].(int64); ok {
+			totalSize += val
+		}
+		(*mapStr)[key] = totalSize
 		return nil
 	}
 	mapStr := m.fetchRowsWithRowCounter(query, reporter, counter)
 
 	tempRecords := make(map[string]map[string]int64) // dbName:tblName:indexSize
 	for key, item := range mapStr {
-		strs := strings.SplitN(key, "-", 3)
-		if len(strs) != 3 {
+		strs := strings.SplitN(key, "-", 2)
+		if len(strs) != 2 {
 			continue
 		}
-		dbName, tableName, _ := strs[0], strs[1], strs[2]
+		dbName, tableName := strs[0], strs[1]
 		if _, ok := tempRecords[dbName]; !ok {
 			tempRecords[dbName] = make(map[string]int64)
 			tempRecords[dbName][tableName] = 0
