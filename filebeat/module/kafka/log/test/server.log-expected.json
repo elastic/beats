@@ -318,5 +318,28 @@
         "log.offset": 2497,
         "message": "Starting",
         "service.type": "kafka"
+    },
+    {
+        "@timestamp": "2022-07-06T18:22:59.737-02:00",
+        "event.action": "start",
+        "event.category": "authentication",
+        "event.dataset": "kafka.log",
+        "event.kind": "event",
+        "event.module": "kafka",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": "logon-failed",
+        "fileset.name": "log",
+        "input.type": "log",
+        "kafka.log.class": "org.apache.kafka.common.network.Selector",
+        "kafka.log.component": "SocketServer listenerType=BROKER, nodeId=1",
+        "log.level": "INFO",
+        "log.offset": 2641,
+        "message": "Failed authentication with /10.10.10.10 (SSL handshake failed)",
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "service.type": "kafka",
+        "source.ip": "10.10.10.10"
     }
 ]

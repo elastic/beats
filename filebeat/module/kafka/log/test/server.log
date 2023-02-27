@@ -18,3 +18,4 @@
 [2017-08-04 10:48:21,127] INFO [ProducerId Manager 0]: Acquired new producerId block (brokerId:0,blockStartProducerId:0,blockEndProducerId:999) by writing to Zk with path version 1 (kafka.coordinator.transaction.ProducerIdManager)
 [2017-08-04 10:48:21,162] INFO [Transaction Coordinator 0]: Starting up. (kafka.coordinator.transaction.TransactionCoordinator)
 [2017-08-04 10:48:21,167] INFO [Transaction Marker Channel Manager 0]: Starting (kafka.coordinator.transaction.TransactionMarkerChannelManager)
+[2022-07-06 18:22:59,737] INFO [SocketServer listenerType=BROKER, nodeId=1] Failed authentication with /10.10.10.10 (SSL handshake failed) (org.apache.kafka.common.network.Selector)

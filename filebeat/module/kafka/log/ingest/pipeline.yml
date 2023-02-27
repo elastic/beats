@@ -71,6 +71,32 @@ processors:
           ctx.event.type = "info";
         }
       }
+- grok:
+    field: message
+    trace_match: true
+    patterns:
+    - ^%{KAFKA_MESSAGE:kafka.message} with /%{IPV4:source.ip} \(SSL handshake failed\)
+    pattern_definitions:
+      KAFKA_MESSAGE: Failed authentication
+    ignore_failure: true
+- append: 
+    field: related.ip
+    value: '{{ source.ip }}'
+    if: "ctx.source?.ip != null"
+- script:
+    lang: painless
+    description: "Check if event.category authentication"
+    if: ctx.kafka?.message != null
+    source: >-
+      if (ctx.kafka.message == "Failed authentication") {
+        ctx.event.type = "logon-failed";
+        ctx.event.category = "authentication";
+        ctx.event.action = "start";
+        ctx.event.outcome = "failure";
+      }
+- remove: 
+    field: kafka.message
+    ignore_missing: true
 on_failure:
 - set:
     field: error.log
