@@ -59,7 +59,7 @@ type thriftPlugin struct {
 
 	publishQueue chan *thriftTransaction
 	results      protos.Reporter
-	watcher      procs.ProcessesWatcher
+	watcher      *procs.ProcessesWatcher
 	idl          *thriftIdl
 }
 
@@ -185,7 +185,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &thriftPlugin{}
@@ -205,7 +205,7 @@ func New(
 func (thrift *thriftPlugin) init(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	config *thriftConfig,
 ) error {
 	thrift.InitDefaults()
@@ -220,6 +220,7 @@ func (thrift *thriftPlugin) init(
 		protos.DefaultTransactionHashSize)
 	thrift.transactions.StartJanitor(thrift.transactionTimeout)
 
+	thrift.watcher = &procs.ProcessesWatcher{}
 	if !testMode {
 		thrift.publishQueue = make(chan *thriftTransaction, 1000)
 		thrift.results = results
@@ -917,8 +918,6 @@ func (thrift *thriftPlugin) ConnectionTimeout() time.Duration {
 func (thrift *thriftPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseThrift exception")
-
 	priv := thriftPrivateData{}
 	if private != nil {
 		var ok bool
@@ -1058,7 +1057,6 @@ func (thrift *thriftPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (thrift *thriftPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(thrift) exception")
 	logp.Debug("thriftdetailed", "GapInStream called")
 
 	if private == nil {

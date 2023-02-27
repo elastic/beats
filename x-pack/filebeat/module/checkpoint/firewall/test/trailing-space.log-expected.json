@@ -19,7 +19,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 5,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"

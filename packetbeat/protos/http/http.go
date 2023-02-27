@@ -102,7 +102,7 @@ type httpPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 var (
@@ -117,7 +117,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &httpPlugin{}
@@ -135,7 +135,7 @@ func New(
 }
 
 // Init initializes the HTTP protocol analyser.
-func (http *httpPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *httpConfig) error {
+func (http *httpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *httpConfig) error {
 	http.setFromConfig(config)
 
 	isDebug = logp.IsDebug("http")
@@ -261,8 +261,6 @@ func (http *httpPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseHttp exception")
-
 	conn := ensureHTTPConnection(private)
 	conn = http.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
@@ -401,8 +399,6 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (http *httpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(http) exception")
-
 	conn := getHTTPConnection(private)
 	if conn == nil {
 		return private, false

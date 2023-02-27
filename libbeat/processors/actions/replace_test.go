@@ -22,6 +22,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -140,6 +142,7 @@ func TestReplaceRun(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			f := &replaceString{
+				log: logp.NewLogger("replace"),
 				config: replaceStringConfig{
 					Fields:        test.Fields,
 					IgnoreMissing: test.IgnoreMissing,
