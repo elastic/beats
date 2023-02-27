@@ -725,18 +725,18 @@ FROM tbl_page_count;`
 		if val, ok := (*mapStr)[key].(int64); ok {
 			totalSize += val
 		}
-		(*mapStr)[key] = totalSize 
+		(*mapStr)[key] = totalSize
 		return nil
 	}
 	mapStr := m.fetchRowsWithRowCounter(query, reporter, counter)
 
 	tempRecords := make(map[string]map[string]int64) // dbName:tblName:indexSize
 	for key, item := range mapStr {
-		strs := strings.SplitN(key, "-", 3)
-		if len(strs) != 3 {
+		strs := strings.SplitN(key, "-", 2)
+		if len(strs) != 2 {
 			continue
 		}
-		dbName, tableName, _ := strs[0], strs[1], strs[2]
+		dbName, tableName := strs[0], strs[1]
 		if _, ok := tempRecords[dbName]; !ok {
 			tempRecords[dbName] = make(map[string]int64)
 			tempRecords[dbName][tableName] = 0
