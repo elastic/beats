@@ -179,7 +179,7 @@ func injectIndexStream(dataStreamType string, expected *proto.UnitExpectedConfig
 	return stream
 }
 
-//injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
+// injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
 // this adds a variety of processors for metadata related to the dataset and input config.
 func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}, defaultProcessors []mapstr.M) (map[string]interface{}, error) {
 	//1. start by "repairing" config to add any missing fields

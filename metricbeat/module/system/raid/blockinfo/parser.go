@@ -32,8 +32,8 @@ import (
 
 var debugf = logp.MakeDebug("system.raid")
 
-//get the raid level and use that to determine how we fill out the array
-//Only data-reduntant RIAD levels (1,4,5,6,10) have some of these fields
+// get the raid level and use that to determine how we fill out the array
+// Only data-reduntant RIAD levels (1,4,5,6,10) have some of these fields
 func isRedundant(raidStr string) bool {
 	if raidStr == "raid1" || raidStr == "raid4" || raidStr == "raid5" ||
 		raidStr == "raid6" || raidStr == "raid10" {
@@ -59,9 +59,9 @@ func parseIntVal(path string) (int64, error) {
 	return value, nil
 }
 
-//get the current sync status as it exists under md/sync_completed
-//if there's no sync operation in progress, the file will just have 'none'
-//in which case, default to to the overall size
+// get the current sync status as it exists under md/sync_completed
+// if there's no sync operation in progress, the file will just have 'none'
+// in which case, default to to the overall size
 func getSyncStatus(path string, size int64) (SyncStatus, error) {
 	raw, err := ioutil.ReadFile(filepath.Join(path, "md", "sync_completed"))
 	if err != nil {
@@ -92,7 +92,7 @@ func getSyncStatus(path string, size int64) (SyncStatus, error) {
 
 }
 
-//Create a new disk object, parsing any needed fields
+// Create a new disk object, parsing any needed fields
 func newMD(path string) (MDDevice, error) {
 	var dev MDDevice
 
@@ -146,7 +146,7 @@ func newMD(path string) (MDDevice, error) {
 	return dev, nil
 }
 
-//get all the disks associated with an MD device
+// get all the disks associated with an MD device
 func getDisks(path string) (DiskStates, error) {
 	//so far, haven't found a less hacky way to do this.
 	devices, err := filepath.Glob(filepath.Join(path, "md", "dev-*"))

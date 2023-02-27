@@ -77,7 +77,7 @@ func (m *MetricSet) Fetch(ctx context.Context, r mb.ReporterV2) error {
 	return nil
 }
 
-//Close stops the metricset
+// Close stops the metricset
 func (m *MetricSet) Close() error {
 
 	return m.dockerClient.Close()
