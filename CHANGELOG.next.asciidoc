@@ -218,6 +218,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add support for Okta debug attributes, `risk_reasons`, `risk_behaviors` and `factor`. {issue}33677[33677] {pull}34508[34508]
 - Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
 - Fixed GCS log format issues. {pull}34659[34659]
+- Add kafka authentication message parsing
 
 *Auditbeat*
 
