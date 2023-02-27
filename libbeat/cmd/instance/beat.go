@@ -153,6 +153,11 @@ func (c certReloadConfig) Validate() error {
 	if c.Reload.Period < time.Second {
 		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
 	}
+
+	if c.Reload.Enabled && runtime.GOOS == "windows" {
+		return errors.New("'restart_on_cert_change' is not supported on Windows")
+	}
+
 	return nil
 }
 
@@ -1020,7 +1025,7 @@ func (b *Beat) makeOutputFactory(
 
 func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	logger := logp.L().Named("ssl.cert.reloader")
-	// Here the output is created and we have acces to the Beat struct (with the manager)
+	// Here the output is created and we have access to the Beat struct (with the manager)
 	// as a workaround we can unpack the new settings and trigger the reload-watcher from here
 
 	// We get an output config, so we extract the 'SSL' bit from it
