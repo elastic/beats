@@ -2,11 +2,22 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package http
+package download
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
 
-func withHeaders(rtt http.RoundTripper, headers map[string]string) http.RoundTripper {
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
+
+// Headers is a collection of headers used in download client.
+var Headers = map[string]string{
+	"User-Agent": fmt.Sprintf("Beat elastic-agent v%s", release.Version()),
+}
+
+// WithHeaders injects specified headers into a download client.
+func WithHeaders(rtt http.RoundTripper, headers map[string]string) http.RoundTripper {
 	if rtt == nil {
 		rtt = http.DefaultTransport
 	}

@@ -39,7 +39,7 @@ type UpdateMarker struct {
 }
 
 // markUpgrade marks update happened so we can handle grace period
-func (h *Upgrader) markUpgrade(ctx context.Context, hash string, action Action) error {
+func (u *Upgrader) markUpgrade(ctx context.Context, hash string, action Action) error {
 	prevVersion := release.Version()
 	prevHash := release.Commit()
 	if len(prevHash) > hashLen {
