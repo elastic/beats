@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
 - Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
 - Fix errors and panics due to re-used processors {pull}34761[34761]
+- Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
 
 *Heartbeat*
 
@@ -228,6 +229,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fixed GCS log format issues. {pull}34659[34659]
 - Add nginx.ingress_controller.upstream.ip to related.ip {issue}34645[34645] {pull}34672[34672]
 - Include NAT and firewall IPs in `related.ip` in Fortinet Firewall module. {issue}34640[34640] {pull}34673[34673]
+- Add Basic Authentication support on constructed requests to CEL input {issue}34609[34609] {pull}34689[34689]
+- Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
 
 *Auditbeat*
 
