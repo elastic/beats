@@ -43,12 +43,14 @@ func (m *inputMetrics) Close() {
 }
 
 func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
-	if count == -1 && m.sqsMessagesWaiting == nil {
+	if m.sqsMessagesWaiting == nil {
 		// if metric not initialized, and count is -1, do nothing
-		return
+		if count == -1 {
+			return
+		}
+		m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
 	}
 
-	m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
 	m.sqsMessagesWaiting.Set(count)
 }
 
