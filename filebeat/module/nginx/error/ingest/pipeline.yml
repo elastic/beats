@@ -51,6 +51,69 @@ processors:
 - append:
     field: event.type
     value: error
+- grok:
+    field: message
+    patterns:
+    - '^user "%{NOTSPACE:user.name}" %{NGINX_AUTH_ERROR:nginx.auth_error} in "%{NOTSPACE}", client: %{IP:source.ip}, server: %{NOTSPACE}, request: "%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}", host: "%{NOTSPACE}"'
+    - '^user "%{NOTSPACE:user.name}": %{NGINX_AUTH_ERROR:nginx.auth_error}, client: %{IP:source.ip}, server: %{NOTSPACE}, request: "%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}", host: "%{NOTSPACE}", referrer: "%{DATA:http.request.referrer}"'
+    pattern_definitions:
+      NGINX_AUTH_ERROR: (was not found|password mismatch)
+    ignore_missing: true
+    ignore_failure: true
+- uri_parts:
+    field: url.original
+    ignore_failure: true
+- remove:
+    field: url.domain
+    ignore_missing: true
+    if: ctx.url?.domain == null
+- remove:
+    field: url.scheme
+    ignore_missing: true
+    if: ctx.url?.scheme == null
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: '{{ source.ip }}'
+    if: ctx.source?.ip != null
+- append:
+    field: related.user
+    value: '{{ user.name }}'
+    if: ctx.user?.name != null
+- append:
+    field: event.category
+    value: authententication
+    if: ctx.nginx?.auth_error != null
+- append:
+    field: event.type
+    value: logon-failed
+    if: ctx.nginx?.auth_error != null
+- set:
+    field: event.outcome
+    value: failure
+    if: ctx.nginx?.auth_error != null
+- remove:
+    field: nginx.auth_error
+    ignore_failure: true
 on_failure:
 - set:
     field: error.message

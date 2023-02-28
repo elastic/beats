@@ -93,5 +93,83 @@
         "process.pid": 54053,
         "process.thread.id": 0,
         "service.type": "nginx"
+    },
+    {
+        "@timestamp": "2023-02-28T17:19:15.000-02:00",
+        "event.category": [
+            "authententication",
+            "web"
+        ],
+        "event.dataset": "nginx.error",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "2023/02/28 17:19:15 [error] 677#677: *307 user \"sherlock\" was not found in \"/etc/nginx/access/test.com/htpasswd\", client: 10.10.10.10, server: _, request: \"GET / HTTP/2.0\", host: \"11.11.11.11\"",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error",
+            "logon-failed"
+        ],
+        "fileset.name": "error",
+        "http.request.method": "GET",
+        "http.version": "2.0",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 1612,
+        "message": "user \"sherlock\" was not found in \"/etc/nginx/access/test.com/htpasswd\", client: 10.10.10.10, server: _, request: \"GET / HTTP/2.0\", host: \"11.11.11.11\"",
+        "nginx.error.connection_id": 307,
+        "process.pid": 677,
+        "process.thread.id": 677,
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "nginx",
+        "source.ip": "10.10.10.10",
+        "url.original": "/",
+        "url.path": "/",
+        "user.name": "sherlock"
+    },
+    {
+        "@timestamp": "2023-02-28T17:24:54.000-02:00",
+        "event.category": [
+            "authententication",
+            "web"
+        ],
+        "event.dataset": "nginx.error",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "2023/02/28 17:24:54 [error] 9447#9447: *25049019 user \"sherlock\": password mismatch, client: 10.10.10.10, server: www.test.com, request: \"GET /mobile/test/?promoId=testNewSite2 HTTP/2.0\", host: \"www.test.com\", referrer: \"https://www.test.com/\"",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error",
+            "logon-failed"
+        ],
+        "fileset.name": "error",
+        "http.request.method": "GET",
+        "http.request.referrer": "https://www.test.com/",
+        "http.version": "2.0",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 1805,
+        "message": "user \"sherlock\": password mismatch, client: 10.10.10.10, server: www.test.com, request: \"GET /mobile/test/?promoId=testNewSite2 HTTP/2.0\", host: \"www.test.com\", referrer: \"https://www.test.com/\"",
+        "nginx.error.connection_id": 25049019,
+        "process.pid": 9447,
+        "process.thread.id": 9447,
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "nginx",
+        "source.ip": "10.10.10.10",
+        "url.original": "/mobile/test/?promoId=testNewSite2",
+        "url.path": "/mobile/test/",
+        "url.query": "promoId=testNewSite2",
+        "user.name": "sherlock"
     }
 ]
