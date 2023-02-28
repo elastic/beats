@@ -32,7 +32,7 @@ type Project struct {
 }
 
 func NewProject(rawCfg *config.C) (*Project, error) {
-	// Global project context to cancell all jobs
+	// Global project context to cancel all jobs
 	// on close
 	ctx, cancel := context.WithCancel(context.Background())
 
