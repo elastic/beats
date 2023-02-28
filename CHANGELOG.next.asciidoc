@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- Enable nodejs engine strict validation when bundling synthetics. {pull}34471[34471]
 
 *Metricbeat*
 
