@@ -12,7 +12,7 @@
         "event.module": "checkpoint",
         "event.outcome": "failure",
         "event.sequence": 3,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "denied"
         ],
@@ -56,7 +56,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed"
         ],

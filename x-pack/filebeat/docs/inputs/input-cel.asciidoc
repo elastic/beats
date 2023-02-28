@@ -11,7 +11,7 @@ experimental[]
 <titleabbrev>CEL</titleabbrev>
 ++++
 
-Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the https://opensource.google.com/projects/cel[Common Expression Language (CEL)] and the https://pkg.go.dev/github.com/elastic/mito/lib[mito] and https://pkg.go.dev/github.com/google/cel-go@v0.12.5/ext#Strings[ext Strings] CEL extension libraries.
+Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the https://opensource.google.com/projects/cel[Common Expression Language (CEL)] and the https://pkg.go.dev/github.com/elastic/mito/lib[mito] CEL extension libraries.
 
 CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can include file and API endpoints using the mito extension library.
 The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation.
@@ -556,6 +556,16 @@ filebeat.inputs:
         "cursor": {"last_requested_at": now}
     })
 ----
+
+[float]
+==== `redact.fields`
+
+This specifies fields in the `state` to be redacted prior to debug logging. Fields listed in this array will be either replaced with a `*` or deleted entirely from messages sent to debug logs.
+
+[float]
+==== `redact.delete`
+
+This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

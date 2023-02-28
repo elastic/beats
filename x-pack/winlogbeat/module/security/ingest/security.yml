@@ -750,6 +750,22 @@ processors:
           type:
             - end
           action: windows-firewall-driver-error
+        "5140":
+          category:
+            - network
+            - file
+          type:
+            - info
+            - access
+          action: network-share-object-accessed
+        "5145":
+          category:
+            - network
+            - file
+          type:
+            - info
+            - access
+          action: network-share-object-access-checked
         "5379":
           category:
             - iam
@@ -2644,7 +2660,7 @@ processors:
               "4750", "4751", "4752", "4753", "4754", "4755", "4756", "4757",
               "4758", "4759", "4760", "4761", "4762", "4763", "4764", "4767",
               "4781", "4798", "4799", "4817", "4904", "4905", "4907", "4912",
-              "4648", "4797", "5379", "5380", "5381", "5382"].contains(ctx.event.code)) {
+              "4648", "4797", "5140", "5145", "5379", "5380", "5381", "5382"].contains(ctx.event.code)) {
           return;
         }
         if (ctx?.winlog?.event_data?.SubjectUserSid != null) {
@@ -2831,7 +2847,7 @@ processors:
               "4749", "4750", "4751", "4752", "4753", "4754", "4755", "4756",
               "4757", "4758", "4759", "4760", "4761", "4762", "4763", "4764",
               "4767", "4768", "4769", "4770", "4771", "4798", "4799", "4817",
-              "4904", "4905", "4907", "4912"].contains(ctx.event.code)) {
+              "4904", "4905", "4907", "4912", "5140", "5145"].contains(ctx.event.code)) {
           return;
         }
         if (ctx?.winlog?.event_data?.ProcessId != null) {
@@ -3442,6 +3458,52 @@ processors:
           splitSidList(ctx.winlog.event_data.SidList, params, ctx);
         }
 
+  - set:
+      field: file.name
+      copy_from: winlog.event_data.RelativeTargetName
+      if: |-
+        ctx.event?.code != null &&
+        ["5140", "5145"].contains(ctx.event.code) &&
+        ctx.winlog?.event_data?.RelativeTargetName != null &&
+        ctx.winlog.event_data.RelativeTargetName != ""
+  - set:
+      field: file.directory
+      copy_from: winlog.event_data.ShareLocalPath
+      if: |-
+        ctx.event?.code != null &&
+        ["5140", "5145"].contains(ctx.event.code) &&
+        ctx.winlog?.event_data?.ShareLocalPath != null &&
+        ctx.winlog.event_data.ShareLocalPath != ""
+  - set:
+      field: file.path
+      value: "{{file.directory}}\\{{file.name}}"
+      if: ctx.file?.name != null && ctx.file?.directory != null
+  - set:
+      field: file.directory
+      copy_from: winlog.event_data.ShareLocalPath
+      if: |-
+        ctx.event?.code != null &&
+        ["5140", "5145"].contains(ctx.event.code) &&
+        ctx.winlog?.event_data?.ShareLocalPath != null &&
+        ctx.winlog.event_data.ShareLocalPath != ""
+  - set:
+      field: file.target_path
+      value: "{{winlog.event_data.ShareName}}\\{{file.name}}"
+      if: |-
+        ctx.event?.code != null &&
+        ["5140", "5145"].contains(ctx.event.code) &&
+        ctx.winlog?.event_data?.ShareName != null &&
+        ctx.winlog.event_data.ShareName != "" &&
+        ctx.file?.name != null
+  - script:
+      description: Adds file information.
+      lang: painless
+      if: ctx.file?.name != null
+      source: |-
+        def extIdx = ctx.file.name.lastIndexOf(".");
+        if (extIdx > -1) {
+            ctx.file.extension = ctx.file.name.substring(extIdx+1);
+        }
   - convert:
       field: winlog.record_id
       type: string

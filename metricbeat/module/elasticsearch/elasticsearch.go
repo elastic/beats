@@ -56,7 +56,8 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"node_stats",
 		"shard",
 	}
-	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
+	optionalXpackMetricsets := []string{"ingest_pipeline"}
+	return elastic.NewModule(&base, xpackEnabledMetricSets, optionalXpackMetricsets, logp.NewLogger(ModuleName))
 }
 
 var (
@@ -196,17 +197,16 @@ func getMasterName(http *helper.HTTP, uri string) (string, error) {
 }
 
 // GetInfo returns the data for the Elasticsearch / endpoint.
-func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
-
+func GetInfo(http *helper.HTTP, uri string) (Info, error) {
 	content, err := fetchPath(http, uri, "/", "")
 	if err != nil {
-		return nil, err
+		return Info{}, err
 	}
 
-	info := &Info{}
+	info := Info{}
 	err = json.Unmarshal(content, &info)
 	if err != nil {
-		return nil, err
+		return Info{}, err
 	}
 
 	return info, nil

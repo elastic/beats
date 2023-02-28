@@ -78,6 +78,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Setting DEV=true when running `mage build` now correctly generates binaries without optimisations and with debug symbols {pull}31955[31955]
 - The beat.cgroup.memory.mem.usage.bytes metric is now a gauge {issue}31582[31582] {pull}32652[32652]
 - Fix the integration testcase docker port mapping for sql and oracle modules {pull}34221[34221]
+- Fix the ingest pipeline for mysql slowlog to parse schema name with dash {pull}34371[34372]
 
 ==== Added
 
@@ -150,6 +151,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add an option to disable event normalization when creating a `beat.Client`. {pull}33657[33657]
 - Add the file path of the instance lock on the error when it's is already locked {pull}33788[33788]
 - Add DropFields processor to js API {pull}33458[33458]
+- Add support for different folders when testing data {pull}34467[34467]
 
 ==== Deprecated
 

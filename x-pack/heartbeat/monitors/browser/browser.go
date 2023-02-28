@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/security"
 )
 
 func init() {
@@ -38,7 +39,7 @@ func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
 	})
 
 	// We do not use user.Current() which does not reflect setuid changes!
-	if syscall.Geteuid() == 0 {
+	if syscall.Geteuid() == 0 && security.NodeChildProcCred == nil {
 		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root")
 	}
 
