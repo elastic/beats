@@ -123,7 +123,7 @@ require (
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/miekg/dns v1.1.42
 	github.com/mitchellh/gox v1.0.1
-	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
+	github.com/mitchellh/hashstructure v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/osquery/osquery-go v0.0.0-20210622151333-99b4efa62ec5
@@ -152,8 +152,8 @@ require (
 	go.elastic.co/go-licence-detector v0.5.0
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.10.0
-	go.uber.org/multierr v1.8.0
-	go.uber.org/zap v1.23.0
+	go.uber.org/multierr v1.9.0
+	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
@@ -193,8 +193,8 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.5.0
-	github.com/elastic/elastic-agent-libs v0.2.16
-	github.com/elastic/elastic-agent-shipper-client v0.4.0
+	github.com/elastic/elastic-agent-libs v0.3.0
+	github.com/elastic/elastic-agent-shipper-client v0.5.0
 	github.com/elastic/elastic-agent-system-metrics v0.4.5-0.20220927192933-25a985b07d51
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/elastic/mito v0.0.0-20221207004749-2f0f2875e464
