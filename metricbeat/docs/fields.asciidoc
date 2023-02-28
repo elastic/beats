@@ -48093,13 +48093,6 @@ node_stats metrics.
 
 
 
-*`logstash.node.version`*::
-+
---
-type: keyword
-
---
-
 *`logstash.node.id`*::
 +
 --

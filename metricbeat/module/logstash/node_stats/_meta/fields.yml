@@ -4,8 +4,6 @@
     node_stats metrics.
   release: ga
   fields:
-    - name: version
-      type: keyword
     - name: id
       type: keyword
     - name: state.pipeline
