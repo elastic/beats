@@ -15,22 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package seccomp
+//go:build windows
+// +build windows
 
-import "github.com/elastic/go-seccomp-bpf"
+package instance
 
-func init() {
-	defaultPolicy = &seccomp.Policy{
-		DefaultAction: seccomp.ActionAllow,
-		Syscalls: []seccomp.SyscallGroup{
-			{
-				Action: seccomp.ActionErrno,
-				Names: []string{
-					"execveat",
-					"fork",
-					"vfork",
-				},
-			},
-		},
-	}
+import (
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+// doReexec is a noop on Windows, it only logs a message explaining it.
+func (b *Beat) doReexec() error {
+	logger := logp.L().Named("ssl.cert.reloader")
+	logger.Info("reloading certs/reexecing is not supported on Windows. %s will not restart", b.Info.Beat)
+	return nil
 }
