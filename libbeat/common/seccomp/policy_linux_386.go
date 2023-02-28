@@ -39,6 +39,7 @@ func init() {
 					"clone3",
 					"close",
 					"dup",
+					"execve",
 					"dup2",
 					"epoll_create",
 					"epoll_create1",

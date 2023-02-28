@@ -440,7 +440,17 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Stop the manager and stop the connection to any dependent services.
-	b.Manager.Stop()
+	// The Manager started to have a working implementation when
+	// https://github.com/elastic/beats/pull/34416 was merged.
+	// This is intended to enable TLS certificates reload on a long
+	// running Beat.
+	//
+	// However calling b.Manager.Stop() here messes up the behavior of the
+	// --once flag because it makes Filebeat exit early.
+	// So if --once is passed, we don't call b.Manager.Stop().
+	if !*once {
+		b.Manager.Stop()
+	}
 
 	return nil
 }

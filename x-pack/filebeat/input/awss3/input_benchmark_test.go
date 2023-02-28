@@ -67,6 +67,10 @@ func (*constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqsTypes.M
 	return nil
 }
 
+func (c *constantSQS) GetQueueAttributes(ctx context.Context, attr []sqsTypes.QueueAttributeName) (map[string]string, error) {
+	return map[string]string{}, nil
+}
+
 type s3PagerConstant struct {
 	mutex        *sync.Mutex
 	objects      []s3Types.Object

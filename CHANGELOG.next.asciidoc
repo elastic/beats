@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - Fix panics when a processor is closed twice {pull}34647[34647]
+- Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}[]
 
 *Auditbeat*
 
@@ -212,12 +213,14 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add pagination support for Salesforce module. {issue}34057[34057] {pull}34065[34065]
 - Allow users to redact sensitive data from CEL input debug logs. {pull}34302[34302]
 - Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
+- Added metric `sqs_messages_waiting_gauge` for aws-s3 input. {pull}34488[34488]
 - Add support for new Rabbitmq timestamp format for logs {pull}34211[34211]
 - Allow user configuration of timezone offset in Cisco ASA and FTD modules. {pull}34436[34436]
 - Allow user configuration of timezone offset in Checkpoint module. {pull}34472[34472]
 - Add support for Okta debug attributes, `risk_reasons`, `risk_behaviors` and `factor`. {issue}33677[33677] {pull}34508[34508]
 - Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
 - Fixed GCS log format issues. {pull}34659[34659]
+- Add nginx.ingress_controller.upstream.ip to related.ip {issue}34645[34645] {pull}34672[34672]
 
 *Auditbeat*
 
