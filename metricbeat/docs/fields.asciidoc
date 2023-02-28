@@ -48086,14 +48086,6 @@ type: keyword
 node
 
 
-
-*`logstash.node.host`*::
-+
---
-type: keyword
-
---
-
 [float]
 === node
 
