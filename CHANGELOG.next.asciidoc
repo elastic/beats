@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
 - Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
 - Fix panics when a processor is closed twice {pull}34647[34647]
+- Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}[]
 
 *Auditbeat*
 
