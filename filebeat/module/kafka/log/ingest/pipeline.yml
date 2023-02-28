@@ -79,6 +79,18 @@ processors:
     pattern_definitions:
       KAFKA_MESSAGE: Failed authentication
     ignore_failure: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
 - append: 
     field: related.ip
     value: '{{ source.ip }}'
