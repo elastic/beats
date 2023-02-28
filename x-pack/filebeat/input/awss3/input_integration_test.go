@@ -187,6 +187,7 @@ func TestInputRunSQS(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
 	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesWaiting.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
@@ -424,6 +425,7 @@ func TestInputRunSNS(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
 	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesWaiting.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
