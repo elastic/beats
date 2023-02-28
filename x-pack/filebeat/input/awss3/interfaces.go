@@ -41,6 +41,7 @@ type sqsAPI interface {
 	sqsReceiver
 	sqsDeleter
 	sqsVisibilityChanger
+	sqsAttributeGetter
 }
 
 type sqsReceiver interface {
@@ -53,6 +54,10 @@ type sqsDeleter interface {
 
 type sqsVisibilityChanger interface {
 	ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error
+}
+
+type sqsAttributeGetter interface {
+	GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error)
 }
 
 type sqsProcessor interface {
@@ -195,6 +200,25 @@ func (a *awsSQSAPI) ChangeMessageVisibility(ctx context.Context, msg *types.Mess
 	}
 
 	return nil
+}
+
+func (a *awsSQSAPI) GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error) {
+	ctx, cancel := context.WithTimeout(ctx, a.apiTimeout)
+	defer cancel()
+
+	attributeOutput, err := a.client.GetQueueAttributes(ctx, &sqs.GetQueueAttributesInput{
+		AttributeNames: attr,
+		QueueUrl:       awssdk.String(a.queueURL),
+	})
+
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			err = fmt.Errorf("api_timeout exceeded: %w", err)
+		}
+		return nil, fmt.Errorf("sqs GetQueueAttributes failed: %w", err)
+	}
+
+	return attributeOutput.Attributes, nil
 }
 
 // ------
