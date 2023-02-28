@@ -29896,6 +29896,24 @@ alias to: elasticsearch.node.stats.thread_pool.write.rejected.count
 --
 
 
+*`node_stats.thread_pool.force_merge.queue`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.force_merge.queue.count
+
+--
+
+*`node_stats.thread_pool.force_merge.rejected`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.thread_pool.force_merge.rejected.count
+
+--
+
 
 
 
@@ -46867,7 +46885,7 @@ type: long
 *`linux.conntrack.summary.insert_failed`*::
 +
 --
-Number of entries where list insert insert failed 
+Number of entries where list insert insert failed
 
 
 type: long
@@ -63379,7 +63397,7 @@ type: keyword
 *`system.raid.sync_action`*::
 +
 --
-Current sync action, if the RAID array is redundant 
+Current sync action, if the RAID array is redundant
 
 
 type: keyword
@@ -63820,7 +63838,7 @@ All TCP connections
 *`system.socket.summary.tcp.memory`*::
 +
 --
-Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
+Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux.
 
 
 type: integer
@@ -63966,7 +63984,7 @@ All UDP connections
 *`system.socket.summary.udp.memory`*::
 +
 --
-Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
+Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux.
 
 
 type: integer
