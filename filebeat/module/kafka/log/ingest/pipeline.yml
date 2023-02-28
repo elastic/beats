@@ -91,6 +91,14 @@ processors:
       - asn
       - organization_name
     ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
 - append: 
     field: related.ip
     value: '{{ source.ip }}'
