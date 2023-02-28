@@ -48086,6 +48086,14 @@ type: keyword
 node
 
 
+
+*`logstash.node.host`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === node
 
@@ -48094,13 +48102,6 @@ node_stats metrics.
 
 
 *`logstash.node.version`*::
-+
---
-type: keyword
-
---
-
-*`logstash.node.host`*::
 +
 --
 type: keyword

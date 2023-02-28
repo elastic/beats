@@ -4,3 +4,5 @@
     node
   release: ga
   fields:
+    - name: host
+      type: keyword
