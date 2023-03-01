@@ -18,6 +18,8 @@
 package replstatus
 
 import (
+	"time"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -43,10 +45,6 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) mapstr.M {
 		"last_committed": replStatus.OpTimes.LastCommitted.Ts.T,
 		"applied":        replStatus.OpTimes.Applied.Ts.T,
 		"durable":        replStatus.OpTimes.Durable.Ts.T,
-	}
-
-	if delay, ok := findOptimeDelay(replStatus.Members); ok {
-		result["optimes"].(mapstr.M)["delay"] = delay
 	}
 
 	// find lag and headroom
@@ -124,5 +122,29 @@ func eventMapping(oplogInfo oplogInfo, replStatus MongoReplStatus) mapstr.M {
 		},
 	}
 
+	return result
+}
+
+func calculateDelay(replStatus MongoReplStatus) []mapstr.M {
+	var primaryOptimeDate time.Time
+	isPrimary := false
+	for _, member := range replStatus.Members {
+		if MemberState(member.State) == PRIMARY {
+			primaryOptimeDate = member.OpTimeDate
+		}
+		isPrimary = isPrimary || (member.Self && MemberState(member.State) == PRIMARY)
+	}
+
+	result := make([]mapstr.M, 0)
+	if isPrimary {
+		for _, member := range replStatus.Members {
+			result = append(result, mapstr.M{
+				"optimes": mapstr.M{
+					"name": member.Name,
+					"delay": primaryOptimeDate.Unix() - member.OpTimeDate.Unix(),
+				},
+			})
+		}
+	}
 	return result
 }

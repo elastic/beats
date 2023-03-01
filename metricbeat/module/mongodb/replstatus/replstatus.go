@@ -80,5 +80,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	reporter.Event(mb.Event{MetricSetFields: event})
 
+	for _, e := range calculateDelay(*replStatus) {
+		reporter.Event(mb.Event{MetricSetFields: e})
+	}
+
 	return nil
 }
