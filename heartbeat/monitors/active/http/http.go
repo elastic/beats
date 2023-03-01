@@ -104,7 +104,7 @@ func create(
 
 	js := make([]jobs.Job, len(config.Hosts))
 	for i, urlStr := range config.Hosts {
-		u, _ := url.Parse(urlStr)
+		u, err := url.Parse(urlStr)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
