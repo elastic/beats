@@ -5,11 +5,15 @@
 package httpjson
 
 import (
+	"context"
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"testing"
 	"time"
 
+	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -239,4 +243,64 @@ func TestGetRateLimitWhenMissingLimit(t *testing.T) {
 	epoch, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
 	assert.EqualValues(t, 0, epoch)
+}
+
+// Test ClientLimit functionality, and that the amount of request tokens returns correctly.
+func TestClientLimitRequest(t *testing.T) {
+	registerRequestTransforms()
+	t.Cleanup(func() { registeredTransforms = newRegistry() })
+
+	// test with dateCursorHandler to have different payloads each request
+	testServer := httptest.NewServer(clientLimitHandler())
+	t.Cleanup(testServer.Close)
+
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"interval":       1,
+		"request.method": "GET",
+		"request.url":    testServer.URL,
+		"request.rate_limit.client_limit.interval": 1,
+		"request.rate_limit.client_limit.requests": 2,
+	})
+
+	config := defaultConfig()
+	assert.NoError(t, cfg.Unpack(&config))
+
+	log := logp.NewLogger("")
+	ctx := context.Background()
+	client, err := newHTTPClient(ctx, config, log)
+	assert.NoError(t, err)
+
+	requestFactory, err := newRequestFactory(ctx, config, log)
+	assert.NoError(t, err)
+	pagination := newPagination(config, client, log)
+	responseProcessor := newResponseProcessor(config, pagination, log)
+
+	requester := newRequester(client, requestFactory, responseProcessor, log)
+	trCtx := emptyTransformContext()
+
+	var currentTokenCount int
+	var lastTokenCount int
+
+	// Making sure that token count = configured amount of requests
+	currentTokenCount = int(requester.client.limiter.clientLimiter.Tokens())
+	assert.EqualValues(t, 2, currentTokenCount)
+	// Request one
+	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
+
+	// Making sure that the current token count decreased from last request
+	lastTokenCount = currentTokenCount
+	currentTokenCount = int(requester.client.limiter.clientLimiter.Tokens())
+	assert.Greater(t, lastTokenCount, currentTokenCount)
+
+	// Second Request
+	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
+	lastTokenCount = currentTokenCount
+	currentTokenCount = int(requester.client.limiter.clientLimiter.Tokens())
+
+	// Third Request, this should wait since token count should be < 0
+	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
+
+	//Determine if a new token is available 1 second from now
+	assert.GreaterOrEqual(t, int(requester.client.limiter.clientLimiter.TokensAt(time.Now().Add(1*time.Second))), 1)
+
 }

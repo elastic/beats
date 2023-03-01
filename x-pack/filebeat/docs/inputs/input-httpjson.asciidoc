@@ -508,6 +508,19 @@ The maximum number of redirects to follow for a request. Default: `10`.
 
 [[request-rate-limit]]
 [float]
+==== `request.rate_limit.client_limit.interval`
+
+Client side rate limit options, when the API endpoint does not provide rate limit options.
+This value is used together with `request.rate_limit.client_limit.requests` to configure
+how many requests are allowed to be sent, per interval (in seconds)
+
+[float]
+==== `request.rate_limit.client_limit.requests`
+Client side rate limit options, when the API endpoint does not provide rate limit options.
+This value is used together with `request.rate_limit.client_limit.interval` to configure
+how many requests are allowed to be sent, per interval (in seconds)
+
+[float]
 ==== `request.rate_limit.limit`
 
 The value of the response that specifies the total limit. It is defined with a Go template value.

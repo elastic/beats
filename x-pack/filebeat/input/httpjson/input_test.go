@@ -1398,6 +1398,14 @@ func dateCursorHandler() http.HandlerFunc {
 	}
 }
 
+func clientLimitHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`))
+	}
+}
+
 func paginationHandler() http.HandlerFunc {
 	var count int
 	return func(w http.ResponseWriter, r *http.Request) {

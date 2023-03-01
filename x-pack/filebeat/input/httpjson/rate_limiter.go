@@ -13,15 +13,17 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"golang.org/x/time/rate"
 )
 
 type rateLimiter struct {
 	log *logp.Logger
 
-	limit      *valueTpl
-	reset      *valueTpl
-	remaining  *valueTpl
-	earlyLimit *float64
+	limit         *valueTpl
+	reset         *valueTpl
+	remaining     *valueTpl
+	earlyLimit    *float64
+	clientLimiter *rate.Limiter
 }
 
 func newRateLimiterFromConfig(config *rateLimitConfig, log *logp.Logger) *rateLimiter {
@@ -29,17 +31,29 @@ func newRateLimiterFromConfig(config *rateLimitConfig, log *logp.Logger) *rateLi
 		return nil
 	}
 
-	return &rateLimiter{
+	limiter := &rateLimiter{
 		log:        log,
 		limit:      config.Limit,
 		reset:      config.Reset,
 		remaining:  config.Remaining,
 		earlyLimit: config.EarlyLimit,
 	}
+
+	if config.ClientLimits.Interval > 0 {
+		limiter.clientLimiter = rate.NewLimiter(rate.Limit(config.ClientLimits.Interval), config.ClientLimits.Requests)
+	}
+
+	return limiter
 }
 
 func (r *rateLimiter) execute(ctx context.Context, f func() (*http.Response, error)) (*http.Response, error) {
 	for {
+		// If client side limits are set, which limits based on configured amounts of Requests per Interval, we wait.
+		// If the amount of requests are still allowed then this will continue.
+		if r.clientLimiter != nil && !r.clientLimiter.Allow() {
+			// This is a blocking call
+			r.clientLimiter.Wait(ctx)
+		}
 		resp, err := f()
 		if err != nil {
 			return nil, fmt.Errorf("failed to read http.response.body: %w", err)
@@ -85,6 +99,13 @@ func (r *rateLimiter) applyRateLimit(ctx context.Context, resp *http.Response) e
 		r.log.Debug("Rate Limit: time is up.")
 		return nil
 	}
+}
+
+func (r *rateLimiter) getClientRateTokens() int {
+	if r.clientLimiter != nil {
+		return int(r.clientLimiter.Tokens())
+	}
+	return 0
 }
 
 // getRateLimit gets the rate limit value if specified in the response,

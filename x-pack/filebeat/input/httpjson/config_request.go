@@ -60,16 +60,26 @@ func (c retryConfig) getWaitMax() time.Duration {
 }
 
 type rateLimitConfig struct {
-	Limit      *valueTpl `config:"limit"`
-	Reset      *valueTpl `config:"reset"`
-	Remaining  *valueTpl `config:"remaining"`
-	EarlyLimit *float64  `config:"early_limit"`
+	Limit        *valueTpl      `config:"limit"`
+	Reset        *valueTpl      `config:"reset"`
+	Remaining    *valueTpl      `config:"remaining"`
+	EarlyLimit   *float64       `config:"early_limit"`
+	ClientLimits *clientLimiter `config:"client_limit"`
+}
+
+type clientLimiter struct {
+	Interval float64 `config:"interval"`
+	Requests int     `config:"requests"`
 }
 
 func (c rateLimitConfig) Validate() error {
 	switch {
 	case c.EarlyLimit != nil && *c.EarlyLimit < 0:
 		return errors.New("early_limit must be greater than or equal to 0")
+	case c.ClientLimits.Interval > 0 && c.ClientLimits.Requests == 0:
+		return errors.New("client_limit.requests must be higher than 0 when client_limit.interval is set to higher than 0")
+	case c.ClientLimits.Interval == 0 && c.ClientLimits.Requests > 0:
+		return errors.New("client_limit.interval must be higher than 0 when client_limit.requests is set to higher than 0")
 	}
 	return nil
 }
