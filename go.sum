@@ -62,8 +62,8 @@ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDk
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/cncf/udpa/go v0.0.0-20200629203442-efcf912fb354/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
-github.com/containerd/containerd v1.5.13 h1:XqvKw9i4P7/mFrC3TSM7yV5cwFZ9avXe6M3YANKnzEE=
-github.com/containerd/containerd v1.5.13/go.mod h1:3AlCrzKROjIuP3JALsY14n8YtntaUDBu7vek+rPN5Vc=
+github.com/containerd/containerd v1.5.18 h1:doHr6cNxfOLTotWmZs6aZF6LrfJFcjmYFcWlRmQgYPM=
+github.com/containerd/containerd v1.5.18/go.mod h1:7IN9MtIzTZH4WPEmD1gNH8bbTQXVX68yd3ZXxSHYCis=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cyphar/filepath-securejoin v0.2.2/go.mod h1:FpkQEhXnPnOthhzymB7CGsFk2G9VLXONKD9G7QGMM+4=
 github.com/cyphar/filepath-securejoin v0.2.3 h1:YX6ebbZCZP7VkM3scTTokDgBL2TY741X51MTk3ycuNI=

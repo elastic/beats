@@ -5041,11 +5041,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Microsoft/hcsshim
-Version: v0.8.24
+Version: v0.8.25
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!microsoft/hcsshim@v0.8.24/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!microsoft/hcsshim@v0.8.25/LICENSE:
 
 The MIT License (MIT)
 
@@ -6736,11 +6736,11 @@ Contents of probable licence file $GOMODCACHE/github.com/containerd/console@v1.0
 
 --------------------------------------------------------------------------------
 Dependency : github.com/containerd/containerd
-Version: v1.5.13
+Version: v1.5.18
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.13/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.18/LICENSE:
 
 
                                  Apache License
@@ -6937,11 +6937,11 @@ Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/containerd/continuity
-Version: v0.1.0
+Version: v0.3.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/containerd/continuity@v0.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/containerd/continuity@v0.3.0/LICENSE:
 
 
                                  Apache License
@@ -18019,11 +18019,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/matttproud/golang_protobuf_extensions
-Version: v1.0.2-0.20181231171920-c182affec369
+Version: v1.0.4
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/matttproud/golang_protobuf_extensions@v1.0.2-0.20181231171920-c182affec369/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/matttproud/golang_protobuf_extensions@v1.0.4/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
