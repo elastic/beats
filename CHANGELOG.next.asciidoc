@@ -221,6 +221,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
 - Fixed GCS log format issues. {pull}34659[34659]
 - Add nginx.ingress_controller.upstream.ip to related.ip {issue}34645[34645] {pull}34672[34672]
+- Add support for client side rate limiting on the httpjson input {pull}34708[34708]
 
 *Auditbeat*
 
