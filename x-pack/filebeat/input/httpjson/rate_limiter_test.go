@@ -12,9 +12,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )

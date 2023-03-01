@@ -12,8 +12,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/time/rate"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type rateLimiter struct {
