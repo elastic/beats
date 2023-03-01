@@ -101,13 +101,6 @@ func (r *rateLimiter) applyRateLimit(ctx context.Context, resp *http.Response) e
 	}
 }
 
-func (r *rateLimiter) getClientRateTokens() int {
-	if r.clientLimiter != nil {
-		return int(r.clientLimiter.Tokens())
-	}
-	return 0
-}
-
 // getRateLimit gets the rate limit value if specified in the response,
 // and returns an int64 value in seconds since unix epoch for rate limit reset time.
 // When there is a remaining rate limit quota, or when the rate limit reset time has expired, it
