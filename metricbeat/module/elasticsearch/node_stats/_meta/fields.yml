@@ -321,6 +321,13 @@
               type: long
             - name: rejected.count
               type: long
+        - name: force_merge
+            type: group
+            fields:
+              - name: queue.count
+                type: long
+              - name: rejected.count
+                type: long
         - name: get
           type: group
           fields:
