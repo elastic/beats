@@ -294,8 +294,6 @@ func TestClientLimitRequest(t *testing.T) {
 
 	// Second Request
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
-	lastTokenCount = currentTokenCount
-	currentTokenCount = int(requester.client.limiter.clientLimiter.Tokens())
 
 	// Third Request, this should wait since token count should be < 0
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
