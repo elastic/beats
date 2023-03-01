@@ -39,19 +39,7 @@ type outputController struct {
 	workQueue chan publisher.Batch
 
 	consumer *eventConsumer
-	out      *outputGroup
-}
-
-// outputGroup configures a group of load balanced outputs with shared work queue.
-type outputGroup struct {
-	// workQueue is a channel that receives event batches that
-	// are ready to send. Each output worker in outputs reads from
-	// workQueue for events to send.
-	workQueue chan publisher.Batch
-	outputs   []outputWorker
-
-	batchSize  int
-	timeToLive int // event lifetime
+	workers  []outputWorker
 }
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
@@ -79,10 +67,8 @@ func (c *outputController) Close() error {
 	c.consumer.close()
 	close(c.workQueue)
 
-	if c.out != nil {
-		for _, out := range c.out.outputs {
-			out.Close()
-		}
+	for _, out := range c.workers {
+		out.Close()
 	}
 	return nil
 }
@@ -93,34 +79,24 @@ func (c *outputController) Set(outGrp outputs.Group) {
 
 	// Close old outputWorkers, so they send their remaining events
 	// back to eventConsumer's retry channel
-	if c.out != nil {
-		for _, w := range c.out.outputs {
-			w.Close()
-		}
+	for _, w := range c.workers {
+		w.Close()
 	}
 
 	// create new output group with the shared work queue
 	clients := outGrp.Clients
-	worker := make([]outputWorker, len(clients))
+	c.workers = make([]outputWorker, len(clients))
 	for i, client := range clients {
 		logger := logp.NewLogger("publisher_pipeline_output")
-		worker[i] = makeClientWorker(c.observer, c.workQueue, client, logger, c.monitors.Tracer)
+		c.workers[i] = makeClientWorker(c.observer, c.workQueue, client, logger, c.monitors.Tracer)
 	}
-	grp := &outputGroup{
-		workQueue:  c.workQueue,
-		outputs:    worker,
-		timeToLive: outGrp.Retry + 1,
-		batchSize:  outGrp.BatchSize,
-	}
-
-	c.out = grp
 
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
 			ch:         c.workQueue,
-			batchSize:  grp.batchSize,
-			timeToLive: grp.timeToLive,
+			batchSize:  outGrp.BatchSize,
+			timeToLive: outGrp.Retry + 1,
 		})
 }
 
