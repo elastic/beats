@@ -255,7 +255,7 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 
 	pip := virtualenvPath(ve, "pip")
 	pipUpgrade := func(pkg string) error {
-		return sh.RunWith(env, pip, "install", "-U", pkg)
+		return sh.RunWith(env, pip, "install", "--user", "-U", pkg)
 	}
 
 	// Ensure we are using the latest pip version.
@@ -269,7 +269,7 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 	}
 
 	// Execute pip to install the dependencies.
-	args := []string{"install"}
+	args := []string{"install", "--user"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
 	}
