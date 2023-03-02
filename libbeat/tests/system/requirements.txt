@@ -5,7 +5,7 @@ cached-property==1.4.2
 certifi==2022.12.7
 chardet==3.0.4
 deepdiff==4.2.0
-docker==5.0.3
+docker==6.0.1
 docker-compose==1.29.2
 docker-pycreds==0.4.0
 dockerpty==0.4.1
@@ -39,7 +39,7 @@ pytest-rerunfailures==9.1.1
 pytest-timeout==1.4.2
 PyYAML==5.4.1
 redis==2.10.6
-requests==2.25.1
+requests==2.28.2
 semver==2.8.1
 setuptools==65.5.1
 six==1.15.0
