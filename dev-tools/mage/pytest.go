@@ -127,6 +127,7 @@ func PythonTest(params PythonTestArgs) error {
 	// Only activate the virtualenv if necessary.
 	ve, err := PythonVirtualenv(false)
 	if err != nil {
+		fmt.Printf(">>> python test failed when activating the virtual env with PythonVirtualenv: %v", err)
 		return err
 	}
 
@@ -168,6 +169,7 @@ func PythonTest(params PythonTestArgs) error {
 	}
 	testFiles, err := FindFiles(files...)
 	if err != nil {
+		fmt.Printf(">>> python test failed when finding test files FindFiles: %v", err)
 		return err
 	}
 	if len(testFiles) == 0 {
@@ -180,6 +182,7 @@ func PythonTest(params PythonTestArgs) error {
 	// installed to the VE.
 	pytestPath, err := LookVirtualenvPath(ve, "pytest")
 	if err != nil {
+		fmt.Printf(">>> python test failed when searching pytest with LookVirtualenvPath: %v", err)
 		return err
 	}
 
@@ -299,6 +302,7 @@ func pythonVirtualenvPath() (string, error) {
 	// shorten the overall shebang interpreter path below the path length limits.
 	pythonVirtualenvDir = os.Getenv("PYTHON_ENV")
 	if pythonVirtualenvDir == "" {
+		fmt.Printf(">>> python test there is no python env (pythonVirtualenvPath), let's get the current repo itself with GetProjectRepoInfo")
 		info, err := GetProjectRepoInfo()
 		if err != nil {
 			return "", err
