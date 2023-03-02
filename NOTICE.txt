@@ -10100,11 +10100,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.2.16
+Version: v0.3.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.2.16/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.3.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -10311,11 +10311,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-l
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-shipper-client
-Version: v0.4.0
+Version: v0.5.1-0.20230228231646-f04347b666f3
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-shipper-client@v0.4.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-shipper-client@v0.5.1-0.20230228231646-f04347b666f3/LICENSE.txt:
 
 Elastic License 2.0
 
@@ -10414,11 +10414,11 @@ these terms.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-system-metrics
-Version: v0.4.5-0.20220927192933-25a985b07d51
+Version: v0.4.6
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.4.5-0.20220927192933-25a985b07d51/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.4.6/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -18401,11 +18401,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 --------------------------------------------------------------------------------
 Dependency : github.com/mitchellh/hashstructure
-Version: v0.0.0-20170116052023-ab25296c0f51
+Version: v1.1.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/mitchellh/hashstructure@v0.0.0-20170116052023-ab25296c0f51/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/mitchellh/hashstructure@v1.1.0/LICENSE:
 
 The MIT License (MIT)
 
@@ -21964,11 +21964,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/multierr
-Version: v1.8.0
+Version: v1.9.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/multierr@v1.8.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/multierr@v1.9.0/LICENSE.txt:
 
 Copyright (c) 2017-2021 Uber Technologies, Inc.
 
@@ -21993,11 +21993,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/zap
-Version: v1.23.0
+Version: v1.24.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/zap@v1.23.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/zap@v1.24.0/LICENSE.txt:
 
 Copyright (c) 2016-2017 Uber Technologies, Inc.
 
