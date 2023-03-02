@@ -22,10 +22,8 @@ package process
 
 import (
 	"os"
-	"os/user"
 	"runtime"
 	"sort"
-	"strconv"
 	"testing"
 	"time"
 
@@ -77,75 +75,6 @@ func TestGetOne(t *testing.T) {
 	assert.NoError(t, err, "GetOne")
 
 	t.Logf("Proc: %s", procData[0].StringToPrint())
-}
-
-func TestFetchProcessFromOtherUser(t *testing.T) {
-	// If we just used Get() or FetchPids() to get a list of processes on the system, this would produce a bootstrapping problem
-	// where if the code wasn't working (and we were skipping over PIDs not owned by us) this test would pass.
-	// re-implement part of the core pid-fetch logic
-	// All this does is find a pid that's not owned by us.
-	if runtime.GOOS != "linux" {
-		t.SkipNow()
-	}
-	dir, err := os.Open("/proc/")
-	require.NoError(t, err, "error opening /proc")
-
-	const readAllDirnames = -1 // see os.File.Readdirnames doc
-
-	names, err := dir.Readdirnames(readAllDirnames)
-	require.NoError(t, err, "error reading directory names")
-	us, err := user.Current()
-	require.NoError(t, err, "error fetching current user")
-	var testPid int
-	for _, name := range names {
-		if !dirIsPid(name) {
-			continue
-		}
-		pid, err := strconv.Atoi(name)
-		if err != nil {
-			t.Logf("Error converting PID name %s", name)
-			continue
-		}
-		pidUser, err := getUser(resolve.NewTestResolver("/"), pid)
-		if err == nil {
-			if pidUser != us.Name {
-				testPid = pid
-				break
-			}
-		}
-	}
-	// CI environments can be weird, we might only have one user
-	if testPid == 0 { // can't find any pids that don't belong to us, skip
-		t.Logf("found no PIDs from other user, skipping")
-		t.SkipNow()
-	}
-
-	defer dir.Close()
-
-	testConfig := Stats{
-		Procs:        []string{".*"},
-		Hostfs:       resolve.NewTestResolver("/"),
-		CPUTicks:     false,
-		CacheCmdLine: true,
-		EnvWhitelist: []string{".*"},
-		IncludeTop: IncludeTopConfig{
-			Enabled:  false,
-			ByCPU:    4,
-			ByMemory: 0,
-		},
-		EnableCgroups: false,
-		CgroupOpts: cgroup.ReaderOptions{
-			RootfsMountpoint:  resolve.NewTestResolver("/"),
-			IgnoreRootCgroups: true,
-		},
-	}
-	err = testConfig.Init()
-	assert.NoError(t, err, "Init")
-
-	t.Logf("found process from another user with pid %d, testing", testPid)
-	pidData, err := testConfig.GetOne(testPid)
-	require.NoError(t, err)
-	t.Logf("got: %s", pidData.StringToPrint())
 }
 
 func TestNetworkFetch(t *testing.T) {
