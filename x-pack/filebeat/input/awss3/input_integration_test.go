@@ -130,9 +130,7 @@ file_selectors:
 }
 
 func createInput(t *testing.T, cfg *conf.C) *s3Input {
-	s3InputManager := Plugin(openTestStatestore()).Manager.(*s3InputManager)
-	inputV2, err := s3InputManager.CreateWithoutClosingMetrics(cfg)
-
+	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
