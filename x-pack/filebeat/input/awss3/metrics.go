@@ -15,6 +15,7 @@ import (
 )
 
 type inputMetrics struct {
+	registry   *monitoring.Registry
 	unregister func()
 
 	sqsMessagesReceivedTotal            *monitoring.Uint // Number of SQS messages received (not necessarily processed fully).
@@ -22,7 +23,9 @@ type inputMetrics struct {
 	sqsMessagesInflight                 *monitoring.Uint // Number of SQS messages inflight (gauge).
 	sqsMessagesReturnedTotal            *monitoring.Uint // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 	sqsMessagesDeletedTotal             *monitoring.Uint // Number of SQS messages deleted.
+	sqsMessagesWaiting                  *monitoring.Int  // Number of SQS messages waiting in the SQS queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
+	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 
 	s3ObjectsRequestedTotal *monitoring.Uint // Number of S3 objects downloaded.
 	s3ObjectsAckedTotal     *monitoring.Uint // Number of S3 objects processed that were fully ACKed.
@@ -36,14 +39,26 @@ type inputMetrics struct {
 
 // Close removes the metrics from the registry.
 func (m *inputMetrics) Close() {
-	// Thanks to this integration tests fail
 	m.unregister()
+}
+
+func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
+	if m.sqsMessagesWaiting == nil {
+		// if metric not initialized, and count is -1, do nothing
+		if count == -1 {
+			return
+		}
+		m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
+	}
+
+	m.sqsMessagesWaiting.Set(count)
 }
 
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
 
 	out := &inputMetrics{
+		registry:                            reg,
 		unregister:                          unreg,
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
@@ -51,6 +66,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		sqsMessagesReturnedTotal:            monitoring.NewUint(reg, "sqs_messages_returned_total"),
 		sqsMessagesDeletedTotal:             monitoring.NewUint(reg, "sqs_messages_deleted_total"),
 		sqsMessageProcessingTime:            metrics.NewUniformSample(1024),
+		sqsLagTime:                          metrics.NewUniformSample(1024),
 		s3ObjectsRequestedTotal:             monitoring.NewUint(reg, "s3_objects_requested_total"),
 		s3ObjectsAckedTotal:                 monitoring.NewUint(reg, "s3_objects_acked_total"),
 		s3ObjectsListedTotal:                monitoring.NewUint(reg, "s3_objects_listed_total"),
@@ -62,6 +78,8 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 	}
 	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "sqs_lag_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.sqsLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	return out

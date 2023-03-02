@@ -21,9 +21,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -60,96 +58,74 @@ func TestMain(m *testing.M) {
 	os.Exit(exit)
 }
 
-func TestLockWithDeadPid(t *testing.T) {
-	// create old lockfile
-	pidFetch = fakeDeadPid
-	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now()}
-	locker := New(testBeat)
-	err := locker.Lock()
+func TestLocker(t *testing.T) {
+	// Setup two beats with same name and data path
+	const beatName = "testbeat-testlocker"
+
+	b1 := beat.Info{}
+	b1.Beat = beatName
+
+	b2 := beat.Info{}
+	b2.Beat = beatName
+
+	// Try to get a lock for the first beat. Expect it to succeed.
+	bl1 := New(b1)
+	err := bl1.Lock()
 	require.NoError(t, err)
 
-	// create new locker
-	pidFetch = os.Getpid
-	newLocker := New(testBeat)
-	err = newLocker.Lock()
-	require.NoError(t, err)
-}
-
-func TestLockWithTwoBeats(t *testing.T) {
-	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now()}
-	// emulate two beats trying to run from the same data path
-	locker := New(testBeat)
-	// use the parent process as another random beat
-	pidFetch = os.Getppid
-	err := locker.Lock()
-	require.NoError(t, err)
-
-	// create new locker for this beat
-	pidFetch = os.Getpid
-	newLocker := New(testBeat)
-	err = newLocker.Lock()
+	// Try to get a lock for the second beat. Expect it to fail because the
+	// first beat already has the lock.
+	bl2 := New(b2)
+	err = bl2.Lock()
 	require.Error(t, err)
-	t.Logf("Got desired error: %s", err)
-}
 
-func TestDoubleLock(t *testing.T) {
-	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now()}
-	locker := New(testBeat)
-	err := locker.Lock()
-	require.NoError(t, err)
-
-	newLocker := New(testBeat)
-	err = newLocker.Lock()
-	require.Error(t, err)
-	t.Logf("Got desired error: %s", err)
 }
 
 func TestUnlock(t *testing.T) {
-	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now()}
-	locker := New(testBeat)
-	err := locker.Lock()
+	const beatName = "testbeat-testunlock"
+
+	b1 := beat.Info{}
+	b1.Beat = beatName
+
+	b2 := beat.Info{}
+	b2.Beat = beatName
+	bl2 := New(b2)
+
+	// Try to get a lock for the first beat. Expect it to succeed.
+	bl1 := New(b1)
+	err := bl1.Lock()
 	require.NoError(t, err)
 
-	err = locker.Unlock()
+	// now unlock
+	err = bl1.Unlock()
 	require.NoError(t, err)
-}
 
-func TestRestartWithSamePID(t *testing.T) {
-	// create old lockfile
-	testBeatName := mustNewUUID(t)
-	testBeat := beat.Info{Beat: testBeatName, StartTime: time.Now().Add(-time.Second * 20)}
-	locker := New(testBeat)
-	err := locker.Lock()
-	require.NoError(t, err)
-	// create new lockfile with the same PID but a newer time
-	// create old lockfile
-	testNewBeat := beat.Info{Name: testBeatName, StartTime: time.Now()}
-	lockerNew := New(testNewBeat)
-	err = lockerNew.Lock()
-	require.NoError(t, err)
-}
-
-func TestEmptyLockfile(t *testing.T) {
-	testBeat := beat.Info{Beat: mustNewUUID(t), StartTime: time.Now().Add(-time.Second * 1)}
-	deadLock := New(testBeat)
-	// Create an empty lockfile
-	// Might happen in cases where a beat shut down at *just* the right time.
-	fh, err := os.Create(deadLock.filePath)
-	require.NoError(t, err)
-	fh.Close()
-
-	newBeat := New(testBeat)
-	err = newBeat.Lock()
+	// try with other lockfile
+	err = bl2.Lock()
 	require.NoError(t, err)
 
 }
 
-func mustNewUUID(t *testing.T) string {
-	uuid, err := uuid.NewV4()
-	require.NoError(t, err)
-	return uuid.String()
-}
+func TestUnlockWithRemainingFile(t *testing.T) {
+	const beatName = "testbeat-testunlockwithfile"
 
-func fakeDeadPid() int {
-	return 99999
+	b1 := beat.Info{}
+	b1.Beat = beatName
+
+	b2 := beat.Info{}
+	b2.Beat = beatName
+	bl2 := New(b2)
+
+	// Try to get a lock for the first beat. Expect it to succeed.
+	bl1 := New(b1)
+	err := bl1.Lock()
+	require.NoError(t, err)
+
+	// unlock the underlying FD, so we don't remove the file
+	err = bl1.fileLock.Unlock()
+	require.NoError(t, err)
+
+	// now lock new handle with the same file
+	err = bl2.Lock()
+	require.NoError(t, err)
 }

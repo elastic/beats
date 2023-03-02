@@ -809,7 +809,7 @@ filebeat.inputs:
        # Source of container events. Available options: all, stdin, stderr.
        #stream: all
 
-       # Format of the container events. Available options: auto, cri, docker, json-file 
+       # Format of the container events. Available options: auto, cri, docker, json-file
        #format: auto
 
   ### Log rotation
@@ -819,7 +819,7 @@ filebeat.inputs:
   #rotation.external.strategy.copytruncate:
   # Regex that matches the rotated files.
   #  suffix_regex: \.\d$
-  # If the rotated filename suffix is a datetime, set it here. 
+  # If the rotated filename suffix is a datetime, set it here.
   #  dateformat: -20060102
 
   ### State options
@@ -858,6 +858,11 @@ filebeat.inputs:
   # ignore_inactive is disabled by default, so no files are ignored by setting it to "".
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
+
+  # If `take_over` is set to `true`, this `filestream` will take over all files
+  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # This functionality is still in beta.
+  #take_over: false
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -1016,7 +1021,7 @@ filebeat.inputs:
   #hosts:
     #- kafka-broker-1:9092
     #- kafka-broker-2:9092
-  
+
   # A list of topics to read from.
   #topics: ["my-topic", "important-logs"]
 
@@ -1051,7 +1056,7 @@ filebeat.inputs:
 
   # The minimum number of bytes to wait for.
   #fetch.min: 1
-  
+
   # The default number of bytes to read per request.
   #fetch.default: 1MB
 
@@ -1184,7 +1189,6 @@ filebeat.inputs:
   #- multiline:
     #type: count
     #count_lines: 3
-
 
 # =========================== Filebeat autodiscover ============================
 
@@ -1660,6 +1664,15 @@ output.elasticsearch:
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
+
+  # Enables restarting filebeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -1798,6 +1811,14 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enables restarting filebeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -2003,6 +2024,14 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enables restarting filebeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true

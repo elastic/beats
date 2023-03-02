@@ -62,6 +62,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 			addMonitorStatus(nil),
 			addMonitorErr,
 			addMonitorDuration,
+			logMonitorRun(nil),
 		),
 		func() jobs.JobWrapper {
 			return makeAddSummary()
@@ -86,7 +87,7 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addMonitorErr,
 		addBrowserSummary(stdMonFields, byEventType("heartbeat/summary")),
 		addMonitorState(stdMonFields, mst),
-		logJourneySummaries,
+		logMonitorRun(byEventType("heartbeat/summary")),
 	)
 }
 
@@ -275,32 +276,24 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 				},
 			})
 			event.Timestamp = start
-
-			logger.LogRun(event, nil)
 		}
 
 		return cont, err
 	}
 }
 
-const META_STEP_COUNT = "__HEARTBEAT_STEP_COUNT__"
+// logMonitorRun emits a metric for the service when summary events are complete.
+func logMonitorRun(match EventMatcher) jobs.JobWrapper {
+	return func(job jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, err := job(event)
 
-// logJourneySummaries emits a metric for the service when summary events are complete.
-// Only applies to browser journeys.
-func logJourneySummaries(job jobs.Job) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		conts, err := job(event)
+			if match == nil || match(event) {
+				logger.LogRun(event)
+			}
 
-		summary, _ := event.GetValue("summary")
-		if summary != nil {
-			sc, _ := event.Meta.GetValue(META_STEP_COUNT)
-			var scInt int
-			// If we don't have it we have zero steps
-			scInt, _ = sc.(int)
-			logger.LogRun(event, &scInt)
+			return cont, err
 		}
-
-		return conts, err
 	}
 }
 
