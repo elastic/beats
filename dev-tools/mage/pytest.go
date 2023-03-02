@@ -255,7 +255,7 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 
 	pip := virtualenvPath(ve, "pip")
 	pipUpgrade := func(pkg string) error {
-		return sh.RunWith(env, pip, "install", "--user", "-U", pkg)
+		return sh.RunWith(env, pip, "install", "-U", pkg)
 	}
 
 	// Ensure we are using the latest pip version.
