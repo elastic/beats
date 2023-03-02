@@ -821,6 +821,7 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
+		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
 		lib.File(mimetypes),
