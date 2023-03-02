@@ -676,7 +676,7 @@ func TestValueTpl(t *testing.T) {
 				assert.NoError(t, defTpl.Unpack(tc.paramDefVal))
 			}
 
-			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, defTpl, logp.NewLogger(""))
+			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, "", defTpl, logp.NewLogger(""))
 			assert.Equal(t, tc.expectedVal, got)
 			if tc.expectedError == "" {
 				assert.NoError(t, err)

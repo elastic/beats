@@ -46,6 +46,13 @@ some extra setup. For more information, see
 {logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
 endif::[]
 
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
+
 // end::shared-logstash-config[]
 
 ==== Accessing metadata fields
@@ -118,6 +125,7 @@ output {
   elasticsearch {
     hosts => ["http://localhost:9200"]
     index => "%{[@metadata][beat]}-%{[@metadata][version]}" <1>
+    action => "create"
   }
 }
 ------------------------------------------------------------------------------
@@ -158,6 +166,7 @@ output {
     elasticsearch {
         hosts => ["http://localhost:9200"]
         index => "%{[@metadata][index]}"
+        action => "create"
     }
 }
 ------
@@ -195,6 +204,7 @@ output {
     elasticsearch {
         hosts => ["http://localhost:9200"]
         index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{[processor][event]}" <1>
+        action => "create"
     }
 }
 ------

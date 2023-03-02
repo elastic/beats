@@ -429,8 +429,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 	}
 
-	if err := seccomp.LoadFilter(b.Config.Seccomp); err != nil {
-		return err
+	// Do not load seccomp for osquerybeat, it was disabled before V2 in the configuration file
+	// https://github.com/elastic/beats/blob/7cf873fd340172c33f294500ccfec948afd7a47c/x-pack/osquerybeat/osquerybeat.yml#L16
+	if b.Info.Beat != "osquerybeat" {
+		if err := seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+			return err
+		}
 	}
 
 	beater, err := b.createBeater(bt)
@@ -553,7 +557,7 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 	}())
 }
 
-//SetupSettings holds settings necessary for beat setup
+// SetupSettings holds settings necessary for beat setup
 type SetupSettings struct {
 	Dashboard       bool
 	Pipeline        bool
@@ -566,6 +570,7 @@ type SetupSettings struct {
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
+//
 //nolint:forbidigo // required to give feedback to user
 func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) error {
 	return handleError(func() error {

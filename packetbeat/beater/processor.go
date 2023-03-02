@@ -128,7 +128,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		return nil, err
 	}
 
-	watcher := procs.ProcessesWatcher{}
+	watcher := &procs.ProcessesWatcher{}
 	// Enable the process watcher only if capturing live traffic
 	if config.Interfaces[0].File == "" {
 		err = watcher.Init(config.Procs)
@@ -160,7 +160,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 
 // setupFlows returns a *flows.Flows that will publish to the provided pipeline,
 // configured with cfg and process enrichment via the provided watcher.
-func setupFlows(pipeline beat.Pipeline, watcher procs.ProcessesWatcher, cfg config.Config) (*flows.Flows, error) {
+func setupFlows(pipeline beat.Pipeline, watcher *procs.ProcessesWatcher, cfg config.Config) (*flows.Flows, error) {
 	if !cfg.Flows.IsEnabled() {
 		return nil, nil
 	}

@@ -11,7 +11,7 @@ experimental[]
 <titleabbrev>CEL</titleabbrev>
 ++++
 
-Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the https://opensource.google.com/projects/cel[Common Expression Language (CEL)] and the https://pkg.go.dev/github.com/elastic/mito/lib[mito] and https://pkg.go.dev/github.com/google/cel-go@v0.12.5/ext#Strings[ext Strings] CEL extension libraries.
+Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the https://opensource.google.com/projects/cel[Common Expression Language (CEL)] and the https://pkg.go.dev/github.com/elastic/mito/lib[mito] CEL extension libraries.
 
 CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can incled with the mito extension library file and API endpoints.
 The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation.
@@ -430,6 +430,26 @@ Duration before declaring that the HTTP client connection has timed out. Valid t
 This specifies SSL/TLS configuration. If the ssl section is missing, the host's
 CAs are used for HTTPS connections. See <<configuration-ssl>> for more
 information.
+
+[float]
+==== `resource.keep_alive.disable`
+
+This specifies whether to disable keep-alives for HTTP end-points. Default: `true`.
+
+[float]
+==== `resource.keep_alive.max_idle_connections`
+
+The maximum number of idle connections across all hosts. Zero means no limit. Default: `0`.
+
+[float]
+==== `resource.keep_alive.max_idle_connections_per_host`
+
+The maximum idle connections to keep per-host. If zero, defaults to two. Default: `0`.
+
+[float]
+==== `resource.keep_alive.idle_connection_timeout`
+
+The maximum amount of time an idle connection will remain idle before closing itself. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Zero means no limit. Default: `0s`.
 
 [float]
 ==== `resource.retry.max_attempts`

@@ -275,7 +275,7 @@ func (s *sniffer) sniffStatic(ctx context.Context, device string) error {
 	}
 	defer handle.Close()
 
-	dec, err := s.decoders(handle.LinkType())
+	dec, err := s.decoders(handle.LinkType(), device)
 	if err != nil {
 		return err
 	}
@@ -315,7 +315,7 @@ func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layer
 	linkType := handle.LinkType()
 	if dec == nil || linkType != last {
 		logp.Info("changing link type: %d -> %d", last, linkType)
-		dec, err = s.decoders(linkType)
+		dec, err = s.decoders(linkType, device)
 		if err != nil {
 			return linkType, dec, err
 		}

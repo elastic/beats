@@ -137,9 +137,41 @@ func (c rateLimitConfig) Validate() error {
 		return errors.New("limit must be greater than zero")
 	}
 	if c.Limit == nil && c.Burst != nil && *c.Burst <= 0 {
-		return errors.New("limit must be greater than zero if limit is specified")
+		return errors.New("burst must be greater than zero if limit is not specified")
 	}
 	return nil
+}
+
+type keepAlive struct {
+	Disable             *bool         `config:"disable"`
+	MaxIdleConns        int           `config:"max_idle_connections"`
+	MaxIdleConnsPerHost int           `config:"max_idle_connections_per_host"` // If zero, http.DefaultMaxIdleConnsPerHost is the value used by http.Transport.
+	IdleConnTimeout     time.Duration `config:"idle_connection_timeout"`
+}
+
+func (c keepAlive) Validate() error {
+	if c.Disable == nil || *c.Disable {
+		return nil
+	}
+	if c.MaxIdleConns < 0 {
+		return errors.New("max_idle_connections must not be negative")
+	}
+	if c.MaxIdleConnsPerHost < 0 {
+		return errors.New("max_idle_connections_per_host must not be negative")
+	}
+	if c.IdleConnTimeout < 0 {
+		return errors.New("idle_connection_timeout must not be negative")
+	}
+	return nil
+}
+
+func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
+	return httpcommon.WithKeepaliveSettings{
+		Disable:             c.Disable == nil || *c.Disable,
+		MaxIdleConns:        c.MaxIdleConns,
+		MaxIdleConnsPerHost: c.MaxIdleConnsPerHost,
+		IdleConnTimeout:     c.IdleConnTimeout,
+	}
 }
 
 type ResourceConfig struct {
@@ -149,6 +181,7 @@ type ResourceConfig struct {
 	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
 	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
 	RateLimit              *rateLimitConfig `config:"rate_limit"`
+	KeepAlive              keepAlive        `config:"keep_alive"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 

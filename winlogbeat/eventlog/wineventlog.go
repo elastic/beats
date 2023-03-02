@@ -23,9 +23,11 @@ package eventlog
 import (
 	"encoding/xml"
 	"errors"
+	"expvar"
 	"fmt"
 	"io"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -41,6 +43,18 @@ import (
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+var (
+	detailSelector = "eventlog_detail"
+	detailf        = logp.MakeDebug(detailSelector)
+
+	// dropReasons contains counters for the number of dropped events for each
+	// reason.
+	dropReasons = expvar.NewMap("drop_reasons")
+
+	// readErrors contains counters for the read error types that occur.
+	readErrors = expvar.NewMap("read_errors")
 )
 
 const (
@@ -186,6 +200,16 @@ type winEventLog struct {
 // Name returns the name of the event log (i.e. Application, Security, etc.).
 func (l *winEventLog) Name() string {
 	return l.id
+}
+
+// Channel returns the event log's channel name.
+func (l *winEventLog) Channel() string {
+	return l.channelName
+}
+
+// IsFile returns true if the event log is an evtx file.
+func (l *winEventLog) IsFile() bool {
+	return l.file
 }
 
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
@@ -580,4 +604,18 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
 	win.Close(bmHandle)
 	return string(l.outputBuf.Bytes()), err
+}
+
+// incrementMetric increments a value in the specified expvar.Map. The key
+// should be a windows syscall.Errno or a string. Any other types will be
+// reported under the "other" key.
+func incrementMetric(v *expvar.Map, key interface{}) {
+	switch t := key.(type) {
+	default:
+		v.Add("other", 1)
+	case string:
+		v.Add(t, 1)
+	case syscall.Errno:
+		v.Add(strconv.Itoa(int(t)), 1)
+	}
 }

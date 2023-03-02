@@ -78,10 +78,56 @@ type enricher struct {
 
 const selector = "kubernetes"
 
+const (
+	PodResource                   = "pod"
+	ServiceResource               = "service"
+	DeploymentResource            = "deployment"
+	ReplicaSetResource            = "replicaset"
+	StatefulSetResource           = "statefulset"
+	DaemonSetResource             = "daemonset"
+	JobResource                   = "job"
+	NodeResource                  = "node"
+	CronJobResource               = "cronjob"
+	PersistentVolumeResource      = "persistentvolume"
+	PersistentVolumeClaimResource = "persistentvolumeclaim"
+	StorageClassResource          = "storageclass"
+)
+
+func getResource(resourceName string) kubernetes.Resource {
+	switch resourceName {
+	case PodResource:
+		return &kubernetes.Pod{}
+	case ServiceResource:
+		return &kubernetes.Service{}
+	case DeploymentResource:
+		return &kubernetes.Deployment{}
+	case ReplicaSetResource:
+		return &kubernetes.ReplicaSet{}
+	case StatefulSetResource:
+		return &kubernetes.StatefulSet{}
+	case DaemonSetResource:
+		return &kubernetes.DaemonSet{}
+	case JobResource:
+		return &kubernetes.Job{}
+	case CronJobResource:
+		return &kubernetes.CronJob{}
+	case PersistentVolumeResource:
+		return &kubernetes.PersistentVolume{}
+	case PersistentVolumeClaimResource:
+		return &kubernetes.PersistentVolumeClaim{}
+	case StorageClassResource:
+		return &kubernetes.StorageClass{}
+	case NodeResource:
+		return &kubernetes.Node{}
+	default:
+		return nil
+	}
+}
+
 // NewResourceMetadataEnricher returns an Enricher configured for kubernetes resource events
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
-	res kubernetes.Resource,
+	resourceName string,
 	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
@@ -91,6 +137,10 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
+	res := getResource(resourceName)
+	if res == nil {
+		return &nilEnricher{}
+	}
 	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, res, nodeScope)
 
 	if watcher == nil {
@@ -138,30 +188,30 @@ func NewResourceMetadataEnricher(
 				nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
 				nodeStore.SetNodeMetrics(metrics)
 
-				m[id] = metaGen.Generate("node", r)
+				m[id] = metaGen.Generate(NodeResource, r)
 
 			case *kubernetes.Deployment:
-				m[id] = metaGen.Generate("deployment", r)
+				m[id] = metaGen.Generate(DeploymentResource, r)
 			case *kubernetes.Job:
-				m[id] = metaGen.Generate("job", r)
+				m[id] = metaGen.Generate(JobResource, r)
 			case *kubernetes.CronJob:
-				m[id] = metaGen.Generate("cronjob", r)
+				m[id] = metaGen.Generate(CronJobResource, r)
 			case *kubernetes.Service:
 				m[id] = serviceMetaGen.Generate(r)
 			case *kubernetes.StatefulSet:
-				m[id] = metaGen.Generate("statefulset", r)
+				m[id] = metaGen.Generate(StatefulSetResource, r)
 			case *kubernetes.Namespace:
 				m[id] = metaGen.Generate("namespace", r)
 			case *kubernetes.ReplicaSet:
-				m[id] = metaGen.Generate("replicaset", r)
+				m[id] = metaGen.Generate(ReplicaSetResource, r)
 			case *kubernetes.DaemonSet:
-				m[id] = metaGen.Generate("daemonset", r)
+				m[id] = metaGen.Generate(DaemonSetResource, r)
 			case *kubernetes.PersistentVolume:
-				m[id] = metaGen.Generate("persistentvolume", r)
+				m[id] = metaGen.Generate(PersistentVolumeResource, r)
 			case *kubernetes.PersistentVolumeClaim:
-				m[id] = metaGen.Generate("persistentvolumeclaim", r)
+				m[id] = metaGen.Generate(PersistentVolumeClaimResource, r)
 			case *kubernetes.StorageClass:
-				m[id] = metaGen.Generate("storageclass", r)
+				m[id] = metaGen.Generate(StorageClassResource, r)
 			default:
 				m[id] = metaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
 			}
@@ -227,7 +277,7 @@ func NewContainerMetadataEnricher(
 			if !ok {
 				base.Logger().Debugf("Error while casting event: %s", ok)
 			}
-			meta := metaGen.Generate(pod)
+			pmeta := metaGen.Generate(pod)
 
 			statuses := make(map[string]*kubernetes.PodContainerStatus)
 			mapStatuses := func(s []kubernetes.PodContainerStatus) {
@@ -243,6 +293,7 @@ func NewContainerMetadataEnricher(
 			podStore, _ := nodeStore.AddPodStore(podId)
 
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
+				cmeta := mapstr.M{}
 				metrics := NewContainerMetrics()
 
 				if cpu, ok := container.Resources.Limits["cpu"]; ok {
@@ -264,14 +315,15 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						kubernetes2.ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+						kubernetes2.ShouldPut(cmeta, "container.id", s.ContainerID[split+3:], base.Logger())
 
-						kubernetes2.ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
+						kubernetes2.ShouldPut(cmeta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-				m[id] = meta
+				cmeta.DeepUpdate(pmeta)
+				m[id] = cmeta
 			}
 		},
 		// delete
@@ -584,18 +636,18 @@ func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 	config, err := GetValidatedConfig(base)
 	if err != nil {
 		logp.Info("could not retrieve validated config")
-		return nil
+		return mapstr.M{}
 	}
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		logp.Err("fail to get kubernetes client: %s", err)
-		return nil
+		return mapstr.M{}
 	}
 	cfg, _ := conf.NewConfigFrom(&config)
 	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
 	if err != nil {
 		logp.Info("could not retrieve cluster metadata: %s", err)
-		return nil
+		return mapstr.M{}
 	}
 	return ecsClusterMeta
 }

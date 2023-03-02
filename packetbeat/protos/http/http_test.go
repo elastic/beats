@@ -88,7 +88,7 @@ func httpModForTests(store *eventStore) *httpPlugin {
 		callback = store.publish
 	}
 
-	http, err := New(false, callback, procs.ProcessesWatcher{}, conf.NewConfig())
+	http, err := New(false, callback, &procs.ProcessesWatcher{}, conf.NewConfig())
 	if err != nil {
 		panic(err)
 	}

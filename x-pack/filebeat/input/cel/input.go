@@ -645,7 +645,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	}
 	c, err := cfg.Resource.Transport.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
+		cfg.Resource.KeepAlive.settings(),
 	)
 	if err != nil {
 		return nil, err
