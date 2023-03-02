@@ -202,15 +202,12 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
 	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
 
-<<<<<<< HEAD
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	metrics := newInputMetrics(metricRegistry, ctx.ID)
-=======
 	if in.config.BackupConfig.GetBucketName() != "" {
 		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets" +
 			"or prefixes to avoid an infinite loop.")
 	}
->>>>>>> 5df1895443 (Add backup to bucket functionality (#33559))
 
 	fileSelectors := in.config.FileSelectors
 	if len(in.config.FileSelectors) == 0 {
@@ -220,12 +217,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 	if err != nil {
 		return nil, err
 	}
-<<<<<<< HEAD
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors)
-=======
-	metrics := newInputMetrics(ctx.ID, nil)
 	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
->>>>>>> 5df1895443 (Add backup to bucket functionality (#33559))
 	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
 	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
@@ -300,12 +292,7 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
-<<<<<<< HEAD
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors)
-=======
-	metrics := newInputMetrics(ctx.ID, nil)
 	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
->>>>>>> 5df1895443 (Add backup to bucket functionality (#33559))
 	s3Poller := newS3Poller(log.Named("s3_poller"),
 		metrics,
 		s3API,

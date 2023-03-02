@@ -39,12 +39,7 @@ type inputMetrics struct {
 
 // Close removes the metrics from the registry.
 func (m *inputMetrics) Close() {
-<<<<<<< HEAD
 	m.parent.Remove(m.id)
-=======
-	// Thanks to this integration tests fail
-	m.unregister()
->>>>>>> 5df1895443 (Add backup to bucket functionality (#33559))
 }
 
 func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
