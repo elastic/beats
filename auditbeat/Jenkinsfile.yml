@@ -29,10 +29,10 @@ stages:
         stage: extended
     unitTest:
         mage: "mage build unitTest"
-        stage: mandatory
+        stage: extended
     crosscompile:
         make: "make -C auditbeat crosscompile"
-        stage: mandatory
+        stage: extended
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
