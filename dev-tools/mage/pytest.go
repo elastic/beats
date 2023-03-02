@@ -269,7 +269,7 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 	}
 
 	// Execute pip to install the dependencies.
-	args := []string{"install", "--user"}
+	args := []string{"install"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
 	}
