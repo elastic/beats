@@ -77,6 +77,32 @@ func TestGetOne(t *testing.T) {
 	t.Logf("Proc: %s", procData[0].StringToPrint())
 }
 
+func TestRootPerm(t *testing.T) {
+	testConfig := Stats{
+		Procs:        []string{".*"},
+		Hostfs:       resolve.NewTestResolver("/"),
+		CPUTicks:     false,
+		CacheCmdLine: true,
+		EnvWhitelist: []string{".*"},
+		IncludeTop: IncludeTopConfig{
+			Enabled:  true,
+			ByCPU:    4,
+			ByMemory: 0,
+		},
+		EnableCgroups: false,
+		CgroupOpts: cgroup.ReaderOptions{
+			RootfsMountpoint:  resolve.NewTestResolver("/"),
+			IgnoreRootCgroups: true,
+		},
+	}
+	err := testConfig.Init()
+	assert.NoError(t, err, "Init")
+
+	data, err := testConfig.GetOne(1131)
+	require.NoError(t, err)
+	t.Logf("got: %s", data.StringToPrint())
+}
+
 func TestNetworkFetch(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("Network data only available on linux")
