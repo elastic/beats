@@ -138,6 +138,9 @@ func calculateDelay(replStatus MongoReplStatus) []mapstr.M {
 	result := make([]mapstr.M, 0)
 	if isPrimary {
 		for _, member := range replStatus.Members {
+			if MemberState(member.State) == ARBITER {
+				continue
+			}
 			result = append(result, mapstr.M{
 				"optimes": mapstr.M{
 					"name": member.Name,
