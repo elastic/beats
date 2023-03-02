@@ -26,6 +26,7 @@ pipeline {
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     KIND_VERSION = 'v0.17.0'
     K8S_VERSION = 'v1.26.0'
+    MAGEFILE_VERBOSE = '1'
   }
   options {
     timeout(time: 6, unit: 'HOURS')
