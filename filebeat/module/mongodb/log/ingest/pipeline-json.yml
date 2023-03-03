@@ -39,6 +39,47 @@ processors:
     field: event.type
     value: error
     if: ctx.log.level == 'F' || ctx.log.level == 'E'
+- rename:
+    field: mongodb.log.attr.principalName
+    target_field: user.name
+    ignore_missing: true
+- append:
+    field: related.user
+    value: '{{ user.name }}'
+    if: ctx?.user?.name != null
+- rename:
+    field: mongodb.log.attr.remote
+    target_field: source.address
+    ignore_missing: true
+- grok:
+    field: source.address
+    patterns:
+      - ^%{IP:source.ip}:%{NUMBER:source.port}
+    ignore_failure: true
+- append:
+    field: related.ip
+    value: '{{ source.ip }}'
+    if: ctx?.source?.ip != null
+- append:
+    field: event.category
+    value: authentication
+    if: ctx?.message == "Authentication failed" || ctx?.message == "Authentication succeeded"
+- append:
+    field: event.type
+    value: logon-failed
+    if: ctx?.message == "Authentication failed"
+- append:
+    field: event.type
+    value: logged-in
+    if: ctx?.message == "Authentication succeeded"
+- set:
+    field: event.outcome
+    value: failure
+    if: ctx?.message == "Authentication failed" || ctx?.message == "Checking authorization failed" 
+- set:
+    field: event.outcome
+    value: success
+    if: ctx?.message == "Authentication succeeded"
 - remove:
     field:
       - mongodb.log.t

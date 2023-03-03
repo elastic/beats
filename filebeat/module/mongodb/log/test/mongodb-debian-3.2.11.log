@@ -35,3 +35,6 @@
 2019-03-07T15:10:26.960+0000 I ASIO [NetworkInterfaceASIO-Replication-0] Successfully connected to dbbox7:27017, took 10ms (1 connections now open to dbbox7:27017)
 2020-03-31T21:19:46.942+0000 E WRITE  [initandlisten] ** ERROR: A write operation resulted in an error. E11000 duplicate key error index: test.people.$_id_ dup key: { : 0 }
 2020-03-31T21:19:47.420+0000 E NETWORK  [initandlisten] ** ERROR: No connection could be made because the target machine actively refused it 127.0.0.1:27017 at System.Net.Sockets.Socket.EndConnect
+2023-02-28T16:51:09.501+0000 I  ACCESS   [conn1336959] SASL SCRAM-SHA-1 authentication failed for sherlock on videoschedule from client 10.10.10.10:50490 ; UserNotFound: Could not find user "sherlock" for db "videoschedule"
+2023-03-01T11:25:39.651+0000 I ACCESS   [conn244390] Unauthorized: not authorized on admin to execute command { find: "system.version", filter: { _id: "shardIdentity" }, limit: 1, singleBatch: true }
+2023-03-01T11:25:53.439+0000 I ACCESS   [conn3391839] Successfully authenticated as principal sherlock on admin

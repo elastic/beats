@@ -740,5 +740,86 @@
         "mongodb.log.component": "NETWORK",
         "mongodb.log.context": "initandlisten",
         "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2023-02-28T16:51:09.501Z",
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.outcome": "failure",
+        "event.type": [
+            "access",
+            "logon-failed"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 4502,
+        "message": "SASL SCRAM-SHA-1 authentication failed for sherlock on videoschedule from client 10.10.10.10:50490 ; UserNotFound: Could not find user \"sherlock\" for db \"videoschedule\"",
+        "mongodb.log.component": "ACCESS",
+        "mongodb.log.context": "conn1336959",
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "related.user" : [
+            "sherlock"
+        ],
+        "service.type": "mongodb",
+        "source.address": "10.10.10.10:50490",
+        "source.ip": "10.10.10.10",
+        "source.port": "50490",
+        "user.name": "sherlock"
+    },
+    {
+        "@timestamp": "2023-03-01T11:25:39.651Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.outcome": "failure",
+        "event.module": "mongodb",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 4726,
+        "message": "Unauthorized: not authorized on admin to execute command { find: \"system.version\", filter: { _id: \"shardIdentity\" }, limit: 1, singleBatch: true }",
+        "mongodb.log.component": "ACCESS",
+        "mongodb.log.context": "conn244390",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2023-03-01T11:25:53.439Z",
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.outcome": "success",
+        "event.type": [
+            "access",
+            "logged-in"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 4926,
+        "message": "Successfully authenticated as principal sherlock on admin",
+        "mongodb.log.component": "ACCESS",
+        "mongodb.log.context": "conn3391839",
+        "related.user" : [
+            "sherlock"
+        ],
+        "service.type": "mongodb",
+        "user.name": "sherlock"
     }
 ]

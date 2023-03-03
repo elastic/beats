@@ -28,6 +28,74 @@ processors:
     field: event.type
     value: error
     if: "ctx?.log?.level == 'F' || ctx?.log?.level == 'E'"
+- grok:
+    field: message
+    trace_match: true
+    patterns:
+      - "^%{DATA} %{MONGODB_AUTH_FAILURE:tmp.auth_failure} for %{NOTSPACE:user.name} on %{NOTSPACE} from client %{NOTSPACE:source.address} ;%{GREEDYDATA}"
+      - "^Unauthorized: %{MONGODB_NOT_AUTHORIZED:tmp.not_authorized} %{NOTSPACE} to execute command"
+      - "^%{MONGODB_AUTH_SUCCESSFUL:tmp.auth_successful} as principal %{USERNAME:user.name} on %{NOTSPACE}"
+    pattern_definitions:
+      MONGODB_AUTH_FAILURE: authentication failed
+      MONGODB_NOT_AUTHORIZED: not authorized on
+      MONGODB_AUTH_SUCCESSFUL: Successfully authenticated
+    ignore_failure: true
+- append:
+    field: related.user
+    value: '{{ user.name }}'
+    if: ctx?.user?.name != null
+- grok:
+    field: source.address
+    patterns:
+      - ^%{IP:source.ip}:%{NUMBER:source.port}
+    ignore_failure: true
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- append: 
+    field: related.ip
+    value: '{{ source.ip }}'
+    if: "ctx.source?.ip != null"
+- append:
+    field: event.category
+    value: authentication
+    if: ctx?.tmp?.auth_failure != null || ctx?.tmp?.auth_successful != null
+- append:
+    field: event.type
+    value: logon-failed
+    if: ctx?.tmp?.auth_failure != null
+- append:
+    field: event.type
+    value: logged-in
+    if: ctx?.tmp?.auth_successful != null
+- set:
+    field: event.outcome
+    value: failure
+    if: ctx?.tmp?.auth_failure != null || ctx?.tmp?.not_authorized != null
+- set:
+    field: event.outcome
+    value: success
+    if: ctx?.tmp?.auth_successful != null
+- remove: 
+    field: tmp
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

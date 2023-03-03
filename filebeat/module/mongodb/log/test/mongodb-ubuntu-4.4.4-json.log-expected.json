@@ -152,5 +152,98 @@
         "mongodb.log.context": "initandlisten",
         "mongodb.log.id": 20625,
         "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2022-07-05T10:13:20.632Z",
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.original": "{\"t\":{\"$date\":\"2022-07-05T13:13:20.632+03:00\"},\"s\":\"I\",  \"c\":\"ACCESS\",   \"id\":20249,   \"ctx\":\"conn351460\",\"msg\":\"Authentication failed\",\"attr\":{\"mechanism\":\"SCRAM-SHA-256\",\"speculative\":true,\"principalName\":\"sherlock\",\"authenticationDatabase\":\"db_name\",\"remote\":\"10.10.10.10:52088\",\"extraInfo\":{},\"error\":\"AuthenticationFailed: SCRAM authentication failed, storedKey mismatch\"}}",
+        "event.outcome": "failure",
+        "event.type": [
+            "access",
+            "logon-failed"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 1834,
+        "message": "Authentication failed",
+        "mongodb.log.component": "ACCESS",
+        "mongodb.log.context": "conn351460",
+        "mongodb.log.id": 20249,
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "mongodb",
+        "source.address": "10.10.10.10:52088",
+        "source.ip": "10.10.10.10",
+        "source.port": "52088",
+        "user.name": "sherlock"
+    },
+    {
+        "@timestamp": "2023-03-01T11:31:09.750Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.original": "{\"t\":{\"$date\":\"2023-03-01T11:31:09.750+00:00\"},\"s\":\"I\",  \"c\":\"ACCESS\",   \"id\":20436,   \"ctx\":\"conn3137147\",\"msg\":\"Checking authorization failed\",\"attr\":{\"error\":{\"code\":13,\"codeName\":\"Unauthorized\",\"errmsg\":\"not authorized on admin to execute command { find: \\\"system.version\\\", filter: { _id: \\\"shardIdentity\\\" }, limit: 1, singleBatch: true, lsid: { id: UUID(\\\"6cd7cfc8-dff1-47c1-800c-ce0cececf400\\\") }, $db: \\\"admin\\\" }\"}}}",
+        "event.outcome": "failure",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 2213,
+        "message": "Checking authorization failed",
+        "mongodb.log.component": "ACCESS",
+        "mongodb.log.context": "conn3137147",
+        "mongodb.log.id": 20436,
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2023-03-01T11:30:56.276Z",
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "mongodb.log",
+        "event.kind": "event",
+        "event.module": "mongodb",
+        "event.original": "{\"t\":{\"$date\":\"2023-03-01T11:30:56.276+00:00\"},\"s\":\"I\",  \"c\":\"ACCESS\",   \"id\":20250,   \"ctx\":\"conn2181505\",\"msg\":\"Authentication succeeded\",\"attr\":{\"mechanism\":\"SCRAM-SHA-256\",\"speculative\":true,\"principalName\":\"sherlock\",\"authenticationDatabase\":\"admin\",\"remote\":\"172.18.0.7:60756\",\"extraInfo\":{}}}",
+        "event.outcome": "success",
+        "event.type": [
+            "access",
+            "logged-in"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 2640,
+        "message": "Authentication succeeded",
+        "mongodb.log.component": "ACCESS",
+        "mongodb.log.context": "conn2181505",
+        "mongodb.log.id": 20250,
+        "related.ip": [
+            "172.18.0.7"
+        ],
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "mongodb",
+        "source.address": "172.18.0.7:60756",
+        "source.ip": "172.18.0.7",
+        "source.port": "60756",
+        "user.name": "sherlock"
     }
 ]
