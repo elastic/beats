@@ -147,6 +147,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 - Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
+- Make generic SQL GA {pull}34637[34637]
 
 
 *Osquerybeat*
