@@ -9,7 +9,7 @@ input:
       resource_type: "Microsoft.DocumentDb/databaseAccounts"
       metrics:
       - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
-               "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures", "UpdateDiagnosticsSettings"]
+               "RegionFailover", "DeleteAccount", "CreateAccount", "UpdateDiagnosticsSettings"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
       - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests", "MongoRequestCharge", "MongoRequests", "MongoRequestsCount",
                "MongoRequestsInsert", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate","ProvisionedThroughput", "NormalizedRUConsumption"]
@@ -28,7 +28,7 @@ input:
           value: "*"
         - name: "StatusCode"
           value: "*"
-      - name: ["CassandraRequestCharges", "CassandraRequests"]
+      - name: ["CassandraConnectionClosures", "CassandraRequestCharges", "CassandraRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
         ignore_unsupported: true
         timegrain: "PT1M"
@@ -48,7 +48,7 @@ input:
     - resource_id: ""
       metrics:
       - name: ["AddRegion", "RemoveRegion", "UpdateAccountReplicationSettings", "UpdateAccountNetworkSettings", "UpdateAccountKeys", "ServiceAvailability", "ReplicationLatency",
-               "RegionFailover", "DeleteAccount", "CreateAccount", "CassandraConnectionClosures", "UpdateDiagnosticsSettings"]
+               "RegionFailover", "DeleteAccount", "CreateAccount", "UpdateDiagnosticsSettings"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
       - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests", "MongoRequestCharge", "MongoRequests", "MongoRequestsCount",
                "MongoRequestsInsert", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate","ProvisionedThroughput", "NormalizedRUConsumption"]
@@ -67,7 +67,7 @@ input:
           value: "*"
         - name: "StatusCode"
           value: "*"
-      - name: ["CassandraRequestCharges", "CassandraRequests"]
+      - name: ["CassandraConnectionClosures", "CassandraRequestCharges", "CassandraRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
         ignore_unsupported: true
         timegrain: "PT1M"
