@@ -383,6 +383,9 @@
         "observer.serial_number": "someotherrouteridagain",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "172.16.0.2"
+        ],
         "related.user": [
             "elastico"
         ],
@@ -473,6 +476,7 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
+            "10.10.10.10",
             "8.8.5.4"
         ],
         "related.user": [
@@ -838,6 +842,9 @@
         "observer.product": "Fortigate",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "172.18.64.250"
+        ],
         "related.user": [
             "skubas"
         ],
@@ -878,6 +885,9 @@
         "observer.product": "Fortigate",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.ip": [
+            "172.18.64.250"
+        ],
         "related.user": [
             "skubas"
         ],
