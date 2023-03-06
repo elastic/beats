@@ -181,16 +181,25 @@
         "postgresql.log.timestamp": "2021-01-04 01:06:20.982 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "86",
-        "service.type": "postgresql"
+        "related.ip": [
+            "172.24.0.1"
+        ],
+        "service.type": "postgresql",
+        "source.ip": "172.24.0.1"
     },
     {
         "@timestamp": "2021-01-04T01:06:21.083Z",
+        "event.action": [
+            "logged-in"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "successful",
         "event.timezone": "UTC",
         "event.type": [
             "info"
@@ -212,10 +221,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/1",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -249,10 +262,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/2",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -286,10 +303,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/3",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -326,10 +347,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/4",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -366,10 +391,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/5",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -406,10 +435,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/6",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -443,10 +476,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/7",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -483,10 +520,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/8",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -523,10 +564,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/9",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -560,10 +605,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/10",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -597,10 +646,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/11",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -765,10 +818,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/0",
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -800,10 +857,14 @@
         "postgresql.log.timestamp": "2021-01-04 01:07:25.950 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "86",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     }
 ]

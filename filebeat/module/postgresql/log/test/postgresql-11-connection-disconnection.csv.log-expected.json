@@ -74,16 +74,25 @@
         "postgresql.log.timestamp": "2021-01-04 00:05:06.011 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "34",
-        "service.type": "postgresql"
+        "related.ip": [
+            "172.24.0.1"
+        ],
+        "service.type": "postgresql",
+        "source.ip": "172.24.0.1"
     },
     {
         "@timestamp": "2021-01-04T00:05:06.086Z",
+        "event.action": [
+            "logged-in"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "successful",
         "event.timezone": "UTC",
         "event.type": [
             "info"
@@ -104,10 +113,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/1",
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -143,10 +156,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/2",
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -179,10 +196,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/3",
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -215,10 +236,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/4",
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -254,10 +279,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/5",
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -293,10 +322,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/6",
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -332,10 +365,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/7",
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -368,10 +405,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/8",
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -402,10 +443,14 @@
         "postgresql.log.timestamp": "2021-01-04 00:05:51.418 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "34",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -433,16 +478,25 @@
         "postgresql.log.timestamp": "2021-01-04 00:05:58.207 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "36",
-        "service.type": "postgresql"
+        "related.ip": [
+            "172.24.0.1"
+        ],
+        "service.type": "postgresql",
+        "source.ip": "172.24.0.1"
     },
     {
         "@timestamp": "2021-01-04T00:05:58.232Z",
+        "event.action": [
+            "logon-failed"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "failure",
         "event.timezone": "UTC",
         "event.type": [
             "error"
@@ -467,10 +521,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/9",
         "process.pid": "36",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "azlev"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "azlev"
     },
     {
@@ -498,16 +556,25 @@
         "postgresql.log.timestamp": "2021-01-04 00:05:59.807 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "37",
-        "service.type": "postgresql"
+        "related.ip": [
+            "172.24.0.1"
+        ],
+        "service.type": "postgresql",
+        "source.ip": "172.24.0.1"
     },
     {
         "@timestamp": "2021-01-04T00:05:59.833Z",
+        "event.action": [
+            "logon-failed"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "failure",
         "event.timezone": "UTC",
         "event.type": [
             "error"
@@ -532,10 +599,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/10",
         "process.pid": "37",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "azlev"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "azlev"
     },
     {
@@ -563,16 +634,25 @@
         "postgresql.log.timestamp": "2021-01-04 00:06:03.347 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "38",
-        "service.type": "postgresql"
+        "related.ip": [
+            "172.24.0.1"
+        ],
+        "service.type": "postgresql",
+        "source.ip": "172.24.0.1"
     },
     {
         "@timestamp": "2021-01-04T00:06:03.370Z",
+        "event.action": [
+            "logon-failed"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "failure",
         "event.timezone": "UTC",
         "event.type": [
             "error"
@@ -597,10 +677,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/11",
         "process.pid": "38",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "azlev"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "azlev"
     },
     {
@@ -628,16 +712,25 @@
         "postgresql.log.timestamp": "2021-01-04 00:06:04.765 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "39",
-        "service.type": "postgresql"
+        "related.ip": [
+            "172.24.0.1"
+        ],
+        "service.type": "postgresql",
+        "source.ip": "172.24.0.1"
     },
     {
         "@timestamp": "2021-01-04T00:06:04.799Z",
+        "event.action": [
+            "logon-failed"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "failure",
         "event.timezone": "UTC",
         "event.type": [
             "error"
@@ -662,10 +755,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/12",
         "process.pid": "39",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "azlev"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "azlev"
     }
 ]

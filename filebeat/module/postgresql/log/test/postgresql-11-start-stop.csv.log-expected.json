@@ -74,7 +74,11 @@
         "postgresql.log.timestamp": "2021-01-03 20:01:00.349 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "35",
-        "service.type": "postgresql"
+        "related.ip": [
+            "172.24.0.1"
+        ],
+        "service.type": "postgresql",
+        "source.ip": "172.24.0.1"
     },
     {
         "@timestamp": "2021-01-03T20:01:02.701Z",
@@ -101,16 +105,25 @@
         "postgresql.log.timestamp": "2021-01-03 20:01:02.701 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "36",
-        "service.type": "postgresql"
+        "related.ip": [
+            "172.24.0.1"
+        ],
+        "service.type": "postgresql",
+        "source.ip": "172.24.0.1"
     },
     {
         "@timestamp": "2021-01-03T20:01:02.727Z",
+        "event.action": [
+            "logged-in"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "successful",
         "event.timezone": "UTC",
         "event.type": [
             "info"
@@ -131,10 +144,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/2",
         "process.pid": "36",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -167,10 +184,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/3",
         "process.pid": "36",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -201,10 +222,14 @@
         "postgresql.log.timestamp": "2021-01-03 20:01:07.724 UTC",
         "postgresql.log.transaction_id": 0,
         "process.pid": "36",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {

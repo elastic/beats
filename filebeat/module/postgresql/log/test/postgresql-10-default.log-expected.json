@@ -43,12 +43,17 @@
     },
     {
         "@timestamp": "2020-04-15T10:04:45.416Z",
+        "event.action": [
+            "logon-failed"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "failure",
         "event.timezone": "CEST",
         "event.type": [
             "info"

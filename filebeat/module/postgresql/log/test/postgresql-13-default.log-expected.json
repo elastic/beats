@@ -1,0 +1,97 @@
+[
+    {
+        "@timestamp": "2023-03-04T18:24:15.242Z",
+        "event.action": [
+            "logon-failed"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.outcome": "failure",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "FATAL",
+        "log.offset": 0,
+        "message": "password authentication failed for user \"sherlock\"",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.session_line_number": 2,
+        "postgresql.log.timestamp": "2023-03-04 18:24:15.242 UTC",
+        "process.pid": 24915,
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "postgresql",
+        "user.name": "sherlock"
+    },
+    {
+        "@timestamp": "2023-03-04T15:10:01.278Z",
+        "event.action": [
+            "logon-failed"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.outcome": "failure",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "FATAL",
+        "log.offset": 115,
+        "message": "Peer authentication failed for user \"sherlock\"",
+        "postgresql.log.database": "finance",
+        "postgresql.log.timestamp": "2023-03-04 15:10:01.278 UTC",
+        "process.pid": 15902,
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "postgresql",
+        "user.name": "sherlock"
+    },
+    {
+        "@timestamp": "2023-03-04T18:38:10.754Z",
+        "event.action": [
+            "logged-in"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.outcome": "successful",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 223,
+        "message": "connection authorized: user=sherlock database=postgres application_name=psql",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.session_line_number": 2,
+        "postgresql.log.timestamp": "2023-03-04 18:38:10.754 UTC",
+        "process.pid": 30165,
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "postgresql",
+        "user.name": "sherlock"
+    }
+]

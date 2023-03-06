@@ -12,3 +12,35 @@ processors:
       POSTGRESQL_DB_NAME: '[a-zA-Z0-9_]+[a-zA-Z0-9_\$]*'
       POSTGRESQL_QUERY_STEP: '%{WORD:postgresql.log.query_step}(?: <unnamed>| %{WORD:postgresql.log.query_name})?'
       POSTGRESQL_ERROR: '\b[A-Z0-9]{5}\b'
+- grok:
+    field: message
+    ignore_missing: true
+    ignore_failure: true
+    patterns:
+    - '^(%{POSTGRESQL_AUTH_FAILURE:tmp.auth_fail}|%{POSTGRESQL_AUTH_SUCCESSFUL:tmp.auth_success})'
+    pattern_definitions:
+      POSTGRESQL_AUTH_FAILURE: '(password authentication failed for user|Peer authentication failed for user)'
+      POSTGRESQL_AUTH_SUCCESSFUL: 'connection authorized'
+- append:
+    field: event.category
+    value: authentication
+    if: "ctx?.tmp?.auth_fail != null || ctx?.tmp?.auth_success != null"
+- append:
+    field: event.action
+    value: logon-failed
+    if: "ctx?.tmp?.auth_fail != null"
+- append:
+    field: event.action
+    value: logged-in
+    if: "ctx?.tmp?.auth_success != null"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.tmp?.auth_fail != null"
+- set:
+    field: event.outcome
+    value: successful
+    if: "ctx?.tmp?.auth_success != null"
+- remove:
+    field: tmp
+    ignore_missing: true

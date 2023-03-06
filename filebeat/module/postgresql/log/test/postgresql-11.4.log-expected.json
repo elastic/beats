@@ -302,12 +302,17 @@
     },
     {
         "@timestamp": "2019-07-23T12:06:30.537Z",
+        "event.action": [
+            "logged-in"
+        ],
         "event.category": [
+            "authentication",
             "database"
         ],
         "event.dataset": "postgresql.log",
         "event.kind": "event",
         "event.module": "postgresql",
+        "event.outcome": "successful",
         "event.timezone": "UTC",
         "event.type": [
             "info"

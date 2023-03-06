@@ -224,6 +224,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fixed GCS log format issues. {pull}34659[34659]
 - Add nginx.ingress_controller.upstream.ip to related.ip {issue}34645[34645] {pull}34672[34672]
 - Include NAT and firewall IPs in `related.ip` in Fortinet Firewall module. {issue}34640[34640] {pull}34673[34673]
+- Add postgresql authentication messsages parsing and source.ip & related.ip fields
 
 *Auditbeat*
 

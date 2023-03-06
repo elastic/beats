@@ -30,10 +30,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/135",
         "process.pid": "105",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -68,10 +72,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/136",
         "process.pid": "105",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     },
     {
@@ -106,10 +114,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/136",
         "process.pid": "105",
+        "related.ip": [
+            "172.24.0.1"
+        ],
         "related.user": [
             "postgres"
         ],
         "service.type": "postgresql",
+        "source.ip": "172.24.0.1",
         "user.name": "postgres"
     }
 ]

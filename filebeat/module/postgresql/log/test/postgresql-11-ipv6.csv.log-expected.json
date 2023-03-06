@@ -27,10 +27,14 @@
         "postgresql.log.transaction_id": 0,
         "postgresql.log.virtual_transaction_id": "3/15493200",
         "process.pid": "20460",
+        "related.ip": [
+            "::1"
+        ],
         "related.user": [
             "jose.villanova"
         ],
         "service.type": "postgresql",
+        "source.ip": "::1",
         "user.name": "jose.villanova"
     }
 ]

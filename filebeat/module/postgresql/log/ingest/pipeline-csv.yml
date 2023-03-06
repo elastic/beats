@@ -73,6 +73,67 @@ processors:
    ignore_missing: true
    patterns:
     - '^%{DATA:postgresql.log.client_addr}(:%{NUMBER:postgresql.log.client_port:int})?$'
+- grok:
+    field: message
+    ignore_missing: true
+    ignore_failure: true
+    patterns:
+    - '^(%{POSTGRESQL_AUTH_FAILURE:tmp.auth_fail}|%{POSTGRESQL_AUTH_SUCCESSFUL:tmp.auth_success})'
+    pattern_definitions:
+      POSTGRESQL_AUTH_FAILURE: '(password authentication failed for user|Peer authentication failed for user)'
+      POSTGRESQL_AUTH_SUCCESSFUL: 'connection authorized'
+- append:
+    field: event.category
+    value: authentication
+    if: "ctx?.postgresql?.log?.command_tag == 'authentication'"
+- append:
+    field: event.action
+    value: logon-failed
+    if: "ctx?.tmp?.auth_fail != null"
+- append:
+    field: event.action
+    value: logged-in
+    if: "ctx?.tmp?.auth_success != null"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.tmp?.auth_fail != null"
+- set:
+    field: event.outcome
+    value: successful
+    if: "ctx?.tmp?.auth_success != null"
+- remove:
+    field: tmp
+    ignore_missing: true
+- set:
+    field: source.ip
+    value: "{{postgresql.log.client_addr}}"
+    if: ctx?.postgresql?.log?.client_addr != null
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: "ctx?.source?.ip != null"
+    allow_duplicates: false
 
 - remove:
     field: tempcsv

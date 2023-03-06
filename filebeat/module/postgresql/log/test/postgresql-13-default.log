@@ -1,0 +1,3 @@
+2023-03-04 18:24:15.242 UTC [24915-2] sherlock@postgres FATAL:  password authentication failed for user "sherlock"
+2023-03-04 15:10:01.278 UTC [15902] sherlock@finance FATAL:  Peer authentication failed for user "sherlock"
+2023-03-04 18:38:10.754 UTC [30165-2] sherlock@postgres LOG:  connection authorized: user=sherlock database=postgres application_name=psql
