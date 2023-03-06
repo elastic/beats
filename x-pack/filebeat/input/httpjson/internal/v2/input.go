@@ -135,10 +135,7 @@ func run(
 
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := config.Request.Transport.Client(
-		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
-	)
+	netHTTPClient, err := config.Request.Transport.Client(clientOptions(config.Request.URL.URL, config.Request.KeepAlive.Settings())...)
 	if err != nil {
 		return nil, err
 	}
@@ -166,6 +163,14 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 	}
 
 	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
+}
+
+// clientOptions returns constructed client configuration options.
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
+	return []httpcommon.TransportOption{
+		httpcommon.WithAPMHTTPInstrumentation(),
+		keepalive,
+	}
 }
 
 func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {

@@ -420,6 +420,26 @@ filebeat.inputs:
 ----
 
 [float]
+==== `request.keep_alive.disable`
+
+This specifies whether to disable keep-alives for HTTP end-points. Default: `true`.
+
+[float]
+==== `request.keep_alive.max_idle_connections`
+
+The maximum number of idle connections across all hosts. Zero means no limit. Default: `0`.
+
+[float]
+==== `request.keep_alive.max_idle_connections_per_host`
+
+The maximum idle connections to keep per-host. If zero, defaults to two. Default: `0`.
+
+[float]
+==== `request.keep_alive.idle_connection_timeout`
+
+The maximum amount of time an idle connection will remain idle before closing itself. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Zero means no limit. Default: `0s`.
+
+[float]
 ==== `request.retry.max_attempts`
 
 The maximum number of retries for the HTTP client. Default: `5`.
