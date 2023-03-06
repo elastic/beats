@@ -1,5 +1,6 @@
 - key: sql
   title: "SQL"
+  release: ga
   description: >
     SQL module fetches metrics from a SQL database
   fields:
