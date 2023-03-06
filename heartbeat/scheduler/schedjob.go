@@ -62,6 +62,7 @@ func (sj *schedJob) run() (startedAt time.Time) {
 	sj.activeTasks.Inc()
 	if sj.jobLimitSem != nil {
 		err := sj.jobLimitSem.Acquire(sj.ctx, 1)
+		// Defer release only if acquired
 		if err == nil {
 			defer sj.jobLimitSem.Release(1)
 		} else {
