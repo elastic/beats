@@ -121,7 +121,7 @@ func (c *eventConsumer) run() {
 outerLoop:
 	for {
 		// If possible, start reading the next batch in the background.
-		// We require a non-nil target channel so we don't to queue up a large
+		// We require a non-nil target channel so we don't queue up a large
 		// batch before we know the real requested size for our output.
 		if queueBatch == nil && !pendingRead && target.ch != nil {
 			pendingRead = true
