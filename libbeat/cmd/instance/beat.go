@@ -972,14 +972,13 @@ func (b *Beat) checkElasticsearchVersion() {
 }
 
 func (b *Beat) isConnectionToOlderVersionAllowed() bool {
-	/*config := struct {
+	config := struct {
 		AllowOlder bool `config:"allow_older_versions"`
 	}{false}
 
 	_ = b.Config.Output.Config().Unpack(&config)
 
-	return config.AllowOlder*/
-	return true
+	return config.AllowOlder
 }
 
 // registerESIndexManagement registers the loading of the template and ILM
