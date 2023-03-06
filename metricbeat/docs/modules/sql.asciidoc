@@ -10,8 +10,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == SQL module
 
-beta[]
-
 The SQL module allows you to execute custom queries against an SQL database and
 store the results in {es}. It also enables developing various SQL metrics integrations, using sql query as input.
 
