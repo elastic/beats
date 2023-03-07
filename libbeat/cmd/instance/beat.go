@@ -552,7 +552,6 @@ func (b *Beat) registerMetrics() {
 	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
 	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
 	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
-	monitoring.NewString(infoRegistry, "hostname").Set(b.Info.Hostname)
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
 	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
 	monitoring.NewString(infoRegistry, "binary_arch").Set(runtime.GOARCH)
@@ -585,9 +584,21 @@ func (b *Beat) registerMetrics() {
 	// state.beat
 	beatRegistry := stateRegistry.NewRegistry("beat")
 	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
+}
+
+func (b *Beat) RegisterHostname(useFQDN bool) {
+	hostname := b.Info.Hostname
+	if useFQDN {
+		hostname = b.Info.FQDN
+	}
+
+	// info.hostname
+	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
+	monitoring.NewString(infoRegistry, "hostname").Set(hostname)
 
 	// state.host
-	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(useFQDN), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -761,6 +772,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
+	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
 
