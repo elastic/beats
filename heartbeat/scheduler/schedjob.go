@@ -62,7 +62,10 @@ func (sj *schedJob) run() (startedAt time.Time) {
 	sj.activeTasks.Inc()
 	if sj.jobLimitSem != nil {
 		err := sj.jobLimitSem.Acquire(sj.ctx, 1)
-		if err != nil {
+		// Defer release only if acquired
+		if err == nil {
+			defer sj.jobLimitSem.Release(1)
+		} else {
 			logp.L().Errorf("could not acquire semaphore: %w", err)
 		}
 	}
@@ -116,11 +119,6 @@ func (sj *schedJob) runTask(task TaskFunc) time.Time {
 			// We can discard the started at times for continuations as those are
 			// irrelevant
 			go sj.runTask(cont)
-		}
-		// There is always at least 1 task (the current one), if that's all, then we know
-		// there are no other jobs active or pending, and we can release the jobLimitSem
-		if sj.jobLimitSem != nil && sj.activeTasks.Load() == 1 {
-			sj.jobLimitSem.Release(1)
 		}
 	}
 
