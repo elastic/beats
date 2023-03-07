@@ -133,7 +133,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.30.0
-	github.com/prometheus/procfs v0.8.0
+	github.com/prometheus/procfs v0.9.0
 	github.com/prometheus/prometheus v1.8.2-0.20210701133801-b0944590a1c9
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
@@ -160,7 +160,7 @@ require (
 	golang.org/x/net v0.2.0
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
 	golang.org/x/sync v0.1.0
-	golang.org/x/sys v0.2.0
+	golang.org/x/sys v0.6.0
 	golang.org/x/text v0.4.0
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.1.12
