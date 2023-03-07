@@ -135,19 +135,27 @@ func (p *addHostMetadata) loadData() error {
 		}
 
 		if len(ipList) > 0 {
-			_, _ = data.Put("host.ip", ipList)
+			if _, err := data.Put("host.ip", ipList); err != nil {
+				return fmt.Errorf("could not set host.ip: %w", err)
+			}
 		}
 		if len(hwList) > 0 {
-			_, _ = data.Put("host.mac", hwList)
+			if _, err := data.Put("host.mac", hwList); err != nil {
+				return fmt.Errorf("could not set host.mac: %w", err)
+			}
 		}
 	}
 
 	switch {
 	case p.config.Name != "":
-		_, _ = data.Put("host.name", p.config.Name)
+		if _, err := data.Put("host.name", p.config.Name); err != nil {
+			return fmt.Errorf("could not set host.name from configured name: %w", err)
+		}
 		break
 	case features.FQDN():
-		_, _ = data.Put("host.name", h.Info().FQDN)
+		if _, err := data.Put("host.name", h.Info().FQDN); err != nil {
+			return fmt.Errorf("could not set host.name from FQDN: %w", err)
+		}
 		break
 	}
 
