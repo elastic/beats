@@ -90,8 +90,7 @@ func (batch *diskQueueBatch) Entry(i int) interface{} {
 	return batch.frames[i].event
 }
 
-func (batch *diskQueueBatch) ID(i int) queue.EntryID {
-	return 0
+func (batch *diskQueueBatch) FreeEntries() {
 }
 
 func (batch *diskQueueBatch) Done() {

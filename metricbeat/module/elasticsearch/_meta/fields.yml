@@ -15,6 +15,9 @@
         - name: shards.stop_time_in_millis
           type: alias
           path: elasticsearch.index.recovery.stop_time.ms
+        - name: shards.total_time_in_millis
+          type: alias
+          path: elasticsearch.index.recovery.total_time.ms
     - name: stack_stats
       type: group
       fields:
@@ -676,6 +679,10 @@
               type: keyword
               description: >
                 Node name.
+            - name: roles
+              type: keyword
+              description: >
+                Node roles.
             - name: master
               type: boolean
               description: >

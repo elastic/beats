@@ -277,6 +277,7 @@ metricbeat.modules:
     #- index
     #- index_recovery
     #- index_summary
+    #- ingest_pipeline
     #- shard
     #- ml_job
   period: 10s
@@ -286,6 +287,7 @@ metricbeat.modules:
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   #index_recovery.active_only: true
+  #ingest_pipeline.processor_sample_rate: 0.25
   #xpack.enabled: false
   #scope: node
 
@@ -1400,6 +1402,15 @@ output.elasticsearch:
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
+
+  # Enables restarting metricbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -1538,6 +1549,14 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enables restarting metricbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1743,6 +1762,14 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enables restarting metricbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true

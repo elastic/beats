@@ -28536,6 +28536,15 @@ alias to: elasticsearch.index.recovery.stop_time.ms
 
 --
 
+*`index_recovery.shards.total_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.total_time.ms
+
+--
+
 
 *`stack_stats.apm.found`*::
 +
@@ -29993,6 +30002,16 @@ type: keyword
 +
 --
 Node name.
+
+
+type: keyword
+
+--
+
+*`elasticsearch.node.roles`*::
++
+--
+Node roles.
 
 
 type: keyword
@@ -31673,6 +31692,118 @@ type: long
 *`elasticsearch.index.summary.total.bulk.time.avg.bytes`*::
 +
 --
+type: long
+
+--
+
+[float]
+=== ingest_pipeline
+
+Runtime metrics on ingest pipeline execution
+
+
+*`elasticsearch.ingest_pipeline.name`*::
++
+--
+Name / id of the ingest pipeline
+
+type: wildcard
+
+--
+
+[float]
+=== total
+
+Metrics on the total ingest pipeline execution, including all processors.
+
+
+*`elasticsearch.ingest_pipeline.total.count`*::
++
+--
+Number of documents processed by this pipeline
+
+type: long
+
+--
+
+*`elasticsearch.ingest_pipeline.total.failed`*::
++
+--
+Number of documented failed to process by this pipeline
+
+type: long
+
+--
+
+*`elasticsearch.ingest_pipeline.total.time.total.ms`*::
++
+--
+Total time spent processing documents through this pipeline, inclusive of other pipelines called
+
+type: long
+
+--
+
+*`elasticsearch.ingest_pipeline.total.time.self.ms`*::
++
+--
+Time spent processing documents through this pipeline, exclusive of other pipelines called
+
+type: long
+
+--
+
+
+*`elasticsearch.ingest_pipeline.processor.type`*::
++
+--
+The type of ingest processor
+
+type: keyword
+
+--
+
+*`elasticsearch.ingest_pipeline.processor.type_tag`*::
++
+--
+The type and the tag for this processor in the format "<type>:<tag>"
+
+type: keyword
+
+--
+
+*`elasticsearch.ingest_pipeline.processor.order_index`*::
++
+--
+The order this processor appears in the pipeline definition
+
+type: long
+
+--
+
+*`elasticsearch.ingest_pipeline.processor.count`*::
++
+--
+Number of documents processed by this processor
+
+type: long
+
+--
+
+*`elasticsearch.ingest_pipeline.processor.failed`*::
++
+--
+Number of documented failed to process by this processor
+
+type: long
+
+--
+
+*`elasticsearch.ingest_pipeline.processor.time.total.ms`*::
++
+--
+Total time spent processing documents through this processor
+
 type: long
 
 --
@@ -47971,6 +48102,13 @@ node_stats metrics.
 
 
 
+*`logstash.node.id`*::
++
+--
+type: keyword
+
+--
+
 
 *`logstash.node.state.pipeline.id`*::
 +
@@ -47983,6 +48121,64 @@ type: keyword
 +
 --
 type: keyword
+
+--
+
+*`logstash.node.state.pipeline.ephemeral_id`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.batch_size`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.state.pipeline.workers`*::
++
+--
+type: long
+
+--
+
+
+*`logstash.node.state.pipeline.representation.hash`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.representation.type`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.representation.version`*::
++
+--
+type: keyword
+
+--
+
+
+*`logstash.node.state.pipeline.representation.graph.edges`*::
++
+--
+type: object
+
+--
+
+*`logstash.node.state.pipeline.representation.graph.vertices`*::
++
+--
+type: object
 
 --
 
@@ -48039,6 +48235,13 @@ alias to: process.pid
 
 --
 
+
+*`logstash.node.stats.timestamp`*::
++
+--
+type: date
+
+--
 
 
 *`logstash.node.stats.jvm.uptime_in_millis`*::

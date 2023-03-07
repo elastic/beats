@@ -81,7 +81,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-        - head~=^update-stack-version
+        - head~=^updatecli_bump-elastic-stack
         - files~=^testing/environments/snapshot.*\.yml$
     actions:
       delete_head_branch:
@@ -92,7 +92,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-        - head~=^update-go-version
+        - head~=^updatecli_bump-golang-version
         - files~=^\.go-version$
     actions:
       delete_head_branch:
@@ -221,6 +221,19 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "8.6"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.7 branch
+    conditions:
+      - merged
+      - label=backport-v8.7.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.7"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
