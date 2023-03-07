@@ -10413,12 +10413,12 @@ these terms.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/elastic-agent-system-metrics
-Version: v0.4.6
-Licence type (autodetected): Apache-2.0
+Dependency : github.com/ycombinator/elastic-agent-system-metrics
+Version: v0.0.0-20230307043722-2fea0616668c
+Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.4.6/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/ycombinator/elastic-agent-system-metrics@v0.0.0-20230307043722-2fea0616668c/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004
