@@ -92,12 +92,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-<<<<<<< HEAD
-        - head~=^update-go-version
-        - files~=^.go-version$
-=======
         - head~=^updatecli_bump-golang-version
         - files~=^\.go-version$
->>>>>>> a8ab071c4a (updatecli: force name of the branch for the bump golang version and update mergify (#34752))
     actions:
       delete_head_branch:
