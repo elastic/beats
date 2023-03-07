@@ -68,7 +68,9 @@ func New(cfg *config.C) (processors.Processor, error) {
 		data:   mapstr.NewPointer(nil),
 		logger: logp.NewLogger("add_host_metadata"),
 	}
-	_ = p.loadData()
+	if err := p.loadData(); err != nil {
+		return nil, fmt.Errorf("failed to load data: %w", err)
+	}
 
 	if c.Geo != nil {
 		geoFields, err := util.GeoConfigToMap(*c.Geo)
