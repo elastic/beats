@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	mu sync.Mutex
+	mu sync.RWMutex
 
 	flags fflags
 )
@@ -80,7 +80,7 @@ func UpdateFromConfig(c *conf.C) error {
 // FQDN reports if FQDN should be used instead of hostname for host.name.
 // If it hasn't been set by UpdateFromConfig or UpdateFromProto, it returns false.
 func FQDN() bool {
-	mu.Lock()
-	defer mu.Unlock()
+	mu.RLock()
+	defer mu.RUnlock()
 	return flags.fqdnEnabled
 }
