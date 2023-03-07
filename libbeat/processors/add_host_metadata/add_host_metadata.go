@@ -126,7 +126,7 @@ func (p *addHostMetadata) loadData() error {
 		return err
 	}
 
-	data := host.MapHostInfo(h.Info())
+	data := host.MapHostInfo(features.FQDN(), h.Info())
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()
@@ -146,17 +146,8 @@ func (p *addHostMetadata) loadData() error {
 		}
 	}
 
-	switch {
-	case p.config.Name != "":
-		if _, err := data.Put("host.name", p.config.Name); err != nil {
-			return fmt.Errorf("could not set host.name from configured name: %w", err)
-		}
-		break
-	case features.FQDN():
-		if _, err := data.Put("host.name", h.Info().FQDN); err != nil {
-			return fmt.Errorf("could not set host.name from FQDN: %w", err)
-		}
-		break
+	if p.config.Name != "" {
+		data.Put("host.name", p.config.Name)
 	}
 
 	p.data.Set(data)
