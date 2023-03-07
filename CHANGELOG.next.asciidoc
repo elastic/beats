@@ -161,6 +161,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
 - Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
+- Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
 
 *Functionbeat*
 
