@@ -81,7 +81,7 @@ func ReportInfo(useFQDN bool) func(_ monitoring.Mode, V monitoring.Visitor) {
 			hostname = info.FQDN
 		}
 
-		monitoring.ReportString(V, "hostname", info.Hostname)
+		monitoring.ReportString(V, "hostname", hostname)
 		monitoring.ReportString(V, "architecture", info.Architecture)
 		monitoring.ReportNamespace(V, "os", func() {
 			monitoring.ReportString(V, "platform", info.OS.Platform)
