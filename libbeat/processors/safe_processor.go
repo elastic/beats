@@ -22,7 +22,12 @@ import (
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common"
+=======
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+>>>>>>> 5cfe62cb2f (Stop re-using processors defined in the config (#34761))
 )
 
 var ErrClosed = errors.New("attempt to use a closed processor")
@@ -45,6 +50,7 @@ func (p *SafeProcessor) Close() (err error) {
 	if atomic.CompareAndSwapUint32(&p.closed, 0, 1) {
 		return Close(p.Processor)
 	}
+	logp.L().Warnf("tried to close already closed %q processor", p.Processor.String())
 	return nil
 }
 
