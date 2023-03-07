@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/elastic-agent-autodiscover/utils"
 )
 
 func init() {
@@ -154,8 +153,8 @@ func (hb *heartbeatHints) getProcessors(hints common.MapStr) []common.MapStr {
 }
 
 func (hb *heartbeatHints) getHostsWithPort(hints common.MapStr, port int, podEvent bool) ([]string, error) {
-	thosts := utils.GetHintAsList(hints, "", hosts)
-	mType := utils.GetHintString(hints, "", scheme)
+	thosts := builder.GetHintAsList(hints, "", hosts)
+	mType := builder.GetHintString(hints, "", scheme)
 
 	// We can't reliable detect duplicated monitors since we don't have all ports/hosts,
 	// relying on runner deduping monitors, see https://github.com/elastic/beats/pull/29041
