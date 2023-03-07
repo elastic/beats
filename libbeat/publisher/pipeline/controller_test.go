@@ -34,6 +34,7 @@ import (
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -114,4 +115,25 @@ func TestOutputReload(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
+	// Just fill out enough to confirm what's sent to the event consumer,
+	// we don't want to start up real helper routines.
+	controller := outputController{
+		consumer: &eventConsumer{
+			targetChan: make(chan consumerTarget, 2),
+		},
+	}
+	controller.Set(outputs.Group{})
+
+	// Two messages should be sent to eventConsumer's targetChan:
+	// one to clear the old target while the state is updating,
+	// and one with the new metadata after the state update is
+	// complete. Since we're setting an empty output group, both
+	// of these calls should have a nil target channel.
+	target := <-controller.consumer.targetChan
+	assert.Nil(t, target.ch, "consumerTarget should receive a nil channel to block batch assembly")
+	target = <-controller.consumer.targetChan
+	assert.Nil(t, target.ch, "consumerTarget should receive a nil channel to block batch assembly")
 }
