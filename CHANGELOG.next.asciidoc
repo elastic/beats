@@ -101,6 +101,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix integration hashing to prevent reloading all when updated. {pull}34697[34697]
+- Fix release of job limit semaphore when context is cancelled. {pull}34697[34697]
 - Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
 - Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
@@ -147,6 +149,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 - Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
+- Make generic SQL GA {pull}34637[34637]
 
 
 *Osquerybeat*
@@ -160,6 +163,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
 - Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
+- Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
 
 *Functionbeat*
 
@@ -222,6 +226,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
 - Fixed GCS log format issues. {pull}34659[34659]
 - Add nginx.ingress_controller.upstream.ip to related.ip {issue}34645[34645] {pull}34672[34672]
+- Include NAT and firewall IPs in `related.ip` in Fortinet Firewall module. {issue}34640[34640] {pull}34673[34673]
 
 *Auditbeat*
 
@@ -231,6 +236,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Heartbeat*
 - Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
+- Added status to monitor run log report.
 
 - Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
 

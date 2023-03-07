@@ -103,6 +103,7 @@ type PackageFile struct {
 	Template      string                  `yaml:"template,omitempty"`        // Input template file.
 	Target        string                  `yaml:"target,omitempty"`          // Target location in package. Relative paths are added to a package specific directory (e.g. metricbeat-7.0.0-linux-x86_64).
 	Mode          os.FileMode             `yaml:"mode,omitempty"`            // Target mode for file. Does not apply when source is a directory.
+	PreserveMode  bool                    `yaml:"preserve_mode"`             // Preserve the original Mode of the file, useful when adding directories and need to preserve the original file permissions
 	Config        bool                    `yaml:"config"`                    // Mark file as config in the package (deb and rpm only).
 	Modules       bool                    `yaml:"modules"`                   // Mark directory as directory with modules.
 	Dep           func(PackageSpec) error `yaml:"-" hash:"-" json:"-"`       // Dependency to invoke during Evaluate.
@@ -832,10 +833,14 @@ func addFileToZip(ar *zip.Writer, baseDir string, pkgFile PackageFile) error {
 			return err
 		}
 
-		if info.Mode().IsRegular() && pkgFile.Mode > 0 {
-			header.SetMode(pkgFile.Mode & os.ModePerm)
-		} else if info.IsDir() {
-			header.SetMode(0755)
+		if pkgFile.PreserveMode {
+			header.SetMode(info.Mode())
+		} else {
+			if info.Mode().IsRegular() && pkgFile.Mode > 0 {
+				header.SetMode(pkgFile.Mode & os.ModePerm)
+			} else if info.IsDir() {
+				header.SetMode(0755)
+			}
 		}
 
 		if filepath.IsAbs(pkgFile.Target) {
@@ -899,10 +904,14 @@ func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 		header.Uname, header.Gname = "root", "root"
 		header.Uid, header.Gid = 0, 0
 
-		if info.Mode().IsRegular() && pkgFile.Mode > 0 {
-			header.Mode = int64(pkgFile.Mode & os.ModePerm)
-		} else if info.IsDir() {
-			header.Mode = int64(0755)
+		if pkgFile.PreserveMode {
+			header.Mode = int64(info.Mode())
+		} else {
+			if info.Mode().IsRegular() && pkgFile.Mode > 0 {
+				header.Mode = int64(pkgFile.Mode & os.ModePerm)
+			} else if info.IsDir() {
+				header.Mode = int64(0755)
+			}
 		}
 
 		if filepath.IsAbs(pkgFile.Target) {
@@ -922,6 +931,7 @@ func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 		if mg.Verbose() {
 			log.Println("Adding", os.FileMode(header.Mode), header.Name)
 		}
+
 		if err := ar.WriteHeader(header); err != nil {
 			return err
 		}
