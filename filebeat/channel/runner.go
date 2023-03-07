@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -127,27 +128,27 @@ func newCommonConfigEditor(
 		return nil, err
 	}
 
-	var indexProcessor processors.Processor
-	if !config.Index.IsEmpty() {
-		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
-		timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
-		if err != nil {
-			return nil, err
-		}
-		indexProcessor = add_formatted_index.New(timestampFormat)
-	}
-
-	userProcessors, err := processors.New(config.Processors)
-	if err != nil {
-		return nil, err
-	}
-
 	serviceType := config.ServiceType
 	if serviceType == "" {
 		serviceType = config.Module
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
+		var indexProcessor processors.Processor
+		if !config.Index.IsEmpty() {
+			staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
+			timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+			if err != nil {
+				return clientCfg, err
+			}
+			indexProcessor = add_formatted_index.New(timestampFormat)
+		}
+
+		userProcessors, err := processors.New(config.Processors)
+		if err != nil {
+			return clientCfg, err
+		}
+
 		meta := clientCfg.Processing.Meta.Clone()
 		fields := clientCfg.Processing.Fields.Clone()
 
@@ -191,6 +192,6 @@ func newCommonConfigEditor(
 
 func setOptional(to mapstr.M, key string, value string) {
 	if value != "" {
-		to.Put(key, value)
+		_, _ = to.Put(key, value)
 	}
 }
