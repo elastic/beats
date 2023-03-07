@@ -398,7 +398,7 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.UpdateStatus(lbmanagement.Stopping, "Stopping")
 			return
 		case change := <-cm.client.UnitChanges():
-			cm.logger.Infof(
+			cm.logger.Debugf(
 				"[features] BeatV2Manager.unitListen UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
 				change.Type, int64(change.Triggers), change.Type, change.Triggers)
 
