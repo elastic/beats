@@ -28536,6 +28536,15 @@ alias to: elasticsearch.index.recovery.stop_time.ms
 
 --
 
+*`index_recovery.shards.total_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.total_time.ms
+
+--
+
 
 *`stack_stats.apm.found`*::
 +
