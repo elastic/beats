@@ -106,6 +106,7 @@ type requestFactory struct {
 	until                  *valueTpl
 	chainHTTPClient        *httpClient
 	chainResponseProcessor *responseProcessor
+	saveFirstResponse      bool
 }
 
 func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]*requestFactory, error) {
@@ -114,12 +115,13 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	// regular call requestFactory object
 	rf := &requestFactory{
-		url:        *config.Request.URL.URL,
-		method:     config.Request.Method,
-		body:       config.Request.Body,
-		transforms: ts,
-		log:        log,
-		encoder:    registeredEncoders[config.Request.EncodeAs],
+		url:               *config.Request.URL.URL,
+		method:            config.Request.Method,
+		body:              config.Request.Body,
+		transforms:        ts,
+		log:               log,
+		encoder:           registeredEncoders[config.Request.EncodeAs],
+		saveFirstResponse: config.Response.SaveFirstResponse,
 	}
 	if config.Auth != nil && config.Auth.Basic.isEnabled() {
 		rf.user = config.Auth.Basic.User
@@ -302,23 +304,26 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
-			// store first response in transform context
-			var bodyMap map[string]interface{}
-			body, err := io.ReadAll(httpResp.Body)
-			if err != nil {
-				return fmt.Errorf("failed to read http response body: %w", err)
+
+			if rf.saveFirstResponse {
+				// store first response in transform context
+				var bodyMap map[string]interface{}
+				body, err := io.ReadAll(httpResp.Body)
+				if err != nil {
+					return fmt.Errorf("failed to read http response body: %w", err)
+				}
+				httpResp.Body = io.NopCloser(bytes.NewReader(body))
+				err = json.Unmarshal(body, &bodyMap)
+				if err != nil {
+					r.log.Errorf("unable to unmarshal first_response.body: %v", err)
+				}
+				firstResponse := response{
+					url:    *httpResp.Request.URL,
+					header: httpResp.Header.Clone(),
+					body:   bodyMap,
+				}
+				trCtx.updateFirstResponse(firstResponse)
 			}
-			httpResp.Body = io.NopCloser(bytes.NewReader(body))
-			err = json.Unmarshal(body, &bodyMap)
-			if err != nil {
-				r.log.Errorf("unable to unmarshal first_response.body: %v", err)
-			}
-			firstResponse := response{
-				url:    *httpResp.Request.URL,
-				header: httpResp.Header.Clone(),
-				body:   bodyMap,
-			}
-			trCtx.updateFirstResponse(firstResponse)
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)

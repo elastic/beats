@@ -21,6 +21,7 @@ type responseConfig struct {
 	Transforms              transformsConfig `config:"transforms"`
 	Pagination              transformsConfig `config:"pagination"`
 	Split                   *splitConfig     `config:"split"`
+	SaveFirstResponse       bool             `config:"save_first_response"`
 }
 
 type splitConfig struct {
