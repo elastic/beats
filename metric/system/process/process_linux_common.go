@@ -22,6 +22,7 @@ package process
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -116,7 +117,7 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 	}
 
 	state.Exe, state.Cwd, err = getProcStringData(hostfs, pid)
-	if err != nil {
+	if err != nil && !errors.Is(err, os.ErrPermission) { // ignore permission errors
 		return state, fmt.Errorf("error getting metadata for pid %d: %w", pid, err)
 	}
 
@@ -136,9 +137,9 @@ func GetInfoForPid(hostfs resolve.Resolver, pid int) (ProcState, error) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			return ProcState{}, syscall.ESRCH
-		} else {
-			return ProcState{}, fmt.Errorf("error reading procdir %s: %w", path, err)
 		}
+		return ProcState{}, fmt.Errorf("error reading procdir %s: %w", path, err)
+
 	}
 
 	state := ProcState{}
@@ -184,12 +185,16 @@ func GetInfoForPid(hostfs resolve.Resolver, pid int) (ProcState, error) {
 
 func getProcStringData(hostfs resolve.Resolver, pid int) (string, string, error) {
 	exe, err := os.Readlink(hostfs.Join("proc", strconv.Itoa(pid), "exe"))
-	if err != nil {
+	if errors.Is(err, os.ErrPermission) { // pass through permission errors
+		return "", "", err
+	} else if err != nil {
 		return "", "", fmt.Errorf("error fetching exe from pid %d: %w", pid, err)
 	}
 
 	cwd, err := os.Readlink(hostfs.Join("proc", strconv.Itoa(pid), "cwd"))
-	if err != nil {
+	if errors.Is(err, os.ErrPermission) {
+		return "", "", err
+	} else if err != nil {
 		return "", "", fmt.Errorf("error fetching cwd for pid %d: %w", pid, err)
 	}
 
@@ -227,7 +232,9 @@ func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (mapstr.M, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "environ")
 	data, err := ioutil.ReadFile(path)
-	if err != nil {
+	if errors.Is(err, os.ErrPermission) { // pass through permission errors
+		return nil, err
+	} else if err != nil {
 		return nil, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 	env := mapstr.M{}
@@ -377,7 +384,9 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 
 	pathFD := hostfs.Join("proc", strconv.Itoa(pid), "fd")
 	fds, err := ioutil.ReadDir(pathFD)
-	if err != nil {
+	if errors.Is(err, os.ErrPermission) { //ignore permission errors, passthrough other data
+		return state, nil
+	} else if err != nil {
 		return state, fmt.Errorf("error reading FD directory for pid %d: %w", pid, err)
 	}
 	state.Open = opt.UintWith(uint64(len(fds)))
