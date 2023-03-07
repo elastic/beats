@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -191,6 +192,6 @@ func newCommonConfigEditor(
 
 func setOptional(to mapstr.M, key string, value string) {
 	if value != "" {
-		to.Put(key, value)
+		_, _ = to.Put(key, value)
 	}
 }
