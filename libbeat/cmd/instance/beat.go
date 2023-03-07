@@ -244,14 +244,11 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 		return nil, err
 	}
 
-	var fqdn string
-	if features.FQDN() {
-		h, err := sysinfo.Host()
-		if err != nil {
-			return nil, fmt.Errorf("failed to get FQDN: %w", err)
-		}
-		fqdn = h.Info().FQDN
+	h, err := sysinfo.Host()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get FQDN: %w", err)
 	}
+	fqdn := h.Info().FQDN
 
 	fields, err := asset.GetFields(name)
 	if err != nil {
