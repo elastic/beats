@@ -27,12 +27,12 @@ import (
 )
 
 var (
-	mu sync.RWMutex
-
-	flags fflags
+	flags = fflags{}
 )
 
 type fflags struct {
+	mu sync.RWMutex
+
 	fqdnEnabled bool
 }
 
@@ -47,9 +47,9 @@ func UpdateFromProto(f *proto.Features) {
 		f.Fqdn = &proto.FQDNFeature{}
 	}
 
-	mu.Lock()
-	defer mu.Unlock()
-	flags = fflags{fqdnEnabled: f.Fqdn.Enabled}
+	flags.mu.Lock()
+	defer flags.mu.Unlock()
+	flags.fqdnEnabled = f.Fqdn.Enabled
 }
 
 // UpdateFromConfig updates the feature flags configuration. If c is nil UpdateFromProto is no-op.
@@ -70,9 +70,9 @@ func UpdateFromConfig(c *conf.C) error {
 		return fmt.Errorf("could not Unpack features config: %w", err)
 	}
 
-	mu.Lock()
-	defer mu.Unlock()
-	flags = fflags{fqdnEnabled: parsedFlags.Features.FQDN.Enabled()}
+	flags.mu.Lock()
+	defer flags.mu.Unlock()
+	flags.fqdnEnabled = parsedFlags.Features.FQDN.Enabled()
 
 	return nil
 }
@@ -80,7 +80,7 @@ func UpdateFromConfig(c *conf.C) error {
 // FQDN reports if FQDN should be used instead of hostname for host.name.
 // If it hasn't been set by UpdateFromConfig or UpdateFromProto, it returns false.
 func FQDN() bool {
-	mu.RLock()
-	defer mu.RUnlock()
+	flags.mu.RLock()
+	defer flags.mu.RUnlock()
 	return flags.fqdnEnabled
 }
