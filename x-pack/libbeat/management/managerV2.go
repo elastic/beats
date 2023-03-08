@@ -402,10 +402,6 @@ func (cm *BeatV2Manager) unitListen() {
 				"[features] BeatV2Manager.unitListen UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
 				change.Type, int64(change.Triggers), change.Type, change.Triggers)
 
-			if change.Triggers&client.TriggeredFeatureChange == client.TriggeredFeatureChange {
-				features.UpdateFromProto(change.Features)
-			}
-
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure if there is a difference between
 			// A unit add and a unit change, since either way we can't do much more than call the reloader
@@ -470,6 +466,10 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 			// log level is still used from an expected stopped unit until
 			// the unit is completely removed (aka. fully stopped)
 			lowestLevel = expected.LogLevel
+		}
+		if expected.Features != nil {
+			// unit is expected to update its feature flags
+			features.UpdateFromProto(expected.Features)
 		}
 		if expected.State == client.UnitStateStopped {
 			// unit is being stopped
