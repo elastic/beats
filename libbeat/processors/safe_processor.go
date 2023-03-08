@@ -22,12 +22,8 @@ import (
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common"
-=======
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> 5cfe62cb2f (Stop re-using processors defined in the config (#34761))
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var ErrClosed = errors.New("attempt to use a closed processor")
