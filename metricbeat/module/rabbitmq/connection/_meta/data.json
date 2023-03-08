@@ -23,6 +23,12 @@
                 "received": 3057,
                 "sent": 3344
             },
+            "recv_octet_details": {
+                "rate": 1.1
+            },
+            "send_octet_details": {
+                "rate": 1.1
+            },
             "packet_count": {
                 "pending": 0,
                 "received": 352,
