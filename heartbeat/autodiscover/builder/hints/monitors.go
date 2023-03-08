@@ -66,6 +66,7 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 		hints    common.MapStr
 		podEvent bool
 	)
+
 	hIface, ok := event["hints"]
 	if ok {
 		hints, _ = hIface.(common.MapStr)
