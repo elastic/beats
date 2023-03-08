@@ -77,8 +77,8 @@ code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a h1:8rqv2w8xEceN
 code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a/go.mod h1:tkZo8GtzBjySJ7USvxm4E36lNQw1D3xM6oKHGqdaAJ4=
 collectd.org v0.3.0/go.mod h1:A/8DzQBkF6abtvrT2j/AU/4tiBgJWYyh0y/oB/4MlWE=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
-github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20230307181736-09474efd7d87 h1:LSoXiRXPzFTqpBoS0+/fmBMtb4woBHpuFBSDiipUtE4=
-github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20230307181736-09474efd7d87/go.mod h1:UlVOHSDvTA4Mfdhdg+BE7aqOsUR3ab+x2Zl0aHlBXs4=
+github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20230308181255-29534aa8504d h1:YioX95HC+0TVd1aQIPOAhnRmhHyWlZHSXJxUUZqTS4k=
+github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20230308181255-29534aa8504d/go.mod h1:UlVOHSDvTA4Mfdhdg+BE7aqOsUR3ab+x2Zl0aHlBXs4=
 github.com/AndersonQ/go-sysinfo v0.0.0-20230201152444-4da8ad906ce9 h1:4IsTtlhSQhzdTBEPtyphq30liugm8njL9EFnJnHbojk=
 github.com/AndersonQ/go-sysinfo v0.0.0-20230201152444-4da8ad906ce9/go.mod h1:j/gGAinRS+z3loQ/1pO+s9pCyQsna8U13kqhF1Aa0fg=
 github.com/Azure/azure-amqp-common-go/v3 v3.2.1 h1:uQyDk81yn5hTP1pW4Za+zHzy97/f4vDz9o1d/exI4j4=
