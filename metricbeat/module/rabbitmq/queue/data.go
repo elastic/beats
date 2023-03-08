@@ -69,6 +69,20 @@ var (
 			"persistent": s.Object{
 				"count": c.Int("messages_persistent"),
 			},
+			"stats": c.Dict("message_stats", s.Schema{
+				"publish": s.Object{
+					"count": c.Int("publish"),
+					"details": c.Dict("publish_details", s.Schema{
+						"rate": c.Float("rate"),
+					}),
+				},
+				"ack": s.Object{
+					"count": c.Int("ack"),
+					"details": c.Dict("ack_details", s.Schema{
+						"rate": c.Float("rate"),
+					}),
+				},
+			}),
 		},
 		"memory": s.Object{
 			"bytes": c.Int("memory"),

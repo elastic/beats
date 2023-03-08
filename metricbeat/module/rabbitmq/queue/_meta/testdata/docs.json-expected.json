@@ -57,7 +57,21 @@
                         "details": {
                             "rate": 0.5
                         }
-                    }
+                    },
+                    "stats": {
+                        "publish": {
+                            "count": 121,
+                            "details": {
+                                "rate": 0
+                            }
+                        },
+                        "ack": {
+                            "count": 9,
+                            "details": {
+                                "rate": 0
+                            }
+                        }
+                    },
                 },
                 "name": "queuenamehere",
                 "state": "running"
