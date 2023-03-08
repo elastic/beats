@@ -27,7 +27,9 @@ It includes the following filesets for receiving logs:
 - `apex-rest` fileset: supports Salesforce Apex logs received from the REST API.
 - `setupaudittrail-rest` fileset: supports logs generated when admins make in your org’s Setup area.
 
-Note: We can leverage the inputs provided above to collect the rest of the events from the Salesforce REST or Streaming API.
+Note:
+- We can leverage the inputs provided above to collect the rest of the events from the Salesforce REST or Streaming API.
+- We have fingerprint on REQUEST_ID, SESSION_KEY, TIMESTAMP_DERIVED, and USER_ID fields to avoid data duplication for EventLogFiles. There are chances that a particular event won't get ingested if mentioned fields are not unique.
 
 include::../include/what-happens.asciidoc[]
 
@@ -49,6 +51,7 @@ Example config:
     var.user: "my.email@here.com"
     var.password: "password"
     var.url: "https://instance-url.salesforce.com"
+    var.initial_days: 1
 ----
 
 include::../include/var-paths.asciidoc[]
@@ -76,6 +79,10 @@ The password used as part of the authentication flow. It is required for authent
 *`var.url`*::
 
 The URL of the Saleforce instance.
+
+*`var.initial_days`*::
+
+The Number of days to look behind while collecting historical events in the first invocation.
 
 [float]
 ==== `login-stream` fileset settings
@@ -137,6 +144,7 @@ Example config:
     var.user: "my.email@here.com"
     var.password: "password"
     var.url: "https://instance-url.salesforce.com"
+    var.initial_days: 1
 ----
 
 include::../include/var-paths.asciidoc[]
@@ -164,6 +172,10 @@ The password used as part of the authentication flow. It is required for authent
 *`var.url`*::
 
 The URL of the Saleforce instance.
+
+*`var.initial_days`*::
+
+The Number of days to look behind while collecting historical events in the first invocation.
 
 [float]
 ==== `logout-stream` fileset settings
@@ -225,6 +237,7 @@ Example config:
     var.user: "my.email@here.com"
     var.password: "password"
     var.url: "https://instance-url.salesforce.com"
+    var.initial_days: 1
 ----
 
 include::../include/var-paths.asciidoc[]
@@ -252,6 +265,10 @@ The password used as part of the authentication flow. It is required for authent
 *`var.url`*::
 
 The URL of the Saleforce instance.
+
+*`var.initial_days`*::
+
+The Number of days to look behind while collecting historical events in the first invocation.
 
 [float]
 ==== `apex-rest` fileset settings
@@ -269,6 +286,7 @@ Example config:
     var.user: "my.email@here.com"
     var.password: "password"
     var.url: "https://instance-url.salesforce.com"
+    var.initial_days: 1
 ----
 
 include::../include/var-paths.asciidoc[]
@@ -296,6 +314,10 @@ The password used as part of the authentication flow. It is required for authent
 *`var.url`*::
 
 The URL of the Saleforce instance.
+
+*`var.initial_days`*::
+
+The Number of days to look behind while collecting historical events in the first invocation.
 
 [float]
 === Example dashboard

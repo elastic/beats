@@ -231,6 +231,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Include NAT and firewall IPs in `related.ip` in Fortinet Firewall module. {issue}34640[34640] {pull}34673[34673]
 - Add Basic Authentication support on constructed requests to CEL input {issue}34609[34609] {pull}34689[34689]
 - Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
+- Add configuration for initial number of days to collect data from for Salesforce module. {issue}34661[34661]
 
 *Auditbeat*
 

@@ -1894,7 +1894,10 @@ filebeat.modules:
 
     # URL, should include the instance_url
     #var.url: "https://instance_id.my.salesforce.com"
-      
+
+    # Initial Days, Number of days to look behind while collecting historical events in the first invocation
+    #var.initial_days: 1
+
   login-rest:
     enabled: false
 
@@ -1915,6 +1918,9 @@ filebeat.modules:
 
     # URL, should include the instance_url
     #var.url: "https://instance_id.my.salesforce.com"
+
+    # Initial Days, Number of days to look behind while collecting historical events in the first invocation
+    #var.initial_days: 1
 
   login-stream:
     enabled: false
@@ -1958,6 +1964,9 @@ filebeat.modules:
     # URL, should include the instance_url
     #var.url: "https://instance_id.my.salesforce.com"
 
+    # Initial Days, Number of days to look behind while collecting historical events in the first invocation
+    #var.initial_days: 1
+
   logout-stream:
     enabled: false
 
@@ -1999,6 +2008,9 @@ filebeat.modules:
 
     # URL, should include the instance_url
     #var.url: "https://instance_id.my.salesforce.com"
+
+    # Initial Days, Number of days to look behind while collecting historical events in the first invocation
+    #var.initial_days: 1
 
 #----------------------------- Google Santa Module -----------------------------
 - module: santa

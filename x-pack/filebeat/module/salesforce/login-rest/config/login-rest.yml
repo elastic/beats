@@ -31,7 +31,7 @@ request.transforms:
   - set:
       target: url.params.q
       value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Login' AND LogDate > [[.cursor.last_published_login]] ORDER BY LogDate ASC NULLS FIRST"
-      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Login' ORDER BY LogDate ASC NULLS FIRST"
+      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND LogDate = LAST_N_DAYS:{{ .initial_days }} AND EventType = 'Login' ORDER BY LogDate ASC NULLS FIRST"
 response.pagination:
   - set:
       target: url.value
