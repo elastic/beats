@@ -51,10 +51,10 @@ var (
             "sent":     c.Int("send_oct"),
             "received": c.Int("recv_oct"),
         },
-        "recv_octet_details": c.Dict("recv_octet_details", s.Schema{
+        "recv_octet_details": c.Dict("recv_oct_details", s.Schema{
             "rate": c.Float("rate"),
         }),
-        "send_octet_details": c.Dict("send_octet_details", s.Schema{
+        "send_octet_details": c.Dict("send_oct_details", s.Schema{
             "rate": c.Float("rate"),
         }),
         "host": c.Str("host"),
