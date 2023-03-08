@@ -9867,11 +9867,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-a
 
 --------------------------------------------------------------------------------
 Dependency : github.com/AndersonQ/elastic-agent-client/v7
-Version: v7.0.0-20230227212100-3ecfad4b2b6a
+Version: v7.0.0-20230308191952-d7d45d93d0da
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!anderson!q/elastic-agent-client/v7@v7.0.0-20230227212100-3ecfad4b2b6a/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!anderson!q/elastic-agent-client/v7@v7.0.0-20230308191952-d7d45d93d0da/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
@@ -10413,12 +10413,12 @@ these terms.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/ycombinator/elastic-agent-system-metrics
-Version: v0.0.0-20230307043722-2fea0616668c
-Licence type (autodetected): Elastic
+Dependency : github.com/elastic/elastic-agent-system-metrics
+Version: v0.4.6-0.20230308003052-ba171438211e
+Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/ycombinator/elastic-agent-system-metrics@v0.0.0-20230307043722-2fea0616668c/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.4.6-0.20230308003052-ba171438211e/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -12353,12 +12353,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-sysinfo
-Version: v1.9.1-0.20230215152520-f544eca983fb
+Dependency : github.com/AndersonQ/go-sysinfo
+Version: v0.0.0-20230201152444-4da8ad906ce9
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.9.1-0.20230215152520-f544eca983fb/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!anderson!q/go-sysinfo@v0.0.0-20230201152444-4da8ad906ce9/LICENSE.txt:
 
 
                                  Apache License
@@ -19087,11 +19087,11 @@ Contents of probable licence file $GOMODCACHE/github.com/prometheus/common@v0.30
 
 --------------------------------------------------------------------------------
 Dependency : github.com/prometheus/procfs
-Version: v0.8.0
+Version: v0.9.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.8.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.9.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -22244,11 +22244,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.2.0
+Version: v0.6.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.2.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.6.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
