@@ -26,14 +26,15 @@ import (
 
 // MapHostInfo converts the HostInfo to a MapStr based on ECS.
 func MapHostInfo(useFQDN bool, info types.HostInfo) mapstr.M {
-	hostname := info.Hostname
+	name := info.Hostname
 	if useFQDN {
-		hostname = info.FQDN
+		name = info.FQDN
 	}
 
 	data := mapstr.M{
 		"host": mapstr.M{
-			"hostname":     hostname,
+			"name":         name,
+			"hostname":     info.Hostname,
 			"architecture": info.Architecture,
 			"os": mapstr.M{
 				"platform": info.OS.Platform,
