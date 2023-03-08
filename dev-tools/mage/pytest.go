@@ -30,6 +30,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/pkg/errors"
 )
 
 // WINDOWS USERS:
@@ -340,7 +341,14 @@ func LookVirtualenvPath(ve, file string) (string, error) {
 	os.Setenv("PATH", virtualenvPath(ve)+string(filepath.ListSeparator)+path)
 	defer os.Setenv("PATH", path)
 
-	return exec.LookPath(file)
+	// See https://pkg.go.dev/os/exec#hdr-Executables_in_the_current_directory
+	// We explicitly want to find ./pytest in the virtualenv if it exists as of Go 1.19.
+	path, err := exec.LookPath(file)
+	if errors.Is(err, exec.ErrDot) {
+		return path, nil
+	}
+
+	return path, err
 }
 
 func expandVirtualenvReqs() []string {
