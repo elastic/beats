@@ -32,7 +32,7 @@ import (
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
+	_ = autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
 }
 
 const (
@@ -54,7 +54,7 @@ func NewHeartbeatHints(cfg *common.Config) (autodiscover.Builder, error) {
 	err := cfg.Unpack(config)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
 	return &heartbeatHints{config, logp.NewLogger("hints.builder")}, nil
@@ -134,14 +134,6 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 
 	// Apply information in event to the template to generate the final config
 	return template.ApplyConfigTemplate(event, configs)
-}
-
-func (hb *heartbeatHints) getType(hints common.MapStr) common.MapStr {
-	return builder.GetHintMapStr(hints, hb.config.Key, montype)
-}
-
-func (hb *heartbeatHints) getSchedule(hints common.MapStr) []string {
-	return builder.GetHintAsList(hints, hb.config.Key, schedule)
 }
 
 func (hb *heartbeatHints) getRawConfigs(hints common.MapStr) []common.MapStr {
