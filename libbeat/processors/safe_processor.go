@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var ErrClosed = errors.New("attempt to use a closed processor")
@@ -45,6 +46,7 @@ func (p *SafeProcessor) Close() (err error) {
 	if atomic.CompareAndSwapUint32(&p.closed, 0, 1) {
 		return Close(p.Processor)
 	}
+	logp.L().Warnf("tried to close already closed %q processor", p.Processor.String())
 	return nil
 }
 
