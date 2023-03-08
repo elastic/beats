@@ -47,11 +47,12 @@ func newProspector(config config) (loginp.Prospector, error) {
 	}
 
 	fileprospector := fileProspector{
-		filewatcher:       filewatcher,
-		identifier:        identifier,
-		ignoreOlder:       config.IgnoreOlder,
-		cleanRemoved:      config.CleanRemoved,
-		stateChangeCloser: config.Close.OnStateChange,
+		filewatcher:        filewatcher,
+		identifier:         identifier,
+		ignoreOlder:        config.IgnoreOlder,
+		ignoreInactiveSince:config.IgnoreInactive,
+		cleanRemoved:       config.CleanRemoved,
+		stateChangeCloser:  config.Close.OnStateChange,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil
