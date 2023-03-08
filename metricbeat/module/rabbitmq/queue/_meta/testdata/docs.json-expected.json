@@ -71,7 +71,7 @@
                                 "rate": 0
                             }
                         }
-                    },
+                    }
                 },
                 "name": "queuenamehere",
                 "state": "running"
