@@ -21,6 +21,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Kerberos pre-authentication failed.\n\nAccount Information:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-3057\n\tAccount Name:\t\tMPUIG\n\nService Information:\n\tService Name:\t\tkrbtgt/test.saas\n\nNetwork Information:\n\tClient Address:\t\t::ffff:192.168.5.44\n\tClient Port:\t\t53366\n\nAdditional Information:\n\tTicket Options:\t\t0x40810010\n\tFailure Code:\t\t0x12\n\tPre-Authentication Type:\t0\n\nCertificate Information:\n\tCertificate Issuer Name:\t\t\n\tCertificate Serial Number: \t\n\tCertificate Thumbprint:\t\t\n\nCertificate information is only provided if a certificate was used for pre-authentication.\n\nPre-authentication types, ticket options and failure codes are defined in RFC 4120.\n\nIf the ticket was malformed or damaged during transit and could not be decrypted, then many fields in this event might not be present.",
     "related": {
       "ip": "192.168.5.44",
       "user": "MPUIG"

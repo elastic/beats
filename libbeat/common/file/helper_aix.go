@@ -24,7 +24,6 @@ import (
 
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
 func SafeFileRotate(path, tempfile string) error {
-	parent := filepath.Dir(path)
 
 	if e := os.Rename(tempfile, path); e != nil {
 		return e
@@ -35,6 +34,14 @@ func SafeFileRotate(path, tempfile string) error {
 	// contain the new file being rotated in.
 	// On AIX, fsync will fail if the file is opened in read-only mode,
 	// which is the case with os.Open.
+	return SyncParent(path)
+
+}
+
+// SyncParent fsyncs parent directory
+func SyncParent(path string) error {
+	parent := filepath.Dir(path)
+
 	f, err := os.OpenFile(parent, os.O_RDWR, 0)
 	if err != nil {
 		return nil // ignore error

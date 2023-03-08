@@ -20,7 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
-func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (string, error) {
+func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string, skipVerifyOverride bool, pgpBytes ...string) (string, error) {
 	// do not update source config
 	settings := *u.settings
 	if sourceURI != "" {
@@ -33,11 +33,6 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 		}
 	}
 
-	verifier, err := newVerifier(version, u.log, &settings)
-	if err != nil {
-		return "", errors.New(err, "initiating verifier")
-	}
-
 	fetcher, err := newDownloader(version, u.log, &settings)
 	if err != nil {
 		return "", errors.New(err, "initiating fetcher")
@@ -48,7 +43,16 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 		return "", errors.New(err, "failed upgrade of agent binary")
 	}
 
-	matches, err := verifier.Verify(agentSpec, version, true)
+	if skipVerifyOverride {
+		return path, nil
+	}
+
+	verifier, err := newVerifier(version, u.log, &settings)
+	if err != nil {
+		return "", errors.New(err, "initiating verifier")
+	}
+
+	matches, err := verifier.Verify(agentSpec, version, true, pgpBytes...)
 	if err != nil {
 		return "", errors.New(err, "failed verification of agent binary")
 	}
@@ -65,12 +69,12 @@ func newDownloader(version string, log *logger.Logger, settings *artifact.Config
 	}
 
 	// try snapshot repo before official
-	snapDownloader, err := snapshot.NewDownloader(settings, version)
+	snapDownloader, err := snapshot.NewDownloader(log, settings, version)
 	if err != nil {
 		return nil, err
 	}
 
-	httpDownloader, err := http.NewDownloader(settings)
+	httpDownloader, err := http.NewDownloader(log, settings)
 	if err != nil {
 		return nil, err
 	}

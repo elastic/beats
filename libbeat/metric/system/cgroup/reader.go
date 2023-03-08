@@ -188,7 +188,7 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) {
 	}
 
 	stats := StatsV1{}
-	stats.Path, stats.ID = getCommonCgroupMetadata(paths.V1)
+	stats.Path, stats.ID = getCommonCgroupMetadata(paths.V1, r.ignoreRootCgroups)
 	stats.Version = CgroupsV1
 	for conName, cgPath := range paths.V1 {
 		if r.ignoreRootCgroups && (cgPath.ControllerPath == "/" && r.cgroupsHierarchyOverride != cgPath.ControllerPath) {
@@ -211,7 +211,7 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 		return nil, err
 	}
 	stats := StatsV2{}
-	stats.Path, stats.ID = getCommonCgroupMetadata(paths.V2)
+	stats.Path, stats.ID = getCommonCgroupMetadata(paths.V2, r.ignoreRootCgroups)
 	stats.Version = CgroupsV2
 	for conName, cgPath := range paths.V2 {
 		if r.ignoreRootCgroups && (cgPath.ControllerPath == "/" && r.cgroupsHierarchyOverride != cgPath.ControllerPath) {
@@ -313,9 +313,14 @@ func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
 // iff all subsystems share a common path and ID. This is common for
 // containerized processes. If there is no common path and ID then the returned
 // values are empty strings.
-func getCommonCgroupMetadata(mounts map[string]ControllerPath) (string, string) {
+func getCommonCgroupMetadata(mounts map[string]ControllerPath, ignoreRoot bool) (string, string) {
 	var path string
 	for _, m := range mounts {
+		// In cases where we have some root controllers and some non-root controllers attached to a single PID,
+		// we still need to report the "correct" root ID.
+		if !m.IsV2 && ignoreRoot && m.ControllerPath == "/" {
+			continue
+		}
 		if path == "" {
 			path = m.ControllerPath
 		} else if path != m.ControllerPath {

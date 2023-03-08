@@ -13,12 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
-        make: |
-          make -C x-pack/functionbeat check;
-          make -C x-pack/functionbeat update;
-          make check-no-changes;
-        stage: lint
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -40,7 +34,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "orka && darwin && poc"
+          - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/functionbeat for macos"
@@ -70,11 +64,12 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
         stage: extended_win
-    windows-2008:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2008-r2"
-        stage: extended_win
+    # EOL: can't install terraform https://github.com/elastic/beats/issues/32327
+    # windows-2008:
+    #     mage: "mage build unitTest"
+    #     platforms:             ## override default labels in this specific stage.
+    #         - "windows-2008-r2"
+    #     stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

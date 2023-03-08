@@ -1,0 +1,47 @@
+---
+name: Bump elastic-stack to latest snapshot version
+pipelineid: 'bump-elastic-stack-snapshot-{{ requiredEnv "BRANCH" }}'
+
+actions:
+  default:
+    title: '[updatecli] update elastic stack version for testing {{ source "latestVersion" }}'
+    kind: github/pullrequest
+    spec:
+      labels:
+        - automation
+        - dependency
+        - backport-skip
+        - build-monitoring
+        - Team:Beats-On-Call
+    scmid: default
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: '{{ requiredEnv "GIT_USER" }}'
+      email: '{{ requiredEnv "GIT_EMAIL" }}'
+      owner: elastic
+      repository: beats
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      username: '{{ requiredEnv "GIT_USER" }}'
+      branch: '{{ requiredEnv "BRANCH" }}'
+
+sources:
+  latestVersion:
+    name: Get latest snapshot build
+    kind: json
+    spec:
+      file: https://storage.googleapis.com/artifacts-api/snapshots/{{ requiredEnv "BRANCH" }}.json
+      key: .build_id
+
+targets:
+  update-snapshot:
+    name: "Update snapshot.yml"
+    kind: file
+    sourceid: latestVersion
+    scmid: default
+    spec:
+      file: testing/environments/snapshot.yml
+      matchpattern: '(image: docker\.elastic\.co/.*):\d+.\d+.\d+-.*-SNAPSHOT'
+      replacepattern: '$1:{{ source "latestVersion" }}-SNAPSHOT'

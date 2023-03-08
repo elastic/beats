@@ -3097,6 +3097,24 @@ type: double
 
 --
 
+*`aws.applicationelb.metrics.HealthyHostCount.max`*::
++
+--
+The number of targets that are considered healthy.
+
+type: long
+
+--
+
+*`aws.applicationelb.metrics.UnHealthyHostCount.max`*::
++
+--
+The number of targets that are considered unhealthy.
+
+type: long
+
+--
+
 [float]
 === networkelb
 
@@ -5051,6 +5069,24 @@ type: long
 
 --
 
+*`aws.transitgateway.metrics.BytesDropCountNoRoute.sum`*::
++
+--
+The number of bytes dropped because they did not match a route.
+
+type: long
+
+--
+
+*`aws.transitgateway.metrics.BytesDropCountBlackhole.sum`*::
++
+--
+The number of bytes dropped because they matched a blackhole route.
+
+type: long
+
+--
+
 [float]
 === usage
 
@@ -5657,11 +5693,6 @@ azure module
 
 
 
-[float]
-=== azure
-
-
-
 
 *`azure.timegrain`*::
 +
@@ -5734,6 +5765,16 @@ type: keyword
 +
 --
 The subscription ID
+
+
+type: keyword
+
+--
+
+*`azure.subscription_name`*::
++
+--
+The subscription name
 
 
 type: keyword
@@ -6024,7 +6065,7 @@ billing and usage details
 *`azure.billing.currency`*::
 +
 --
-The currency
+Billing Currency.
 
 
 type: keyword
@@ -6034,7 +6075,27 @@ type: keyword
 *`azure.billing.pretax_cost`*::
 +
 --
-Cost
+The amount of cost before tax.
+
+
+type: float
+
+--
+
+*`azure.billing.unit_price`*::
++
+--
+Unit Price is the price applicable to you. (your EA or other contract price).
+
+
+type: float
+
+--
+
+*`azure.billing.quantity`*::
++
+--
+Measure the quantity purchased or consumed. The amount of the meter used during the billing period.
 
 
 type: float
@@ -6054,7 +6115,7 @@ type: keyword
 *`azure.billing.product`*::
 +
 --
-The product type
+Product name for the consumed service or purchase.
 
 
 type: keyword
@@ -6084,7 +6145,7 @@ type: date
 *`azure.billing.billing_period_id`*::
 +
 --
-The billing period id
+The billing period id.
 
 
 type: keyword
@@ -6094,7 +6155,17 @@ type: keyword
 *`azure.billing.account_name`*::
 +
 --
-The billing account name
+Name of the Billing Account.
+
+
+type: keyword
+
+--
+
+*`azure.billing.account_id`*::
++
+--
+Billing Account identifier.
 
 
 type: keyword
@@ -29015,7 +29086,7 @@ type: long
 
 --
 
-*`gcp.storage.authz.acl_based_object_access_.ount`*::
+*`gcp.storage.authz.acl_based_object_access.count`*::
 +
 --
 Delta count of requests that result in an object being granted access solely due to object ACLs.
@@ -52089,10 +52160,20 @@ type: keyword
 *`system.filesystem.files`*::
 +
 --
-The total number of file nodes in the file system.
+Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices.
 
 
 type: long
+
+--
+
+*`system.filesystem.options`*::
++
+--
+The options present on the filesystem mount.
+
+
+type: keyword
 
 --
 

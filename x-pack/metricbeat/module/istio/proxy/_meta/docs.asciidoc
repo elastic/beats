@@ -8,11 +8,11 @@ Tested with Istio 1.7
 
 Istio-proxy is a sidecar container that is being injected into every Pod that is
 being deployed on a Kubernetes cluster which's traffic is managed by Istio.
-Because of this reason, in oder to collect metrics from this sidecars we need
+Because of this reason, in order to collect metrics from this sidecars we need
 to automatically identify these sidecar containers and start monitoring them
 using their IP and the predifined port (15090). This can be achieved easily by
-defining the proper autodiscover provider that will automatically identifies
-all these sidecar containers and will start `proxy` metricset for each one of
+defining the proper autodiscover provider that will automatically identify
+all these sidecar containers and will start the `proxy` metricset for each one of
 them. Here is an example configuration that can be used for that purpose:
 
 

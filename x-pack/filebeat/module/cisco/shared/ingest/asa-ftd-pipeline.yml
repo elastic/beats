@@ -15,7 +15,7 @@ processors:
         - "(?:%{SYSLOG_HEADER})?\\s*%{GREEDYDATA:log.original}"
       pattern_definitions:
         SYSLOG_HEADER: "(?:%{SYSLOGFACILITY}\\s*)?(?:%{FTD_DATE:_temp_.raw_date}:?\\s+)?(?:%{PROCESS_HOST}|%{HOST_PROCESS})(?:{DATA})?%{SYSLOG_END}?"
-        SYSLOGFACILITY: "<%{NONNEGINT:syslog.facility:int}(?:.%{NONNEGINT:syslog.priority:int})?>"
+        SYSLOGFACILITY: "<%{NONNEGINT:log.syslog.priority:int}>"
         # Beginning with version 6.3, Firepower Threat Defense provides the option to enable timestamp as per RFC 5424.
         FTD_DATE: "(?:%{TIMESTAMP_ISO8601}|%{ASA_DATE})"
         ASA_DATE: "(?:%{DAY} )?%{MONTH}  *%{MONTHDAY}(?: %{YEAR})? %{TIME}(?: %{TZ})?"
@@ -24,6 +24,17 @@ processors:
         # exactly match the syntax for firepower management logs
         PROCESS_HOST: "(?:%{PROCESS:process.name}:\\s%{SYSLOGHOST:host.name})"
         HOST_PROCESS: "(?:%{SYSLOGHOST:host.hostname}:?\\s+)?(?:%{PROCESS:process.name}?(?:\\[%{POSINT:process.pid:long}\\])?)?"
+  - script:
+      lang: painless
+      source: |
+        if (ctx.log?.syslog?.priority != null) {
+          def severity = new HashMap();
+          severity['code'] = ctx.log.syslog.priority&0x7;
+          ctx.log.syslog['severity'] = severity;
+          def facility = new HashMap();
+          facility['code'] = ctx.log.syslog.priority>>3;
+          ctx.log.syslog['facility'] = facility;
+        }
 
   #
   # Parse FTD/ASA style message
@@ -271,7 +282,7 @@ processors:
       - ^%{NOTSPACE:event.outcome} ((protocol %{POSINT:network.iana_number})|%{NOTSPACE:network.transport}) src %{NOTCOLON:_temp_.cisco.source_interface}:%{IPORHOST:source.address}(/%{POSINT:source.port})?\s*(\(%{CISCO_USER:_temp_.cisco.source_username}\) )?dst %{NOTCOLON:_temp_.cisco.destination_interface}:%{IPORHOST:destination.address}(/%{POSINT:destination.port})?%{DATA}by access-group "%{NOTSPACE:_temp_.cisco.list_id}"
       pattern_definitions:
         NOTCOLON: "[^:]*"
-        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?)
+        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?(, *%{NUMBER})?)
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106027'"
       field: "message"
@@ -332,10 +343,10 @@ processors:
       field: "message"
       description: "302013, 302015"
       patterns:
-        - Built %{NOTSPACE:network.direction} %{NOTSPACE:network.transport} connection %{NUMBER:_temp_.cisco.connection_id} for %{NOTCOLON:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port} \(%{IP:_temp_.natsrcip}/%{NUMBER:_temp_.cisco.mapped_source_port}\)(\(%{CISCO_USER:_temp_.cisco.source_username}\))? to %{NOTCOLON:_temp_.cisco.destination_interface}:%{NOTSPACE:destination.address}/%{NUMBER:destination.port} \(%{NOTSPACE:_temp_.natdstip}/%{NUMBER:_temp_.cisco.mapped_destination_port}\)(\(%{CISCO_USER:destination.user.name}\))?( \(%{CISCO_USER:_temp_.cisco.termination_user}\))?%{GREEDYDATA}
+        - Built %{NOTSPACE:network.direction} %{NOTSPACE:network.transport} connection %{NUMBER:_temp_.cisco.connection_id} for %{NOTCOLON:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port} \(%{IP:_temp_.natsrcip}/%{NUMBER:_temp_.cisco.mapped_source_port}\)(\(%{CISCO_USER:_temp_.cisco.source_username}\))? to %{NOTCOLON:_temp_.cisco.destination_interface}:%{NOTSPACE:destination.address}/%{NUMBER:destination.port} \(%{NOTSPACE:_temp_.natdstip}/%{NUMBER:_temp_.cisco.mapped_destination_port}\)(\(%{CISCO_USER:_temp_.cisco.destination_username}\))?( \(%{CISCO_USER:_temp_.cisco.termination_user}\))?%{GREEDYDATA}
       pattern_definitions:
         NOTCOLON: "[^:]*"
-        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?)
+        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?(, *%{NUMBER})?)
   - dissect:
       if: "ctx._temp_.cisco.message_id == '303002'"
       field: "message"
@@ -349,8 +360,13 @@ processors:
         - Teardown %{DATA} %{NOTSPACE:network.transport} translation from %{NOTCOLON:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port}(\s*\(%{CISCO_USER:_temp_.cisco.source_username}\))? to %{NOTCOLON:_temp_.cisco.destination_interface}:%{IP:destination.address}/%{NUMBER:destination.port} duration %{DURATION:_temp_.duration_hms}
       pattern_definitions:
         NOTCOLON: "[^:]*"
-        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?)
+        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?(, *%{NUMBER})?)
         DURATION: "%{INT}:%{MINUTE}:%{SECOND}"
+  - set:
+      if: '["302020"].contains(ctx._temp_.cisco.message_id)'
+      field: "event.action"
+      value: "flow-creation"
+      description: "302020"
   - grok:
       if: "ctx._temp_.cisco.message_id == '302020'"
       field: "message"
@@ -362,7 +378,7 @@ processors:
         ECSSOURCEIPORHOST: "(?:%{IP:source.address}|%{HOSTNAME:source.domain})"
         ECSDESTIPORHOST: "(?:%{IP:destination.address}|%{HOSTNAME:destination.domain})"
         MAPPEDSRC: "(?:%{DATA:_temp_.natsrcip}|%{HOSTNAME})"
-        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?)
+        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?(, *%{NUMBER})?)
   - dissect:
       if: "ctx._temp_.cisco.message_id == '302022'"
       field: "message"
@@ -782,10 +798,10 @@ processors:
   # Handle 302xxx messages (Flow expiration a.k.a "Teardown")
   #
   - set:
-      if: '["305012", "302014", "302016", "302018", "302020", "302021", "302036", "302304", "302306", "609001", "609002"].contains(ctx._temp_.cisco.message_id)'
+      if: '["305012", "302014", "302016", "302018", "302021", "302036", "302304", "302306", "609001", "609002"].contains(ctx._temp_.cisco.message_id)'
       field: "event.action"
       value: "flow-expiration"
-      description: "305012, 302014, 302016, 302018, 302020, 302021, 302036, 302304, 302306, 609001, 609002"
+      description: "305012, 302014, 302016, 302018, 302021, 302036, 302304, 302306, 609001, 609002"
   - grok:
       field: "message"
       if: '["302014", "302016", "302018", "302021", "302036", "302304", "302306"].contains(ctx._temp_.cisco.message_id)'
@@ -804,7 +820,7 @@ processors:
         ECSDESTIPORHOST: "(?:%{IP:destination.address}|%{HOSTNAME:destination.domain})"
         MAPPEDSRC: "(?:%{IPORHOST:_temp_.natsrcip}|%{HOSTNAME})"
         DURATION: "%{INT}:%{MINUTE}:%{SECOND}"
-        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?)
+        CISCO_USER: ((LOCAL\\)?(%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?(, *%{NUMBER})?)
   #
   # Decode FTD's Security Event Syslog Messages
   #
@@ -1344,6 +1360,36 @@ processors:
   #
   # Parse Source/Dest Username/Domain
   #
+  - grok:
+      field: "_temp_.cisco.source_username"
+      if: 'ctx?._temp_?.cisco?.source_username != null'
+      ignore_failure: true
+      patterns:
+        - '%{CISCO_DOMAIN_USER:_temp_.cisco.source_username}%{CISCO_SGT}'
+      pattern_definitions:
+        CISCO_DOMAIN_USER: (%{CISCO_DOMAIN})?%{CISCO_USER}
+        CISCO_SGT: (, *%{NUMBER:_temp_.cisco.source_user_security_group_tag})?
+        CISCO_USER: "%{USERNAME}(@%{HOSTNAME})?"
+        CISCO_DOMAIN: (LOCAL\\)?(%{HOSTNAME}\\)?
+  - convert:
+      field: _temp_.cisco.source_user_security_group_tag
+      type: long
+      ignore_missing: true
+  - grok:
+      field: "_temp_.cisco.destination_username"
+      if: 'ctx?._temp_?.cisco?.destination_username != null'
+      ignore_failure: true
+      patterns:
+        - '%{CISCO_DOMAIN_USER:_temp_.cisco.destination_username}%{CISCO_SGT}'
+      pattern_definitions:
+        CISCO_DOMAIN_USER: (%{CISCO_DOMAIN})?%{CISCO_USER}
+        CISCO_SGT: (, *%{NUMBER:_temp_.cisco.destination_user_security_group_tag})?
+        CISCO_USER: "%{USERNAME}(@%{HOSTNAME})?"
+        CISCO_DOMAIN: (LOCAL\\)?(%{HOSTNAME}\\)?
+  - convert:
+      field: _temp_.cisco.destination_user_security_group_tag
+      type: long
+      ignore_missing: true
   - set:
       field: source.user.name
       value: "{{{ _temp_.cisco.source_username }}}"
@@ -1357,18 +1403,18 @@ processors:
       if: 'ctx?.source?.user?.name != null'
       ignore_failure: true
       patterns:
-        - (%{CISCO_DOMAIN})?%{CISCO_USER:source.user.name}
+        - (%{CISCO_DOMAIN})?%{CISCO_USER}
       pattern_definitions:
-        CISCO_USER: "%{USERNAME}(@%{HOSTNAME:source.user.domain})?"
+        CISCO_USER: "%{USERNAME:source.user.name}(@%{HOSTNAME:source.user.domain})?"
         CISCO_DOMAIN: (LOCAL\\)?(%{HOSTNAME:source.user.domain}\\)?
   - grok:
       field: "destination.user.name"
       if: 'ctx?.destination?.user?.name != null'
       ignore_failure: true
       patterns:
-        - (%{CISCO_DOMAIN})?%{CISCO_USER:destination.user.name}
+        - (%{CISCO_DOMAIN})?%{CISCO_USER}
       pattern_definitions:
-        CISCO_USER: "%{USERNAME}(@%{HOSTNAME:destination.user.domain})?"
+        CISCO_USER: "%{USERNAME:destination.user.name}(@%{HOSTNAME:destination.user.domain})?"
         CISCO_DOMAIN: (LOCAL\\)?(%{HOSTNAME:destination.user.domain}\\)?
   #
   # Normalize protocol names
@@ -1794,6 +1840,13 @@ processors:
             - network
           type:
             - info
+        flow-creation:
+          kind: event
+          category:
+            - network
+          type:
+            - connection
+            - start
         flow-expiration:
           kind: event
           category:

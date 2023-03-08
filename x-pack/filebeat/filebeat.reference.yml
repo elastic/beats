@@ -490,6 +490,8 @@ filebeat.modules:
       connection_string: ""
       # the name of the storage account the state/offsets will be stored and updated
       storage_account: ""
+      # the name of the storage account container you would like to store the offset information in.
+      storage_account_container: ""
       # the storage account key, this key will be used to authorize access to data in your storage account
       storage_account_key: ""
 
@@ -2754,6 +2756,9 @@ filebeat.inputs:
 #--------------------------- Filestream input ----------------------------
 - type: filestream
 
+  # Unique ID among all inputs, an ID is required.
+  id: my-filestream-id
+
   # Change to true to enable this input configuration.
   enabled: false
 
@@ -4053,9 +4058,6 @@ output.elasticsearch:
 
     # Strategy for fetching the topics metadata from the broker. Default is false.
     #full: false
-
-  # The number of concurrent load-balanced Kafka output workers.
-  #worker: 1
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, events are typically dropped.

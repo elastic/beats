@@ -21,6 +21,7 @@
     "log": {
       "level": "error"
     },
+    "message": "The security log is now full.",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",

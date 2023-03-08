@@ -13,6 +13,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
+const (
+	darwin  = "darwin"
+	linux   = "linux"
+	windows = "windows"
+)
+
 // Config is a configuration used for verifier and downloader
 type Config struct {
 	// OperatingSystem: operating system [linux, windows, darwin]
@@ -44,8 +50,10 @@ type Config struct {
 func DefaultConfig() *Config {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 
-	// binaries are a getting bit larger it might take >30s to download them
-	transport.Timeout = 120 * time.Second
+	// Elastic Agent binary is rather large and based on the network bandwidth it could take some time
+	// to download the full file. 10 minutes is a very large value, but we really want it to finish.
+	// The HTTP download will log progress in the case that it is taking a while to download.
+	transport.Timeout = 10 * time.Minute
 
 	return &Config{
 		SourceURI:             "https://artifacts.elastic.co/downloads/",
@@ -62,12 +70,12 @@ func (c *Config) OS() string {
 	}
 
 	switch runtime.GOOS {
-	case "windows":
-		c.OperatingSystem = "windows"
-	case "darwin":
-		c.OperatingSystem = "darwin"
+	case windows:
+		c.OperatingSystem = windows
+	case darwin:
+		c.OperatingSystem = darwin
 	default:
-		c.OperatingSystem = "linux"
+		c.OperatingSystem = linux
 	}
 
 	return c.OperatingSystem

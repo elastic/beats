@@ -91,6 +91,12 @@
 - Snapshot artifact lookup will use agent.download proxy settings. {issue}27903[27903] {pull}27904[27904]
 - Fix lazy acker to only add new actions to the batch. {pull}27981[27981]
 - Allow HTTP metrics to run in bootstrap mode. Add ability to adjust timeouts for Fleet Server. {pull}28260[28260]
+- Increase the download artifact timeout to 10mins and add log download statistics. {pull}31461[31461]
+- Add filemod times to files in diagnostics collect bundle. {pull}31986[31986]
+- Allow ':' characters in dynamic variables. {pull}32407[32407]
+- Allow the - char to appear as part of variable names in eql expressions. {pull}32350[32350]
+- Allow the / char to appear as part of variable names in eql expressions. {pull}32528{32528}
+- Fix add_fields processor on Docker provider {pull}33269{33269}
 
 ==== New features
 
@@ -158,3 +164,4 @@
 - Install command will skip install/uninstall steps when installation via package is detected on Linux distros. {pull}30289[30289]
 - Add support for enabling the metrics buffer endpoint in the elastic-agent and beats it runs. diagnostics collect command will gather metrics-buffer data if enabled. {pull}30471[30471]
 - Elastic Agent now propagates ID for Filebeat input. {pull}30386[30386]
+- Fix incorrectly creating a filebeat redis input when a policy contains a packetbeat redis input. {issue}[427] {pull}[700]

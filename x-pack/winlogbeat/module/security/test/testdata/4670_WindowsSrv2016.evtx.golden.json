@@ -23,6 +23,7 @@
     "log": {
       "level": "information"
     },
+    "message": "Permissions on an object were changed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nObject:\n\tObject Server:\tSecurity\n\tObject Type:\tToken\n\tObject Name:\t-\n\tHandle ID:\t0x56c\n\nProcess:\n\tProcess ID:\t0x2fc\n\tProcess Name:\tC:\\Windows\\System32\\services.exe\n\nPermissions Change:\n\tOriginal Security Descriptor:\tD:(A;;GA;;;SY)(A;;GA;;;NS)\n\tNew Security Descriptor:\tD:(A;;GA;;;SY)(A;;RC;;;OW)(A;;GA;;;S-1-5-80-123231216-2592883651-3715271367-3753151631-4175906628)",
     "process": {
       "executable": "C:\\Windows\\System32\\services.exe",
       "name": "services.exe",

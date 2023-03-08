@@ -1,0 +1,532 @@
+---
+apiVersion: v1
+
+# The repository name in registry1, excluding /ironbank/
+name: "elastic/beats/heartbeat"
+
+# List of tags to push for the repository in registry1
+# The most specific version should be the first tag and will be shown
+# on ironbank.dsop.io
+tags:
+  - "{{ beat_version }}"
+
+# Build args passed to Dockerfile ARGs
+args:
+  BASE_IMAGE: "redhat/ubi/ubi8"
+  BASE_TAG: "8.6"
+  ELASTIC_STACK: "{{ beat_version }}"
+  ELASTIC_PRODUCT: "heartbeat"
+
+# Docker image labels
+labels:
+  org.opencontainers.image.title: "heartbeat"
+  ## Human-readable description of the software packaged in the image
+  org.opencontainers.image.description: "heartbeat Lightweight shipper for uptime monitoring"
+  ## License(s) under which contained software is distributed
+  org.opencontainers.image.licenses: "Elastic License"
+  ## URL to find more information on the image
+  org.opencontainers.image.url: "https://www.elastic.co/products/beats/heartbeat"
+  ## Name of the distributing entity, organization or individual
+  org.opencontainers.image.vendor: "Elastic"
+  org.opencontainers.image.version: "{{ beat_version }}"
+  ## Keywords to help with search (ex. "cicd,gitops,golang")
+  mil.dso.ironbank.image.keywords: "uptime,heartbeat,monitoring,observabilty,o11y,oblt,beats,elastic,elasticsearch,golang"
+  ## This value can be "opensource" or "commercial"
+  mil.dso.ironbank.image.type: "commercial"
+  ## Product the image belongs to for grouping multiple images
+  mil.dso.ironbank.product.name: "heartbeat"
+
+# List of project maintainers
+maintainers:
+  - email: "nassim.kammah@elastic.co"
+    name: "Nassim Kammah"
+    username: "nassim.kammah"
+  - email: "ivan.fernandez@elastic.co"
+    name: "Ivan Fernandez Calvo"
+    username: "ivan.fernandez"
+  - email: "victor.martinez@elastic.co"
+    name: "Victor Martinez"
+    username: "victor.martinez"
+
+# List of resources to make available to the offline build context
+resources:
+  - filename: "heartbeat-{{ beat_version }}-linux-x86_64.tar.gz"
+    url: "<artifact_path>/heartbeat-{{ beat_version }}-linux-x86_64.tar.gz"
+    validation:
+      type: "sha512"
+      value: "<insert SHA 512 here>"
+  - filename: tinit
+    url: https://github.com/krallin/tini/releases/download/v0.19.0/tini-amd64
+    validation:
+      type: sha256
+      value: 93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c
+  - filename: fontconfig-2.13.1-4.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/f/fontconfig-2.13.1-4.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 6f8bbe7f9c22003405031deeb18ef38815d8dd4935b8766f711ac8abff276601
+  - filename: fontpackages-filesystem-1.44-22.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/f/fontpackages-filesystem-1.44-22.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: ecf3b428e9fcc44177c12d85122aabd775db4531bf4599f5f99de99bc5cc3925
+  - filename: libX11-1.6.8-5.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libX11-1.6.8-5.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 66600448091b07b90d26aad07eef05f65693d5ede2d1272c7d5b75a07b2deaa2
+  - filename: libX11-common-1.6.8-5.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libX11-common-1.6.8-5.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 98f5d2c3d2a2da96383645800c79d4794ee2387ad58378e65c16e32d62204190
+  - filename: freetype-2.9.1-9.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/f/freetype-2.9.1-9.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 1f82bd400e0ebd592f64347968c0ae85970230f51bbc8a2e49cf10a08f88526f
+  - filename: libX11-xcb-1.6.8-5.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libX11-xcb-1.6.8-5.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 8aba2186142e2053bb7e06f871ba1fd5b71e4822ef2e6d8f8d7dcabe250e5302
+  - filename: libXau-1.0.9-3.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXau-1.0.9-3.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 028141ae18fb41c9ee406307953e600eba388282b0d581c7132db5ff22ace362
+  - filename: libsoup-2.62.3-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libsoup-2.62.3-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 016ca0305984238d33fea53cf9c1b3d7c80d104d941d2b0ba564e82877c7fe7d
+  - filename: vulkan-loader-1.3.224.0-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/v/vulkan-loader-1.3.224.0-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 04f8daa017250796784a780b73af1def53d4e83cca26aaf802595ddbe2182910
+  - filename: libXcomposite-0.4.4-14.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXcomposite-0.4.4-14.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 3d0681577ee2961431bcd2cd646f08ad99bf7f19d52b12483e71ebb14fee7ab8
+  - filename: gsettings-desktop-schemas-3.32.0-6.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/g/gsettings-desktop-schemas-3.32.0-6.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: ef0bee544ec9f62c9d8746d753fdbef129a1d5a1d94c19cc503d69396239c57a
+  - filename: libXcursor-1.1.15-3.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXcursor-1.1.15-3.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: e327d8469bd71ea0d747673bc362240e3ddad672a0eb7fe815a06d1317e74598
+  - filename: libXdamage-1.1.4-14.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXdamage-1.1.4-14.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: b0fa6e96826a5adf55337191c4c9f3b6a31a4eb1ed81981102058cb4b506e5ef
+  - filename: hwdata-0.314-8.14.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/h/hwdata-0.314-8.14.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: f5c166acc52db9ae9836178b01bfb72aa33fac6c2d6f23debcee7d4f5159a343
+  - filename: gdk-pixbuf2-2.36.12-5.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/g/gdk-pixbuf2-2.36.12-5.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: b9329e5de8573a782d04cdd35bf6c540349259fd71b05fc097baa6d52fba1cd6
+  - filename: libXext-1.3.4-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXext-1.3.4-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: d4b037882da8eb6c588eee822f3227e7caf6ed2e9352ed490f0cd3577ed78470
+  - filename: libXfixes-5.0.3-7.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXfixes-5.0.3-7.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: be03c4d9a5ea3b1b1fb80f301f932ff0488fd80fb7acd9126153956f27cedb13
+  - filename: wget-1.19.5-10.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/w/wget-1.19.5-10.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: cb1dbb79240c60648916fed72bc3368e5394de1013b4135b54a812a40a279cff
+  - filename: libXft-2.3.3-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXft-2.3.3-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 2d4a1d4c0c9e61c70936873f0563ed2ac6b468549c3163bf73f91134ff2e9860
+  - filename: pango-1.42.4-8.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/p/pango-1.42.4-8.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 481dc7c787260e8d261cd4f7d7499105def3a3a64835e4f7f4ed6ab0ddf92723
+  - filename: libXi-1.7.10-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXi-1.7.10-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 50085caa63b1a131251449903e9918d847702e5a9b64ed33bd2b72b1ff657343
+  - filename: glib-networking-2.56.1-1.1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/g/glib-networking-2.56.1-1.1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 074f4aa3245993c10719f8fe1df9f9cf53b792711453c05b92c9512ba065657c
+  - filename: libXinerama-1.1.4-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXinerama-1.1.4-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 2c2c3ea3c22c99e7a2254e00ff3139327c778dd89a0b43245e88447c262f9cfc
+  - filename: libXrandr-1.5.2-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXrandr-1.5.2-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 6e162f68d0459598f596ee0698a504c795d6c992a807dec0e718efdc8a1e225e
+  - filename: xdg-utils-1.1.2-5.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/x/xdg-utils-1.1.2-5.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 898513d33aef302cf9dc32c2863748df3432cb0c2455b897a6c26f7031b32557
+  - filename: libXrender-0.9.10-7.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXrender-0.9.10-7.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 686856648531848c72434a295d276394d4dee6dab1336c6b745b9daab0613292
+  - filename: xkeyboard-config-2.28-1.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/x/xkeyboard-config-2.28-1.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 66853f37796011f8bd91e5068c80e00d74d7a98d1c468f416116bac1d3d4db6e
+  - filename: libXtst-1.2.3-7.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libXtst-1.2.3-7.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 2f095a882b0593cc3d19fae7d84859e8216a2c009fd5906c862daf84b6caa249
+  - filename: cairo-1.15.12-6.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/c/cairo-1.15.12-6.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 7fd42a923afbaebcff03073c443235685e4094ef7eab8ca48c8043d198b92673
+  - filename: cairo-gobject-1.15.12-6.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/c/cairo-gobject-1.15.12-6.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 6828a209878746c228c9902843e0519407eb9cb8a3d204346a68833e9321ce8a
+  - filename: mesa-libgbm-22.1.5-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/m/mesa-libgbm-22.1.5-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 889f75f01e3c57b747dbc83b95a31effb102af0e50a2cd7f2b9d8b766d1c580e
+  - filename: mesa-vulkan-drivers-22.1.5-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/m/mesa-vulkan-drivers-22.1.5-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 1e9297112295cf07fabc4adc15a20c50cff1cfb64128477deddb9e2053cd7b71
+  - filename: llvm-libs-14.0.6-1.module+el8.7.0+1080+d88dc670.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/llvm-libs-14.0.6-1.module+el8.7.0+1080+d88dc670.x86_64.rpm
+    validation:
+      type: sha256
+      value: db3cd9ebcbda9282c40e20386e21a30ebf6d178592284ddc2f4a86962761fd0b
+  - filename: shared-mime-info-1.9-3.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/s/shared-mime-info-1.9-3.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: ce73a789eb8c10f5a859c4712c95eb6a03ddc4c50e4bbe6c449033c7d9d9b46b
+  - filename: pixman-0.38.4-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/p/pixman-0.38.4-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: fba43060573303c7e5d8bf3f65997ab720d2935be48a2910b778ee8e84f5fcc0
+  - filename: libdatrie-0.2.9-7.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libdatrie-0.2.9-7.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: af6561333c5b3e0a13d7539c5fc34756cb0facd69184a5dfc3c83cf1a148e8d7
+  - filename: fribidi-1.0.4-9.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/f/fribidi-1.0.4-9.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 140455eb981d3ea0296f5719b1026b29f8e6316caf885301b5607af38483edec
+  - filename: libdrm-2.4.111-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libdrm-2.4.111-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: e394a9750bef7f85575b7b5e5757b07be87d3051f852e774d2c5dd349919c57d
+  - filename: colord-libs-1.4.2-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/c/colord-libs-1.4.2-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: ba80ea0162df37e1b9b82c5808a0b569a7cb05b83ed30fbb707ac7892b9dbc3b
+  - filename: abattis-cantarell-fonts-0.0.25-6.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/a/abattis-cantarell-fonts-0.0.25-6.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 467a74c9b44fd7ca2910712a83ed040fcbcaafbc7fda8b541bd1d6d8cfc6988d
+  - filename: libepoxy-1.5.8-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libepoxy-1.5.8-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: fa45b6c15f3a168ecb19032e0e2321541e1ac5bc8775d28491889b32696332bd
+  - filename: adwaita-cursor-theme-3.28.0-3.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/a/adwaita-cursor-theme-3.28.0-3.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 3b35985ea1acf4036276f55b8831b41875279082a9c57232a1c028a5399bb65b
+  - filename: adwaita-icon-theme-3.28.0-3.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/a/adwaita-icon-theme-3.28.0-3.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 2407bf478cec673be1f78f6b7ac92e18b8e5929992534578ffde85cff251c0d1
+  - filename: alsa-lib-1.2.7.2-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/a/alsa-lib-1.2.7.2-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: bf2a1da9089da0cb1bf360ebedbbcbee3f214cd2f5e455b6374a813ca971afe7
+  - filename: jasper-libs-2.0.14-5.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/j/jasper-libs-2.0.14-5.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 5830d55c1e5a8b07c706d339f3deb917c7d0a4364160859ccbd59044315ca93c
+  - filename: libthai-0.1.27-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libthai-0.1.27-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 40184946b4bdf8e00577e89d2aaad32794785946834a92b9b7f6b5bba46da12f
+  - filename: libtiff-4.0.9-23.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libtiff-4.0.9-23.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 737b891cb4bbb38adaa29d482c291dd2bfca79cbc69dfc4113209859109e7641
+  - filename: liberation-fonts-2.00.3-7.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/liberation-fonts-2.00.3-7.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 0d8d6669df35252af4573cff943f642b079dc6bea809c91011cc7413842024c1
+  - filename: liberation-fonts-common-2.00.3-7.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/liberation-fonts-common-2.00.3-7.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 125f053c400815d6aac6ae876f1c050a9fb9b3acd2f71bb4281220ae2b45702d
+  - filename: liberation-mono-fonts-2.00.3-7.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/liberation-mono-fonts-2.00.3-7.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 5455e6eddd7c2d5c109775a8bdd39cc35fb2bf1f4790df9b530358d57926bd56
+  - filename: avahi-libs-0.7-20.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/a/avahi-libs-0.7-20.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 4025ada765b99bd04a94850b628b480d30d997674671bd78d2f73ed3acf37a55
+  - filename: liberation-sans-fonts-2.00.3-7.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/liberation-sans-fonts-2.00.3-7.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 3721a1315298f5fe4c3a635d7c3b7048428f711b6a6f90638dcb44aab624537d
+  - filename: liberation-serif-fonts-2.00.3-7.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/liberation-serif-fonts-2.00.3-7.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 41ebbfca4b7fc586cd22ff6ece89461aa61cd346fda9b4f98d2817c83ef630ff
+  - filename: graphite2-1.3.10-10.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/graphite2-1.3.10-10.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: b008a03eec2d111f34e4e4857fef2133997ee831d22ab06a5e47beb450d5093b
+  - filename: jbigkit-libs-2.1-14.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/j/jbigkit-libs-2.1-14.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 7516d75360c9f9cefbc9bf08659edf6703534279fd467d2e1febe7eb06a92dd5
+  - filename: gtk-update-icon-cache-3.22.30-11.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gtk-update-icon-cache-3.22.30-11.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: c574da0954ff6ba85c0eabe58a7acbded426be845d408c57e57cb443fe560933
+  - filename: libgusb-0.3.0-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libgusb-0.3.0-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 282eedb549408cc6c04220aad6b081f9c5d791366fd7724f2946daa1fc49e22a
+  - filename: gtk3-3.22.30-11.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gtk3-3.22.30-11.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 29a2f90df2465bdb2e4798d90e6d43933bb34cf742747f97efd77db0832c06c6
+  - filename: dconf-0.28.0-4.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/d/dconf-0.28.0-4.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 7b50268254a1a308f2ee2dc13783603d8da3a3e4d9723cca8d541007241c59d3
+  - filename: desktop-file-utils-0.23-8.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/d/desktop-file-utils-0.23-8.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 909becf23616f2f4d8c5fe8ebdde76d576ee397cabda0b9ed89e50870368b99f
+  - filename: cups-libs-2.2.6-50.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/c/cups-libs-2.2.6-50.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 265a56f7893b17918e27ccb7023bb44b2bd104173146e55992e0bb3188b4e312
+  - filename: at-spi2-atk-2.26.2-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/a/at-spi2-atk-2.26.2-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 8cf63781b34314ecd9931ac8cfcbd3ffdc526d720bae948a27e868d9beff08e3
+  - filename: libwayland-client-1.19.0-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libwayland-client-1.19.0-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: f8be8d0b50f23d997f7643d9dba4d149a1b29f26c61ce6bb85f8b136cb2265d7
+  - filename: libjpeg-turbo-1.5.3-12.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libjpeg-turbo-1.5.3-12.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 71a9f44edce13938e9fb1557ec88d9d923fe2ea547fdb3cb0926489d04e93c01
+  - filename: libwayland-cursor-1.19.0-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libwayland-cursor-1.19.0-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 2d9e5c9557e076c1730c407955d4959668bf72c1b33f257ba240a221e19daea9
+  - filename: at-spi2-core-2.28.0-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/a/at-spi2-core-2.28.0-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: c9bba632f64d56e6a45b23dc9f79fc6868f292d2a21f638ead6bd48116184a8c
+  - filename: libwayland-egl-1.19.0-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libwayland-egl-1.19.0-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 22c6e952f8edce3aaf3dd0caaf3c2544b4cae56a0f0bc11c47ae9263c935cd6f
+  - filename: libwayland-server-1.19.0-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libwayland-server-1.19.0-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 81752663a48a83b6251f80cbbc8f49e19032cbdb2452a83647034f2a372e259b
+  - filename: atk-2.28.1-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/a/atk-2.28.1-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 01abcea12bbada68012f4933c190f269a5053da4e0c6372eea534f04be099530
+  - filename: nspr-4.34.0-3.el8_6.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/n/nspr-4.34.0-3.el8_6.x86_64.rpm
+    validation:
+      type: sha256
+      value: 1543f75ee941cc74ec0e291eeb19eb2ecfa34491efa46059d78874418e9aae9e
+  - filename: libmetalink-0.1.3-7.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libmetalink-0.1.3-7.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 419f28acbaef4f9d8b840a252f2fd6efb1c22b2c3be8ff4cae9c6f706642b3f9
+  - filename: libxcb-1.13.1-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libxcb-1.13.1-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: f879eab6ae5acfddf7c6aa6cb7192fec725940babca04b33388fb1f0b5aadb5b
+  - filename: nss-3.79.0-10.el8_6.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/n/nss-3.79.0-10.el8_6.x86_64.rpm
+    validation:
+      type: sha256
+      value: 684862bc5ffd7c2f1fb4e3d80f02a05807655af5f218eb8a71f0ae541f1f38d0
+  - filename: harfbuzz-1.7.5-3.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/h/harfbuzz-1.7.5-3.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 3ae64f68f756f6a0a74b91c7f76e7a67288c3f08e07c6fb112641e9a29a4fcc0
+  - filename: dejavu-fonts-common-2.35-7.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/d/dejavu-fonts-common-2.35-7.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 6e64def2370390384d4cdd21c778c5dcb505c5f7775fd8de59c7af7e7695aa49
+  - filename: dejavu-sans-mono-fonts-2.35-7.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/d/dejavu-sans-mono-fonts-2.35-7.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 7cf6c7c26ee37725d37f5cb320861dff6599e0402f02e7e23455235625ac2dd4
+  - filename: libxkbcommon-0.9.1-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libxkbcommon-0.9.1-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 51f79ea9268dae9826ece0bc98c135dd5ca62b08581694ae5401971690fd3766
+  - filename: libmodman-2.0.1-17.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libmodman-2.0.1-17.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 364087e4dd6dab7bdf6c671a852f856e989d427e082936183af6e7bb74d995ef
+  - filename: nss-softokn-3.79.0-10.el8_6.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/n/nss-softokn-3.79.0-10.el8_6.x86_64.rpm
+    validation:
+      type: sha256
+      value: 8f4702dc979720438b3ca338b5215f0ec7b017443c3a2229aa71f84ce6cfe734
+  - filename: nss-softokn-freebl-3.79.0-10.el8_6.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/n/nss-softokn-freebl-3.79.0-10.el8_6.x86_64.rpm
+    validation:
+      type: sha256
+      value: 93e78d2bfa30aaa30402f15bb1a29c067a6bc628353eca60453d33fff73527fa
+  - filename: nss-sysinit-3.79.0-10.el8_6.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/n/nss-sysinit-3.79.0-10.el8_6.x86_64.rpm
+    validation:
+      type: sha256
+      value: f81f9bedbc71db1b05c23f436b16a20bb898e02f4afbb4ae30142becfda270a3
+  - filename: hicolor-icon-theme-0.17-2.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/h/hicolor-icon-theme-0.17-2.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 2971da4cfc39fa573025a8d3915b6205dcfa5d0c2dccaf63e9bf7b1a273e8bcf
+  - filename: nss-util-3.79.0-10.el8_6.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/n/nss-util-3.79.0-10.el8_6.x86_64.rpm
+    validation:
+      type: sha256
+      value: 4ed196ef6fa5a607f63430ec3e0822565f8a9dc8206ed99142b405eeba898adc
+  - filename: libxshmfence-1.3-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/libxshmfence-1.3-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 8174c80b6048f3dab1d08960b1a59c0af739d52bafb373e99a3447107ab6499f
+  - filename: google-chrome-stable-103.0.5060.134-1.x86_64.rpm
+    url: https://dl.google.com/linux/chrome/rpm/stable/x86_64/google-chrome-stable-103.0.5060.134-1.x86_64.rpm
+    validation:
+      type: sha256
+      value: 0cb17f6ed4f421fe2c61e66d6db28dd442c3a5f4fed07629f23cc070d19165ea
+  - filename: gdk-pixbuf2-modules-2.36.12-5.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/g/gdk-pixbuf2-modules-2.36.12-5.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 4214f8cd9b483725dc3fe2413aa4b3d09eb9af33258c25da75aa099c7f2d2b90
+  - filename: libpciaccess-0.14-1.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libpciaccess-0.14-1.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: ffa55e88d93b88b63f6bd254d324d220f261d99384caefcf861defdd367da064
+  - filename: libpng-1.6.34-5.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libpng-1.6.34-5.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 7adc30f7a2cf65e3e100fe1ee79df5aac2ffff94230e8479659d539ef705cc66
+  - filename: libproxy-0.4.15-5.2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/l/libproxy-0.4.15-5.2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: 5241313c39cdff915e7b14813e345de2af8036f4f53b31351101167c2099a274
+  - filename: emacs-filesystem-26.1-7.el8.noarch.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/e/emacs-filesystem-26.1-7.el8.noarch.rpm
+    validation:
+      type: sha256
+      value: 0528c60ec061f0dcbeecc420412f48d018143debee30ce7477233688128aaa97
+  - filename: rest-0.8.1-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/r/rest-0.8.1-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: d0b724dfbb28d44f79af0996c1905de505a12160918c98754fece8f8c26864f4
+  - filename: lcms2-2.9-2.el8.x86_64.rpm
+    url: https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/Packages/l/lcms2-2.9-2.el8.x86_64.rpm
+    validation:
+      type: sha256
+      value: e6f6dcd95aded680ca3f4252e98d6ebb489587f0d68610b767a23bbf1e8a275d
+  - filename: node.tar.gz
+    url: https://nodejs.org/dist/v12.22.5/node-v12.22.5-linux-x64.tar.gz
+    validation:
+      type: sha256
+      value: 89eaf038c41439dcbc543d1783adc0e9f38ddf07c993c08e111d55fe35dadc21
+  - filename: elastic-synthetics.tar.gz
+    url: https://storage.googleapis.com/obs-ci-cache/beats/elastic-synthetics-1.0.0-beta.17.tgz
+    validation:
+      type: sha256
+      value: aa890887a1630abf9c73ac2568b1d7a59494bf1ed23d44789c162da92655178c

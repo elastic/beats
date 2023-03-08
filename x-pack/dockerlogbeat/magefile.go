@@ -344,6 +344,7 @@ func Export() error {
 		if err != nil {
 			return errors.Wrap(err, "error creating release tarball")
 		}
+		return errors.Wrap(devtools.CreateSHA512File(outpath), "failed to create .sha512 file")
 	}
 
 	return nil
@@ -380,6 +381,14 @@ func Package() {
 	}
 
 	mg.SerialDeps(Build, Export)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
 }
 
 func isSupportedPlatform() bool {

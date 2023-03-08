@@ -10,13 +10,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-
 *Auditbeat*
 
 *Filebeat*
 
 *Heartbeat*
-
+- Update the recommended Node.js version to 18.12.0 for Synthetics {pull}15196[15196]
 
 *Metricbeat*
 
@@ -31,49 +30,35 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
-
-- Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
-- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
-- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
-- Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
-- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
-- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
+- Fix panics when a processor is closed twice {pull}34647[34647]
 
 *Auditbeat*
 
-- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
 
 *Filebeat*
 
-- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
-- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
-- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
-- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
-- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
-- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
-- Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
+- [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
+- Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
+- Fix panics when a processor is closed twice {pull}34647[34647]
 
 *Heartbeat*
 
+- Enable nodejs engine strict validation when bundling synthetics. {pull}34471[34471]
 
 *Metricbeat*
 
-- Enhance metricbeat on openshift documentation {pull}30054[30054]
-- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
-- Fix Docker module: rename fields on dashboards. {pull}30500[30500]
-- Add back missing metrics to system/linux. {pull}30774[30774]
-- GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
-- Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
 
 *Packetbeat*
 
+- Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
 
 *Winlogbeat*
 
+- Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
+- Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
+- Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
 
 *Functionbeat*
-
-
 
 *Elastic Logging Plugin*
 
@@ -82,24 +67,27 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+
+
 *Auditbeat*
+
 
 *Filebeat*
 
-- Remove beta flag for some filebeat modules. {pull}14374[14374]
-- Extend documentation about hints annotation for processors {pull}30561[30561]
+
+*Auditbeat*
+
+
+*Filebeat*
+
 
 *Heartbeat*
 
-- Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
 - Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
 
 *Metricbeat*
 
-- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
-- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
-- Fix overflow in `iostat` metrics {pull}30679[30679]
-- Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
+- Remove GCP Compute metadata cache {pull}33655[33655]
 
 *Packetbeat*
 
@@ -134,4 +122,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
-

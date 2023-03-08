@@ -244,7 +244,8 @@ endif::[]
  `add_resource_metadata` can be done for `node` or `namespace`. By default all labels will be included
   while annotations are not added by default. This settings are useful when labels' and annotations'
   storing requires special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
-  can be individually disabled by setting `enabled: false`.
+  can be individually disabled by setting `enabled: false`. If resource is `pod` and it is created from a `deployment`, by default
+  the deployment name is added, this can be disabled by setting `deployment: false`.
   Example:
 
 ["source","yaml",subs="attributes"]
@@ -255,6 +256,7 @@ endif::[]
         node:
           include_labels: ["nodelabel2"]
           include_annotations: ["nodeannotation1"]
+        deployment: false
 -------------------------------------------------------------------------------------
 
 `unique`:: (Optional) Defaults to `false`. Marking an autodiscover provider as unique results into

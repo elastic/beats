@@ -102,7 +102,7 @@ func (s *split) run(ctx *transformContext, resp transformable, ch chan<- maybeMs
 // split recursively executes the split processor chain.
 func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybeMsg) error {
 	v, err := root.GetValue(s.targetInfo.Name)
-	if err != nil && err != common.ErrKeyNotFound {
+	if err != nil && err != common.ErrKeyNotFound { //nolint:errorlint // This is never wrapped.
 		return err
 	}
 
@@ -135,6 +135,7 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 				return nil
 			}
 			if s.isRoot {
+				ch <- maybeMsg{msg: root}
 				return errEmptyRootField
 			}
 			ch <- maybeMsg{msg: root}

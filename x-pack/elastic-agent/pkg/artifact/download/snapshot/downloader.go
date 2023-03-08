@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
@@ -18,18 +20,18 @@ import (
 
 // NewDownloader creates a downloader which first checks local directory
 // and then fallbacks to remote if configured.
-func NewDownloader(config *artifact.Config, versionOverride string) (download.Downloader, error) {
+func NewDownloader(log *logger.Logger, config *artifact.Config, versionOverride string) (download.Downloader, error) {
 	cfg, err := snapshotConfig(config, versionOverride)
 	if err != nil {
 		return nil, err
 	}
-	return http.NewDownloader(cfg)
+	return http.NewDownloader(log, cfg)
 }
 
 func snapshotConfig(config *artifact.Config, versionOverride string) (*artifact.Config, error) {
 	snapshotURI, err := snapshotURI(versionOverride, config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to detect remote snapshot repo, proceeding with configured: %v", err)
+		return nil, fmt.Errorf("failed to detect remote snapshot repo, proceeding with configured: %w", err)
 	}
 
 	return &artifact.Config{
@@ -46,9 +48,7 @@ func snapshotConfig(config *artifact.Config, versionOverride string) (*artifact.
 func snapshotURI(versionOverride string, config *artifact.Config) (string, error) {
 	version := release.Version()
 	if versionOverride != "" {
-		if strings.HasSuffix(versionOverride, "-SNAPSHOT") {
-			versionOverride = strings.TrimSuffix(versionOverride, "-SNAPSHOT")
-		}
+		versionOverride = strings.TrimSuffix(versionOverride, "-SNAPSHOT")
 		version = versionOverride
 	}
 
@@ -94,11 +94,18 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 		}
 
 		index := strings.Index(uri, "/beats/elastic-agent/")
-		if index == -1 {
-			return "", fmt.Errorf("not an agent uri: '%s'", uri)
-		}
 
-		return uri[:index], nil
+		// Because we're iterating over a map from the API response,
+		// the order is random and some elements there do not contain the
+		// `/beats/elastic-agent/` substring, so we need to go through the
+		// whole map before returning an error.
+		//
+		// One of the elements that might be there and do not contain this
+		// substring is the `elastic-agent-shipper`, whose URL is something like:
+		// https://snapshots.elastic.co/8.7.0-d050210c/downloads/elastic-agent-shipper/elastic-agent-shipper-8.7.0-SNAPSHOT-linux-x86_64.tar.gz
+		if index != -1 {
+			return uri[:index], nil
+		}
 	}
 
 	return "", fmt.Errorf("uri not detected")

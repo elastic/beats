@@ -154,6 +154,14 @@
               type: keyword
               description: |
                 Trust type
+            - name: is_compliant
+              type: boolean
+              description: |
+                If the device is compliant
+            - name: is_managed
+              type: boolean
+              description: |
+                If the device is managed
         - name: applied_conditional_access_policies
           type: array
           description: |
@@ -166,12 +174,23 @@
           type: flattened
           description: |
             Additional authentication processing details, such as the agent name in case of PTA/PHS or Server/farm name in case of federated authentication.
+        - name: authentication_protocol
+          type: keyword
+          description: |
+            Authentication protocol type.
+        - name: incoming_token_type
+          type: keyword
+          description: |
+            Incoming token type.
+        - name: unique_token_identifier
+          type: keyword
+          description: Unique token identifier for the request.
         - name: authentication_requirement
           type: keyword
           description: |
             This holds the highest level of authentication needed through all the sign-in steps, for sign-in to succeed.
         - name: authentication_requirement_policies
-          type: keyword
+          type: flattened
           description: |
             Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user
         - name: flagged_for_review

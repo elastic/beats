@@ -326,6 +326,15 @@ func Package() {
 	packageAgent(requiredPackages, devtools.UseElasticAgentPackaging)
 }
 
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	start := time.Now()
+	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
+	return devtools.Ironbank()
+}
+
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
 	for _, pkg := range requiredPackages {
 		if _, ok := os.LookupEnv(snapshotEnv); ok {
@@ -398,7 +407,16 @@ func Config() {
 
 // ControlProto generates pkg/agent/control/proto module.
 func ControlProto() error {
-	return sh.RunV("protoc", "--go_out=plugins=grpc:.", "control.proto")
+	err := sh.RunV("protoc", "--go_out=plugins=grpc:.", "control.proto")
+	if err == nil {
+		return nil
+	}
+
+	return sh.RunV(
+		"protoc",
+		"--go_out=pkg/agent/control/proto/", "--go_opt=paths=source_relative",
+		"--go-grpc_out=pkg/agent/control/proto/", "--go-grpc_opt=paths=source_relative",
+		"control.proto")
 }
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.

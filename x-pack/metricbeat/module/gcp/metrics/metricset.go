@@ -314,14 +314,16 @@ func (m *MetricSet) getMetadata(out *metric.MetricDescriptor, metricsWithMeta ma
 		ingestDelay:  0 * time.Second,
 	}
 
-	if out.Metadata.SamplePeriod != nil {
-		m.Logger().Debugf("For metric type %s: sample period = %s", out.Type, out.Metadata.SamplePeriod)
-		meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
-	}
+	if out.Metadata != nil {
+		if out.Metadata.SamplePeriod != nil {
+			m.Logger().Debugf("For metric type %s: sample period = %s", out.Type, out.Metadata.SamplePeriod)
+			meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
+		}
 
-	if out.Metadata.IngestDelay != nil {
-		m.Logger().Debugf("For metric type %s: ingest delay = %s", out.Type, out.Metadata.IngestDelay)
-		meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+		if out.Metadata.IngestDelay != nil {
+			m.Logger().Debugf("For metric type %s: ingest delay = %s", out.Type, out.Metadata.IngestDelay)
+			meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+		}
 	}
 
 	metricsWithMeta[out.Type] = meta

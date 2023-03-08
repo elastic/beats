@@ -48,6 +48,7 @@
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -58,7 +59,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2682,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
@@ -106,6 +110,7 @@
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -116,7 +121,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2686,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
@@ -170,6 +178,7 @@
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -180,7 +189,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2687,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
@@ -228,6 +240,7 @@
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -238,7 +251,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2690,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }
@@ -286,6 +302,7 @@
         "TargetObject": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA"
       },
       "event_id": "13",
+      "opcode": "Info",
       "process": {
         "pid": 5496,
         "thread": {
@@ -296,7 +313,10 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2691,
       "user": {
-        "identifier": "S-1-5-18"
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
       },
       "version": 2
     }

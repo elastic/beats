@@ -81,6 +81,10 @@ func (inp *managedInput) Run(
 
 	inp.prospector.Run(ctx, sourceStore, hg)
 
+	// Notify the manager the input  has stopped, currently that is used to
+	// keep track of duplicated IDs
+	inp.manager.StopInput(inp.userID)
+
 	return nil
 }
 

@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"fmt"
 	"net/http"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -12,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/aws/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
@@ -35,6 +35,17 @@ type ConfigAWS struct {
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
+
+	// Set default region if empty to make initial aws api call
+	if AWSConfig.Region == "" {
+		AWSConfig.Region = "us-east-1"
+	}
+
+	// Assume IAM role if iam_role config parameter is given
+	if config.RoleArn != "" {
+		AWSConfig = switchToAssumeRoleProvider(config, AWSConfig)
+	}
+
 	if config.ProxyUrl != "" {
 		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
 		if err != nil {
@@ -66,7 +77,6 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 }
 
 func getAccessKeys(config ConfigAWS) awssdk.Config {
-	logger := logp.NewLogger("getAccessKeys")
 	awsConfig := defaults.Config()
 	awsCredentials := awssdk.Credentials{
 		AccessKeyID:     config.AccessKeyID,
@@ -79,17 +89,6 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 
 	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
 		Value: awsCredentials,
-	}
-
-	// Set default region if empty to make initial aws api call
-	if awsConfig.Region == "" {
-		awsConfig.Region = "us-east-1"
-	}
-
-	// Assume IAM role if iam_role config parameter is given
-	if config.RoleArn != "" {
-		logger.Debug("Using role arn and access keys for AWS credential")
-		return getRoleArn(config, awsConfig)
 	}
 
 	return awsConfig
@@ -116,25 +115,17 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 
 	awsConfig, err := external.LoadDefaultAWSConfig(options...)
 	if err != nil {
-		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
-	}
-
-	// Set default region if empty to make initial aws api call
-	if awsConfig.Region == "" {
-		awsConfig.Region = "us-east-1"
-	}
-
-	// Assume IAM role if iam_role config parameter is given
-	if config.RoleArn != "" {
-		logger.Debug("Using role arn and shared credential profile for AWS credential")
-		return getRoleArn(config, awsConfig), nil
+		return awsConfig, fmt.Errorf("external.LoadDefaultAWSConfig failed with shared credential profile given: %w", err)
 	}
 
 	logger.Debug("Using shared credential profile for AWS credential")
 	return awsConfig, nil
 }
 
-func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+// switchToAssumeRoleProvider switches the credentials provider in the awsConfig to the `AssumeRoleProvider`.
+func switchToAssumeRoleProvider(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+	logger := logp.NewLogger("switchToAssumeRoleProvider")
+	logger.Debug("Switching credentials provider to AssumeRoleProvider")
 	stsSvc := sts.New(awsConfig)
 	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
 	awsConfig.Credentials = stsCredProvider

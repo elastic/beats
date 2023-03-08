@@ -196,10 +196,15 @@ func (ms *MetricSet) findNewPaths() map[string]struct{} {
 	newPaths := make(map[string]struct{})
 
 	for _, path := range ms.config.Paths {
-		// Resolve symlinks to ensure we have an absolute path.
+		// Resolve symlinks and ensure we have an absolute path.
 		evalPath, err := filepath.EvalSymlinks(path)
 		if err != nil {
-			ms.log.Warnw("Failed to resolve", "file_path", path, "error", err)
+			ms.log.Warnw("Failed to resolve symlink", "file_path", path, "error", err)
+			continue
+		}
+		evalPath, err = filepath.Abs(evalPath)
+		if err != nil {
+			ms.log.Warnw("Failed to resolve to absolute path", "file_path", path, "error", err)
 			continue
 		}
 

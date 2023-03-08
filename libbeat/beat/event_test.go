@@ -48,6 +48,168 @@ func TestEventPutGetTimestamp(t *testing.T) {
 	assert.Nil(t, evt.Fields["@timestamp"])
 }
 
+func TestDeepUpdate(t *testing.T) {
+	ts := time.Now()
+
+	cases := []struct {
+		name      string
+		event     *Event
+		update    common.MapStr
+		overwrite bool
+		expected  *Event
+	}{
+		{
+			name:     "does nothing if no update",
+			event:    &Event{},
+			update:   common.MapStr{},
+			expected: &Event{},
+		},
+		{
+			name:  "updates timestamp",
+			event: &Event{},
+			update: common.MapStr{
+				timestampFieldKey: ts,
+			},
+			overwrite: true,
+			expected: &Event{
+				Timestamp: ts,
+			},
+		},
+		{
+			name: "does not overwrite timestamp",
+			event: &Event{
+				Timestamp: ts,
+			},
+			update: common.MapStr{
+				timestampFieldKey: time.Now().Add(time.Hour),
+			},
+			overwrite: false,
+			expected: &Event{
+				Timestamp: ts,
+			},
+		},
+		{
+			name:  "initializes metadata if nil",
+			event: &Event{},
+			update: common.MapStr{
+				metadataFieldKey: common.MapStr{
+					"first":  "new",
+					"second": 42,
+				},
+			},
+			expected: &Event{
+				Meta: common.MapStr{
+					"first":  "new",
+					"second": 42,
+				},
+			},
+		},
+		{
+			name: "updates metadata but does not overwrite",
+			event: &Event{
+				Meta: common.MapStr{
+					"first": "initial",
+				},
+			},
+			update: common.MapStr{
+				metadataFieldKey: common.MapStr{
+					"first":  "new",
+					"second": 42,
+				},
+			},
+			overwrite: false,
+			expected: &Event{
+				Meta: common.MapStr{
+					"first":  "initial",
+					"second": 42,
+				},
+			},
+		},
+		{
+			name: "updates metadata and overwrites",
+			event: &Event{
+				Meta: common.MapStr{
+					"first": "initial",
+				},
+			},
+			update: common.MapStr{
+				metadataFieldKey: common.MapStr{
+					"first":  "new",
+					"second": 42,
+				},
+			},
+			overwrite: true,
+			expected: &Event{
+				Meta: common.MapStr{
+					"first":  "new",
+					"second": 42,
+				},
+			},
+		},
+		{
+			name: "updates fields but does not overwrite",
+			event: &Event{
+				Fields: common.MapStr{
+					"first": "initial",
+				},
+			},
+			update: common.MapStr{
+				"first":  "new",
+				"second": 42,
+			},
+			overwrite: false,
+			expected: &Event{
+				Fields: common.MapStr{
+					"first":  "initial",
+					"second": 42,
+				},
+			},
+		},
+		{
+			name: "updates metadata and overwrites",
+			event: &Event{
+				Fields: common.MapStr{
+					"first": "initial",
+				},
+			},
+			update: common.MapStr{
+				"first":  "new",
+				"second": 42,
+			},
+			overwrite: true,
+			expected: &Event{
+				Fields: common.MapStr{
+					"first":  "new",
+					"second": 42,
+				},
+			},
+		},
+		{
+			name:  "initializes fields if nil",
+			event: &Event{},
+			update: common.MapStr{
+				"first":  "new",
+				"second": 42,
+			},
+			expected: &Event{
+				Fields: common.MapStr{
+					"first":  "new",
+					"second": 42,
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.event.deepUpdate(tc.update, tc.overwrite)
+			assert.Equal(t, tc.expected.Timestamp, tc.event.Timestamp)
+			assert.Equal(t, tc.expected.Fields, tc.event.Fields)
+			assert.Equal(t, tc.expected.Meta, tc.event.Meta)
+		})
+	}
+}
+
 func TestEventMetadata(t *testing.T) {
 	const id = "123"
 	newMeta := func() common.MapStr { return common.MapStr{"_id": id} }

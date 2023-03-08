@@ -37,7 +37,9 @@ class TestCAPinning(BaseTest):
                 "username": "admin",
                 "password": "changeme",
                 "ssl.certificate_authorities": [ca],
-                "ssl.ca_sha256": "8hZS8gpciuzlu+7Xi0sdv8T7RKRRxG1TWKumUQsDam0=",
+                # Use certificate verification only to avoid validating localhost as the hostname.
+                "ssl.verification_mode": "certificate",
+                "ssl.ca_sha256": "FDFOtqdUyXZw74YgvAJUC+I67ED1WfcI1qK44Qy2WQM=",
             },
         )
 

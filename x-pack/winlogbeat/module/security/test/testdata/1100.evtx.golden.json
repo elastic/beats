@@ -21,6 +21,7 @@
     "log": {
       "level": "information"
     },
+    "message": "The event logging service has shut down.",
     "winlog": {
       "api": "wineventlog",
       "channel": "Security",

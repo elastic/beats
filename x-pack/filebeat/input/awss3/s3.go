@@ -6,18 +6,20 @@ package awss3
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -44,7 +46,7 @@ type s3Poller struct {
 	listPrefix           string
 	region               string
 	bucketPollInterval   time.Duration
-	workerSem            *sem
+	workerSem            *awscommon.Sem
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
@@ -75,7 +77,7 @@ func newS3Poller(log *logp.Logger,
 		listPrefix:           listPrefix,
 		region:               awsRegion,
 		bucketPollInterval:   bucketPollInterval,
-		workerSem:            newSem(numberOfWorkers),
+		workerSem:            awscommon.NewSem(numberOfWorkers),
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,
@@ -88,7 +90,7 @@ func newS3Poller(log *logp.Logger,
 }
 
 func (p *s3Poller) handlePurgingLock(info s3ObjectInfo, isStored bool) {
-	id := info.name + info.key
+	id := stateID(info.name, info.key, info.etag, info.lastModified)
 	previousState := p.states.FindPreviousByID(id)
 	if !previousState.IsEmpty() {
 		if isStored {
@@ -122,9 +124,11 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 
 		if err != nil {
 			event := s3ObjectPayload.s3ObjectEvent
-			errs = append(errs, errors.Wrapf(err,
-				"failed processing S3 event for object key %q in bucket %q",
-				event.S3.Object.Key, event.S3.Bucket.Name))
+			errs = append(errs,
+				fmt.Errorf(
+					fmt.Sprintf("failed processing S3 event for object key %q in bucket %q: %%w",
+						event.S3.Object.Key, event.S3.Bucket.Name),
+					err))
 
 			p.handlePurgingLock(info, false)
 			continue
@@ -175,7 +179,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 				continue
 			}
 
-			state := newState(bucketName, filename, *object.ETag, *object.LastModified)
+			state := newState(bucketName, filename, *object.ETag, p.listPrefix, *object.LastModified)
 			if p.states.MustSkip(state, p.store) {
 				p.log.Debugw("skipping state.", "state", state)
 				continue
@@ -189,10 +193,11 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 			event.S3.Bucket.ARN = p.bucket
 			event.S3.Object.Key = filename
 
-			acker := newEventACKTracker(ctx)
+			acker := awscommon.NewEventACKTracker(ctx)
 
 			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
 			if s3Processor == nil {
+				p.log.Debugw("empty s3 processor.", "state", state)
 				continue
 			}
 
@@ -212,6 +217,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 		}
 
 		if totProcessableObjects == 0 {
+			p.log.Debugw("0 processable objects on bucket pagination.", "bucket", p.bucket, "listPrefix", p.listPrefix, "listingID", listingID)
 			// nothing to be ACKed, unlock here
 			p.states.DeleteListing(listingID.String())
 			lock.Unlock()
@@ -232,12 +238,11 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 	if err := paginator.Err(); err != nil {
 		p.log.Warnw("Error when paginating listing.", "error", err)
 	}
-
-	return
 }
 
 func (p *s3Poller) Purge() {
 	listingIDs := p.states.GetListingIDs()
+	p.log.Debugw("purging listing.", "listingIDs", listingIDs)
 	for _, listingID := range listingIDs {
 		// we lock here in order to process the purge only after
 		// full listing page is ACKed by all the workers
@@ -246,39 +251,45 @@ func (p *s3Poller) Purge() {
 			// purge calls can overlap, GetListingIDs can return
 			// an outdated snapshot with listing already purged
 			p.states.DeleteListing(listingID)
+			p.log.Debugw("deleting already purged listing from states.", "listingID", listingID)
 			continue
 		}
 
 		lock.(*sync.Mutex).Lock()
 
 		keys := map[string]struct{}{}
-		latestStoredTimeByBucket := make(map[string]time.Time, 0)
+		latestStoredTimeByBucketAndListPrefix := make(map[string]time.Time, 0)
 
 		for _, state := range p.states.GetStatesByListingID(listingID) {
 			// it is not stored, keep
 			if !state.Stored {
+				p.log.Debugw("state not stored, skip purge", "state", state)
 				continue
 			}
 
 			var latestStoredTime time.Time
 			keys[state.ID] = struct{}{}
-			latestStoredTime, ok := latestStoredTimeByBucket[state.Bucket]
+			latestStoredTime, ok := latestStoredTimeByBucketAndListPrefix[state.Bucket+state.ListPrefix]
 			if !ok {
 				var commitWriteState commitWriteState
-				err := p.store.Get(awsS3WriteCommitPrefix+state.Bucket, &commitWriteState)
+				err := p.store.Get(awsS3WriteCommitPrefix+state.Bucket+state.ListPrefix, &commitWriteState)
 				if err == nil {
 					// we have no entry in the map and we have no entry in the store
 					// set zero time
 					latestStoredTime = time.Time{}
+					p.log.Debugw("last stored time is zero time", "bucket", state.Bucket, "listPrefix", state.ListPrefix)
 				} else {
 					latestStoredTime = commitWriteState.Time
+					p.log.Debugw("last stored time is commitWriteState", "commitWriteState", commitWriteState, "bucket", state.Bucket, "listPrefix", state.ListPrefix)
 				}
+			} else {
+				p.log.Debugw("last stored time from memory", "latestStoredTime", latestStoredTime, "bucket", state.Bucket, "listPrefix", state.ListPrefix)
 			}
 
 			if state.LastModified.After(latestStoredTime) {
-				latestStoredTimeByBucket[state.Bucket] = state.LastModified
+				p.log.Debugw("last stored time updated", "state.LastModified", state.LastModified, "bucket", state.Bucket, "listPrefix", state.ListPrefix)
+				latestStoredTimeByBucketAndListPrefix[state.Bucket+state.ListPrefix] = state.LastModified
 			}
-
 		}
 
 		for key := range keys {
@@ -289,8 +300,8 @@ func (p *s3Poller) Purge() {
 			p.log.Errorw("Failed to write states to the registry", "error", err)
 		}
 
-		for bucket, latestStoredTime := range latestStoredTimeByBucket {
-			if err := p.store.Set(awsS3WriteCommitPrefix+bucket, commitWriteState{latestStoredTime}); err != nil {
+		for bucketAndListPrefix, latestStoredTime := range latestStoredTimeByBucketAndListPrefix {
+			if err := p.store.Set(awsS3WriteCommitPrefix+bucketAndListPrefix, commitWriteState{latestStoredTime}); err != nil {
 				p.log.Errorw("Failed to write commit time to the registry", "error", err)
 			}
 		}
@@ -300,8 +311,6 @@ func (p *s3Poller) Purge() {
 		p.workersListingMap.Delete(listingID)
 		p.states.DeleteListing(listingID)
 	}
-
-	return
 }
 
 func (p *s3Poller) Poll(ctx context.Context) error {
@@ -345,8 +354,15 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 			}()
 		}
 
-		timed.Wait(ctx, p.bucketPollInterval)
+		err = timed.Wait(ctx, p.bucketPollInterval)
+		if err != nil {
+			if errors.Is(err, context.Canceled) {
+				// A canceled context is a normal shutdown.
+				return nil
+			}
 
+			return err
+		}
 	}
 
 	// Wait for all workers to finish.

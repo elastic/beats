@@ -276,10 +276,11 @@ func TestSplit(t *testing.T) {
 			},
 		},
 		{
-			name: "First level split skips publish if no events",
+			name: "First level split publishes with key if no events",
 			config: &splitConfig{
-				Target: "body.response",
-				Type:   "array",
+				Target:     "body.response",
+				Type:       "array",
+				KeepParent: true,
 				Split: &splitConfig{
 					Target:     "body.Event.Attributes",
 					KeepParent: true,
@@ -291,8 +292,12 @@ func TestSplit(t *testing.T) {
 					"response": []interface{}{},
 				},
 			},
-			expectedMessages: []common.MapStr{},
-			expectedErr:      errEmptyRootField,
+			expectedMessages: []common.MapStr{
+				{
+					"response": []interface{}{},
+				},
+			},
+			expectedErr: errEmptyRootField,
 		},
 		{
 			name: "Changes must be local to parent when nested splits",

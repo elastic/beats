@@ -9,7 +9,7 @@ processors:
     - '%{SYSLOG5424PRI}%{NONNEGINT:syslog5424_ver} +(?:%{TIMESTAMP_ISO8601:syslog5424_ts}|-)
       +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app})
       +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(?::-|%{SYSLOG5424PRINTASCII:syslog5424_msgid})
-      +\[%{GREEDYDATA:syslog5424_sd}\]$'
+      +\[%{GREEDYDATA:syslog5424_sd}\]'
 - kv:
     field: syslog5424_sd
     field_split: '; '
@@ -402,6 +402,10 @@ processors:
     field: checkpoint.ifdir
     target_field: network.direction
     ignore_missing: true
+- convert:
+    field: checkpoint.bytes
+    type: long
+    ignore_missing: true
 - rename:
     field: checkpoint.bytes
     target_field: network.bytes
@@ -409,6 +413,10 @@ processors:
 - rename:
     field: checkpoint.proto
     target_field: network.iana_number
+    ignore_missing: true
+- convert:
+    field: checkpoint.packets
+    type: long
     ignore_missing: true
 - rename:
     field: checkpoint.packets
@@ -434,12 +442,12 @@ processors:
     field: checkpoint.ifname
     target_field: observer.ingress.interface.name
     ignore_missing: true
-    if: ctx.network?.direction == 'inbound'
+    if: ctx.observer?.ingress?.interface?.name == null && ctx.network?.direction == 'inbound'
 - rename:
     field: checkpoint.ifname
     target_field: observer.egress.interface.name
     ignore_missing: true
-    if: ctx.network?.direction == 'outbound'
+    if: ctx.observer?.egress?.interface?.name == null && ctx.network?.direction == 'outbound'
 - rename:
     field: checkpoint.type
     target_field: observer.type
@@ -849,24 +857,36 @@ processors:
       )
 - remove:
     field:
+    - checkpoint.ifname
+    - checkpoint.server_outbound_interface
     - checkpoint.client_outbound_packets
     - checkpoint.server_outbound_packets
     - checkpoint.client_outbound_bytes
-    - checkpoint.sent_byte
     - checkpoint.server_outbound_bytes
+    - checkpoint.client_inbound_packets
+    - checkpoint.server_inbound_packets
+    - checkpoint.client_inbound_bytes
+    - checkpoint.server_inbound_bytes
+    - checkpoint.sent_byte
     - checkpoint.received_bytes
     - checkpoint.service
     - checkpoint.xlatedport
     - checkpoint.s_port
     - checkpoint.xlatesport
+    - checkpoint.contextnum
     - checkpoint.sequencenum
     - checkpoint.file_size
     - checkpoint.product
+    - checkpoint.severity
     - checkpoint.xlatesrc
     - checkpoint.xlatedst
     - checkpoint.uid
     - checkpoint.time
-    - checkpoint.severity
+    - checkpoint.__nsons
+    - checkpoint.__p_dport
+    - checkpoint.__pos
+    - checkpoint.hll_key
+    - checkpoint.segment_time
     - syslog5424_ts
     - _temp_
     ignore_missing: true

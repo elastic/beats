@@ -13,22 +13,22 @@ when:
     tags: true                 ## for all the tags
 platform: "windows-2019"       ## default label for all the stages
 stages:
-    lint:
-        make: |
-          make -C x-pack/winlogbeat check;
-          make -C x-pack/winlogbeat update;
-          make -C winlogbeat check;
-          make -C winlogbeat update;
-          make check-no-changes;
-        platforms:             ## override default labels in this specific stage.
-            - "immutable && ubuntu-18"
-        stage: lint
     build:
         mage: "mage build unitTest"
         withModule: true
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
         stage: mandatory
+    windows-2022:
+      mage: "mage build unitTest"
+      platforms: ## override default labels in this specific stage.
+        - "windows-2022"
+      stage: mandatory
+    windows-2019:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2019"
+        stage: extended_win
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
@@ -44,11 +44,12 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
         stage: extended_win
-    windows-2008:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2008-r2"
-        stage: extended_win
+    # EOL: can't install terraform https://github.com/elastic/beats/issues/32327
+    # windows-2008:
+    #     mage: "mage build unitTest"
+    #     platforms:             ## override default labels in this specific stage.
+    #         - "windows-2008-r2"
+    #     stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
