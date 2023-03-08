@@ -28,6 +28,7 @@ func init() {
 			// Server
 			"etcd_server_has_leader":                    prometheus.Metric("server.has_leader"),
 			"etcd_server_leader_changes_seen_total":     prometheus.Metric("server.leader_changes.count"),
+			"etcd_server_is_leader":                     prometheus.Metric("server.is_leader"),
 			"etcd_server_proposals_committed_total":     prometheus.Metric("server.proposals_committed.count"),
 			"etcd_server_proposals_pending":             prometheus.Metric("server.proposals_pending.count"),
 			"etcd_server_proposals_failed_total":        prometheus.Metric("server.proposals_failed.count"),
