@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	v2 "github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/internal/v2"
 )
 
 // config contains information about httpjson configuration
@@ -32,6 +33,7 @@ type config struct {
 	NoHTTPBody           bool              `config:"no_http_body"`
 	Pagination           *paginationConfig `config:"pagination"`
 	RateLimit            *rateLimitConfig  `config:"rate_limit"`
+	KeepAlive            v2.KeepAlive      `config:"keep_alive"`
 	RetryMax             int               `config:"retry.max_attempts"`
 	RetryWaitMin         time.Duration     `config:"retry.wait_min"`
 	RetryWaitMax         time.Duration     `config:"retry.wait_max"`

@@ -80,6 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Allow user configuration of keep-alive behaviour for HTTPJSON input. {issue}33951[33951] {pull}34014[34014] {pull}34743[34743]
 
 *Heartbeat*
 

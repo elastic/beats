@@ -160,12 +160,11 @@ func run(
 func newHTTPClient(ctx context.Context, config config) (*http.Client, error) {
 	config.Transport.Timeout = config.HTTPClientTimeout
 
-	httpClient, err :=
-		config.Transport.Client(
-			httpcommon.WithAPMHTTPInstrumentation(),
-			httpcommon.WithKeepaliveSettings{Disable: true},
-			httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
-		)
+	httpClient, err := config.Transport.Client(
+		httpcommon.WithAPMHTTPInstrumentation(),
+		config.KeepAlive.Settings(),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ package v2
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"testing"
 
@@ -15,6 +16,7 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 func TestProviderCanonical(t *testing.T) {
@@ -39,7 +41,7 @@ func TestIsEnabled(t *testing.T) {
 		t.Fatal("OAuth2 should be enabled by default")
 	}
 
-	var enabled = false
+	enabled := false
 	oauth2.Enabled = &enabled
 
 	assert.False(t, oauth2.isEnabled())
@@ -69,19 +71,19 @@ func TestGetTokenURLWithAzure(t *testing.T) {
 }
 
 func TestGetEndpointParams(t *testing.T) {
-	var expected = map[string][]string{"foo": {"bar"}}
+	expected := map[string][]string{"foo": {"bar"}}
 	oauth2 := oAuth2Config{EndpointParams: map[string][]string{"foo": {"bar"}}}
 	assert.Equal(t, expected, oauth2.getEndpointParams())
 }
 
 func TestGetEndpointParamsWithAzure(t *testing.T) {
-	var expectedWithoutResource = map[string][]string{"foo": {"bar"}}
+	expectedWithoutResource := map[string][]string{"foo": {"bar"}}
 	oauth2 := oAuth2Config{Provider: "azure", EndpointParams: map[string][]string{"foo": {"bar"}}}
 
 	assert.Equal(t, expectedWithoutResource, oauth2.getEndpointParams())
 
 	oauth2.AzureResource = "baz"
-	var expectedWithResource = map[string][]string{"foo": {"bar"}, "resource": {"baz"}}
+	expectedWithResource := map[string][]string{"foo": {"bar"}, "resource": {"baz"}}
 
 	assert.Equal(t, expectedWithResource, oauth2.getEndpointParams())
 }
@@ -391,4 +393,60 @@ func TestCursorEntryConfig(t *testing.T) {
 	assert.False(t, conf["entry2"].mustIgnoreEmptyValue())
 	assert.True(t, conf["entry3"].mustIgnoreEmptyValue())
 	assert.True(t, conf["entry4"].mustIgnoreEmptyValue())
+}
+
+var keepAliveTests = []struct {
+	name    string
+	input   map[string]interface{}
+	want    httpcommon.WithKeepaliveSettings
+	wantErr error
+}{
+	{
+		name:  "keep_alive_none", // Default to the old behaviour of true.
+		input: map[string]interface{}{},
+		want:  httpcommon.WithKeepaliveSettings{Disable: true},
+	},
+	{
+		name: "keep_alive_true",
+		input: map[string]interface{}{
+			"request.keep_alive.disable": true,
+		},
+		want: httpcommon.WithKeepaliveSettings{Disable: true},
+	},
+	{
+		name: "keep_alive_false",
+		input: map[string]interface{}{
+			"request.keep_alive.disable": false,
+		},
+		want: httpcommon.WithKeepaliveSettings{Disable: false},
+	},
+	{
+		name: "keep_alive_invalid_max",
+		input: map[string]interface{}{
+			"request.keep_alive.disable":              false,
+			"request.keep_alive.max_idle_connections": -1,
+		},
+		wantErr: errors.New("max_idle_connections must not be negative accessing 'request.keep_alive'"),
+	},
+}
+
+func TestKeepAliveSetting(t *testing.T) {
+	for _, test := range keepAliveTests {
+		t.Run(test.name, func(t *testing.T) {
+			test.input["request.url"] = "localhost"
+			cfg := common.MustNewConfigFrom(test.input)
+			conf := defaultConfig()
+			err := cfg.Unpack(&conf)
+			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+				t.Errorf("unexpected error return from Unpack: got: %q want: %q", err, test.wantErr)
+			}
+			if err != nil {
+				return
+			}
+			got := conf.Request.KeepAlive.Settings()
+			if got != test.want {
+				t.Errorf("unexpected setting for %s: got: %#v\nwant:%#v", test.name, got, test.want)
+			}
+		})
+	}
 }
