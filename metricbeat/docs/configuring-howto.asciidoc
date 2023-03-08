@@ -26,6 +26,7 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 * <<http-endpoint>>
 * <<regexp-support>>
 * <<configuration-instrumentation>>
+* <<configuration-feature-flags>>
 * <<{beatname_lc}-reference-yml>>
 
 --
