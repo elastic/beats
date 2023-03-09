@@ -65,6 +65,12 @@ func TestFQDN(t *testing.T) {
   features:`,
 			want: false,
 		},
+		{
+			name: "No features",
+			yaml: `
+  # no features, just a comment`,
+			want: false,
+		},
 	}
 
 	for _, tc := range tcs {
