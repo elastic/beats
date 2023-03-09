@@ -9866,12 +9866,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-a
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/AndersonQ/elastic-agent-client/v7
-Version: v7.0.0-20230308191952-d7d45d93d0da
+Dependency : github.com/elastic/elastic-agent-client/v7
+Version: v7.0.3
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!anderson!q/elastic-agent-client/v7@v7.0.0-20230308191952-d7d45d93d0da/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.3/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
@@ -12353,12 +12353,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/AndersonQ/go-sysinfo
-Version: v0.0.0-20230201152444-4da8ad906ce9
+Dependency : github.com/elastic/go-sysinfo
+Version: v1.9.1-0.20230215152520-f544eca983fb
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!anderson!q/go-sysinfo@v0.0.0-20230201152444-4da8ad906ce9/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.9.1-0.20230215152520-f544eca983fb/LICENSE.txt:
 
 
                                  Apache License
