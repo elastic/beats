@@ -184,8 +184,6 @@ func PythonTest(params PythonTestArgs) error {
 		return err
 	}
 
-	fmt.Println("====================================== pytestPath:", pytestPath)
-
 	defer fmt.Println(">> python test:", params.TestName, "Testing Complete")
 	_, err = sh.Exec(pytestEnv, os.Stdout, os.Stderr, pytestPath, append(pytestOptions, testFiles...)...)
 	return err
