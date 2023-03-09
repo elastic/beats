@@ -74,7 +74,7 @@ func TestSQSReceiver(t *testing.T) {
 
 		// Execute sqsReader and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx))
+		require.NoError(t, receiver.Receive(ctx, nil))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 
@@ -107,7 +107,7 @@ func TestSQSReceiver(t *testing.T) {
 
 		// Execute SQSReceiver and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx))
+		require.NoError(t, receiver.Receive(ctx, nil))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 }
