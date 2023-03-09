@@ -36,7 +36,6 @@ func init() {
 }
 
 const (
-	montype    = "type"
 	schedule   = "schedule"
 	hosts      = "hosts"
 	processors = "processors"
