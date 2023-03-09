@@ -587,7 +587,6 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return fmt.Errorf("failed to generate config for output: %w", err)
 	}
 
-	// features.UpdateFromProto(featureFlags)
 	err = output.Reload(reloadConfig)
 	if err != nil {
 		return fmt.Errorf("failed to reload output: %w", err)
