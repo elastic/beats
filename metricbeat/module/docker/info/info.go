@@ -68,7 +68,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	return eventMapping(&info), nil
 }
 
-//Close stops the metricset
+// Close stops the metricset
 func (m *MetricSet) Close() error {
 
 	return m.dockerClient.Close()

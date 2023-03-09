@@ -51,12 +51,14 @@ type arrayData struct {
 // InstantVectorResponse is for "vector" type from Prometheus Query API Request
 // instantVectorResult format:
 // [
-//  {
-//    "metric": { "<label_name>": "<label_value>", ... },
-//    "value": [ <unix_time>, "<sample_value>" ]
-//  },
-//  ...
-//]
+//
+//	{
+//	  "metric": { "<label_name>": "<label_value>", ... },
+//	  "value": [ <unix_time>, "<sample_value>" ]
+//	},
+//	...
+//
+// ]
 type InstantVectorResponse struct {
 	Status string            `json:"status"`
 	Data   instantVectorData `json:"data"`
@@ -72,12 +74,14 @@ type instantVectorResult struct {
 // RangeVectorResponse is for "vector" type from Prometheus Query API Request
 // rangeVectorResult format:
 // [
-//  {
-//    "metric": { "<label_name>": "<label_value>", ... },
-//    "values": [ [ <unix_time>, "<sample_value>" ], ... ]
-//  },
-//  ...
-//]
+//
+//	{
+//	  "metric": { "<label_name>": "<label_value>", ... },
+//	  "values": [ [ <unix_time>, "<sample_value>" ], ... ]
+//	},
+//	...
+//
+// ]
 type RangeVectorResponse struct {
 	Status string          `json:"status"`
 	Data   rangeVectorData `json:"data"`
