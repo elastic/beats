@@ -587,10 +587,7 @@ func (b *Beat) registerMetrics() {
 }
 
 func (b *Beat) RegisterHostname(useFQDN bool) {
-	hostname := b.Info.Hostname
-	if useFQDN {
-		hostname = b.Info.FQDN
-	}
+	hostname := b.Info.FQDNAwareHostname(useFQDN)
 
 	// info.hostname
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()

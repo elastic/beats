@@ -42,3 +42,11 @@ type Info struct {
 		DefaultUsername string // The default username to be used to connect to Elasticsearch Monitoring
 	}
 }
+
+func (i Info) FQDNAwareHostname(useFQDN bool) string {
+	if useFQDN {
+		return i.FQDN
+	}
+
+	return i.Hostname
+}

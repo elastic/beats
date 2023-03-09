@@ -144,12 +144,7 @@ var WithHost modifier = builtinModifier(func(info beat.Info) mapstr.M {
 // pipeline.
 func WithAgentMeta() modifier {
 	return builtinModifier(func(info beat.Info) mapstr.M {
-		var hostname string
-		if features.FQDN() {
-			hostname = info.FQDN
-		} else {
-			hostname = info.Hostname
-		}
+		hostname := info.FQDNAwareHostname(features.FQDN())
 
 		metadata := mapstr.M{
 			"ephemeral_id": info.EphemeralID.String(),
