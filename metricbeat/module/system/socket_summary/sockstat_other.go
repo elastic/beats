@@ -26,15 +26,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-<<<<<<< HEAD
-//a stub function for non-linux systems
-//get a list of platform-specific enhancements and apply them to our mapStr object.
-func applyEnhancements(data common.MapStr) (common.MapStr, error) {
-=======
 // a stub function for non-linux systems
 // get a list of platform-specific enhancements and apply them to our mapStr object.
-func applyEnhancements(data mapstr.M, sys resolve.Resolver) (mapstr.M, error) {
->>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
+func applyEnhancements(data common.MapStr) (common.MapStr, error) {
 	return data, nil
 }
 

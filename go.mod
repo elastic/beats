@@ -63,7 +63,7 @@ require (
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.12.0
-	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
+	github.com/elastic/elastic-agent-client/v7 v7.0.3
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.1
 	github.com/elastic/go-licenser v0.4.0
@@ -95,7 +95,7 @@ require (
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v1.12.1
-	github.com/google/go-cmp v0.5.6
+	github.com/google/go-cmp v0.5.8
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.3.0
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
@@ -165,7 +165,7 @@ require (
 	go.uber.org/atomic v1.9.0
 	go.uber.org/multierr v1.8.0
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
@@ -173,7 +173,7 @@ require (
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8
 	golang.org/x/text v0.3.7
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
-	golang.org/x/tools v0.1.9
+	golang.org/x/tools v0.1.11-0.20220509190205-b87ceec0dd4d
 	google.golang.org/api v0.62.0
 	google.golang.org/genproto v0.0.0-20220426171045-31bebdecfb46
 	google.golang.org/grpc v1.46.0
@@ -196,37 +196,11 @@ require (
 )
 
 require (
-<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.2.11
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
-=======
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
-	github.com/Azure/go-autorest/autorest/adal v0.9.14
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
-	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
-	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
-	github.com/aws/smithy-go v1.12.0
-	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
-	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/elastic-agent-autodiscover v0.5.0
-	github.com/elastic/elastic-agent-libs v0.3.3
-	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.4.6
-	github.com/elastic/go-elasticsearch/v8 v8.2.0
-	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678
-	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
-	github.com/google/cel-go v0.13.0
-	github.com/googleapis/gax-go/v2 v2.6.0
-	github.com/gorilla/handlers v1.5.1
-	github.com/gorilla/mux v1.8.0
-	github.com/pierrec/lz4/v4 v4.1.15
-	github.com/shirou/gopsutil/v3 v3.21.12
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
-	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
-	go.elastic.co/apm/v2 v2.0.0
-	go.mongodb.org/mongo-driver v1.5.1
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0
->>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
+	github.com/elastic/toutoumomoma v0.0.0-20221031233927-5d2efdb6e76a
+	github.com/fearful-symmetry/gorapl v0.0.4
+	github.com/pierrec/lz4/v4 v4.1.17
 )
 
 require (
@@ -259,6 +233,7 @@ require (
 	github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
+	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
 	github.com/godbus/dbus/v5 v5.0.5 // indirect
@@ -309,7 +284,8 @@ require (
 	github.com/xdg/stringprep v1.0.3 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/mod v0.5.1 // indirect
+	golang.org/x/exp v0.0.0-20220602145555-4a0574d9293f // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -318,6 +294,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7 // indirect
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.57 // indirect
+	mvdan.cc/garble v0.7.1 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.0 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )

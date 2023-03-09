@@ -25,39 +25,6 @@
 //	C       century of era (&gt;=0)      number         no       20
 //	Y       year of era (&gt;=0)         year           yes      1996
 //
-<<<<<<< HEAD
-//  Symbol  Meaning                      Type     Supported Examples
-//  ------  -------                      -------  --------- -------
-//  G       era                          text      no       AD
-//  C       century of era (&gt;=0)      number    no       20
-//  Y       year of era (&gt;=0)         year      yes      1996
-//
-//  x       weekyear                     year      yes      1996
-//  w       week of weekyear             number    yes      27
-//  e       day of week                  number    yes      2
-//  E       day of week                  text      yes      Tuesday; Tue
-//
-//  y       year                         year      yes      1996
-//  D       day of year                  number    yes      189
-//  M       month of year                month     yes      July; Jul; 07
-//  d       day of month                 number    yes      10
-//
-//  a       halfday of day               text      yes      PM
-//  K       hour of halfday (0~11)       number    yes      0
-//  h       clockhour of halfday (1~12)  number    yes      12
-//
-//  H       hour of day (0~23)           number    yes      0
-//  k       clockhour of day (1~24)      number    yes      24
-//  m       minute of hour               number    yes      30
-//  s       second of minute             number    yes      55
-//  S       fraction of second           millis    no       978
-//
-//  z       time zone                    text      no       Pacific Standard Time; PST
-//  Z       time zone offset/id          zone      no       -0800; -08:00; America/Los_Angeles
-//
-//  '       escape for text              delimiter
-//  ''      single quote                 literal
-=======
 //	x       weekyear                     year           yes      1996
 //	w       week of weekyear             number         yes      27
 //	e       day of week                  number         yes      2
@@ -84,7 +51,6 @@
 //
 //	'       escape for text              delimiter
 //	''      single quote                 literal
->>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 //
 // The format is based on pattern letter count. Any character not in the range
 // [a-z][A-Z] is interpreted as literal and copied into final string as is.

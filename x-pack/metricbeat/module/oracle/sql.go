@@ -23,13 +23,8 @@ func SetSqlValueWithParentKey(logger *logp.Logger, output map[string]common.MapS
 	SetSqlValue(logger, ms, targetFieldName, v)
 }
 
-<<<<<<< HEAD
-//SetSqlValue avoid setting an invalid empty value value on Metricbeat event
-func SetSqlValue(logger *logp.Logger, output common.MapStr, targetFieldName string, v SqlValue) {
-=======
 // SetSqlValue avoid setting an invalid empty value value on Metricbeat event
-func SetSqlValue(logger *logp.Logger, output mapstr.M, targetFieldName string, v SqlValue) {
->>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
+func SetSqlValue(logger *logp.Logger, output common.MapStr, targetFieldName string, v SqlValue) {
 	if v.isValid() {
 		if _, err := output.Put(targetFieldName, v.Value()); err != nil {
 			logger.Debug(errors.New("error trying to set value on common.Mapstr"))

@@ -43,11 +43,6 @@ const (
 
 // createLog creates a new event log and returns a handle for writing events
 // to the log.
-<<<<<<< HEAD
-=======
-//
-//nolint:errcheck // Errors are not checked since they always precede termination.
->>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 	const name = winlogbeatTestLogName
 	const source = "wineventlog_test"

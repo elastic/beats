@@ -57,13 +57,8 @@ type processor struct {
 // IP src / IP dst / IP proto / ICMP type + "counter-type" or code
 //
 // Other IP-borne protocols:
-<<<<<<< HEAD
-//   IP src / IP dst / IP proto
-func New(cfg *common.Config) (processors.Processor, error) {
-=======
 // IP src / IP dst / IP proto
-func New(cfg *cfg.C) (processors.Processor, error) {
->>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
+func New(cfg *common.Config) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the community_id configuration")
