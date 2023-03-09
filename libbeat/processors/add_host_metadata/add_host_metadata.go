@@ -147,7 +147,9 @@ func (p *addHostMetadata) loadData() error {
 	}
 
 	if p.config.Name != "" {
-		data.Put("host.name", p.config.Name)
+		if _, err := data.Put("host.name", p.config.Name); err != nil {
+			return fmt.Errorf("could not set host.name: %w", err)
+		}
 	}
 
 	p.data.Set(data)
