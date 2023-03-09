@@ -29,7 +29,7 @@ import (
 // but only iterate the known flow tables.
 //
 // Note: FlowTables will not be released, as it's assumed different kind of
-//       flow tables is limited by network patterns
+// flow tables is limited by network patterns
 type flowMetaTable struct {
 	sync.Mutex
 

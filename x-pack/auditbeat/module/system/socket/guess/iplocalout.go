@@ -98,8 +98,9 @@ func (g *guessIPLocalOut) Requires() []string {
 
 // Probes returns two probes:
 // - ip_local_out(_sk). fetches:
-// 		* arg2 (arg1 if this system has ip_local_out_sk)
-//		* dump of arg1 (arg2 if this system has ip_local_out_sk)
+//   - arg2 (arg1 if this system has ip_local_out_sk)
+//   - dump of arg1 (arg2 if this system has ip_local_out_sk)
+//
 // - tcp_sendmsg, returning the sock* argument.
 func (g *guessIPLocalOut) Probes() ([]helper.ProbeDef, error) {
 	return []helper.ProbeDef{
