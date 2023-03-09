@@ -85,7 +85,7 @@ func isProtocolHeader(data []byte) (isHeader bool, version string) {
 	return false, ""
 }
 
-//func to read a frame header and check if it is valid and complete
+// func to read a frame header and check if it is valid and complete
 func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	var frame amqpFrame
 	if len(data) < 8 {
@@ -190,7 +190,7 @@ func hasProperty(prop, flag byte) bool {
 	return (prop & flag) == flag
 }
 
-//function to get message content-type and content-encoding
+// function to get message content-type and content-encoding
 func getMessageProperties(s *amqpStream, data []byte) bool {
 	m := s.message
 
