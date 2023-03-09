@@ -88,11 +88,11 @@ func Creator(options ...Option) beat.Creator {
 //
 // This is equivalent to calling
 //
-//     beater.Creator(
-//         beater.WithModuleOptions(
-//             module.WithMetricSetInfo(),
-//         ),
-//     )
+//	beater.Creator(
+//	    beater.WithModuleOptions(
+//	        module.WithMetricSetInfo(),
+//	    ),
+//	)
 func DefaultCreator() beat.Creator {
 	return Creator(
 		WithLightModules(),
@@ -110,13 +110,13 @@ func DefaultCreator() beat.Creator {
 //
 // This is equivalent to calling
 //
-//  beater.Creator(
-//		beater.WithLightModules(),
-//		beater.WithModuleOptions(
-//			module.WithMetricSetInfo(),
-//			module.WithMaxStartDelay(0),
-//		),
-//	)
+//	 beater.Creator(
+//			beater.WithLightModules(),
+//			beater.WithModuleOptions(
+//				module.WithMetricSetInfo(),
+//				module.WithMaxStartDelay(0),
+//			),
+//		)
 func DefaultTestModulesCreator() beat.Creator {
 	return Creator(
 		WithLightModules(),

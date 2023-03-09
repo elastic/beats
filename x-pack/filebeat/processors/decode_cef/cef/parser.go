@@ -31,6 +31,7 @@ const cef_en_gobble_extension int = 33
 const cef_en_main int = 1
 const cef_en_main_cef_extensions int = 29
 
+<<<<<<< HEAD
 //line cef.rl:16
 
 type cefState struct {
@@ -51,7 +52,11 @@ func (s *cefState) pushEscape(start, end int) {
 	s.escapes = append(s.escapes, escapePosition{start, end})
 }
 
+=======
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 // unpack unpacks a CEF message.
+//
+//line parser.rl:17
 func (e *Event) unpack(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0

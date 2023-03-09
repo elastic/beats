@@ -79,3 +79,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	return nil
 }
+<<<<<<< HEAD:x-pack/metricbeat/module/appsearch/stats/stats.go
+=======
+
+// Load takes the events and sends them to Elasticsearch.
+func (m *MetricSet) Load(ctx context.Context, events []mb.Event, reporter mb.ReporterV2) {
+	for _, event := range events {
+		if reported := reporter.Event(event); !reported {
+			return
+		}
+	}
+}
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497)):x-pack/metricbeat/module/oracle/sysmetric/metricset.go

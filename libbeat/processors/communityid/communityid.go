@@ -51,14 +51,19 @@ type processor struct {
 // values that are incorporated into the hash vary by protocol.
 //
 // TCP / UDP / SCTP:
-//   IP src / IP dst / IP proto / source port / dest port
+// IP src / IP dst / IP proto / source port / dest port
 //
 // ICMPv4 / ICMPv6:
-//   IP src / IP dst / IP proto / ICMP type + "counter-type" or code
+// IP src / IP dst / IP proto / ICMP type + "counter-type" or code
 //
 // Other IP-borne protocols:
+<<<<<<< HEAD
 //   IP src / IP dst / IP proto
 func New(cfg *common.Config) (processors.Processor, error) {
+=======
+// IP src / IP dst / IP proto
+func New(cfg *cfg.C) (processors.Processor, error) {
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the community_id configuration")

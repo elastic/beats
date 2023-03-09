@@ -405,6 +405,11 @@ func changeGID(t testing.TB, file string) int {
 
 // mustRun runs a sub-test and stops the execution of the parent if the sub-test
 // fails.
+<<<<<<< HEAD
+=======
+//
+//lint:ignore U1000 Used in unconditionally skipped flakey tests.
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 func mustRun(t *testing.T, name string, f func(t *testing.T)) {
 	if !t.Run(name, f) {
 		t.FailNow()

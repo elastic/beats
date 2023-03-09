@@ -78,7 +78,7 @@ func applyEnhancements(data common.MapStr) (common.MapStr, error) {
 }
 
 // parseSockstat parses the ipv4 sockstat file
-//see net/ipv4/proc.c
+// see net/ipv4/proc.c
 func parseSockstat(path string) (SockStat, error) {
 	fd, err := os.Open(path)
 	if err != nil {

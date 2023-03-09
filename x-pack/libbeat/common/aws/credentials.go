@@ -94,6 +94,7 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 	return awsConfig
 }
 
+<<<<<<< HEAD
 func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 	// If accessKeyID, secretAccessKey or sessionToken is not given, iam_role is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
@@ -103,6 +104,18 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 	var options []external.Config
 	if config.ProfileName != "" {
 		options = append(options, external.WithSharedConfigProfile(config.ProfileName))
+=======
+// getConfigSharedCredentialProfile If accessKeyID, secretAccessKey or sessionToken is not given,
+// then load from default config // Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
+//
+//	with more details. If credential_profile_name is empty, then default profile is used.
+func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, error) {
+	logger := logp.NewLogger("WithSharedConfigProfile")
+
+	var options []func(*awsConfig.LoadOptions) error
+	if beatsConfig.ProfileName != "" {
+		options = append(options, awsConfig.WithSharedConfigProfile(beatsConfig.ProfileName))
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 	}
 
 	// If shared_credential_file is empty, then external.LoadDefaultAWSConfig

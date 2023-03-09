@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 )
 
-//timeSeriesGrouped groups TimeSeries responses into common Elasticsearch friendly events. This is to avoid sending
+// timeSeriesGrouped groups TimeSeries responses into common Elasticsearch friendly events. This is to avoid sending
 // events with a single metric that shares info (like timestamp) with another event with a single metric too
 func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.MetadataService, tsas []timeSeriesWithAligner, e *incomingFieldExtractor) (map[string][]KeyValuePoint, error) {
 	eventGroups := make(map[string][]KeyValuePoint)

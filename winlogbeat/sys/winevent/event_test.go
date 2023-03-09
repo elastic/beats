@@ -433,9 +433,9 @@ const nonUnsignedIntVersion = `
 // version number is not an unsigned byte as per the schema definition.
 // Microsoft documentation defines version as:
 //
-//     <xs:element name="Version"
-//        type="unsignedByte"
-//     />
+//	<xs:element name="Version"
+//	   type="unsignedByte"
+//	/>
 //
 // But some event producers don't adhere to the schema. The value space of
 // xsd:unsignedByte is the range of integers between 0 and 255 — the unsigned

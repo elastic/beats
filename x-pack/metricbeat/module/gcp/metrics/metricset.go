@@ -50,7 +50,7 @@ type MetricSet struct {
 	MetricsConfig []metricsConfig `config:"metrics" validate:"nonzero,required"`
 }
 
-//metricsConfig holds a configuration specific for metrics metricset.
+// metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
 	ServiceName string `config:"service"  validate:"required"`
 	// ServiceMetricPrefix allows to specify the prefix string for MetricTypes

@@ -124,7 +124,7 @@ func (m *Migrator) Run() error {
 // The data representation has changed multiple times before version 0 was introduced. The update function tries
 // to fix the state, allow us to migrarte from older Beats registry files.
 // NOTE: The oldest known filebeat registry file format this was tested with is from Filebeat 6.3.
-//       Support for older Filebeat versions is best effort.
+// Support for older Filebeat versions is best effort.
 func (m *Migrator) updateToVersion0(regHome, migrateFile string) error {
 	logp.Info("Migrate registry file to registry directory")
 

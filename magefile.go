@@ -47,9 +47,17 @@ var (
 	}
 )
 
+<<<<<<< HEAD
 // GenerateCustomBeat generates a new custom beat
 func GenerateCustomBeat() error {
 	return beatgen.Generate()
+=======
+// Aliases are shortcuts to long target names.
+// nolint: deadcode // it's used by `mage`.
+var Aliases = map[string]interface{}{
+	"llc":  mage.Linter.LastChange,
+	"lint": mage.Linter.All,
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 }
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip

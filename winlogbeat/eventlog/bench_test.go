@@ -44,7 +44,8 @@ var (
 // different batch sizes.
 //
 // Recommended usage:
-//   go test -run TestBenchmarkRead -benchmem -benchtime 10s -benchtest -v .
+//
+//	go test -run TestBenchmarkRead -benchmem -benchtime 10s -benchtest -v .
 func TestBenchmarkRead(t *testing.T) {
 	if !*benchTest {
 		t.Skip("-benchtest not enabled")

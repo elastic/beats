@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.18
+go 1.19
 
 require (
 	cloud.google.com/go/bigquery v1.8.0
@@ -196,8 +196,37 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.2.11
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
+=======
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
+	github.com/Azure/go-autorest/autorest/adal v0.9.14
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
+	github.com/aws/smithy-go v1.12.0
+	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
+	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/elastic-agent-autodiscover v0.5.0
+	github.com/elastic/elastic-agent-libs v0.3.3
+	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
+	github.com/elastic/elastic-agent-system-metrics v0.4.6
+	github.com/elastic/go-elasticsearch/v8 v8.2.0
+	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678
+	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
+	github.com/google/cel-go v0.13.0
+	github.com/googleapis/gax-go/v2 v2.6.0
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/mux v1.8.0
+	github.com/pierrec/lz4/v4 v4.1.15
+	github.com/shirou/gopsutil/v3 v3.21.12
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
+	go.elastic.co/apm/v2 v2.0.0
+	go.mongodb.org/mongo-driver v1.5.1
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 )
 
 require (

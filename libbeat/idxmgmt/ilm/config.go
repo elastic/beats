@@ -79,6 +79,7 @@ var DefaultPolicy = common.MapStr{
 	},
 }
 
+<<<<<<< HEAD
 //Unpack creates enumeration value true, false or auto
 func (m *Mode) Unpack(in string) error {
 	in = strings.ToLower(in)
@@ -102,6 +103,9 @@ func (m *Mode) Unpack(in string) error {
 }
 
 //Validate verifies that expected config options are given and valid
+=======
+// Validate verifies that expected config options are given and valid
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 func (cfg *Config) Validate() error {
 	if cfg.RolloverAlias.IsEmpty() && cfg.Mode != ModeDisabled {
 		return fmt.Errorf("rollover_alias must be set when ILM is not disabled")

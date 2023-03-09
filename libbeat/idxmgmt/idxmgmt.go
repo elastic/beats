@@ -136,13 +136,20 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 // checkTemplateESSettings validates template settings and output.elasticsearch
 // settings to be consistent.
 // XXX: This is some legacy check that will not be active if the output is
-//      configured via Central Config Management.
-//      In the future we will have CM deal with index setup and providing a
-//      consistent output configuration.
+// configured via Central Config Management.
+// In the future we will have CM deal with index setup and providing a
+// consistent output configuration.
+//
 // TODO: check if it's safe to move this check to the elasticsearch output
+<<<<<<< HEAD
 //       (Not doing so, so to not interfere with outputs being setup via Central
 //       Management for now).
 func checkTemplateESSettings(tmpl *common.Config, out common.ConfigNamespace) error {
+=======
+// (Not doing so, so to not interfere with outputs being setup via Central
+// Management for now).
+func checkTemplateESSettings(tmpl *config.C, out config.Namespace) error {
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 	if out.Name() != "elasticsearch" {
 		return nil
 	}

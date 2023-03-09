@@ -96,6 +96,11 @@ type Host struct {
 
 // changeDetectionHash creates a hash of selected parts of the host information.
 // This is used later to detect changes to a host over time.
+<<<<<<< HEAD
+=======
+//
+//nolint:errcheck // All checks are for writes to a hasher.
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 func (host *Host) changeDetectionHash() uint64 {
 	h := xxhash.New()
 
