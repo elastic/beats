@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.18
+go 1.19
 
 require (
 	cloud.google.com/go/bigquery v1.42.0
@@ -193,8 +193,13 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.5.0
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.2.16
 	github.com/elastic/elastic-agent-shipper-client v0.4.0
+=======
+	github.com/elastic/elastic-agent-libs v0.3.3
+	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
+>>>>>>> e7e6dacfca ([updatecli][githubrelease] Bump version to 1.19.5 (#34497))
 	github.com/elastic/elastic-agent-system-metrics v0.4.6
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678

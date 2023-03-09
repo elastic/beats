@@ -223,10 +223,10 @@ func getMSRCPUs(hostfs resolve.Resolver) ([]int, error) {
 	return coreList, nil
 }
 
-//I'm not really sure how portable this algo is
-//it is, however, the simplest way to do this. The intel power gadget iterates through each CPU using affinity masks, and runs `cpuid` in a loop to
-//figure things out
-//This uses /sys/devices/system/cpu/cpu*/topology/physical_package_id, which is what lscpu does. I *think* geopm does something similar to this.
+// I'm not really sure how portable this algo is
+// it is, however, the simplest way to do this. The intel power gadget iterates through each CPU using affinity masks, and runs `cpuid` in a loop to
+// figure things out
+// This uses /sys/devices/system/cpu/cpu*/topology/physical_package_id, which is what lscpu does. I *think* geopm does something similar to this.
 func topoPkgCPUMap(hostfs resolve.Resolver) (map[int][]int, error) {
 
 	sysdir := "/sys/devices/system/cpu/"
