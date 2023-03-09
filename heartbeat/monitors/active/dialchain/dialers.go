@@ -38,12 +38,12 @@ import (
 //
 // The dialer will update the active events with:
 //
-//  {
-//    "tcp": {
-//      "port": ...,
-//      "rtt": { "connect": { "us": ... }}
-//    }
-//  }
+//	{
+//	  "tcp": {
+//	    "port": ...,
+//	    "rtt": { "connect": { "us": ... }}
+//	  }
+//	}
 func TCPDialer(to time.Duration) NetDialer {
 	return CreateNetDialer(to)
 }
@@ -55,12 +55,12 @@ func TCPDialer(to time.Duration) NetDialer {
 //
 // The dialer will update the active events with:
 //
-//  {
-//    "udp": {
-//      "port": ...,
-//      "rtt": { "connect": { "us": ... }}
-//    }
-//  }
+//	{
+//	  "udp": {
+//	    "port": ...,
+//	    "rtt": { "connect": { "us": ... }}
+//	  }
+//	}
 func UDPDialer(to time.Duration) NetDialer {
 	return CreateNetDialer(to)
 }
