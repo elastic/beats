@@ -232,7 +232,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add Basic Authentication support on constructed requests to CEL input {issue}34609[34609] {pull}34689[34689]
 - Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
 - Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
-- Add nginx ingress_controller parsing if one of upstreams fails to return response
+- Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 
 *Auditbeat*
 
