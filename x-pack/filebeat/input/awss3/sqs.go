@@ -47,7 +47,7 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 	}
 }
 
-func (r *sqsReader) Receive(ctx context.Context) error {
+func (r *sqsReader) Receive(ctx context.Context, metricReporterChan chan int64) error {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the max message cap as opposed to a simpler loop that receives
 	// N messages, waits for them all to finish, then requests N more messages.
@@ -61,6 +61,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 
 		// Receive (at most) as many SQS messages as there are workers.
 		msgs, err := r.sqs.ReceiveMessage(ctx, workers)
+		r.log.Warnw("Messages received", "msg count", len(msgs))
 		if err != nil {
 			r.workerSem.Release(workers)
 
@@ -85,7 +86,9 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 			go func(msg types.Message, start time.Time) {
 				defer func() {
 					r.metrics.sqsMessagesInflight.Dec()
-					r.metrics.sqsMessageProcessingTime.Update(time.Since(start).Nanoseconds())
+					processingTimeNanos := time.Since(start).Nanoseconds()
+					r.metrics.sqsMessageProcessingTime.Update(processingTimeNanos)
+					metricReporterChan <- processingTimeNanos
 					workerWg.Done()
 					r.workerSem.Release(1)
 				}()

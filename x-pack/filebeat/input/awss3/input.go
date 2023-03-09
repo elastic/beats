@@ -129,10 +129,14 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 		defer receiver.metrics.Close()
 
-		// Poll sqs waiting metric periodically in the background.
+		// Poll metrics periodically in the background
 		go pollSqsWaitingMetric(ctx, receiver)
 
-		if err := receiver.Receive(ctx); err != nil {
+		metricReporterChan := make(chan int64)
+		defer close(metricReporterChan)
+		go pollSqsUtilizationMetric(ctx, receiver, metricReporterChan)
+
+		if err := receiver.Receive(ctx, metricReporterChan); err != nil {
 			return err
 		}
 	}
@@ -406,6 +410,31 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 			}
 
 			receiver.metrics.setSQSMessagesWaiting(int64(count))
+		}
+	}
+}
+
+func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader, metricReporterChan chan int64) {
+	pollDur := 5 * time.Second
+	t := time.NewTicker(pollDur)
+	defer t.Stop()
+
+	utilizedNanos := new(int64)
+	go func() {
+		for elem := range metricReporterChan {
+			*utilizedNanos += elem
+		}
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+			denom := pollDur.Nanoseconds() * int64(receiver.maxMessagesInflight)
+			utilizedRate := float64(*utilizedNanos) / float64(denom)
+			receiver.metrics.sqsWorkerUtilization.Set(utilizedRate)
+			*utilizedNanos = 0
 		}
 	}
 }

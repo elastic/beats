@@ -18,14 +18,15 @@ type inputMetrics struct {
 	registry   *monitoring.Registry
 	unregister func()
 
-	sqsMessagesReceivedTotal            *monitoring.Uint // Number of SQS messages received (not necessarily processed fully).
-	sqsVisibilityTimeoutExtensionsTotal *monitoring.Uint // Number of SQS visibility timeout extensions.
-	sqsMessagesInflight                 *monitoring.Uint // Number of SQS messages inflight (gauge).
-	sqsMessagesReturnedTotal            *monitoring.Uint // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
-	sqsMessagesDeletedTotal             *monitoring.Uint // Number of SQS messages deleted.
-	sqsMessagesWaiting                  *monitoring.Int  // Number of SQS messages waiting in the SQS queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
-	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
-	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
+	sqsMessagesReceivedTotal            *monitoring.Uint  // Number of SQS messages received (not necessarily processed fully).
+	sqsVisibilityTimeoutExtensionsTotal *monitoring.Uint  // Number of SQS visibility timeout extensions.
+	sqsMessagesInflight                 *monitoring.Uint  // Number of SQS messages inflight (gauge).
+	sqsMessagesReturnedTotal            *monitoring.Uint  // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
+	sqsMessagesDeletedTotal             *monitoring.Uint  // Number of SQS messages deleted.
+	sqsMessagesWaiting                  *monitoring.Int   // Number of SQS messages waiting in the SQS queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
+	sqsWorkerUtilization                *monitoring.Float // Rate of SQS worker utilization over previous 5 seconds. 0 indicates idle, 1 indicates all workers utilized.
+	sqsMessageProcessingTime            metrics.Sample    // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
+	sqsLagTime                          metrics.Sample    // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 
 	s3ObjectsRequestedTotal *monitoring.Uint // Number of S3 objects downloaded.
 	s3ObjectsAckedTotal     *monitoring.Uint // Number of S3 objects processed that were fully ACKed.
@@ -65,6 +66,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
 		sqsMessagesReturnedTotal:            monitoring.NewUint(reg, "sqs_messages_returned_total"),
 		sqsMessagesDeletedTotal:             monitoring.NewUint(reg, "sqs_messages_deleted_total"),
+		sqsWorkerUtilization:                monitoring.NewFloat(reg, "sqs_worker_utilization"),
 		sqsMessageProcessingTime:            metrics.NewUniformSample(1024),
 		sqsLagTime:                          metrics.NewUniformSample(1024),
 		s3ObjectsRequestedTotal:             monitoring.NewUint(reg, "s3_objects_requested_total"),
