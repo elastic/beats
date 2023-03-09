@@ -246,7 +246,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 
 	h, err := sysinfo.Host()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get FQDN: %w", err)
+		return nil, fmt.Errorf("failed to get host information: %w", err)
 	}
 	fqdn := h.Info().FQDN
 
