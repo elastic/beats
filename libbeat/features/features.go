@@ -23,7 +23,6 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -39,7 +38,6 @@ type fflags struct {
 // UpdateFromProto updates the feature flags configuration. If f is nil UpdateFromProto is no-op.
 func UpdateFromProto(f *proto.Features) {
 	if f == nil {
-		logp.L().Debug("feature flags are nil, ignoring them")
 		return
 	}
 
@@ -52,10 +50,9 @@ func UpdateFromProto(f *proto.Features) {
 	flags.fqdnEnabled = f.Fqdn.Enabled
 }
 
-// UpdateFromConfig updates the feature flags configuration. If c is nil UpdateFromProto is no-op.
+// UpdateFromConfig updates the feature flags configuration. If c is nil UpdateFromConfig is no-op.
 func UpdateFromConfig(c *conf.C) error {
 	if c == nil {
-		logp.L().Debug("feature flags are nil, ignoring them")
 		return nil
 	}
 
