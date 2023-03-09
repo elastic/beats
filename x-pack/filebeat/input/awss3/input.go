@@ -131,7 +131,6 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 
 		// Poll metrics periodically in the background
 		go pollSqsWaitingMetric(ctx, receiver)
-
 		metricReporterChan := make(chan int64)
 		defer close(metricReporterChan)
 		go pollSqsUtilizationMetric(ctx, receiver, metricReporterChan)
@@ -434,6 +433,7 @@ func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader, metricRe
 			denom := pollDur.Nanoseconds() * int64(receiver.maxMessagesInflight)
 			utilizedRate := float64(*utilizedNanos) / float64(denom)
 			receiver.metrics.sqsWorkerUtilization.Set(utilizedRate)
+			// reset for the next polling duration
 			*utilizedNanos = 0
 		}
 	}
