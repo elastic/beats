@@ -55,8 +55,8 @@ func (countACKer) Close()                        {}
 // If N events have been acked by the output, then `total` will include all events dropped in between
 // the last forwarded N events and the 'tail' of dropped events. For example (X = send, D = dropped):
 //
-//  index: 0  1  2  3  4  5  6  7  8  9  10  11
-//  event: X  X  D  D  X  D  D  X  D  X   X   X
+//	index: 0  1  2  3  4  5  6  7  8  9  10  11
+//	event: X  X  D  D  X  D  D  X  D  X   X   X
 //
 // If the output ACKs 3 events, then all events from index 0 to 6 will be reported because:
 // - the drop sequence for events 2 and 3 is inbetween the number of forwarded and ACKed events
@@ -217,8 +217,8 @@ func (a *trackingACKer) Close() {}
 // events and the 'tail' of dropped events. For example (X = send, D =
 // dropped):
 //
-//  index: 0  1  2  3  4  5  6  7  8  9  10  11
-//  event: X  X  D  D  X  D  D  X  D  X   X   X
+//	index: 0  1  2  3  4  5  6  7  8  9  10  11
+//	event: X  X  D  D  X  D  D  X  D  X   X   X
 //
 // If the output ACKs 3 events, then all events from index 0 to 6 will be reported because:
 // - the drop sequence for events 2 and 3 is inbetween the number of forwarded and ACKed events
