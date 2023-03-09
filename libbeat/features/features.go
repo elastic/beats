@@ -41,12 +41,15 @@ func UpdateFromProto(f *proto.Features) {
 		return
 	}
 
-	if f.Fqdn == nil {
-		f.Fqdn = &proto.FQDNFeature{}
-	}
-
 	flags.mu.Lock()
 	defer flags.mu.Unlock()
+
+	if f.Fqdn == nil {
+		// By default, FQDN reporting is disabled.
+		flags.fqdnEnabled = false
+		return
+	}
+
 	flags.fqdnEnabled = f.Fqdn.Enabled
 }
 
