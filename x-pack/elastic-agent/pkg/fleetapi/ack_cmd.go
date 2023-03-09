@@ -37,9 +37,10 @@ type AckEvent struct {
 // AckRequest consists of multiple actions acked to fleet ui.
 // POST /agents/{agentId}/acks
 // Authorization: ApiKey {AgentAccessApiKey}
-// {
-//   "action_ids": ["id1"]
-// }
+//
+//	{
+//	  "action_ids": ["id1"]
+//	}
 type AckRequest struct {
 	Events []AckEvent `json:"events"`
 }
@@ -51,9 +52,10 @@ func (e *AckRequest) Validate() error {
 
 // AckResponse is the response send back from the server.
 // 200
-// {
-// 	 "action": "acks"
-// }
+//
+//	{
+//		 "action": "acks"
+//	}
 type AckResponse struct {
 	Action string `json:"action"`
 }
