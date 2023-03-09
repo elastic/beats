@@ -27,12 +27,20 @@ type JourneyLister func(ctx context.Context, projectPath string, params mapstr.M
 type Project struct {
 	rawCfg     *config.C
 	projectCfg *Config
+	ctx        context.Context
+	cancel     context.CancelFunc
 }
 
 func NewProject(rawCfg *config.C) (*Project, error) {
+	// Global project context to cancel all jobs
+	// on close
+	ctx, cancel := context.WithCancel(context.Background())
+
 	s := &Project{
 		rawCfg:     rawCfg,
 		projectCfg: DefaultConfig(),
+		ctx:        ctx,
+		cancel:     cancel,
 	}
 	err := rawCfg.Unpack(s.projectCfg)
 	if err != nil {
@@ -81,6 +89,9 @@ func (p *Project) Close() error {
 		p.projectCfg.Source.ActiveMemo.Close()
 	}
 
+	// Cancel running jobs ctxs
+	p.cancel()
+
 	return nil
 }
 
@@ -127,8 +138,9 @@ func (p *Project) extraArgs() []string {
 
 func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
+
 	isScript := p.projectCfg.Source.Inline != nil
-	ctx := context.WithValue(context.Background(), synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
+	ctx := context.WithValue(p.ctx, synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
 
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script

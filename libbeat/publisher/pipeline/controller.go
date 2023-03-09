@@ -91,10 +91,21 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		c.workers[i] = makeClientWorker(c.observer, c.workQueue, client, logger, c.monitors.Tracer)
 	}
 
+	targetChan := c.workQueue
+	if len(clients) == 0 {
+		// If there are no output clients, we are probably still waiting
+		// for our output config from Agent via BeatV2Manager.reloadOutput.
+		// In this case outGrp.BatchSize is probably 0, allowing arbitrarily
+		// large batches. Set the work channel to nil so eventConsumer
+		// doesn't prime the pipeline with such batches until we get the
+		// requested batch size for the real output.
+		targetChan = nil
+	}
+
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
-			ch:         c.workQueue,
+			ch:         targetChan,
 			batchSize:  outGrp.BatchSize,
 			timeToLive: outGrp.Retry + 1,
 		})
