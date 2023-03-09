@@ -21482,11 +21482,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.1/LICENS
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/go-licence-detector
-Version: v0.5.0
+Version: v0.6.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.5.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.6.0/LICENSE:
 
 
                                  Apache License
@@ -22096,11 +22096,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/mod
-Version: v0.6.0-dev.0.20220419223038-86c51ed26bb4
+Version: v0.9.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.6.0-dev.0.20220419223038-86c51ed26bb4/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.9.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -22207,11 +22207,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sync
-Version: v0.0.0-20220929204114-8fcdb60fdcc0
+Version: v0.1.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sync@v0.0.0-20220929204114-8fcdb60fdcc0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sync@v0.1.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -34062,11 +34062,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/gobuffalo/here
-Version: v0.6.0
+Version: v0.6.7
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/gobuffalo/here@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/gobuffalo/here@v0.6.7/LICENSE:
 
 The MIT License (MIT)
 
@@ -34982,11 +34982,11 @@ Contents of probable licence file $GOMODCACHE/github.com/google/gofuzz@v1.2.0/LI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/licenseclassifier
-Version: v0.0.0-20200402202327-879cb1424de0
+Version: v0.0.0-20221004142553-c1ed8fcf4bab
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/licenseclassifier@v0.0.0-20200402202327-879cb1424de0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/licenseclassifier@v0.0.0-20221004142553-c1ed8fcf4bab/LICENSE:
 
 
                                  Apache License
@@ -39983,11 +39983,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/karrick/godirwalk
-Version: v1.15.8
+Version: v1.17.0
 Licence type (autodetected): BSD-2-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/karrick/godirwalk@v1.15.8/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/karrick/godirwalk@v1.17.0/LICENSE:
 
 BSD 2-Clause License
 
@@ -40711,11 +40711,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/markbates/pkger
-Version: v0.17.0
+Version: v0.17.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/markbates/pkger@v0.17.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/markbates/pkger@v0.17.1/LICENSE:
 
 The MIT License (MIT)
 
@@ -43889,11 +43889,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/sergi/go-diff
-Version: v1.1.0
+Version: v1.3.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/sergi/go-diff@v1.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/sergi/go-diff@v1.3.1/LICENSE:
 
 Copyright (c) 2012-2016 The go-diff Authors. All rights reserved.
 
