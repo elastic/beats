@@ -30,6 +30,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -209,6 +211,19 @@ func TestPublish(t *testing.T) {
 			observerExpected: &TestObserver{cancelled: 3, batch: 3},
 			serverError:      errors.New("some error"),
 			expError:         "failed to publish the batch to the shipper, none of the 3 events were accepted",
+		},
+		{
+			name:   "drops the batch on resource exceeded error",
+			events: events,
+			expSignals: []outest.BatchSignal{
+				{
+					Tag: outest.BatchDrop,
+				},
+			},
+			marshalMethod:    toShipperEvent,
+			qSize:            3,
+			observerExpected: &TestObserver{batch: 3, dropped: 3},
+			serverError:      status.Error(codes.ResourceExhausted, "rpc size limit exceeded"),
 		},
 	}
 

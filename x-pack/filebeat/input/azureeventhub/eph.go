@@ -32,7 +32,6 @@ var environments = map[string]azure.Environment{
 // To learn more, check the following resources:
 // - https://github.com/Azure/azure-event-hubs-go#event-processor-host
 // - https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host
-//
 func (a *azureInput) runWithEPH() error {
 	// create a new Azure Storage Leaser / Checkpointer
 	cred, err := azblob.NewSharedKeyCredential(a.config.SAName, a.config.SAKey)
