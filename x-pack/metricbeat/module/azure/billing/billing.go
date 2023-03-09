@@ -114,8 +114,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 // Currently, the usage period is the start/end time (00:00:00->23:59:59 UTC) of the day before the reference time.
 //
 // For example, if the reference time is 2007-01-09 09:41:00Z, the usage period is:
-//   2007-01-08 00:00:00Z -> 2007-01-08 23:59:59Z
 //
+//	2007-01-08 00:00:00Z -> 2007-01-08 23:59:59Z
 func usageIntervalFrom(reference time.Time) (time.Time, time.Time) {
 	beginningOfDay := reference.UTC().Truncate(24 * time.Hour).Add((-24) * time.Hour)
 	endOfDay := beginningOfDay.Add(time.Hour * 24).Add(time.Second * (-1))
@@ -128,8 +128,8 @@ func usageIntervalFrom(reference time.Time) (time.Time, time.Time) {
 // reference time.
 //
 // For example, if the reference time is 2007-01-09 09:41:00Z, the forecast period is:
-//   2007-01-01T00:00:00Z -> 2007-01-31:59:59Z
 //
+//	2007-01-01T00:00:00Z -> 2007-01-31:59:59Z
 func forecastIntervalFrom(reference time.Time) (time.Time, time.Time) {
 	referenceUTC := reference.UTC()
 	beginningOfMonth := time.Date(referenceUTC.Year(), referenceUTC.Month(), 1, 0, 0, 0, 0, time.UTC)

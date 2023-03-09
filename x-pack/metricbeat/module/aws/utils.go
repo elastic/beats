@@ -110,19 +110,22 @@ func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (boo
 
 // FindTimestamp function checks MetricDataResults and find the timestamp to collect metrics from.
 // For example, MetricDataResults might look like:
-// metricDataResults =  [{
-//	 Id: "sqs0",
-//   Label: "testName SentMessageSize",
-//   StatusCode: Complete,
-//   Timestamps: [2019-03-11 17:45:00 +0000 UTC],
-//   Values: [981]
-// } {
-//	 Id: "sqs1",
-//	 Label: "testName NumberOfMessagesSent",
-//	 StatusCode: Complete,
-//	 Timestamps: [2019-03-11 17:45:00 +0000 UTC,2019-03-11 17:40:00 +0000 UTC],
-//	 Values: [0.5,0]
-// }]
+//
+//	metricDataResults =  [{
+//		 Id: "sqs0",
+//	  Label: "testName SentMessageSize",
+//	  StatusCode: Complete,
+//	  Timestamps: [2019-03-11 17:45:00 +0000 UTC],
+//	  Values: [981]
+//	} {
+//
+//		 Id: "sqs1",
+//		 Label: "testName NumberOfMessagesSent",
+//		 StatusCode: Complete,
+//		 Timestamps: [2019-03-11 17:45:00 +0000 UTC,2019-03-11 17:40:00 +0000 UTC],
+//		 Values: [0.5,0]
+//	}]
+//
 // This case, we are collecting values for both metrics from timestamp 2019-03-11 17:45:00 +0000 UTC.
 func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time {
 	timestamp := time.Time{}
