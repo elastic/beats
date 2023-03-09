@@ -199,7 +199,26 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 			Events: toSend,
 		})
 
-		if status.Code(err) != codes.OK {
+		if err != nil {
+			if status.Code(err) == codes.ResourceExhausted {
+				// This error can only come from the gRPC connection, and
+				// most likely indicates this request exceeds the shipper's
+				// RPC size limit. The correct thing to do here is split
+				// the batch as in https://github.com/elastic/beats/issues/29778.
+				// Since this isn't supported yet, we drop this batch to avoid
+				// permanently blocking the pipeline.
+				s.log.Errorf("dropping %d events because of RPC failure: %v", len(events), err)
+				batch.Drop()
+				s.observer.Dropped(len(events))
+				return nil
+			}
+			// All other known errors are, in theory, retryable once the
+			// RPC connection is successfully restarted, and don't depend on
+			// the contents of the request. We should be cautious, though: if an
+			// error is deterministic based on the contents of a publish
+			// request, then cancelling here (instead of dropping or retrying)
+			// will cause an infinite retry loop, wedging the pipeline.
+
 			batch.Cancelled()                 // does not decrease the TTL
 			s.observer.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
 			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(toSend), err)
