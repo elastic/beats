@@ -32,8 +32,9 @@ import (
 // client connects a beat with the processors and pipeline queue.
 //
 // TODO: All ackers currently drop any late incoming ACK. Some beats still might
-//       be interested in handling/waiting for event ACKs more globally
-//       -> add support for not dropping pending ACKs
+//
+//	be interested in handling/waiting for event ACKs more globally
+//	-> add support for not dropping pending ACKs
 type client struct {
 	pipeline   *Pipeline
 	processors beat.Processor

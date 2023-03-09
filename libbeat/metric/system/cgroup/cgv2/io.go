@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 )
 
-//IOSubsystem is the replacement for the bulkio controller in cgroupsV1
+// IOSubsystem is the replacement for the bulkio controller in cgroupsV1
 type IOSubsystem struct {
 	ID   string `json:"id,omitempty"`   // ID of the cgroup.
 	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.

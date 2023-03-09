@@ -315,7 +315,7 @@ func createAndReadKeystoreWithPassword(t *testing.T, password []byte) {
 }
 
 // CreateAnExistingKeystore creates a keystore with an existing key
-/// `output.elasticsearch.password` with the value `secret`.
+// / `output.elasticsearch.password` with the value `secret`.
 func CreateAnExistingKeystore(path string) Keystore {
 	keyStore, err := NewFileKeystore(path)
 	// Fail fast in the test suite

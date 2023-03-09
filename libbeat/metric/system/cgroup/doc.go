@@ -19,7 +19,7 @@
 // control groups, a Linux kernel feature for grouping tasks to track and limit
 // resource usage.
 //
-// Terminology
+// # Terminology
 //
 // A cgroup is a collection of processes that are bound to a set of limits.
 //

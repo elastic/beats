@@ -40,7 +40,7 @@ func (stat StatsV1) CGVersion() CgroupsVersion {
 	return CgroupsV1
 }
 
-//Format converts the stats object to a MapStr that can be sent to Report()
+// Format converts the stats object to a MapStr that can be sent to Report()
 func (stat StatsV1) Format() (common.MapStr, error) {
 	to := common.MapStr{}
 	err := typeconv.Convert(&to, stat)
@@ -96,7 +96,7 @@ func (curStat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Tim
 
 }
 
-//Format converts the stats object to a MapStr that can be sent to Report()
+// Format converts the stats object to a MapStr that can be sent to Report()
 func (stat StatsV2) Format() (common.MapStr, error) {
 	to := common.MapStr{}
 	err := typeconv.Convert(&to, stat)

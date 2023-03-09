@@ -28,10 +28,10 @@ const alternativeKey = "value"
 // Put This method implements a way to put dotted keys into a MapStr while
 // ensuring they don't override each other. For example:
 //
-//  a := MapStr{}
-//  safemapstr.Put(a, "com.docker.swarm.task", "x")
-//  safemapstr.Put(a, "com.docker.swarm.task.id", 1)
-//  safemapstr.Put(a, "com.docker.swarm.task.name", "foobar")
+//	a := MapStr{}
+//	safemapstr.Put(a, "com.docker.swarm.task", "x")
+//	safemapstr.Put(a, "com.docker.swarm.task.id", 1)
+//	safemapstr.Put(a, "com.docker.swarm.task.name", "foobar")
 //
 // Will result in `{"com":{"docker":{"swarm":{"task":{"id":1,"name":"foobar","value":"x"}}}}}`
 //

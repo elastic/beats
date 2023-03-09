@@ -258,10 +258,11 @@ func (b *inBroker) eventloopShutdown() {
 // buffer.
 //
 // stateEmpty transitions:
-//   -> stateEmpty if serializing the event failed
-//   -> stateWithTimer if event is written to buffer without flush
-//        => start timer
-//   -> stateBlocked if queue did return an error on write (Flush failed)
+//
+//	-> stateEmpty if serializing the event failed
+//	-> stateWithTimer if event is written to buffer without flush
+//	     => start timer
+//	-> stateBlocked if queue did return an error on write (Flush failed)
 func (b *inBroker) stateEmpty() bool {
 	log := b.ctx.logger
 
@@ -319,12 +320,13 @@ func (b *inBroker) stateEmpty() bool {
 // buffer.
 //
 // stateWithTimer transitions:
-//   -> stateWithTimer
-//        - if serializing failed
-//        - if event is added to buffer, without flush
-//        - flush, but more events are available in the buffer (might reset timer)
-//   -> stateEmpty if all events have been flushed
-//   -> stateBlocked if queue did return an error on write/flush (Flush failed)
+//
+//	-> stateWithTimer
+//	     - if serializing failed
+//	     - if event is added to buffer, without flush
+//	     - flush, but more events are available in the buffer (might reset timer)
+//	-> stateEmpty if all events have been flushed
+//	-> stateBlocked if queue did return an error on write/flush (Flush failed)
 func (b *inBroker) stateWithTimer() bool {
 	log := b.ctx.logger
 
@@ -422,9 +424,10 @@ func (b *inBroker) stateWithTimer() bool {
 // ignored in the future.
 //
 // stateBlocked transitions:
-//   -> stateEmpty if flush was successful and write buffer is empty
-//   -> stateWithTimer if flush was successful, but we still have some pending events
-//   -> stateBlocked if flush failed (still not enough space)
+//
+//	-> stateEmpty if flush was successful and write buffer is empty
+//	-> stateWithTimer if flush was successful, but we still have some pending events
+//	-> stateBlocked if flush failed (still not enough space)
 func (b *inBroker) stateBlocked() bool {
 	log := b.ctx.logger
 
