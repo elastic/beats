@@ -104,10 +104,10 @@ spec:
           requests:
             # for synthetics, 2 full cores is a good starting point for relatively consistent perform of a single concurrent check
             # For lightweight checks as low as 100m is fine
-            cpu: 2000m
-            # A high value like this is encouraged for browser based monitors.
+            cpu: 2000m 
+            # A high value like this is encouraged for browser based monitors. 
             # Lightweight checks use substantially less, even 128Mi is fine for those.
-            memory: 1536Mi
+            memory: 1536Mi 
         volumeMounts:
         - name: config
           mountPath: /etc/heartbeat.yml
