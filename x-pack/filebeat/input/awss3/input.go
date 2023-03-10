@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -132,7 +133,6 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		// Poll metrics periodically in the background
 		go pollSqsWaitingMetric(ctx, receiver)
 		metricReporterChan := make(chan int64)
-		defer close(metricReporterChan)
 		go pollSqsUtilizationMetric(ctx, receiver, metricReporterChan)
 
 		if err := receiver.Receive(ctx, metricReporterChan); err != nil {
@@ -414,27 +414,33 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 }
 
 func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader, metricReporterChan chan int64) {
-	pollDur := 5 * time.Second
-	t := time.NewTicker(pollDur)
+	defer close(metricReporterChan)
+
+	t := time.NewTicker(5 * time.Second)
 	defer t.Stop()
 
-	utilizedNanos := new(int64)
+	var utilizedNanos int64
 	go func() {
 		for elem := range metricReporterChan {
-			*utilizedNanos += elem
+			atomic.AddInt64(&utilizedNanos, elem)
 		}
 	}()
 
+	lastTick := time.Now()
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-t.C:
-			denom := pollDur.Nanoseconds() * int64(receiver.maxMessagesInflight)
-			utilizedRate := float64(*utilizedNanos) / float64(denom)
+		case tick := <-t.C:
+			denom := float64(tick.Sub(lastTick)) * float64(receiver.maxMessagesInflight)
+
+			utilizedRate := float64(utilizedNanos) / denom
 			receiver.metrics.sqsWorkerUtilization.Set(utilizedRate)
+			receiver.log.Warnw("util rate", "util", utilizedRate, "top", utilizedNanos, "bottom", denom, "time", tick.Sub(lastTick))
+
 			// reset for the next polling duration
-			*utilizedNanos = 0
+			utilizedNanos = 0
+			lastTick = tick
 		}
 	}
 }
