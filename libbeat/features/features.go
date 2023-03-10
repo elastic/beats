@@ -70,7 +70,7 @@ func UpdateFromConfig(c *conf.C) error {
 
 	parsedFlags := cfg{}
 	if err := c.Unpack(&parsedFlags); err != nil {
-		return fmt.Errorf("could not Unpack features config: %w", err)
+		return fmt.Errorf("could not unpack features config: %w", err)
 	}
 
 	flags.SetFQDNEnabled(parsedFlags.Features.FQDN.Enabled())
