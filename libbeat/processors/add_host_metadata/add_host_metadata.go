@@ -44,10 +44,11 @@ type addHostMetadata struct {
 		time.Time
 		sync.Mutex
 	}
-	data    mapstr.Pointer
-	geoData mapstr.M
-	config  Config
-	logger  *logp.Logger
+	data                   mapstr.Pointer
+	geoData                mapstr.M
+	config                 Config
+	logger                 *logp.Logger
+	fqdnOnChangeCallbackID string
 }
 
 const (
@@ -78,6 +79,15 @@ func New(cfg *config.C) (processors.Processor, error) {
 		p.geoData = mapstr.M{"host": mapstr.M{"geo": geoFields}}
 	}
 
+	cbID, err := features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"could not register callback for FQDN reporting onChange from %s processor: %w",
+			processorName, err,
+		)
+	}
+	p.fqdnOnChangeCallbackID = cbID
+
 	return p, nil
 }
 
@@ -99,6 +109,11 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		event.Fields.DeepUpdate(p.geoData)
 	}
 	return event, nil
+}
+
+func (p *addHostMetadata) Close() error {
+	features.RemoveFQDNOnChangeCallback(p.fqdnOnChangeCallbackID)
+	return nil
 }
 
 func (p *addHostMetadata) expired() bool {
@@ -159,6 +174,30 @@ func (p *addHostMetadata) loadData() error {
 func (p *addHostMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
 		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
+}
+
+func (p *addHostMetadata) handleFQDNReportingChange(new, old bool) {
+	if new == old {
+		// Nothing to do
+		return
+	}
+
+	// Whether we should report the FQDN or not has changed.  Expire cache
+	// so we start report the desired hostname value immediately.
+	p.expireCache()
+}
+
+func (p *addHostMetadata) expireCache() {
+	if p.config.CacheTTL <= 0 {
+		return
+	}
+
+	p.lastUpdate.Lock()
+	defer p.lastUpdate.Unlock()
+
+	// Update cache's last updated timestamp to be zero,
+	// effectively expiring the cache immediately.
+	p.lastUpdate.Time = time.Time{}
 }
 
 func skipAddingHostMetadata(event *beat.Event) bool {

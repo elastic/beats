@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -29,10 +31,14 @@ var (
 	flags = fflags{}
 )
 
+type boolValueOnChangeCallback func(new, old bool)
+
 type fflags struct {
 	mu sync.RWMutex
 
-	fqdnEnabled bool
+	// TODO: Refactor to generalize for other feature flags
+	fqdnEnabled   bool
+	fqdnCallbacks map[string]boolValueOnChangeCallback
 }
 
 // UpdateFromProto updates the feature flags configuration. If f is nil UpdateFromProto is no-op.
@@ -41,16 +47,13 @@ func UpdateFromProto(f *proto.Features) {
 		return
 	}
 
-	flags.mu.Lock()
-	defer flags.mu.Unlock()
-
 	if f.Fqdn == nil {
 		// By default, FQDN reporting is disabled.
-		flags.fqdnEnabled = false
+		flags.SetFQDNEnabled(false)
 		return
 	}
 
-	flags.fqdnEnabled = f.Fqdn.Enabled
+	flags.SetFQDNEnabled(f.Fqdn.Enabled)
 }
 
 // UpdateFromConfig updates the feature flags configuration. If c is nil UpdateFromConfig is no-op.
@@ -70,11 +73,20 @@ func UpdateFromConfig(c *conf.C) error {
 		return fmt.Errorf("could not Unpack features config: %w", err)
 	}
 
-	flags.mu.Lock()
-	defer flags.mu.Unlock()
-	flags.fqdnEnabled = parsedFlags.Features.FQDN.Enabled()
+	flags.SetFQDNEnabled(parsedFlags.Features.FQDN.Enabled())
 
 	return nil
+}
+
+func (f *fflags) SetFQDNEnabled(newValue bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+
+	oldValue := f.fqdnEnabled
+	f.fqdnEnabled = newValue
+	for _, cb := range f.fqdnCallbacks {
+		cb(newValue, oldValue)
+	}
 }
 
 // FQDN reports if FQDN should be used instead of hostname for host.name.
@@ -83,4 +95,34 @@ func FQDN() bool {
 	flags.mu.RLock()
 	defer flags.mu.RUnlock()
 	return flags.fqdnEnabled
+}
+
+// AddFQDNOnChangeCallback takes a callback function that will be called with the new and old values
+// of `flags.fqdnEnabled` whenever it changes.
+func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback) (string, error) {
+	flags.mu.Lock()
+	defer flags.mu.Unlock()
+
+	u, err := uuid.NewV4()
+	if err != nil {
+		return "", fmt.Errorf("unable to create ID for FQDN onChange callback: %w", err)
+	}
+
+	// Initialize callbacks map if necessary.
+	if flags.fqdnCallbacks == nil {
+		flags.fqdnCallbacks = map[string]boolValueOnChangeCallback{}
+	}
+
+	flags.fqdnCallbacks[u.String()] = cb
+	return u.String(), nil
+}
+
+// RemoveFQDNOnChangeCallback removes the callback function associated with the given ID (originally
+// returned by `AddFQDNOnChangeCallback` so that function will be no longer be called when
+// `flags.fqdnEnabled` changes.
+func RemoveFQDNOnChangeCallback(id string) {
+	flags.mu.Lock()
+	defer flags.mu.Unlock()
+
+	delete(flags.fqdnCallbacks, id)
 }
