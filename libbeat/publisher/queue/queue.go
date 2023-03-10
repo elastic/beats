@@ -34,7 +34,7 @@ type ACKListener interface {
 	OnACK(eventCount int) // number of consecutively published events acked by producers
 }
 
-//Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
+// Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
 type Metrics struct {
 	//EventCount is the total events currently in the queue
 	EventCount opt.Uint

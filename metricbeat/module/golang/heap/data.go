@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-//Stats contains the memory info that we get from the fetch request
+// Stats contains the memory info that we get from the fetch request
 type Stats struct {
 	MemStats runtime.MemStats
 	Cmdline  []interface{}

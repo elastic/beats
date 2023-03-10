@@ -22,7 +22,7 @@ package network_summary
 
 import "github.com/elastic/beats/v7/metricbeat/module/docker"
 
-//Config is the config object for docker/network
+// Config is the config object for docker/network
 type Config struct {
 	TLS            *docker.TLSConfig `config:"ssl"`
 	DeDot          bool              `config:"labels.dedot"`

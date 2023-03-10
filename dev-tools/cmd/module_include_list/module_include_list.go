@@ -191,7 +191,7 @@ type Data struct {
 	Imports   []string
 }
 
-//stringSliceFlag is a flag type that allows more than one value to be specified.
+// stringSliceFlag is a flag type that allows more than one value to be specified.
 type stringSliceFlag []string
 
 func (f *stringSliceFlag) String() string { return strings.Join(*f, ", ") }

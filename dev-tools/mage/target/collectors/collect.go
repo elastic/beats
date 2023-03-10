@@ -21,7 +21,7 @@ import (
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 )
 
-//CollectDocs creates the documentation under docs/
+// CollectDocs creates the documentation under docs/
 func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
