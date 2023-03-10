@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -98,23 +96,19 @@ func FQDN() bool {
 }
 
 // AddFQDNOnChangeCallback takes a callback function that will be called with the new and old values
-// of `flags.fqdnEnabled` whenever it changes.
-func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback) (string, error) {
+// of `flags.fqdnEnabled` whenever it changes. It also takes a string ID - this is useful
+// in calling `RemoveFQDNOnChangeCallback` to de-register the callback.
+func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback, id string)  error {
 	flags.mu.Lock()
 	defer flags.mu.Unlock()
-
-	u, err := uuid.NewV4()
-	if err != nil {
-		return "", fmt.Errorf("unable to create ID for FQDN onChange callback: %w", err)
-	}
 
 	// Initialize callbacks map if necessary.
 	if flags.fqdnCallbacks == nil {
 		flags.fqdnCallbacks = map[string]boolValueOnChangeCallback{}
 	}
 
-	flags.fqdnCallbacks[u.String()] = cb
-	return u.String(), nil
+	flags.fqdnCallbacks[id] = cb
+	return nil
 }
 
 // RemoveFQDNOnChangeCallback removes the callback function associated with the given ID (originally

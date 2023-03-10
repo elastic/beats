@@ -48,7 +48,6 @@ type addHostMetadata struct {
 	geoData                mapstr.M
 	config                 Config
 	logger                 *logp.Logger
-	fqdnOnChangeCallbackID string
 }
 
 const (
@@ -79,14 +78,13 @@ func New(cfg *config.C) (processors.Processor, error) {
 		p.geoData = mapstr.M{"host": mapstr.M{"geo": geoFields}}
 	}
 
-	cbID, err := features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange)
+	err := features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, processorName)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"could not register callback for FQDN reporting onChange from %s processor: %w",
 			processorName, err,
 		)
 	}
-	p.fqdnOnChangeCallbackID = cbID
 
 	return p, nil
 }
@@ -111,10 +109,14 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *addHostMetadata) Close() error {
-	features.RemoveFQDNOnChangeCallback(p.fqdnOnChangeCallbackID)
-	return nil
-}
+// Ideally we'd be able to implement the Closer interface here and
+// deregister the callback.  But processors that can be used with the
+// `script` processor are not allowed to implement the Closer
+// interface (@see https://github.com/elastic/beats/pull/16349).
+//func (p *addHostMetadata) Close() error {
+//	features.RemoveFQDNOnChangeCallback(processorName)
+//	return nil
+//}
 
 func (p *addHostMetadata) expired() bool {
 	if p.config.CacheTTL <= 0 {
