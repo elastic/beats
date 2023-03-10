@@ -61,7 +61,6 @@ func (r *sqsReader) Receive(ctx context.Context, metricReporterChan chan int64) 
 
 		// Receive (at most) as many SQS messages as there are workers.
 		msgs, err := r.sqs.ReceiveMessage(ctx, workers)
-		r.log.Warnw("Messages received", "msg count", len(msgs))
 		if err != nil {
 			r.workerSem.Release(workers)
 

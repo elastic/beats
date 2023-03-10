@@ -436,7 +436,6 @@ func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader, metricRe
 
 			utilizedRate := float64(utilizedNanos) / denom
 			receiver.metrics.sqsWorkerUtilization.Set(utilizedRate)
-			receiver.log.Warnw("util rate", "util", utilizedRate, "top", utilizedNanos, "bottom", denom, "time", tick.Sub(lastTick))
 
 			// reset for the next polling duration
 			utilizedNanos = 0
