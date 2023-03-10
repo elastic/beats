@@ -24,6 +24,8 @@ import (
 )
 
 const v2Path = "../testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
+const ubuntu = "../testdata/io_statfiles/ubuntu"
+const ubuntu2 = "../testdata/io_statfiles/ubuntu2"
 
 func TestGetIO(t *testing.T) {
 	ioTest := IOSubsystem{}
@@ -43,6 +45,125 @@ func TestGetIO(t *testing.T) {
 		},
 	}
 
+	assert.Equal(t, goodStat, ioTest.Stats)
+}
+
+func TestIostatFilesDuplicatedDeviceMetrics(t *testing.T) {
+	ioTest := IOSubsystem{}
+	err := ioTest.Get(ubuntu, false)
+	assert.NoError(t, err, "error in Get")
+
+	goodStat := map[string]IOStat{
+		"7:7": {
+			Read: IOMetric{
+				Bytes: 556032,
+				IOs:   78,
+			},
+			Write: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+			Discarded: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+		},
+		"7:6": {
+			Read: IOMetric{
+				Bytes: 556032,
+				IOs:   78,
+			},
+			Write: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+			Discarded: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+		},
+		"7:5": {
+			Read: IOMetric{
+				Bytes: 556032,
+				IOs:   78,
+			},
+			Write: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+			Discarded: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+		},
+		"7:4": {
+			Read: IOMetric{
+				Bytes: 556032,
+				IOs:   78,
+			},
+			Write: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+			Discarded: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+		},
+		"7:3": {
+			Read: IOMetric{
+				Bytes: 21017600,
+				IOs:   629,
+			},
+			Write: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+			Discarded: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+		},
+	}
+
+	assert.Equal(t, goodStat, ioTest.Stats)
+}
+
+func TestIOStatDeviceWithNoMetrics(t *testing.T) {
+	ioTest := IOSubsystem{}
+	err := ioTest.Get(ubuntu2, false)
+	assert.NoError(t, err, "error in Get")
+
+	goodStat := map[string]IOStat{
+		"253:0": {
+			Read: IOMetric{
+				Bytes: 45931053056,
+				IOs:   1078394,
+			},
+			Write: IOMetric{
+				Bytes: 211814596608,
+				IOs:   21426614,
+			},
+			Discarded: IOMetric{
+				Bytes: 0,
+				IOs:   0,
+			},
+		},
+		"259:0": {
+			Read: IOMetric{
+				Bytes: 48963873792,
+				IOs:   1315370,
+			},
+			Write: IOMetric{
+				Bytes: 217588278272,
+				IOs:   15358572,
+			},
+			Discarded: IOMetric{
+				Bytes: 3222265856,
+				IOs:   24,
+			},
+		},
+	}
 	assert.Equal(t, goodStat, ioTest.Stats)
 }
 

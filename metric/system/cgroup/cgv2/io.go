@@ -23,12 +23,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 )
 
-//IOSubsystem is the replacement for the bulkio controller in cgroupsV1
+// IOSubsystem is the replacement for the bulkio controller in cgroupsV1
 type IOSubsystem struct {
 	ID   string `json:"id,omitempty"`   // ID of the cgroup.
 	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
@@ -88,31 +90,81 @@ func getIOStats(path string, resolveDevIDs bool) (map[string]IOStat, error) {
 
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
-		devMetric := IOStat{}
-		var major, minor uint64
-		_, err := fmt.Sscanf(sc.Text(), "%d:%d rbytes=%d wbytes=%d rios=%d wios=%d dbytes=%d dios=%d", &major, &minor, &devMetric.Read.Bytes, &devMetric.Write.Bytes, &devMetric.Read.IOs, &devMetric.Write.IOs, &devMetric.Discarded.Bytes, &devMetric.Discarded.IOs)
+		devices, metrics, foundMetrics, err := parseStatLine(sc.Text(), resolveDevIDs)
 		if err != nil {
-			return stats, fmt.Errorf("error scanning file: %s: %w", file, err)
+			return nil, fmt.Errorf("error parsing line in file: %w", err)
 		}
-
-		// try to find the device name associated with the major/minor pair
-		// This isn't guaranteed to work, for a number of reasons, so we'll need to fall back
-		var found bool
-		var devName string
-		if resolveDevIDs {
-			found, devName, err = fetchDeviceName(major, minor)
-			if err != nil {
-				return nil, fmt.Errorf("error looking up device ID %d:%d %w", major, minor, err)
-			}
+		if !foundMetrics {
+			continue
 		}
-
-		if found {
-			stats[devName] = devMetric
-		} else {
-			idKey := fmt.Sprintf("%d:%d", major, minor)
-			stats[idKey] = devMetric
+		for _, dev := range devices {
+			stats[dev] = metrics
 		}
 	}
 
 	return stats, nil
+}
+
+// parses a single line in io.stat; a bit complicated, since these files are more complex then they look.
+// returns a list of device names associated with the metrics, the metric set, and a bool indicating if metrics were found
+func parseStatLine(line string, resolveDevIDs bool) ([]string, IOStat, bool, error) {
+	devIds := []string{}
+	stats := IOStat{}
+	foundMetrics := false
+	// cautiously iterate over a line to find the components
+	// under certain conditions, the stat.io will combine different loopback devices onto a single line,
+	// 7:7 7:6 7:5 7:4 rbytes=556032 wbytes=0 rios=78 wios=0 dbytes=0 dios=0
+	// we can also get lines without metrics, like
+	//  7:7 7:6 7:5 7:4
+	for _, component := range strings.Split(line, " ") {
+		if strings.Contains(component, ":") {
+			var major, minor uint64
+			_, err := fmt.Sscanf(component, "%d:%d", &major, &minor)
+			if err != nil {
+				return nil, IOStat{}, false, fmt.Errorf("could not read device ID: %s: %w", component, err)
+			}
+
+			var found bool
+			var devName string
+			// try to find the device name associated with the major/minor pair
+			// This isn't guaranteed to work, for a number of reasons, so we'll need to fall back
+			if resolveDevIDs {
+				found, devName, _ = fetchDeviceName(major, minor)
+			}
+
+			if found {
+				devIds = append(devIds, devName)
+			} else {
+				devIds = append(devIds, component)
+			}
+		} else if strings.Contains(component, "=") {
+			foundMetrics = true
+			counterSplit := strings.Split(component, "=")
+			if len(counterSplit) < 2 {
+				continue
+			}
+			name := counterSplit[0]
+			counter, err := strconv.ParseUint(counterSplit[1], 10, 64)
+			if err != nil {
+				return nil, IOStat{}, false, fmt.Errorf("error parsing counter '%s' in stat: %w", counterSplit[1], err)
+			}
+			switch name {
+			case "rbytes":
+				stats.Read.Bytes = counter
+			case "wbytes":
+				stats.Write.Bytes = counter
+			case "rios":
+				stats.Read.IOs = counter
+			case "wios":
+				stats.Write.IOs = counter
+			case "dbytes":
+				stats.Discarded.Bytes = counter
+			case "dios":
+				stats.Discarded.IOs = counter
+			}
+
+		}
+
+	}
+	return devIds, stats, foundMetrics, nil
 }
