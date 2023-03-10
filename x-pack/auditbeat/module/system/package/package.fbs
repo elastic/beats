@@ -1,0 +1,19 @@
+
+namespace schema;
+
+ table Package  {
+	name:string;
+	version:string;
+	release:string;
+	arch:string;
+	license:string;
+	installtime:ulong;
+	size:ulong;
+	summary:string;
+	url:string;
+	type:string;
+}
+
+
+root_type Package;
+
