@@ -98,7 +98,7 @@ func FQDN() bool {
 // AddFQDNOnChangeCallback takes a callback function that will be called with the new and old values
 // of `flags.fqdnEnabled` whenever it changes. It also takes a string ID - this is useful
 // in calling `RemoveFQDNOnChangeCallback` to de-register the callback.
-func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback, id string)  error {
+func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback, id string) error {
 	flags.mu.Lock()
 	defer flags.mu.Unlock()
 

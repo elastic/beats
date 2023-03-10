@@ -44,10 +44,10 @@ type addHostMetadata struct {
 		time.Time
 		sync.Mutex
 	}
-	data                   mapstr.Pointer
-	geoData                mapstr.M
-	config                 Config
-	logger                 *logp.Logger
+	data    mapstr.Pointer
+	geoData mapstr.M
+	config  Config
+	logger  *logp.Logger
 }
 
 const (
