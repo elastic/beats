@@ -87,7 +87,9 @@ func (r *sqsReader) Receive(ctx context.Context, metricReporterChan chan int64) 
 					r.metrics.sqsMessagesInflight.Dec()
 					processingTimeNanos := time.Since(start).Nanoseconds()
 					r.metrics.sqsMessageProcessingTime.Update(processingTimeNanos)
-					metricReporterChan <- processingTimeNanos
+					if metricReporterChan != nil {
+						metricReporterChan <- processingTimeNanos
+					}
 					workerWg.Done()
 					r.workerSem.Release(1)
 				}()
