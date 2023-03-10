@@ -95,6 +95,16 @@ func TestParseMongoURL(t *testing.T) {
 			ExpectedUsername: "",
 			ExpectedPassword: "",
 		},
+		{
+			Name:     "with options replicaset",
+			URL:      "mongodb://localhost:40001/?replicaSet=dbrs",
+			Username: "anotheruser",
+			Password: "anotherpass",
+
+			ExpectedAddr:     "localhost:40001",
+			ExpectedUsername: "anotheruser",
+			ExpectedPassword: "anotherpass",
+		},
 	}
 
 	for _, test := range tests {

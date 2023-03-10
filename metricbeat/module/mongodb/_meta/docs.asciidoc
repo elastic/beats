@@ -31,6 +31,27 @@ Or more complex like:
   hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
 ----------------------------------------------------------------------
 
+some more supported URLS are:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://localhost:27017,localhost:27022,localhost:27023"]
+----------------------------------------------------------------------
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://localhost:27017/?directConnection=true"]
+----------------------------------------------------------------------
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://localhost:27017,localhost:27022,localhost:27023/?replicaSet=dbrs"]
+----------------------------------------------------------------------
+
+
 The username and password can be included in the URL or they can be set using
 the respective configuration options. The credentials in the URL take precedence
 over the username and password configuration options.
