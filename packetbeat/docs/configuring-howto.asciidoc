@@ -59,4 +59,6 @@ include::{libbeat-dir}/http-endpoint.asciidoc[]
 
 include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
+include::{libbeat-dir}/shared-feature-flags.asciidoc[]
+
 include::{libbeat-dir}/reference-yml.asciidoc[]
