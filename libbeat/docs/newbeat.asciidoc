@@ -1,4 +1,4 @@
 [[new-beat]]
 == Developer Guide: Creating a New Beat
 
-See the https://www.elastic.co/guide/en/beats/devguide/master/index.html[Beats Developer Guide] for the latest information about creating a new beat.
+See the {beats-devguide}/index.html[Beats Developer Guide] for the latest information about creating a new beat.
