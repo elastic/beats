@@ -222,7 +222,6 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 			event.Channel = data.(string)
 		case EvtSystemComputer:
 			event.Computer = data.(string)
-			// TODO: set event.Computer to FQDN if features.FQDN() is true?
 		case EvtSystemUserID:
 			sid := data.(*windows.SID)
 			event.User.Identifier = sid.String()
