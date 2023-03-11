@@ -24,7 +24,6 @@
         "input.type": "log",
         "log.offset": 186,
         "related.ip": [
-            "172.31.77.6",
             "172.31.77.6"
         ],
         "service.type": "iis",

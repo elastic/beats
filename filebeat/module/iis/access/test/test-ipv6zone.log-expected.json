@@ -31,7 +31,6 @@
         "input.type": "log",
         "log.offset": 331,
         "related.ip": [
-            "::1",
             "::1"
         ],
         "service.type": "iis",

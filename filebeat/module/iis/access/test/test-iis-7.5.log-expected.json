@@ -137,7 +137,6 @@
         "input.type": "log",
         "log.offset": 706,
         "related.ip": [
-            "2001:cdba:0000:0000:0000:0000:3257:9652",
             "2001:cdba:0000:0000:0000:0000:3257:9652"
         ],
         "service.type": "iis",
@@ -145,5 +144,53 @@
         "source.ip": "2001:cdba:0000:0000:0000:0000:3257:9652",
         "url.original": "/health-monitoring",
         "url.path": "/health-monitoring"
+    },
+    {
+        "@timestamp": "2023-03-10T17:35:01.000Z",
+        "destination.address": "172.25.13.11",
+        "destination.ip": "172.25.13.11",
+        "destination.port": 8080,
+        "event.category": [
+            "network",
+            "web"
+        ],
+        "event.dataset": "iis.access",
+        "event.duration": 17763000000,
+        "event.kind": "event",
+        "event.module": "iis",
+        "event.original": "2023-03-10 17:35:01 172.25.13.11 POST /test/test.aspx - 8080 sherlock 10.250.105.11 Mozilla/5.0+(Windows+NT+10.0;+Win64;+x64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/108.0.0.0+Safari/537.36 https://test.com/test/test.aspx 201 0 0 17763",
+        "event.outcome": "success",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "access",
+        "http.request.method": "POST",
+        "http.request.referrer": "https://test.com/test/test.aspx",
+        "http.response.status_code": 201,
+        "iis.access.sub_status": 0,
+        "iis.access.win32_status": 0,
+        "input.type": "log",
+        "log.offset": 849,
+        "related.ip": [
+            "10.250.105.11",
+            "172.25.13.11"
+        ],
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "iis",
+        "source.address": "10.250.105.11",
+        "source.ip": "10.250.105.11",
+        "url.extension": "aspx",
+        "url.original": "/test/test.aspx",
+        "url.path": "/test/test.aspx",
+        "user.name": "sherlock",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Chrome",
+        "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+        "user_agent.os.full": "Windows 10",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "10",
+        "user_agent.version": "108.0.0.0"
     }
 ]
