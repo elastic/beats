@@ -262,5 +262,51 @@
         "message": "[MY-011323] [Server] X Plugin ready for connections. Socket: '/var/run/mysqld/mysqlx.sock' bind-address: '::' port: 33060",
         "mysql.thread_id": 0,
         "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2023-03-12T15:30:16.866Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "mysql.error",
+        "event.kind": "event",
+        "event.module": "mysql",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "Note",
+        "log.offset": 1723,
+        "message": "Aborted connection 4016575 to db: 'testdb' user: 'sherlock' host: 'localhost' (Got an error reading communication packets)",
+        "mysql.thread_id": 4016575,
+        "service.type": "mysql"
+    },
+    {
+        "@timestamp": "2023-03-07T09:34:58.461Z",
+        "event.category": [
+            "database"
+        ],
+        "event.code": "MY-010909",
+        "event.dataset": "mysql.error",
+        "event.kind": "event",
+        "event.module": "mysql",
+        "event.provider": "Server",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "Warning",
+        "log.offset": 1889,
+        "message": "[MY-010909] [Server] /usr/sbin/mysqld: Forcing close of thread 14  user: 'sherlock'.",
+        "mysql.thread_id": 0,
+        "related.user": [
+            "sherlock"
+        ],
+        "service.type": "mysql",
+        "user.name": "sherlock"
     }
 ]

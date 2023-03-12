@@ -23,6 +23,12 @@
         "mysql.slowlog.rows_examined": 1489615,
         "mysql.slowlog.rows_sent": 1000,
         "mysql.thread_id": 10997316,
+        "related.ip": [
+            "1.1.1.1"
+        ],
+        "related.user": [
+            "apphost"
+        ],
         "service.type": "mysql",
         "source.domain": "apphost",
         "source.ip": "1.1.1.1",
@@ -52,6 +58,12 @@
         "mysql.slowlog.rows_examined": 4751313,
         "mysql.slowlog.rows_sent": 0,
         "mysql.thread_id": 10999834,
+        "related.ip": [
+            "1.1.1.1"
+        ],
+        "related.user": [
+            "apphost"
+        ],
         "service.type": "mysql",
         "source.domain": "apphost",
         "source.ip": "1.1.1.1",
@@ -81,6 +93,12 @@
         "mysql.slowlog.rows_examined": 4754675,
         "mysql.slowlog.rows_sent": 0,
         "mysql.thread_id": 11004208,
+        "related.ip": [
+            "1.1.1.1"
+        ],
+        "related.user": [
+            "apphost"
+        ],
         "service.type": "mysql",
         "source.domain": "apphost",
         "source.ip": "1.1.1.1",

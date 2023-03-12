@@ -94,6 +94,20 @@
         "field": "event.type",
         "value": "info"
       }
+    },
+    {
+      "append": {
+        "field": "related.user",
+        "value": "{{user.name}}",
+        "if": "ctx?.user?.name != null"
+      }
+    },
+    {
+      "append": {
+        "field": "related.ip",
+        "value": "{{source.ip}}",
+        "if": "ctx?.source?.ip != null"
+      }
     }
   ],
   "on_failure": [
