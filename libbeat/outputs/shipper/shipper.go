@@ -31,7 +31,6 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	"google.golang.org/grpc"
@@ -82,6 +81,9 @@ type shipper struct {
 func init() {
 	outputs.RegisterType("shipper", makeShipper)
 }
+
+// shipperProcessor serves as a wrapper for testing Publish() calls with alternate marshalling callbacks
+var shipperProcessor = toShipperEvent
 
 func makeShipper(
 	_ outputs.IndexManager,
@@ -170,7 +172,7 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 	droppedCount := 0
 
 	for i, e := range events {
-		converted, err := toShipperEvent(e)
+		converted, err := shipperProcessor(e)
 		if err != nil {
 			// conversion errors are not recoverable, so we have to drop the event completely
 			s.log.Errorf("%d/%d: %q, dropped", i+1, len(events), err)
@@ -197,7 +199,26 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 			Events: toSend,
 		})
 
-		if status.Code(err) != codes.OK {
+		if err != nil {
+			if status.Code(err) == codes.ResourceExhausted {
+				// This error can only come from the gRPC connection, and
+				// most likely indicates this request exceeds the shipper's
+				// RPC size limit. The correct thing to do here is split
+				// the batch as in https://github.com/elastic/beats/issues/29778.
+				// Since this isn't supported yet, we drop this batch to avoid
+				// permanently blocking the pipeline.
+				s.log.Errorf("dropping %d events because of RPC failure: %v", len(events), err)
+				batch.Drop()
+				s.observer.Dropped(len(events))
+				return nil
+			}
+			// All other known errors are, in theory, retryable once the
+			// RPC connection is successfully restarted, and don't depend on
+			// the contents of the request. We should be cautious, though: if an
+			// error is deterministic based on the contents of a publish
+			// request, then cancelling here (instead of dropping or retrying)
+			// will cause an infinite retry loop, wedging the pipeline.
+
 			batch.Cancelled()                 // does not decrease the TTL
 			s.observer.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
 			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(toSend), err)
@@ -213,7 +234,7 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 		}
 		toSend = toSend[publishReply.AcceptedCount:]
 		lastAcceptedIndex = publishReply.AcceptedIndex
-		s.log.Debugf("%d events have been accepted during a publish request", len(toSend))
+		s.log.Debugf("%d events have been accepted during a publish request", publishReply.AcceptedCount)
 	}
 
 	s.log.Debugf("total of %d events have been accepted from batch, %d dropped", convertedCount, droppedCount)
@@ -367,44 +388,13 @@ func (s *shipper) ackWorker(ctx context.Context) {
 	}
 }
 
-func convertMapStr(m mapstr.M) (*messages.Value, error) {
-	if m == nil {
-		return helpers.NewNullValue(), nil
-	}
-
-	fields := make(map[string]*messages.Value, len(m))
-
-	for key, value := range m {
-		var (
-			protoValue *messages.Value
-			err        error
-		)
-		switch v := value.(type) {
-		case mapstr.M:
-			protoValue, err = convertMapStr(v)
-		default:
-			protoValue, err = helpers.NewValue(v)
-		}
-		if err != nil {
-			return nil, err
-		}
-		fields[key] = protoValue
-	}
-
-	s := &messages.Struct{
-		Data: fields,
-	}
-
-	return helpers.NewStructValue(s), nil
-}
-
 func toShipperEvent(e publisher.Event) (*messages.Event, error) {
-	meta, err := convertMapStr(e.Content.Meta)
+	meta, err := helpers.NewValue(e.Content.Meta)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert event metadata to protobuf: %w", err)
 	}
 
-	fields, err := convertMapStr(e.Content.Fields)
+	fields, err := helpers.NewValue(e.Content.Fields)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert event fields to protobuf: %w", err)
 	}

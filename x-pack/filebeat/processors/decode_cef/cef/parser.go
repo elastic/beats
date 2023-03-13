@@ -32,9 +32,9 @@ const cef_en_gobble_extension int = 33
 const cef_en_main int = 1
 const cef_en_main_cef_extensions int = 29
 
-//line parser.rl:17
-
 // unpack unpacks a CEF message.
+//
+//line parser.rl:17
 func (e *Event) unpack(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0

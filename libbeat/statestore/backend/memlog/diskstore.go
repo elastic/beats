@@ -290,7 +290,7 @@ func (s *diskstore) LogOperation(op op) error {
 // The active marker file is overwritten after all updates did succeed. The
 // marker file contains the filename of the current valid data-file.
 // NOTE: due to limitation on some Operating system or file systems, the active
-//       marker is not a symlink, but an actual file.
+// marker is not a symlink, but an actual file.
 func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
 	tmpPath, err := s.checkpointTmpFile(filepath.Join(s.home, checkpointTmpFileName), state)
 	if err != nil {
@@ -691,9 +691,9 @@ func readMetaFile(home string) (storeMeta, error) {
 
 // isTxIDLessEqual compares two IDs by checking that their distance is < 2^63.
 // It always returns true if
-//  - a == b
-//  - a < b (mod 2^63)
-//  - b > a after an integer rollover that is still within the distance of <2^63-1
+//   - a == b
+//   - a < b (mod 2^63)
+//   - b > a after an integer rollover that is still within the distance of <2^63-1
 func isTxIDLessEqual(a, b uint64) bool {
 	return int64(a-b) <= 0
 }

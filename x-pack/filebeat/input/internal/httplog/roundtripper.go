@@ -53,26 +53,27 @@ type LoggingRoundTripper struct {
 // the request and response to the underlying logger.
 //
 // Fields logged in requests:
-//  url.original
-//  url.scheme
-//  url.path
-//  url.domain
-//  url.port
-//  url.query
-//  http.request
-//  user_agent.original
-//  http.request.body.content
-//  http.request.body.bytes
-//  http.request.mime_type
-//  event.original (the full request and body from httputil.DumpRequestOut)
+//
+//	url.original
+//	url.scheme
+//	url.path
+//	url.domain
+//	url.port
+//	url.query
+//	http.request
+//	user_agent.original
+//	http.request.body.content
+//	http.request.body.bytes
+//	http.request.mime_type
+//	event.original (the full request and body from httputil.DumpRequestOut)
 //
 // Fields logged in responses:
-//  http.response.status_code
-//  http.response.body.content
-//  http.response.body.bytes
-//  http.response.mime_type
-//  event.original (the full response and body from httputil.DumpResponse)
 //
+//	http.response.status_code
+//	http.response.body.content
+//	http.response.body.bytes
+//	http.response.mime_type
+//	event.original (the full response and body from httputil.DumpResponse)
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
 	log := rt.logger.With(

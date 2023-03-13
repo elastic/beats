@@ -10,7 +10,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -72,8 +71,6 @@ type rawData struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The sql query metricset is beta.")
-
 	b := &MetricSet{BaseMetricSet: base}
 
 	if err := base.Module().UnpackConfig(&b.Config); err != nil {

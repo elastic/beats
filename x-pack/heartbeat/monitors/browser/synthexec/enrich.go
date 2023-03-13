@@ -17,8 +17,8 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -195,7 +195,8 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		},
 	})
 
-	eventext.SetMeta(event, wrappers.META_STEP_COUNT, je.stepCount)
+	// Add step count meta for log wrapper
+	eventext.SetMeta(event, logger.META_STEP_COUNT, je.stepCount)
 
 	if je.journeyComplete {
 		return je.error

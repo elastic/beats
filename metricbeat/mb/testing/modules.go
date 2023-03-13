@@ -19,7 +19,7 @@
 Package testing provides utility functions for testing Module and MetricSet
 implementations.
 
-MetricSet Example
+# MetricSet Example
 
 This is an example showing how to use this package to test a MetricSet. By
 using these methods you ensure the MetricSet is instantiated in the same way
