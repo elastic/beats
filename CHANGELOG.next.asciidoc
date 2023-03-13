@@ -218,7 +218,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
 
 *Auditbeat*
-
+   - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
 
 *Filebeat*
 
