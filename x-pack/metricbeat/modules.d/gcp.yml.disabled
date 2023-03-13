@@ -63,3 +63,10 @@
   dataset_id: "dataset id"
   table_pattern: "table pattern"
   cost_type: "regular"
+  metricsets:
+    - carbon
+  period: 24h
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  dataset_id: "dataset id"
+  table_pattern: "table pattern"

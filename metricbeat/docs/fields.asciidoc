@@ -35359,6 +35359,102 @@ type: float
 --
 
 [float]
+=== carbon
+
+Google Cloud Carbon Footprint metrics
+
+
+*`gcp.carbon.project_id`*::
++
+--
+Project ID the carbon footprint report belongs to.
+
+type: keyword
+
+--
+
+*`gcp.carbon.project_name`*::
++
+--
+Project name the carbon footprint report belongs to.
+
+type: keyword
+
+--
+
+*`gcp.carbon.service_id`*::
++
+--
+Service ID for the carbon footprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.service_description`*::
++
+--
+Service description for the carbon footprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.region`*::
++
+--
+Region for the carbon fooprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.footprint.scope1`*::
++
+--
+Scope 1 carbon footprint.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope2.location`*::
++
+--
+Scope 2 carbon footprint using location-based methodology.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope2.market`*::
++
+--
+Scope 2 carbon footprint using market-based methodology.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope3`*::
++
+--
+Scope 3 carbon footprint.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.offsets`*::
++
+--
+Total carbon offsets.
+
+type: float
+
+--
+
+[float]
 === compute
 
 Google Cloud Compute metrics
