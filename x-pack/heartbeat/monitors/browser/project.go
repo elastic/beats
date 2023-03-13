@@ -29,6 +29,7 @@ type Project struct {
 	projectCfg *Config
 	ctx        context.Context
 	cancel     context.CancelFunc
+	tracer     synthexec.SynthEventTracer
 }
 
 func NewProject(rawCfg *config.C) (*Project, error) {
@@ -41,10 +42,15 @@ func NewProject(rawCfg *config.C) (*Project, error) {
 		projectCfg: DefaultConfig(),
 		ctx:        ctx,
 		cancel:     cancel,
+		tracer:     synthexec.NewNoopTracer(),
 	}
 	err := rawCfg.Unpack(s.projectCfg)
 	if err != nil {
 		return nil, ErrBadConfig(err)
+	}
+
+	if s.projectCfg.Trace != "" {
+		s.tracer = synthexec.NewSynthEventTracer(ctx, s.projectCfg.Trace)
 	}
 
 	return s, nil
@@ -144,14 +150,14 @@ func (p *Project) jobs() []jobs.Job {
 
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), p.StdFields(), p.extraArgs()...)
+		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), p.StdFields(), p.tracer, p.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
+			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.tracer, p.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
