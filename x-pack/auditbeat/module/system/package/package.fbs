@@ -14,6 +14,7 @@ namespace schema;
 	type:string;
 }
 
-
-root_type Package;
-
+table PackageContainer {
+	packages: [Package];
+}
+root_type PackageContainer;

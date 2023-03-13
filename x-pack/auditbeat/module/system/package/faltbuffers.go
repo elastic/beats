@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/package/schema"
+	"github.com/elastic/elastic-agent-libs/logp"
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
@@ -46,16 +47,37 @@ func fbGetBuilder() (b *flatbuffers.Builder, release func()) {
 	return b, func() { bufferPool.Put(b) }
 }
 
+// encodePackages, encodes an array of packages by creating a vector of packages and tracking offsets. It uses the
+// func fbEncodePackage to encode individual packages, and returns a []byte containing the encoded data
+func encodePackages(builder *flatbuffers.Builder, packages []*Package) []byte {
+	offsets := make([]flatbuffers.UOffsetT, len(packages))
+
+	for i, p := range packages {
+		offsets[i] = fbEncodePackage(builder, p)
+	}
+	schema.PackageContainerStartPackagesVector(builder, len(offsets))
+	for _, offset := range offsets {
+		builder.PrependUOffsetT(offset)
+	}
+	packageContainerVector := builder.EndVector(len(offsets))
+	schema.PackageContainerStart(builder)
+	schema.PackageContainerAddPackages(builder, packageContainerVector)
+	root := schema.PackageContainerEnd(builder)
+	builder.Finish(root)
+	return builder.Bytes[builder.Head():]
+}
+
 // fbEncodePackage encodes the given Package to a flatbuffer. The returned bytes
 // are a pointer into the Builder's memory.
-func fbEncodePackage(b *flatbuffers.Builder, p *Package) []byte {
+func fbEncodePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 	if p == nil {
-		return nil
+		return 0
 	}
 
 	offset := fbWritePackage(b, p)
-	b.Finish(offset)
-	return b.FinishedBytes()
+	// b.Finish(offset)
+	// return b.FinishedBytes()
+	return offset
 }
 
 func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
@@ -98,7 +120,7 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 	}
 
 	schema.PackageStart(b)
-	schema.PackageAddInstalltime(b, uint64(p.InstallTime.UnixNano()))
+	schema.PackageAddInstalltime(b, uint64(p.InstallTime.Unix()))
 	schema.PackageAddSize(b, p.Size)
 
 	if packageNameOffset > 0 {
@@ -129,10 +151,28 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 	return schema.PackageEnd(b)
 }
 
-// fbDecodePackage decodes flatbuffer event data and copies it into a Package
+// decodePackagesFromContainer, accepts a flatbuffer encoded byte slice, and decodes
+// each package from the container vector with the help of he func fbDecodePackage.
+// It returns an array of package objects.
+func decodePackagesFromContainer(data []byte, log *logp.Logger) (packages []*Package) {
+	container := schema.GetRootAsPackageContainer(data, 0)
+	for i := 0; i < container.PackagesLength(); i++ {
+		sPkg := schema.Package{}
+		done := container.Packages(&sPkg, i)
+		// query: if a single package fails to load, should we abandon the entire loading proces ?
+		if !done && log != nil {
+			log.Warnf("Failed to load package at container vector position: %d", i)
+		} else {
+			p := fbDecodePackage(&sPkg)
+			packages = append(packages, p)
+		}
+	}
+	return packages
+}
+
+// fbDecodePackage decodes flatbuffer package data and copies it into a Package
 // object that is returned.
-func fbDecodePackage(buf []byte, offset int) *Package {
-	p := schema.GetRootAsPackage(buf[offset:], 0)
+func fbDecodePackage(p *schema.Package) *Package {
 
 	rtnPkg := &Package{
 		Name:        string(p.Name()),
@@ -140,7 +180,7 @@ func fbDecodePackage(buf []byte, offset int) *Package {
 		Release:     string(p.Release()),
 		Arch:        string(p.Arch()),
 		License:     string(p.License()),
-		InstallTime: time.Unix(int64(p.Installtime()), 0),
+		InstallTime: time.Unix(int64(p.Installtime()), 0).UTC(),
 		Size:        p.Size(),
 		Summary:     string(p.Summary()),
 		URL:         string(p.Url()),
@@ -148,13 +188,4 @@ func fbDecodePackage(buf []byte, offset int) *Package {
 	}
 
 	return rtnPkg
-}
-
-// fbIsPackageTimestampBefore returns true if the package's timestamp is before
-// the given ts. This convenience function allows you to compare the package's
-// timestamp without fully decoding and copying the flatbuffer package data.
-func fbIsPackageTimestampBefore(buf []byte, ts time.Time) bool {
-	p := schema.GetRootAsPackage(buf, 0)
-	packageInstallTime := time.Unix(0, int64(p.Installtime()))
-	return packageInstallTime.Before(ts)
 }

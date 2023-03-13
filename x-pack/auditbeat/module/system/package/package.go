@@ -11,8 +11,10 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
+	"encoding/gob"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -22,7 +24,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
-	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -40,6 +41,7 @@ const (
 
 	bucketName              = "package.v1"
 	bucketKeyPackages       = "packages"
+	bucketKeyPackagesFb     = "packages_fb"
 	bucketKeyStateTimestamp = "state_timestamp"
 
 	eventTypeState = "state"
@@ -108,6 +110,7 @@ type MetricSet struct {
 	lastState time.Time
 
 	suppressNoPackageWarnings bool
+	arePackagesGobEncoded     bool
 }
 
 // Package represents information for a package.
@@ -424,12 +427,13 @@ func convertToCacheable(packages []*Package) []cache.Cacheable {
 
 // restorePackagesFromDisk loads the packages from disk.
 func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) {
-	//var decoder *gob.Decoder
+	var gobDecoder *gob.Decoder
 	var buf *bytes.Buffer
 	err = ms.bucket.Load(bucketKeyPackages, func(blob []byte) error {
 		if len(blob) > 0 {
 			buf = bytes.NewBuffer(blob)
-			//decoder = gob.NewDecoder(buf)
+			gobDecoder = gob.NewDecoder(buf)
+			ms.arePackagesGobEncoded = true
 		}
 		return nil
 	})
@@ -437,56 +441,55 @@ func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) 
 		return nil, err
 	}
 
-	if buf != nil {
-		for i := 0; i < buf.Len(); {
-			size := int(flatbuffers.GetUOffsetT(buf.Bytes()[i:]))
-			pkg := fbDecodePackage(buf.Bytes(), i)
-			packages = append(packages, pkg)
-			i += size
+	// if existing packages are gob encoded
+	if gobDecoder != nil {
+		for {
+			pkg := new(Package)
+			err = gobDecoder.Decode(pkg)
+			if err == nil {
+				packages = append(packages, pkg)
+			} else if err == io.EOF {
+				// Read all packages
+				break
+			} else {
+				return nil, fmt.Errorf("error decoding packages: %w", err)
+			}
+		}
+	} else {
+		var data []byte
+		err = ms.bucket.Load(bucketKeyPackagesFb, func(blob []byte) error {
+			if len(blob) > 0 {
+				data = blob
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		// if existing packages are stored as flatbuffers
+		if len(data) > 0 {
+			packages = decodePackagesFromContainer(data, ms.log)
 		}
 	}
-	// if decoder != nil {
-	// 	for {
-	// 		pkg := new(Package)
-	// 		err = decoder.Decode(pkg)
-	// 		if err == nil {
-	// 			packages = append(packages, pkg)
-	// 		} else if err == io.EOF {
-	// 			// Read all packages
-	// 			break
-	// 		} else {
-	// 			return nil, fmt.Errorf("error decoding packages: %w", err)
-	// 		}
-	// 	}
-	// }
 
 	return packages, nil
 }
 
 // Save packages to disk.
 func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
-	// var buf bytes.Buffer
-	// encoder := gob.NewEncoder(&buf)
 	builder, release := fbGetBuilder()
 	defer release()
-	for _, pkg := range packages {
-		// err := encoder.Encode(*pkg)
-		fbEncodePackage(builder, pkg)
-		// if err != nil {
-		// 	return fmt.Errorf("error encoding packages: %w", err)
-		// }
+	data := encodePackages(builder, packages)
+	if err := ms.bucket.Store(bucketKeyPackagesFb, data); err != nil {
+		return fmt.Errorf("error writing packages as flatbuffers to disk: %w", err)
 	}
-	data := builder.Bytes[builder.Head():]
-
-	if err := ms.bucket.Store(bucketKeyPackages, data); err != nil {
-		return fmt.Errorf("error writing packages to disk: %w", err)
+	// remove old storage key
+	if ms.arePackagesGobEncoded {
+		if err := ms.bucket.Delete(bucketKeyPackages); err != nil {
+			return fmt.Errorf("error removing old package key from disk: %w", err)
+		}
 	}
-
-	// err := ms.bucket.Store(bucketKeyPackages, buf.Bytes())
-	// if err != nil {
-	// 	return fmt.Errorf("error writing packages to disk: %w", err)
-	// }
-
 	return nil
 }
 
