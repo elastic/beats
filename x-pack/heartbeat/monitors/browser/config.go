@@ -41,7 +41,6 @@ type Config struct {
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
 	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
 	Timeout           time.Duration                 `config:"timeout"`
-	Trace             string                        `config:"trace_file"`
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")

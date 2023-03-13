@@ -74,6 +74,10 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
 	}
 
+	if parsedConfig.Trace != "" {
+
+	}
+
 	limit := parsedConfig.Scheduler.Limit
 	schedLocationName := parsedConfig.Scheduler.Location
 	if schedLocationName == "" {
