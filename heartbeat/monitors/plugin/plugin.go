@@ -60,7 +60,7 @@ func (p Plugin) Close() error {
 
 // RunWrapped runs the plug-in with the provided wrappers returning a channel of resultant events.
 func (p Plugin) RunWrapped(fields stdfields.StdMonitorFields) chan *beat.Event {
-	wj := wrappers.WrapCommon(p.Jobs, fields, nil)
+	wj := wrappers.WrapCommon(p.Jobs, fields, nil, nil)
 	results := make(chan *beat.Event)
 
 	var runJob func(j jobs.Job)

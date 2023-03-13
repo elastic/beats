@@ -46,7 +46,7 @@ type Config struct {
 	Autodiscover   *autodiscover.Config `config:"autodiscover"`
 	Jobs           map[string]*JobLimit `config:"jobs"`
 	RunFrom        *LocationWithID      `config:"run_from"`
-	Trace          string               `config:"trace_file"`
+	Trace          string               `config:"trace"`
 }
 
 type JobLimit struct {

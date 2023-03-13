@@ -69,7 +69,7 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	mon, err := newMonitor(conf, reg, pipel.ConnectSync(), sched.Add, nil, nil)
+	mon, err := newMonitor(conf, reg, pipel.ConnectSync(), sched.Add, nil, nil, nil)
 	require.NoError(t, err)
 
 	mon.Start()
@@ -116,7 +116,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	m, err := newMonitor(serverMonConf, reg, pipel.ConnectSync(), sched.Add, nil, nil)
+	m, err := newMonitor(serverMonConf, reg, pipel.ConnectSync(), sched.Add, nil, nil, nil)
 	require.Error(t, err)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")

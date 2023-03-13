@@ -184,7 +184,7 @@ func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time
 	cmd.Dir = filepath.Join(cwd, "testcmd")
 	ctx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
 
-	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{}, NewNoopTracer())
+	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent

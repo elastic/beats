@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/tracer"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
@@ -79,7 +80,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
+	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, tracer.NewNoopTracer(), nil)
 
 	return err
 }
@@ -92,9 +93,10 @@ func newMonitor(
 	pubClient pipeline.ISyncClient,
 	taskAdder scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
+	eventTracer tracer.EventTracer,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, eventTracer, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -109,6 +111,7 @@ func newMonitorUnsafe(
 	pubClient pipeline.ISyncClient,
 	addTask scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
+	eventTracer tracer.EventTracer,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
@@ -156,7 +159,7 @@ func newMonitorUnsafe(
 
 	var wrappedJobs []jobs.Job
 	if err == nil {
-		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader, eventTracer)
 	} else {
 		// If we've hit an error at this point, still run on schedule, but always return an error.
 		// This way the error is clearly communicated through to kibana.
@@ -179,7 +182,7 @@ func newMonitorUnsafe(
 		// We need to use the lightweight wrapping for error jobs
 		// since browser wrapping won't write summaries, but the fake job here is
 		// effectively a lightweight job
-		wrappedJobs = wrappers.WrapLightweight(p.Jobs, m.stdFields, monitorstate.NewTracker(stateLoader, false))
+		wrappedJobs = wrappers.WrapLightweight(p.Jobs, m.stdFields, monitorstate.NewTracker(stateLoader, false), eventTracer)
 	}
 
 	m.endpoints = p.Endpoints

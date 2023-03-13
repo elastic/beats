@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/tracer"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -55,6 +56,7 @@ type Heartbeat struct {
 	monitorFactory     *monitors.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
+	eventTracer        tracer.EventTracer
 }
 
 // New creates a new heartbeat.
@@ -74,8 +76,9 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
 	}
 
+	eventTracer := tracer.NewNoopTracer()
 	if parsedConfig.Trace != "" {
-
+		eventTracer = tracer.NewEventTracer(parsedConfig.Trace)
 	}
 
 	limit := parsedConfig.Scheduler.Limit
@@ -109,6 +112,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		config:             parsedConfig,
 		scheduler:          sched,
 		replaceStateLoader: replaceStateLoader,
+		eventTracer:        eventTracer,
 		// monitorFactory is the factory used for creating all monitor instances,
 		// wiring them up to everything needed to actually execute.
 		monitorFactory: monitors.NewFactory(monitors.FactoryParams{
@@ -118,6 +122,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PluginsReg:            plugin.GlobalPluginsReg,
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
+			EventTracer:           eventTracer,
 		}),
 	}
 	return bt, nil
@@ -175,6 +180,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	defer bt.scheduler.Stop()
+	defer bt.eventTracer.Done()
 
 	<-bt.done
 

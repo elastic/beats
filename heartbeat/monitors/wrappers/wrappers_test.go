@@ -72,7 +72,7 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.sFields, nil)
+		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, nil)
 
 		core, observedLogs := observer.New(zapcore.InfoLevel)
 		logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
@@ -745,7 +745,7 @@ func TestECSErrors(t *testing.T) {
 
 	for name, makeSummaryEvent := range testCases {
 		t.Run(name, func(t *testing.T) {
-			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, wrappedECSErr, projectMonitorValues)}, testBrowserMonFields, nil)
+			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, wrappedECSErr, projectMonitorValues)}, testBrowserMonFields, nil, nil)
 			event := &beat.Event{}
 			_, err := j[0](event)
 			require.NoError(t, err)

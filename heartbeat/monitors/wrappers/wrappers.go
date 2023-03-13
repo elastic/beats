@@ -36,23 +36,24 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/tracer"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader, eventTracer tracer.EventTracer) []jobs.Job {
 	// flapping is disabled by default until we sort out how it should work
 	mst := monitorstate.NewTracker(stateLoader, false)
 	if stdMonFields.Type == "browser" {
-		return WrapBrowser(js, stdMonFields, mst)
+		return WrapBrowser(js, stdMonFields, mst, eventTracer)
 	} else {
-		return WrapLightweight(js, stdMonFields, mst)
+		return WrapLightweight(js, stdMonFields, mst, eventTracer)
 	}
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
-func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker) []jobs.Job {
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker, eventTracer tracer.EventTracer) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
@@ -62,6 +63,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 			addMonitorStatus(nil),
 			addMonitorErr,
 			addMonitorDuration,
+			addEventTrace(eventTracer, nil),
 			logMonitorRun(nil),
 		),
 		func() jobs.JobWrapper {
@@ -77,7 +79,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
-func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker) []jobs.Job {
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker, eventTracer tracer.EventTracer) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),
@@ -87,6 +89,7 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addMonitorErr,
 		addBrowserSummary(stdMonFields, byEventType("heartbeat/summary")),
 		addMonitorState(stdMonFields, mst),
+		addEventTrace(eventTracer, byEventType("journey/start", "cmd/status", "journey/end")),
 		logMonitorRun(byEventType("heartbeat/summary")),
 	)
 }
@@ -404,13 +407,40 @@ func addBrowserSummary(sf stdfields.StdMonitorFields, match EventMatcher) jobs.J
 	}
 }
 
-func byEventType(t string) func(event *beat.Event) bool {
+func byEventType(types ...string) func(event *beat.Event) bool {
 	return func(event *beat.Event) bool {
 		eventType, err := event.Fields.GetValue("event.type")
 		if err != nil {
 			return false
 		}
 
-		return eventType == t
+		for _, t := range types {
+			if eventType == t {
+				return true
+			}
+		}
+
+		return false
+	}
+}
+
+func addEventTrace(eventTracer tracer.EventTracer, match EventMatcher) jobs.JobWrapper {
+	t := eventTracer
+	if t == nil {
+		t = tracer.NewNoopTracer()
+	}
+
+	return func(job jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, jobErr := job(event)
+
+			if match != nil && !match(event) {
+				return cont, jobErr
+			}
+
+			t.Write(event)
+
+			return cont, jobErr
+		}
 	}
 }

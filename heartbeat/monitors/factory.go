@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/tracer"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -48,6 +49,7 @@ type RunnerFactory struct {
 	info                  beat.Info
 	addTask               scheduler.AddTask
 	stateLoader           monitorstate.StateLoader
+	eventTracer           tracer.EventTracer
 	byId                  map[string]*Monitor
 	mtx                   *sync.Mutex
 	pluginsReg            *plugin.PluginsReg
@@ -84,6 +86,7 @@ type FactoryParams struct {
 	PluginsReg            *plugin.PluginsReg
 	PipelineClientFactory PipelineClientFactory
 	BeatRunFrom           *config.LocationWithID
+	EventTracer           tracer.EventTracer
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
@@ -98,6 +101,7 @@ func NewFactory(fp FactoryParams) *RunnerFactory {
 		pipelineClientFactory: fp.PipelineClientFactory,
 		beatLocation:          fp.BeatRunFrom,
 		stateLoader:           fp.StateLoader,
+		eventTracer:           fp.EventTracer,
 	}
 }
 
@@ -159,7 +163,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	if err != nil {
 		return nil, fmt.Errorf("could not create pipeline client via factory: %w", err)
 	}
-	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
+	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, f.eventTracer, safeStop)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
 	}
