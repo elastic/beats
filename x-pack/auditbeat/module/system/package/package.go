@@ -391,9 +391,9 @@ func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAc
 		event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
 	}
 
-	// if pkg.error != nil {
-	// 	event.RootFields.Put("error.message", pkg.error.Error())
-	// }
+	if pkg.error != nil {
+		event.RootFields.Put("error.message", pkg.error.Error())
+	}
 
 	return event
 }
