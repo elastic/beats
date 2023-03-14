@@ -469,7 +469,10 @@ func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) 
 
 		// if existing packages are stored as flatbuffers
 		if len(data) > 0 {
-			packages = decodePackagesFromContainer(data, ms.log)
+			packages, err = decodePackagesFromContainer(data)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

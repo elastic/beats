@@ -1,29 +1,17 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
 package pkg
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/package/schema"
-	"github.com/elastic/elastic-agent-libs/logp"
 	flatbuffers "github.com/google/flatbuffers/go"
+
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/package/schema"
 )
 
 // Requires the Google flatbuffer compiler and Elastic go-licenser.
@@ -39,9 +27,9 @@ func init() {
 }
 
 // fbGetBuilder returns a Builder that can be used for encoding data. The builder
-// should be released by invoking the release function after the encoded bytes
+// should be put back into the pool by invoking the put function after the encoded bytes
 // are no longer in used (i.e. a copy of b.FinishedBytes() has been made).
-func fbGetBuilder() (b *flatbuffers.Builder, release func()) {
+func fbGetBuilder() (b *flatbuffers.Builder, put func()) {
 	b = bufferPool.Get().(*flatbuffers.Builder)
 	b.Reset()
 	return b, func() { bufferPool.Put(b) }
@@ -64,7 +52,7 @@ func encodePackages(builder *flatbuffers.Builder, packages []*Package) []byte {
 	schema.PackageContainerAddPackages(builder, packageContainerVector)
 	root := schema.PackageContainerEnd(builder)
 	builder.Finish(root)
-	return builder.Bytes[builder.Head():]
+	return builder.FinishedBytes()
 }
 
 // fbEncodePackage encodes the given Package to a flatbuffer. The returned bytes
@@ -74,10 +62,7 @@ func fbEncodePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 		return 0
 	}
 
-	offset := fbWritePackage(b, p)
-	// b.Finish(offset)
-	// return b.FinishedBytes()
-	return offset
+	return fbWritePackage(b, p)
 }
 
 func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
@@ -85,14 +70,16 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 		return 0
 	}
 
-	var packageNameOffset flatbuffers.UOffsetT
-	var packageVersionOffset flatbuffers.UOffsetT
-	var packageReleaseOffset flatbuffers.UOffsetT
-	var packageArchOffset flatbuffers.UOffsetT
-	var packageLicenseOffset flatbuffers.UOffsetT
-	var packageSummaryOffset flatbuffers.UOffsetT
-	var packageURLOffset flatbuffers.UOffsetT
-	var packageTypeOffset flatbuffers.UOffsetT
+	var (
+		packageNameOffset,
+		packageVersionOffset,
+		packageReleaseOffset,
+		packageArchOffset,
+		packageLicenseOffset,
+		packageSummaryOffset,
+		packageURLOffset,
+		packageTypeOffset flatbuffers.UOffsetT
+	)
 
 	if p.Name != "" {
 		packageNameOffset = b.CreateString(p.Name)
@@ -154,27 +141,26 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 // decodePackagesFromContainer, accepts a flatbuffer encoded byte slice, and decodes
 // each package from the container vector with the help of he func fbDecodePackage.
 // It returns an array of package objects.
-func decodePackagesFromContainer(data []byte, log *logp.Logger) (packages []*Package) {
+func decodePackagesFromContainer(data []byte) ([]*Package, error) {
+	var packages []*Package
 	container := schema.GetRootAsPackageContainer(data, 0)
 	for i := 0; i < container.PackagesLength(); i++ {
 		sPkg := schema.Package{}
 		done := container.Packages(&sPkg, i)
-		// query: if a single package fails to load, should we abandon the entire loading proces ?
-		if !done && log != nil {
-			log.Warnf("Failed to load package at container vector position: %d", i)
+		if !done {
+			return nil, fmt.Errorf("failed to load package at container vector position: %d", i)
 		} else {
 			p := fbDecodePackage(&sPkg)
 			packages = append(packages, p)
 		}
 	}
-	return packages
+	return packages, nil
 }
 
 // fbDecodePackage decodes flatbuffer package data and copies it into a Package
 // object that is returned.
 func fbDecodePackage(p *schema.Package) *Package {
-
-	rtnPkg := &Package{
+	return &Package{
 		Name:        string(p.Name()),
 		Version:     string(p.Version()),
 		Release:     string(p.Release()),
@@ -187,5 +173,4 @@ func fbDecodePackage(p *schema.Package) *Package {
 		Type:        string(p.Type()),
 	}
 
-	return rtnPkg
 }
