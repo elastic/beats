@@ -29819,23 +29819,6 @@ alias to: elasticsearch.node.stats.thread_pool.bulk.rejected.count
 
 --
 
-*`node_stats.thread_pool.force_merge.queue`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.force_merge.queue.count
-
---
-
-*`node_stats.thread_pool.force_merge.rejected`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.thread_pool.force_merge.rejected.count
-
---
 
 *`node_stats.thread_pool.get.queue`*::
 +
