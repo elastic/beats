@@ -127,14 +127,14 @@ $ mage build
 $ ./metricbeat modules enable mysql
 ----
 
-This will enable the module and rename file `metricbeat/modules.d/mysql.yml.disabled` to `metricbeat/modules.d/mysql.yml`. According to our https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mysql.html[documentation] we should specify username and password to user MySQL. It's always a good idea to take a look at the docs to see also that a pre-built dashboard is also available. So tweaking the config a bit, this is how it looks like:
+This will enable the module and rename file `metricbeat/modules.d/mysql.yml.disabled` to `metricbeat/modules.d/mysql.yml`. According to our {metricbeat-ref}/metricbeat-module-mysql.html[documentation] we should specify username and password to user MySQL. It's always a good idea to take a look at the docs to see also that a pre-built dashboard is also available. So tweaking the config a bit, this is how it looks like:
 
-[source,yaml]
+["source","yaml",subs="attributes"]
 ----
 $ cat modules.d/mysql.yml
 
 # Module: mysql
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mysql.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/{branch}/metricbeat-module-mysql.html
 
 - module: mysql
   metricsets:
