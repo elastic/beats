@@ -206,6 +206,7 @@
         "observer.vendor": "Fortinet",
         "related.ip": [
             "175.16.199.1",
+            "67.43.156.12",
             "8.6.4.7"
         ],
         "rule.category": "unknown",
@@ -548,6 +549,7 @@
         "observer.vendor": "Fortinet",
         "related.ip": [
             "175.16.199.1",
+            "23.23.23.23",
             "81.2.69.145"
         ],
         "related.user": [
@@ -700,6 +702,7 @@
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
+            "0.0.0.0",
             "104.80.88.154",
             "67.43.156.15"
         ],
@@ -793,6 +796,7 @@
         "observer.vendor": "Fortinet",
         "related.ip": [
             "10.1.100.11",
+            "172.16.200.2",
             "172.16.200.55"
         ],
         "rule.category": "Web-Client",
@@ -871,6 +875,7 @@
         "observer.vendor": "Fortinet",
         "related.ip": [
             "10.1.100.11",
+            "172.16.200.2",
             "185.244.31.158"
         ],
         "rule.category": "unscanned",
@@ -950,6 +955,7 @@
         "observer.vendor": "Fortinet",
         "related.ip": [
             "10.1.100.22",
+            "172.16.200.10",
             "172.16.200.55"
         ],
         "rule.category": "unscanned",
@@ -1034,6 +1040,7 @@
         "observer.vendor": "Fortinet",
         "related.ip": [
             "10.1.100.22",
+            "172.16.200.10",
             "52.216.177.83"
         ],
         "rule.category": "unscanned",

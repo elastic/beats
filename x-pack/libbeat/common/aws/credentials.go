@@ -117,6 +117,7 @@ func getConfigForKeys(beatsConfig ConfigAWS) awssdk.Config {
 
 // getConfigSharedCredentialProfile If accessKeyID, secretAccessKey or sessionToken is not given,
 // then load from default config // Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
+//
 //	with more details. If credential_profile_name is empty, then default profile is used.
 func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, error) {
 	logger := logp.NewLogger("WithSharedConfigProfile")

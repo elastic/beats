@@ -50,7 +50,7 @@ var (
 )
 
 // Aliases are shortcuts to long target names.
-//nolint: deadcode // it's used by `mage`.
+// nolint: deadcode // it's used by `mage`.
 var Aliases = map[string]interface{}{
 	"llc":  mage.Linter.LastChange,
 	"lint": mage.Linter.All,

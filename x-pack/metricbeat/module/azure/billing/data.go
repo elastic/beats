@@ -159,7 +159,6 @@ func getResourceNameFromPath(path string) string {
 // .Rows:
 // 0: []interface {}{0.11, 2.0200807e+07, "Actual", "USD"}
 // 1: []interface {}{0.11, 2.0200808e+07, "Forecast", "USD"}
-//
 func getEventsFromQueryResult(result costmanagement.QueryResult, subscriptionID string, logger *logp.Logger) ([]mb.Event, error) {
 	// The number of columns expected in the QueryResult supported by this input.
 	// The structure of the QueryResult is determined by the value we set in

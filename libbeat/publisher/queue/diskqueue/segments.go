@@ -542,7 +542,7 @@ func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
 	return r.src.Seek(offset, whence)
 }
 
-//segmentWriter handles writing of segments.  With Schema version 2
+// segmentWriter handles writing of segments.  With Schema version 2
 // there is the option for plain data, encrypted data, compressed data
 // and encrypted compressed data.  getWriter sets up the segmentWriter
 // to handle these options.  If compression is enabled operations go

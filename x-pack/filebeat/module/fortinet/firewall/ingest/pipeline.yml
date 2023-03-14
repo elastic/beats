@@ -373,6 +373,31 @@ processors:
     allow_duplicates: false
     if: "ctx.destination?.ip != null"
 - append:
+    field: related.ip
+    value: "{{source.nat.ip}}"
+    allow_duplicates: false
+    if: "ctx.source?.nat?.ip != null"
+- append:
+    field: related.ip
+    value: "{{destination.nat.ip}}"
+    allow_duplicates: false
+    if: "ctx.destination?.nat?.ip != null"
+- append:
+    field: related.ip
+    value: "{{fortinet.firewall.ip}}"
+    allow_duplicates: false
+    if: "ctx.fortinet?.firewall?.ip != null"
+- append:
+    field: related.ip
+    value: "{{fortinet.firewall.assignip}}"
+    allow_duplicates: false
+    if: "ctx.fortinet?.firewall?.assignip != null"
+- append:
+    field: related.ip
+    value: "{{fortinet.firewall.tunnelip}}"
+    allow_duplicates: false
+    if: "ctx.fortinet?.firewall?.tunnelip != null"
+- append:
     field: related.user
     value: "{{source.user.name}}"
     allow_duplicates: false

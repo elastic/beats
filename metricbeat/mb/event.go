@@ -116,21 +116,20 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 // duration (round-trip time in nanoseconds) values if they are non-zero
 // values.
 //
-//   {
-//     "event": {
-//       "dataset": "apache.status",
-//       "duration": 115,
-//       "module": "apache"
-//     },
-//     "service": {
-//       "address": "127.0.0.1",
-//     },
-//     "metricset": {
-//       "name": "status",
-//       "period": 10000
-//     }
-//   }
-//
+//	{
+//	  "event": {
+//	    "dataset": "apache.status",
+//	    "duration": 115,
+//	    "module": "apache"
+//	  },
+//	  "service": {
+//	    "address": "127.0.0.1",
+//	  },
+//	  "metricset": {
+//	    "name": "status",
+//	    "period": 10000
+//	  }
+//	}
 func AddMetricSetInfo(module, metricset string, event *Event) {
 	if event.Namespace == "" {
 		event.Namespace = fmt.Sprintf("%s.%s", module, metricset)

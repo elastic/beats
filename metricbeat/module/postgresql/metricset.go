@@ -53,7 +53,7 @@ func (ms *MetricSet) DB(ctx context.Context) (*sql.Conn, error) {
 	return ms.db.Conn(ctx)
 }
 
-//QueryStats makes the database call for a given metric
+// QueryStats makes the database call for a given metric
 func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string]interface{}, error) {
 	db, err := ms.DB(ctx)
 	if err != nil {

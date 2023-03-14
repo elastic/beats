@@ -46,9 +46,9 @@ const cef_recover_en_gobble_extension int = 55
 const cef_recover_en_main int = 1
 const cef_recover_en_main_cef_extensions int = 28
 
-//line parser_recover.rl:17
-
 // recoverExtensions unpacks a CEF message's extensions from messages with incomplete headers.
+//
+//line parser_recover.rl:17
 func (e *Event) recoverExtensions(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0

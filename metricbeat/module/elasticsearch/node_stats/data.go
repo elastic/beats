@@ -368,11 +368,14 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 			continue
 		}
 
+		roles := node["roles"]
+
 		event.ModuleFields = mapstr.M{
 			"node": mapstr.M{
 				"id":       nodeID,
 				"mlockall": mlockall,
 				"master":   isMaster,
+				"roles":    roles,
 			},
 			"cluster": mapstr.M{
 				"name": info.ClusterName,

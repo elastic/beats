@@ -63,8 +63,10 @@ var (
 // For files attached to e-mails (using Mail app), three strings are
 // returned: Sender address, subject and e-mail identifier:
 // [ "Adrian Serrano \u003cadrian@elastic.co\u003e",
-//   "Sagrada Familia tickets",
-//   "message:%3CCAMZw10FD4fktC9qdJgLjwW=a8LM4gbJ44jFcaK8.BOWg1t4OwQ@elastic.co%3E"
+//
+//	"Sagrada Familia tickets",
+//	"message:%3CCAMZw10FD4fktC9qdJgLjwW=a8LM4gbJ44jFcaK8.BOWg1t4OwQ@elastic.co%3E"
+//
 // ],
 //
 // For all other files the result is an empty (nil) list.

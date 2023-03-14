@@ -31,16 +31,15 @@ import (
 //
 // Example (stateless input):
 //
-//   func Plugin() input.Plugin {
-//       return input.Plugin{
-//           Name: "myservice",
-//           Stability: feature.Stable,
-//           Deprecated: false,
-//           Info: "collect data from myservice",
-//           Manager: stateless.NewInputManager(configure),
-//       }
-//   }
-//
+//	func Plugin() input.Plugin {
+//	    return input.Plugin{
+//	        Name: "myservice",
+//	        Stability: feature.Stable,
+//	        Deprecated: false,
+//	        Info: "collect data from myservice",
+//	        Manager: stateless.NewInputManager(configure),
+//	    }
+//	}
 type Plugin struct {
 	// Name of the input type.
 	Name string
