@@ -63,7 +63,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 			addMonitorStatus(nil),
 			addMonitorErr,
 			addMonitorDuration,
-			addEventTrace(eventTracer, nil),
+			addEventTrace(eventTracer),
 			logMonitorRun(nil),
 		),
 		func() jobs.JobWrapper {
@@ -89,7 +89,7 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addMonitorErr,
 		addBrowserSummary(stdMonFields, byEventType("heartbeat/summary")),
 		addMonitorState(stdMonFields, mst),
-		addEventTrace(eventTracer, byEventType("journey/start", "cmd/status", "journey/end")),
+		addEventTrace(eventTracer),
 		logMonitorRun(byEventType("heartbeat/summary")),
 	)
 }
@@ -424,10 +424,15 @@ func byEventType(types ...string) func(event *beat.Event) bool {
 	}
 }
 
-func addEventTrace(eventTracer tracer.EventTracer, match EventMatcher) jobs.JobWrapper {
+func addEventTrace(eventTracer tracer.EventTracer) jobs.JobWrapper {
 	t := eventTracer
 	if t == nil {
 		t = tracer.NewNoopTracer()
+	}
+
+	var match EventMatcher = nil
+	if t.GetFilter() != nil {
+		match = byEventType(t.GetFilter()...)
 	}
 
 	return func(job jobs.Job) jobs.Job {

@@ -46,7 +46,7 @@ type Config struct {
 	Autodiscover   *autodiscover.Config `config:"autodiscover"`
 	Jobs           map[string]*JobLimit `config:"jobs"`
 	RunFrom        *LocationWithID      `config:"run_from"`
-	Trace          string               `config:"trace"`
+	Trace          *Trace               `config:"trace"`
 }
 
 type JobLimit struct {
@@ -57,6 +57,12 @@ type JobLimit struct {
 type Scheduler struct {
 	Limit    int64  `config:"limit"  validate:"min=0"`
 	Location string `config:"location"`
+}
+
+type Trace struct {
+	Path        string      `config:"path" validate:"required"`
+	Permissions os.FileMode `config:"permissions"`
+	Filter      []string    `config:"filter"`
 }
 
 // DefaultConfig is the canonical instantiation of Config.

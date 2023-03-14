@@ -77,8 +77,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	}
 
 	eventTracer := tracer.NewNoopTracer()
-	if parsedConfig.Trace != "" {
-		eventTracer = tracer.NewEventTracer(parsedConfig.Trace)
+	if parsedConfig.Trace != nil {
+		eventTracer = tracer.NewEventTracer(parsedConfig.Trace.Path, parsedConfig.Trace.Permissions, parsedConfig.Trace.Filter)
 	}
 
 	limit := parsedConfig.Scheduler.Limit
