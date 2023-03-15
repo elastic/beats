@@ -18,8 +18,11 @@
 package wrappers
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -43,17 +46,20 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/tracer"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 type testDef struct {
-	name         string
-	sFields      stdfields.StdMonitorFields
-	jobs         []jobs.Job
-	want         []validator.Validator
-	metaWant     []validator.Validator
-	logValidator func(t *testing.T, results []*beat.Event, observed []observer.LoggedEntry)
+	name           string
+	sFields        stdfields.StdMonitorFields
+	jobs           []jobs.Job
+	want           []validator.Validator
+	metaWant       []validator.Validator
+	logValidator   func(t *testing.T, results []*beat.Event, observed []observer.LoggedEntry)
+	traceValidator func(t *testing.T, results []*beat.Event, file *os.File, filter []string)
+	traceFilter    []string
 }
 
 var testMonFields = stdfields.StdMonitorFields{
@@ -72,7 +78,13 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, nil)
+		tmp := t.TempDir()
+		file, err := os.CreateTemp(tmp, "trace-*")
+		assert.NoError(t, err)
+		defer file.Close()
+		trace := tracer.NewEventTracer(file.Name(), os.FileMode(0770), tt.traceFilter)
+
+		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, trace)
 
 		core, observedLogs := observer.New(zapcore.InfoLevel)
 		logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
@@ -99,6 +111,11 @@ func testCommonWrap(t *testing.T, tt testDef) {
 
 		if tt.logValidator != nil {
 			tt.logValidator(t, results, observedLogs.All())
+		}
+
+		trace.Done()
+		if tt.traceValidator != nil {
+			tt.traceValidator(t, results, file, tt.traceFilter)
 		}
 	})
 }
@@ -144,6 +161,7 @@ func TestSimpleJob(t *testing.T) {
 				logp.Any("monitor", &expectedMonitor),
 			}, observed[0].Context)
 		},
+		traceValidator(), nil,
 	})
 }
 
@@ -205,6 +223,7 @@ func TestAdditionalStdFields(t *testing.T) {
 					)},
 				nil,
 				nil,
+				traceValidator(), nil,
 			})
 		})
 	}
@@ -243,6 +262,7 @@ func TestErrorJob(t *testing.T) {
 			)},
 		nil,
 		nil,
+		traceValidator(), nil,
 	})
 }
 
@@ -275,6 +295,7 @@ func TestMultiJobNoConts(t *testing.T) {
 		[]validator.Validator{validatorMaker("http://foo.com"), validatorMaker("http://bar.com")},
 		nil,
 		nil,
+		traceValidator(), nil,
 	})
 }
 
@@ -334,6 +355,7 @@ func TestMultiJobConts(t *testing.T) {
 		},
 		nil,
 		nil,
+		traceValidator(), nil,
 	})
 }
 
@@ -404,6 +426,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			lookslike.MustCompile(isdef.IsEqual(mapstr.M(nil))),
 		},
 		nil,
+		traceValidator(), nil,
 	})
 }
 
@@ -540,6 +563,7 @@ func TestInlineBrowserJob(t *testing.T) {
 		},
 		nil,
 		nil,
+		traceValidator(), nil,
 	})
 }
 
@@ -643,6 +667,7 @@ func TestProjectBrowserJob(t *testing.T) {
 				))},
 		nil,
 		nil,
+		traceValidator(), nil,
 	})
 	testCommonWrap(t, testDef{
 		"with up summary",
@@ -663,6 +688,7 @@ func TestProjectBrowserJob(t *testing.T) {
 				))},
 		nil,
 		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2, "up"),
+		traceValidator(), nil,
 	})
 	testCommonWrap(t, testDef{
 		"with down summary",
@@ -687,6 +713,7 @@ func TestProjectBrowserJob(t *testing.T) {
 				))},
 		nil,
 		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2, "down"),
+		traceValidator(), nil,
 	})
 
 	legacySFields := testBrowserMonFields
@@ -725,6 +752,7 @@ func TestProjectBrowserJob(t *testing.T) {
 				))},
 		nil,
 		nil,
+		traceValidator(), nil,
 	})
 }
 
@@ -752,4 +780,111 @@ func TestECSErrors(t *testing.T) {
 			require.Equal(t, expectedECSErr, event.Fields["error"])
 		})
 	}
+}
+
+var traceValidator = func() func(t *testing.T, events []*beat.Event, file *os.File, filter []string) {
+	return func(t *testing.T, events []*beat.Event, file *os.File, filter []string) {
+		traces := []*beat.Event{}
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			line := scanner.Text()
+			var bEvent *beat.Event
+			err := json.Unmarshal([]byte(line), &bEvent)
+			assert.NoError(t, err)
+
+			traces = append(traces, bEvent)
+		}
+
+		filtered := []*beat.Event{}
+		for _, event := range events {
+			if filter == nil {
+				filtered = append(filtered, event)
+			}
+
+			eventType, err := event.Fields.GetValue("event.type")
+			if err != nil {
+				continue
+			}
+
+			for _, t := range filter {
+				if eventType == t {
+					filtered = append(filtered, event)
+				}
+			}
+		}
+
+		require.Len(t, filtered, len(traces))
+	}
+}
+
+func TestTraceFilter(t *testing.T) {
+	sFields := testBrowserMonFields
+	sFields.ID = projectMonitorValues.id
+	sFields.Name = projectMonitorValues.name
+	sFields.Origin = "my-origin"
+	urlStr := "http://foo.com"
+	urlU, _ := url.Parse(urlStr)
+
+	expectedMonFields := lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"state": isdef.Optional(hbtestllext.IsMonitorState),
+			"monitor": map[string]interface{}{
+				"type":        "browser",
+				"id":          projectMonitorValues.id,
+				"name":        projectMonitorValues.name,
+				"duration":    mapstr.M{"us": time.Second.Microseconds()},
+				"origin":      "my-origin",
+				"check_group": projectMonitorValues.checkGroup,
+				"timespan": mapstr.M{
+					"gte": hbtestllext.IsTime,
+					"lt":  hbtestllext.IsTime,
+				},
+			},
+			"url": URLFields(urlU),
+		}),
+	)
+
+	testCommonWrap(t, testDef{
+		"empty",
+		sFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, nil, projectMonitorValues)},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, urlStr),
+					expectedMonFields,
+					lookslike.MustCompile(map[string]interface{}{
+						"monitor": map[string]interface{}{"status": "up"},
+						"summary": map[string]interface{}{"up": 1, "down": 0},
+						"event": map[string]interface{}{
+							"type": "heartbeat/summary",
+						},
+					}),
+				))},
+		nil,
+		nil,
+		traceValidator(), []string{"empty-event"},
+	})
+
+	testCommonWrap(t, testDef{
+		"filter",
+		sFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, nil, projectMonitorValues)},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, urlStr),
+					expectedMonFields,
+					lookslike.MustCompile(map[string]interface{}{
+						"monitor": map[string]interface{}{"status": "up"},
+						"summary": map[string]interface{}{"up": 1, "down": 0},
+						"event": map[string]interface{}{
+							"type": "heartbeat/summary",
+						},
+					}),
+				))},
+		nil,
+		nil,
+		traceValidator(), []string{"heartbeat/summary"},
+	})
 }

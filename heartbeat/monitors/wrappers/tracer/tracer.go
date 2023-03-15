@@ -48,6 +48,8 @@ func (t *eventTracer) Write(event *beat.Event) {
 
 func (t *eventTracer) Done() {
 	t.cancel()
+	t.writer.Sync()
+	t.writer.Close()
 }
 
 func (t *eventTracer) GetFilter() []string {
@@ -55,7 +57,6 @@ func (t *eventTracer) GetFilter() []string {
 }
 
 func (t *eventTracer) writeF() {
-	defer t.writer.Close()
 	for {
 		select {
 		case <-t.ctx.Done():
