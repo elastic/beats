@@ -316,6 +316,7 @@ A set of named regular expressions that may be used during a CEL program's execu
 ----
 filebeat.inputs:
 - type: cel
+  # Define two regular expressions, 'products' and 'solutions' for use during CEL execution.
   regexp:
     products: '(?i)(Elasticsearch|Beats|Logstash|Kibana)'
     solutions: '(?i)(Search|Observability|Security)'
