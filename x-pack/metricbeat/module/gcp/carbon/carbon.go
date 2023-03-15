@@ -156,7 +156,7 @@ func getTable(ctx context.Context, client *bigquery.Client, datasetID string, ta
 
 	for {
 		dataset, err := dit.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
@@ -176,7 +176,7 @@ func getTable(ctx context.Context, client *bigquery.Client, datasetID string, ta
 		tit := dataset.Tables(ctx)
 		for {
 			table, err := tit.Next()
-			if err == iterator.Done {
+			if errors.Is(err, iterator.Done) {
 				break
 			}
 			if err != nil {
@@ -227,10 +227,13 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 	}
 
 	it, err := job.Read(ctx)
+	if err != nil {
+		return events, err
+	}
 	for {
 		var row []bigquery.Value
 		err := it.Next(&row)
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 
