@@ -48,7 +48,7 @@ func (t *eventTracer) Write(event *beat.Event) {
 
 func (t *eventTracer) Done() {
 	t.cancel()
-	t.writer.Sync()
+	_ = t.writer.Sync()
 	t.writer.Close()
 }
 
