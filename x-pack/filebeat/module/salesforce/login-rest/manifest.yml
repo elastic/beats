@@ -5,6 +5,8 @@ var:
     default: httpjson
   - name: interval
     default: 1h
+  - name: initial_days
+    default: 1
   - name: tags
     default: [salesforce-login-rest, forwarded]
   - name: proxy_url
