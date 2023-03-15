@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !windows
+// +build !windows
+
 package pkg
 
 import (
@@ -60,5 +63,31 @@ func TestFBEncodeDecode(t *testing.T) {
 	assert.Equal(t, len(p), len(out))
 	for i := 0; i < len(p); i++ {
 		assert.Equal(t, p[i], out[i])
+	}
+}
+
+func BenchmarkFBEncodePackages(b *testing.B) {
+	builder, release := fbGetBuilder()
+	defer release()
+	p := testPackage()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		builder.Reset()
+		encodePackages(builder, p)
+	}
+}
+
+func BenchmarkFBDecodePackages(b *testing.B) {
+	builder, release := fbGetBuilder()
+	defer release()
+	p := testPackage()
+	data := encodePackages(builder, p)
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		if packages, err := decodePackagesFromContainer(data); err != nil || len(packages) == 0 {
+			b.Fatal("failed to decode")
+		}
 	}
 }
