@@ -1702,5 +1702,66 @@
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15.7",
         "user_agent.version": "104.0.0.0"
+    },
+    {
+        "@timestamp": "2020-02-07T11:56:54.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:54 +0000] \"GET /products/42 HTTP/1.1\" 200 59 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 369 0.002 [default-web-8080] [] unix:/var/run/php-fpm.sock 59 0.002 200 0f76ea730f282d5759018eb756b23b14",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "0f76ea730f282d5759018eb756b23b14",
+        "http.request.method": "GET",
+        "http.response.body.bytes": 59,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 7430,
+        "nginx.ingress_controller.http.request.id": "0f76ea730f282d5759018eb756b23b14",
+        "nginx.ingress_controller.http.request.length": 369,
+        "nginx.ingress_controller.http.request.time": 0.002,
+        "nginx.ingress_controller.remote_ip_list": [
+            "192.168.64.1"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.response.length": 59,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "59"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "200"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.002,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.002"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "unix:/var/run/php-fpm.sock"
+        ],
+        "related.ip": [
+            "192.168.64.1"
+        ],
+        "service.type": "nginx",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
+        "url.original": "/products/42",
+        "url.path": "/products/42",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Safari",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
+        "user_agent.os.full": "Mac OS X 10.14.6",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.14.6",
+        "user_agent.version": "13.0.5"
     }
 ]

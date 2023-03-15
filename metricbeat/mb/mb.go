@@ -261,7 +261,6 @@ type PushMetricSetV2WithContext interface {
 // configuration data like protocols, usernames, and passwords may also be
 // used to construct this HostData data. HostData also contains information when combined scheme are
 // used, like doing HTTP request over a UNIX socket.
-//
 type HostData struct {
 	Transport dialer.Builder // The transport builder to use when creating the connection.
 
