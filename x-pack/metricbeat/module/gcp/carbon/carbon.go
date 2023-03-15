@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	"cloud.google.com/go/civil"
+	"cloud.google.com/go/civil" //nolint:typecheck // civil is used for type casting
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
