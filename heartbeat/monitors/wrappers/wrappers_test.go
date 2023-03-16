@@ -82,7 +82,7 @@ func testCommonWrap(t *testing.T, tt testDef) {
 		file, err := os.CreateTemp(tmp, "trace-*")
 		assert.NoError(t, err)
 		defer file.Close()
-		trace := tracer.NewEventTracer(file.Name(), os.FileMode(0770), tt.traceFilter)
+		trace := tracer.NewEventTracer(file.Name(), 0770, tt.traceFilter)
 
 		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, trace)
 
