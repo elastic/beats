@@ -9866,12 +9866,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-a
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/ycombinator/elastic-agent-client/v7
-Version: v7.0.0-20230311095229-434c2a952fdb
+Dependency : github.com/elastic/elastic-agent-client/v7
+Version: v7.0.3-0.20230315204017-166fd1fd746f
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/ycombinator/elastic-agent-client/v7@v7.0.0-20230311095229-434c2a952fdb/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.3-0.20230315204017-166fd1fd746f/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
