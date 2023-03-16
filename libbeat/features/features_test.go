@@ -20,12 +20,12 @@ package features
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/stretchr/testify/require"
-
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewConfigFromProto(t *testing.T) {
