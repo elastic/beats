@@ -19,7 +19,7 @@
         "footprint.scope2.location": 1.797,
         "footprint.scope2.market":   null,
         "footprint.scope3":          2.337,
-        "footprint.offsets":         null,
+        "footprint.offsets":         null
       }
     },
     "metricset": {
