@@ -60,9 +60,9 @@ type Scheduler struct {
 }
 
 type Trace struct {
-	Path        string      `config:"path" validate:"required"`
-	Permissions os.FileMode `config:"permissions"`
-	Filter      []string    `config:"filter"`
+	Path        string   `config:"path" validate:"required"`
+	Permissions uint32   `config:"permissions" validate:"required"`
+	Filter      []string `config:"filter"`
 }
 
 // DefaultConfig is the canonical instantiation of Config.

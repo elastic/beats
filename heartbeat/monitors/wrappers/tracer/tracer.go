@@ -80,7 +80,7 @@ func (t *eventTracer) writeF() {
 	}
 }
 
-func NewEventTracer(path string, perms os.FileMode, filter []string) EventTracer {
+func NewEventTracer(path string, perms uint32, filter []string) EventTracer {
 	file := filepath.Base(path)
 	dir, err := filepath.Abs(filepath.Dir(path))
 	if err != nil {
@@ -88,19 +88,19 @@ func NewEventTracer(path string, perms os.FileMode, filter []string) EventTracer
 		return NewNoopTracer()
 	}
 
-	err = os.MkdirAll(dir, perms)
+	err = os.MkdirAll(dir, os.FileMode(perms))
 	if err != nil {
 		logp.L().Error("error creating trace path: %w", err)
 		return NewNoopTracer()
 	}
 
-	w, err := os.OpenFile(filepath.Join(dir, file), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perms)
+	w, err := os.OpenFile(filepath.Join(dir, file), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(perms))
 	if err != nil {
 		logp.L().Error("error opening trace file: %w", err)
 		return NewNoopTracer()
 	}
 
-	logp.L().Infof("trace file open at: %s, filtering for %v", filepath.Join(dir, file), filter)
+	logp.L().Infof("trace file open at: %s, filtering for %v", filepath.Join(dir, file), os.FileMode(perms))
 
 	ctx, cancel := context.WithCancel(context.Background())
 	s := &eventTracer{
