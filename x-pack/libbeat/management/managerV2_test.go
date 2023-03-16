@@ -74,119 +74,118 @@ func TestManagerV2(t *testing.T) {
 		t.Logf("FQDN feature flag set to %v", fqdnEnabled)
 	}
 
-	srv := mockSrv(
-		[][]*proto.UnitExpected{
+	srv := mockSrv([][]*proto.UnitExpected{
+		{
 			{
-				{
-					Id:             "output-unit",
-					Type:           proto.UnitType_OUTPUT,
-					ConfigStateIdx: 1,
-					Config: &proto.UnitExpectedConfig{
-						Id:   "default",
-						Type: "elasticsearch",
-						Name: "elasticsearch",
-					},
-					State:    proto.State_HEALTHY,
-					LogLevel: proto.UnitLogLevel_INFO,
+				Id:             "output-unit",
+				Type:           proto.UnitType_OUTPUT,
+				ConfigStateIdx: 1,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "default",
+					Type: "elasticsearch",
+					Name: "elasticsearch",
 				},
-				{
-					Id:             "input-unit-1",
-					Type:           proto.UnitType_INPUT,
-					ConfigStateIdx: 1,
-					Config: &proto.UnitExpectedConfig{
-						Id:   "system/metrics-system-default-system-1",
-						Type: "system/metrics",
-						Name: "system-1",
-						Streams: []*proto.Stream{
-							{
-								Id: "system/metrics-system.filesystem-default-system-1",
-								Source: requireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
-									"period":     "1m",
-								}),
-							},
+				State:    proto.State_HEALTHY,
+				LogLevel: proto.UnitLogLevel_INFO,
+			},
+			{
+				Id:             "input-unit-1",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "system/metrics-system-default-system-1",
+					Type: "system/metrics",
+					Name: "system-1",
+					Streams: []*proto.Stream{
+						{
+							Id: "system/metrics-system.filesystem-default-system-1",
+							Source: requireNewStruct(t, map[string]interface{}{
+								"metricsets": []interface{}{"filesystem"},
+								"period":     "1m",
+							}),
 						},
 					},
-					State:    proto.State_HEALTHY,
-					LogLevel: proto.UnitLogLevel_INFO,
 				},
-				{
-					Id:             "input-unit-2",
-					Type:           proto.UnitType_INPUT,
-					ConfigStateIdx: 1,
-					Config: &proto.UnitExpectedConfig{
-						Id:   "system/metrics-system-default-system-2",
-						Type: "system/metrics",
-						Name: "system-2",
-						Streams: []*proto.Stream{
-							{
-								Id: "system/metrics-system.filesystem-default-system-2",
-								Source: requireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
-									"period":     "1m",
-								}),
-							},
-							{
-								Id: "system/metrics-system.filesystem-default-system-3",
-								Source: requireNewStruct(t, map[string]interface{}{
-									"metricsets": []interface{}{"filesystem"},
-									"period":     "1m",
-								}),
-							},
+				State:    proto.State_HEALTHY,
+				LogLevel: proto.UnitLogLevel_INFO,
+			},
+			{
+				Id:             "input-unit-2",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "system/metrics-system-default-system-2",
+					Type: "system/metrics",
+					Name: "system-2",
+					Streams: []*proto.Stream{
+						{
+							Id: "system/metrics-system.filesystem-default-system-2",
+							Source: requireNewStruct(t, map[string]interface{}{
+								"metricsets": []interface{}{"filesystem"},
+								"period":     "1m",
+							}),
+						},
+						{
+							Id: "system/metrics-system.filesystem-default-system-3",
+							Source: requireNewStruct(t, map[string]interface{}{
+								"metricsets": []interface{}{"filesystem"},
+								"period":     "1m",
+							}),
 						},
 					},
-					State:    proto.State_HEALTHY,
-					LogLevel: proto.UnitLogLevel_INFO,
 				},
+				State:    proto.State_HEALTHY,
+				LogLevel: proto.UnitLogLevel_INFO,
 			},
-			{
-				{
-					Id:             "output-unit",
-					Type:           proto.UnitType_OUTPUT,
-					ConfigStateIdx: 1,
-					State:          proto.State_HEALTHY,
-					LogLevel:       proto.UnitLogLevel_INFO,
-				},
-				{
-					Id:             "input-unit-1",
-					Type:           proto.UnitType_INPUT,
-					ConfigStateIdx: 1,
-					State:          proto.State_HEALTHY,
-					LogLevel:       proto.UnitLogLevel_DEBUG,
-				},
-				{
-					Id:             "input-unit-2",
-					Type:           proto.UnitType_INPUT,
-					ConfigStateIdx: 1,
-					State:          proto.State_HEALTHY,
-					LogLevel:       proto.UnitLogLevel_INFO,
-				},
-			},
-			{
-				{
-					Id:             "output-unit",
-					Type:           proto.UnitType_OUTPUT,
-					ConfigStateIdx: 1,
-					State:          proto.State_STOPPED,
-					LogLevel:       proto.UnitLogLevel_INFO,
-				},
-				{
-					Id:             "input-unit-1",
-					Type:           proto.UnitType_INPUT,
-					ConfigStateIdx: 1,
-					State:          proto.State_STOPPED,
-					LogLevel:       proto.UnitLogLevel_DEBUG,
-				},
-				{
-					Id:             "input-unit-2",
-					Type:           proto.UnitType_INPUT,
-					ConfigStateIdx: 1,
-					State:          proto.State_STOPPED,
-					LogLevel:       proto.UnitLogLevel_INFO,
-				},
-			},
-			{},
 		},
+		{
+			{
+				Id:             "output-unit",
+				Type:           proto.UnitType_OUTPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_INFO,
+			},
+			{
+				Id:             "input-unit-1",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_DEBUG,
+			},
+			{
+				Id:             "input-unit-2",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_INFO,
+			},
+		},
+		{
+			{
+				Id:             "output-unit",
+				Type:           proto.UnitType_OUTPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_STOPPED,
+				LogLevel:       proto.UnitLogLevel_INFO,
+			},
+			{
+				Id:             "input-unit-1",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_STOPPED,
+				LogLevel:       proto.UnitLogLevel_DEBUG,
+			},
+			{
+				Id:             "input-unit-2",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_STOPPED,
+				LogLevel:       proto.UnitLogLevel_INFO,
+			},
+		},
+		{},
+	},
 		[]uint64{1, 2, 2, 2},
 		[]*proto.Features{
 			nil,
