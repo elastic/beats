@@ -679,7 +679,7 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 		}
 	}
 
-	// combine the two in a somewhat coherent way
+	// combine all of the above in a somewhat coherent way
 	// This isn't perfect, but generating a config that can actually be fed back into the beat
 	// would require
 	beatCfg := struct {
