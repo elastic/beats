@@ -82,8 +82,9 @@ type BeatV2Manager struct {
 	lastInputCfgs map[string]*proto.UnitExpectedConfig
 
 	// used for the debug callback to report as-running config
-	lastBeatOutputCfg *reload.ConfigWithMeta
-	lastBeatInputCfgs []*reload.ConfigWithMeta
+	lastBeatOutputCfg   *reload.ConfigWithMeta
+	lastBeatInputCfgs   []*reload.ConfigWithMeta
+	lastBeatFeaturesCfg *conf.C
 }
 
 // ================================
@@ -459,6 +460,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	var outputUnit *client.Unit
 	var inputUnits []*client.Unit
 	var stoppingUnits []*client.Unit
+	var errs multierror.Errors
 
 	for _, unit := range units {
 		expected := unit.Expected()
@@ -469,7 +471,16 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 		}
 		if expected.Features != nil {
 			// unit is expected to update its feature flags
-			features.UpdateFromProto(expected.Features)
+			featuresCfg, err := features.NewConfigFromProto(expected.Features)
+			if err != nil {
+				errs = append(errs, err)
+			}
+
+			if err := features.UpdateFromConfig(featuresCfg); err != nil {
+				errs = append(errs, err)
+			}
+
+			cm.lastBeatFeaturesCfg = featuresCfg
 		}
 		if expected.State == client.UnitStateStopped {
 			// unit is being stopped
@@ -499,7 +510,6 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	publisher.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
-	var errs multierror.Errors
 	if err := cm.reloadOutput(outputUnit); err != nil {
 		errs = append(errs, err)
 	}
@@ -659,15 +669,27 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 			return nil
 		}
 	}
+
+	// generate features
+	var featuresCfg map[string]interface{}
+	if cm.lastBeatFeaturesCfg != nil {
+		if err := cm.lastBeatFeaturesCfg.Unpack(&featuresCfg); err != nil {
+			cm.logger.Errorf("error unpacking feature flags config for debug callback: %s", err)
+			return nil
+		}
+	}
+
 	// combine the two in a somewhat coherent way
 	// This isn't perfect, but generating a config that can actually be fed back into the beat
 	// would require
 	beatCfg := struct {
-		Inputs  []map[string]interface{}
-		Outputs map[string]interface{}
+		Inputs   []map[string]interface{}
+		Outputs  map[string]interface{}
+		Features map[string]interface{}
 	}{
-		Inputs:  inputList,
-		Outputs: outputCfg,
+		Inputs:   inputList,
+		Outputs:  outputCfg,
+		Features: featuresCfg,
 	}
 
 	data, err := yaml.Marshal(beatCfg)

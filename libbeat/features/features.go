@@ -39,19 +39,30 @@ type fflags struct {
 	fqdnCallbacks map[string]boolValueOnChangeCallback
 }
 
-// UpdateFromProto updates the feature flags configuration. If f is nil UpdateFromProto is no-op.
-func UpdateFromProto(f *proto.Features) {
+// NewConfigFromProto converts the given *proto.Features object to
+// a *config.C object.
+func NewConfigFromProto(f *proto.Features) (*conf.C, error) {
 	if f == nil {
-		return
+		return nil, nil
 	}
 
-	if f.Fqdn == nil {
-		// By default, FQDN reporting is disabled.
-		flags.SetFQDNEnabled(false)
-		return
+	var beatCfg struct {
+		Features *proto.Features `config:"features"`
 	}
 
-	flags.SetFQDNEnabled(f.Fqdn.Enabled)
+	beatCfg.Features = f
+
+	c, err := conf.NewConfigFrom(&beatCfg)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse feature flags message into beat configuration: %w", err)
+	}
+
+	_, err = c.Remove("features.source", -1)
+	if err != nil {
+		return nil, fmt.Errorf("unable to convert feature flags message to beat configuration: %w", err)
+	}
+
+	return c, nil
 }
 
 // UpdateFromConfig updates the feature flags configuration. If c is nil UpdateFromConfig is no-op.
