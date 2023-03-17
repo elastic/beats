@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Metricbeat*
+- Use user level for HAProxy socket {pull}34846[34846]
 
 
 *Packetbeat*
