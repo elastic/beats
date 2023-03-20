@@ -16,8 +16,8 @@ class TestStan(XPackTest):
         "channels",
         "subscriptions",
     ])
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @unittest.skip("tests failing: https://github.com/elastic/beats/issues/34844")
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_metricset(self, metricset):
         """
         stan metricset tests
