@@ -434,11 +434,10 @@ func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader, metricRe
 		case tick := <-t.C:
 			denom := float64(tick.Sub(lastTick)) * float64(receiver.maxMessagesInflight)
 
-			utilizedRate := float64(utilizedNanos) / denom
+			utilizedRate := float64(atomic.SwapInt64(&utilizedNanos, 0)) / denom
 			receiver.metrics.sqsWorkerUtilization.Set(utilizedRate)
 
 			// reset for the next polling duration
-			utilizedNanos = 0
 			lastTick = tick
 		}
 	}
