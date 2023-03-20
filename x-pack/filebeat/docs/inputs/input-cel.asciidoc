@@ -269,6 +269,59 @@ The `cel` input supports the following configuration options plus the
 
 Duration between repeated requests. It may make additional pagination requests in response to the initial request if pagination is enabled. Default: `60s`.
 
+[[program-cel]]
+[float]
+=== `program`
+
+The CEL program that is executed each polling period. This field is required.
+
+[[state-cel]]
+[float]
+==== `state`
+
+`state` is an optional object that is passed to the CEL program on the first execution. It is available to the executing program as the `state` variable. It is made available to subsequent executions of the program during the life of input as the returned value of the previous execution, but with the `state.events` field removed. Except for the `state.cursor` field, `state` does not persist over restarts.
+
+[[cursor-cel]]
+[float]
+==== `state.cursor`
+
+The cursor is an object available as `state.cursor` where arbitrary values may be stored. Cursor state is kept between input restarts and updated after each event of a request has been published. When a cursor is used the CEL program must either create a cursor state for each event that is returned by the program, or a single cursor that reflect the cursor for completion of the full set of events.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Fetch your public IP every minute and note when the last request was made.
+- type: cel
+  interval: 1m
+  resource.url: https://api.ipify.org/?format=json
+  program: |
+    bytes(get(state.url).Body).as(body, {
+        "events": [body.decode_json().with({
+            "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
+                state.cursor.last_requested_at
+            :
+                now
+        })],
+        "cursor": {"last_requested_at": now}
+    })
+----
+
+[[regexp-cel]]
+[float]
+=== `regexp`
+
+A set of named regular expressions that may be used during a CEL program's execution using the `regexp` extension library. The syntax used for the regular expressions is https://github.com/google/re2/wiki/Syntax[RE2].
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  # Define two regular expressions, 'products' and 'solutions' for use during CEL execution.
+  regexp:
+    products: '(?i)(Elasticsearch|Beats|Logstash|Kibana)'
+    solutions: '(?i)(Search|Observability|Security)'
+----
+
 [float]
 ==== `auth.basic.enabled`
 
@@ -537,31 +590,6 @@ Whether to use the host's local time rather that UTC for timestamping rotated lo
 ==== `resource.tracer.compress`
 
 This determines whether rotated logs should be gzip compressed.
-
-[[cursor-cel]]
-[float]
-==== `cursor`
-
-Cursor is an object available as `state.cursor` where arbitrary values may be stored. Cursor state is kept between input restarts and updated after each event of a request has been published. When a cursor is used the CEL program must create a cursor state for each event that is returned by the program.
-
-["source","yaml",subs="attributes"]
-----
-filebeat.inputs:
-# Fetch your public IP every minute and note when the last request was made.
-- type: cel
-  interval: 1m
-  resource.url: https://api.ipify.org/?format=json
-  program: |
-    bytes(get(state.url).Body).as(body, {
-        "events": [body.decode_json().with({
-            "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
-                state.cursor.last_requested_at
-            :
-                now
-        })],
-        "cursor": {"last_requested_at": now}
-    })
-----
 
 [float]
 ==== `redact.fields`
