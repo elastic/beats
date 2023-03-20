@@ -8,6 +8,7 @@
 package pkg
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -81,7 +82,8 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 		packageLicenseOffset,
 		packageSummaryOffset,
 		packageURLOffset,
-		packageTypeOffset flatbuffers.UOffsetT
+		packageTypeOffset,
+		packageErrorOffset flatbuffers.UOffsetT
 	)
 
 	if p.Name != "" {
@@ -107,6 +109,9 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 	}
 	if p.Type != "" {
 		packageTypeOffset = b.CreateString(p.Type)
+	}
+	if p.error != nil {
+		packageErrorOffset = b.CreateString(p.error.Error())
 	}
 
 	schema.PackageStart(b)
@@ -136,6 +141,9 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 	}
 	if packageTypeOffset > 0 {
 		schema.PackageAddType(b, packageTypeOffset)
+	}
+	if packageErrorOffset > 0 {
+		schema.PackageAddError(b, packageErrorOffset)
 	}
 
 	return schema.PackageEnd(b)
@@ -174,6 +182,12 @@ func fbDecodePackage(p *schema.Package) *Package {
 		Summary:     string(p.Summary()),
 		URL:         string(p.Url()),
 		Type:        string(p.Type()),
+		error: func() error {
+			if string(p.Error()) == "" {
+				return nil
+			}
+			return errors.New(string(p.Error()))
+		}(),
 	}
 
 }

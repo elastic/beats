@@ -12,6 +12,7 @@ namespace schema;
 	summary:string;
 	url:string;
 	type:string;
+	error:string;
 }
 
 table PackageContainer {

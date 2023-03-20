@@ -8,6 +8,8 @@
 package pkg
 
 import (
+	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -40,6 +42,19 @@ func testPackage() []*Package {
 			URL:         "http://csv.example.com",
 			Type:        "rpm",
 		},
+		{
+			Name:        "vscode",
+			Version:     "1.5.7",
+			Release:     "2",
+			Arch:        "",
+			License:     "",
+			InstallTime: time.Time{},
+			Size:        0,
+			Summary:     "",
+			URL:         "",
+			Type:        "",
+			error:       errors.New("error unmarshalling JSON in /homebrew/Cellar: invalid JSON"),
+		},
 	}
 }
 
@@ -64,6 +79,51 @@ func TestFBEncodeDecode(t *testing.T) {
 	for i := 0; i < len(p); i++ {
 		assert.Equal(t, p[i], out[i])
 	}
+}
+
+// tests if the bufferPool is being shared in an unintended manner
+func TestPoolPoison(t *testing.T) {
+	p := testPackage()
+	input1 := p[0:2]
+	input2 := p[2:]
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		if i%2 == 0 {
+			go poolPoison(input1, t, &wg)
+		} else {
+			go poolPoison(input2, t, &wg)
+		}
+	}
+	wg.Wait()
+
+}
+
+func poolPoison(p []*Package, t *testing.T, wg *sync.WaitGroup) {
+	for k := 0; k < 1000; k++ {
+		builder, release := fbGetBuilder()
+		defer release()
+		data := encodePackages(builder, p)
+		t.Log("encoded length:", len(data))
+
+		out, err := decodePackagesFromContainer(data)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// since decoded slice is in reversed order
+		for i, j := 0, len(out)-1; i < j; i, j = i+1, j-1 {
+			out[i], out[j] = out[j], out[i]
+		}
+
+		assert.Equal(t, len(p), len(out))
+		for i := 0; i < len(p); i++ {
+			assert.Equal(t, p[i], out[i])
+		}
+	}
+	wg.Done()
 }
 
 func BenchmarkFBEncodePackages(b *testing.B) {
