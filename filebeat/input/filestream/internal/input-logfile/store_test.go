@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//nolint: errcheck // Some errors are not checked on tests/helper functions
+// nolint: errcheck // Some errors are not checked on tests/helper functions
 package input_logfile
 
 import (
@@ -396,7 +396,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	})
 }
 
-//nolint: dupl // Test code won't be refactored on this commit
+// nolint: dupl // Test code won't be refactored on this commit
 func TestSourceStore_CleanIf(t *testing.T) {
 	t.Run("entries are cleaned when function returns true", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
@@ -471,7 +471,7 @@ func closeStoreWith(fn func(s *store)) func() {
 	}
 }
 
-//nolint: unparam // It's a test helper
+// nolint: unparam // It's a test helper
 func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *store {
 	if persistentStore == nil {
 		persistentStore = createSampleStore(t, nil)
@@ -533,7 +533,8 @@ func (ts testStateStore) snapshot() map[string]state {
 // persistent state.
 //
 // Note: The state returned by storeMemorySnapshot is always ahead of the state returned by storeInSyncSnapshot.
-//       All key value pairs are fully in-sync, if both snapshot functions return the same state.
+//
+//	All key value pairs are fully in-sync, if both snapshot functions return the same state.
 func storeMemorySnapshot(store *store) map[string]state {
 	store.ephemeralStore.mu.Lock()
 	defer store.ephemeralStore.mu.Unlock()
@@ -550,7 +551,8 @@ func storeMemorySnapshot(store *store) map[string]state {
 // written to the persistent store already.
 
 // Note: The state returned by storeMemorySnapshot is always ahead of the state returned by storeInSyncSnapshot.
-//       All key value pairs are fully in-sync, if both snapshot functions return the same state.
+//
+//	All key value pairs are fully in-sync, if both snapshot functions return the same state.
 func storeInSyncSnapshot(store *store) map[string]state {
 	store.ephemeralStore.mu.Lock()
 	defer store.ephemeralStore.mu.Unlock()
@@ -566,7 +568,7 @@ func storeInSyncSnapshot(store *store) map[string]state {
 // fails with Errorf if the state differ.
 //
 // Note: testify is too strict when comparing timestamp, better use checkEqualStoreState.
-//nolint: unparam // It's a test helper
+// nolint: unparam // It's a test helper
 func checkEqualStoreState(t *testing.T, want, got map[string]state) bool {
 	t.Helper()
 	if d := cmp.Diff(want, got); d != "" {

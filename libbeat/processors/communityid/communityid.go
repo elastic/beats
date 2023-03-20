@@ -51,13 +51,13 @@ type processor struct {
 // values that are incorporated into the hash vary by protocol.
 //
 // TCP / UDP / SCTP:
-//   IP src / IP dst / IP proto / source port / dest port
+// IP src / IP dst / IP proto / source port / dest port
 //
 // ICMPv4 / ICMPv6:
-//   IP src / IP dst / IP proto / ICMP type + "counter-type" or code
+// IP src / IP dst / IP proto / ICMP type + "counter-type" or code
 //
 // Other IP-borne protocols:
-//   IP src / IP dst / IP proto
+// IP src / IP dst / IP proto
 func New(cfg *cfg.C) (processors.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {

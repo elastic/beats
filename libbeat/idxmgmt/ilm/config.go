@@ -57,7 +57,7 @@ var DefaultPolicy = mapstr.M{
 	},
 }
 
-//Validate verifies that expected config options are given and valid
+// Validate verifies that expected config options are given and valid
 func (cfg *Config) Validate() error {
 	return nil
 }
