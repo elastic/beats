@@ -46,14 +46,13 @@ var gotestHelperMode = os.Getenv(envGoTestHelper) == "1"
 // TestGoTest_CaptureOutput sets the `GOTEST_WANT_HELPER` environment variable when it executes the tests.
 // each test helper must check if it is driven by this function or not:
 //
-//         func TestGoTest_Helper_X(t *testing.T) {
-//           if !gotestHelperMode {
-//             return
-//           }
+//	func TestGoTest_Helper_X(t *testing.T) {
+//	  if !gotestHelperMode {
+//	    return
+//	  }
 //
-//           // sample test
-//         }
-//
+//	  // sample test
+//	}
 func TestGoTest_CaptureOutput(t *testing.T) {
 	errNonZero := "go test returned a non-zero value"
 	makeArgs := func(test string) GoTestArgs {
