@@ -25,6 +25,7 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 * <<http-endpoint>>
 * <<regexp-support>>
 * <<configuration-instrumentation>>
+* <<configuration-feature-flags>>
 * <<{beatname_lc}-reference-yml>>
 
 After changing configuration settings, you need to restart {beatname_uc} to
@@ -63,5 +64,7 @@ include::{libbeat-dir}/http-endpoint.asciidoc[]
 include::{libbeat-dir}/regexp.asciidoc[]
 
 include::{libbeat-dir}/shared-instrumentation.asciidoc[]
+
+include::{libbeat-dir}/shared-feature-flags.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]

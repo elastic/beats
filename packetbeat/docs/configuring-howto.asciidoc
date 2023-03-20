@@ -26,6 +26,7 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 * <<configuration-logging>>
 * <<http-endpoint>>
 * <<configuration-instrumentation>>
+* <<configuration-feature-flags>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -59,5 +60,7 @@ include::{libbeat-dir}/http-endpoint.asciidoc[]
 include::./protocol-metrics-packetbeat.asciidoc[]
 
 include::{libbeat-dir}/shared-instrumentation.asciidoc[]
+
+include::{libbeat-dir}/shared-feature-flags.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]
