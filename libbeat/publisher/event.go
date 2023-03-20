@@ -41,6 +41,10 @@ type Batch interface {
 	// Try sending the events in this list again; all others are acknowledged.
 	RetryEvents(events []Event)
 
+	// Split this batch's events into two smaller batches and retry them both.
+	// Returns false if the batch could not be split.
+	SplitRetry() bool
+
 	// Release the internal pointer to this batch's events but do not yet
 	// acknowledge this batch. This exists specifically for the shipper output,
 	// where there is potentially a long gap between when events are handed off
