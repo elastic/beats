@@ -29,9 +29,8 @@ import (
 // Require registers the path module that provides utilities for working with
 // file and directory paths. It can be accessed using:
 //
-//    // javascript
-//    var path = require('path');
-//
+//	// javascript
+//	var path = require('path');
 func Require(vm *goja.Runtime, module *goja.Object) {
 	setPosix := func(o *goja.Object) *goja.Object {
 		o.Set("basename", path.Base)

@@ -67,6 +67,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
+	"github.com/elastic/elastic-agent-libs/filewatcher"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -76,6 +77,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/report/buffer"
 	"github.com/elastic/elastic-agent-libs/paths"
 	svc "github.com/elastic/elastic-agent-libs/service"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
@@ -96,6 +98,9 @@ type Beat struct {
 	processing processing.Supporter
 
 	InputQueueSize int // Size of the producer queue used by most queues.
+
+	// shouldReexec is a flag to indicate the Beat should restart
+	shouldReexec bool
 }
 
 type beatConfig struct {
@@ -137,6 +142,32 @@ type beatConfig struct {
 	Migration *config.C `config:"migration.6_to_7"`
 	// TimestampPrecision sets the precision of all timestamps in the Beat.
 	TimestampPrecision *config.C `config:"timestamp"`
+}
+
+type certReloadConfig struct {
+	tlscommon.Config `config:",inline" yaml:",inline"`
+	Reload           cfgfile.Reload `config:"restart_on_cert_change" yaml:"restart_on_cert_change"`
+}
+
+func (c certReloadConfig) Validate() error {
+	if c.Reload.Period < time.Second {
+		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
+	}
+
+	if c.Reload.Enabled && runtime.GOOS == "windows" {
+		return errors.New("'restart_on_cert_change' is not supported on Windows")
+	}
+
+	return nil
+}
+
+func defaultCertReloadConfig() certReloadConfig {
+	return certReloadConfig{
+		Reload: cfgfile.Reload{
+			Enabled: false,
+			Period:  time.Minute,
+		},
+	}
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -488,7 +519,19 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Allow the manager to stop a currently running beats out of bound.
 	b.Manager.SetStopCallback(beater.Stop)
 
-	return beater.Run(&b.Beat)
+	err = beater.Run(&b.Beat)
+	if b.shouldReexec {
+		if err := b.reexec(); err != nil {
+			return fmt.Errorf("could not restart %s: %w", b.Info.Beat, err)
+		}
+	}
+
+	return err
+}
+
+// reexec restarts the Beat, it calls the OS-specific implementation.
+func (b *Beat) reexec() error {
+	return b.doReexec()
 }
 
 // registerMetrics registers metrics with the internal monitoring API. This data
@@ -980,9 +1023,104 @@ func (b *Beat) makeOutputFactory(
 	}
 }
 
+func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
+	logger := logp.L().Named("ssl.cert.reloader")
+	// Here the output is created and we have access to the Beat struct (with the manager)
+	// as a workaround we can unpack the new settings and trigger the reload-watcher from here
+
+	// We get an output config, so we extract the 'SSL' bit from it
+	rawTLSCfg, err := cfg.Config().Child("ssl", -1)
+	if err != nil {
+		var e ucfg.Error
+		if errors.As(err, &e) {
+			if errors.Is(e.Reason(), ucfg.ErrMissing) {
+				// if the output configuration does not contain a `ssl` section
+				// do nothing and return no error
+				return nil
+			}
+		}
+		return fmt.Errorf("could not extract the 'ssl' section of the output config: %w", err)
+	}
+
+	extendedTLSCfg := defaultCertReloadConfig()
+	if err := rawTLSCfg.Unpack(&extendedTLSCfg); err != nil {
+		return fmt.Errorf("unpacking 'ssl' config: %w", err)
+	}
+
+	if !extendedTLSCfg.Reload.Enabled {
+		return nil
+	}
+	logger.Debug("exit on CA certs change enabled")
+
+	possibleFilesToWatch := append(
+		extendedTLSCfg.CAs,
+		extendedTLSCfg.Certificate.Certificate,
+		extendedTLSCfg.Certificate.Key,
+	)
+
+	filesToWatch := []string{}
+	for _, f := range possibleFilesToWatch {
+		if f == "" {
+			continue
+		}
+		if tlscommon.IsPEMString(f) {
+			// That's an embedded cert, we're only interested in files
+			continue
+		}
+
+		logger.Debugf("watching '%s' for changes", f)
+		filesToWatch = append(filesToWatch, f)
+	}
+
+	// If there are no files to watch, don't do anything.
+	if len(filesToWatch) == 0 {
+		logger.Debug("no files to watch, filewatcher will not be started")
+		return nil
+	}
+
+	watcher := filewatcher.New(filesToWatch...)
+	// Ignore the first scan as it will always return
+	// true for files changed. The output has not been
+	// started yet, so even if the files have changed since
+	// the Beat started, they don't need to be reloaded
+	_, _, _ = watcher.Scan()
+
+	// Watch for file changes while the Beat is alive
+	go func() {
+		//nolint:staticcheck // this is an endless function
+		ticker := time.Tick(extendedTLSCfg.Reload.Period)
+
+		for {
+			<-ticker
+			files, changed, err := watcher.Scan()
+			if err != nil {
+				logger.Warnf("could not scan certificate files: %s", err.Error())
+			}
+
+			if changed {
+				logger.Infof(
+					"some of the following files have been modified: %v, restarting %s.",
+					files, b.Info.Beat)
+
+				b.shouldReexec = true
+				b.Manager.Stop()
+
+				// we're done, finish the goroutine just for the sake of it
+				return
+			}
+		}
+	}()
+
+	return nil
+}
+
 func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outputs.Group, error) {
 	if !cfg.IsSet() {
 		return outputs.Group{}, nil
+	}
+
+	if err := b.reloadOutputOnCertChange(cfg); err != nil {
+		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
 	}
 
 	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())

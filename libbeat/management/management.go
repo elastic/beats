@@ -60,8 +60,6 @@ var Namespace = "libbeat.management"
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
 
-var centralMgmtKey = "x-pack-cm"
-
 // StatusReporter provides a method to update current status of the beat.
 type StatusReporter interface {
 	// UpdateStatus called when the status of the beat has changed.
@@ -142,40 +140,26 @@ func Factory(cfg *config.C) FactoryFunc {
 	return nilFactory
 }
 
-type modeConfig struct {
-	Mode string `config:"mode" yaml:"mode"`
-}
-
-func defaultModeConfig() *modeConfig {
-	return &modeConfig{
-		Mode: centralMgmtKey,
-	}
-}
-
-// nilManager, fallback when no manager is present
-type nilManager struct {
+// fallbackManager, fallback when no manager is present
+type fallbackManager struct {
 	logger   *logp.Logger
 	lock     sync.Mutex
 	status   Status
 	msg      string
 	stopFunc func()
+	stopOnce sync.Once
 }
 
 func nilFactory(*config.C, *reload.Registry, uuid.UUID) (Manager, error) {
 	log := logp.NewLogger("mgmt")
-	return &nilManager{
+	return &fallbackManager{
 		logger: log,
 		status: Unknown,
 		msg:    "",
 	}, nil
 }
 
-func (*nilManager) SetStopCallback(func())             {}
-func (*nilManager) Enabled() bool                      { return false }
-func (*nilManager) Start() error                       { return nil }
-func (*nilManager) Stop()                              {}
-func (*nilManager) CheckRawConfig(cfg *config.C) error { return nil }
-func (n *nilManager) UpdateStatus(status Status, msg string) {
+func (n *fallbackManager) UpdateStatus(status Status, msg string) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.status != status || n.msg != msg {
@@ -185,8 +169,33 @@ func (n *nilManager) UpdateStatus(status Status, msg string) {
 	}
 }
 
-func (n *nilManager) RegisterAction(action client.Action) {}
+func (n *fallbackManager) SetStopCallback(f func()) {
+	n.lock.Lock()
+	n.stopFunc = f
+	n.lock.Unlock()
+}
 
-func (n *nilManager) UnregisterAction(action client.Action) {}
+func (n *fallbackManager) Stop() {
+	n.lock.Lock()
+	defer n.lock.Unlock()
+	if n.stopFunc != nil {
+		// I'm not sure we really need the sync.Once here, but
+		// because different Beats can have different requirements
+		// for their stup function, it's better to make sure it will
+		// only be called once.
+		n.stopOnce.Do(func() {
+			n.stopFunc()
+		})
+	}
+}
 
-func (n *nilManager) SetPayload(map[string]interface{}) {}
+// Enabled returns false because management is disabled.
+// the nilManager is still used for shutdown on some cases,
+// but that does not mean the Beat is being managed externally,
+// hence it will always return false.
+func (n *fallbackManager) Enabled() bool                         { return false }
+func (n *fallbackManager) Start() error                          { return nil }
+func (n *fallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
+func (n *fallbackManager) RegisterAction(action client.Action)   {}
+func (n *fallbackManager) UnregisterAction(action client.Action) {}
+func (n *fallbackManager) SetPayload(map[string]interface{})     {}

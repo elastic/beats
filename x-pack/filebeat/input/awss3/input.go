@@ -6,13 +6,16 @@ package awss3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/smithy-go"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -24,7 +27,10 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-const inputName = "aws-s3"
+const (
+	inputName                = "aws-s3"
+	sqsAccessDeniedErrorCode = "AccessDeniedException"
+)
 
 func Plugin(store beater.StateStore) v2.Plugin {
 	return v2.Plugin{
@@ -122,6 +128,9 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
 		}
 		defer receiver.metrics.Close()
+
+		// Poll sqs waiting metric periodically in the background.
+		go pollSqsWaitingMetric(ctx, receiver)
 
 		if err := receiver.Receive(ctx); err != nil {
 			return err
@@ -374,6 +383,31 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		}
 	}
 	return "unknown"
+}
+
+func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
+	t := time.NewTicker(time.Minute)
+	defer t.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+			count, err := receiver.GetApproximateMessageCount(ctx)
+
+			var apiError smithy.APIError
+			if errors.As(err, &apiError) {
+				switch apiError.ErrorCode() {
+				case sqsAccessDeniedErrorCode:
+					// stop polling if auth error is encountered
+					receiver.metrics.setSQSMessagesWaiting(int64(count))
+					return
+				}
+			}
+
+			receiver.metrics.setSQSMessagesWaiting(int64(count))
+		}
+	}
 }
 
 // boolPtr returns a pointer to b.

@@ -26,3 +26,8 @@ package eventlog
 func IsRecoverable(err error) bool {
 	return false
 }
+
+// IsChannelNotFound returns true if the error indicates the channel was not found.
+func IsChannelNotFound(err error) bool {
+	return false
+}
