@@ -47,7 +47,7 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 	}
 }
 
-func (r *sqsReader) Receive(ctx context.Context, metricReporterChan chan int64) error {
+func (r *sqsReader) Receive(ctx context.Context) error {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the max message cap as opposed to a simpler loop that receives
 	// N messages, waits for them all to finish, then requests N more messages.
@@ -87,8 +87,8 @@ func (r *sqsReader) Receive(ctx context.Context, metricReporterChan chan int64) 
 					r.metrics.sqsMessagesInflight.Dec()
 					processingTimeNanos := time.Since(start).Nanoseconds()
 					r.metrics.sqsMessageProcessingTime.Update(processingTimeNanos)
-					if metricReporterChan != nil {
-						metricReporterChan <- processingTimeNanos
+					if r.metrics.metricReporterChan != nil {
+						r.metrics.metricReporterChan <- processingTimeNanos
 					}
 					workerWg.Done()
 					r.workerSem.Release(1)
@@ -106,6 +106,8 @@ func (r *sqsReader) Receive(ctx context.Context, metricReporterChan chan int64) 
 
 	// Wait for all workers to finish.
 	workerWg.Wait()
+
+	close(r.metrics.metricReporterChan)
 
 	if errors.Is(ctx.Err(), context.Canceled) {
 		// A canceled context is a normal shutdown.

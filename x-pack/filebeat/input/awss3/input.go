@@ -132,10 +132,9 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 
 		// Poll metrics periodically in the background
 		go pollSqsWaitingMetric(ctx, receiver)
-		metricReporterChan := make(chan int64)
-		go pollSqsUtilizationMetric(ctx, receiver, metricReporterChan)
+		go pollSqsUtilizationMetric(ctx, receiver)
 
-		if err := receiver.Receive(ctx, metricReporterChan); err != nil {
+		if err := receiver.Receive(ctx); err != nil {
 			return err
 		}
 	}
@@ -413,15 +412,15 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 	}
 }
 
-func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader, metricReporterChan chan int64) {
-	defer close(metricReporterChan)
+func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader) {
+	// defer close(metricReporterChan)
 
 	t := time.NewTicker(5 * time.Second)
 	defer t.Stop()
 
 	var utilizedNanos int64
 	go func() {
-		for elem := range metricReporterChan {
+		for elem := range receiver.metrics.metricReporterChan {
 			atomic.AddInt64(&utilizedNanos, elem)
 		}
 	}()
@@ -432,9 +431,9 @@ func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader, metricRe
 		case <-ctx.Done():
 			return
 		case tick := <-t.C:
-			denom := float64(tick.Sub(lastTick)) * float64(receiver.maxMessagesInflight)
+			maxUtilization := float64(tick.Sub(lastTick)) * float64(receiver.maxMessagesInflight)
 
-			utilizedRate := float64(atomic.SwapInt64(&utilizedNanos, 0)) / denom
+			utilizedRate := float64(atomic.SwapInt64(&utilizedNanos, 0)) / maxUtilization
 			receiver.metrics.sqsWorkerUtilization.Set(utilizedRate)
 
 			// reset for the next polling duration

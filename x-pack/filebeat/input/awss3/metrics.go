@@ -15,8 +15,9 @@ import (
 )
 
 type inputMetrics struct {
-	registry   *monitoring.Registry
-	unregister func()
+	registry           *monitoring.Registry
+	unregister         func()
+	metricReporterChan chan int64
 
 	sqsMessagesReceivedTotal            *monitoring.Uint  // Number of SQS messages received (not necessarily processed fully).
 	sqsVisibilityTimeoutExtensionsTotal *monitoring.Uint  // Number of SQS visibility timeout extensions.
@@ -61,6 +62,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 	out := &inputMetrics{
 		registry:                            reg,
 		unregister:                          unreg,
+		metricReporterChan:                  make(chan int64),
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
