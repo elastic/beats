@@ -83,16 +83,16 @@ var (
 // GetAppleSigningInfo returns the signing identities used for code signing
 // apps and installers.
 //
-// Environment Variables
+// # Environment Variables
 //
 // APPLE_SIGNING_ENABLED - Must be set to true to enable signing. Defaults to
-//     false.
+// false.
 //
 // APPLE_SIGNING_IDENTITY_INSTALLER - filter for selecting the signing identity
-//     for installers.
+// for installers.
 //
 // APPLE_SIGNING_IDENTITY_APP - filter for selecting the signing identity
-//     for apps.
+// for apps.
 func GetAppleSigningInfo() (*AppleSigningInfo, error) {
 	appleSigningInfoOnce.Do(func() {
 		appleSigningInfoValue, appleSigningInfoErr = getAppleSigningInfo()

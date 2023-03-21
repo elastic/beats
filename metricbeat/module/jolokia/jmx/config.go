@@ -52,26 +52,28 @@ type Target struct {
 // RequestBlock is used to build the request blocks of the following format:
 //
 // [
-//    {
-//       "type":"read",
-//       "mbean":"java.lang:type=Runtime",
-//       "attribute":[
-//          "Uptime"
-//       ]
-//    },
-//    {
-//       "type":"read",
-//       "mbean":"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
-//       "attribute":[
-//          "CollectionTime",
-//          "CollectionCount"
-//       ],
-//       "target":{
-//          "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
-//          "user":"jolokia",
-//          "password":"s!cr!t"
-//       }
-//    }
+//
+//	{
+//	   "type":"read",
+//	   "mbean":"java.lang:type=Runtime",
+//	   "attribute":[
+//	      "Uptime"
+//	   ]
+//	},
+//	{
+//	   "type":"read",
+//	   "mbean":"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
+//	   "attribute":[
+//	      "CollectionTime",
+//	      "CollectionCount"
+//	   ],
+//	   "target":{
+//	      "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
+//	      "user":"jolokia",
+//	      "password":"s!cr!t"
+//	   }
+//	}
+//
 // ]
 type RequestBlock struct {
 	Type      string                 `json:"type"`
@@ -83,11 +85,11 @@ type RequestBlock struct {
 
 // TargetBlock is used to build the target blocks of the following format into RequestBlock.
 //
-// "target":{
-//    "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
-//    "user":"jolokia",
-//    "password":"s!cr!t"
-// }
+//	"target":{
+//	   "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
+//	   "user":"jolokia",
+//	   "password":"s!cr!t"
+//	}
 type TargetBlock struct {
 	URL      string `json:"url"`
 	User     string `json:"user,omitempty"`
@@ -117,12 +119,12 @@ type MBeanName struct {
 }
 
 // Parse strings with properties with the format key=value, being:
-// - Key a nonempty string of characters which may not contain any of the characters,
-//   comma (,), equals (=), colon, asterisk, or question mark.
-// - Value a string that can be quoted or unquoted, if unquoted it cannot be empty and
-//   cannot contain any of the characters comma, equals, colon, or quote.
-//   If quoted, it can contain any character, including newlines, but quote needs to be
-//   escaped with a backslash.
+//   - Key a nonempty string of characters which may not contain any of the characters,
+//     comma (,), equals (=), colon, asterisk, or question mark.
+//   - Value a string that can be quoted or unquoted, if unquoted it cannot be empty and
+//     cannot contain any of the characters comma, equals, colon, or quote.
+//     If quoted, it can contain any character, including newlines, but quote needs to be
+//     escaped with a backslash.
 var mbeanRegexp = regexp.MustCompile(`([^,=:*?]+)=([^,=:"]+|"([^\\"]|\\.)*?")`)
 
 // This replacer is responsible for adding a "!" before special characters in GET request URIs

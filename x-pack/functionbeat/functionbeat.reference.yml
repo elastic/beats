@@ -1460,3 +1460,10 @@ logging.files:
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: false
 
+# =============================== Feature Flags ================================
+
+# Enable and configure feature flags.
+#features:
+#  fqdn:
+#    enabled: true
+
