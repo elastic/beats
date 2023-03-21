@@ -29,9 +29,7 @@ import (
 var mockEvent = &beat.Event{}
 
 type mockProcessor struct {
-<<<<<<< HEAD
-	runCount   int
-	closeCount int
+	runCount int
 }
 
 func newMockConstructor() (Constructor, *mockProcessor) {
@@ -40,9 +38,6 @@ func newMockConstructor() (Constructor, *mockProcessor) {
 		return &p, nil
 	}
 	return constructor, &p
-=======
-	runCount int
->>>>>>> fe908d5ade (Don't safe-wrap processors that don't have `Close` (#34871))
 }
 
 func (p *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
@@ -66,17 +61,17 @@ func (p *mockCloserProcessor) Close() error {
 
 func newMockCloserConstructor() (Constructor, *mockCloserProcessor) {
 	p := mockCloserProcessor{}
-	constructor := func(config *config.C) (Processor, error) {
+	constructor := func(config *common.Config) (Processor, error) {
 		return &p, nil
 	}
 	return constructor, &p
 }
 
-func mockConstructor(config *config.C) (Processor, error) {
+func mockConstructor(config *common.Config) (Processor, error) {
 	return &mockProcessor{}, nil
 }
 
-func mockCloserConstructor(config *config.C) (Processor, error) {
+func mockCloserConstructor(config *common.Config) (Processor, error) {
 	return &mockCloserProcessor{}, nil
 }
 
