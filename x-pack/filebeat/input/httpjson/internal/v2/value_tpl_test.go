@@ -236,8 +236,8 @@ func TestValueTpl(t *testing.T) {
 				lastResponse: newTestResponse(
 					nil,
 					http.Header{"Link": []string{
-						`<https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK>;title="Page 1";rel="previous",
-						<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>;title="Page 3";rel="next"`,
+						`<https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK>;title="Page 1";rel="previous"`,
+						`<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>;title="Page 3";rel="next"`,
 					}},
 					"",
 				),
