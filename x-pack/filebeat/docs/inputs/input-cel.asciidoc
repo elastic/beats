@@ -271,7 +271,7 @@ Duration between repeated requests. It may make additional pagination requests i
 
 [[program-cel]]
 [float]
-=== `program`
+==== `program`
 
 The CEL program that is executed each polling period. This field is required.
 
@@ -308,7 +308,7 @@ filebeat.inputs:
 
 [[regexp-cel]]
 [float]
-=== `regexp`
+==== `regexp`
 
 A set of named regular expressions that may be used during a CEL program's execution using the `regexp` extension library. The syntax used for the regular expressions is https://github.com/google/re2/wiki/Syntax[RE2].
 
