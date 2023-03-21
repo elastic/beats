@@ -22,7 +22,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
+
 	"github.com/stretchr/testify/require"
 )
 
