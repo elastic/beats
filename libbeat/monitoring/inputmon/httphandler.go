@@ -77,7 +77,7 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		if _, ok = m["id"].(string); !ok {
 			continue
 		}
-		
+
 		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
 			continue
 		}
