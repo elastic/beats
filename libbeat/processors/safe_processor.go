@@ -67,6 +67,12 @@ func SafeWrap(constructor Constructor) Constructor {
 		if err != nil {
 			return nil, err
 		}
+		// if the processor does not implement `Closer`
+		// it does not need a wrap
+		if _, ok := processor.(Closer); !ok {
+			return processor, nil
+		}
+
 		return &SafeProcessor{
 			Processor: processor,
 		}, nil
