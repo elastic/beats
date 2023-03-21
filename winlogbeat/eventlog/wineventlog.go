@@ -664,7 +664,7 @@ func newInputMetrics(name, id string) *inputMetrics {
 	if id == "" {
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry(name, id, nil)
+	reg, unreg := inputmon.NewInputRegistry("winlog", id, nil)
 	out := &inputMetrics{
 		unregister:  unreg,
 		name:        monitoring.NewString(reg, "provider"),
