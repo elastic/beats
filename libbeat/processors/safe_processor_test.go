@@ -29,8 +29,7 @@ import (
 var mockEvent = &beat.Event{}
 
 type mockProcessor struct {
-	runCount   int
-	closeCount int
+	runCount int
 }
 
 func (p *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
