@@ -74,15 +74,11 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		inputType, ok := m["input"].(string)
-		if !ok {
-			continue
-		}
 		if _, ok = m["id"].(string); !ok {
 			continue
 		}
-
-		if requestedType != "" && !strings.EqualFold(inputType, requestedType) {
+		
+		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
 			continue
 		}
 
