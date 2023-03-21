@@ -96,6 +96,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Prevent Elasticsearch from spewing log warnings about redundant wildcard when setting up ingest pipelines. {issue}34249[34249] {pull}34550[34550]
 - Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
 - Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
+- Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
 - Fix errors and panics due to re-used processors {pull}34761[34761]
 - Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
 
@@ -127,6 +128,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
 - Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
+- Fix handling of RFC5988 links' relation parameters by `getRFC5988Link` in HTTPJSON. {issue}34603[34603] {pull}34622[34622]
 
 *Auditbeat*
 
@@ -180,7 +182,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Affecting all Beats*
 
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
-
+- Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
 
 *Auditbeat*
 
@@ -232,6 +234,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add Basic Authentication support on constructed requests to CEL input {issue}34609[34609] {pull}34689[34689]
 - Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
 - Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
+- Improve CEL input documentation {pull}34831[34831]
 
 *Auditbeat*
 
