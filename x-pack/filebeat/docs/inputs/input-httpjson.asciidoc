@@ -608,8 +608,9 @@ does not exist at the root level, please use the clause `.first_response.` to ac
 
 Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request.
 However if `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is 
-because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the
-`first_response` object always stores the very first response in the process chain.
+because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the `first_response` object always stores the very first response in the process chain.
+
+NOTE: The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.  
 
 [float]
 ==== `request.tracer.filename`
@@ -1293,8 +1294,8 @@ This behaviour of targeted fixed pattern replacement in the url helps solve vari
     the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be 
     extrated becomes `"" (an empty string)`, which has no definition within any context variable.
 
-NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching.
-
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+  
 [float]
 ==== `chain[].while`
 
