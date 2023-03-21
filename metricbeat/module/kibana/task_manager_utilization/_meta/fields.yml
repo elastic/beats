@@ -1,0 +1,8 @@
+- name: task_manager_utilization
+  type: group
+  description: >
+    Kibana task manager utilization metrics.
+  release: beta
+  fields:
+    - name: load
+      type: long
