@@ -23,7 +23,6 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/winlogbeat/sys"
@@ -238,7 +237,7 @@ const (
 	EVENTLOG_VERBOSE_LEVEL
 )
 
-// Mapping of event levels to their string representations.
+// EventLevelToString maps event levels to their string representations.
 var EventLevelToString = map[EventLevel]string{
 	EVENTLOG_LOGALWAYS_LEVEL:   "Information",
 	EVENTLOG_INFORMATION_LEVEL: "Information",
@@ -556,7 +555,7 @@ func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, property
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
 	err = _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed in EvtGetPublisherMetadataProperty")
+		return nil, fmt.Errorf("failed in EvtGetPublisherMetadataProperty: %w", err)
 	}
 
 	v, err := pEvtVariant.Data(buf)
@@ -575,20 +574,20 @@ func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, property
 func EvtGetObjectArrayProperty(arrayHandle EvtObjectArrayPropertyHandle, propertyID EvtPublisherMetadataPropertyID, index uint32) (interface{}, error) {
 	var bufferUsed uint32
 	err := _EvtGetObjectArrayProperty(arrayHandle, propertyID, index, 0, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return nil, errors.Wrap(err, "failed in EvtGetObjectArrayProperty, expected ERROR_INSUFFICIENT_BUFFER")
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return nil, fmt.Errorf("failed in EvtGetObjectArrayProperty, expected ERROR_INSUFFICIENT_BUFFER: %w", err)
 	}
 
 	buf := make([]byte, bufferUsed)
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
 	err = _EvtGetObjectArrayProperty(arrayHandle, propertyID, index, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed in EvtGetObjectArrayProperty")
+		return nil, fmt.Errorf("failed in EvtGetObjectArrayProperty: %w", err)
 	}
 
 	value, err := pEvtVariant.Data(buf)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read EVT_VARIANT value")
+		return nil, fmt.Errorf("failed to read EVT_VARIANT value: %w", err)
 	}
 	return value, nil
 }
@@ -618,7 +617,7 @@ func GetEventMetadataProperty(metadataHandle EvtHandle, propertyID EvtEventMetad
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
 	err = _EvtGetEventMetadataProperty(metadataHandle, propertyID, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
 	if err != nil {
-		return nil, errors.Wrap(err, "_EvtGetEventMetadataProperty")
+		return nil, fmt.Errorf("_EvtGetEventMetadataProperty: %w", err)
 	}
 
 	return pEvtVariant.Data(buf)
