@@ -29,7 +29,6 @@ import (
 )
 
 type runnerFactoryMock struct {
-	cfgfile.RunnerFactory
 	clientCount int
 	cfgs        []beat.ClientConfig
 }
@@ -52,6 +51,10 @@ func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cf
 	return &struct {
 		cfgfile.Runner
 	}{}, nil
+}
+
+func (runnerFactoryMock) CheckConfig(config *conf.C) error {
+	return nil
 }
 
 // Assert runs various checks for the clients created by the wrapped pipeline connector
@@ -102,17 +105,22 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 }
 
 type clientMock struct {
-	beat.Client
 	cfg beat.ClientConfig
 }
 
-type pipelineConnectorMock struct {
-	beat.Pipeline
-}
+func (clientMock) Publish(beat.Event)      {}
+func (clientMock) PublishAll([]beat.Event) {}
+func (clientMock) Close() error            { return nil }
 
-func (p *pipelineConnectorMock) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
+type pipelineConnectorMock struct{}
+
+func (pipelineConnectorMock) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	client := &clientMock{
 		cfg: cfg,
 	}
 	return client, nil
+}
+
+func (pipelineConnectorMock) Connect() (beat.Client, error) {
+	return &clientMock{}, nil
 }
