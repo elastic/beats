@@ -32,14 +32,6 @@ type mockProcessor struct {
 	runCount int
 }
 
-func newMockConstructor() (Constructor, *mockProcessor) {
-	p := mockProcessor{}
-	constructor := func(config *common.Config) (Processor, error) {
-		return &p, nil
-	}
-	return constructor, &p
-}
-
 func (p *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	p.runCount++
 	return mockEvent, nil
