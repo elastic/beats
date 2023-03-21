@@ -151,7 +151,7 @@ func checkUnitStateHealthy(units []*proto.UnitObserved) bool {
 	return true
 }
 
-//RequireNewStruct converts a mapstr to a protobuf struct
+// RequireNewStruct converts a mapstr to a protobuf struct
 func RequireNewStruct(v map[string]interface{}) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {
