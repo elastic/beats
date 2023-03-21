@@ -30,13 +30,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
-<<<<<<< HEAD
-=======
+
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
->>>>>>> 3d917c8519 (Add test for the processor re-use issue (#34870))
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -235,7 +231,7 @@ service.type: "module"
 pipeline: "test"
 index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 `
-	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
+	cfg, err := common.NewConfigWithYAML([]byte(configYAML), configYAML)
 	require.NoError(t, err)
 
 	b := beat.Info{} // not important for the test

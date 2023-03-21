@@ -22,8 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-
-	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/stretchr/testify/require"
 )
@@ -33,7 +32,7 @@ type runnerFactoryMock struct {
 	cfgs        []beat.ClientConfig
 }
 
-func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cfgfile.Runner, error) {
+func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *common.Config) (cfgfile.Runner, error) {
 	// When using the connector multiple times to create a client
 	// it's using the same editor function for creating a new client
 	// with a modified configuration that includes predefined processing.
@@ -53,7 +52,7 @@ func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cf
 	}{}, nil
 }
 
-func (runnerFactoryMock) CheckConfig(config *conf.C) error {
+func (runnerFactoryMock) CheckConfig(config *common.Config) error {
 	return nil
 }
 

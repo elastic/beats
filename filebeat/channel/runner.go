@@ -72,31 +72,17 @@ func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *common.Co
 // configuration file settings.
 //
 // Common settings ensured by this factory wrapper:
-<<<<<<< HEAD
 //  - *fields*: common fields to be added to the pipeline
 //  - *fields_under_root*: select at which level to store the fields
 //  - *tags*: add additional tags to the events
 //  - *processors*: list of local processors to be added to the processing pipeline
 //  - *keep_null*: keep or remove 'null' from events to be published
 //  - *_module_name* (hidden setting): Add fields describing the module name
-//  - *_ fileset_name* (hiddrn setting):
+//  - *_ fileset_name* (hidden setting):
 //  - *pipeline*: Configure the ES Ingest Node pipeline name to be used for events from this input
 //  - *index*: Configure the index name for events to be collected from this input
 //  - *type*: implicit event type
 //  - *service.type*: implicit event type
-=======
-//   - *fields*: common fields to be added to the pipeline
-//   - *fields_under_root*: select at which level to store the fields
-//   - *tags*: add additional tags to the events
-//   - *processors*: list of local processors to be added to the processing pipeline
-//   - *keep_null*: keep or remove 'null' from events to be published
-//   - *_module_name* (hidden setting): Add fields describing the module name
-//   - *_ fileset_name* (hidden setting):
-//   - *pipeline*: Configure the ES Ingest Node pipeline name to be used for events from this input
-//   - *index*: Configure the index name for events to be collected from this input
-//   - *type*: implicit event type
-//   - *service.type*: implicit event type
->>>>>>> 3d917c8519 (Add test for the processor re-use issue (#34870))
 func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
 	return wrapRunnerCreate(f,
 		func(
