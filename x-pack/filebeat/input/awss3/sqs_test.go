@@ -23,7 +23,10 @@ import (
 
 const testTimeout = 10 * time.Second
 
-var errFakeConnectivityFailure = errors.New("fake connectivity failure")
+var (
+	errFakeConnectivityFailure = errors.New("fake connectivity failure")
+	errFakeGetAttributeFailute = errors.New("something went wrong")
+)
 
 func TestSQSReceiver(t *testing.T) {
 	err := logp.TestingSetup()
@@ -106,6 +109,65 @@ func TestSQSReceiver(t *testing.T) {
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
 		require.NoError(t, receiver.Receive(ctx))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
+	})
+}
+
+func TestGetApproximateMessageCount(t *testing.T) {
+	err := logp.TestingSetup()
+	assert.Nil(t, err)
+
+	const maxMessages = 5
+	const count = 500
+	attrName := []types.QueueAttributeName{sqsApproximateNumberOfMessages}
+	attr := map[string]string{"ApproximateNumberOfMessages": "500"}
+
+	t.Run("GetApproximateMessageCount success", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockAPI := NewMockSQSAPI(ctrl)
+		mockMsgHandler := NewMockSQSProcessor(ctrl)
+
+		gomock.InOrder(
+			mockAPI.EXPECT().
+				GetQueueAttributes(gomock.Any(), gomock.Eq(attrName)).
+				Times(1).
+				DoAndReturn(func(_ context.Context, _ []types.QueueAttributeName) (map[string]string, error) {
+					return attr, nil
+				}),
+		)
+
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receivedCount, err := receiver.GetApproximateMessageCount(ctx)
+		assert.Equal(t, count, receivedCount)
+		assert.Nil(t, err)
+	})
+
+	t.Run("GetApproximateMessageCount error", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+
+		mockAPI := NewMockSQSAPI(ctrl)
+		mockMsgHandler := NewMockSQSProcessor(ctrl)
+
+		gomock.InOrder(
+			mockAPI.EXPECT().
+				GetQueueAttributes(gomock.Any(), gomock.Eq(attrName)).
+				Times(1).
+				DoAndReturn(func(_ context.Context, _ []types.QueueAttributeName) (map[string]string, error) {
+					return nil, errFakeGetAttributeFailute
+				}),
+		)
+
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receivedCount, err := receiver.GetApproximateMessageCount(ctx)
+		assert.Equal(t, -1, receivedCount)
+		assert.NotNil(t, err)
 	})
 }
 

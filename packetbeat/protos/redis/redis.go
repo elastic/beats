@@ -132,8 +132,6 @@ func (redis *redisPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseRedis exception")
-
 	conn := redis.ensureRedisConnection(private)
 	conn = redis.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {

@@ -240,8 +240,6 @@ func (pgsql *pgsqlPlugin) ConnectionTimeout() time.Duration {
 func (pgsql *pgsqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParsePgsql exception")
-
 	priv := pgsqlPrivateData{}
 	if private != nil {
 		var ok bool
@@ -334,8 +332,6 @@ func messageHasEnoughData(msg *pgsqlMessage) bool {
 func (pgsql *pgsqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInPgsqlStream exception")
-
 	if private == nil {
 		return private, false
 	}

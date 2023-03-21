@@ -241,12 +241,11 @@ winlogbeat.event_logs:
 
 [WARNING]
 =======================================
-If you specify more that 22 event IDs to include or 22 event IDs to exclude,
-Windows will prevent {beatname_uc} from reading the event log because it limits the
-number of conditions that can be used in an event log query. If this occurs a similar
-warning as shown below will be logged by {beatname_uc}, and it will continue
-processing data from other event logs. For more information, see
-https://support.microsoft.com/en-us/kb/970453.
+If you specify more than 22 query conditions (event IDs or event ID ranges), some
+versions of Windows will prevent {beatname_uc} from reading the event log due to
+limits in the query system. If this occurs a similar warning as shown below will
+be logged by {beatname_uc}, and it will continue processing data from other event
+logs.
 
 `WARN EventLog[Application] Open() error. No events will be read from this
 source. The specified query is invalid.`

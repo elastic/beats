@@ -146,8 +146,6 @@ func (cassandra *cassandra) Parse(
 	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("Parse cassandra exception")
-
 	conn := cassandra.ensureConnection(private)
 	st := conn.streams[dir]
 	if st == nil {

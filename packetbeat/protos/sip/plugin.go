@@ -100,7 +100,6 @@ func (p *plugin) GetPorts() []int {
 }
 
 func (p *plugin) ParseUDP(pkt *protos.Packet) {
-	defer logp.Recover("SIP ParseUDP exception")
 	pi := newParsingInfo(pkt, pkt.Tuple.BaseTuple)
 	if _, err := p.doParse(pi); err != nil {
 		logp.Error(err)
@@ -114,8 +113,6 @@ func (p *plugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("SIP Parse exception")
-
 	conn := ensureConnection(private)
 	st := conn.streams[dir]
 	if st == nil {
@@ -207,8 +204,6 @@ func (p *plugin) GapInStream(
 	private protos.ProtocolData,
 ) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(sip) exception")
-
 	conn := getConnection(private)
 	if conn == nil {
 		return private, false

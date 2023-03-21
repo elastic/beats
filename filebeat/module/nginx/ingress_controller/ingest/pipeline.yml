@@ -23,7 +23,7 @@ processors:
         NGINX_HOST: (?:%{IP:destination.ip}|%{NGINX_NOTSEPARATOR:destination.domain})(:%{NUMBER:destination.port})?
         NGINX_NOTSEPARATOR: "[^\t ,:]+"
         NGINX_ADDRESS_LIST: (?:%{IP}|%{WORD})("?,?\s*(?:%{IP}|%{WORD}))*
-        UPSTREAM_ADDRESS_LIST: (?:%{IP}(:%{NUMBER})?)("?,?\s*(?:%{IP}(:%{NUMBER})?))*
+        UPSTREAM_ADDRESS_LIST: (unix:%{NOTSPACE}|(?:%{IP}(:%{NUMBER})?)("?,?\s*(?:%{IP}(:%{NUMBER})?))*)
         UPSTREAM_RESPONSE_LENGTH_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
         UPSTREAM_RESPONSE_TIME_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
         UPSTREAM_RESPONSE_STATUS_CODE_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
@@ -291,10 +291,17 @@ processors:
       field: related.ip
       value: "{{source.ip}}"
       if: "ctx?.source?.ip != null"
+      allow_duplicates: false
   - append:
       field: related.ip
       value: "{{destination.ip}}"
       if: "ctx?.destination?.ip != null"
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: "{{nginx.ingress_controller.upstream.ip}}"
+      if: "ctx?.nginx?.ingress_controller?.upstream?.ip != null"
+      allow_duplicates: false
   - append:
       field: related.user
       value: "{{user.name}}"

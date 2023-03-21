@@ -849,21 +849,16 @@ func dnsToString(dns *mkdns.Msg, logger *logp.Logger) string {
 }
 
 // decodeDnsData decodes a byte array into a DNS struct. If an error occurs
-// then the returned dns pointer will be nil. This method recovers from panics
-// and is concurrency-safe.
+// then the returned dns pointer will be nil. This is concurrency-safe.
 // We do not handle Unpack ErrTruncated for now. See https://github.com/miekg/dns/pull/281
 func decodeDNSData(transp transport, rawData []byte) (dns *mkdns.Msg, err error) {
 	var offset int
 	if transp == transportTCP {
 		offset = decodeOffset
 	}
-
-	// Recover from any panics that occur while parsing a packet.
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("panic: %v", r)
-		}
-	}()
+	if len(rawData) < offset {
+		return nil, nonDNSMsg
+	}
 
 	msg := &mkdns.Msg{}
 	err = msg.Unpack(rawData[offset:])

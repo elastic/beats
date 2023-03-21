@@ -26,3 +26,6 @@ readlink
 rename
 unlink
 wait4
+
+# Reexec
+execve

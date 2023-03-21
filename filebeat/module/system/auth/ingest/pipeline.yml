@@ -17,7 +17,7 @@ processors:
         GREEDYMULTILINE: '(.|\n)*'
         TIMESTAMP: (?:%{TIMESTAMP_ISO8601}|%{SYSLOGTIMESTAMP})
       patterns:
-        - '^%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname}? %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:%{SPACE}+%{GREEDYMULTILINE:_temp.message}$'
+        - '^%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname}? %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:%{SPACE}%{GREEDYMULTILINE:_temp.message}$'
   - grok:
       description: Grok specific auth messages.
       tag: grok-specific-messages

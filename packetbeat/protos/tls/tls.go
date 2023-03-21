@@ -139,8 +139,6 @@ func (plugin *tlsPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseTLS exception")
-
 	conn := ensureTLSConnection(private)
 	if private == nil {
 		conn.startTime = pkt.Ts
