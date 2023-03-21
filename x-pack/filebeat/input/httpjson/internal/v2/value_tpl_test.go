@@ -231,8 +231,8 @@ func TestValueTpl(t *testing.T) {
 			name:  "func getRFC5988Link no space link parameters",
 			value: `[[ getRFC5988Link "next" .last_response.header.Link ]]`,
 			paramCtx: &transformContext{
-				firstEvent: &mapstr.M{},
-				lastEvent:  &mapstr.M{},
+				firstEvent: &common.MapStr{},
+				lastEvent:  &common.MapStr{},
 				lastResponse: newTestResponse(
 					nil,
 					http.Header{"Link": []string{
