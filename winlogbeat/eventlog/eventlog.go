@@ -21,17 +21,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
-=======
-	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
->>>>>>> 34a87e51a5 ([winlog/winlogbeat] Gracefully handle event channel not found errors (#34605))
 )
 
 // Debug selectors used in this package.
@@ -120,25 +113,6 @@ func rename(m common.MapStr, oldKey, newKey string) {
 	if err != nil {
 		return
 	}
-<<<<<<< HEAD
-	m.Put(newKey, v)
-	m.Delete(oldKey)
-}
-
-// incrementMetric increments a value in the specified expvar.Map. The key
-// should be a windows syscall.Errno or a string. Any other types will be
-// reported under the "other" key.
-func incrementMetric(v *expvar.Map, key interface{}) {
-	switch t := key.(type) {
-	default:
-		v.Add("other", 1)
-	case string:
-		v.Add(t, 1)
-	case syscall.Errno:
-		v.Add(strconv.Itoa(int(t)), 1)
-	}
-=======
 	_, _ = m.Put(newKey, v)
 	_ = m.Delete(oldKey)
->>>>>>> 34a87e51a5 ([winlog/winlogbeat] Gracefully handle event channel not found errors (#34605))
 }
