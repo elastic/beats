@@ -180,3 +180,23 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 	o.cond.Broadcast()
 	return o.done
 }
+
+func TestSanitizeMessage(t *testing.T) {
+	msg := "{\"records\":[{'test':\"this is some message\", \n \"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
+		"{\"test\":\"this is '2nd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
+		"{\"test\":\"this is '3rd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"
+	msgs := []string{
+		"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
+		"{\"test\":\"this is '2nd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
+		"{\"test\":\"this is '3rd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
+	}
+
+	input := azureInput{log: logp.NewLogger(fmt.Sprintf("%s test for input", inputName))}
+	input.config.SanitizeMessage = true
+	messages := input.parseMultipleMessages([]byte(msg))
+	assert.NotNil(t, messages)
+	assert.Equal(t, len(messages), 3)
+	for _, ms := range messages {
+		assert.Contains(t, msgs, ms)
+	}
+}
