@@ -117,7 +117,8 @@ type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
 
 // Register a config manager
 func Register(name string, fn PluginFunc, stability feature.Stability) {
-	f := feature.New(Namespace, name, fn, feature.MakeDetails(name, "", stability))
+	f := feature.New(
+		Namespace, name, fn, feature.MakeDetails(name, "", stability))
 	feature.MustRegister(f)
 }
 

@@ -29,16 +29,7 @@ import (
 var mockEvent = &beat.Event{}
 
 type mockProcessor struct {
-	runCount   int
-	closeCount int
-}
-
-func newMockConstructor() (Constructor, *mockProcessor) {
-	p := mockProcessor{}
-	constructor := func(config *config.C) (Processor, error) {
-		return &p, nil
-	}
-	return constructor, &p
+	runCount int
 }
 
 func (p *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
@@ -46,16 +37,56 @@ func (p *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return mockEvent, nil
 }
 
-func (p *mockProcessor) Close() error {
-	p.closeCount++
-	return nil
-}
 func (p *mockProcessor) String() string {
 	return "mock-processor"
 }
 
+type mockCloserProcessor struct {
+	mockProcessor
+	closeCount int
+}
+
+func (p *mockCloserProcessor) Close() error {
+	p.closeCount++
+	return nil
+}
+
+func newMockCloserConstructor() (Constructor, *mockCloserProcessor) {
+	p := mockCloserProcessor{}
+	constructor := func(config *config.C) (Processor, error) {
+		return &p, nil
+	}
+	return constructor, &p
+}
+
+func mockConstructor(config *config.C) (Processor, error) {
+	return &mockProcessor{}, nil
+}
+
+func mockCloserConstructor(config *config.C) (Processor, error) {
+	return &mockCloserProcessor{}, nil
+}
+
+func TestSafeWrap(t *testing.T) {
+	t.Run("does not wrap a non-closer processor", func(t *testing.T) {
+		nonCloser := mockConstructor
+		wrappedNonCloser := SafeWrap(nonCloser)
+		wp, err := wrappedNonCloser(nil)
+		require.NoError(t, err)
+		require.IsType(t, &mockProcessor{}, wp)
+	})
+
+	t.Run("wraps a closer processor", func(t *testing.T) {
+		closer := mockCloserConstructor
+		wrappedCloser := SafeWrap(closer)
+		wcp, err := wrappedCloser(nil)
+		require.NoError(t, err)
+		require.IsType(t, &SafeProcessor{}, wcp)
+	})
+}
+
 func TestSafeProcessor(t *testing.T) {
-	cons, p := newMockConstructor()
+	cons, p := newMockCloserConstructor()
 	var (
 		sp  Processor
 		err error
@@ -67,10 +98,11 @@ func TestSafeProcessor(t *testing.T) {
 	})
 
 	t.Run("propagates Run to a processor", func(t *testing.T) {
+		require.Equal(t, 0, p.runCount)
+
 		e, err := sp.Run(nil)
 		require.NoError(t, err)
 		require.Equal(t, e, mockEvent)
-
 		e, err = sp.Run(nil)
 		require.NoError(t, err)
 		require.Equal(t, e, mockEvent)
@@ -79,9 +111,10 @@ func TestSafeProcessor(t *testing.T) {
 	})
 
 	t.Run("propagates Close to a processor only once", func(t *testing.T) {
+		require.Equal(t, 0, p.closeCount)
+
 		err := Close(sp)
 		require.NoError(t, err)
-
 		err = Close(sp)
 		require.NoError(t, err)
 
@@ -89,9 +122,10 @@ func TestSafeProcessor(t *testing.T) {
 	})
 
 	t.Run("does not propagate Run when closed", func(t *testing.T) {
+		require.Equal(t, 2, p.runCount) // still 2 from the previous test case
 		e, err := sp.Run(nil)
 		require.Nil(t, e)
 		require.ErrorIs(t, err, ErrClosed)
-		require.Equal(t, 2, p.runCount) // still 2 from the previous test case
+		require.Equal(t, 2, p.runCount)
 	})
 }
