@@ -57,7 +57,7 @@ include::{libbeat-dir}/http-endpoint.asciidoc[]
 === Metrics
 
 {beatname_uc} exposes the following additional metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
-These metrics are exposed under the `/dataset` path.
+These metrics are exposed under the `/inputs` path.
 
 [options="header"]
 |=======
