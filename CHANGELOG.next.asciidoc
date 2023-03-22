@@ -236,6 +236,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
 - Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
 - Improve CEL input documentation {pull}34831[34831]
+- Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
 
 *Auditbeat*
 
@@ -272,6 +273,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}33854[33854]
 - Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
 - Allow user to prevent Npcap library installation on Windows. {issue}34420[34420] {pull}34428[34428]
+- Add metrics documentation for TCP and UDP protocols. {issue}34887[34887] {pull}34889[34889]
 
 *Packetbeat*
 
@@ -282,6 +284,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Winlogbeat*
 
 - Add metrics for log event processing. {pull}33922[33922]
+- Add metrics documentation for event processing. {issue}34887[34887] {pull}34889[34889]
 
 *Elastic Log Driver*
 
