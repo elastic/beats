@@ -114,6 +114,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
 with the ecs field name `container`. {pull}34403[34403]
 automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- Fix broken mapping for state.ends field. {pull}34891[34891]
 
 *Heartbeat*
 
