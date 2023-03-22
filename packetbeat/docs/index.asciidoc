@@ -44,6 +44,8 @@ include::{docdir}/howto/howto.asciidoc[]
 
 include::./fields.asciidoc[]
 
+include::./protocol-metrics-packetbeat.asciidoc[]
+
 include::{libbeat-dir}/monitoring/monitoring-beats.asciidoc[]
 
 include::{libbeat-dir}/shared-securing-beat.asciidoc[]

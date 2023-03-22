@@ -42,6 +42,8 @@ include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
 
+include::./metrics-winlogbeat.asciidoc[]
+
 include::{libbeat-dir}/monitoring/monitoring-beats.asciidoc[]
 
 include::{libbeat-dir}/shared-securing-beat.asciidoc[]
