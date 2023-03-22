@@ -65,6 +65,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
+
 - [Auditbeat System Package] Added support for Apple Silicon chips. {pull}34433[34433]
 - [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
    with the ecs field name `container`. {pull}34403[34403]
@@ -99,6 +100,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
 - Fix errors and panics due to re-used processors {pull}34761[34761]
 - Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 
 *Heartbeat*
 
@@ -172,6 +174,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
 - Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
 - Improve documentation for event_logs.name configuration. {pull}[]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 
 *Functionbeat*
 
