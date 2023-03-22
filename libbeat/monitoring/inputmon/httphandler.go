@@ -74,7 +74,7 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		if id, ok = m["id"].(string); !ok || id == "" {
+		if id, ok := m["id"].(string); !ok || id == "" {
 			continue
 		}
 
