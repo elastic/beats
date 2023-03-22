@@ -1,5 +1,5 @@
 [[protocol-metrics-packetbeat]]
-== Protocol-Specific Metrics
+=== Protocol-Specific Metrics
 
 Packetbeat exposes per-protocol metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
 These metrics are exposed under the `/inputs` path. They can be used to

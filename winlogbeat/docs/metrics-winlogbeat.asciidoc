@@ -1,5 +1,5 @@
 [[metrics-winlogbeat]]
-== Event Processing Metrics
+=== Event Processing Metrics
 
 Winlogbeat exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
 These metrics are exposed under the `/inputs` path. They can be used to
