@@ -31,7 +31,7 @@ const (
 	KeySize = 16
 )
 
-//EncryptionReader allows reading from a AES-128-CTR stream
+// EncryptionReader allows reading from a AES-128-CTR stream
 type EncryptionReader struct {
 	src        io.ReadCloser
 	stream     cipher.Stream
@@ -40,7 +40,7 @@ type EncryptionReader struct {
 	ciphertext []byte
 }
 
-//NewEncryptionReader returns a new AES-128-CTR decrypter
+// NewEncryptionReader returns a new AES-128-CTR decrypter
 func NewEncryptionReader(r io.ReadCloser, key []byte) (*EncryptionReader, error) {
 	if len(key) != KeySize {
 		return nil, fmt.Errorf("key must be %d bytes long", KeySize)
@@ -87,7 +87,7 @@ func (er *EncryptionReader) Close() error {
 	return er.src.Close()
 }
 
-//Reset Sets up stream again, assumes that caller has already set the
+// Reset Sets up stream again, assumes that caller has already set the
 // src to the iv
 func (er *EncryptionReader) Reset() error {
 	iv := make([]byte, aes.BlockSize)
@@ -103,14 +103,14 @@ func (er *EncryptionReader) Reset() error {
 	return nil
 }
 
-//EncryptionWriter allows writing to a AES-128-CTR stream
+// EncryptionWriter allows writing to a AES-128-CTR stream
 type EncryptionWriter struct {
 	dst        WriteCloseSyncer
 	stream     cipher.Stream
 	ciphertext []byte
 }
 
-//NewEncryptionWriter returns a new AES-128-CTR stream encryptor
+// NewEncryptionWriter returns a new AES-128-CTR stream encryptor
 func NewEncryptionWriter(w WriteCloseSyncer, key []byte) (*EncryptionWriter, error) {
 	if len(key) != KeySize {
 		return nil, fmt.Errorf("key must be %d bytes long", KeySize)

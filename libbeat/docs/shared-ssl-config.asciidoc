@@ -567,6 +567,28 @@ Allows a remote server to request renegotiation repeatedly.
 +
 The default value is `never`.
 
+[float]
+[[exit_on_cert_change_enabled]]
+==== `restart_on_cert_change.enabled`
+If set to `true` {beatname_uc} will restart if any file listed by `key`,
+`certificate`, or `certificate_authorities` is modified.
+
+NOTE: This feature is NOT supported on Windows. The default value is
+`false`.
+
+NOTE: This feature requres the `execve` system call to be enabled. If
+you have a custom seccomp policy in place, make sure to allow for
+`execve`.
+
+[float]
+[[restart_on_cert_change_period]]
+==== `restart_on_cert_change.period`
+Specifies how often the files are checked for changes. Do not set the
+period to less than 1s because the modification time of files is often
+stored in seconds. Setting the period to less than 1s will result in
+validation error and {beatname_uc} will not start. The default value
+is 1m.
+
 ifeval::["{beatname_lc}" == "filebeat"]
 [float]
 [[server-client-renegotiation]]

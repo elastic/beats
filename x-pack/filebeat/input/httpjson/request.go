@@ -157,6 +157,7 @@ type requestFactory struct {
 	until                  *valueTpl
 	chainHTTPClient        *httpClient
 	chainResponseProcessor *responseProcessor
+	saveFirstResponse      bool
 }
 
 func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]*requestFactory, error) {
@@ -165,12 +166,13 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	// regular call requestFactory object
 	rf := &requestFactory{
-		url:        *config.Request.URL.URL,
-		method:     config.Request.Method,
-		body:       config.Request.Body,
-		transforms: ts,
-		log:        log,
-		encoder:    registeredEncoders[config.Request.EncodeAs],
+		url:               *config.Request.URL.URL,
+		method:            config.Request.Method,
+		body:              config.Request.Body,
+		transforms:        ts,
+		log:               log,
+		encoder:           registeredEncoders[config.Request.EncodeAs],
+		saveFirstResponse: config.Response.SaveFirstResponse,
 	}
 	if config.Auth != nil && config.Auth.Basic.isEnabled() {
 		rf.user = config.Auth.Basic.User
@@ -344,6 +346,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		r.log.Infof("request finished: %d events published", n)
 	}()
 
+	//nolint:bodyclose // response body is closed through drainBody method
 	for i, rf := range r.requestFactories {
 		publishedEventsCountChannel := make(chan int, 1)
 		events := make(chan maybeMsg, 1)
@@ -360,26 +363,26 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				closeChannels(responseChannel, intermediateResponseChannel, initialResponseChannel)
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
-			// store first response in transform context
-			var bodyMap map[string]interface{}
-			body, err := io.ReadAll(httpResp.Body)
-			if err != nil {
-				close(publishedEventsCountChannel)
-				close(events)
-				closeChannels(responseChannel, intermediateResponseChannel, initialResponseChannel)
-				return fmt.Errorf("failed to read http response body: %w", err)
+
+			if rf.saveFirstResponse {
+				// store first response in transform context
+				var bodyMap map[string]interface{}
+				body, err := io.ReadAll(httpResp.Body)
+				if err != nil {
+					return fmt.Errorf("failed to read http response body: %w", err)
+				}
+				httpResp.Body = io.NopCloser(bytes.NewReader(body))
+				err = json.Unmarshal(body, &bodyMap)
+				if err != nil {
+					r.log.Errorf("unable to unmarshal first_response.body: %v", err)
+				}
+				firstResponse := response{
+					url:    *httpResp.Request.URL,
+					header: httpResp.Header.Clone(),
+					body:   bodyMap,
+				}
+				trCtx.updateFirstResponse(firstResponse)
 			}
-			httpResp.Body = io.NopCloser(bytes.NewReader(body))
-			err = json.Unmarshal(body, &bodyMap)
-			if err != nil {
-				r.log.Errorf("unable to unmarshal first_response.body: %v", err)
-			}
-			firstResponse := response{
-				url:    *httpResp.Request.URL,
-				header: httpResp.Header.Clone(),
-				body:   bodyMap,
-			}
-			trCtx.updateFirstResponse(firstResponse)
 
 			if len(r.requestFactories) == 1 {
 				responseChannel <- processResponse{httpResponse: httpResp}
@@ -685,6 +688,8 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 }
 
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
+//
+//nolint:bodyclose // response body is closed through drainBody method
 func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
 	var (
 		n         int

@@ -59,6 +59,7 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 			events = append(events, event)
 		}
 	}
+	original.FreeEntries()
 
 	b := &ttlBatch{
 		done:    original.Done,
@@ -92,6 +93,10 @@ func (b *ttlBatch) Cancelled() {
 func (b *ttlBatch) RetryEvents(events []publisher.Event) {
 	b.events = events
 	b.Retry()
+}
+
+func (b *ttlBatch) FreeEntries() {
+	b.events = nil
 }
 
 // reduceTTL reduces the time to live for all events that have no 'guaranteed'

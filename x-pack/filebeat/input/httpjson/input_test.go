@@ -818,8 +818,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -896,8 +897,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -932,8 +934,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{

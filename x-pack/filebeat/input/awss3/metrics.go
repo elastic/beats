@@ -15,6 +15,7 @@ import (
 )
 
 type inputMetrics struct {
+	registry   *monitoring.Registry
 	unregister func()
 
 	sqsMessagesReceivedTotal            *monitoring.Uint // Number of SQS messages received (not necessarily processed fully).
@@ -22,6 +23,7 @@ type inputMetrics struct {
 	sqsMessagesInflight                 *monitoring.Uint // Number of SQS messages inflight (gauge).
 	sqsMessagesReturnedTotal            *monitoring.Uint // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 	sqsMessagesDeletedTotal             *monitoring.Uint // Number of SQS messages deleted.
+	sqsMessagesWaiting                  *monitoring.Int  // Number of SQS messages waiting in the SQS queue (gauge). The value is refreshed every minute via data from GetQueueAttributes.
 	sqsMessageProcessingTime            metrics.Sample   // Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 	sqsLagTime                          metrics.Sample   // Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 
@@ -40,10 +42,23 @@ func (m *inputMetrics) Close() {
 	m.unregister()
 }
 
+func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
+	if m.sqsMessagesWaiting == nil {
+		// if metric not initialized, and count is -1, do nothing
+		if count == -1 {
+			return
+		}
+		m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
+	}
+
+	m.sqsMessagesWaiting.Set(count)
+}
+
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
 
 	out := &inputMetrics{
+		registry:                            reg,
 		unregister:                          unreg,
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),

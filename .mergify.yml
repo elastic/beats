@@ -81,7 +81,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-        - head~=^update-stack-version
+        - head~=^updatecli_bump-elastic-stack
         - files~=^testing/environments/snapshot.*\.yml$
     actions:
       delete_head_branch:
@@ -92,7 +92,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-        - head~=^update-go-version
+        - head~=^updatecli_bump-golang-version
         - files~=^\.go-version$
     actions:
       delete_head_branch:
