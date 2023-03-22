@@ -18,14 +18,15 @@
 // Package log harvests different inputs for new information. Currently
 // two harvester types exist:
 //
-//   * log
-//   * stdin
+//   - log
 //
-//  The log harvester reads a file line by line. In case the end of a file is found
-//  with an incomplete line, the line pointer stays at the beginning of the incomplete
-//  line. As soon as the line is completed, it is read and returned.
+//   - stdin
 //
-//  The stdin harvesters reads data from stdin.
+//     The log harvester reads a file line by line. In case the end of a file is found
+//     with an incomplete line, the line pointer stays at the beginning of the incomplete
+//     line. As soon as the line is completed, it is read and returned.
+//
+//     The stdin harvesters reads data from stdin.
 package log
 
 import (
@@ -639,12 +640,12 @@ func (h *Harvester) cleanup() {
 //
 // It creates a chain of readers which looks as following:
 //
-//   limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> line -> log_file
+//	limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> line -> log_file
 //
 // Each reader on the left, contains the reader on the right and calls `Next()` to fetch more data.
 // At the base of all readers the the log_file reader. That means in the data is flowing in the opposite direction:
 //
-//   log_file -> line -> encode -> json -> strip_newline -> (timeout -> multiline) -> limit
+//	log_file -> line -> encode -> json -> strip_newline -> (timeout -> multiline) -> limit
 //
 // log_file implements io.Reader interface and encode reader is an adapter for io.Reader to
 // reader.Reader also handling file encodings. All other readers implement reader.Reader

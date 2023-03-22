@@ -36,9 +36,8 @@ var methods = map[string]method{
 
 // ReadPassword allows to read a password passed as a command line parameter.
 // It offers several ways to read the password so it is not directly passed as a plain text argument:
-//   stdin - Will prompt the user to input the password
-//   env:VAR_NAME - Will read the password from the given env variable
-//
+// - stdin - Will prompt the user to input the password
+// - env:VAR_NAME - Will read the password from the given env variable
 func ReadPassword(def string) (string, error) {
 	if len(def) == 0 {
 		return "", errors.New("empty password definition")

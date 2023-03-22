@@ -294,6 +294,32 @@ int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(inde
 			{"next": 3.0},
 		},
 	},
+	{
+		name: "strings_split",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+{
+	"events": state.data.split(":").map(s,
+		{
+			"message": s
+		}
+	)
+}
+`,
+			"state": map[string]interface{}{
+				"data": "first:second:third",
+			},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "first"},
+			{"message": "second"},
+			{"message": "third"},
+		},
+	},
 
 	// FS-based tests.
 	{

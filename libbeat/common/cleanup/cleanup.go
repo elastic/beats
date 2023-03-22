@@ -21,14 +21,14 @@
 // cleanup functions will be executed if `check` is false, no matter if an
 // error has been returned or an panic has occured.
 //
-//     initOK := false
-//     defer cleanup.IfNot(&initOK, func() {
-//       cleanup
-//     })
+//	initOK := false
+//	defer cleanup.IfNot(&initOK, func() {
+//	  cleanup
+//	})
 //
-//     ... // init structures...
+//	... // init structures...
 //
-//     initOK = true // notify handler cleanup code must not be executed
+//	initOK = true // notify handler cleanup code must not be executed
 package cleanup
 
 // If will run the cleanup function if the bool value is true.
