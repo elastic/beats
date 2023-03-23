@@ -42,7 +42,7 @@ import (
 var (
 	errPayloadTooLarge = errors.New("the bulk payload is too large for the server. Consider to adjust `http.max_content_length` parameter in Elasticsearch or `bulk_max_size` in the beat. The batch has been dropped")
 
-	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true.")
+	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance or set output.elasticsearch.allow_older_versions to true")
 )
 
 // Client is an elasticsearch client.
@@ -190,7 +190,21 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 
 	switch {
 	case err == errPayloadTooLarge:
-		batch.Drop()
+		if batch.SplitRetry() {
+			// If we successfully split the batch, we report the events to the
+			// observer as "failed", since this indicates a publish error that
+			// will be retried.
+			client.observer.Failed(len(events))
+		} else {
+			// If the batch could not be split, there is no option left but
+			// to drop it.
+			batch.Drop()
+			client.observer.Dropped(len(events))
+		}
+		// Returning an error from Publish forces a client close / reconnect,
+		// so don't pass this error through since it doesn't indicate anything
+		// wrong with the connection.
+		return nil
 	case len(rest) == 0:
 		batch.ACK()
 	default:
@@ -246,7 +260,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		pubCount,
-		time.Now().Sub(begin))
+		time.Since(begin))
 
 	// check response for transient errors
 	var failedEvents []publisher.Event

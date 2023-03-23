@@ -42,7 +42,9 @@ type Batch interface {
 	RetryEvents(events []Event)
 
 	// Split this batch's events into two smaller batches and retry them both.
-	// Returns false if the batch could not be split.
+	// If SplitRetry returns false, the batch could not be split, and the
+	// caller is responsible for reporting the error (including calling
+	// batch.Drop() if necessary).
 	SplitRetry() bool
 
 	// Release the internal pointer to this batch's events but do not yet

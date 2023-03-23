@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -54,13 +55,11 @@ func (testIndexSelector) Select(event *beat.Event) (string, error) {
 }
 
 type batchMock struct {
-	// we embed the interface so we are able to implement the interface partially,
-	// only functions needed for tests are implemented
-	// if you use a function that is not implemented in the mock it will panic
-	publisher.Batch
 	events      []publisher.Event
 	ack         bool
 	drop        bool
+	canSplit    bool
+	didSplit    bool
 	retryEvents []publisher.Event
 }
 
@@ -73,6 +72,15 @@ func (bm *batchMock) ACK() {
 func (bm *batchMock) Drop() {
 	bm.drop = true
 }
+func (bm *batchMock) Retry()       { panic("unimplemented") }
+func (bm *batchMock) Cancelled()   { panic("unimplemented") }
+func (bm *batchMock) FreeEntries() {}
+func (bm *batchMock) SplitRetry() bool {
+	if bm.canSplit {
+		bm.didSplit = true
+	}
+	return bm.canSplit
+}
 func (bm *batchMock) RetryEvents(events []publisher.Event) {
 	bm.retryEvents = events
 }
@@ -84,7 +92,7 @@ func TestPublishStatusCode(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 	events := []publisher.Event{event}
 
-	t.Run("returns pre-defined error and drops batch when 413", func(t *testing.T) {
+	t.Run("splits large batches on status code 413", func(t *testing.T) {
 		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusRequestEntityTooLarge)
 			w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
@@ -93,6 +101,7 @@ func TestPublishStatusCode(t *testing.T) {
 
 		client, err := NewClient(
 			ClientSettings{
+				Observer: outputs.NewNilObserver(),
 				ConnectionSettings: eslegclient.ConnectionSettings{
 					URL: esMock.URL,
 				},
@@ -104,15 +113,27 @@ func TestPublishStatusCode(t *testing.T) {
 
 		event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 		events := []publisher.Event{event}
-		batch := &batchMock{
-			events: events,
-		}
 
+		// Try publishing a batch that can be split
+		batch := &batchMock{
+			events:   events,
+			canSplit: true,
+		}
 		err = client.Publish(ctx, batch)
 
-		assert.Error(t, err)
-		assert.Equal(t, errPayloadTooLarge, err, "should be a pre-defined error")
-		assert.True(t, batch.drop, "should must be dropped")
+		assert.NoError(t, err, "Publish should split the batch without error")
+		assert.True(t, batch.didSplit, "batch should be split")
+
+		// Try publishing a batch that cannot be split
+		batch = &batchMock{
+			events:   events,
+			canSplit: false,
+		}
+		err = client.Publish(ctx, batch)
+
+		assert.NoError(t, err, "Publish should drop the batch without error")
+		assert.False(t, batch.didSplit, "batch should not be split")
+		assert.True(t, batch.drop, "unsplittable batch should be dropped")
 	})
 
 	t.Run("retries the batch if bad HTTP status", func(t *testing.T) {
@@ -123,6 +144,7 @@ func TestPublishStatusCode(t *testing.T) {
 
 		client, err := NewClient(
 			ClientSettings{
+				Observer: outputs.NewNilObserver(),
 				ConnectionSettings: eslegclient.ConnectionSettings{
 					URL: esMock.URL,
 				},
@@ -147,6 +169,7 @@ func TestPublishStatusCode(t *testing.T) {
 func TestCollectPublishFailsNone(t *testing.T) {
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
 		},
 		nil,
@@ -170,6 +193,7 @@ func TestCollectPublishFailsNone(t *testing.T) {
 func TestCollectPublishFailMiddle(t *testing.T) {
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
 		},
 		nil,
@@ -199,6 +223,7 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "dead_letter_index",
 		},
 		nil,
@@ -257,6 +282,7 @@ func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
 func TestCollectPublishFailDrop(t *testing.T) {
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
 		},
 		nil,
@@ -300,6 +326,7 @@ func TestCollectPublishFailDrop(t *testing.T) {
 func TestCollectPublishFailAll(t *testing.T) {
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
 		},
 		nil,
@@ -328,6 +355,7 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
 		},
 		nil,
@@ -374,6 +402,7 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
 		},
 		nil,
@@ -402,6 +431,7 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
 		},
 		nil,
@@ -431,6 +461,7 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 func BenchmarkCollectPublishFailAll(b *testing.B) {
 	client, err := NewClient(
 		ClientSettings{
+			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
 		},
 		nil,
@@ -479,6 +510,7 @@ func TestClientWithHeaders(t *testing.T) {
 	defer ts.Close()
 
 	client, err := NewClient(ClientSettings{
+		Observer: outputs.NewNilObserver(),
 		ConnectionSettings: eslegclient.ConnectionSettings{
 			URL: ts.URL,
 			Headers: map[string]string{
@@ -555,6 +587,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 
 			client, err := NewClient(
 				ClientSettings{
+					Observer: outputs.NewNilObserver(),
 					Index:    index,
 					Pipeline: pipeline,
 				},
@@ -628,8 +661,9 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		}
 	}
 
-	client, err := NewClient(
+	client, _ := NewClient(
 		ClientSettings{
+			Observer: outputs.NewNilObserver(),
 			Index:    index,
 			Pipeline: pipeline,
 		},
@@ -645,8 +679,8 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		if bulkEventIndex == -1 {
 			continue
 		}
-		caseOpType, _ := cases[i]["op_type"]
-		caseMessage, _ := cases[i]["message"].(string)
+		caseOpType := cases[i]["op_type"]
+		caseMessage := cases[i]["message"].(string)
 		switch bulkItems[bulkEventIndex].(type) {
 		case eslegclient.BulkCreateAction:
 			validOpTypes := []interface{}{e.OpTypeCreate, nil}
@@ -672,6 +706,7 @@ func TestClientWithAPIKey(t *testing.T) {
 	defer ts.Close()
 
 	client, err := NewClient(ClientSettings{
+		Observer: outputs.NewNilObserver(),
 		ConnectionSettings: eslegclient.ConnectionSettings{
 			URL:    ts.URL,
 			APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
