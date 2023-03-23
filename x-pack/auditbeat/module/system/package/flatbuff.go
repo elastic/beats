@@ -171,6 +171,11 @@ func decodePackagesFromContainer(data []byte) ([]*Package, error) {
 // fbDecodePackage decodes flatbuffer package data and copies it into a Package
 // object that is returned.
 func fbDecodePackage(p *schema.Package) *Package {
+	var err error
+	if string(p.Error()) != "" {
+		err = errors.New(string(p.Error()))
+	}
+
 	return &Package{
 		Name:        string(p.Name()),
 		Version:     string(p.Version()),
@@ -182,12 +187,7 @@ func fbDecodePackage(p *schema.Package) *Package {
 		Summary:     string(p.Summary()),
 		URL:         string(p.Url()),
 		Type:        string(p.Type()),
-		error: func() error {
-			if string(p.Error()) == "" {
-				return nil
-			}
-			return errors.New(string(p.Error()))
-		}(),
+		error:       err,
 	}
 
 }

@@ -84,18 +84,13 @@ func TestFBEncodeDecode(t *testing.T) {
 // tests if the bufferPool is being shared in an unintended manner
 func TestPoolPoison(t *testing.T) {
 	p := testPackage()
-	input1 := p[0:2]
-	input2 := p[2:]
+	input := [][]*Package{p[:2], p[2:]}
 
 	var wg sync.WaitGroup
 
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		if i%2 == 0 {
-			go poolPoison(input1, t, &wg)
-		} else {
-			go poolPoison(input2, t, &wg)
-		}
+		go poolPoison(input[i%2], t, &wg)
 	}
 	wg.Wait()
 
