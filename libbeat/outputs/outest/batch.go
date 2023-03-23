@@ -39,6 +39,7 @@ const (
 	BatchACK BatchSignalTag = iota
 	BatchDrop
 	BatchRetry
+	BatchSplitRetry
 	BatchRetryEvents
 	BatchCancelled
 )
@@ -72,7 +73,8 @@ func (b *Batch) RetryEvents(events []publisher.Event) {
 }
 
 func (b *Batch) SplitRetry() bool {
-	return false
+	b.doSignal(BatchSignal{Tag: BatchSplitRetry})
+	return len(b.events) > 1
 }
 
 func (b *Batch) FreeEntries() {}

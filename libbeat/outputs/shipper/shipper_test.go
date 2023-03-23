@@ -143,7 +143,6 @@ func TestToShipperEvent(t *testing.T) {
 }
 
 func TestPublish(t *testing.T) {
-	//logp.DevelopmentSetup()
 	events := []beat.Event{
 		{
 			Timestamp: time.Now(),
@@ -179,9 +178,7 @@ func TestPublish(t *testing.T) {
 			events:        events,
 			marshalMethod: toShipperEvent,
 			expSignals: []outest.BatchSignal{
-				{
-					Tag: outest.BatchACK,
-				},
+				{Tag: outest.BatchACK},
 			},
 			qSize:            3,
 			observerExpected: &TestObserver{batch: 3, acked: 3},
@@ -190,9 +187,7 @@ func TestPublish(t *testing.T) {
 			name:   "retries not accepted events",
 			events: events,
 			expSignals: []outest.BatchSignal{
-				{
-					Tag: outest.BatchACK,
-				},
+				{Tag: outest.BatchACK},
 			},
 			marshalMethod:    failMarshal, // emulate a dropped event
 			qSize:            3,
@@ -202,9 +197,7 @@ func TestPublish(t *testing.T) {
 			name:   "cancels the batch if server error",
 			events: events,
 			expSignals: []outest.BatchSignal{
-				{
-					Tag: outest.BatchCancelled,
-				},
+				{Tag: outest.BatchCancelled},
 			},
 			marshalMethod:    toShipperEvent,
 			qSize:            3,
@@ -213,16 +206,26 @@ func TestPublish(t *testing.T) {
 			expError:         "failed to publish the batch to the shipper, none of the 3 events were accepted",
 		},
 		{
-			name:   "drops the batch on resource exceeded error",
+			name:   "splits the batch on resource exceeded error",
 			events: events,
 			expSignals: []outest.BatchSignal{
-				{
-					Tag: outest.BatchDrop,
-				},
+				{Tag: outest.BatchSplitRetry},
 			},
 			marshalMethod:    toShipperEvent,
 			qSize:            3,
-			observerExpected: &TestObserver{batch: 3, dropped: 3},
+			observerExpected: &TestObserver{batch: 3, failed: 3},
+			serverError:      status.Error(codes.ResourceExhausted, "rpc size limit exceeded"),
+		},
+		{
+			name:   "drops an unsplittable batch on resource exceeded error",
+			events: events[:1], // only 1 event so SplitRetry returns false
+			expSignals: []outest.BatchSignal{
+				{Tag: outest.BatchSplitRetry},
+				{Tag: outest.BatchDrop},
+			},
+			marshalMethod:    toShipperEvent,
+			qSize:            1,
+			observerExpected: &TestObserver{batch: 1, dropped: 1},
 			serverError:      status.Error(codes.ResourceExhausted, "rpc size limit exceeded"),
 		},
 	}
