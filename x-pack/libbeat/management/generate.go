@@ -42,7 +42,8 @@ func (r *TransformRegister) SetTransform(transform func(*proto.UnitExpectedConfi
 }
 
 // Transform sets a transform function callback
-func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
+func (r *TransformRegister) Transform(
+	cfg *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	// If no transform is registered, fallback to a basic setup
 	if r.transformFunc == nil {
 		streamList, err := CreateInputsFromStreams(cfg, "log", agentInfo)
@@ -182,7 +183,7 @@ func injectIndexStream(dataStreamType string, expected *proto.UnitExpectedConfig
 // injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
 // this adds a variety of processors for metadata related to the dataset and input config.
 func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}, defaultProcessors []mapstr.M) (map[string]interface{}, error) {
-	//1. start by "repairing" config to add any missing fields
+	// 1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
 	procInputType, procInputDataset, procInputNamespace := metadataFromDatastreamValues(dataStreamType, expected, streamExpected)
 
@@ -203,7 +204,7 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType s
 		processors = append(processors, inputID)
 	}
 
-	//2. Actually add the processors
+	// 2. Actually add the processors
 	// namespace
 	datastream := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset,
 		"namespace": procInputNamespace, "type": procInputType}, "data_stream")

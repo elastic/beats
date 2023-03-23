@@ -114,6 +114,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
 with the ecs field name `container`. {pull}34403[34403]
 automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- Fix broken mapping for state.ends field. {pull}34891[34891]
 
 *Heartbeat*
 
@@ -128,6 +129,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
 - Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
+- Fix handling of RFC5988 links' relation parameters by `getRFC5988Link` in HTTPJSON. {issue}34603[34603] {pull}34622[34622]
 
 *Auditbeat*
 
@@ -181,7 +183,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Affecting all Beats*
 
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
-
+- Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
 
 *Auditbeat*
 
@@ -234,6 +236,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
 - Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
 - Improve CEL input documentation {pull}34831[34831]
+- Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
 
 *Auditbeat*
 
@@ -270,6 +273,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}33854[33854]
 - Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
 - Allow user to prevent Npcap library installation on Windows. {issue}34420[34420] {pull}34428[34428]
+- Add metrics documentation for TCP and UDP protocols. {issue}34887[34887] {pull}34889[34889]
 
 *Packetbeat*
 
@@ -280,6 +284,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Winlogbeat*
 
 - Add metrics for log event processing. {pull}33922[33922]
+- Add metrics documentation for event processing. {issue}34887[34887] {pull}34889[34889]
 
 *Elastic Log Driver*
 

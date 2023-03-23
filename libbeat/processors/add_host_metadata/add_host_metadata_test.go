@@ -23,6 +23,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/features"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -466,4 +468,41 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 			assert.Equal(t, c.expectedSkip, skip)
 		})
 	}
+}
+
+func TestExpireCacheOnFQDNReportingChange(t *testing.T) {
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+		"cache.ttl": "5m",
+	})
+
+	p, err := New(testConfig)
+	require.NoError(t, err)
+
+	ahmP, ok := p.(*addHostMetadata)
+	require.True(t, ok)
+
+	// Call the expired() method once to prime the cache's
+	// lastUpdated value
+	ahmP.expired()
+
+	// Since we just primed the cache's lastUpdated value, the
+	// cache should no longer be expired.
+	expired := ahmP.expired()
+	require.False(t, expired)
+
+	// Toggle the FQDN feature flag; this should cause the cache
+	// to expire.
+	features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": true,
+	}))
+	expired = ahmP.expired()
+	require.True(t, expired)
+
+	// Set the FQDN feature flag to the same value; this should NOT
+	// cause the cache to expire.
+	features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": true,
+	}))
+	expired = ahmP.expired()
+	require.False(t, expired)
 }

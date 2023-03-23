@@ -52,6 +52,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/kibana"
@@ -81,9 +82,9 @@ import (
 	libversion "github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
-	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -113,7 +114,8 @@ type beatConfig struct {
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
-	Seccomp *config.C `config:"seccomp"`
+	Seccomp  *config.C `config:"seccomp"`
+	Features *config.C `config:"features"`
 
 	// beat internal components configurations
 	HTTP            *config.C              `config:"http"`
@@ -242,6 +244,12 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 		return nil, err
 	}
 
+	h, err := sysinfo.Host()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get host information: %w", err)
+	}
+	fqdn := h.Info().FQDN
+
 	fields, err := asset.GetFields(name)
 	if err != nil {
 		return nil, err
@@ -260,6 +268,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			Version:         v,
 			Name:            hostname,
 			Hostname:        hostname,
+			FQDN:            fqdn,
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
@@ -543,7 +552,6 @@ func (b *Beat) registerMetrics() {
 	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
 	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
 	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
-	monitoring.NewString(infoRegistry, "hostname").Set(b.Info.Hostname)
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
 	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
 	monitoring.NewString(infoRegistry, "binary_arch").Set(runtime.GOARCH)
@@ -576,9 +584,18 @@ func (b *Beat) registerMetrics() {
 	// state.beat
 	beatRegistry := stateRegistry.NewRegistry("beat")
 	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
+}
+
+func (b *Beat) RegisterHostname(useFQDN bool) {
+	hostname := b.Info.FQDNAwareHostname(useFQDN)
+
+	// info.hostname
+	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
+	monitoring.NewString(infoRegistry, "hostname").Set(hostname)
 
 	// state.host
-	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(useFQDN), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -605,9 +622,9 @@ type SetupSettings struct {
 	Dashboard       bool
 	Pipeline        bool
 	IndexManagement bool
-	//Deprecated: use IndexManagementKey instead
+	// Deprecated: use IndexManagementKey instead
 	Template bool
-	//Deprecated: use IndexManagementKey instead
+	// Deprecated: use IndexManagementKey instead
 	ILMPolicy         bool
 	EnableAllFilesets bool
 }
@@ -748,6 +765,11 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
+
+	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
+		return fmt.Errorf("could not parse features: %w", err)
+	}
+	b.RegisterHostname(features.FQDN())
 
 	b.Beat.Config = &b.Config.BeatConfig
 
