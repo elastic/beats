@@ -36,6 +36,8 @@ type sqsReader struct {
 func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
 	if metrics == nil {
 		metrics = newInputMetrics("", monitoring.NewRegistry())
+	} else {
+		metrics.initializeReporterChan()
 	}
 	return &sqsReader{
 		maxMessagesInflight: maxMessagesInflight,
@@ -107,7 +109,9 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 	// Wait for all workers to finish.
 	workerWg.Wait()
 
-	close(r.metrics.metricReporterChan)
+	if r.metrics.metricReporterChan != nil {
+		close(r.metrics.metricReporterChan)
+	}
 
 	if errors.Is(ctx.Err(), context.Canceled) {
 		// A canceled context is a normal shutdown.

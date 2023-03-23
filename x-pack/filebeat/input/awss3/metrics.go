@@ -44,6 +44,10 @@ func (m *inputMetrics) Close() {
 	m.unregister()
 }
 
+func (m *inputMetrics) initializeReporterChan() {
+	m.metricReporterChan = make(chan int64)
+}
+
 func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
 	if m.sqsMessagesWaiting == nil {
 		// if metric not initialized, and count is -1, do nothing
@@ -62,7 +66,6 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 	out := &inputMetrics{
 		registry:                            reg,
 		unregister:                          unreg,
-		metricReporterChan:                  make(chan int64),
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),

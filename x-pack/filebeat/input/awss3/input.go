@@ -413,8 +413,6 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 }
 
 func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader) {
-	// defer close(metricReporterChan)
-
 	t := time.NewTicker(5 * time.Second)
 	defer t.Stop()
 
