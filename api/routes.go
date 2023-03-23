@@ -29,19 +29,20 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type handlerFunc func(http.ResponseWriter, *http.Request)
+// HandlerFunc is an http callback
+type HandlerFunc func(http.ResponseWriter, *http.Request)
 type lookupFunc func(string) *monitoring.Namespace
 
-var handlerFuncMap = make(map[string]handlerFunc)
+var handlerFuncMap = make(map[string]HandlerFunc)
 
 // NewWithDefaultRoutes creates a new server with default API routes.
 func NewWithDefaultRoutes(log *logp.Logger, c *config.C, ns lookupFunc) (*Server, error) {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", makeRootAPIHandler(makeAPIHandler(ns("info"))))
-	mux.HandleFunc("/state", makeAPIHandler(ns("state")))
-	mux.HandleFunc("/stats", makeAPIHandler(ns("stats")))
-	mux.HandleFunc("/dataset", makeAPIHandler(ns("dataset")))
+	mux.HandleFunc("/", MakeRootAPIHandler(MakeAPIHandler(ns("info"))))
+	mux.HandleFunc("/state", MakeAPIHandler(ns("state")))
+	mux.HandleFunc("/stats", MakeAPIHandler(ns("stats")))
+	mux.HandleFunc("/dataset", MakeAPIHandler(ns("dataset")))
 
 	for api, h := range handlerFuncMap {
 		mux.HandleFunc(api, h)
@@ -49,6 +50,7 @@ func NewWithDefaultRoutes(log *logp.Logger, c *config.C, ns lookupFunc) (*Server
 	return New(log, mux, c)
 }
 
+// AttachPprof adds /debug/pprof endpoints to the server
 func (s *Server) AttachPprof() {
 	s.log.Info("Attaching pprof endpoints")
 	s.mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +59,8 @@ func (s *Server) AttachPprof() {
 
 }
 
-func makeRootAPIHandler(handler handlerFunc) handlerFunc {
+// MakeRootAPIHandler creates a HandlerFunc for the root / path
+func MakeRootAPIHandler(handler HandlerFunc) HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
@@ -67,7 +70,8 @@ func makeRootAPIHandler(handler handlerFunc) handlerFunc {
 	}
 }
 
-func makeAPIHandler(ns *monitoring.Namespace) handlerFunc {
+// MakeAPIHandler creates an API handler for the given namespace
+func MakeAPIHandler(ns *monitoring.Namespace) HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -90,8 +94,10 @@ func prettyPrint(w http.ResponseWriter, data mapstr.M, u *url.URL) {
 	}
 }
 
-// AddHandlerFunc provides interface to add customized handlerFunc
-func AddHandlerFunc(api string, h handlerFunc) error {
+// AddHandlerFunc adds a handler to the global handler map.
+// Callbacks should be added before calling NewWithDefaultRoutes()
+// This is NOT threadsafe
+func AddHandlerFunc(api string, h HandlerFunc) error {
 	if _, exist := handlerFuncMap[api]; exist {
 		return fmt.Errorf("%s already exist", api)
 	}

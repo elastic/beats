@@ -39,6 +39,7 @@ const (
 type Server struct {
 	log    *logp.Logger
 	mux    *http.ServeMux
+	srv    *http.Server
 	l      net.Listener
 	config Config
 }
@@ -54,13 +55,18 @@ func New(log *logp.Logger, mux *http.ServeMux, c *config.C) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	srv := &http.Server{ReadHeaderTimeout: cfg.Timeout}
 	l, err := makeListener(cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Server{mux: mux, l: l, config: cfg, log: log.Named("api")}, nil
+	return &Server{mux: mux, srv: srv, l: l, config: cfg, log: log.Named("api")}, nil
+}
+
+// AddRoute adds a route to the server mux
+func (s *Server) AddRoute(path string, handler HandlerFunc) {
+	s.mux.HandleFunc(path, handler)
 }
 
 // Start starts the HTTP server and accepting new connection.
@@ -68,7 +74,8 @@ func (s *Server) Start() {
 	s.log.Info("Starting stats endpoint")
 	go func(l net.Listener) {
 		s.log.Infof("Metrics endpoint listening on: %s (configured: %s)", l.Addr().String(), s.config.Host)
-		err := http.Serve(l, s.mux)
+		s.srv.Handler = s.mux
+		err := s.srv.Serve(l)
 		s.log.Infof("Stats endpoint (%s) finished: %v", l.Addr().String(), err)
 	}(s.l)
 }
