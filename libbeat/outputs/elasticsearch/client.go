@@ -197,9 +197,12 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 			client.observer.Failed(len(events))
 		} else {
 			// If the batch could not be split, there is no option left but
-			// to drop it.
+			// to drop it and log the error state.
 			batch.Drop()
 			client.observer.Dropped(len(events))
+			err := apm.CaptureError(ctx, fmt.Errorf("failed to perform bulk index operation: %w", err))
+			err.Send()
+			client.log.Error(err)
 		}
 		// Returning an error from Publish forces a client close / reconnect,
 		// so don't pass this error through since it doesn't indicate anything
@@ -248,7 +251,9 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 	if sendErr != nil {
 		if status == http.StatusRequestEntityTooLarge {
-			sendErr = errPayloadTooLarge
+			// This error must be handled by splitting the batch, propagate it
+			// back to Publish instead of reporting it directly
+			return data, errPayloadTooLarge
 		}
 		err := apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", sendErr))
 		err.Send()
