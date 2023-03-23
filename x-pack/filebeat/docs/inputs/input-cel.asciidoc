@@ -271,7 +271,7 @@ Duration between repeated requests. It may make additional pagination requests i
 
 [[program-cel]]
 [float]
-=== `program`
+==== `program`
 
 The CEL program that is executed each polling period. This field is required.
 
@@ -308,7 +308,7 @@ filebeat.inputs:
 
 [[regexp-cel]]
 [float]
-=== `regexp`
+==== `regexp`
 
 A set of named regular expressions that may be used during a CEL program's execution using the `regexp` extension library. The syntax used for the regular expressions is https://github.com/google/re2/wiki/Syntax[RE2].
 
@@ -600,6 +600,26 @@ This specifies fields in the `state` to be redacted prior to debug logging. Fiel
 ==== `redact.delete`
 
 This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                    | Description
+| `resource`                | URL or path of the input resource.
+| `cel_executions`          | Number times the CEL program has been executed.
+| `batches_received_total`  | Number of event arrays received.
+| `events_received_total`   | Number of events received.
+| `batches_published_total` | Number of event arrays published.
+| `events_published_total`  | Number of events published.
+| `cel_processing_time`     | Histogram of the elapsed successful CEL program processing times in nanoseconds.
+| `batch_processing_time`   | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
+|=======
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

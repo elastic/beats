@@ -130,6 +130,22 @@ cloudwatchlogs:DescribeLogGroups
 logs:FilterLogEvents
 ----
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                            | Description
+| `log_events_received_total`       | Number of CloudWatch log events received.
+| `log_groups_total`                | Logs collected from number of CloudWatch log groups.
+| `cloudwatch_events_created_total` | Number of events created from processing logs from CloudWatch.
+| `api_calls_total`                 | Number of API calls made total.
+|=======
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
