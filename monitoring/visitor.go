@@ -23,6 +23,7 @@ type Visitor interface {
 	RegistryVisitor
 }
 
+// ValueVisitor is an interface for the monitoring visitor type
 type ValueVisitor interface {
 	OnString(s string)
 	OnBool(b bool)
@@ -31,12 +32,14 @@ type ValueVisitor interface {
 	OnStringSlice(f []string)
 }
 
+// RegistryVisitor is the interface type for interacting with a monitoring registry
 type RegistryVisitor interface {
 	OnRegistryStart()
 	OnRegistryFinished()
 	OnKey(s string)
 }
 
+// ReportNamespace reports a value for a given namespace
 func ReportNamespace(V Visitor, name string, f func()) {
 	V.OnKey(name)
 	V.OnRegistryStart()
@@ -44,31 +47,37 @@ func ReportNamespace(V Visitor, name string, f func()) {
 	V.OnRegistryFinished()
 }
 
+// ReportVar reports an interface var typew for the visitor
 func ReportVar(V Visitor, name string, m Mode, v Var) {
 	V.OnKey(name)
 	v.Visit(m, V)
 }
 
+// ReportString reports a string value for the visitor
 func ReportString(V Visitor, name string, value string) {
 	V.OnKey(name)
 	V.OnString(value)
 }
 
+// ReportBool reports a bool for the visitor
 func ReportBool(V Visitor, name string, value bool) {
 	V.OnKey(name)
-	V.OnString(name)
+	V.OnBool(value)
 }
 
+// ReportInt reports an int type for the visitor
 func ReportInt(V Visitor, name string, value int64) {
 	V.OnKey(name)
 	V.OnInt(value)
 }
 
+// ReportFloat reports a float type for the visitor
 func ReportFloat(V Visitor, name string, value float64) {
 	V.OnKey(name)
 	V.OnFloat(value)
 }
 
+// ReportStringSlice reports a string array for the visitor
 func ReportStringSlice(V Visitor, name string, value []string) {
 	V.OnKey(name)
 	V.OnStringSlice(value)

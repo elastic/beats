@@ -38,6 +38,30 @@ func TestSafeVars(t *testing.T) {
 	require.Equal(t, uint64(5), testSecondUint.Get())
 }
 
+func TestVarsTypes(t *testing.T) {
+	testReg := Default.NewRegistry("test_type_reg")
+
+	expected := map[string]interface{}{
+		"string_key": "string_val",
+		"bool_key":   false,
+		"int_key":    int64(42),
+		"float_key":  42.1,
+		"slice_key":  []string{"test", "string"},
+	}
+
+	NewFunc(testReg, "test", func(m Mode, v Visitor) {
+		ReportString(v, "string_key", "string_val")
+		ReportBool(v, "bool_key", false)
+		ReportInt(v, "int_key", 42)
+		ReportFloat(v, "float_key", 42.1)
+		ReportStringSlice(v, "slice_key", []string{"test", "string"})
+	})
+
+	gotData := CollectStructSnapshot(testReg, Full, false)
+
+	require.Equal(t, expected, gotData)
+}
+
 func TestNilReg(t *testing.T) {
 	uintValName := "testUint"
 	// This can also just panic if there's a bug
