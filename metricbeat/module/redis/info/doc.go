@@ -25,6 +25,5 @@ More details on all the fields provided by the redis info command can be found h
 `info.go` uses the Redis `INFO default` command for stats. This allows us to fetch  all metrics at once and filter out
 undesired metrics based on user configuration on the client. The alternative would be to fetch each type as an
 independent `INFO` call, which has the potential of introducing higher latency (e.g., more round trip Redis calls).
-
 */
 package info

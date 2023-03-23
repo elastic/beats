@@ -37,11 +37,20 @@ func TestManagerV2(t *testing.T) {
 	logLevelSet := false
 	allStopped := false
 	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
-		if currentIdx < 2 {
+		if currentIdx == 1 {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			if oCfg != nil && len(iCfgs) == 3 {
 				configsSet = true
+				t.Logf("output and inputs configuration set")
+			}
+		} else if currentIdx == 2 {
+			oCfg := output.Config()
+			iCfgs := inputs.Configs()
+			if oCfg == nil || len(iCfgs) != 3 {
+				// should not happen (config no longer set)
+				configsSet = false
+				t.Logf("output and inputs configuration cleared (should not happen)")
 			}
 		} else {
 			oCfg := output.Config()
@@ -51,10 +60,12 @@ func TestManagerV2(t *testing.T) {
 			}
 			if len(observed.Units) == 0 {
 				allStopped = true
+				t.Logf("output and inputs configuration cleared (stopping)")
 			}
 		}
 		if logp.GetLevel() == zapcore.DebugLevel {
 			logLevelSet = true
+			t.Logf("debug log level set")
 		}
 	}
 
@@ -169,7 +180,7 @@ func TestManagerV2(t *testing.T) {
 			},
 		},
 		{},
-	}, onObserved)
+	}, onObserved, 500*time.Millisecond)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 
@@ -192,10 +203,10 @@ func TestManagerV2(t *testing.T) {
 
 	require.Eventually(t, func() bool {
 		return configsSet && configsCleared && logLevelSet && allStopped
-	}, 15*time.Second, 100*time.Millisecond)
+	}, 15*time.Second, 300*time.Millisecond)
 }
 
-func mockSrvWithUnits(units [][]*proto.UnitExpected, observedCallback func(*proto.CheckinObserved, int)) *mock.StubServerV2 {
+func mockSrvWithUnits(units [][]*proto.UnitExpected, observedCallback func(*proto.CheckinObserved, int), delay time.Duration) *mock.StubServerV2 {
 	i := 0
 	agentInfo := &proto.CheckinAgentInfo{
 		Id:       "elastic-agent-id",
@@ -214,6 +225,10 @@ func mockSrvWithUnits(units [][]*proto.UnitExpected, observedCallback func(*prot
 					AgentInfo: agentInfo,
 					Units:     units[i],
 				}
+			}
+			// delay sending next expected based on delay
+			if delay > 0 {
+				<-time.After(delay)
 			}
 			// send next set of units
 			i += 1

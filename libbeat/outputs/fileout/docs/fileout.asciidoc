@@ -25,6 +25,13 @@ output.file:
   #rotate_on_startup: true
 ------------------------------------------------------------------------------
 
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
+
 ==== Configuration options
 
 You can specify the following `output.file` options in the +{beatname_lc}.yml+ config file:

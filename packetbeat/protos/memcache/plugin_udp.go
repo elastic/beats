@@ -69,7 +69,7 @@ type udpTransaction struct {
 // to deal with possible thread safety issues
 //
 // Note: only for cleanup. Transaction was published already,
-//       as publishing is thread safe
+// as publishing is thread safe
 type udpExpTransList struct {
 	sync.Mutex
 	head *udpTransaction

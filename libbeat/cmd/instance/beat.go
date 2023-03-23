@@ -28,6 +28,7 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"net"
 	"os"
 	"os/user"
 	"runtime"
@@ -1108,7 +1109,9 @@ func logSystemInfo(info beat.Info) {
 
 	// Host
 	if host, err := sysinfo.Host(); err == nil {
-		log.Infow("Host info", "host", host.Info())
+		hostInfo := host.Info()
+		hostInfo.IPs = sanitizeIPs(hostInfo.IPs)
+		log.Infow("Host info", "host", hostInfo)
 	}
 
 	// Process
@@ -1220,4 +1223,26 @@ func initPaths(cfg *config.C) error {
 		return fmt.Errorf("error setting default paths: %w", err)
 	}
 	return nil
+}
+
+// every IP address received from `Info()` has a netmask suffix
+// which makes every IP address invalid from the validation perspective.
+// If this log entry is ingested to a data stream as it is, the event will be dropped.
+// We must make sure every address is valid and does not have suffixes
+func sanitizeIPs(ips []string) []string {
+	validIPs := make([]string, 0, len(ips))
+	for _, ip := range ips {
+		if ip == "" {
+			continue
+		}
+		trimIndex := strings.LastIndexByte(ip, '/')
+		if trimIndex != -1 {
+			ip = ip[:trimIndex]
+		}
+		if net.ParseIP(ip) == nil {
+			continue
+		}
+		validIPs = append(validIPs, ip)
+	}
+	return validIPs
 }

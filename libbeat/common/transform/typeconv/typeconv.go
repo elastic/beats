@@ -118,11 +118,12 @@ func (c *Converter) Convert(to, from interface{}) (err error) {
 // Go structures can influence the transformation via tags using the `struct` namespace.
 // If the tag is missing, the structs field names are used. Additional options are separates by `,`.
 // options:
-//   `squash`, `inline`: The fields in the child struct/map are assumed to be inlined, without reporting a sub-oject.
-//   `omitempty`: The field is not converted if it is "empty". For example an
-//                empty string, array or `nil` pointers are assumed to be empty. In either case the original value
-//                in `to` will not be overwritten.
-//   `omit`, `-`: Do not convert the field.
+//
+//	`squash`, `inline`: The fields in the child struct/map are assumed to be inlined, without reporting a sub-oject.
+//	`omitempty`: The field is not converted if it is "empty". For example an
+//	             empty string, array or `nil` pointers are assumed to be empty. In either case the original value
+//	             in `to` will not be overwritten.
+//	`omit`, `-`: Do not convert the field.
 func Convert(to, from interface{}) (err error) {
 	c := convPool.Get().(*Converter)
 	defer convPool.Put(c)

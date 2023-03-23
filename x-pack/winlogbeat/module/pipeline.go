@@ -11,6 +11,7 @@ import (
 )
 
 // pipelineFS holds the yml representation of the ingest node pipelines
+//
 //go:embed */ingest/*.yml
 var pipelinesFS embed.FS
 
