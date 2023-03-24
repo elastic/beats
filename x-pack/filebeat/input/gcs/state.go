@@ -104,7 +104,18 @@ func (s *state) updateFailedJobs(jobName string) {
 }
 
 // setCheckpoint, sets checkpoint from source to current state instance
+// If for some reason the current state is empty, assigns new states as
+// a fail safe mechanism
 func (s *state) setCheckpoint(chkpt *Checkpoint) {
+	if chkpt.FailedJobs == nil {
+		chkpt.FailedJobs = make(map[string]int)
+	}
+	if chkpt.IsRootArray == nil {
+		chkpt.IsRootArray = make(map[string]bool)
+	}
+	if chkpt.LastProcessedOffset == nil {
+		chkpt.LastProcessedOffset = make(map[string]int64)
+	}
 	s.cp = chkpt
 }
 
