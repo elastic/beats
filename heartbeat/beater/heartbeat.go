@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	_ "github.com/elastic/beats/v7/heartbeat/security"
+	"github.com/elastic/beats/v7/heartbeat/tracer"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -55,6 +56,7 @@ type Heartbeat struct {
 	monitorFactory     *monitors.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
+	trace              tracer.Tracer
 }
 
 // New creates a new heartbeat.
@@ -72,6 +74,18 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		}
 	} else if b.Manager.Enabled() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
+	}
+
+	var trace tracer.Tracer = tracer.NewNoopTracer()
+	stConfig := parsedConfig.SocketTrace
+	if stConfig != nil {
+		// Note this, intentionally, blocks until connected to the trace endpoint
+		var err error
+		logp.L().Info("Setting up sock tracer")
+		trace, err = tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
+		if err != nil {
+			logp.L().Fatal("could not connect to socket trace at path %s after %s timeout: %s", stConfig.Path, stConfig.Wait, err)
+		}
 	}
 
 	limit := parsedConfig.Scheduler.Limit
@@ -115,12 +129,16 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
 		}),
+		trace: trace,
 	}
 	return bt, nil
 }
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
+	bt.trace.Write("start\n")
+	defer bt.trace.Close()
+
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
 	logp.L().Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
@@ -174,6 +192,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	<-bt.done
 
+	bt.trace.Write("stop")
 	logp.L().Info("Shutting down.")
 	return nil
 }
