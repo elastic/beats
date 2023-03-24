@@ -354,8 +354,7 @@ func (e *inputTestingEnvironment) waitUntilEventCountCtx(ctx context.Context, co
 			msg := msgi.(string)
 			logLines[path] = append(logLines[path], msg)
 		}
-		ll := e.pipeline.GetAllEvents()
-		_ = ll
+
 		e.t.Fatalf("waitUntilEventCountCtx: %v. Want %d events, got %d: %v",
 			ctx.Err(),
 			count,
