@@ -189,7 +189,7 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	rest, err := client.publishEvents(ctx, events)
 
 	switch {
-	case err == errPayloadTooLarge:
+	case errors.Is(err, errPayloadTooLarge):
 		if batch.SplitRetry() {
 			// If we successfully split the batch, we report the events to the
 			// observer as "failed", since this indicates a publish error that
@@ -331,13 +331,13 @@ func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) 
 
 	pipeline, err := client.getPipeline(event)
 	if err != nil {
-		err := fmt.Errorf("failed to select pipeline: %v", err)
+		err := fmt.Errorf("failed to select pipeline: %w", err)
 		return nil, err
 	}
 
 	index, err := client.index.Select(event)
 	if err != nil {
-		err := fmt.Errorf("failed to select event index: %v", err)
+		err := fmt.Errorf("failed to select event index: %w", err)
 		return nil, err
 	}
 
@@ -370,7 +370,7 @@ func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) 
 func (client *Client) getPipeline(event *beat.Event) (string, error) {
 	if event.Meta != nil {
 		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
-		if err == mapstr.ErrKeyNotFound {
+		if errors.Is(err, mapstr.ErrKeyNotFound) {
 			return "", nil
 		}
 		if err != nil {
@@ -436,7 +436,7 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 							dead_letter_marker_field: true,
 						}
 					} else {
-						data[i].Content.Meta.Put(dead_letter_marker_field, true)
+						data[i].Content.Meta[dead_letter_marker_field] = true
 					}
 					data[i].Content.Fields = mapstr.M{
 						"message":       data[i].Content.Fields.String(),

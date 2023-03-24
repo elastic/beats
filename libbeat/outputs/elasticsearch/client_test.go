@@ -95,7 +95,7 @@ func TestPublishStatusCode(t *testing.T) {
 	t.Run("splits large batches on status code 413", func(t *testing.T) {
 		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusRequestEntityTooLarge)
-			w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
+			_, _ = w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
 		}))
 		defer esMock.Close()
 
@@ -351,7 +351,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
+	_ = logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	client, err := NewClient(
 		ClientSettings{
@@ -523,7 +523,8 @@ func TestClientWithHeaders(t *testing.T) {
 	assert.NoError(t, err)
 
 	// simple ping
-	client.Connect()
+	err = client.Connect()
+	assert.NoError(t, err)
 	assert.Equal(t, 1, requestCount)
 
 	// bulk request
@@ -714,6 +715,7 @@ func TestClientWithAPIKey(t *testing.T) {
 	}, nil)
 	assert.NoError(t, err)
 
-	client.Connect()
+	err = client.Connect()
+	assert.NoError(t, err)
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
 }
