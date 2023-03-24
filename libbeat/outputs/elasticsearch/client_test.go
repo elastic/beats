@@ -715,7 +715,10 @@ func TestClientWithAPIKey(t *testing.T) {
 	}, nil)
 	assert.NoError(t, err)
 
-	err = client.Connect()
-	assert.NoError(t, err)
+	// This connection will fail since the server doesn't return a valid
+	// response. This is fine since we're just testing the headers in the
+	// original client request.
+	//nolint:errcheck // connection doesn't need to succeed
+	client.Connect()
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
 }
