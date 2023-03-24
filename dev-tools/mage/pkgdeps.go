@@ -18,7 +18,10 @@
 package mage
 
 import (
+	"bytes"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/magefile/mage/sh"
 )
@@ -117,10 +120,15 @@ func installDependencies(arch string, pkgs ...string) error {
 		}
 	}
 
+	err := fixJessieRepositories()
+	if err != nil {
+		return fmt.Errorf("error while editing the repositories: %w", err)
+	}
+
 	// TODO: This is only for debian 7 and should be removed when move to a newer OS. This flag is
 	// going to be used unnecessary when building using non-debian7 images
 	// (like when making the linux/arm binaries) and we should remove it soonish.
-	// See https://github.com/elastic/beats/v7/issues/11750 for more details.
+	// See https://github.com/elastic/beats/issues/11750 for more details.
 	if err := sh.Run("apt-get", "update", "-o", "Acquire::Check-Valid-Until=false"); err != nil {
 		return err
 	}
@@ -135,6 +143,42 @@ func installDependencies(arch string, pkgs ...string) error {
 	}, pkgs...)
 
 	return sh.Run("apt-get", params...)
+}
+
+// This is a hack to continue using the old Debian Jessie (8) release.
+// The repositories were moved to the archive, so we have to replace sources
+// in order to make `apt` work again.
+func fixJessieRepositories() error {
+	sources := "/etc/apt/sources.list"
+	bts, err := os.ReadFile(sources)
+	if err != nil {
+		return err
+	}
+	if !bytes.Contains(bts, []byte("jessie")) {
+		return nil
+	}
+
+	log.Println("Detected Debian Jessie, need to fix the repository sources...")
+
+	sourcesFile := `deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main
+deb-src http://archive.debian.org/debian jessie-backports main
+deb [check-valid-until=no] http://archive.debian.org/debian jessie main
+deb-src [check-valid-until=no] http://archive.debian.org/debian jessie main
+`
+
+	err = os.WriteFile(sources, []byte(sourcesFile), 0644)
+	if err != nil {
+		return err
+	}
+
+	err = sh.Run("apt-get", "autoremove")
+	if err != nil {
+		return err
+	}
+
+	log.Println("Repository sources have been replaced")
+
+	return nil
 }
 
 func (p PlatformDescription) Packages(names ...string) PackageDependency {
