@@ -8,7 +8,7 @@ RUN go install github.com/go-delve/delve/cmd/dlv@v1.9.0
 
 COPY build/metricbeat-debugger /usr/share/metricbeat/metricbeat-debugger
 
-FROM alpine:3.15
+FROM alpine:3.16
 
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin
 
