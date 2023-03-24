@@ -40,7 +40,7 @@ var (
 )
 
 // GolangCrossBuild builds the Beat binary inside the golang-builder and then
-// checks the binaries GLIBC requirements for RHEL compatability.
+// checks the binaries GLIBC requirements for RHEL compatibility.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	return multierr.Combine(
