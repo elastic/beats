@@ -241,7 +241,7 @@ This options specific which URL path to accept requests on. Defaults to `/`
 [float]
 ==== `prefix`
 
-This option specifies which prefix the incoming request will be mapped to.
+This option specifies which prefix the incoming request will be mapped to. Defaults to `json`
 
 [float]
 ==== `include_headers`
