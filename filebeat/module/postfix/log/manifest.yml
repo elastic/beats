@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/mail.log
+      - /var/log/maillog
+    os.darwin:
+      - /var/log/mail.log
+      - /var/log/maillog
+
+ingest_pipeline: ingest/pipeline.json
+input: config/log.yml

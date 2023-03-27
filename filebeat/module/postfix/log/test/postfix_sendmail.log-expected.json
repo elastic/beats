@@ -1,0 +1,16 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "fatal",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/sendmail[25469]: fatal: root(0): message file too big",
+        "postfix.message": "root(0): message file too big",
+        "process.name": "postfix/sendmail",
+        "service.type": "postfix"
+    }
+]

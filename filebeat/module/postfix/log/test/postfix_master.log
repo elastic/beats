@@ -1,0 +1,3 @@
+Mar 24 13:58:01 5mail-gw01 postfix/master[25469]: daemon started -- version 2.11.0, configuration /etc/postfix
+Mar 24 13:58:01 5mail-gw01 postfix/master[25469]: dterminating on signal 15
+Mar 24 13:58:01 5mail-gw01 postfix/master[25469]: dreload -- version 2.11.0, configuration /etc/postfix

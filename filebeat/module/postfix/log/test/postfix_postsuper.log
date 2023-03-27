@@ -1,0 +1,8 @@
+Mar 24 13:58:01 5mail-gw01 postfix/postsuper[25469]: D4F2023DB: removed
+Mar 24 13:58:01 5mail-gw01 postfix/postsuper[25469]: D4F2023DB: requeued
+Mar 24 13:58:01 5mail-gw01 postfix/postsuper[25469]: D4F2023DB: placed on hold
+Mar 24 13:58:01 5mail-gw01 postfix/postsuper[25469]: D4F2023DB: released from hold
+Mar 24 13:58:01 5mail-gw01 postfix/postsuper[25469]: Deleted: 115 messages
+Mar 24 13:58:01 5mail-gw01 postfix/postsuper[25469]: Requeued: 1 message
+Mar 24 13:58:01 5mail-gw01 postfix/postsuper[25469]: Placed on hold: 67 messages
+Mar 24 13:58:01 5mail-gw01 postfix/postsuper[25469]: Released from hold: 13 messages

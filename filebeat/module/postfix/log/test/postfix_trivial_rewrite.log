@@ -1,0 +1,2 @@
+Mar 24 13:58:01 5mail-gw01 postfix/trivial-rewrite[25469]: warning: virtual_alias_domains lookup failure
+Mar 24 13:58:01 5mail-gw01 postfix/trivial-rewrite[25469]: warning: dict_ldap_lookup: Search error -1: Can't contact LDAP server 

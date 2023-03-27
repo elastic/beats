@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-postfix-log-Dashboard
+  file: Filebeat-postfix-log.json

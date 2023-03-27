@@ -1,0 +1,30 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/trivial-rewrite[25469]: warning: virtual_alias_domains lookup failure",
+        "postfix.message": "virtual_alias_domains lookup failure",
+        "process.name": "postfix/trivial-rewrite",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 105,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/trivial-rewrite[25469]: warning: dict_ldap_lookup: Search error -1: Can't contact LDAP server ",
+        "postfix.message": "dict_ldap_lookup: Search error -1: Can't contact LDAP server ",
+        "process.name": "postfix/trivial-rewrite",
+        "service.type": "postfix"
+    }
+]

@@ -1,0 +1,29 @@
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: cache btree:/var/lib/postfix-in/postscreen_cache full cleanup: retained=242 dropped=7 entries
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: CONNECT from [61.238.241.86]:53024 to [89.105.204.244]:25
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: DISCONNECT [216.81.72.72]:43421
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS OLD [61.238.241.86]:53024
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS OLD [2604:8d00:0:1::3]:52237
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS NEW [2607:f8b0:4003:c01::23a]:36051
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: WHITELISTED [61.238.241.86]:53024
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: BLACKLISTED [61.238.241.86]:53024
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: WHITELIST VETO [61.238.241.86]:53024
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PREGREET 6 after 1.2 from [216.81.72.72]:43421: RSET\r\n
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: DNSBL rank 3 for [111.73.45.149]:1038
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: HANGUP after 63 from [111.73.45.149]:1038 in tests after SMTP handshake
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: HANGUP after 0 from [66.55.85.58]:54017 in tests before SMTP handshake
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after CONNECT
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after HELO
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after EHLO
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after AUTH
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after MAIL
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51796 after RCPT
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND COUNT LIMIT from [182.246.250.243]:51796 after RCPT
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND LENGTH LIMIT from [182.246.250.243]:51796 after RCPT
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NON-SMTP COMMAND from [93.174.93.51]:45284 after CONNECT: GET http://ipv4scan.com/hello/check.txt HTTP/1.1
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: CONNECT from [1.2.3.4]:1337: too many connections
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: CONNECT from [5.6.7.8]:1337: all server ports busy
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND PIPELINING from [88.208.233.4]:42606 after .: \n
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: BARE NEWLINE from [88.208.233.4]:42606 after .
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: RCPT from [182.98.255.184]:2413: 550 5.5.1 Protocol error; from=<lvtowxfdp@yahoo.com>, to=<tom@example.com>, proto=SMTP, helo=<mx32.usaindiamunish.net>
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: RCPT from [27.157.200.233]:4984: 550 5.7.1 Service unavailable; client [27.157.200.233] blocked using zen.spamhaus.org; from=<hcdvbnm@qhhn.com>, to=<4ECEA00F.9040306@example.com>, proto=ESMTP, helo=<qhhn.com>
+Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: warning: getpeername: Transport endpoint is not connected -- dropping this connection

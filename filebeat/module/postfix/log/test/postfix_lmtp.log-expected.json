@@ -1,0 +1,14 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/lmtp[25469]: 7EE668039: to=<admin@example.com>, relay=127.0.0.1[127.0.0.1]:2525, delay=3.6, delays=0.2/0.02/0.04/3.3, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 153053D)",
+        "process.name": "postfix/lmtp",
+        "service.type": "postfix"
+    }
+]

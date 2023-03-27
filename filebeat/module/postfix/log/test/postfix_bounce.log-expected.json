@@ -1,0 +1,44 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:27:43.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Mar 24 13:27:43 fbinfowlbzmr01 postfix/bounce[10884]: 17CCA8044: sender non-delivery notification: ADD2F8052",
+        "postfix.bounce.queueid": "ADD2F8052",
+        "postfix.queueid": "17CCA8044",
+        "process.name": "postfix/bounce",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:27:43.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 109,
+        "message": "Mar 24 13:27:43 fbinfowlbzmr01 postfix/bounce[10884]: 65AFB8B5: sender delivery status notification: 1DF35917",
+        "postfix.bounce.queueid": "1DF35917",
+        "postfix.queueid": "65AFB8B5",
+        "process.name": "postfix/bounce",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:27:43.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 219,
+        "message": "Mar 24 13:27:43 fbinfowlbzmr01 postfix/bounce[10884]: 264FE1A18: sender delay notification: 0A87A1A08",
+        "postfix.bounce.queueid": "0A87A1A08",
+        "postfix.queueid": "264FE1A18",
+        "process.name": "postfix/bounce",
+        "service.type": "postfix"
+    }
+]

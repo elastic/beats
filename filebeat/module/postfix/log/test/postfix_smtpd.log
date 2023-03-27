@@ -1,0 +1,33 @@
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: connect from 061238241086.static.ctinets.com[61.238.241.86]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: disconnect from 061238241086.static.ctinets.com[61.238.241.86]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: 4104E3D: client=061238241086.static.ctinets.com[61.238.241.86]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: RCPT from 061238241086.static.ctinets.com[61.238.241.86]: 550 5.1.1 <toernooicommissie@example.com>: Recipient address rejected: User unknown in virtual mailbox table; from=<wumt5@cchfdc.com> to=<toernooicommissie@example.com> proto=ESMTP helo=<ecsolved.com>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: lost connection after STARTTLS from unknown[72.13.58.7]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: warning: hostname exemple.com does not resolve to address 185.14.29.32
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: timeout after CONNECT from unknown[177.227.18.3]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: RCPT from unknown[2001:980:cfb1:1:82f:f74e:a45c:3033]: 504 5.5.2 <aap@henk>: Sender address rejected: need fully-qualified address; from=<aap@henk> to=<user@example.com> proto=SMTP helo=<test>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: RCPT from news.zihan-promo.com[192.36.205.58]: 554 5.7.1 Service unavailable; Helo command [news.zihan-promo.com] blocked using dbl.spamhaus.org; http://www.spamhaus.org/query/dbl?domain=zihan-promo.com; from=<mark.alexander@zihan-promo.com> to=<tom@example.com> proto=ESMTP helo=<news.zihan-promo.com>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: Anonymous TLS connection established from julie.example.com[10.163.89.202]: TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits)
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: lost connection after DATA (7774180 bytes) from unknown[72.13.58.7]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: lost connection after UNKNOWN from unknown[2001:456:cfb1:1:f5d7:dead:beef:cafe]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: lost connection after RSET from unknown[72.13.58.7]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: timeout after END-OF-MESSAGE from unknown[72.13.58.7]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: improper command pipelining after EHLO from unknown[2001:968:9999:20:415c:cd2:da8e:d0cf]: MAIL FROM:<>\nRCPT TO:<tom@example.net>\nDATA\nSubject: pipeline test\n\nThis is a test\n.\nQUIT\n\r\n
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: lost connection after DATA (0 bytes) from unknown[72.13.58.7]
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: VRFY from unknown[2001:968:9999:20:88b:9b7d:2a54:2bd2]: 454 4.7.1 <aap@henk.com>: Relay access denied; to=<aap@henk.com> proto=SMTP helo=<me>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: VRFY from unknown[2001:968:9999:20:88b:9b7d:2a54:2bd2]: 550 5.1.1 <does-not-exist@example.com>: Recipient address rejected: User unknown in virtual mailbox table; to=<does-not-exist@example.com> proto=SMTP helo=<me>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: SSL_accept error from unknown[72.13.58.7]: lost connection
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: proxy-accept: END-OF-MESSAGE: 250 2.0.0 from MTA(smtp:[127.0.0.1]:10013): 250 2.0.0 Ok: queued as DF66E940333; from=<user1@test.example.com> to=<user2@example2.com> proto=ESMTP helo=<[127.0.0.1]>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: proxy-reject: END-OF-MESSAGE: ; from=<user1@test.example.com> to=<user2@example2.com> proto=ESMTP helo=<[192.168.0.16]>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: proxy-reject: END-OF-MESSAGE: 554 5.7.0 Reject, contact postmaster@example.com, id=31619-02 - spam; from=<> to=<user2@example2.com> proto=SMTP helo=<17.33.12.53>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: SSL_accept error from unknown[72.13.58.7]: Connection timed out
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: SSL_accept error from ssl-tools.net[185.55.116.145]: -1
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: SSL_accept error from eu-smtp-delivery-201.mimecast.com[207.82.80.201]: 0
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: discard: MAIL from ccm231.constantcontact.com[208.75.123.231]: <bsdbdsfbw==_4343_sdfbddw==@in.constantcontact.com>: Sender address SPAM; from=<bsdbdsfbw==_4343_sdfbddw==@in.constantcontact.com> proto=ESMTP helo=<ccm231.constantcontact.com>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: filter: RCPT from unknown[85.25.255.255]: <mail@sender.com>: Sender address triggers FILTER smtp-amavis:[127.0.0.1]:10024; from=<mail@sender.com> to=<user@domain.com> proto=ESMTP helo=<plutoapp.biz>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: disconnect from unknown[72.10.165.66] ehlo=2 starttls=1 mail=1 rcpt=0/1 data=0/1 quit=1 commands=5/7
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: warning: ec2-3-84-57-208.compute-1.amazonaws.com[3.84.57.208]: SASL LOGIN authentication failed: UGFzc3dvcmQ6
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: RCPT from 061238241086.static.ctinets.com[61.238.241.86]: 550 5.12.345 <user@example.com>: Recipient address rejected: Some error message; from=<wumt5@cchfdc.com> to=<user@example.com> proto=ESMTP helo=<ecsolved.com>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject_warning: RCPT from example.com[93.184.216.34]: 553 5.7.1 <sender@example.com>: Sender address rejected: not owned by user ph123; from=<sender@example.com> to=<recipient@example.com> proto=ESMTP helo=<example.com>
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: 5D88A76BDE: client=unknown[81.198.186.4], sasl_method=LOGIN, sasl_username=5mail-gw01@dc
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: 5D88A76BDE: client=unknown[81.198.186.4], sasl_method=PLAIN, sasl_username=5mail-gw01@dc

@@ -1,0 +1,1 @@
+Mar 24 13:58:01 5mail-gw01 postfix/discard[25469]: 25F2E5E061: to=<george.desantis@test.example.com>, relay=none, delay=0.05, delays=0.05/0/0/0, dsn=2.0.0, status=sent (test.example.com)

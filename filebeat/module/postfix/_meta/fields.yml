@@ -1,0 +1,466 @@
+- key: postfix
+  title: "postfix"
+  description: >
+    postfix Module
+  fields:
+    - name: postfix
+      type: group
+      description: >
+      fields:
+        - name: full_message
+          description: please add description
+          example: please add example
+          type: text
+        - name: message
+          description: please add description
+          example: please add example
+          type: text
+        - name: anvil
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: conn_count
+              description: please add description
+              example: please add example
+              type: integer
+            - name: conn_rate
+              description: please add description
+              example: please add example
+              type: integer
+            - name: conn_period
+              description: please add description
+              example: please add example
+              type: keyword
+            - name: timestamp
+              description: please add description
+              example: please add example
+              type: text
+            - name: cache_size
+              description: please add description
+              example: please add example
+              type: integer
+        - name: bounce
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: queueid
+              description: please add description
+              example: please add example
+              type: keyword
+        - name: cmd
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: auth
+              description: please add description
+              example: please add example
+              type: integer
+            - name: auth_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: count
+              description: please add description
+              example: please add example
+              type: integer
+            - name: count_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: data
+              description: please add description
+              example: please add example
+              type: integer
+            - name: data_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: ehlo
+              description: please add description
+              example: please add example
+              type: integer
+            - name: ehlo_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: helo
+              description: please add description
+              example: please add example
+              type: integer
+            - name: helo_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: mail
+              description: please add description
+              example: please add example
+              type: integer
+            - name: mail_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: quit
+              description: please add description
+              example: please add example
+              type: integer
+            - name: quit_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: rcpt
+              description: please add description
+              example: please add example
+              type: integer
+            - name: rcpt_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: rset
+              description: please add description
+              example: please add example
+              type: integer
+            - name: rset_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: starttls
+              description: please add description
+              example: please add example
+              type: integer
+            - name: starttls_accepted
+              description: please add description
+              example: please add example
+              type: integer
+            - name: unknown
+              description: please add description
+              example: please add example
+              type: integer
+            - name: unknown_accepted
+              description: please add description
+              example: please add example
+              type: integer
+        - name: service
+          description: please add description
+          example: please add example
+          type: keyword
+        - name: queueid
+          description: please add description
+          example: please add example
+          type: text
+        - name: milter
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: message
+              description: please add description
+              example: please add example
+              type: text
+            - name: data
+              description: please add description
+              example: please add example
+              type: text
+            - name: result
+              description: please add description
+              example: please add example
+              type: text
+        - name: dnsbl
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: domain
+              description: please add description
+              example: please add example
+              type: text
+            - name: result
+              description: please add description
+              example: please add example
+              type: text
+        - name: prepend
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: type
+              description: please add description
+              example: please add example
+              type: text
+            - name: trigger
+              description: please add description
+              example: please add example
+              type: text
+            - name: value
+              description: please add description
+              example: please add example
+              type: text
+        - name: error_response
+          description: please add description
+          example: please add example
+          type: text
+        - name: status
+          description: please add description
+          example: please add example
+          type: text
+        - name: message-id
+          description: please add description
+          example: please add example
+          type: text
+        - name: config_path
+          description: please add description
+          example: please add example
+          type: text
+        - name: termination_signal
+          description: please add description
+          example: please add example
+          type: integer
+        - name: version
+          description: please add description
+          example: please add example
+          type: text
+        - name: pipe_response
+          description: please add description
+          example: please add example
+          type: text
+        - name: status_data
+          description: please add description
+          example: please add example
+          type: text
+        - name: status_message
+          description: please add description
+          example: please add example
+          type: text
+        - name: status_code
+          description: please add description
+          example: please add example
+          type: integer
+        - name: status_code_enhanced
+          description: please add description
+          example: please add example
+          type: text
+        - name: postscreen
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: access
+              description: please add description
+              example: please add example
+              type: text
+            - name: toobusy_data
+              description: please add description
+              example: please add example
+              type: text
+            - name: violation
+              description: please add description
+              example: please add example
+              type: text
+            - name: violation_time
+              description: please add description
+              example: please add example
+              type: float
+            - name: cache_dropped
+              description: please add description
+              example: please add example
+              type: integer
+            - name: cache_retained
+              description: please add description
+              example: please add example
+              type: integer
+            - name: dnsbl_rank
+              description: please add description
+              example: please add example
+              type: integer
+            - name: data
+              description: please add description
+              example: please add example
+              type: text
+        - name: smtp_stage
+          description: please add description
+          example: please add example
+          type: text
+        - name: action
+          description: please add description
+          example: please add example
+          type: text
+        - name: var 
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: to
+              description: email.to.address
+              example: please add example
+              type: text
+            - name: delay
+              description: please add description
+              example: please add example
+              type: float
+            - name: sasl_method
+              description: please add description
+              example: please add example
+              type: keyword
+            - name: from
+              description: please add description
+              example: please add example
+              type: text
+            - name: nrcpt 
+              description: please add description
+              example: please add example
+              type: integer
+            - name: orig_to
+              description: please add description
+              example: please add example
+              type: text
+            - name: dsn
+              description: please add description
+              example: please add example
+              type: text
+            - name: helo
+              description: please add description
+              example: please add example
+              type: text
+            - name: uid
+              description: please add description
+              example: please add example
+              type: text
+            - name: size
+              description: please add description
+              example: please add example
+              type: integer
+            - name: proto
+              description: please add description
+              example: please add example
+              type: text
+        - name: command_counter_data
+          description: please add description
+          example: please add example
+          type: text
+        - name: improper_pipelining_data
+          description: please add description
+          example: please add example
+          type: text
+        - name: logs
+          description: please add description
+          example: please add example
+          type: text
+        - name: pix_workaround
+          description: please add description
+          example: please add example
+          type: text
+        - name: proxy
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: message
+              description: please add description
+              example: please add example
+              type: text
+            - name: result
+              description: please add description
+              example: please add example
+              type: text
+            - name: smtp_stage
+              description: please add description
+              example: please add example
+              type: text
+            - name: status_code
+              description: please add description
+              example: please add example
+              type: text
+            - name: status_code_enhanced
+              description: please add description
+              example: please add example
+              type: text
+        - name: relay_service
+          description: please add description
+          example: please add example
+          type: text
+        - name: smtp
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: lostconn_data
+              description: please add description
+              example: please add example
+              type: text
+            - name: lostconn_reason
+              description: please add description
+              example: please add example
+              type: text
+            - name: response
+              description: please add description
+              example: please add example
+              type: text
+        - name: smtpd
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: lostconn_data
+              description: please add description
+              example: please add example
+              type: text
+            - name: lostconn_reason
+              description: please add description
+              example: please add example
+              type: text
+        - name: tls
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: cipher
+              description: please add description
+              example: please add example
+              type: text
+            - name: cipher_size
+              description: please add description
+              example: please add example
+              type: text
+            - name: error
+              description: please add description
+              example: please add example
+              type: text
+            - name: version
+              description: please add description
+              example: please add example
+              type: text
+        - name: postsuper
+          description: please add description
+          example: please add example
+          type: group
+          fields:
+            - name: action
+              description: please add description
+              example: please add example
+              type: text
+            - name: summary_action
+              description: please add description
+              example: please add example
+              type: text
+            - name: summary_count
+              description: please add description
+              example: please add example
+              type: text
+        - name: delay_before_qmgr
+          description: please add description
+          example: please add example
+          type: float
+        - name: delay_in_qmgr
+          description: please add description
+          example: please add example
+          type: float
+        - name: delay_conn_setup
+          description: please add description
+          example: please add example
+          type: float
+        - name: delay_transmission
+          description: please add description
+          example: please add example
+          type: float

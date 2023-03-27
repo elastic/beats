@@ -1,0 +1,1 @@
+Mar 24 13:58:01 5mail-gw01 postfix/virtual[25469]: B657F2DB195D: to=<postmaster@example.com>, relay=virtual, delay=0.52, delays=0.51/0.01/0/0, dsn=2.0.0, status=sent (delivered to maildir)

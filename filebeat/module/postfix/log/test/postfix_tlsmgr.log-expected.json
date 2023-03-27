@@ -1,0 +1,16 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/tlsmgr[25469]: warning: request to update table btree:/var/spool/postfix/smtpd_scache in non-postfix directory /var/spool/postfix",
+        "postfix.message": "request to update table btree:/var/spool/postfix/smtpd_scache in non-postfix directory /var/spool/postfix",
+        "process.name": "postfix/tlsmgr",
+        "service.type": "postfix"
+    }
+]

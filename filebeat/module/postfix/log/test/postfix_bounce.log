@@ -1,0 +1,3 @@
+Mar 24 13:27:43 fbinfowlbzmr01 postfix/bounce[10884]: 17CCA8044: sender non-delivery notification: ADD2F8052
+Mar 24 13:27:43 fbinfowlbzmr01 postfix/bounce[10884]: 65AFB8B5: sender delivery status notification: 1DF35917
+Mar 24 13:27:43 fbinfowlbzmr01 postfix/bounce[10884]: 264FE1A18: sender delay notification: 0A87A1A08

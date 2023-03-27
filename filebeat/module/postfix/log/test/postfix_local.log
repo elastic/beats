@@ -1,0 +1,3 @@
+Mar 24 13:58:01 5mail-gw01 postfix/local[25469]: 2A22C263F6: to=user@hostname.example.com, orig_to=root@localhost, relay=local, delay=0.07, delays=0.04/0/0/0.03, dsn=2.0.0, status=sent (delivered to command: procmail -a "$EXTENSION")
+Mar 24 13:58:01 5mail-gw01 postfix/local[25469]: 892A0205B6: to=ghdsgfhdslfh@localhost, relay=local, delay=0.05, delays=0.02/0/0/0.02, dsn=5.1.1, status=bounced (unknown user: "ghdsgfhdslfh")
+Mar 24 13:58:01 5mail-gw01 postfix/local[25469]: warning: dict_nis_init: NIS domain name not set - NIS lookups disabled

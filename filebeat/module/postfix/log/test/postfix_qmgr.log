@@ -1,0 +1,5 @@
+Mar 24 13:58:01 5mail-gw01 postfix/qmgr[25469]: 0F5383D: removed
+Mar 24 13:58:01 5mail-gw01 postfix/qmgr[25469]: 0F5383D: from=<owner-postfix-users@postfix.org>, size=5360, nrcpt=1 (queue active)
+Mar 24 13:58:01 5mail-gw01 postfix/qmgr[25469]: warning: bounce_queue_lifetime is larger than maximal_queue_lifetime - adjusting bounce_queue_lifetime
+Mar 24 13:58:01 5mail-gw01 postfix/qmgr[25469]: 585BC3F: from=<>, status=expired, returned to sender
+Mar 24 13:58:01 5mail-gw01 postfix/qmgr[25469]: 66C15648577B: from=<uvnhbl@yahoo.com.tw>, status=expired, returned to sender

@@ -1,0 +1,2 @@
+Mar 24 13:58:01 5mail-gw01 postfix/error[25469]: 2DC5552A34: to=<user@yahoo.com>, relay=none, delay=63495, delays=63350/144/0/0, dsn=4.4.2, status=deferred (delivery temporarily suspended: lost connection with mta7.am0.yahoodns.net[98.136.216.22] while sending RCPT TO)
+Mar 24 13:58:01 5mail-gw01 postfix/error[25469]: 3E29030F8637E: to=<user@yahoo.com>, relay=none, delay=0.01, delays=0.01/0/0/0, dsn=5.1.1, status=undeliverable-but-not-cached (User unknown in virtual alias table)

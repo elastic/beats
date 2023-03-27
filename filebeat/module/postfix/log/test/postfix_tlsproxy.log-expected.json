@@ -1,0 +1,36 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/tlsproxy[25469]: DISCONNECT [82.118.17.142]:51637",
+        "process.name": "postfix/tlsproxy",
+        "related.ip": [
+            "82.118.17.142"
+        ],
+        "service.type": "postfix",
+        "source.ip": "82.118.17.142",
+        "source.port": "51637"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 85,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/tlsproxy[25469]: CONNECT from [82.118.17.142]:51637",
+        "process.name": "postfix/tlsproxy",
+        "related.ip": [
+            "82.118.17.142"
+        ],
+        "service.type": "postfix",
+        "source.ip": "82.118.17.142",
+        "source.port": "51637"
+    }
+]

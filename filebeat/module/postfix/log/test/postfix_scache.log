@@ -1,0 +1,4 @@
+Mar 24 13:58:01 5mail-gw01 postfix/scache[25469]: statistics: domain lookup hits=0 miss=1 success=0%
+Mar 24 13:58:01 5mail-gw01 postfix/scache[25469]: statistics: start interval Dec  6 21:20:35
+Mar 24 13:58:01 5mail-gw01 postfix/scache[25469]: statistics: address lookup hits=0 miss=1 success=0%
+Mar 24 13:58:01 5mail-gw01 postfix/scache[25469]: statistics: max simultaneous domains=1 addresses=1 connection=1

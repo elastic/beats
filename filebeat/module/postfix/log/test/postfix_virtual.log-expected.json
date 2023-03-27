@@ -1,0 +1,25 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/virtual[25469]: B657F2DB195D: to=<postmaster@example.com>, relay=virtual, delay=0.52, delays=0.51/0.01/0/0, dsn=2.0.0, status=sent (delivered to maildir)",
+        "postfix.delay_before_qmgr": "0.51",
+        "postfix.delay_conn_setup": "0",
+        "postfix.delay_in_qmgr": "0.01",
+        "postfix.delay_transmission": "0",
+        "postfix.queueid": "B657F2DB195D",
+        "postfix.relay_service": "virtual",
+        "postfix.smtp.response": "delivered to maildir",
+        "postfix.status": "sent",
+        "postfix.var.delay": "0.52",
+        "postfix.var.dsn": "2.0.0",
+        "postfix.var.to": "postmaster@example.com",
+        "process.name": "postfix/virtual",
+        "service.type": "postfix"
+    }
+]

@@ -73,6 +73,7 @@ grouped in the following categories:
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
 * <<exported-fields-pensando>>
+* <<exported-fields-postfix>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-proofpoint>>
@@ -113461,6 +113462,1188 @@ Timestamp of the log.
 
 
 type: date
+
+--
+
+[[exported-fields-postfix]]
+== postfix fields
+
+postfix Module
+
+
+
+[float]
+=== postfix
+
+
+
+
+*`postfix.full_message`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.message`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== anvil
+
+please add description
+
+
+*`postfix.anvil.conn_count`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.anvil.conn_rate`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.anvil.conn_period`*::
++
+--
+please add description
+
+type: keyword
+
+example: please add example
+
+--
+
+*`postfix.anvil.timestamp`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.anvil.cache_size`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+[float]
+=== bounce
+
+please add description
+
+
+*`postfix.bounce.queueid`*::
++
+--
+please add description
+
+type: keyword
+
+example: please add example
+
+--
+
+[float]
+=== cmd
+
+please add description
+
+
+*`postfix.cmd.auth`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.auth_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.count`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.count_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.data`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.data_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.ehlo`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.ehlo_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.helo`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.helo_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.mail`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.mail_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.quit`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.quit_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.rcpt`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.rcpt_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.rset`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.rset_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.starttls`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.starttls_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.unknown`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.cmd.unknown_accepted`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.service`*::
++
+--
+please add description
+
+type: keyword
+
+example: please add example
+
+--
+
+*`postfix.queueid`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== milter
+
+please add description
+
+
+*`postfix.milter.message`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.milter.data`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.milter.result`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== dnsbl
+
+please add description
+
+
+*`postfix.dnsbl.domain`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.dnsbl.result`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== prepend
+
+please add description
+
+
+*`postfix.prepend.type`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.prepend.trigger`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.prepend.value`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.error_response`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.status`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.message-id`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.config_path`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.termination_signal`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.version`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.pipe_response`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.status_data`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.status_message`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.status_code`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.status_code_enhanced`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== postscreen
+
+please add description
+
+
+*`postfix.postscreen.access`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.postscreen.toobusy_data`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.postscreen.violation`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.postscreen.violation_time`*::
++
+--
+please add description
+
+type: float
+
+example: please add example
+
+--
+
+*`postfix.postscreen.cache_dropped`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.postscreen.cache_retained`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.postscreen.dnsbl_rank`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.postscreen.data`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.smtp_stage`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.action`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== var
+
+please add description
+
+
+*`postfix.var.to`*::
++
+--
+email.to.address
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.var.delay`*::
++
+--
+please add description
+
+type: float
+
+example: please add example
+
+--
+
+*`postfix.var.sasl_method`*::
++
+--
+please add description
+
+type: keyword
+
+example: please add example
+
+--
+
+*`postfix.var.from`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.var.nrcpt`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.var.orig_to`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.var.dsn`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.var.helo`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.var.uid`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.var.size`*::
++
+--
+please add description
+
+type: integer
+
+example: please add example
+
+--
+
+*`postfix.var.proto`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.command_counter_data`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.improper_pipelining_data`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.logs`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.pix_workaround`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== proxy
+
+please add description
+
+
+*`postfix.proxy.message`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.proxy.result`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.proxy.smtp_stage`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.proxy.status_code`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.proxy.status_code_enhanced`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.relay_service`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== smtp
+
+please add description
+
+
+*`postfix.smtp.lostconn_data`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.smtp.lostconn_reason`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.smtp.response`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== smtpd
+
+please add description
+
+
+*`postfix.smtpd.lostconn_data`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.smtpd.lostconn_reason`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== tls
+
+please add description
+
+
+*`postfix.tls.cipher`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.tls.cipher_size`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.tls.error`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.tls.version`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+[float]
+=== postsuper
+
+please add description
+
+
+*`postfix.postsuper.action`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.postsuper.summary_action`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.postsuper.summary_count`*::
++
+--
+please add description
+
+type: text
+
+example: please add example
+
+--
+
+*`postfix.delay_before_qmgr`*::
++
+--
+please add description
+
+type: float
+
+example: please add example
+
+--
+
+*`postfix.delay_in_qmgr`*::
++
+--
+please add description
+
+type: float
+
+example: please add example
+
+--
+
+*`postfix.delay_conn_setup`*::
++
+--
+please add description
+
+type: float
+
+example: please add example
+
+--
+
+*`postfix.delay_transmission`*::
++
+--
+please add description
+
+type: float
+
+example: please add example
+
+--
+
+[float]
+=== log
+
+Please add description
+
+
+*`postfix.log.tags`*::
++
+--
+type: keyword
 
 --
 

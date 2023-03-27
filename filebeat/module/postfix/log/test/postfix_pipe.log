@@ -1,0 +1,4 @@
+Mar 24 13:58:01 5mail-gw01 postfix/pipe[25469]: 0F5383D: to=<tom@example.com>, relay=dovecot, delay=4.3, delays=4.1/0.01/0/0.15, dsn=2.0.0, status=sent (delivered via dovecot service)
+Mar 24 13:58:01 5mail-gw01 postfix/pipe[25469]: 153053D: to=<tom@example.com>, orig_to=<admin@example.com>, relay=dovecot, delay=3.4, delays=3.3/0.03/0/0.12, dsn=2.0.0, status=sent (delivered via dovecot service)
+Mar 24 13:58:01 5mail-gw01 postfix/pipe[25469]: 95ECE24E0: to=<tom@example.com>, relay=dovecot, delay=0.12, delays=0.03/0/0/0.08, dsn=5.4.6, status=bounced (mail forwarding loop for tom@example.com)
+Mar 24 13:58:01 5mail-gw01 postfix/pipe[25469]: 2F6C83D: to=<user@example.org>, relay=dovecot, delay=5.1, delays=4.4/0.02/0/0.61, dsn=5.1.1, status=bounced (user unknown)

@@ -1,0 +1,559 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: cache btree:/var/lib/postfix-in/postscreen_cache full cleanup: retained=242 dropped=7 entries",
+        "postfix.postscreen.cache_dropped": "7",
+        "postfix.postscreen.cache_retained": "242",
+        "process.name": "postfix/postscreen",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "destination.ip": "89.105.204.244",
+        "destination.port": "25",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 144,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: CONNECT from [61.238.241.86]:53024 to [89.105.204.244]:25",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "61.238.241.86",
+            "89.105.204.244"
+        ],
+        "service.type": "postfix",
+        "source.ip": "61.238.241.86",
+        "source.port": "53024"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 252,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: DISCONNECT [216.81.72.72]:43421",
+        "postfix.postscreen.access": "DISCONNECT",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "216.81.72.72"
+        ],
+        "service.type": "postfix",
+        "source.ip": "216.81.72.72",
+        "source.port": "43421"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 334,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS OLD [61.238.241.86]:53024",
+        "postfix.postscreen.access": "PASS OLD",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "61.238.241.86"
+        ],
+        "service.type": "postfix",
+        "source.ip": "61.238.241.86",
+        "source.port": "53024"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 415,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS OLD [2604:8d00:0:1::3]:52237",
+        "postfix.postscreen.access": "PASS OLD",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "2604:8d00:0:1::3"
+        ],
+        "service.type": "postfix",
+        "source.as.number": 237,
+        "source.as.organization.name": "Merit Network Inc.",
+        "source.ip": "2604:8d00:0:1::3",
+        "source.port": "52237"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 499,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS NEW [2607:f8b0:4003:c01::23a]:36051",
+        "postfix.postscreen.access": "PASS NEW",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "2607:f8b0:4003:c01::23a"
+        ],
+        "service.type": "postfix",
+        "source.as.number": 237,
+        "source.as.organization.name": "Merit Network Inc.",
+        "source.ip": "2607:f8b0:4003:c01::23a",
+        "source.port": "36051"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 590,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: WHITELISTED [61.238.241.86]:53024",
+        "postfix.postscreen.access": "WHITELISTED",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "61.238.241.86"
+        ],
+        "service.type": "postfix",
+        "source.ip": "61.238.241.86",
+        "source.port": "53024"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 674,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: BLACKLISTED [61.238.241.86]:53024",
+        "postfix.postscreen.access": "BLACKLISTED",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "61.238.241.86"
+        ],
+        "service.type": "postfix",
+        "source.ip": "61.238.241.86",
+        "source.port": "53024"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 758,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: WHITELIST VETO [61.238.241.86]:53024",
+        "postfix.postscreen.access": "WHITELIST VETO",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "61.238.241.86"
+        ],
+        "service.type": "postfix",
+        "source.ip": "61.238.241.86",
+        "source.port": "53024"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 845,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PREGREET 6 after 1.2 from [216.81.72.72]:43421: RSET\\r\\n",
+        "postfix.postscreen.data": "RSET\\r\\n",
+        "postfix.postscreen.violation": "PREGREET",
+        "postfix.postscreen.violation_time": "1.2",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "216.81.72.72"
+        ],
+        "service.type": "postfix",
+        "source.ip": "216.81.72.72",
+        "source.port": "43421"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 952,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: DNSBL rank 3 for [111.73.45.149]:1038",
+        "postfix.postscreen.dnsbl_rank": "3",
+        "postfix.postscreen.violation": "DNSBL",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "111.73.45.149"
+        ],
+        "service.type": "postfix",
+        "source.ip": "111.73.45.149",
+        "source.port": "1038"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1040,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: HANGUP after 63 from [111.73.45.149]:1038 in tests after SMTP handshake",
+        "postfix.postscreen.violation": "HANGUP",
+        "postfix.postscreen.violation_time": "63",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "111.73.45.149"
+        ],
+        "service.type": "postfix",
+        "source.ip": "111.73.45.149",
+        "source.port": "1038"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1162,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: HANGUP after 0 from [66.55.85.58]:54017 in tests before SMTP handshake",
+        "postfix.postscreen.violation": "HANGUP",
+        "postfix.postscreen.violation_time": "0",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "66.55.85.58"
+        ],
+        "service.type": "postfix",
+        "source.ip": "66.55.85.58",
+        "source.port": "54017"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1283,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after CONNECT",
+        "postfix.postscreen.violation": "COMMAND TIME LIMIT",
+        "postfix.smtp_stage": "CONNECT",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.246.250.243"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.246.250.243",
+        "source.port": "51799"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1395,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after HELO",
+        "postfix.postscreen.violation": "COMMAND TIME LIMIT",
+        "postfix.smtp_stage": "HELO",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.246.250.243"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.246.250.243",
+        "source.port": "51799"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1504,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after EHLO",
+        "postfix.postscreen.violation": "COMMAND TIME LIMIT",
+        "postfix.smtp_stage": "EHLO",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.246.250.243"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.246.250.243",
+        "source.port": "51799"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1613,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after AUTH",
+        "postfix.postscreen.violation": "COMMAND TIME LIMIT",
+        "postfix.smtp_stage": "AUTH",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.246.250.243"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.246.250.243",
+        "source.port": "51799"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1722,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51799 after MAIL",
+        "postfix.postscreen.violation": "COMMAND TIME LIMIT",
+        "postfix.smtp_stage": "MAIL",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.246.250.243"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.246.250.243",
+        "source.port": "51799"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1831,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND TIME LIMIT from [182.246.250.243]:51796 after RCPT",
+        "postfix.postscreen.violation": "COMMAND TIME LIMIT",
+        "postfix.smtp_stage": "RCPT",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.246.250.243"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.246.250.243",
+        "source.port": "51796"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1940,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND COUNT LIMIT from [182.246.250.243]:51796 after RCPT",
+        "postfix.postscreen.violation": "COMMAND COUNT LIMIT",
+        "postfix.smtp_stage": "RCPT",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.246.250.243"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.246.250.243",
+        "source.port": "51796"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2050,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND LENGTH LIMIT from [182.246.250.243]:51796 after RCPT",
+        "postfix.postscreen.violation": "COMMAND LENGTH LIMIT",
+        "postfix.smtp_stage": "RCPT",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.246.250.243"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.246.250.243",
+        "source.port": "51796"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2161,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NON-SMTP COMMAND from [93.174.93.51]:45284 after CONNECT: GET http://ipv4scan.com/hello/check.txt HTTP/1.1",
+        "postfix.postscreen.data": "GET http://ipv4scan.com/hello/check.txt HTTP/1.1",
+        "postfix.postscreen.violation": "NON-SMTP COMMAND",
+        "postfix.smtp_stage": "CONNECT",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "93.174.93.51"
+        ],
+        "service.type": "postfix",
+        "source.ip": "93.174.93.51",
+        "source.port": "45284"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2318,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: CONNECT from [1.2.3.4]:1337: too many connections",
+        "postfix.postscreen.toobusy_data": "too many connections",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "1.2.3.4"
+        ],
+        "service.type": "postfix",
+        "source.ip": "1.2.3.4",
+        "source.port": "1337"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2435,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: CONNECT from [5.6.7.8]:1337: all server ports busy",
+        "postfix.postscreen.toobusy_data": "all server ports busy",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "5.6.7.8"
+        ],
+        "service.type": "postfix",
+        "source.ip": "5.6.7.8",
+        "source.port": "1337"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2553,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: COMMAND PIPELINING from [88.208.233.4]:42606 after .: \\n",
+        "postfix.postscreen.data": "\\n",
+        "postfix.postscreen.violation": "COMMAND PIPELINING",
+        "postfix.smtp_stage": ".",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "88.208.233.4"
+        ],
+        "service.type": "postfix",
+        "source.ip": "88.208.233.4",
+        "source.port": "42606"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2660,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: BARE NEWLINE from [88.208.233.4]:42606 after .",
+        "postfix.postscreen.violation": "BARE NEWLINE",
+        "postfix.smtp_stage": ".",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "88.208.233.4"
+        ],
+        "service.type": "postfix",
+        "source.ip": "88.208.233.4",
+        "source.port": "42606"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2757,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: RCPT from [182.98.255.184]:2413: 550 5.5.1 Protocol error; from=<lvtowxfdp@yahoo.com>, to=<tom@example.com>, proto=SMTP, helo=<mx32.usaindiamunish.net>",
+        "postfix.action": "reject",
+        "postfix.queueid": "NOQUEUE",
+        "postfix.smtp_stage": "RCPT",
+        "postfix.status_code": "550",
+        "postfix.status_code_enhanced": "5.5.1",
+        "postfix.status_message": "Protocol error",
+        "postfix.var.from": "lvtowxfdp@yahoo.com",
+        "postfix.var.helo": "mx32.usaindiamunish.net",
+        "postfix.var.proto": "SMTP",
+        "postfix.var.to": "tom@example.com",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "182.98.255.184"
+        ],
+        "service.type": "postfix",
+        "source.ip": "182.98.255.184",
+        "source.port": "2413"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 2976,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: RCPT from [27.157.200.233]:4984: 550 5.7.1 Service unavailable; client [27.157.200.233] blocked using zen.spamhaus.org; from=<hcdvbnm@qhhn.com>, to=<4ECEA00F.9040306@example.com>, proto=ESMTP, helo=<qhhn.com>",
+        "postfix.action": "reject",
+        "postfix.queueid": "NOQUEUE",
+        "postfix.smtp_stage": "RCPT",
+        "postfix.status_code": "550",
+        "postfix.status_code_enhanced": "5.7.1",
+        "postfix.status_data": "27.157.200.233",
+        "postfix.status_message": "blocked using zen.spamhaus.org",
+        "postfix.var.from": "hcdvbnm@qhhn.com",
+        "postfix.var.helo": "qhhn.com",
+        "postfix.var.proto": "ESMTP",
+        "postfix.var.to": "4ECEA00F.9040306@example.com",
+        "process.name": "postfix/postscreen",
+        "related.ip": [
+            "27.157.200.233"
+        ],
+        "service.type": "postfix",
+        "source.ip": "27.157.200.233",
+        "source.port": "4984"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 3252,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: warning: getpeername: Transport endpoint is not connected -- dropping this connection",
+        "postfix.message": "getpeername: Transport endpoint is not connected -- dropping this connection",
+        "process.name": "postfix/postscreen",
+        "service.type": "postfix"
+    }
+]

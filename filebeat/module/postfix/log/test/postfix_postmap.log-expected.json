@@ -1,0 +1,16 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postmap[9891]: warning: /etc/postfix/conf.d/users.db: duplicate entry: \\\"xxx@yyy.com\\\"",
+        "postfix.message": "/etc/postfix/conf.d/users.db: duplicate entry: \\\"xxx@yyy.com\\\"",
+        "process.name": "postfix/postmap",
+        "service.type": "postfix"
+    }
+]

@@ -1,0 +1,54 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 anymr01 postfix/dnsblog[9891]: addr 61.238.241.86 listed by domain psbl.surriel.com as 127.0.0.2",
+        "postfix.dnsbl.domain": "psbl.surriel.com",
+        "postfix.dnsbl.result": "127.0.0.2",
+        "process.name": "postfix/dnsblog",
+        "related.ip": [
+            "61.238.241.86"
+        ],
+        "service.type": "postfix",
+        "source.ip": "61.238.241.86"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 113,
+        "message": "Mar 24 13:58:01 anymr01 postfix/dnsblog[9891]: addr 2607:f8b0:4003:c01::23a listed by domain list.dnswl.org as 127.0.5.1",
+        "postfix.dnsbl.domain": "list.dnswl.org",
+        "postfix.dnsbl.result": "127.0.5.1",
+        "process.name": "postfix/dnsblog",
+        "related.ip": [
+            "2607:f8b0:4003:c01::23a"
+        ],
+        "service.type": "postfix",
+        "source.as.number": 237,
+        "source.as.organization.name": "Merit Network Inc.",
+        "source.ip": "2607:f8b0:4003:c01::23a"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 234,
+        "message": "Mar 24 13:58:01 anymr01 postfix/dnsblog[9891]: warning: dnsblog_query: lookup error for DNS query 198.204.82.110.list.dnswl.org: Host or domain name not found. Name service error for name=198.204.82.110.list.dnswl.org type=A: Host not found, try again",
+        "postfix.message": "dnsblog_query: lookup error for DNS query 198.204.82.110.list.dnswl.org: Host or domain name not found. Name service error for name=198.204.82.110.list.dnswl.org type=A: Host not found, try again",
+        "process.name": "postfix/dnsblog",
+        "service.type": "postfix"
+    }
+]

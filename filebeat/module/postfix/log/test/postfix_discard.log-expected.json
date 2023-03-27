@@ -1,0 +1,24 @@
+[
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/discard[25469]: 25F2E5E061: to=<george.desantis@test.example.com>, relay=none, delay=0.05, delays=0.05/0/0/0, dsn=2.0.0, status=sent (test.example.com)",
+        "postfix.delay_before_qmgr": "0.05",
+        "postfix.delay_conn_setup": "0",
+        "postfix.delay_in_qmgr": "0",
+        "postfix.delay_transmission": "0",
+        "postfix.queueid": "25F2E5E061",
+        "postfix.relay_service": "none",
+        "postfix.status": "sent",
+        "postfix.var.delay": "0.05",
+        "postfix.var.dsn": "2.0.0",
+        "postfix.var.to": "george.desantis@test.example.com",
+        "process.name": "postfix/discard",
+        "service.type": "postfix"
+    }
+]

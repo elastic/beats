@@ -1,0 +1,1 @@
+Mar 24 13:58:01 5mail-gw01 postfix/lmtp[25469]: 7EE668039: to=<admin@example.com>, relay=127.0.0.1[127.0.0.1]:2525, delay=3.6, delays=0.2/0.02/0.04/3.3, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 153053D)

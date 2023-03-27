@@ -1,0 +1,7 @@
+- name: log
+  description: Please add description
+  example: Please add example
+  type: group
+  fields:
+  - name: tags
+    type: keyword
