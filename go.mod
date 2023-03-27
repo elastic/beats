@@ -152,7 +152,7 @@ require (
 	go.elastic.co/go-licence-detector v0.6.0
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.10.0
-	go.uber.org/multierr v1.9.0
+	go.uber.org/multierr v1.10.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
@@ -195,7 +195,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.5.0
 	github.com/elastic/elastic-agent-libs v0.3.3
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.4.6-0.20230308003052-ba171438211e
+	github.com/elastic/elastic-agent-system-metrics v0.5.0
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
